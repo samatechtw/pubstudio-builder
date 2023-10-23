@@ -1,0 +1,190 @@
+name: PR Merge (main)
+
+on:
+  push:
+    branches: [main]
+
+env:
+  WORKSPACE_ROOT: .
+  ENVIRONMENT: stg
+  CACHE_SUFFIX: c # cache busting
+
+# Cancel redundant workflow runs
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pre_job:
+    name: Run Workflow?
+    runs-on: ubuntu-22.04
+    outputs:
+      should_skip: ${{ steps.skip_check.outputs.should_skip }}
+    steps:
+      - id: skip_check
+        uses: fkirc/skip-duplicate-actions@master
+        with:
+          concurrent_skipping: 'never'
+          skip_after_successful_duplicate: 'true'
+          # Changes to paths must be synced with pr-merge*.yml
+          paths: '[".github/workflows/pr-commit.yml", "apps/**", "backend/**", "libs/**", "*"]'
+          paths_ignore: '["**/README.md", "skaffold*.yaml"]'
+
+  repo-metadata:
+    name: Get repo metadata
+    runs-on: ubuntu-latest
+    outputs:
+      next_version: ${{ steps.meta.outputs.next_version }}
+      sha8: ${{ steps.meta.outputs.sha8 }}
+      repo_slug: ${{ steps.meta.outputs.repo_slug }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - id: meta
+        uses: ./.github/actions/repo-metadata
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+  build-apps:
+    needs: pre_job
+    if: ${{ needs.pre_job.outputs.should_skip != 'true' }}
+    name: Build Apps
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout code into workspace directory
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/env-setup
+      - name: Build apps
+        run: npx nx run-many -t build --projects="web*" --parallel=3
+      - name: Upload web-site bundle
+        uses: actions/upload-artifact@v3
+        with:
+          name: web-site-bundle
+          path: |
+            ./dist/apps/web-site/index.html
+          if-no-files-found: error
+          retention-days: 1
+
+  build-backend:
+    needs: pre_job
+    if: ${{ needs.pre_job.outputs.should_skip != 'true' }}
+    name: Build Backend
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout code into workspace directory
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - run: |
+          rustup set auto-self-update disable
+          rustup toolchain install 1.72.0 --profile minimal
+      - name: Cache build
+        uses: Swatinem/rust-cache@v2
+        with:
+          key: pr-x86_64-${{ env.CACHE_SUFFIX }}
+          workspaces: backend
+      - name: Build app in release mode
+        run: cd backend && cargo build --release
+      - name: Upload binaries
+        uses: actions/upload-artifact@v3
+        with:
+          name: backend-binaries
+          path: |
+            ./backend/target/release/site-api
+          if-no-files-found: error
+          retention-days: 1
+
+  build-docker-site-api-stg:
+    needs: [pre_job, build-backend, repo-metadata]
+    if: ${{ needs.pre_job.outputs.should_skip != 'true' }}
+    name: Site API Production Image
+    runs-on: ubuntu-22.04
+    env:
+      APP_NAME: site-api
+      BRANCH_NAME: main
+    steps:
+      - name: Checkout code into workspace directory
+        uses: actions/checkout@v3
+      - name: Download binary
+        uses: actions/download-artifact@v3
+        with:
+          name: backend-binaries
+          path: ./backend/target/release/${{env.APP_NAME}}
+      - name: Download web-site bundle
+        uses: actions/download-artifact@v3
+        with:
+          name: web-site-bundle
+          path: ./dist/apps/web-site/index.html
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{github.actor}}
+          password: ${{secrets.GITHUB_TOKEN}}
+      - name: Build and push prod docker image
+        id: docker_build
+        uses: docker/build-push-action@v4
+        with:
+          context: ${{env.WORKSPACE_ROOT}}
+          # Include non-secret args so we don't need them in the site-api server env
+          # Except SITE_API_HOST, which is unique to each server
+          build-args: |
+            "EXEC_ENV=stg"
+            "DATABASE_URL=sqlite:site-api/db/metadata/sites_metadata.db"
+            "SITE_API_PORT=3100"
+            "SITE_API_HOST=0.0.0.0"
+            "SITE_ADMIN_PUBLIC_KEY=LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUlJQ0lqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FnOEFNSUlDQ2dLQ0FnRUF4WUdaVEVrbVltZXpCVGxNWlF1cwp4MU5uMHY1MGZRdVIySUZsaE1uelcybjkveEhDc3Btb29BT0MyTklVRGNyVEV5clZ6WVNvZ1dzU1lDTWNGM1A5CjRFTkR3ZjhtWFZYS3dST0Jwa2ZFNDJCTHFPdElzVFc0RkxjeWtPUXBrOS91K1hNOENrT1Ywa2xRSlRqZndCT24KWnlFZ2JVT2NmTHBGNXVDMDBBWURlOUxwWW52WjZ3RWZhckZIcmY0cHhhNTQ3aXZqZ3poSlhCVy9aSWFNTmNyawoyU1Z6UzE0a0ZVOEtGckNQTytIT2J0ek1HQllIbWwwL3RldFl2L0RLcDdVM0pLRlJSODhpY1JwMjhhWWNCemlJCnNMN00xb1haWjlIRDZpZ0ppajlsdXdPM01mMkZ4REh0L2huL0U1TnNjdkpTMXZ3dGNIM3YyQUFLajg5UlljUUMKWllyaDNnSlgyQkJOUis0S1hlRE9QTm94RDFYWEY2cFVQSVZ3VzVlZWEzQUNQZmRyVitQRnluL2t0RGl0M28rMQpKQThGcG9xeGZpdS9yRXh0YUFKQTlxZTUvSWxBYUxQRmRUVklQU050L1VraGRibDlsaGY1VW9FMGFuU3FISGIvCmxqelc2YVl3ekZTT1dIRzJSNk5YN1EyTWY5ZjFtUXdicG9ZNTg0YjFqM1JRT1lGSVhVeENEOTlEVTlMcmtMdlEKa1YrR2dMMTFtOWxYTWMxOHFDb3hkREdJVnNlbkFCMVJlR1ZYQUFJTEU5Qy9JeWNiZlFVRnBCVE1Sb05aOUhEVgovSzhxRjJSSlZGb1gzdnpKcDhPUWk1NTU2Tjd3dnJlYVVlVS9lTzJBdzFyWEZQekgrRmNuejNnLzlDbCtDdnVkCm1WY1VZYWVmOC90T2FrNm4zRTVuakZNQ0F3RUFBUT09Ci0tLS0tRU5EIFBVQkxJQyBLRVktLS0tLQo="
+            "S3_URL=https://5c1306ea6e8d53469625b2c687ab7190.r2.cloudflarestorage.com"
+            "S3_ACCESS_KEY_ID=2f0c694897771fb4c2650fba24fc483e"
+            "S3_SECRET_ACCESS_KEY=${{ secrets.S3_SECRET_ACCESS_KEY_STG }}"
+            "SLACK_WEBHOOK_INFO_URL=${{ secrets.SITE_API_SLACK_WEBHOOK_URL_STG }}"
+            "SLACK_WEBHOOK_ERROR_URL=${{ secrets.SITE_API_SLACK_WEBHOOK_URL_STG }}"
+            "LAST_COMMIT_SHA=${{needs.repo-metadata.outputs.sha8}}"
+            "RELEASE_VERSION=${{needs.repo-metadata.outputs.next_version}}"
+          push: true
+          file: ${{env.WORKSPACE_ROOT}}/backend/${{env.APP_NAME}}/Dockerfile
+          target: prod
+          tags: |
+            ${{needs.repo-metadata.outputs.repo_slug}}/${{env.ENVIRONMENT}}/${{env.APP_NAME}}:${{env.BRANCH_NAME}}-${{needs.repo-metadata.outputs.sha8}}-${{github.run_number}}
+            ${{needs.repo-metadata.outputs.repo_slug}}/${{env.ENVIRONMENT}}/${{env.APP_NAME}}:latest
+
+  build-docker-builder-demo-stg:
+    needs: [pre_job, repo-metadata]
+    if: ${{ needs.pre_job.outputs.should_skip != 'true' }}
+    name: Web Staging Image
+    runs-on: ubuntu-22.04
+    env:
+      APP_NAME: builder-demo
+      BRANCH_NAME: main
+    steps:
+      - name: Checkout code into workspace directory
+        uses: actions/checkout@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{github.actor}}
+          password: ${{secrets.GITHUB_TOKEN}}
+      - name: Build and push staging docker image
+        id: docker_build
+        uses: docker/build-push-action@v4
+        with:
+          context: ${{env.WORKSPACE_ROOT}}
+          build-args: |
+            "LAST_COMMIT_SHA=${{needs.repo-metadata.outputs.sha8}}"
+            "RELEASE_VERSION=${{needs.repo-metadata.outputs.next_version}}"
+          push: true
+          file: ${{env.WORKSPACE_ROOT}}/apps/${{env.APP_NAME}}/Dockerfile
+          target: stg
+          tags: |
+            ${{needs.repo-metadata.outputs.repo_slug}}/${{env.ENVIRONMENT}}/${{env.APP_NAME}}:${{env.BRANCH_NAME}}-${{needs.repo-metadata.outputs.sha8}}-${{github.run_number}}
+            ${{needs.repo-metadata.outputs.repo_slug}}/${{env.ENVIRONMENT}}/${{env.APP_NAME}}:latest

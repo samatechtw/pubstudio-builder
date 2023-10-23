@@ -1,0 +1,24 @@
+{
+  "name": "frontend-feature-builtin",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/frontend/feature-builtin/src",
+  "projectType": "library",
+  "targets": {
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/frontend/feature-builtin/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/libs/frontend/feature-builtin"],
+      "options": {
+        "jestConfig": "libs/frontend/feature-builtin/jest.config.ts",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": ["scope:frontend", "type:feature"]
+}

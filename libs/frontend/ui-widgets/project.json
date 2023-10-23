@@ -1,0 +1,17 @@
+{
+  "name": "frontend-ui-widgets",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/frontend/ui-widgets/src",
+  "projectType": "library",
+  "targets": {
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/frontend/ui-widgets/**/*.ts"],
+        "eslintConfig": "libs/frontend/ui-widgets/.eslintrc.js"
+      }
+    }
+  },
+  "tags": ["scope:frontend", "type:ui"]
+}

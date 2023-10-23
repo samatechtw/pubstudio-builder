@@ -1,0 +1,35 @@
+target/
+build/
+dist/
+tmp/
+out-tsc/
+node_modules/
+
+package-lock.json
+pnpm-lock.yaml
+.nyc_output
+*.zip
+
+.DS_Store
+
+log
+*~
+*.sqlite3
+*-shm
+*-wal
+*.db
+
+!.env
+.env.stage
+.env.prod
+
+# IDE
+.vscode/
+.idea/
+
+*lang.postcss.json
+
+# Local Netlify folder
+.netlify
+
+node_modules/

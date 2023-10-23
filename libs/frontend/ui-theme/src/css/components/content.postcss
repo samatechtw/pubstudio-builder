@@ -1,0 +1,44 @@
+@import '@theme/css/typography.postcss';
+@import '@theme/css/breakpoints.postcss';
+
+.content-title {
+  @mixin title 32px;
+  margin-bottom: 16px;
+  color: $color-text;
+}
+.content-title-wrap {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+  .back-button {
+    margin: 0 16px 0 0;
+    align-self: center;
+  }
+  .content-title {
+    margin-bottom: 0;
+  }
+}
+
+.container {
+  @mixin container;
+}
+
+h1 {
+  @mixin h1;
+}
+
+h2 {
+  @mixin h2;
+}
+
+h3 {
+  @mixin h3;
+}
+
+h4 {
+  @mixin h4;
+}
+
+h5 {
+  @mixin h5;
+}

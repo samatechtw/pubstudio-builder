@@ -1,0 +1,15 @@
+{
+  "name": "data-access-state",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/frontend/data-access-state/src",
+  "projectType": "library",
+  "targets": {
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "options": {
+        "lintFilePatterns": ["libs/frontend/data-access-state/**/*.ts"]
+      }
+    }
+  },
+  "tags": ["scope:frontend", "type:data-access"]
+}

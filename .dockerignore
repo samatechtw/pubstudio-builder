@@ -1,0 +1,21 @@
+# Ignore all by default
+*
+
+# Except these
+!apps/
+!libs/
+!backend/
+!dist/apps/web-site/
+!**/tsconfig*.json
+!subset.config.js
+!package*.json
+!pnpm-lock.yaml
+!.npmrc
+!nx.json
+!tools/scripts/package-subset.js
+!tools/scripts/package-subset-module.js
+!tools/nginx
+!tools/prebuilds
+!tools/test/backup_test_dev_ci.db
+
+*.db*

@@ -1,0 +1,40 @@
+@import '@theme/css/mixins.postcss';
+
+@define-mixin auth-page {
+  .auth-wrap {
+    @mixin flex-col;
+    padding: 72px 24px 80px;
+    align-items: center;
+    max-width: 400px;
+    width: 400px;
+    min-height: 600px;
+    margin: 0 auto;
+    color: black;
+    > * {
+      width: 100%;
+    }
+    form > * {
+      width: 100%;
+    }
+  }
+
+  .auth-title {
+    @mixin title 40px;
+    text-align: center;
+  }
+  .auth-subtitle {
+    @mixin title-medium 18px;
+    text-align: center;
+    max-width: 300px;
+    margin-top: 16px;
+  }
+  .email-input {
+    margin-top: 24px;
+  }
+  .password-input {
+    margin-top: 16px;
+  }
+  .submit-button {
+    margin-top: 32px;
+  }
+}

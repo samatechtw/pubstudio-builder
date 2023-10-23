@@ -1,0 +1,48 @@
+<template>
+  <PSMultiselect
+    ref="multiselectRef"
+    :value="newVal"
+    class="style-property"
+    :placeholder="t('property')"
+    :options="CssValues"
+    :searchable="true"
+    :caret="false"
+    :clearable="false"
+    @select="emit('update:modelValue', $event)"
+    @click.stop
+  />
+</template>
+
+<script lang="ts" setup>
+import { onMounted, ref, toRefs, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { PSMultiselect } from '@pubstudio/frontend/ui-widgets'
+import { Css, CssValues } from '@pubstudio/shared/type-site'
+
+const { t } = useI18n()
+
+const props = defineProps<{
+  modelValue: Css
+}>()
+
+const { modelValue } = toRefs(props)
+
+watch(modelValue, (val) => {
+  newVal.value = val
+})
+
+const emit = defineEmits<{
+  (e: 'update:modelValue', value: Css): void
+}>()
+
+const newVal = ref(Css.Empty)
+const multiselectRef = ref(null)
+
+defineExpose({ multiselectRef })
+
+onMounted(() => {
+  newVal.value = modelValue.value
+})
+</script>
+
+<style lang="postcss" scoped></style>

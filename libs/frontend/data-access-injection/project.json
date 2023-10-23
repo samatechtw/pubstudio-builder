@@ -1,0 +1,23 @@
+{
+  "name": "frontend-data-access-injection",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/frontend/data-access-injection/src",
+  "projectType": "library",
+  "targets": {
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "options": {
+        "lintFilePatterns": ["libs/frontend/data-access-injection/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/libs/frontend/data-access-injection"],
+      "options": {
+        "jestConfig": "libs/frontend/data-access-injection/jest.config.ts",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": ["scope:frontend", "type:data-access"]
+}

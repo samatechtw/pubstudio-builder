@@ -1,0 +1,16 @@
+export enum Keys {
+  Escape = 'Escape',
+  ArrowUp = 'ArrowUp',
+  ArrowDown = 'ArrowDown',
+  ArrowLeft = 'ArrowLeft',
+  ArrowRight = 'ArrowRight',
+  Enter = 'Enter',
+  Delete = 'Backspace',
+  LowerC = 'c',
+  UpperC = 'C',
+  LowerD = 'd',
+  UpperD = 'D',
+  LowerV = 'v',
+  UpperV = 'V',
+  Z = 'z',
+}

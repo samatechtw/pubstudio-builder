@@ -1,0 +1,84 @@
+# Pubstudio Site API
+
+The Site API is written in Rust, and is not managed by Nx. Use the instructions below to install and run.
+
+## Prerequisites
+
+**Install Rust**
+
+```bash
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+```
+
+**SQLx CLI**
+
+```bash
+cargo install sqlx-cli --features sqlite
+```
+
+**Migrations**
+
+```bash
+# Create metadata db and run migrations
+sqlx db create
+sqlx migrate --source db/metadata/migrations run
+```
+
+## Run
+
+```bash
+# Debug mode
+cargo run
+
+# Release mode
+cargo run --release
+```
+
+## Build
+
+```bash
+cargo build --release
+```
+
+**Docker**
+
+```bash
+docker build -t site-api -f backend/site-api/Dockerfile --target=dev  .
+
+docker run -p 3100:3100 \
+  -e EXEC_ENV='ci' \
+  -e DATABASE_URL='sqlite:site-api/db/metadata/sites_metadata.db' \
+  -e SITE_API_HOST='0.0.0.0' \
+  -e SITE_API_PORT='3100' \
+  -e S3_URL='https://da7c8f85bc450afcae564b1d7ae16d4e.r2.cloudflarestorage.com' \
+  -e S3_ACCESS_KEY_ID='866e86eed58870d56aa4312f894a73cc' \
+  -e S3_SECRET_ACCESS_KEY='dev' \
+  -e SITE_ADMIN_PUBLIC_KEY='LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUlJQ0lqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FnOEFNSUlDQ2dLQ0FnRUF6Mis4bklTVmpubmFqNXlCVkRObgo4amhRVVFOeUlLYTUyUEIraG5DSWVCYVFaaHJVVkRWRXJESWU0MEx5ekF1WmRwaWNUY0RUSTRwTjE5RFZtQjcyClNpMXlDYldpTHp5azduUkMrVlVUNllvbXE1YWlCRG8rMDZ2dUVpbmZmTmhlODMwY0RCRGd1OC9XcWliTi92M2kKeDdiNkhkWGczSHNNSFRHRjVFM3dEU005ZTdzTzVJWCt0eTFsV3lRb1EydmZ6SDRxbkZJVmM2Z3lCRkE1Wmk0cwptSnQ2bkFsTnZrVHNYYzdhb3ZRYlArY1VrM2dmWFgyZjU2U0RrVDBMM3VLUDdiTDNaWERiRGNzTm5zbGxwR1F5Cms4Q3JwK0ZLZzgzUjV2bzg0Z3hFVCtROVA3amtEVS9XZUFPZmxNZm1idnc4aUNrRFQ0TnI3RGM2d2FWanZ2V3AKYUJsOEFzaEhHbURjZURLZ2NPRFk4WWVGREZGMENzbEtSTWFya20velU0ZjZrQ0Vza3hNRy9ZUE9ucXpoL1B6bAphUlJHekpDakFWZDU1ejJYdHZWUTROUnB3eGtLMk1NQlNYS1BuQ3Fnd3JsUWlPazBYeVhjVHhKcmZBc2hldDV0Cm9selZKdklkU3RieG02dUlBUmI4cUlVZG1HVVRLdEVaV3BTUzdBVitneUVZQ1pJVER2amNlZUs5bmFjaTF3Y04KM1hvV3RzZDZPMzJxc1BRcjc0dzU2R2xvbC96OFVhZjM5Z2hNUjFiajdYa0FST0E0NzNyWlcwMVJQcFdrQjZ4KwpTeUFqRms1YTc2aCtsRjlKWVhOR3p3TFk5dytlVUZNRjB5MEVOOGNWNFhVOXRod1ZweU1EZHpwVjlxeVJ2SC9SClN2dURKVFBzbUF4WnBNUSs5cFJId3FjQ0F3RUFBUT09Ci0tLS0tRU5EIFBVQkxJQyBLRVktLS0tLQ==' \
+  site-api
+```
+
+## Usage
+
+Runs on port 3100 by default.
+
+A [requests.http](./requests.http) file is provided that makes it easy to test the API. Install the VSCode extension "REST Client" to send the requests.
+
+```bash
+# Create
+curl 'http://localhost:3100/api/sites' \
+  -H 'content-type: application/json' \
+  --data-raw '{"name":"Test Site","data":"{\\\"some\\\":\\\"stringified_json\\\"}"}'
+
+# Get
+curl 'http://localhost:3100/api/sites/1'
+
+# List
+curl 'http://localhost:3100/api/sites'
+
+# Update
+curl 'http://localhost:3100/api/sites/1' \
+  -H 'content-type: application/json' \
+  -X PATCH \
+  --data-raw '{"name":"New Name", "data":"{\"some\":\"new_data\"}"}'
+
+```

@@ -1,0 +1,84 @@
+import { ISetPageHeadData } from '@pubstudio/shared/type-command-data'
+import {
+  IHeadObject,
+  IHeadTag,
+  IPageHead,
+  IPageHeadObject,
+  ISite,
+} from '@pubstudio/shared/type-site'
+
+const removeHeadField = (site: ISite, route: string, tag: IHeadTag, index: number) => {
+  // TODO -- find a better way to handle these types
+  const page = site.pages[route]
+  if (page) {
+    const head = page.head[tag as keyof IPageHead] as IPageHeadObject[]
+    if (head) {
+      head.splice(index, 1)
+    }
+    if (head.length === 0) {
+      page.head[tag as keyof IPageHead] = undefined
+    }
+  }
+}
+
+const setHeadField = (
+  site: ISite,
+  route: string,
+  tag: IHeadTag,
+  index: number,
+  newValue: IHeadObject,
+) => {
+  const page = site.pages[route]
+  if (page) {
+    ;(page.head[tag as keyof IPageHead] as IPageHeadObject[])[index] = newValue
+  }
+}
+
+const addHeadField = (
+  site: ISite,
+  route: string,
+  tag: IHeadTag,
+  index: number,
+  newValue: IHeadObject,
+) => {
+  const page = site.pages[route]
+  if (page) {
+    const head = page.head[tag as keyof IPageHead] as IPageHeadObject[]
+    if (head) {
+      head.splice(index, 0, newValue)
+    } else {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      page.head[tag as keyof IPageHead] = [newValue] as any
+    }
+  }
+}
+
+const setEvents = (
+  site: ISite,
+  route: string,
+  tag: IHeadTag,
+  index: number,
+  oldValue: IHeadObject | undefined,
+  newValue: IHeadObject | undefined,
+) => {
+  // Remove
+  if (oldValue && !newValue) {
+    removeHeadField(site, route, tag, index)
+  } else if (oldValue && newValue) {
+    setHeadField(site, route, tag, index, newValue)
+  } else if (!oldValue && newValue) {
+    addHeadField(site, route, tag, index, newValue)
+  } else {
+    console.error('set-page-head no val', oldValue, newValue)
+  }
+}
+
+export const applySetPageHead = (site: ISite, data: ISetPageHeadData) => {
+  const { route, tag, index, oldValue, newValue } = data
+  setEvents(site, route, tag, index, oldValue, newValue)
+}
+
+export const undoSetPageHead = (site: ISite, data: ISetPageHeadData) => {
+  const { route, tag, index, oldValue, newValue } = data
+  setEvents(site, route, tag, index, newValue, oldValue)
+}

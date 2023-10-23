@@ -1,0 +1,25 @@
+{
+  "name": "frontend-feature-site-assets",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/frontend/feature-site-assets/src",
+  "projectType": "library",
+  "targets": {
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/frontend/feature-site-assets/**/*.ts"],
+        "eslintConfig": "libs/frontend/feature-site-assets/.eslintrc.js"
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/libs/frontend/feature-site-assets"],
+      "options": {
+        "jestConfig": "libs/frontend/feature-site-assets/jest.config.ts",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": ["scope:web", "type:feature"]
+}

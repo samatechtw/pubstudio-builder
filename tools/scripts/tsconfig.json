@@ -1,0 +1,10 @@
+{
+  "extends": "../tsconfig.tools.json",
+  "files": [],
+  "include": ["**/*.ts"],
+  "compilerOptions": {
+    "rootDir": "../../",
+    "types": ["node"],
+    "lib": ["dom"]
+  }
+}

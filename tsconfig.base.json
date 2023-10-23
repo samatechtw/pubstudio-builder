@@ -1,0 +1,162 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "rootDir": ".",
+    "sourceMap": true,
+    "declaration": false,
+    "moduleResolution": "node",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "importHelpers": false,
+    "target": "es2015",
+    "module": "esnext",
+    "lib": ["es2017", "dom"],
+    "jsx": "preserve",
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    "baseUrl": ".",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "strict": true,
+    "strictPropertyInitialization": false,
+    "paths": {
+      "@pubstudio/frontend/util-builtin": ["libs/frontend/util-builtin/src/index.ts"],
+      "@pubstudio/frontend/feature-render": ["libs/frontend/feature-render/src/index.ts"],
+      "@frontend-assets/*": ["libs/frontend/ui-assets/src/*"],
+      "@pubstudio/frontend/data-access-site-api": [
+        "libs/frontend/data-access-site-api/src/index.ts"
+      ],
+      "@pubstudio/frontend/data-access-injection": [
+        "libs/frontend/data-access-injection/src/index.ts"
+      ],
+      "@pubstudio/frontend/data-access-state": [
+        "libs/frontend/data-access-state/src/index.ts"
+      ],
+      "@pubstudio/frontend/feature-checkout": [
+        "libs/frontend/feature-checkout/src/index.ts"
+      ],
+      "@pubstudio/frontend/feature-color-picker": [
+        "libs/frontend/feature-color-picker/src/index.ts"
+      ],
+      "@pubstudio/frontend/feature-template": [
+        "libs/frontend/feature-template/src/index.ts"
+      ],
+      "@pubstudio/frontend/type-ui-widgets": [
+        "libs/frontend/type-ui-widgets/src/index.ts"
+      ],
+      "@pubstudio/frontend/ui-widgets": ["libs/frontend/ui-widgets/src/index.ts"],
+      "@pubstudio/frontend/util-api": ["libs/frontend/util-api/src/index.ts"],
+      "@pubstudio/frontend/util-asset": ["libs/frontend/util-asset/src/index.ts"],
+      "@pubstudio/frontend/util-clickaway": ["libs/frontend/util-clickaway/src/index.ts"],
+      "@pubstudio/frontend/util-config": ["libs/frontend/util-config/src/index.ts"],
+      "@pubstudio/frontend/util-doc": ["libs/frontend/util-doc/src/index.ts"],
+      "@pubstudio/frontend/util-dropdown": ["libs/frontend/util-dropdown/src/index.ts"],
+      "@pubstudio/frontend/util-fields": ["libs/frontend/util-fields/src/index.ts"],
+      "@pubstudio/frontend/util-gradient": ["libs/frontend/util-gradient/src/index.ts"],
+      "@pubstudio/frontend/util-identicon": ["libs/frontend/util-identicon/src/index.ts"],
+      "@pubstudio/frontend/util-key-listener": [
+        "libs/frontend/util-key-listener/src/index.ts"
+      ],
+      "@pubstudio/frontend/util-router": ["libs/frontend/util-router/src/index.ts"],
+      "@pubstudio/frontend/util-tooltip": ["libs/frontend/util-tooltip/src/index.ts"],
+      "@pubstudio/frontend/util-translations": [
+        "libs/frontend/util-translations/src/index.ts"
+      ],
+      "@pubstudio/frontend/util-ui-alert": ["libs/frontend/util-ui-alert/src/index.ts"],
+      "@pubstudio/frontend/util-validate": ["libs/frontend/util-validate/src/index.ts"],
+      "@pubstudio/frontend/util-vite-config": [
+        "libs/frontend/util-vite-config/src/index.ts"
+      ],
+      "@pubstudio/shared/type-api-local-site": [
+        "libs/shared/type-api-local-site/src/index.ts"
+      ],
+      "@pubstudio/shared/type-api-platform-site": [
+        "libs/shared/type-api-platform-site/src/index.ts"
+      ],
+      "@pubstudio/shared/type-api-platform-site-asset": [
+        "libs/shared/type-api-platform-site-asset/src/index.ts"
+      ],
+      "@pubstudio/shared/type-api-platform-template": [
+        "libs/shared/type-api-platform-template/src/index.ts"
+      ],
+      "@pubstudio/shared/type-api-platform-user": [
+        "libs/shared/type-api-platform-user/src/index.ts"
+      ],
+      "@pubstudio/shared/type-api-site-backup": [
+        "libs/shared/type-api-site-backup/src/index.ts"
+      ],
+      "@pubstudio/shared/type-api-site-sites": [
+        "libs/shared/type-api-site-sites/src/index.ts"
+      ],
+      "@pubstudio/shared/type-command": ["libs/shared/type-command/src/index.ts"],
+      "@pubstudio/shared/type-command-data": [
+        "libs/shared/type-command-data/src/index.ts"
+      ],
+      "@pubstudio/shared/type-site": ["libs/shared/type-site/src/index.ts"],
+      "@pubstudio/shared/type-site-store": ["libs/shared/type-site-store/src/index.ts"],
+      "@pubstudio/shared/type-sort": ["libs/shared/type-sort/src/index.ts"],
+      "@pubstudio/shared/type-utils": ["libs/shared/type-utils/src/index.ts"],
+      "@pubstudio/shared/util-core": ["libs/shared/util-core/src/index.ts"],
+      "@pubstudio/shared/util-debounce": ["libs/shared/util-debounce/src/index.ts"],
+      "@pubstudio/shared/util-fetch-api": ["libs/shared/util-fetch-api/src/index.ts"],
+      "@pubstudio/shared/util-format": ["libs/shared/util-format/src/index.ts"],
+      "@pubstudio/shared/util-parse": ["libs/shared/util-parse/src/index.ts"],
+      "@pubstudio/shared/util-test-reset": ["libs/shared/util-test-reset/src/index.ts"],
+      "@pubstudio/frontend/data-access-api": [
+        "libs/frontend/data-access-api/src/index.ts"
+      ],
+      "@pubstudio/frontend/data-access-web-store": [
+        "libs/frontend/data-access-web-store/src/index.ts"
+      ],
+      "@pubstudio/frontend/feature-builtin": [
+        "libs/frontend/feature-builtin/src/index.ts"
+      ],
+      "@pubstudio/frontend/feature-breakpoint": [
+        "libs/frontend/feature-breakpoint/src/index.ts"
+      ],
+      "@pubstudio/frontend/feature-build": ["libs/frontend/feature-build/src/index.ts"],
+      "@pubstudio/frontend/feature-build-event": [
+        "libs/frontend/feature-build-event/src/index.ts"
+      ],
+      "@pubstudio/frontend/feature-command": [
+        "libs/frontend/feature-command/src/index.ts"
+      ],
+      "@pubstudio/frontend/feature-editor": ["libs/frontend/feature-editor/src/index.ts"],
+      "@pubstudio/frontend/feature-preview": [
+        "libs/frontend/feature-preview/src/index.ts"
+      ],
+      "@pubstudio/frontend/feature-site-assets": [
+        "libs/frontend/feature-site-assets/src/index.ts"
+      ],
+      "@pubstudio/web/feature-site-resources": [
+        "libs/web/feature-site-resources/src/index.ts"
+      ],
+      "@pubstudio/frontend/feature-site-source": [
+        "libs/frontend/feature-site-source/src/index.ts"
+      ],
+      "@pubstudio/frontend/feature-site-store": [
+        "libs/frontend/feature-site-store/src/index.ts"
+      ],
+      "@pubstudio/frontend/feature-sites": ["libs/frontend/feature-sites/src/index.ts"],
+      "@pubstudio/web/type-builtins": ["libs/web/type-builtins/src/index.ts"],
+      "@pubstudio/frontend/ui-theme": ["libs/frontend/ui-theme/src"],
+      "@pubstudio/frontend/util-build": ["libs/frontend/util-build/src/index.ts"],
+      "@pubstudio/frontend/util-command": ["libs/frontend/util-command/src/index.ts"],
+      "@pubstudio/frontend/util-component": ["libs/frontend/util-component/src/index.ts"],
+      "@pubstudio/frontend/util-edit-text": ["libs/frontend/util-edit-text/src/index.ts"],
+      "@pubstudio/frontend/util-ids": ["libs/frontend/util-ids/src/index.ts"],
+      "@pubstudio/frontend/util-render": ["libs/frontend/util-render/src/index.ts"],
+      "@pubstudio/frontend/util-runtime": ["libs/frontend/util-runtime/src/index.ts"],
+      "@pubstudio/frontend/util-site-deserialize": [
+        "libs/frontend/util-site-deserialize/src/index.ts"
+      ],
+      "@pubstudio/frontend/util-site-store": [
+        "libs/frontend/util-site-store/src/index.ts"
+      ],
+      "@pubstudio/web/util-test": ["libs/web/util-test/src/index.ts"],
+      "@pubstudio/web/util-test-mock": ["libs/web/util-test-mock/src/index.ts"]
+    }
+  },
+  "exclude": ["node_modules", "tmp"]
+}

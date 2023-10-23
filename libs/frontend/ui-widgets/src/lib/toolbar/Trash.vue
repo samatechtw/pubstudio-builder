@@ -1,0 +1,22 @@
+<template>
+  <!-- eslint-disable max-len -->
+  <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+    <path :fill="color" d="M12 12h2v12h-2zm6 0h2v12h-2z" />
+    <path
+      :fill="color"
+      d="M4 6v2h2v20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8h2V6zm4 22V8h16v20zm4-26h8v2h-8z"
+    />
+  </svg>
+  <!-- eslint-enable max-len -->
+</template>
+
+<script lang="ts" setup>
+withDefaults(
+  defineProps<{
+    color?: string
+  }>(),
+  {
+    color: '#000',
+  },
+)
+</script>

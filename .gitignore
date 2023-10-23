@@ -1,0 +1,34 @@
+build/
+dist/
+tmp/
+out-tsc/
+node_modules/
+
+.nyc_output
+*.zip
+
+.DS_Store
+
+log
+*~
+*.sqlite3
+
+*.env
+.env.stage
+.env.prod
+
+# Playwright
+/test-results/
+/playwright-report/
+/playwright/.cache/
+
+# IDE
+.vscode/
+.idea/
+
+*lang.postcss.json
+
+# Local Netlify folder
+.netlify
+
+analyse.html

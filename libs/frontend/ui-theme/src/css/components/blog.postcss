@@ -1,0 +1,18 @@
+@import '../colors.postcss';
+@import '../typography.postcss';
+
+.blog-content {
+  padding: 88px 24px 64px;
+  color: white;
+  a {
+    color: $blue-500;
+  }
+}
+.blog-title {
+  @mixin title 32px;
+  margin: 16px 0 24px;
+}
+.blog-text {
+  @mixin title-thin 16px;
+  margin: 16px 0;
+}

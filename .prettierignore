@@ -1,0 +1,12 @@
+# Add files here to ignore them from prettier formatting
+
+/dist
+/backend
+tools/prebuilds
+**/artifacts
+**/coverage
+node_modules
+*-lock.*
+cache
+logs
+log

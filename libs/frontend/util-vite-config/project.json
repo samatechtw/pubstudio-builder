@@ -1,0 +1,16 @@
+{
+  "name": "util-vite-config",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/frontend/util-vite-config/src",
+  "projectType": "library",
+  "targets": {
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/frontend/util-vite-config/**/*.ts"]
+      }
+    }
+  },
+  "tags": ["scope:frontend", "type:util"]
+}

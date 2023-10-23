@@ -1,0 +1,196 @@
+name: PR Commit
+on:
+  pull_request:
+    branches: [main]
+env:
+  WORKSPACE_ROOT: .
+  CACHE_SUFFIX: c # cache busting
+
+# Cancel redundant workflow runs
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pre_job:
+    name: Run Workflow?
+    runs-on: ubuntu-22.04
+    outputs:
+      should_skip: ${{ steps.skip_check.outputs.should_skip }}
+    steps:
+      - id: skip_check
+        uses: fkirc/skip-duplicate-actions@master
+        with:
+          concurrent_skipping: 'never'
+          skip_after_successful_duplicate: 'true'
+          # Changes to paths must be synced with pr-merge*.yml
+          paths: '[".github/workflows/pr-commit.yml", "apps/**", "backend/**", "libs/**", "*"]'
+          paths_ignore: '["**/README.md", "skaffold*.yaml"]'
+
+  check-format:
+    needs: pre_job
+    if: ${{ needs.pre_job.outputs.should_skip != 'true' }}
+    name: Format, Lint, Unit Test
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout code into workspace directory
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/env-setup
+      - name: Check code format
+        run: npx nx format:check --base=origin/main
+      - name: Lint source code
+        if: success() || failure()
+        run: npx nx affected:lint --base=origin/main --parallel=4
+      - name: Lint commits
+        if: success() || failure()
+        run: npx commitlint --verbose --from=origin/main
+      - name: Run unit tests
+        if: success() || failure()
+        run: npx nx affected:test --base=origin/main --parallel=3
+
+  build-apps:
+    needs: pre_job
+    if: ${{ needs.pre_job.outputs.should_skip != 'true' }}
+    name: Build Apps
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout code into workspace directory
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/env-setup
+      - name: Build apps
+        run: npx nx run-many -t build --projects="web*" --parallel=3
+      - name: Upload web-site bundle
+        uses: actions/upload-artifact@v3
+        with:
+          name: web-site-bundle
+          path: |
+            ./dist/apps/web-site/index.html
+          if-no-files-found: error
+          retention-days: 1
+
+  build-backend:
+    needs: pre_job
+    name: Build Backend
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout code into workspace directory
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - run: |
+          rustup set auto-self-update disable
+          rustup toolchain install 1.72.0 --profile minimal
+      - name: Cache build
+        uses: Swatinem/rust-cache@v2
+        with:
+          key: pr-x86_64-${{ env.CACHE_SUFFIX }}
+          workspaces: backend
+      - name: Build app in release mode
+        run: cd backend && cargo build --release
+      - name: Upload binaries
+        uses: actions/upload-artifact@v3
+        with:
+          name: backend-binaries
+          path: |
+            ./backend/target/release/site-api
+          if-no-files-found: error
+          retention-days: 1
+
+  build-docker-api-site:
+    needs: [pre_job, build-backend, build-apps]
+    if: ${{ needs.pre_job.outputs.should_skip != 'true' }}
+    name: Site API Production Image
+    runs-on: ubuntu-22.04
+    env:
+      APP_NAME: site-api
+    steps:
+      # https://docs.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions#contexts
+      - name: '[DEBUG ONLY!!!] Dumping contexts'
+        env:
+          GITHUB_CONTEXT: ${{toJson(github)}}
+        run: |
+          echo "$GITHUB_CONTEXT"
+      - name: Get last commit short SHA
+        id: slug
+        run: echo "::set-output name=sha8::$(echo ${{github.event.after}} | cut -c1-8)"
+      - name: Checkout code into workspace directory
+        uses: actions/checkout@v3
+      - name: Download binary
+        uses: actions/download-artifact@v3
+        with:
+          name: backend-binaries
+          path: ./backend/target/release/${{env.APP_NAME}}
+      - name: Download web-site bundle
+        uses: actions/download-artifact@v3
+        with:
+          name: web-site-bundle
+          path: ./dist/apps/web-site/index.html
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Build docker image
+        id: docker_build
+        uses: docker/build-push-action@v4
+        with:
+          context: ${{env.WORKSPACE_ROOT}}
+          file: ${{env.WORKSPACE_ROOT}}/backend/${{env.APP_NAME}}/Dockerfile
+          target: stg
+          tags: ${{env.APP_NAME}}.prod
+          outputs: type=docker,dest=/tmp/${{env.APP_NAME}}-${{steps.slug.outputs.sha8}}-${{github.run_number}}.tar
+      - name: Upload docker image
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{env.APP_NAME}}-${{steps.slug.outputs.sha8}}-${{github.run_number}}
+          path: /tmp/${{env.APP_NAME}}-${{steps.slug.outputs.sha8}}-${{github.run_number}}.tar
+          if-no-files-found: error
+          retention-days: 3
+
+  site-api-tests:
+    needs: build-docker-api-site
+    name: Site Request Tests
+    runs-on: ubuntu-22.04
+    env:
+      APP_NAME: site-api
+    steps:
+      - name: Get last commit short SHA
+        id: slug
+        run: echo "::set-output name=sha8::$(echo ${{github.event.after}} | cut -c1-8)"
+      - name: Checkout code into workspace directory
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/env-setup
+      - name: Download docker images
+        id: download
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{env.APP_NAME}}-${{steps.slug.outputs.sha8}}-${{github.run_number}}
+          path: /tmp
+      - name: Load and run Site API image
+        run: |
+          docker load -i /tmp/${{env.APP_NAME}}-${{steps.slug.outputs.sha8}}-${{github.run_number}}.tar
+          docker images
+          CID=$(docker run -d -p 3100:3100 -e SITE_API_PORT='3100' -e DATABASE_URL='sqlite:site-api/db/metadata/sites_metadata.db' -e EXEC_ENV='ci' -e SITE_API_HOST='0.0.0.0' -e S3_URL='https://da7c8f85bc450afcae564b1d7ae16d4e.r2.cloudflarestorage.com' -e S3_ACCESS_KEY_ID='866e86eed58870d56aa4312f894a73cc' -e S3_SECRET_ACCESS_KEY='dev' -e SITE_ADMIN_PUBLIC_KEY='LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUlJQ0lqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FnOEFNSUlDQ2dLQ0FnRUF6Mis4bklTVmpubmFqNXlCVkRObgo4amhRVVFOeUlLYTUyUEIraG5DSWVCYVFaaHJVVkRWRXJESWU0MEx5ekF1WmRwaWNUY0RUSTRwTjE5RFZtQjcyClNpMXlDYldpTHp5azduUkMrVlVUNllvbXE1YWlCRG8rMDZ2dUVpbmZmTmhlODMwY0RCRGd1OC9XcWliTi92M2kKeDdiNkhkWGczSHNNSFRHRjVFM3dEU005ZTdzTzVJWCt0eTFsV3lRb1EydmZ6SDRxbkZJVmM2Z3lCRkE1Wmk0cwptSnQ2bkFsTnZrVHNYYzdhb3ZRYlArY1VrM2dmWFgyZjU2U0RrVDBMM3VLUDdiTDNaWERiRGNzTm5zbGxwR1F5Cms4Q3JwK0ZLZzgzUjV2bzg0Z3hFVCtROVA3amtEVS9XZUFPZmxNZm1idnc4aUNrRFQ0TnI3RGM2d2FWanZ2V3AKYUJsOEFzaEhHbURjZURLZ2NPRFk4WWVGREZGMENzbEtSTWFya20velU0ZjZrQ0Vza3hNRy9ZUE9ucXpoL1B6bAphUlJHekpDakFWZDU1ejJYdHZWUTROUnB3eGtLMk1NQlNYS1BuQ3Fnd3JsUWlPazBYeVhjVHhKcmZBc2hldDV0Cm9selZKdklkU3RieG02dUlBUmI4cUlVZG1HVVRLdEVaV3BTUzdBVitneUVZQ1pJVER2amNlZUs5bmFjaTF3Y04KM1hvV3RzZDZPMzJxc1BRcjc0dzU2R2xvbC96OFVhZjM5Z2hNUjFiajdYa0FST0E0NzNyWlcwMVJQcFdrQjZ4KwpTeUFqRms1YTc2aCtsRjlKWVhOR3p3TFk5dytlVUZNRjB5MEVOOGNWNFhVOXRod1ZweU1EZHpwVjlxeVJ2SC9SClN2dURKVFBzbUF4WnBNUSs5cFJId3FjQ0F3RUFBUT09Ci0tLS0tRU5EIFBVQkxJQyBLRVktLS0tLQ==' site-api.prod)
+          echo "CID=$CID" >> "$GITHUB_ENV"
+      - uses: ./.github/actions/env-setup
+      - name: Run Site API tests
+        run: |
+          NODE_OPTIONS=--dns-result-order=ipv4first EXEC_ENV=ci npx nx req-test api-site-test
+      # - name: Debug Docker logs
+      #   if: always()
+      #   run: docker logs ${{env.CID}}
+
+  clear-artifacts:
+    needs: [site-api-tests]
+    name: Clean up artifacts
+    if: always()
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: geekyeggo/delete-artifact@v2
+        with:
+          name: |
+            site-api-*
+            backend-binaries

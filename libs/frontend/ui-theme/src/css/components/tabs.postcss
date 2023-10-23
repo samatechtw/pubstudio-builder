@@ -1,0 +1,22 @@
+.ps-tabs {
+  @mixin flex-row;
+  width: 100%;
+  padding-top: 16px;
+}
+.ps-tab {
+  @mixin title 14px;
+  padding: 8px 12px;
+  border-radius: 14px;
+  border: 1px solid $border1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  & + .ps-tab {
+    margin-left: 8px;
+  }
+  &-active {
+    color: $grey-100;
+    background-color: $grey-700;
+    border: none;
+  }
+}

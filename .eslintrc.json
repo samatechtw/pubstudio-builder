@@ -1,0 +1,149 @@
+{
+  "root": true,
+  "ignorePatterns": ["**/*"],
+  "plugins": ["@nrwl/nx"],
+  "overrides": [
+    {
+      "files": ["*.ts", "*.js", "*.spec.ts"],
+      "rules": {
+        "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
+        "@nrwl/nx/enforce-module-boundaries": [
+          "error",
+          {
+            "enforceBuildableLibDependency": true,
+            "depConstraints": [
+              {
+                "sourceTag": "scope:frontend",
+                "onlyDependOnLibsWithTags": ["scope:frontend", "scope:shared"]
+              },
+              {
+                "sourceTag": "scope:web-site",
+                "onlyDependOnLibsWithTags": [
+                  "scope:web-site",
+                  "scope:frontend",
+                  "scope:shared"
+                ]
+              },
+              {
+                "sourceTag": "scope:builder-demo",
+                "onlyDependOnLibsWithTags": [
+                  "scope:builder-demo",
+                  "scope:web-site",
+                  "scope:frontend",
+                  "scope:shared"
+                ]
+              },
+              {
+                "sourceTag": "scope:web-admin",
+                "onlyDependOnLibsWithTags": [
+                  "scope:web-admin",
+                  "scope:frontend",
+                  "scope:shared"
+                ]
+              },
+              {
+                "sourceTag": "scope:e2e",
+                "onlyDependOnLibsWithTags": [
+                  "scope:e2e",
+                  "scope:web-site",
+                  "scope:web-admin",
+                  "scope:frontend",
+                  "scope:shared"
+                ]
+              },
+              {
+                "sourceTag": "scope:backend",
+                "onlyDependOnLibsWithTags": ["scope:backend", "scope:shared"]
+              },
+              {
+                "sourceTag": "scope:api",
+                "onlyDependOnLibsWithTags": ["scope:api", "scope:backend", "scope:shared"]
+              },
+              {
+                "sourceTag": "scope:db-api",
+                "onlyDependOnLibsWithTags": [
+                  "scope:db-api",
+                  "scope:backend",
+                  "scope:shared"
+                ]
+              },
+              {
+                "sourceTag": "scope:jobs",
+                "onlyDependOnLibsWithTags": [
+                  "scope:jobs",
+                  "scope:backend",
+                  "scope:shared"
+                ]
+              },
+              {
+                "sourceTag": "scope:db-jobs",
+                "onlyDependOnLibsWithTags": [
+                  "scope:db-jobs",
+                  "scope:backend",
+                  "scope:shared"
+                ]
+              },
+              {
+                "sourceTag": "scope:shared",
+                "onlyDependOnLibsWithTags": ["scope:shared"]
+              },
+              {
+                "sourceTag": "type:app",
+                "onlyDependOnLibsWithTags": [
+                  "type:feature",
+                  "type:ui",
+                  "type:data-access",
+                  "type:util",
+                  "type:type"
+                ]
+              },
+              {
+                "sourceTag": "type:feature",
+                "onlyDependOnLibsWithTags": [
+                  "type:feature",
+                  "type:ui",
+                  "type:data-access",
+                  "type:domain",
+                  "type:util",
+                  "type:type"
+                ]
+              },
+              {
+                "sourceTag": "type:ui",
+                "onlyDependOnLibsWithTags": ["type:ui", "type:util", "type:type"]
+              },
+              {
+                "sourceTag": "type:data-access",
+                "onlyDependOnLibsWithTags": [
+                  "type:data-access",
+                  "type:domain",
+                  "type:util",
+                  "type:type"
+                ]
+              },
+              {
+                "sourceTag": "type:domain",
+                "onlyDependOnLibsWithTags": ["type:domain", "type:util", "type:type"]
+              },
+              {
+                "sourceTag": "type:util",
+                "onlyDependOnLibsWithTags": ["type:util", "type:type"]
+              },
+              { "sourceTag": "type:type", "onlyDependOnLibsWithTags": ["type:type"] }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["*.ts", "*.spec.ts", "*.vue"],
+      "extends": ["plugin:@nrwl/nx/typescript"],
+      "rules": { "@typescript-eslint/no-empty-interface": "off" }
+    },
+    {
+      "files": ["*.js"],
+      "extends": ["plugin:@nrwl/nx/javascript"],
+      "rules": {}
+    }
+  ]
+}

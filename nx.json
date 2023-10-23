@@ -1,0 +1,29 @@
+{
+  "affected": {
+    "defaultBase": "main"
+  },
+  "tasksRunnerOptions": {
+    "default": {
+      "runner": "nx/tasks-runners/default",
+      "options": {
+        "cacheableOperations": ["build", "lint", "test", "e2e", "integration-test"],
+        "runtimeCacheInputs": ["node -v"],
+        "useDaemonProcess": false,
+        "parallel": 1
+      }
+    }
+  },
+  "defaultProject": "builder-demo",
+  "targetDefaults": {
+    "build": {
+      "dependsOn": ["^build"],
+      "inputs": ["production", "^production"]
+    }
+  },
+  "$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "namedInputs": {
+    "default": ["{projectRoot}/**/*", "sharedGlobals"],
+    "sharedGlobals": [],
+    "production": ["default"]
+  }
+}

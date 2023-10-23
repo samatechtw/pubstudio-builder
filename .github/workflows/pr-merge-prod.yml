@@ -1,0 +1,243 @@
+name: PR Merge (prod)
+
+on:
+  pull_request:
+    types: [edited]
+    branches: [prod]
+  issue_comment:
+    types: [created]
+
+env:
+  WORKSPACE_ROOT: .
+  ENVIRONMENT: prod
+
+# Cancel redundant workflow runs
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  fast_forward_job:
+    name: Fast Forward
+    if: github.event.issue.pull_request && contains(github.event.comment.body, '/ff')
+    runs-on: ubuntu-22.04
+    steps:
+      # To use this repository's private action, you must check out the repository
+      - name: Checkout code into workspace directory
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      # Basic use case example
+      - name: Fast Forward PR
+        id: ff-action
+        uses: samatechtw/fast-forward-js-action@master
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          success_message: 'Success! Fast forwarded `prod` to `main` with ```git checkout prod && git merge main --ff-only```'
+          failure_message: 'Failed! Cannot fast forward!'
+          staging_branch: 'main'
+          production_branch: 'prod'
+
+  pre_job:
+    needs: fast_forward_job
+    name: Run Workflow?
+    runs-on: ubuntu-22.04
+    outputs:
+      should_skip: ${{ steps.skip_check.outputs.should_skip }}
+    steps:
+      - id: skip_check
+        uses: fkirc/skip-duplicate-actions@master
+        with:
+          concurrent_skipping: 'never'
+          skip_after_successful_duplicate: 'true'
+          # Changes to paths must be synced with pr-merge*.yml
+          paths: '[".github/workflows/pr-merge-*.yml", "apps/**", "backend/**", "libs/**", "*"]'
+          paths_ignore: '["**/README.md", "skaffold*.yaml"]'
+
+  repo-metadata:
+    needs: pre_job
+    if: ${{ needs.pre_job.outputs.should_skip != 'true' }}
+    name: Get repo metadata
+    runs-on: ubuntu-latest
+    outputs:
+      next_version: ${{ steps.meta.outputs.next_version }}
+      sha8: ${{ steps.meta.outputs.sha8 }}
+      repo_slug: ${{ steps.meta.outputs.repo_slug }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - id: meta
+        uses: ./.github/actions/repo-metadata
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+  build-apps:
+    needs: pre_job
+    if: ${{ needs.pre_job.outputs.should_skip != 'true' }}
+    name: Build Apps
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout code into workspace directory
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/env-setup
+      - name: Build apps
+        run: npx nx run-many -t build --projects="web*" --parallel=3
+      - name: Upload web-site bundle
+        uses: actions/upload-artifact@v3
+        with:
+          name: web-site-bundle
+          path: |
+            ./dist/apps/web-site/index.html
+          if-no-files-found: error
+          retention-days: 1
+
+  build-backend:
+    needs: pre_job
+    if: ${{ needs.pre_job.outputs.should_skip != 'true' }}
+    name: Build Backend
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout code into workspace directory
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - run: |
+          rustup set auto-self-update disable
+          rustup toolchain install 1.72.0 --profile minimal
+      - name: Build app in release mode
+        run: cd backend && cargo build --release
+      - name: Upload binaries
+        uses: actions/upload-artifact@v3
+        with:
+          name: backend-binaries
+          path: |
+            ./backend/target/release/site-api
+          if-no-files-found: error
+          retention-days: 1
+
+  build-docker-site-api-prod:
+    needs: [pre_job, build-backend, repo-metadata]
+    if: ${{ needs.pre_job.outputs.should_skip != 'true' }}
+    name: Site API Production Image
+    runs-on: ubuntu-22.04
+    env:
+      APP_NAME: site-api
+      BRANCH_NAME: prod
+    steps:
+      - name: Checkout code into workspace directory
+        uses: actions/checkout@v3
+      - name: Download binary
+        uses: actions/download-artifact@v3
+        with:
+          name: backend-binaries
+          path: ./backend/target/release/${{env.APP_NAME}}
+      - name: Download web-site bundle
+        uses: actions/download-artifact@v3
+        with:
+          name: web-site-bundle
+          path: ./dist/apps/web-site/index.html
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{github.actor}}
+          password: ${{secrets.GITHUB_TOKEN}}
+      - name: Build and push prod docker image
+        id: docker_build
+        uses: docker/build-push-action@v4
+        with:
+          context: ${{env.WORKSPACE_ROOT}}
+          # Include non-secret args so we don't need them in the site-api server env
+          # Except SITE_API_HOST, which is unique to each server
+          build-args: |
+            "EXEC_ENV=prod"
+            "DATABASE_URL=sqlite:site-api/db/metadata/sites_metadata.db"
+            "SITE_API_PORT=3100"
+            "SITE_API_HOST=0.0.0.0"
+            "SITE_ADMIN_PUBLIC_KEY=LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUlJQ0lqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FnOEFNSUlDQ2dLQ0FnRUE1Sjc4OUxSbzI4ek5SekhxQk56YQp6bitPZU1YcEFTSlAyNE1mK3A5enIvL0dFSERqMUZEaWRibHFJdWJnYjQzQ3hDV2l2YXpBSkQ2N1BKSnBJNmFSCkRYNDZMSTcvSWhuVHhyR3o5Wkt6bVZnZkZybi94aXhVRnVmQU1PQW1uU1RBRHhzOW5ObEpaY0d5REhOb2pxcGMKWGIrYU52cjZPamc5QTh4TDJDTGdWaStQVndHcnJsaFQ0Q3JZa3FISVZwY041Nkxxelh5U3oxekl2bXpOVjNaYgpmaW82WG5ZMEMwbjN2aVZvdVpiQkhMOHRVMURuUnVuT29JdDlDOEtYaDR1TUZpemEzL1hZU1VZUWUrQ0JTR1ZlCllBYTdab2gyZStHU0VCOEYwQ1ZiTHorRGVySStrRjU5UUpqdXV2aDhVdWhMTEkzOHo2dVB5bHZPeDd0b295ZmUKRThiUE5RMzhXeUxKQStRSC9hTW1HNkIybXQyQTdBVDJ2SFBsMWE2TnJ0TWdkR1V5U2lsczNVUWpGZjdpenVwMwpZVWt6TU9xbFd3WDE0ZzZ4bXhIYktXL24wNzZvUnNMcmdBQXppcnRXTGI2eXI2VlpkdmFjSWJxN00yazBYbTN4Cm0rTURVS2RObFlpQkRlZ2tjSndkVmVxK00rbGMyWmI4bkE0WUcweE1HUDcrQzFhbUJ1V2ZpdC9Lby9KR0hRYjgKbG4vekZsL2VQdnU2OCswd1hTd3kvTGdUdyt3cUJlRmsyR3dOT3JhWFBQT0RTNVZPMVArZDNiVWRyRHlWd1FGKwpsa0Y5c1dkaHNUY1Y2SVVKYzE3ekpRWjlnY3JGZ0JTOFY0dHFaRWI4QktLMS8xMlo0NzBOY2Q0dlp6L2tLZ255CklmOGZyanBFaEhmM3d3bEJMTnVmNjNrQ0F3RUFBUT09Ci0tLS0tRU5EIFBVQkxJQyBLRVktLS0tLQo="
+            "S3_URL=https://641c50214c2309f3c667d5669a39e2d1.r2.cloudflarestorage.com"
+            "S3_ACCESS_KEY_ID=2f0c694897771fb4c2650fba24fc483e"
+            "S3_SECRET_ACCESS_KEY=${{ secrets.S3_SECRET_ACCESS_KEY_PROD }}"
+            "SLACK_WEBHOOK_INFO_URL=${{ secrets.SITE_API_SLACK_WEBHOOK_URL_PROD }}"
+            "SLACK_WEBHOOK_ERROR_URL=${{ secrets.SITE_API_SLACK_WEBHOOK_URL_PROD }}"
+            "LAST_COMMIT_SHA=${{needs.repo-metadata.outputs.sha8}}"
+            "RELEASE_VERSION=${{needs.repo-metadata.outputs.next_version}}"
+          push: true
+          file: ${{env.WORKSPACE_ROOT}}/backend/${{env.APP_NAME}}/Dockerfile
+          target: prod
+          tags: |
+            ${{needs.repo-metadata.outputs.repo_slug}}/${{env.ENVIRONMENT}}/${{env.APP_NAME}}:${{env.BRANCH_NAME}}-${{needs.repo-metadata.outputs.sha8}}-${{github.run_number}}
+            ${{needs.repo-metadata.outputs.repo_slug}}/${{env.ENVIRONMENT}}/${{env.APP_NAME}}:latest
+
+  build-docker-builder-demo-prod:
+    needs: [pre_job, repo-metadata]
+    if: ${{ needs.pre_job.outputs.should_skip != 'true' }}
+    name: Builder Demo Prod Image
+    runs-on: ubuntu-22.04
+    env:
+      APP_NAME: builder-demo
+      BRANCH_NAME: prod
+    steps:
+      - name: Checkout code into workspace directory
+        uses: actions/checkout@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{github.actor}}
+          password: ${{secrets.GITHUB_TOKEN}}
+      - name: Build and push staging docker image
+        id: docker_build
+        uses: docker/build-push-action@v4
+        with:
+          context: ${{env.WORKSPACE_ROOT}}
+          build-args: |
+            "LAST_COMMIT_SHA=${{needs.repo-metadata.outputs.sha8}}"
+            "RELEASE_VERSION=${{needs.repo-metadata.outputs.next_version}}"
+          push: true
+          file: ${{env.WORKSPACE_ROOT}}/apps/${{env.APP_NAME}}/Dockerfile
+          target: prod
+          tags: |
+            ${{needs.repo-metadata.outputs.repo_slug}}/${{env.ENVIRONMENT}}/${{env.APP_NAME}}:${{env.BRANCH_NAME}}-${{needs.repo-metadata.outputs.sha8}}-${{github.run_number}}
+            ${{needs.repo-metadata.outputs.repo_slug}}/${{env.ENVIRONMENT}}/${{env.APP_NAME}}:latest
+
+  release:
+    needs:
+      - build-docker-site-api-prod
+      - build-docker-builder-demo-prod
+    name: Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Set up NodeJS (LTS)
+        uses: actions/setup-node@v3
+        with:
+          node-version: 'lts/*'
+      - name: Install dependencies
+        run: |
+          npm install -g semantic-release@18
+          npm install -g @semantic-release/changelog
+          npm install -g conventional-changelog-conventionalcommits
+      - name: Release
+        env:
+          # Default GITHUB_TOKEN is OK as long as there no workflows triggered
+          # on "create release" event as the latter will not be emitted.
+          # See https://github.com/semantic-release/github
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git branch -avv
+          npx semantic-release --debug

@@ -1,0 +1,16 @@
+{
+  "extends": "../../../tsconfig.base.json",
+  "compilerOptions": {
+    "strict": true,
+    "outDir": "../../../dist/out-tsc",
+    "declaration": true,
+    "types": ["node"],
+    "target": "ESNext"
+  },
+  "include": ["**/*.ts", "**/*.vue"],
+  "references": [
+    {
+      "path": "./tsconfig.spec.json"
+    }
+  ]
+}

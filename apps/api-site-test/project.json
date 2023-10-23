@@ -1,0 +1,24 @@
+{
+  "name": "api-site-test",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/api-site-test/src",
+  "projectType": "application",
+  "targets": {
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "options": {
+        "lintFilePatterns": ["apps/api-site-test/**/*.ts"]
+      }
+    },
+    "req-test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/apps/api-site-test"],
+      "options": {
+        "jestConfig": "apps/api-site-test/jest.config.ts",
+        "passWithNoTests": true,
+        "runInBand": true
+      }
+    }
+  },
+  "tags": ["scope:api-site-test", "type:app"]
+}

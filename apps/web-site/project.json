@@ -1,0 +1,37 @@
+{
+  "name": "web-site",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/web-site/src",
+  "targets": {
+    "build": {
+      "executor": "nx-vue3-vite:build-app",
+      "options": {
+        "dist": "dist/apps/web-site"
+      }
+    },
+    "serve": {
+      "executor": "nx-vue3-vite:dev-server",
+      "options": {
+        "port": 8100,
+        "host": "127.0.0.1"
+      }
+    },
+    "preview": {
+      "executor": "nx-vue3-vite:preview-server",
+      "options": {
+        "port": 8101,
+        "host": "127.0.0.1",
+        "dist": "dist/apps/web-site"
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "options": {
+        "lintFilePatterns": ["apps/web-site/**/*.{js,ts,vue}"],
+        "eslintConfig": "apps/web-site/.eslintrc.js"
+      }
+    }
+  },
+  "tags": ["scope:web-site", "type:app"]
+}

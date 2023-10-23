@@ -1,0 +1,50 @@
+name: Repo Metadata
+description: 'Generate sha8 of latest commit and next release version'
+inputs:
+  github_token:
+    description: 'secrets.GITHUB_TOKEN'
+    required: true
+outputs:
+  sha8:
+    description: 'Latest commit sha8'
+    value: ${{ steps.slug.outputs.sha8 }}
+  repo_slug:
+    description: 'Latest commit sha8'
+    value: ${{ steps.repo_slug.outputs.result }}
+  next_version:
+    description: 'Next release version'
+    value: ${{ steps.preview_release.outputs.next_version }}
+runs:
+  using: 'composite'
+  steps:
+    - name: Get last commit short SHA
+      shell: bash
+      id: slug
+      run: echo "sha8=$(echo ${GITHUB_SHA} | cut -c1-8)" >> $GITHUB_OUTPUT
+    - name: Sanitize repo owner slug
+      uses: actions/github-script@v6
+      id: repo_slug
+      with:
+        result-encoding: string
+        script: return `ghcr.io/${context.repo.owner.toLowerCase()}/${context.repo.repo.toLowerCase()}`
+    - name: Checkout branch
+      shell: bash
+      run: git checkout $GITHUB_HEAD_REF
+    - name: Set up NodeJS (LTS)
+      uses: actions/setup-node@v3
+      with:
+        node-version: 'lts/*'
+    - name: Install dependencies
+      shell: bash
+      run: |
+        npm install -g semantic-release@18
+        npm install -g @semantic-release/changelog
+    - name: Preview semantic-release
+      shell: bash
+      id: preview_release
+      env:
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+      run: |
+        export NEXT_VERSION=$(unset GITHUB_ACTIONS && npx semantic-release --dry-run --no-ci --branches main | grep 'The next release version is' | sed -E 's/.* ([[:digit:].]+)$/\1/')
+        echo "$NEXT_VERSION"
+        echo "next_version=$NEXT_VERSION" >> $GITHUB_OUTPUT

@@ -1,0 +1,21 @@
+// Return a new object without key/value pairs where key is in `keys`
+interface OmitFn {
+  <T extends object, K extends [...(keyof T)[]]>(
+    obj: T,
+    ...keys: K
+  ): {
+    [K2 in Exclude<keyof T, K[number]>]: T[K2]
+  }
+}
+
+export const omit: OmitFn = (obj, ...keys) => {
+  const ret = {} as {
+    [K in keyof typeof obj]: (typeof obj)[K]
+  }
+  for (const key in obj) {
+    if (!keys.includes(key)) {
+      ret[key] = obj[key]
+    }
+  }
+  return ret
+}
