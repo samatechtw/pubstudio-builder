@@ -19,6 +19,7 @@ export interface ISiteViewModel {
   owner_id: string
   site_type: SiteType
   published: boolean
+  disabled: boolean
   subdomain: string
   site_server: ISiteServerRelationViewModel
   checkout?: ISiteCheckoutRelationViewModel

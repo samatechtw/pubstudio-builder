@@ -5,4 +5,5 @@ export enum JobName {
   SendChargeReminder = 'SendChargeReminder',
   CheckChargesDue = 'CheckChargesDue',
   ECPayReAuth = 'ECPayReAuth',
+  DisableSites = 'DisableSites',
 }

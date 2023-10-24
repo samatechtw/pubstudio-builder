@@ -8,4 +8,5 @@ export interface ISiteViewModel {
   history: string
   pages: string
   published: boolean
+  disabled: boolean
 }
