@@ -34,7 +34,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout code into workspace directory
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - uses: ./.github/actions/env-setup
@@ -57,7 +57,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout code into workspace directory
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - uses: ./.github/actions/env-setup
@@ -78,7 +78,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout code into workspace directory
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - run: |
@@ -118,7 +118,7 @@ jobs:
         id: slug
         run: echo "::set-output name=sha8::$(echo ${{github.event.after}} | cut -c1-8)"
       - name: Checkout code into workspace directory
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Download binary
         uses: actions/download-artifact@v3
         with:
@@ -159,7 +159,7 @@ jobs:
         id: slug
         run: echo "::set-output name=sha8::$(echo ${{github.event.after}} | cut -c1-8)"
       - name: Checkout code into workspace directory
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - uses: ./.github/actions/env-setup

@@ -39,7 +39,7 @@ jobs:
       repo_slug: ${{ steps.meta.outputs.repo_slug }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
           persist-credentials: false
@@ -55,7 +55,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout code into workspace directory
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - uses: ./.github/actions/env-setup
@@ -77,7 +77,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout code into workspace directory
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - run: |
@@ -109,7 +109,7 @@ jobs:
       BRANCH_NAME: main
     steps:
       - name: Checkout code into workspace directory
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Download binary
         uses: actions/download-artifact@v3
         with:
@@ -165,7 +165,7 @@ jobs:
       BRANCH_NAME: main
     steps:
       - name: Checkout code into workspace directory
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
       - name: Login to GitHub Container Registry
