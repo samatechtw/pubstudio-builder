@@ -1,12 +1,12 @@
 import { deserializeSite } from '@pubstudio/frontend/util-site-deserialize'
-import { IComponentPosition } from '@pubstudio/shared/type-command-data'
-import { IComponent, ISite, Tag } from '@pubstudio/shared/type-site'
 import {
   mockAddComponentData,
   mockMoveComponentData,
   mockSerializedComponent,
   mockSerializedSite,
-} from '@pubstudio/web/util-test-mock'
+} from '@pubstudio/frontend/util-test-mock'
+import { IComponentPosition } from '@pubstudio/shared/type-command-data'
+import { IComponent, ISite, Tag } from '@pubstudio/shared/type-site'
 import { applyAddComponent } from '../component/add-component'
 import { applyMoveComponent, undoMoveComponent } from './move-component'
 

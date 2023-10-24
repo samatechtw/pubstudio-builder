@@ -53,6 +53,7 @@ export const useSiteApi = (params: IUseSiteApiParams): IApiSite => {
       history: serialized.history ? JSON.parse(serialized.history) : undefined,
       pages: JSON.parse(serialized.pages),
       published: serialized.published,
+      disabled: serialized.disabled,
     }
   }
 
@@ -84,6 +85,7 @@ export const useSiteApi = (params: IUseSiteApiParams): IApiSite => {
       editor: serialized.editor ? JSON.parse(serialized.editor) : undefined,
       history: serialized.history ? JSON.parse(serialized.history) : undefined,
       pages: JSON.parse(serialized.pages),
+      disabled: serialized.disabled,
       published: serialized.published,
     }
   }

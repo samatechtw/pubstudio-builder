@@ -1,7 +1,7 @@
 import { deserializeSite } from '@pubstudio/frontend/util-site-deserialize'
+import { mockSerializedSite } from '@pubstudio/frontend/util-test-mock'
 import { IEditComponentData } from '@pubstudio/shared/type-command-data'
 import { IComponent, ISite, Tag } from '@pubstudio/shared/type-site'
-import { mockSerializedSite } from '@pubstudio/web/util-test-mock'
 import { applyEditComponent, undoEditComponent } from './edit-component'
 
 describe('Remove Component', () => {

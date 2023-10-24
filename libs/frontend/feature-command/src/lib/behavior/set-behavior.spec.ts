@@ -1,8 +1,8 @@
 import { nextBehaviorId } from '@pubstudio/frontend/util-ids'
 import { deserializeSite } from '@pubstudio/frontend/util-site-deserialize'
+import { mockSerializedSite } from '@pubstudio/frontend/util-test-mock'
 import { ISetBehaviorData } from '@pubstudio/shared/type-command-data'
 import { IBehavior, ISite, ISiteContext } from '@pubstudio/shared/type-site'
-import { mockSerializedSite } from '@pubstudio/web/util-test-mock'
 import { applySetBehavior, undoSetBehavior } from './set-behavior'
 
 describe('Set Component Input', () => {

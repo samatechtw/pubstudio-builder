@@ -3,6 +3,15 @@ import { DEFAULT_BREAKPOINT_ID, noBehaviorId } from '@pubstudio/frontend/util-id
 import { deserializeSite } from '@pubstudio/frontend/util-site-deserialize'
 import { serializeComponent, stringifySite } from '@pubstudio/frontend/util-site-store'
 import {
+  addComponentDataWithSelected,
+  expectSiteWithoutComponentTree,
+  setupMockBehavior,
+} from '@pubstudio/frontend/util-test'
+import {
+  mockSerializedComponent,
+  mockSerializedSite,
+} from '@pubstudio/frontend/util-test-mock'
+import {
   EditorEventName,
   IBreakpoint,
   IComponent,
@@ -11,15 +20,6 @@ import {
   ISerializedComponent,
   ISite,
 } from '@pubstudio/shared/type-site'
-import {
-  addComponentDataWithSelected,
-  expectSiteWithoutComponentTree,
-  setupMockBehavior,
-} from '@pubstudio/web/util-test'
-import {
-  mockSerializedComponent,
-  mockSerializedSite,
-} from '@pubstudio/web/util-test-mock'
 import { applyAddComponent, undoAddComponent } from './add-component'
 
 jest.mock('@pubstudio/frontend/util-runtime', () => {

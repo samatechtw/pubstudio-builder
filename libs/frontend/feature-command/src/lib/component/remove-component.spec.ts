@@ -4,22 +4,22 @@ import { noBehaviorId } from '@pubstudio/frontend/util-ids'
 import { deserializeSite } from '@pubstudio/frontend/util-site-deserialize'
 import { stringifySite } from '@pubstudio/frontend/util-site-store'
 import {
+  addComponentDataWithSelected,
+  expectSiteWithoutComponentTree,
+  setupMockBehavior,
+} from '@pubstudio/frontend/util-test'
+import {
+  mockAddComponentData,
+  mockSerializedComponent,
+  mockSerializedSite,
+} from '@pubstudio/frontend/util-test-mock'
+import {
   EditorEventName,
   IComponent,
   IComponentEditorEvents,
   IEditorEvent,
   ISite,
 } from '@pubstudio/shared/type-site'
-import {
-  addComponentDataWithSelected,
-  expectSiteWithoutComponentTree,
-  setupMockBehavior,
-} from '@pubstudio/web/util-test'
-import {
-  mockAddComponentData,
-  mockSerializedComponent,
-  mockSerializedSite,
-} from '@pubstudio/web/util-test-mock'
 import { applyAddComponent } from './add-component'
 import { applyRemoveComponent, undoRemoveComponent } from './remove-component'
 

@@ -1,8 +1,8 @@
 import { nextBreakpointId } from '@pubstudio/frontend/util-ids'
 import { deserializeSite } from '@pubstudio/frontend/util-site-deserialize'
+import { mockSerializedSite } from '@pubstudio/frontend/util-test-mock'
 import { ISetBreakpointData } from '@pubstudio/shared/type-command-data'
 import { IBreakpoint, ISite } from '@pubstudio/shared/type-site'
-import { mockSerializedSite } from '@pubstudio/web/util-test-mock'
 import { applySetBreakpoint, undoSetBreakpoint } from './set-breakpoint'
 
 describe('Set Breakpoint', () => {

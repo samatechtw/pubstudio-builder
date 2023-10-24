@@ -1,6 +1,6 @@
 import { deserializeSite } from '@pubstudio/frontend/util-site-deserialize'
+import { mockSerializedSite } from '@pubstudio/frontend/util-test-mock'
 import { ISite } from '@pubstudio/shared/type-site'
-import { mockSerializedSite } from '@pubstudio/web/util-test-mock'
 import { stringifySite } from './serialize-site'
 import { validateSite } from './validate-site'
 

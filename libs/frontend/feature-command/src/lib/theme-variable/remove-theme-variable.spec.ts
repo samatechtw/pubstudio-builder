@@ -1,9 +1,9 @@
 import { deserializeSite } from '@pubstudio/frontend/util-site-deserialize'
-import { ISite, IThemeVariable } from '@pubstudio/shared/type-site'
 import {
   mockRemoveThemeVariableData,
   mockSerializedSite,
-} from '@pubstudio/web/util-test-mock'
+} from '@pubstudio/frontend/util-test-mock'
+import { ISite, IThemeVariable } from '@pubstudio/shared/type-site'
 import { applyAddThemeVariable } from './add-theme-variable'
 import {
   applyRemoveThemeVariable,

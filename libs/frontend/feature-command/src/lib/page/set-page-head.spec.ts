@@ -1,7 +1,7 @@
 import { deserializeSite } from '@pubstudio/frontend/util-site-deserialize'
+import { mockSerializedSite } from '@pubstudio/frontend/util-test-mock'
 import { ISetPageHeadData } from '@pubstudio/shared/type-command-data'
 import { ISite } from '@pubstudio/shared/type-site'
-import { mockSerializedSite } from '@pubstudio/web/util-test-mock'
 import { applySetPageHead, undoSetPageHead } from './set-page-head'
 
 describe('Set Page Head', () => {

@@ -47,6 +47,7 @@ export const useLocalSiteApi = (api: PSApi): IApiLocalSite => {
       pages: JSON.parse(serialized.pages),
       published: serialized.published,
       subdomain: serialized.subdomain,
+      disabled: serialized.disabled,
     }
   }
 

@@ -4,13 +4,13 @@ import {
   verticalStyle,
 } from '@pubstudio/frontend/util-builtin'
 import { deserializeSite } from '@pubstudio/frontend/util-site-deserialize'
-import { IReplaceComponentMixinData } from '@pubstudio/shared/type-command-data'
-import { ISerializedComponent, ISite } from '@pubstudio/shared/type-site'
 import {
   mockAddComponentData,
   mockSerializedComponent,
   mockSerializedSite,
-} from '@pubstudio/web/util-test-mock'
+} from '@pubstudio/frontend/util-test-mock'
+import { IReplaceComponentMixinData } from '@pubstudio/shared/type-command-data'
+import { ISerializedComponent, ISite } from '@pubstudio/shared/type-site'
 import { applyAddComponent } from '../component/add-component'
 import {
   applyReplaceComponentMixin,

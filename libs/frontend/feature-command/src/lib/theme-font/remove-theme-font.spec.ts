@@ -1,15 +1,15 @@
 import { deserializeSite } from '@pubstudio/frontend/util-site-deserialize'
 import {
+  mockAddThemeFontData,
+  mockRemoveThemeFontData,
+  mockSerializedSite,
+} from '@pubstudio/frontend/util-test-mock'
+import {
   ISite,
   IThemeFont,
   ThemeFontSource,
   WebSafeFont,
 } from '@pubstudio/shared/type-site'
-import {
-  mockAddThemeFontData,
-  mockRemoveThemeFontData,
-  mockSerializedSite,
-} from '@pubstudio/web/util-test-mock'
 import { applyAddThemeFont } from './add-theme-font'
 import { applyRemoveThemeFont, undoRemoveThemeFont } from './remove-theme-font'
 
