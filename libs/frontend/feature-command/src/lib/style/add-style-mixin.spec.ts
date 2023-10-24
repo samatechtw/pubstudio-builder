@@ -1,7 +1,10 @@
 import { DEFAULT_BREAKPOINT_ID } from '@pubstudio/frontend/util-ids'
 import { deserializeSite } from '@pubstudio/frontend/util-site-deserialize'
+import {
+  mockAddStyleMixinData,
+  mockSerializedSite,
+} from '@pubstudio/frontend/util-test-mock'
 import { IPseudoStyle, ISite } from '@pubstudio/shared/type-site'
-import { mockAddStyleMixinData, mockSerializedSite } from '@pubstudio/web/util-test-mock'
 import { applyAddStyleMixin, undoAddStyleMixin } from './add-style-mixin'
 
 describe('Add Style Mixin', () => {

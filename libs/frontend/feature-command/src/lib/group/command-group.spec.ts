@@ -1,14 +1,14 @@
 import { DEFAULT_BREAKPOINT_ID } from '@pubstudio/frontend/util-ids'
 import { deserializeSite } from '@pubstudio/frontend/util-site-deserialize'
-import { CommandType } from '@pubstudio/shared/type-command'
-import { ICommandGroupData } from '@pubstudio/shared/type-command-data'
-import { Css, CssPseudoClass, IComponent, ISite } from '@pubstudio/shared/type-site'
-import { addComponentDataWithSelected } from '@pubstudio/web/util-test'
+import { addComponentDataWithSelected } from '@pubstudio/frontend/util-test'
 import {
   mockAddComponentCustomStyleData,
   mockSerializedComponent,
   mockSerializedSite,
-} from '@pubstudio/web/util-test-mock'
+} from '@pubstudio/frontend/util-test-mock'
+import { CommandType } from '@pubstudio/shared/type-command'
+import { ICommandGroupData } from '@pubstudio/shared/type-command-data'
+import { Css, CssPseudoClass, IComponent, ISite } from '@pubstudio/shared/type-site'
 import { applyAddComponent } from '../component/add-component'
 import { applyCommandGroup, undoCommandGroup } from './command-group'
 

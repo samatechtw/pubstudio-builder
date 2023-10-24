@@ -59,6 +59,8 @@
         "libs/frontend/util-key-listener/src/index.ts"
       ],
       "@pubstudio/frontend/util-router": ["libs/frontend/util-router/src/index.ts"],
+      "@pubstudio/frontend/util-test": ["libs/frontend/util-test/src/index.ts"],
+      "@pubstudio/frontend/util-test-mock": ["libs/frontend/util-test-mock/src/index.ts"],
       "@pubstudio/frontend/util-tooltip": ["libs/frontend/util-tooltip/src/index.ts"],
       "@pubstudio/frontend/util-translations": [
         "libs/frontend/util-translations/src/index.ts"
@@ -153,9 +155,7 @@
       ],
       "@pubstudio/frontend/util-site-store": [
         "libs/frontend/util-site-store/src/index.ts"
-      ],
-      "@pubstudio/web/util-test": ["libs/web/util-test/src/index.ts"],
-      "@pubstudio/web/util-test-mock": ["libs/web/util-test-mock/src/index.ts"]
+      ]
     }
   },
   "exclude": ["node_modules", "tmp"]

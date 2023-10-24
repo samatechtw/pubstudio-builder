@@ -1,6 +1,11 @@
 import { resolveComponent } from '@pubstudio/frontend/util-builtin'
 import { noBehaviorId, toggleHiddenId } from '@pubstudio/frontend/util-ids'
 import { deserializeSite } from '@pubstudio/frontend/util-site-deserialize'
+import {
+  mockAddComponentData,
+  mockSerializedComponent,
+  mockSerializedSite,
+} from '@pubstudio/frontend/util-test-mock'
 import { ISetComponentEventData } from '@pubstudio/shared/type-command-data'
 import {
   ComponentEventType,
@@ -8,11 +13,6 @@ import {
   IComponentEvent,
   ISite,
 } from '@pubstudio/shared/type-site'
-import {
-  mockAddComponentData,
-  mockSerializedComponent,
-  mockSerializedSite,
-} from '@pubstudio/web/util-test-mock'
 import { applyAddComponent } from '../component/add-component'
 import { applySetComponentEvent, undoSetComponentEvent } from './set-component-event'
 

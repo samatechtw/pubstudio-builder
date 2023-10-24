@@ -1,13 +1,13 @@
 import { resolveComponent } from '@pubstudio/frontend/util-builtin'
 import { DEFAULT_BREAKPOINT_ID } from '@pubstudio/frontend/util-ids'
 import { deserializeSite } from '@pubstudio/frontend/util-site-deserialize'
-import { IMergeComponentStyleData } from '@pubstudio/shared/type-command-data'
-import { IComponentStyle, ISerializedComponent, ISite } from '@pubstudio/shared/type-site'
 import {
   mockAddComponentData,
   mockSerializedComponent,
   mockSerializedSite,
-} from '@pubstudio/web/util-test-mock'
+} from '@pubstudio/frontend/util-test-mock'
+import { IMergeComponentStyleData } from '@pubstudio/shared/type-command-data'
+import { IComponentStyle, ISerializedComponent, ISite } from '@pubstudio/shared/type-site'
 import { applyAddComponent } from '../component/add-component'
 import {
   applyMergeComponentStyle,

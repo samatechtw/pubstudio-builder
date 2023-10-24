@@ -1,11 +1,11 @@
 import { setActivePage, setSelectedComponent } from '@pubstudio/frontend/feature-editor'
 import { deserializeSite } from '@pubstudio/frontend/util-site-deserialize'
-import { IEditorContext, IPageMetadata, ISite } from '@pubstudio/shared/type-site'
 import {
   mockAddPageData,
   mockChangePageData,
   mockSerializedSite,
-} from '@pubstudio/web/util-test-mock'
+} from '@pubstudio/frontend/util-test-mock'
+import { IEditorContext, IPageMetadata, ISite } from '@pubstudio/shared/type-site'
 import { applyAddPage } from './add-page'
 import { applyChangePage, undoChangePage } from './change-page'
 

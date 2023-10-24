@@ -1,7 +1,7 @@
 import { deserializeSite } from '@pubstudio/frontend/util-site-deserialize'
+import { mockSerializedSite } from '@pubstudio/frontend/util-test-mock'
 import { ISetDefaultsHeadData } from '@pubstudio/shared/type-command-data'
 import { IHeadBase, ISite } from '@pubstudio/shared/type-site'
-import { mockSerializedSite } from '@pubstudio/web/util-test-mock'
 import { applySetDefaultsHead, undoSetDefaultsHead } from './set-defaults-head'
 
 describe('Set Defaults Head', () => {

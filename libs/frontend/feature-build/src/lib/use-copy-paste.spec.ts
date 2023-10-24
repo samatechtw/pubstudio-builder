@@ -1,11 +1,11 @@
 import { applyAddComponent } from '@pubstudio/frontend/feature-command'
 import { resolveComponent } from '@pubstudio/frontend/util-builtin'
 import { DEFAULT_BREAKPOINT_ID } from '@pubstudio/frontend/util-ids'
-import { ISerializedComponent, ISite } from '@pubstudio/shared/type-site'
 import {
   mockAddComponentData,
   mockSerializedComponent,
-} from '@pubstudio/web/util-test-mock'
+} from '@pubstudio/frontend/util-test-mock'
+import { ISerializedComponent, ISite } from '@pubstudio/shared/type-site'
 import { IUseBuild, useBuild } from './use-build'
 import { IUseCopyPaste, useCopyPaste } from './use-copy-paste'
 

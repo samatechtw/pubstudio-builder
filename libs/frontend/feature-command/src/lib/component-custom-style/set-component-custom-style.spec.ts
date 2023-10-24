@@ -2,6 +2,14 @@ import { resolveComponent } from '@pubstudio/frontend/util-builtin'
 import { DEFAULT_BREAKPOINT_ID } from '@pubstudio/frontend/util-ids'
 import { deserializeSite } from '@pubstudio/frontend/util-site-deserialize'
 import {
+  mockAddComponentCustomStyleData,
+  mockAddComponentData,
+  mockEditComponentCustomStyleData,
+  mockRemoveComponentCustomStyleData,
+  mockSerializedComponent,
+  mockSerializedSite,
+} from '@pubstudio/frontend/util-test-mock'
+import {
   Css,
   CssPseudoClass,
   CssPseudoClassValues,
@@ -9,14 +17,6 @@ import {
   ISite,
   IStyleEntry,
 } from '@pubstudio/shared/type-site'
-import {
-  mockAddComponentCustomStyleData,
-  mockAddComponentData,
-  mockEditComponentCustomStyleData,
-  mockRemoveComponentCustomStyleData,
-  mockSerializedComponent,
-  mockSerializedSite,
-} from '@pubstudio/web/util-test-mock'
 import { applyAddComponent } from '../component/add-component'
 import {
   applySetComponentCustomStyle,

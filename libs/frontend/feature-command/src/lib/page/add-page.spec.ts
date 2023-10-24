@@ -1,14 +1,14 @@
 import { builtinBehaviors } from '@pubstudio/frontend/util-builtin'
 import { noBehaviorId } from '@pubstudio/frontend/util-ids'
 import { deserializeSite } from '@pubstudio/frontend/util-site-deserialize'
+import { setupMockBehavior } from '@pubstudio/frontend/util-test'
+import { mockAddPageData, mockSerializedSite } from '@pubstudio/frontend/util-test-mock'
 import {
   EditorEventName,
   IEditorContext,
   IPageMetadata,
   ISite,
 } from '@pubstudio/shared/type-site'
-import { setupMockBehavior } from '@pubstudio/web/util-test'
-import { mockAddPageData, mockSerializedSite } from '@pubstudio/web/util-test-mock'
 import { applyAddComponent } from '../component/add-component'
 import { applyAddPage, undoAddPage } from './add-page'
 
