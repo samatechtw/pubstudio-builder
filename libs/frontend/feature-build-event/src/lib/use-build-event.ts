@@ -72,8 +72,6 @@ export const useBuildEvent = () => {
   const { pressCopy, pressPaste } = useCopyPaste()
   const { pressDuplicate } = useDuplicateComponent()
   const { drag, stopDrag } = usePaddingMarginEdit()
-  const ed = editor.value
-  const context = site.value.context
   let buildWindow: HTMLElement | null = null
 
   const selectComponent = (component: IComponent) => {
@@ -88,7 +86,7 @@ export const useBuildEvent = () => {
   }
 
   const clickRenderer = (target: HTMLElement | undefined) => {
-    setBuildSubmenu(ed, undefined)
+    setBuildSubmenu(editor.value, undefined)
     if (site.value.editor?.resizeData) {
       site.value.editor.resizeData = undefined
       siteStore.value.save(site.value)
@@ -96,14 +94,14 @@ export const useBuildEvent = () => {
       const componentId =
         target?.id || target?.closest('.component-content-container')?.parentElement?.id
       if (componentId) {
-        const component = context.components[componentId]
+        const component = site.value.context.components[componentId]
         if (component) {
           selectComponent(component)
         } else if (target.parentElement && isDynamicComponent(target.id)) {
           // TODO -- this is fragile, it's probably better to add dynamic components to the
           // Site's `context.components`
           const index = parseInt(target.id.split('_').pop() ?? '')
-          const parent = context.components[target.parentElement.id]
+          const parent = site.value.context.components[target.parentElement.id]
           if (parent.children?.[index]) {
             selectComponent(parent.children[index])
           }
@@ -115,26 +113,31 @@ export const useBuildEvent = () => {
     if (
       // Close the active Build Submenu if any other part of the menu was clicked
       !(
-        (ed?.buildSubmenu === BuildSubmenu.New && target?.closest('#build-new')) ||
-        (ed?.buildSubmenu === BuildSubmenu.Page && target?.closest('#build-page')) ||
-        (ed?.buildSubmenu === BuildSubmenu.File && target?.closest('#build-file')) ||
-        (ed?.buildSubmenu === BuildSubmenu.Behavior &&
+        (editor.value?.buildSubmenu === BuildSubmenu.New &&
+          target?.closest('#build-new')) ||
+        (editor.value?.buildSubmenu === BuildSubmenu.Page &&
+          target?.closest('#build-page')) ||
+        (editor.value?.buildSubmenu === BuildSubmenu.File &&
+          target?.closest('#build-file')) ||
+        (editor.value?.buildSubmenu === BuildSubmenu.Behavior &&
           target?.closest('#build-behaviors')) ||
-        (ed?.buildSubmenu === BuildSubmenu.Asset && target?.closest('#build-asset')) ||
-        (ed?.buildSubmenu === BuildSubmenu.History && target?.closest('#build-history'))
+        (editor.value?.buildSubmenu === BuildSubmenu.Asset &&
+          target?.closest('#build-asset')) ||
+        (editor.value?.buildSubmenu === BuildSubmenu.History &&
+          target?.closest('#build-history'))
       )
     ) {
-      setBuildSubmenu(ed, undefined)
+      setBuildSubmenu(editor.value, undefined)
     }
   }
   const clickStyleToolbar = (_target: HTMLElement | undefined) => {
-    setBuildSubmenu(ed, undefined)
+    setBuildSubmenu(editor.value, undefined)
   }
   const clickRightMenu = (_target: HTMLElement | undefined) => {
-    setBuildSubmenu(ed, undefined)
+    setBuildSubmenu(editor.value, undefined)
   }
   const clickComponentTree = (_target: HTMLElement | undefined) => {
-    setBuildSubmenu(ed, undefined)
+    setBuildSubmenu(editor.value, undefined)
   }
   const handleClick = (event: Event) => {
     const target = event.target as HTMLElement | undefined
@@ -155,20 +158,20 @@ export const useBuildEvent = () => {
   }
 
   const pressEscape = () => {
-    if (ed?.editBehavior) {
+    if (editor.value?.editBehavior) {
       // Handled directly in `BehaviorModal.vue`'s modal widget
-    } else if (ed?.styleMenu) {
-      setStyleToolbarMenu(ed, undefined)
-    } else if (ed?.buildSubmenu) {
-      setBuildSubmenu(ed, undefined)
+    } else if (editor.value?.styleMenu) {
+      setStyleToolbarMenu(editor.value, undefined)
+    } else if (editor.value?.buildSubmenu) {
+      setBuildSubmenu(editor.value, undefined)
     } else if (
-      ed?.componentTab.editEvent !== undefined ||
-      ed?.componentTab.editInput !== undefined ||
-      ed?.componentTab.editInputValue !== undefined ||
-      ed?.componentTab.editStyle !== undefined ||
-      ed?.componentTab.editInfo !== undefined
+      editor.value?.componentTab.editEvent !== undefined ||
+      editor.value?.componentTab.editInput !== undefined ||
+      editor.value?.componentTab.editInputValue !== undefined ||
+      editor.value?.componentTab.editStyle !== undefined ||
+      editor.value?.componentTab.editInfo !== undefined
     ) {
-      clearComponentTabState(ed)
+      clearComponentTabState(editor.value)
     } else {
       selectComponentParent()
     }
@@ -212,11 +215,11 @@ export const useBuildEvent = () => {
     }
     const target = e.target as HTMLElement
     const component =
-      resolveComponent(context, target?.id) ??
+      resolveComponent(site.value.context, target?.id) ??
       // This is for elements that use an additional wrapper for hover edges, such as img.
       // Kebab case "component-id" will be converted to camel case "componentId".
       // See https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/dataset#name_conversion
-      resolveComponent(context, target?.dataset.componentId)
+      resolveComponent(site.value.context, target?.dataset.componentId)
     if (editor) {
       const data = editor.resizeData
       if (component && data) {
@@ -299,7 +302,7 @@ export const useBuildEvent = () => {
 
     // If the cursor is dragged while ProseMirror is active, mouseup/click outside the
     // component shouldn't de-select the current component. Convenient for selecting editable text
-    const mousedownComponent = resolveComponent(context, target.id)
+    const mousedownComponent = resolveComponent(site.value.context, target.id)
     mouseDownOnTextEditableComponent =
       !!target.closest('.ProseMirror') ||
       (mousedownComponent !== undefined &&
@@ -311,7 +314,7 @@ export const useBuildEvent = () => {
       // This is for elements that use an additional wrapper for hover edges, such as img.
       resizeCmp = resizeCmp.children[0] as HTMLElement
     }
-    const component = resolveComponent(context, resizeCmp?.id)
+    const component = resolveComponent(site.value.context, resizeCmp?.id)
     const side = target.classList[target.classList.length - 1]
     if (
       parent &&
@@ -321,14 +324,14 @@ export const useBuildEvent = () => {
       ['bottom', 'right', 'bottom-right'].includes(side)
     ) {
       const initialHeightProp = resolvedComponentStyle(
-        context,
+        site.value.context,
         component,
         CssPseudoClass.Default,
         Css.Height,
         activeBreakpoint.value.id,
       )
       const initialWidthProp = resolvedComponentStyle(
-        context,
+        site.value.context,
         component,
         CssPseudoClass.Default,
         Css.Width,
