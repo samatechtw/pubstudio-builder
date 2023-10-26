@@ -6,5 +6,4 @@ export interface IUpdateSiteApiRequest {
   editor?: string
   history?: string
   pages?: string
-  domains?: string[]
 }

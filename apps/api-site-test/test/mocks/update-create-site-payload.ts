@@ -8,5 +8,4 @@ export const mockUpdateSitePayload = (): IUpdateSiteApiRequest => ({
   editor: '{"some":"json2"}',
   history: '{"some":"json2"}',
   pages: '{"some":"json2"}',
-  domains: ['update-subdomain.dev.pubstud.io', 'shop.abc.com'],
 })
