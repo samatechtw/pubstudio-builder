@@ -8,7 +8,11 @@
         <Import></Import>
       </BuildMenuIconText>
     </SimpleFileUpload>
-    <BuildMenuIconText :text="t('templates')" @click="emit('showTemplates')">
+    <BuildMenuIconText
+      :text="t('templates')"
+      class="templates"
+      @click="emit('showTemplates')"
+    >
       <Templates></Templates>
     </BuildMenuIconText>
     <BuildMenuIconText
