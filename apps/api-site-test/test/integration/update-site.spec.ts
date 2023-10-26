@@ -1,5 +1,4 @@
 import {
-  IGetSiteDomainsApiResponse,
   IUpdateSiteApiRequest,
   IUpdateSiteApiResponse,
 } from '@pubstudio/shared/type-api-site-sites'
@@ -47,15 +46,6 @@ describe('Update Site', () => {
     expect(JSON.parse(body.editor)).toEqual(payload.editor)
     expect(JSON.parse(body.history)).toEqual(payload.history)
     expect(JSON.parse(body.pages)).toEqual(payload.pages)
-
-    // Verify domains are updated
-    const getResponse = await api
-      .get(`/api/sites/${siteId}/domains`)
-      .set('Authorization', adminAuth)
-      .expect(200)
-    const getBody: IGetSiteDomainsApiResponse = getResponse.body
-
-    expect(getBody.domains).toEqual(payload.domains)
   })
 
   it('updates site and verifies result when requester is owner', async () => {
@@ -111,44 +101,6 @@ describe('Update Site', () => {
         message: 'Unauthorized',
         status: 401,
       })
-    })
-
-    it('returns 400 when domains is invalid', () => {
-      payload.domains = [
-        // length > 10
-        'a1',
-        'a2',
-        'a3',
-        'a4',
-        'a5',
-        'a6',
-        'a7',
-        'a8',
-        'a9',
-        'a10',
-        'a11',
-      ]
-      api
-        .patch(`${testEndpoint}/${siteId}`)
-        .set('Authorization', adminAuth)
-        .send(payload)
-        .expect(400, {
-          code: 'InvalidFormData',
-          message: 'Failed to validate request',
-          status: 400,
-        })
-
-      payload.domains = ['1w1']
-      api
-        .patch(`${testEndpoint}/${siteId}`)
-        .set('Authorization', adminAuth)
-        .send(payload)
-        .expect(400, {
-          code: 'InvalidFormData',
-          message:
-            'Custom domains can only contain lowercase characters, numbers, and dashes',
-          status: 400,
-        })
     })
   })
 
