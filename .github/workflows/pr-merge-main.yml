@@ -158,7 +158,7 @@ jobs:
   build-docker-builder-demo-stg:
     needs: [pre_job, repo-metadata]
     if: ${{ needs.pre_job.outputs.should_skip != 'true' }}
-    name: Web Staging Image
+    name: Builder Demo Staging Image
     runs-on: ubuntu-22.04
     env:
       APP_NAME: builder-demo
