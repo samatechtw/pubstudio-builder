@@ -59,11 +59,14 @@ CMD ["../run-docker.sh", "site-api"]
 FROM debian:bookworm-slim as prod
 WORKDIR /usr/src/backend/site-api
 
+ARG TARGETPLATFORM
+ARG PLATFORM_FOLDER=${TARGETPLATFORM}/
+
 # Add LABEL to set pre-update hook
 LABEL com.centurylinklabs.watchtower.lifecycle.pre-update="../pre-update.sh"
 
 COPY --from=base /tini /tini
-COPY --chmod=755 ./backend/target/release/site-api ./
+COPY --chmod=755 ./backend/target/${PLATFORM_FOLDER}release/site-api ./
 COPY --chmod=755 ./dist/apps/web-site/index.html ./
 COPY --chmod=755 ./backend/pre-update.sh ../
 COPY ./backend/site-api/db/metadata/migrations/* ./db/metadata/migrations/
