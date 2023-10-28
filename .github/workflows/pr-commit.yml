@@ -4,7 +4,7 @@ on:
     branches: [main]
 env:
   WORKSPACE_ROOT: .
-  CACHE_SUFFIX: c # cache busting
+  CACHE_SUFFIX: d # cache busting
 
 # Cancel redundant workflow runs
 concurrency:
@@ -138,6 +138,8 @@ jobs:
           context: ${{env.WORKSPACE_ROOT}}
           file: ${{env.WORKSPACE_ROOT}}/backend/${{env.APP_NAME}}/Dockerfile
           target: stg
+          build-args: |
+            PLATFORM_FOLDER=
           tags: ${{env.APP_NAME}}.prod
           outputs: type=docker,dest=/tmp/${{env.APP_NAME}}-${{steps.slug.outputs.sha8}}-${{github.run_number}}.tar
       - name: Upload docker image

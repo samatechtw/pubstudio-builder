@@ -68,7 +68,7 @@ cargo build --release
 > :warning: If you plan to expose the Site API to the public, replace `SITE_ADMIN_PUBLIC_KEY` with one generated following the above instructions.
 
 ```bash
-docker build -t site-api -f backend/site-api/Dockerfile --target=dev  .
+docker build -t site-api --build-arg="PLATFORM_FOLDER=" -f backend/site-api/Dockerfile --target=dev  .
 
 docker run -p 3100:3100 \
   -e EXEC_ENV='ci' \
