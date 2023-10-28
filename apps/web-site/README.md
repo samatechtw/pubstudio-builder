@@ -2,6 +2,17 @@
 
 This app provides a bare renderer that expects an API source to provide site data.
 
+#### Prerequisites
+
+- Install [PNPM](https://pnpm.io/)
+
+#### Setup
+
+```bash
+# Install packages
+pnpm i
+```
+
 ## Run
 
 ```bash

@@ -1,31 +1,48 @@
 # PubStudio Backend
 
-Rust/Cargo workspace for PubStudio Platform API/DB and Site API.
+Rust/Cargo workspace for PubStudio Site API, and related libraries.
 
-## Environment setup
+The main setup instructions are located in the [site-api](./site-api/Readme.md) Readme.
 
-In development, the backend is built on the host with Cargo. Binaries are cross-compiled and copied into the development cluster. Some tools are needed to achieve this.
+## Library usage
 
+TODO
+
+**Run Site API**
+
+```bash
+# Compile Site API
+npm run dev:build
+
+# Run Site API
+npm run dev:run
+```
+
+To automatically re-compile and run in development, install cargo-watch:
 ```bash
 # Install Cargo watch
 cargo install cargo-watch
+```
 
+Run the development build in watch mode:
+```bash
+npm run dev:watch
+```
+
+### Build for Docker
+
+It can be useful to build for other architectures, for example when running on an ARM Mac in Docker with Linux (Alpine/Debian/etc base image).
+
+```bash
 # Install linker for linux/gnu
 brew tap messense/macos-cross-toolchains
 brew install aarch64-unknown-linux-gnu
 
 # Add Rust toolchain target
 rustup target add aarch64-unknown-linux-gnu
-```
 
-**Run backend**
-
-```bash
-# Compiles all backend apps and rebuilds when files change
-npm run dev:watch
-
-# Start development cluster
-npm run skaffold
+# Build for aarch64
+npm run dev:build-aarch
 ```
 
 ## Optimize dependencies

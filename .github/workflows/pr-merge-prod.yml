@@ -132,6 +132,8 @@ jobs:
     steps:
       - name: Checkout code into workspace directory
         uses: actions/checkout@v4
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
       - name: Download binary
         uses: actions/download-artifact@v3
         with:
@@ -173,6 +175,7 @@ jobs:
           push: true
           file: ${{env.WORKSPACE_ROOT}}/backend/${{env.APP_NAME}}/Dockerfile
           target: prod
+          platforms: linux/amd64,linux/arm64
           tags: |
             ${{needs.repo-metadata.outputs.repo_slug}}/${{env.ENVIRONMENT}}/${{env.APP_NAME}}:${{env.BRANCH_NAME}}-${{needs.repo-metadata.outputs.sha8}}-${{github.run_number}}
             ${{needs.repo-metadata.outputs.repo_slug}}/${{env.ENVIRONMENT}}/${{env.APP_NAME}}:latest
@@ -188,6 +191,8 @@ jobs:
     steps:
       - name: Checkout code into workspace directory
         uses: actions/checkout@v4
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
       - name: Login to GitHub Container Registry
@@ -207,6 +212,7 @@ jobs:
           push: true
           file: ${{env.WORKSPACE_ROOT}}/apps/${{env.APP_NAME}}/Dockerfile
           target: prod
+          platforms: linux/amd64,linux/arm64
           tags: |
             ${{needs.repo-metadata.outputs.repo_slug}}/${{env.ENVIRONMENT}}/${{env.APP_NAME}}:${{env.BRANCH_NAME}}-${{needs.repo-metadata.outputs.sha8}}-${{github.run_number}}
             ${{needs.repo-metadata.outputs.repo_slug}}/${{env.ENVIRONMENT}}/${{env.APP_NAME}}:latest

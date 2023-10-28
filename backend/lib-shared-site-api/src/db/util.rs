@@ -34,25 +34,6 @@ pub fn append_eq<
     (query, count)
 }
 
-/// Appends a " field LIKE %$x%" binding to the query builder,
-/// prepended with " AND" if it's not the first call
-/// Returns the input `count + 1` if a parameter was bound
-pub fn append_like<'a, T: 'a + sqlx::Type<DB> + sqlx::Encode<'a, DB> + Send, DB: Database>(
-    query: QueryBuilder<'a, DB>,
-    arg_name: &str,
-    arg: Option<T>,
-    count: u32,
-) -> (QueryBuilder<'a, DB>, u32) {
-    if let Some(arg_val) = arg {
-        let (mut q, count) = append_and(query, count);
-        q.push(format!(" lower(\"{}\") LIKE %", arg_name));
-        q.push_bind(arg_val);
-        q.push("%");
-        return (q, count + 1);
-    }
-    (query, count)
-}
-
 pub fn append_comma<
     'a,
     T: 'a + sqlx::Type<DB> + sqlx::Encode<'a, DB> + Send,
