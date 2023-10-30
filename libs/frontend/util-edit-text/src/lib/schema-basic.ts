@@ -23,7 +23,6 @@ import { DOMOutputSpec, MarkSpec, NodeSpec, Schema } from 'prosemirror-model'
 const pDOM: DOMOutputSpec = ['p', 0],
   blockquoteDOM: DOMOutputSpec = ['blockquote', 0],
   hrDOM: DOMOutputSpec = ['hr'],
-  preDOM: DOMOutputSpec = ['pre', ['code', 0]],
   brDOM: DOMOutputSpec = ['br']
 
 /// [Specs](#model.NodeSpec) for the nodes defined in this schema.
@@ -94,9 +93,17 @@ export const nodes = {
     group: 'block',
     code: true,
     defining: true,
-    parseDOM: [{ tag: 'pre', preserveWhitespace: 'full' }],
-    toDOM() {
-      return preDOM
+    parseDOM: [
+      {
+        tag: 'pre',
+        preserveWhitespace: 'full',
+        getAttrs: (node: HTMLElement | string) => ({
+          params: (<Element>node)?.getAttribute('data-params') || '',
+        }),
+      },
+    ],
+    toDOM(node) {
+      return ['pre', { 'data-params': node.attrs.params, class: 'hljs' }, ['code', 0]]
     },
   } as NodeSpec,
 

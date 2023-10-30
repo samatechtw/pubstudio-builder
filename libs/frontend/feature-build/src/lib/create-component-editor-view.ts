@@ -6,7 +6,7 @@ import {
 import { EditorView } from 'prosemirror-view'
 import { useBuild } from './use-build'
 
-export function createEditorView(
+export function createComponentEditorView(
   options: IProsemirrorSetupOptions,
   container: HTMLElement,
 ): EditorView | undefined {

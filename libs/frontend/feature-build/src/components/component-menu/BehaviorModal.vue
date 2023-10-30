@@ -33,13 +33,7 @@
           />
         </div>
       </div>
-      <textarea
-        :value="newBehavior.code || ''"
-        class="code"
-        :placeholder="t('build.behavior_code')"
-        rows="15"
-        @input="updateCode"
-      />
+      <div ref="behaviorCodeEditor" class="code-wrap" />
       <div class="input-actions">
         <PSButton
           v-if="behavior"
@@ -68,7 +62,7 @@
 
 <script lang="ts" setup>
 import { useI18n } from 'vue-i18n'
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { Modal, PSButton } from '@pubstudio/frontend/ui-widgets'
 import { setOrCreate } from '@pubstudio/shared/type-utils'
 import { nextBehaviorId } from '@pubstudio/frontend/util-ids'
@@ -78,6 +72,12 @@ import MenuRow from '../MenuRow.vue'
 import BehaviorArgs from './BehaviorArgs.vue'
 import { useBuild } from '../../lib/use-build'
 import BehaviorContextVars from './BehaviorContextVars.vue'
+import { createCodeEditorView } from '../../lib/create-code-editor-view'
+import hljs from 'highlight.js/lib/core'
+import js from 'highlight.js/lib/languages/javascript'
+import { EditorView } from 'prosemirror-view'
+
+hljs.registerLanguage('javascript', js)
 
 const { t } = useI18n()
 const { site, editor, setBehavior, removeBehavior, setBehaviorArg } = useBuild()
@@ -109,8 +109,8 @@ const saveState = () => {
   }
 }
 
-const updateCode = (event: Event) => {
-  newBehavior.value.code = (event.target as HTMLInputElement)?.value
+const updateCode = (value: string) => {
+  newBehavior.value.code = value
 }
 
 const saveArg = (oldArg: IBehaviorArg | undefined, newArg: IBehaviorArg | undefined) => {
@@ -144,13 +144,42 @@ const clearTimer = () => {
   }
 }
 
+const behaviorCodeEditor = ref<HTMLDivElement>()
+
+let codeEditorView: EditorView | undefined = undefined
+
+const mountCodeEditor = () => {
+  if (behaviorCodeEditor.value) {
+    codeEditorView = createCodeEditorView(
+      newBehavior.value.code ?? '',
+      behaviorCodeEditor.value,
+      updateCode,
+    )
+  }
+}
+
+const unmountCodeEditor = () => {
+  codeEditorView?.destroy()
+  codeEditorView = undefined
+}
+
+// onMounted() and onUnmounted() don't suit here because they only work when the modal is
+// mounted/unmounted, so we use `watch` to mount/unmount ProseMirror editor when target div
+// is mounted/unmounted.
+watch(behaviorCodeEditor, (domElement) => {
+  if (domElement) {
+    mountCodeEditor()
+  } else {
+    unmountCodeEditor()
+  }
+})
+
 const set = () => {
-  const behavior = newBehavior.value
   setBehavior({
-    id: behavior.id ?? nextBehaviorId(site.value.context),
-    name: behavior.name,
-    code: behavior.code,
-    args: behavior.args,
+    id: newBehavior.value.id ?? nextBehaviorId(site.value.context),
+    name: newBehavior.value.name,
+    code: newBehavior.value.code,
+    args: newBehavior.value.args,
   })
   clearBehavior()
 }
@@ -168,6 +197,10 @@ const clearBehavior = () => {
 onMounted(() => {
   startStateTimer()
   newBehavior.value = { ...(behavior.value ?? { name: '' }) }
+})
+
+onUnmounted(() => {
+  unmountCodeEditor()
 })
 </script>
 
@@ -194,9 +227,17 @@ onMounted(() => {
     max-height: 90vh;
     overflow-y: auto;
   }
-  .code {
+  .code-wrap {
     width: 100%;
-    white-space: nowrap;
+    max-height: 250px;
+    overflow: auto;
+    .ProseMirror {
+      .hljs {
+        margin: 0;
+        min-height: 250px;
+        padding: 8px;
+      }
+    }
   }
   .menu-row {
     justify-content: flex-start;

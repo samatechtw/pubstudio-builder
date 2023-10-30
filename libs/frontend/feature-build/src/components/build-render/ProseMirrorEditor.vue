@@ -1,5 +1,5 @@
 <template>
-  <div ref="container" :id="containerId" class="prose-mirror-editor-container" />
+  <div :id="containerId" ref="container" class="prose-mirror-editor-container" />
 </template>
 
 <script lang="ts" setup>
@@ -7,7 +7,7 @@ import { computed, onMounted, onBeforeUnmount, ref, toRefs, watch } from 'vue'
 import { IComponent, IEditorContext } from '@pubstudio/shared/type-site'
 import { getProseMirrorContainerId } from '@pubstudio/frontend/feature-editor'
 import { prosemirrorSetup } from '@pubstudio/frontend/util-edit-text'
-import { createEditorView } from '../../lib/create-editor-view'
+import { createComponentEditorView } from '../../lib/create-component-editor-view'
 
 const props = defineProps<{
   component: IComponent
@@ -26,9 +26,9 @@ const mountProseMirrorEditor = (
   const { selectedComponent } = editor ?? {}
   if (editor && container && selectedComponent) {
     editor.editView?.destroy()
-    editor.editView = createEditorView(
+    editor.editView = createComponentEditorView(
       {
-        component: selectedComponent,
+        content: selectedComponent.content ?? '',
       },
       container,
     )
@@ -60,7 +60,7 @@ watch(
     // because `updateState()` will cause the editor to lose its' focus and selection.
     const proseMirrorFocused = document.activeElement?.classList.contains('ProseMirror')
     if (!proseMirrorFocused) {
-      const newState = prosemirrorSetup({ component: component.value })
+      const newState = prosemirrorSetup({ content: component.value.content ?? '' })
       editor.value?.editView?.updateState(newState)
     }
   },
