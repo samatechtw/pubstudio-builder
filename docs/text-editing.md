@@ -8,7 +8,7 @@ Editing procedure:
 
 - User clicks a component eligible for text editing. Ineligible components include those with children, images, videos, and line breaks.
   - Detected in `setSelectedComponent` in `editor-helpers.ts`
-- A ProseMirror editor is created with `createEditorView` and stored in the EditorContext
+- A ProseMirror editor is created with `createComponentEditorView` and stored in the EditorContext
   - Note - the EditorView is not serialized, but should be recreated when a site is loaded with an eligible `selectedComponent`
 - The renderer displays `innerHTML` for the selected component based on the current state of the EditorView, serialized with `editorStateToHtml`
 - All clicks and key presses are now handled/controlled by the ProseMirror EditorView

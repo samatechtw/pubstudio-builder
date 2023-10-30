@@ -1,9 +1,5 @@
 lockfileVersion: '6.0'
 
-settings:
-  autoInstallPeers: true
-  excludeLinksFromLockfile: false
-
 dependencies:
   '@floating-ui/vue':
     specifier: ^1.0.2
@@ -26,6 +22,9 @@ dependencies:
   date-fns-tz:
     specifier: ^2.0.0
     version: 2.0.0(date-fns@2.30.0)
+  highlight.js:
+    specifier: ^11.9.0
+    version: 11.9.0
   jwt-decode:
     specifier: ^3.1.2
     version: 3.1.2
@@ -5802,6 +5801,11 @@ packages:
     engines: {node: '>=8'}
     dev: true
 
+  /highlight.js@11.9.0:
+    resolution: {integrity: sha512-fJ7cW7fQGCYAkgv4CPfwFHrfd/cLS4Hau96JuJ+ZTOWhjnhoeN1ub1tFmALm/+lW5z4WCAuAV9bm05AP0mS6Gw==}
+    engines: {node: '>=12.0.0'}
+    dev: false
+
   /hookable@5.5.3:
     resolution: {integrity: sha512-Yc+BQe8SvoXH1643Qez1zqLRmbA5rCL+sSmk6TVos0LWVfNIB7PGncdlId77WzLGSIB5KaWgTaNTs2lNVEI6VQ==}
     dev: false
@@ -9210,3 +9214,7 @@ packages:
   /zhead@2.2.0:
     resolution: {integrity: sha512-NzynJDdbRD5CIMZEoWd6esLlUwm4PzjbHVEu7qpLNpi32DY0wd1a83XZP86hkW8HPqjjaYBuMfapx1iahMF46g==}
     dev: false
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
