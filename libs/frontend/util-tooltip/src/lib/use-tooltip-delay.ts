@@ -4,6 +4,7 @@ import { IUseTooltip, IUseTooltipOptions, useTooltip } from './use-tooltip'
 
 export interface IUseTooltipDelay extends IUseTooltip {
   cancelHoverTimer: () => void
+  tooltipMouseEnter: () => void
 }
 
 export interface IUseTooltipDelayOptions extends IUseTooltipOptions {
@@ -32,13 +33,13 @@ export const useTooltipDelay = (options?: IUseTooltipDelayOptions): IUseTooltipD
     cancelGlobalShowTimer()
     // If the user hovers over another tooltip within the delay time, immediately show
     if (globalShow.value) {
-      tooltip.show.value = true
+      tooltip.tooltipMouseEnter()
     } else {
       hoverTimer = setTimeout(() => {
         if (mouseover) {
           tooltip.update()
-          tooltip.show.value = true
           globalShow.value = true
+          tooltip.tooltipMouseEnter()
         }
       }, hoverDelay)
     }
@@ -66,7 +67,7 @@ export const useTooltipDelay = (options?: IUseTooltipDelayOptions): IUseTooltipD
       }, globalShowDuration)
     }
     mouseover = false
-    tooltip.show.value = false
+    tooltip.tooltipMouseLeave()
   }
 
   onUnmounted(() => {

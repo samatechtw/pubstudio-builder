@@ -152,6 +152,7 @@ const {
 } = useDropdown({
   clickawayIgnoreSelector: `div[data-toggle-id="${dataToggleId}"]`,
   offset: { mainAxis: 0, crossAxis: 0 },
+  layoutShift: false,
   middlewares: [
     observePlacementChange({
       currentPlacement: dropdownCurrentPlacement,

@@ -76,24 +76,10 @@ onUnmounted(() => {
 })
 </script>
 
-<style lang="postcss">
+<style lang="postcss" scoped>
 @import '@theme/css/mixins.postcss';
 @import '@theme/css/colors.postcss';
 
-.modal-title {
-  @mixin title 32px;
-  color: $color-title;
-}
-.modal-text {
-  @mixin text-medium 16px;
-  line-height: 140%;
-  color: $color-text;
-  margin-top: 16px;
-}
-.modal-buttons {
-  @mixin flex-row;
-  margin-top: 24px;
-}
 .modal-outer {
   background-color: rgba(0, 0, 0, 0.6);
   @mixin overlay;
@@ -109,6 +95,20 @@ onUnmounted(() => {
   background-color: white;
   width: 440px;
   border-radius: 4px;
+}
+:slotted(.modal-title) {
+  @mixin title 32px;
+  color: $color-title;
+}
+:slotted(.modal-text) {
+  @mixin text-medium 16px;
+  line-height: 140%;
+  color: $color-text;
+  margin-top: 16px;
+}
+:slotted(.modal-buttons) {
+  @mixin flex-row;
+  margin-top: 24px;
 }
 
 .modal-enter-active,

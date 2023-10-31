@@ -115,6 +115,7 @@ const saveBreakpoints = (newBreakpoints: IBreakpoint[]) => {
 .edit-breakpoint-wrap {
   @mixin flex-center;
   @mixin size 40px;
+  position: relative;
   .edit-icon {
     @mixin size 20px;
     flex-shrink: 0;

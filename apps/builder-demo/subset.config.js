@@ -32,6 +32,7 @@ module.exports = {
       'prosemirror-state',
       'prosemirror-transform',
       'prosemirror-view',
+      'highlight.js/lib/core',
       'typescript',
       'vite',
       '@floating-ui/vue',

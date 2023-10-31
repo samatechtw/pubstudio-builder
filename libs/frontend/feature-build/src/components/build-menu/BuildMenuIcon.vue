@@ -42,11 +42,12 @@ const {
 <style lang="postcss" scoped>
 @import '@theme/css/mixins.postcss';
 
-$arrow-size: 10px;
+$arrow-size: 8px;
 
 .build-icon {
   @mixin flex-col;
   align-items: center;
+  position: relative;
   color: $color-title;
   transition: color 0.2s;
   cursor: pointer;

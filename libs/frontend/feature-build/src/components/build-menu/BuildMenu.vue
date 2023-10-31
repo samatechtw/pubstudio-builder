@@ -135,6 +135,7 @@ const toggleSubMenu = (newSubmenu: BuildSubmenu) => {
   height: 100%;
   width: $build-menu-width;
   padding-bottom: 8px;
+  overflow: visible;
   align-items: center;
   z-index: 2;
   > div {

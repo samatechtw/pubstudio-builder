@@ -8,7 +8,12 @@
     @click="click"
   >
     <ToolbarBreakpointIcon :breakpoint="breakpoint" />
-    <div v-if="show" ref="tooltipRef" class="tooltip" :style="tooltipStyle">
+    <div
+      v-if="show"
+      ref="tooltipRef"
+      class="tooltip"
+      :style="{ ...tooltipStyle, width: '280px' }"
+    >
       <div class="breakpoint-name">
         {{ breakpoint.name }}
       </div>
@@ -92,6 +97,7 @@ const breakpointHint = computed(() => {
     @mixin flex-center;
     width: 40px;
     height: 40px;
+    position: relative;
     &-active {
       background-color: $color-toolbar-button-active;
     }
@@ -100,7 +106,6 @@ const breakpointHint = computed(() => {
 
 .tooltip {
   @mixin tooltip;
-  max-width: 280px;
   margin-top: 4px;
   padding: 12px;
 }
