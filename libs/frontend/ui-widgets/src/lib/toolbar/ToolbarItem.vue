@@ -10,11 +10,9 @@
     @click="click"
   >
     <slot />
-    <Teleport to="body">
-      <div v-if="tooltip && show" ref="tooltipRef" class="tooltip" :style="tooltipStyle">
-        {{ tooltip }}
-      </div>
-    </Teleport>
+    <div v-if="tooltip && show" ref="tooltipRef" class="tooltip" :style="tooltipStyle">
+      {{ tooltip }}
+    </div>
   </button>
 </template>
 
@@ -67,6 +65,7 @@ const {
 
 .toolbar-item {
   @mixin size $style-toolbar-height;
+  position: relative;
   outline: none;
   cursor: pointer;
   padding: 6px;

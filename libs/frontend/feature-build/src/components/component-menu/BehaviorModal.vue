@@ -163,7 +163,7 @@ const unmountCodeEditor = () => {
   codeEditorView = undefined
 }
 
-// onMounted() and onUnmounted() don't suit here because they only work when the modal is
+// onMounted() and onUnmounted() isn't suitable here because they only work when the modal is
 // mounted/unmounted, so we use `watch` to mount/unmount ProseMirror editor when target div
 // is mounted/unmounted.
 watch(behaviorCodeEditor, (domElement) => {

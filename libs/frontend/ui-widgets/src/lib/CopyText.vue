@@ -1,5 +1,10 @@
 <template>
-  <div ref="itemRef" class="copy-wrap" @mouseenter="showTip" @mouseleave="show = false">
+  <div
+    ref="itemRef"
+    class="copy-wrap"
+    @mouseenter="mouseEnter"
+    @mouseleave="tooltipMouseLeave"
+  >
     <Copy class="copy" @click="copyText" />
     <div v-if="show" ref="tooltipRef" class="tip" :style="tooltipStyle">
       <div>
@@ -24,19 +29,26 @@ const { text } = toRefs(props)
 
 const { t } = useI18n()
 
-const { itemRef, arrowStyle, tooltipRef, tooltipStyle } = useTooltip({
+const {
+  itemRef,
+  arrowStyle,
+  tooltipRef,
+  tooltipStyle,
+  show,
+  tooltipMouseEnter,
+  tooltipMouseLeave,
+} = useTooltip({
   placement: 'top',
   arrow: true,
   shift: true,
   offset: 8,
 })
-const show = ref(false)
 
 const tip = ref(t('copy_text'))
 
-const showTip = () => {
+const mouseEnter = () => {
   tip.value = t('copy_text')
-  show.value = true
+  tooltipMouseEnter()
 }
 
 const copyText = () => {
@@ -47,6 +59,10 @@ const copyText = () => {
 
 <style lang="postcss" scoped>
 @import '@theme/css/mixins.postcss';
+
+.copy-wrap {
+  position: relative;
+}
 
 .tip {
   @mixin tooltip;
