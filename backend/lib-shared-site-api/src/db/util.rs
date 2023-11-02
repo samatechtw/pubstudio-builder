@@ -84,6 +84,26 @@ pub fn append_order_by<'a, DB: Database>(
     query
 }
 
+pub fn append_array_contains<'a, DB, T>(
+    query: QueryBuilder<'a, DB>,
+    arg_name: &str,
+    arg: Option<T>,
+    count: u32,
+) -> (QueryBuilder<'a, DB>, u32)
+where
+    DB: Database,
+    T: 'a + sqlx::Type<DB> + sqlx::Encode<'a, DB> + Send,
+{
+    if let Some(arg_val) = arg {
+        let (mut q, count) = append_and(query, count);
+        q.push(" ");
+        q.push_bind(arg_val);
+        q.push(format!(" <@ {}", arg_name));
+        return (q, count + 1);
+    }
+    (query, count)
+}
+
 pub fn option_string_to_uuid(str: Option<String>) -> Option<Uuid> {
     str.and_then(|id| Uuid::parse_str(&id).ok())
 }
