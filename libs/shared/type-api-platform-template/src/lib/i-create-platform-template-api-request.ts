@@ -8,6 +8,7 @@ import {
 export interface ICreatePlatformTemplateRequest {
   collection_id: string
   description: string
+  categories: string[]
   preview_content_size: number
   preview_content_type: AssetContentType
   public: boolean

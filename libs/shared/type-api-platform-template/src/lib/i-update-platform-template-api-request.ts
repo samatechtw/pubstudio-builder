@@ -9,6 +9,7 @@ export interface IUpdatePlatformTemplateRequest {
   description?: string
   public?: boolean
   name?: string
+  categories?: string[]
   preview_content_size?: number
   preview_content_type?: AssetContentType
   version?: string
