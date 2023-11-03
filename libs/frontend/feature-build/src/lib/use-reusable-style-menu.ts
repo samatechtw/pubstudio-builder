@@ -1,37 +1,39 @@
-import { setComponentEditStyle } from '@pubstudio/frontend/feature-editor'
-import { activeBreakpoint } from '@pubstudio/frontend/feature-site-source'
+import {
+  activeBreakpoint,
+  descSortedBreakpoints,
+} from '@pubstudio/frontend/feature-site-source'
+import { computeComponentFlattenedStyles } from '@pubstudio/frontend/util-component'
 import {
   Css,
   CssPseudoClass,
-  IActiveBreakpointStyle,
-  IPseudoStyle,
+  IBreakpointStylesWithSource,
+  IInheritedStyleEntry,
+  IRawStylesWithSource,
   IStyle,
   IStyleEntry,
+  StyleSourceType,
 } from '@pubstudio/shared/type-site'
-import { computed, ComputedRef, reactive, Ref, ref, UnwrapNestedRefs } from 'vue'
+import { computed, ComputedRef, Ref, ref, toRaw } from 'vue'
 import { useBuild } from './use-build'
 
 export interface IUseStyleMenuFeature {
   editing: Ref<boolean>
-  editingStyle: UnwrapNestedRefs<IEditingStyle>
+  editingStyle: Ref<IEditingStyle>
+  editingStyleEntries: ComputedRef<IInheritedStyleEntry[]>
   styleError: Ref<string | undefined>
   styles: ComputedRef<IStyle[]>
   clearEditingState: () => void
   newStyle: () => void
   setEditingStyle: (style: IStyle) => void
   newEditingStyleProp: () => void
-  updateEditingStyleProp: (index: number, newStyle: IStyleEntry) => void
-  removeEditingStyleProp: (index: number) => void
+  updateEditingStyleProp: (oldProperty: Css, newEntry: IStyleEntry) => void
+  removeEditingStyleProp: (property: Css) => void
   saveStyle: () => void
 }
 
-export interface IEditingStyle {
+export interface IEditingStyle extends Omit<IStyle, 'id'> {
   id?: string
-  name: string
-  breakpoints: Record<string, IPseudoStyleEntries>
 }
-
-type IPseudoStyleEntries = { [key in CssPseudoClass]?: IStyleEntry[] }
 
 const emptyStyle = (): IEditingStyle => ({
   id: undefined,
@@ -40,7 +42,7 @@ const emptyStyle = (): IEditingStyle => ({
 })
 
 const editing = ref(false)
-const editingStyle = reactive<IEditingStyle>(emptyStyle())
+const editingStyle = ref(emptyStyle())
 const styleError = ref<string | undefined>()
 
 export const resetStyleMenu = () => {
@@ -68,103 +70,102 @@ export const useReusableStyleMenu = (): IUseStyleMenuFeature => {
   }
 
   const setEditingStyle = (style: IStyle) => {
-    const newEditingStyle: IEditingStyle = {
-      id: style.id,
-      name: style.name,
-      breakpoints: Object.entries(style.breakpoints).reduce(
-        (breakpointStyles, [breakpointId, pseudoStyle]) => {
-          if (!breakpointStyles[breakpointId]) {
-            breakpointStyles[breakpointId] = {}
-          }
-
-          const breakpointStyle = breakpointStyles[breakpointId]
-
-          Object.entries(pseudoStyle).forEach(([pseudoKey, rawStyle]) => {
-            const pseudoClass = pseudoKey as CssPseudoClass
-            if (!breakpointStyle[pseudoClass]) {
-              breakpointStyle[pseudoClass] = []
-            }
-
-            const styleEntries = breakpointStyle[pseudoClass] as IStyleEntry[]
-
-            Object.entries(rawStyle).forEach(([css, value]) => {
-              styleEntries.push({
-                pseudoClass,
-                property: css as Css,
-                value,
-              })
-            })
-          })
-          return breakpointStyles
-        },
-        {} as Record<string, IPseudoStyleEntries>,
-      ),
-    }
-    Object.assign(editingStyle, newEditingStyle)
+    editingStyle.value = structuredClone(toRaw(style))
     editing.value = true
   }
 
-  const getEditingStyleEntries = (): IStyleEntry[] => {
-    const activeBreakpointId = activeBreakpoint.value.id
-
-    if (!editingStyle.breakpoints[activeBreakpointId]) {
-      editingStyle.breakpoints[activeBreakpointId] = {}
+  const getActiveRawStyle = () => {
+    let pseudoStyle = editingStyle.value.breakpoints[activeBreakpoint.value.id]
+    if (!pseudoStyle) {
+      pseudoStyle = editingStyle.value.breakpoints[activeBreakpoint.value.id] = {}
     }
 
-    if (!editingStyle.breakpoints[activeBreakpointId][currentPseudoClass.value]) {
-      editingStyle.breakpoints[activeBreakpointId][currentPseudoClass.value] = []
+    let rawStyle = pseudoStyle[currentPseudoClass.value]
+    if (!rawStyle) {
+      rawStyle = pseudoStyle[currentPseudoClass.value] = {}
     }
 
-    return editingStyle.breakpoints[activeBreakpointId][
-      currentPseudoClass.value
-    ] as IStyleEntry[]
+    return rawStyle
   }
+
+  const editingStyleEntries = computed(() => {
+    // Compute breakpoint styles with source
+    const breakpointStylesWithSource: IBreakpointStylesWithSource = {}
+    Object.entries(editingStyle.value.breakpoints).forEach(
+      ([breakpointId, editingPseudoStyle]) => {
+        if (!breakpointStylesWithSource[breakpointId]) {
+          breakpointStylesWithSource[breakpointId] = {}
+        }
+        const pseudoStyle = breakpointStylesWithSource[breakpointId]
+
+        Object.entries(editingPseudoStyle).forEach(([pseudoClass, editingRawStyle]) => {
+          if (!pseudoStyle[pseudoClass as CssPseudoClass]) {
+            pseudoStyle[pseudoClass as CssPseudoClass] = {}
+          }
+          const rawStyle = pseudoStyle[
+            pseudoClass as CssPseudoClass
+          ] as IRawStylesWithSource
+
+          Object.entries(editingRawStyle).forEach(([css, value]) => {
+            rawStyle[css as Css] = {
+              sourceType: StyleSourceType.Mixin,
+              sourceId: editingStyle.value.id ?? '',
+              sourceBreakpointId: breakpointId,
+              value,
+            }
+          })
+        })
+      },
+    )
+
+    const flattenedStyles = computeComponentFlattenedStyles(
+      editor.value,
+      breakpointStylesWithSource,
+      descSortedBreakpoints.value,
+      activeBreakpoint.value,
+    )
+
+    return Object.entries(flattenedStyles).map(
+      ([css, source]) =>
+        ({
+          pseudoClass: currentPseudoClass.value,
+          property: css as Css,
+          value: source.value,
+          sourceType: source.sourceType,
+          sourceId: source.sourceId,
+          sourceBreakpointId: source.sourceBreakpointId,
+        }) as IInheritedStyleEntry,
+    )
+  })
 
   const newEditingStyleProp = () => {
-    const editingStyleEntries = getEditingStyleEntries()
-    editingStyleEntries.push({
-      pseudoClass: currentPseudoClass.value,
-      property: Css.Empty,
-      value: '',
-    })
-  }
-
-  const updateEditingStyleProp = (index: number, newStyle: IStyleEntry) => {
-    const editingStyleEntries = getEditingStyleEntries()
-
-    const editedEntry = editingStyleEntries[index]
-    if (editedEntry?.property === '') {
-      // Set component edit style to prevent new style entry from exiting the edit
-      // state because we use `${entry.pseudoClass}-${entry.property}` as the key
-      //of <StyleRow> in StyleMenuEdit component.
-      setComponentEditStyle(editor.value, newStyle.property)
-    }
-
-    const samePropertyEntryIndex = editingStyleEntries.findIndex(
-      (entry) => entry.property === newStyle.property,
-    )
-    if (samePropertyEntryIndex >= 0) {
-      editingStyleEntries[samePropertyEntryIndex] = newStyle
-      if (index !== samePropertyEntryIndex) {
-        removeEditingStyleProp(index)
-      }
-    } else {
-      editingStyleEntries[index] = newStyle
+    const rawStyle = getActiveRawStyle()
+    if (!rawStyle[Css.Empty]) {
+      rawStyle[Css.Empty] = ''
     }
   }
 
-  const removeEditingStyleProp = (index: number) => {
-    const editingStyleEntries = getEditingStyleEntries()
-    editingStyleEntries.splice(index, 1)
+  const updateEditingStyleProp = (oldProperty: Css, newEntry: IStyleEntry) => {
+    const rawStyle = getActiveRawStyle()
+    if (oldProperty !== newEntry.property) {
+      delete rawStyle[oldProperty]
+    }
+    rawStyle[newEntry.property] = newEntry.value
+  }
+
+  const removeEditingStyleProp = (property: Css) => {
+    const rawStyle = getActiveRawStyle()
+    delete rawStyle[property]
   }
 
   const validateStyle = (): boolean => {
     styleError.value = undefined
-    if (!editingStyle.name) {
+    if (!editingStyle.value.name) {
       styleError.value = 'Style must have a name'
     } else {
-      const editingStyleEntries = getEditingStyleEntries()
-      if (editingStyleEntries.some((entry) => !entry.property)) {
+      const rawStyle = getActiveRawStyle()
+      const rawStyleEntries = Object.entries(rawStyle)
+      if (rawStyleEntries.some(([property]) => property === Css.Empty)) {
         styleError.value = 'Property cannot be empty'
       }
     }
@@ -176,26 +177,11 @@ export const useReusableStyleMenu = (): IUseStyleMenuFeature => {
       if (!validateStyle()) {
         return
       }
-      const editingStyleEntries = getEditingStyleEntries()
-
-      const newStyle: IActiveBreakpointStyle = {
-        id: editingStyle.id ?? '',
-        name: editingStyle.name,
-        pseudoStyle: editingStyleEntries.reduce((pseudoStyle, entry) => {
-          const pseudoClass = pseudoStyle[entry.pseudoClass]
-          if (pseudoClass) {
-            pseudoClass[entry.property] = entry.value
-          } else {
-            pseudoStyle[entry.pseudoClass] = { [entry.property]: entry.value }
-          }
-          return pseudoStyle
-        }, {} as IPseudoStyle),
-      }
-
-      if (editingStyle.id) {
-        editStyle(newStyle)
+      const newStyle = structuredClone(toRaw(editingStyle.value))
+      if (editingStyle.value.id) {
+        editStyle(newStyle as IStyle)
       } else {
-        addStyle(newStyle)
+        addStyle(newStyle as IStyle)
       }
     }
     clearEditingState()
@@ -204,6 +190,7 @@ export const useReusableStyleMenu = (): IUseStyleMenuFeature => {
   return {
     editing,
     editingStyle,
+    editingStyleEntries,
     styleError,
     styles,
     clearEditingState,

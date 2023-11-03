@@ -68,7 +68,12 @@ watch(
 </script>
 
 <style lang="postcss">
-.component-content-container > p,
+/* Style when ProseMirror editor is not active */
+.component-content-container > p + p:empty::before {
+  content: '\00a0';
+}
+
+/* Style when ProseMirror editor is active */
 .ProseMirror > p {
   margin-top: 0;
   margin-bottom: 0;

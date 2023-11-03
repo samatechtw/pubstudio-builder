@@ -26,12 +26,6 @@ export type IStyle = {
   breakpoints: IBreakpointStyles
 }
 
-export type IActiveBreakpointStyle = {
-  id: string
-  name: string
-  pseudoStyle: IPseudoStyle
-}
-
 export type IRawStyleWithSource = {
   sourceType: StyleSourceType
   sourceId: string
