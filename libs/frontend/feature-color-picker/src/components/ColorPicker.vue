@@ -248,12 +248,13 @@ const selectAlpha = (a: any) => {
   updateSelectedGradientColor(rgbaString.value)
 }
 
-const inputHex = (color: string) => {
+const inputHex = async (color: string) => {
   const { r, g, b, a, h, s, v } = setColorValue(color)
   Object.assign(c, { r, g, b, a, h, s, v })
   modelHex.value = color
   modelRgba.value = rgbaStringShort.value
-  rerender()
+  updateSelectedGradientColor(rgbaString.value)
+  await rerender()
 }
 
 const rerender = async () => {
@@ -268,6 +269,7 @@ const inputRgba = async (color: string) => {
   Object.assign(c, { r, g, b, a, h, s, v })
   modelHex.value = hexString.value
   modelRgba.value = color
+  updateSelectedGradientColor(rgbaString.value)
   await rerender()
 }
 

@@ -12,7 +12,7 @@ import { Css, IPage, ISite } from '@pubstudio/shared/type-site'
 import { Link, Meta, Script, useHead } from '@unhead/vue'
 import { Component, computed, ComputedRef, defineComponent, h, Ref } from 'vue'
 import { getBuildPageStyle, getLivePageStyle } from './get-page-style'
-import { getBuildReusableStyle, getLiveReusableStyle } from './get-reusable-style'
+import { getReusableStyle } from './get-reusable-style'
 import { renderPage } from './render'
 
 export interface IUseRender {
@@ -35,19 +35,10 @@ export interface IUseRenderOptions {
 export const useRender = (options: IUseRenderOptions): IUseRender => {
   const { site, activePage, notFoundComponent, renderMode, unhead } = options
 
-  const buildReusableStyle = computed(() => {
+  const reusableStyle = computed(() => {
     let styleContent = ''
     if (site.value) {
-      const reusableStyle = getBuildReusableStyle(site.value)
-      styleContent = rawStyleRecordToString(reusableStyle, site.value.context)
-    }
-    return h('style', styleContent)
-  })
-
-  const liveReusableStyle = computed(() => {
-    let styleContent = ''
-    if (site.value) {
-      const reusableStyle = getLiveReusableStyle(site.value.context)
+      const reusableStyle = getReusableStyle(site.value.context)
       styleContent = queryStyleToString(site.value.context, reusableStyle)
     }
     return h('style', styleContent)
@@ -55,11 +46,7 @@ export const useRender = (options: IUseRenderOptions): IUseRender => {
 
   const ReusableStyle = defineComponent({
     render() {
-      if (renderMode === RenderMode.Build) {
-        return buildReusableStyle.value
-      } else {
-        return liveReusableStyle.value
-      }
+      return reusableStyle.value
     },
   })
 

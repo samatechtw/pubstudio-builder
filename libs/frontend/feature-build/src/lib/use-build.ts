@@ -63,7 +63,6 @@ import {
 import {
   Css,
   CssPseudoClass,
-  IActiveBreakpointStyle,
   IBehavior,
   IBehaviorArg,
   IBreakpoint,
@@ -153,8 +152,8 @@ export interface IUseBuild {
     oldArg: IBehaviorArg | undefined,
     newArg: IBehaviorArg | undefined,
   ) => void
-  addStyle: (style: IActiveBreakpointStyle) => void
-  editStyle: (style: IActiveBreakpointStyle) => void
+  addStyle: (style: IStyle) => void
+  editStyle: (style: IStyle) => void
   deleteStyle: (style: IStyle) => void
   addThemeVariable: (data: IAddThemeVariableData) => void
   editThemeVariable: (data: IEditThemeVariableData) => void
@@ -703,15 +702,15 @@ export const useBuild = (): IUseBuild => {
     }
   }
 
-  const addStyle = (style: IActiveBreakpointStyle) => {
+  const addStyle = (style: IStyle) => {
     const data: IAddStyleMixinData = {
       name: style.name,
-      breakpoints: { [activeBreakpoint.value.id]: style.pseudoStyle },
+      breakpoints: style.breakpoints,
     }
     pushCommand(CommandType.AddStyleMixin, data)
   }
 
-  const editStyle = (style: IActiveBreakpointStyle) => {
+  const editStyle = (style: IStyle) => {
     const oldStyle = structuredClone(toRaw(resolveStyle(site.value.context, style.id)))
     if (!oldStyle) {
       return
@@ -719,7 +718,7 @@ export const useBuild = (): IUseBuild => {
 
     const newStyle = structuredClone(oldStyle)
     newStyle.name = style.name
-    newStyle.breakpoints[activeBreakpoint.value.id] = style.pseudoStyle
+    newStyle.breakpoints = style.breakpoints
 
     const data: IEditStyleMixinData = {
       oldStyle,
