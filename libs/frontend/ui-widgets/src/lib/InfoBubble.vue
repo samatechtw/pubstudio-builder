@@ -35,7 +35,8 @@
         @mouseleave="hideBubble"
         @mouseenter="cancelBubbleDelay"
       >
-        <div v-if="useHtml" class="message-html" v-html="message" />
+        <slot v-if="useSlot"></slot>
+        <div v-else-if="useHtml" class="message-html" v-html="message" />
         <template v-else-if="message">
           {{ message }}
         </template>
@@ -61,6 +62,7 @@ const props = withDefaults(
     showArrow?: boolean
     placement?: Placement
     useHtml?: boolean
+    useSlot?: boolean
   }>(),
   {
     message: undefined,
@@ -140,6 +142,10 @@ const hideBubble = () => {
   position: absolute;
   max-width: 200px;
   z-index: 1000;
+  :deep(a) {
+    color: $purple-500;
+    font-weight: 500;
+  }
 }
 
 :deep(svg) {
