@@ -37,4 +37,5 @@ export enum CommandType {
   SetDefaultsHead = 'setDH',
   SetPageHead = 'setPH',
   SetBreakpoint = 'setBP',
+  SetTranslations = 'setT',
 }

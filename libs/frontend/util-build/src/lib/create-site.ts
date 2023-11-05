@@ -68,6 +68,7 @@ export const createSite = (namespace: string): ISite => {
         name: 'Mobile',
       },
     },
+    i18n: {},
   }
 
   // Root component

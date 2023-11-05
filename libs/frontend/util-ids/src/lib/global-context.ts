@@ -11,4 +11,5 @@ export const globalContext: ISiteContext = {
     fonts: {},
   },
   breakpoints: {},
+  i18n: {},
 }
