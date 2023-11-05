@@ -70,6 +70,8 @@ export const serializeSiteContext = (context: ISiteContext): ISerializedSiteCont
     behaviors: context.behaviors,
     theme: context.theme,
     breakpoints: context.breakpoints,
+    i18n: context.i18n,
+    defaultI18n: context.defaultI18n,
   }
 }
 

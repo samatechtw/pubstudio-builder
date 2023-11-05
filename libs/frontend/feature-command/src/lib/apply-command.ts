@@ -32,6 +32,7 @@ import { applyRemoveThemeFont } from './theme-font/remove-theme-font'
 import { applyAddThemeVariable } from './theme-variable/add-theme-variable'
 import { applyEditThemeVariable } from './theme-variable/edit-theme-variable'
 import { applyRemoveThemeVariable } from './theme-variable/remove-theme-variable'
+import { applySetTranslations } from './translations/set-translations'
 
 // Applies a command to the current site context
 export const applyCommand = (
@@ -57,6 +58,7 @@ export const applyCommand = (
     [CommandType.SetComponentEvent]: applySetComponentEvent,
     [CommandType.SetBehavior]: applySetBehavior,
     [CommandType.SetBehaviorArg]: applySetBehaviorArg,
+    [CommandType.SetTranslations]: applySetTranslations,
     [CommandType.AddStyleMixin]: applyAddStyleMixin,
     [CommandType.EditStyleMixin]: applyEditStyleMixin,
     [CommandType.RemoveStyleMixin]: applyRemoveStyleMixin,

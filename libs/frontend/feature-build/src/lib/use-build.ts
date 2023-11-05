@@ -16,6 +16,7 @@ import {
   makeEditComponentData,
   makeRemoveComponentData,
   makeSetInputData,
+  makeSetTranslationsData,
 } from '@pubstudio/frontend/util-command'
 import {
   computeComponentBreakpointStyles,
@@ -44,6 +45,7 @@ import {
   IEditThemeVariableData,
   IMergeComponentStyleData,
   IMoveComponentData,
+  INewTranslations,
   IRemoveComponentMixinData,
   IRemovePageData,
   IRemoveStyleMixinData,
@@ -155,6 +157,7 @@ export interface IUseBuild {
   addStyle: (style: IStyle) => void
   editStyle: (style: IStyle) => void
   deleteStyle: (style: IStyle) => void
+  setTranslations: (code: string, translations: INewTranslations) => void
   addThemeVariable: (data: IAddThemeVariableData) => void
   editThemeVariable: (data: IEditThemeVariableData) => void
   deleteThemeVariable: (themeVariable: IRemoveThemeVariableData) => void
@@ -732,6 +735,11 @@ export const useBuild = (): IUseBuild => {
     pushCommand(CommandType.RemoveStyleMixin, data)
   }
 
+  const setTranslations = (code: string, translations: INewTranslations) => {
+    const data = makeSetTranslationsData(site.value.context, code, translations)
+    pushCommand(CommandType.SetTranslations, data)
+  }
+
   const addThemeVariable = (data: IAddThemeVariableData) => {
     pushCommand(CommandType.AddThemeVariable, data)
   }
@@ -1072,6 +1080,7 @@ export const useBuild = (): IUseBuild => {
     addStyle,
     editStyle,
     deleteStyle,
+    setTranslations,
     addThemeVariable,
     editThemeVariable,
     deleteThemeVariable,

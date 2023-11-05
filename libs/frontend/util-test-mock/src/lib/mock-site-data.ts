@@ -67,6 +67,7 @@ export const mockSerializedSite: ISerializedSite = {
         name: 'Mobile',
       },
     },
+    i18n: { en: { hello: 'My First Blog' } },
   },
   history: {
     back: [

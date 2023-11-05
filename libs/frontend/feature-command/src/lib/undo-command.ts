@@ -32,6 +32,7 @@ import { undoRemoveThemeFont } from './theme-font/remove-theme-font'
 import { undoAddThemeVariable } from './theme-variable/add-theme-variable'
 import { undoEditThemeVariable } from './theme-variable/edit-theme-variable'
 import { undoRemoveThemeVariable } from './theme-variable/remove-theme-variable'
+import { undoSetTranslations } from './translations/set-translations'
 
 // Undo the most recent command and shift it to the redo stack
 export const undoCommand = (site: ISite, command: ICommand) => {
@@ -54,6 +55,7 @@ export const undoCommand = (site: ISite, command: ICommand) => {
     [CommandType.AddStyleMixin]: undoAddStyleMixin,
     [CommandType.EditStyleMixin]: undoEditStyleMixin,
     [CommandType.RemoveStyleMixin]: undoRemoveStyleMixin,
+    [CommandType.SetTranslations]: undoSetTranslations,
     [CommandType.AddThemeVariable]: undoAddThemeVariable,
     [CommandType.EditThemeVariable]: undoEditThemeVariable,
     [CommandType.RemoveThemeVariable]: undoRemoveThemeVariable,

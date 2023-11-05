@@ -110,6 +110,9 @@ export const deserializedHelper = (serialized: ISerializedSite): ISite => {
     styles: context.styles,
     theme: context.theme,
     breakpoints: context.breakpoints,
+    // Added 231105
+    i18n: context.i18n ?? {},
+    defaultI18n: context.defaultI18n,
   }
   const site: ISite = {
     context: siteContext,
