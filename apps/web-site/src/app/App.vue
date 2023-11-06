@@ -164,8 +164,6 @@ body {
   margin: 0;
   width: 100%;
   height: 100%;
-  background-color: #f8f5f0;
-  color: black;
   * {
     box-sizing: border-box;
   }

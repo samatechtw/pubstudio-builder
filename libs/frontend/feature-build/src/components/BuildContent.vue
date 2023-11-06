@@ -24,6 +24,12 @@ import { buildContentWindowId, useBuild } from '../lib/use-build'
 import { setBuilderWidth } from '@pubstudio/frontend/feature-editor'
 import { NotFound } from '@pubstudio/frontend/ui-widgets'
 import { useRenderBuilder } from '../lib/use-render-builder'
+import { Css, IRawStyle } from '@pubstudio/shared/type-site'
+import { findStyles } from '@pubstudio/frontend/util-component'
+import {
+  activeBreakpoint,
+  descSortedBreakpoints,
+} from '@pubstudio/frontend/feature-site-source'
 
 const { site, activePage, editor } = useBuild()
 
@@ -32,7 +38,6 @@ const {
   ComponentStyle,
   GoogleFontLink,
   PageContent,
-  rootComponentHeight,
   rootComponentMinHeight,
 } = useRenderBuilder({
   site,
@@ -58,10 +63,25 @@ const innerStyle = computed<StyleValue>(() => {
 
   const innerHeight = buildContentWindowHeight / builderScale
 
+  // Set builder background/color to page root to handle the case
+  //   when child components overflow the root
+  let rootStyles: IRawStyle | undefined = undefined
+  if (activePage.value) {
+    rootStyles = findStyles(
+      [Css.Background, Css.BackgroundColor],
+      site.value,
+      activePage.value?.root,
+      descSortedBreakpoints.value,
+      activeBreakpoint.value,
+    )
+  }
+
   return {
     width: `${innerWidth}px`,
     height: `${innerHeight}px`,
     transform: `scale(${builderScale})`,
+    background: rootStyles?.[Css.Background],
+    'background-color': rootStyles?.[Css.BackgroundColor],
   }
 })
 
@@ -113,7 +133,6 @@ $border-offset: 0px;
       overflow: auto;
       /* Page root */
       & > div {
-        height: v-bind(rootComponentHeight);
         min-height: v-bind(rootComponentMinHeight);
         /* Select anything that is the direct children of page root */
         & > :deep(*) {

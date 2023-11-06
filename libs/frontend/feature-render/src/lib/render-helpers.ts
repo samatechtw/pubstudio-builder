@@ -35,7 +35,7 @@ export const parseI18n = (
   }
   return content.replace(i18nVarRegex, (_, variable: string) => {
     const active = site.context.activeI18n ?? 'en'
-    const val = site.context.i18n[active][variable]
+    const val = (site.context.i18n[active] ?? {})[variable]
     return val ?? variable
   })
 }
