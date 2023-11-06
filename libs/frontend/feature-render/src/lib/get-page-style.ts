@@ -13,9 +13,11 @@ import {
   rawStyleToResolvedStyleWithSource,
 } from '@pubstudio/frontend/util-render'
 import {
+  Css,
   CssPseudoClass,
   IComponent,
   IPage,
+  IRawStyle,
   ISite,
   ISiteContext,
 } from '@pubstudio/shared/type-site'
@@ -44,6 +46,34 @@ export const getBuildPageStyle = (site: ISite, page: IPage): IRawStyleRecord => 
   appendStyle(page.root)
 
   return pageStyle
+}
+
+export const getRootBackgroundStyle = (
+  context: ISiteContext,
+  page: IPage,
+): IQueryStyle => {
+  const queryStyle = createQueryStyle(context)
+  const breakpointStyles = computeComponentBreakpointStyles(context, page.root, {
+    computeMixins: true,
+  })
+  for (const breakpointId in context.breakpoints) {
+    const pseudoStyle = breakpointStyles[breakpointId]
+    if (pseudoStyle) {
+      Object.entries(pseudoStyle).forEach(([pseudoClass, rawStyle]) => {
+        const resolvedStyle = rawStyleToResolvedStyleWithSource(context, rawStyle)
+        const filteredStyle: IRawStyle = {}
+        if (resolvedStyle[Css.Background]) {
+          filteredStyle[Css.Background] = resolvedStyle[Css.Background]
+        }
+        if (resolvedStyle[Css.BackgroundColor]) {
+          filteredStyle[Css.BackgroundColor] = resolvedStyle[Css.BackgroundColor]
+        }
+        const pseudoValue = pseudoClass === CssPseudoClass.Default ? '' : pseudoClass
+        queryStyle[breakpointId][`html${pseudoValue}`] = filteredStyle
+      })
+    }
+  }
+  return queryStyle
 }
 
 export const getLivePageStyle = (context: ISiteContext, page: IPage): IQueryStyle => {

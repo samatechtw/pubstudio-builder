@@ -8,11 +8,12 @@
 </template>
 
 <script lang="ts" setup>
-import { computed } from 'vue'
+import { computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { RenderMode } from '@pubstudio/frontend/util-render'
 import { useRenderPreview } from '@pubstudio/frontend/feature-preview'
 import { NotFound } from '@pubstudio/frontend/ui-widgets'
+import { useRootBackgroundWorkaround } from '@pubstudio/frontend/feature-render'
 import { useBuild } from '../../lib/use-build'
 
 const route = useRoute()
@@ -41,7 +42,6 @@ const {
   ComponentStyle,
   GoogleFontLink,
   PageContent,
-  rootComponentHeight,
   rootComponentMinHeight,
 } = useRenderPreview({
   site,
@@ -53,12 +53,14 @@ const {
 </script>
 
 <style lang="postcss" scoped>
+html {
+  background-color: black;
+}
 .preview-content {
   width: 100%;
   height: 100%;
   /* Page Root */
   & > :deep(div) {
-    height: v-bind(rootComponentHeight) !important;
     min-height: v-bind(rootComponentMinHeight) !important;
     /* Select anything that is the direct children of page root */
     & > * {
