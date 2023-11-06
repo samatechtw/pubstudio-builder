@@ -28,7 +28,7 @@ pub type SiteDbPools = RwLock<HashMap<String, SqlitePool>>;
 
 pub type DynSiteRepo = Arc<dyn SiteRepoTrait + Send + Sync>;
 
-const SITE_COLUMNS: &str = r#"id, name, version, context, defaults, editor, history, pages, created_at, updated_at, published"#;
+const SITE_COLUMNS: &str = r#"id, name, version, context, defaults, editor, history, pages, created_at, updated_at, published, update_key"#;
 
 #[async_trait]
 pub trait SiteRepoTrait {
@@ -179,6 +179,7 @@ impl SiteRepoTrait for SiteRepo {
         let (query, update_count) = append_comma(query, "editor", req.editor, update_count);
         let (query, update_count) = append_comma(query, "history", req.history, update_count);
         let (query, update_count) = append_comma(query, "pages", req.pages, update_count);
+        let (query, update_count) = append_comma(query, "update_key", req.update_key, update_count);
         let (mut query, update_count) =
             append_comma(query, "published", req.published, update_count);
 
@@ -388,5 +389,6 @@ fn map_to_site_entity(row: SqliteRow) -> Result<SiteEntity, Error> {
         created_at: row.try_get("created_at")?,
         updated_at: row.try_get("updated_at")?,
         published: row.try_get("published")?,
+        update_key: row.try_get("update_key")?,
     })
 }

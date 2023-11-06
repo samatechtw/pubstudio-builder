@@ -1,11 +1,11 @@
 use axum::{
-    extract::{Path, State},
+    extract::{Path, State, Query},
     Extension, Json,
 };
 use axum_macros::debug_handler;
 use lib_shared_site_api::error::api_error::ApiError;
 use lib_shared_types::{
-    dto::site_api::get_site_dto::{to_api_response, GetSiteDto},
+    dto::site_api::get_site_dto::{to_api_response, GetSiteDto, GetSiteQuery},
     entity::site_api::site_metadata_entity::SiteMetadataEntity,
     error::api_error::ApiErrorCode,
     shared::user::{RequestUser, UserType},
@@ -31,6 +31,7 @@ fn is_admin_or_site_owner(metadata: &SiteMetadataEntity, user: &RequestUser) -> 
 #[debug_handler]
 pub async fn get_site(
     Path(site_id): Path<String>,
+    Query(query): Query<GetSiteQuery>,
     Extension(user): Extension<RequestUser>,
     State(context): State<ApiContext>,
 ) -> Result<Json<GetSiteDto>, ApiError> {
@@ -78,11 +79,17 @@ pub async fn get_site(
                 site_metadata.site_type,
             )
             .await;
-        return Ok(Json(to_api_response(
-            site,
-            admin_or_owner,
-            site_metadata.disabled,
-        )));
+
+            match query.update_key {
+                Some(update_key) if site.update_key == update_key => {
+                    return Ok(Json(GetSiteDto::default()))
+                }
+                _ => return Ok(Json(to_api_response(
+                    site,
+                    admin_or_owner,
+                    site_metadata.disabled,
+                ))),
+            }
     }
     Err(ApiError::forbidden())
 }

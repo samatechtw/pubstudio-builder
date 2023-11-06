@@ -1,5 +1,5 @@
 use chrono::{DateTime, Utc};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use crate::entity::site_api::site_entity::SiteEntity;
 
@@ -17,6 +17,30 @@ pub struct GetSiteDto {
     pub updated_at: Option<DateTime<Utc>>,
     pub published: Option<bool>,
     pub disabled: Option<bool>,
+}
+
+#[derive(Deserialize)]
+pub struct GetSiteQuery {
+    pub update_key: Option<u16>,
+}
+
+impl GetSiteDto {
+    pub fn default() -> Self {
+        Self {
+            id: 0,
+            name: "".to_string(),
+            version: "".to_string(),
+            context: "".to_string(),
+            defaults: "".to_string(),
+            history: None,
+            editor: None,
+            pages: "".to_string(),
+            created_at: None,
+            updated_at: None,
+            published: None,
+            disabled: None,
+        }
+    }
 }
 
 pub fn to_api_response(site_entity: SiteEntity, with_editor: bool, disabled: bool) -> GetSiteDto {

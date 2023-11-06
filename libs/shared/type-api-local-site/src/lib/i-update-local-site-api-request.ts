@@ -4,4 +4,5 @@ export interface IUpdateLocalSiteApiRequest
   extends Omit<IUpdateSiteApiRequest, 'domains'> {
   published?: boolean
   subdomain?: string
+  update_key?: number
 }

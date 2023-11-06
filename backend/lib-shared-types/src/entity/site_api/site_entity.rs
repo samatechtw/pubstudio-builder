@@ -14,6 +14,7 @@ pub struct SiteEntity {
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
     pub published: bool,
+    pub update_key: u16,
 }
 
 impl SiteEntity {

@@ -116,4 +116,17 @@ describe('Update Site', () => {
         status: 400,
       })
   })
+
+  it('when update_key exceeds u16 limit', () => {
+    payload.update_key = 65536
+    return api
+      .patch(`${testEndpoint}/${siteId}`)
+      .set('Authorization', adminAuth)
+      .send(payload)
+      .expect(400, {
+        code: 'InvalidFormData',
+        message: 'Failed to deserialize the JSON body into the target type',
+        status: 400,
+      })
+  })
 })

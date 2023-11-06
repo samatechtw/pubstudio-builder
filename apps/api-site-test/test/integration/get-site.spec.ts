@@ -51,6 +51,44 @@ describe('Get Site', () => {
       expect(body.pages).toBeDefined()
     })
 
+    it('returns site data if current update_key does not match the saved one', async () => {
+      const response = await api
+        .get(`${testEndpoint}/${siteId}`)
+        .query({ update_key: 1 })
+        .set('Authorization', adminAuth)
+        .expect(200)
+      const body: IGetSiteApiResponse = response.body
+
+      expect(body.id).toEqual(1)
+      expect(body.name).toEqual('Test Site 2')
+      expect(body.published).toEqual(false)
+      expect(body.version).toEqual('0.1')
+      expect(body.context).toBeDefined()
+      expect(body.defaults).toBeDefined()
+      expect(body.editor).toBeDefined()
+      expect(body.history).toBeDefined()
+      expect(body.pages).toBeDefined()
+    })
+
+    it('returns site data if current update_key match the saved one', async () => {
+      const response = await api
+        .get(`${testEndpoint}/${siteId}`)
+        .query({ update_key: 0 })
+        .set('Authorization', adminAuth)
+        .expect(200)
+      const body: IGetSiteApiResponse = response.body
+
+      expect(body.id).toEqual(0)
+      expect(body.name).toEqual('')
+      expect(body.published).toBeNull()
+      expect(body.version).toEqual('')
+      expect(body.context).toEqual('')
+      expect(body.defaults).toEqual('')
+      expect(body.editor).toBeNull()
+      expect(body.history).toBeNull()
+      expect(body.pages).toEqual('')
+    })
+
     it('returns 401 when admin token has expired', async () => {
       await api
         .get(`${testEndpoint}/${siteId}`)

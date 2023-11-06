@@ -1,0 +1,3 @@
+ALTER TABLE site_versions
+ADD
+    COLUMN update_key INTEGER NOT NULL DEFAULT 0;
