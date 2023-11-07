@@ -5,7 +5,7 @@ import { h, VNode } from 'vue'
 import { computeAttrsInputsMixins } from './compute-attrs-inputs-mixins'
 import { IContent, IPropsContent } from './i-props-content'
 import { LiveComponent } from './live-component'
-import { computeEvents } from './render-helpers'
+import { computeEvents, parseI18n } from './render-helpers'
 
 export const renderPage = (
   site: ISite,
@@ -28,7 +28,7 @@ export const computePropsContent = (
 
   const content: IContent = component.children?.length
     ? component.children.map((child) => renderComponent(site, child, renderMode))
-    : component.content
+    : parseI18n(site, component.content)
 
   const props = {
     ...data.attrs,

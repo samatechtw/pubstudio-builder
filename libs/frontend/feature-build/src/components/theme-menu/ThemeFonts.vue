@@ -102,8 +102,8 @@ const removeFont = (font: IThemeFont) => {
     }
   }
   .theme-fonts-empty {
-    padding-top: 16px;
     @mixin text-medium 16px;
+    padding-top: 16px;
     color: $grey-500;
   }
 }

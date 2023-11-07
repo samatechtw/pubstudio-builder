@@ -68,7 +68,7 @@
 </template>
 
 <script lang="ts" setup generic="T extends IMultiselectOption">
-import { ComponentPublicInstance, computed, nextTick, ref, toRefs } from 'vue'
+import { ComponentPublicInstance, computed, nextTick, onMounted, ref, toRefs } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Placement } from '@floating-ui/vue'
 import { useDropdown, observePlacementChange } from '@pubstudio/frontend/util-dropdown'
@@ -96,6 +96,7 @@ const props = withDefaults(
     toggleId?: string
     tooltip?: string
     emptyText?: string
+    openInitial?: boolean
     openControl?: () => boolean
   }>(),
   {
@@ -113,6 +114,7 @@ const props = withDefaults(
 )
 const {
   labelKey,
+  openInitial,
   openControl,
   options,
   searchable,
@@ -287,6 +289,12 @@ const clear = () => {
   setMenuOpened(false)
   emit('select', undefined)
 }
+
+onMounted(() => {
+  if (openInitial.value) {
+    toggleDropdown()
+  }
+})
 </script>
 
 <style lang="postcss" scoped>

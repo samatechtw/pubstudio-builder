@@ -1,0 +1,17 @@
+<template>
+  <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+    <path fill="currentColor" d="M23 27V15h-5v-2h12v2h-5v12h-2z" />
+    <path fill="currentColor" d="M11 27V8H2V6h20v2h-9v19h-2z" />
+  </svg>
+</template>
+
+<script lang="ts" setup>
+withDefaults(
+  defineProps<{
+    color?: string
+  }>(),
+  {
+    color: '#000',
+  },
+)
+</script>

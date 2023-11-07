@@ -39,6 +39,14 @@
         <Assets v-if="store.auth.loggedIn.value" />
       </BuildMenuIcon>
       <BuildMenuIcon
+        v-if="store.auth.loggedIn.value"
+        id="build-asset"
+        :text="t('build.assets')"
+        @click="toggleTranslations"
+      >
+        <Text></Text>
+      </BuildMenuIcon>
+      <BuildMenuIcon
         id="build-behaviors"
         :text="t('build.behaviors')"
         @click="toggleSubMenu(BuildSubmenu.Behavior)"
@@ -60,6 +68,7 @@
         <File></File>
       </BuildMenuIcon>
     </div>
+    <TranslationsModal :show="!!editor?.translations" />
     <Transition name="submenu">
       <component
         :is="submenu"
@@ -76,10 +85,11 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { setBuildSubmenu } from '@pubstudio/frontend/feature-editor'
+import { setBuildSubmenu, showTranslations } from '@pubstudio/frontend/feature-editor'
 import { store } from '@pubstudio/frontend/data-access-web-store'
-import { Assets, BuildNew, Command, Pages } from '@pubstudio/frontend/ui-widgets'
+import { Assets, BuildNew, Command, Pages, Text } from '@pubstudio/frontend/ui-widgets'
 import { Code, Theme, Style, File } from '@pubstudio/frontend/ui-widgets'
+import { TranslationsModal } from '@pubstudio/frontend/feature-site-translations'
 import { BuildSubmenu } from '@pubstudio/shared/type-site'
 import BuildMenuIcon from './BuildMenuIcon.vue'
 import BuildMenuNew from './BuildMenuNew.vue'
@@ -113,6 +123,10 @@ const submenu = computed(() => {
   const submenu = editor.value?.buildSubmenu
   return submenu ? menus[submenu] : undefined
 })
+
+const toggleTranslations = () => {
+  showTranslations(editor.value, !editor.value?.translations)
+}
 
 const toggleSubMenu = (newSubmenu: BuildSubmenu) => {
   const submenu = editor.value?.buildSubmenu

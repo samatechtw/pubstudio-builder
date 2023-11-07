@@ -7,7 +7,7 @@ import { computed, onMounted, onBeforeUnmount, ref, toRefs, watch } from 'vue'
 import { IComponent, IEditorContext } from '@pubstudio/shared/type-site'
 import { getProseMirrorContainerId } from '@pubstudio/frontend/feature-editor'
 import { prosemirrorSetup } from '@pubstudio/frontend/util-edit-text'
-import { createComponentEditorView } from '../../lib/create-component-editor-view'
+import { createComponentEditorView } from '../../lib/create-editor-view'
 
 const props = defineProps<{
   component: IComponent
@@ -35,12 +35,8 @@ const mountProseMirrorEditor = (
   }
 }
 
-const mountEditor = () => {
-  mountProseMirrorEditor(editor.value, container.value)
-}
-
 onMounted(() => {
-  mountEditor()
+  mountProseMirrorEditor(editor.value, container.value)
 })
 
 onBeforeUnmount(() => {

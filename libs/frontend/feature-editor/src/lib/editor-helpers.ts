@@ -209,6 +209,13 @@ export const setEditBehavior = (
   }
 }
 
+export const showTranslations = (editor: IEditorContext | undefined, show: boolean) => {
+  if (editor && show !== editor.translations) {
+    editor.translations = show
+    siteStore.value.saveEditor(editor)
+  }
+}
+
 export const setThemeTab = (editor: IEditorContext | undefined, tab: ThemeTab) => {
   if (editor && tab !== editor.themeTab) {
     editor.themeTab = tab

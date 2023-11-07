@@ -3,6 +3,7 @@ import {
   computeEvents,
   IContent,
   IPropsContent,
+  parseI18n,
 } from '@pubstudio/frontend/feature-render'
 import { RenderMode } from '@pubstudio/frontend/util-render'
 import { resetRuntimeContext } from '@pubstudio/frontend/util-runtime'
@@ -27,7 +28,7 @@ export const computePropsContent = (
 
   const content: IContent = component.children?.length
     ? component.children.map((child) => renderComponent(site, child, renderMode))
-    : component.content
+    : parseI18n(site, component.content)
 
   const props = {
     ...data.attrs,

@@ -131,6 +131,9 @@
       "@pubstudio/frontend/feature-site-assets": [
         "libs/frontend/feature-site-assets/src/index.ts"
       ],
+      "@pubstudio/frontend/feature-site-translations": [
+        "libs/frontend/feature-site-translations/src/index.ts"
+      ],
       "@pubstudio/web/feature-site-resources": [
         "libs/web/feature-site-resources/src/index.ts"
       ],

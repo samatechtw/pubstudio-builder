@@ -4,6 +4,7 @@ import {
   IAttrsInputsMixins,
   IBuildContent,
   IPropsBuildContent,
+  parseI18n,
 } from '@pubstudio/frontend/feature-render'
 import {
   activeBreakpoint,
@@ -200,7 +201,10 @@ export const computePropsContent = (
       content.push(h(ProseMirrorEditor, { component, editor }))
     } else {
       content.push(
-        h('div', { class: 'component-content-container', innerHTML: component.content }),
+        h('div', {
+          class: 'component-content-container',
+          innerHTML: parseI18n(site, component.content),
+        }),
       )
     }
   }

@@ -23,3 +23,19 @@ export const computeEvents = (site: ISite, component: IComponent): IEventCollect
   }
   return events
 }
+
+const i18nVarRegex = /\$\{(.*?)\}/g
+
+export const parseI18n = (
+  site: ISite,
+  content: string | undefined,
+): string | undefined => {
+  if (!content) {
+    return content
+  }
+  return content.replace(i18nVarRegex, (_, variable: string) => {
+    const active = site.context.activeI18n ?? 'en'
+    const val = site.context.i18n[active][variable]
+    return val ?? variable
+  })
+}
