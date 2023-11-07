@@ -130,11 +130,7 @@ export const onDrop = (
       parentId: dragComponent.parentId as string,
       index: dragComponent.index,
     }
-    const toCmp =
-      // hover-top/right/bottom/left should have a higher priority than hover-self.
-      props.hoverTop || props.hoverRight || props.hoverBottom || props.hoverLeft
-        ? component.parent
-        : component
+    const toCmp = props.hoverSelf ? component : component.parent
     const to: IComponentPosition = {
       parentId: toCmp?.id as string,
       index: props.destinationIndex,
