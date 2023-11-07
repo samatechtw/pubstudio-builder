@@ -99,6 +99,8 @@ export interface IEditorContext {
   styleMenu?: StyleToolbarMenu
   // Saved state of behavior edit modal
   editBehavior?: IEditBehavior
+  // Toggle translations modal
+  translations?: boolean
   // Active theme tab
   themeTab?: ThemeTab
   componentTab: {

@@ -14,5 +14,5 @@ export interface ISiteContext {
   theme: ITheme
   breakpoints: Record<string, IBreakpoint>
   i18n: Record<string, ITranslations>
-  defaultI18n?: string
+  activeI18n?: string
 }

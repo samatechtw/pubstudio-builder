@@ -48,6 +48,7 @@ export { default as File } from './lib/svg/File.vue'
 export { default as Style } from './lib/svg/Style.vue'
 export { default as Theme } from './lib/svg/Theme.vue'
 export { default as Pages } from './lib/svg/Pages.vue'
+export { default as Text } from './lib/svg/Text.vue'
 
 // toolbar
 export { default as AlignBottom } from './lib/toolbar/AlignBottom.vue'

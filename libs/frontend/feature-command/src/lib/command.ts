@@ -26,7 +26,7 @@ export const useCommand = (): IUseCommand => {
   const pushCommandHelper = <Data>(type: CommandType, data: Data, clearRedo = true) => {
     let [commandType, commandData] = [type, data]
 
-    // Unwrap a group of 1 command to increase performance
+    // Unwrap a group of 1 command to improve performance
     if (commandType === CommandType.Group) {
       const { commands } = commandData as ICommandGroupData
       if (commands.length === 1) {

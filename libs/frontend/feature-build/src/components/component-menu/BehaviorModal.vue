@@ -63,6 +63,9 @@
 <script lang="ts" setup>
 import { useI18n } from 'vue-i18n'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import hljs from 'highlight.js/lib/core'
+import js from 'highlight.js/lib/languages/javascript'
+import { EditorView } from 'prosemirror-view'
 import { Modal, PSButton } from '@pubstudio/frontend/ui-widgets'
 import { setOrCreate } from '@pubstudio/shared/type-utils'
 import { nextBehaviorId } from '@pubstudio/frontend/util-ids'
@@ -73,9 +76,6 @@ import BehaviorArgs from './BehaviorArgs.vue'
 import { useBuild } from '../../lib/use-build'
 import BehaviorContextVars from './BehaviorContextVars.vue'
 import { createCodeEditorView } from '../../lib/create-code-editor-view'
-import hljs from 'highlight.js/lib/core'
-import js from 'highlight.js/lib/languages/javascript'
-import { EditorView } from 'prosemirror-view'
 
 hljs.registerLanguage('javascript', js)
 

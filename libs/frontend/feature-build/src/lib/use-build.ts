@@ -61,6 +61,7 @@ import {
   ISetDefaultsHeadData,
   ISetHomePageData,
   ISetPageHeadData,
+  ISetTranslationsData,
 } from '@pubstudio/shared/type-command-data'
 import {
   Css,
@@ -157,7 +158,8 @@ export interface IUseBuild {
   addStyle: (style: IStyle) => void
   editStyle: (style: IStyle) => void
   deleteStyle: (style: IStyle) => void
-  setTranslations: (code: string, translations: INewTranslations) => void
+  setTranslations: (code: string, translations: INewTranslations, first: boolean) => void
+  setActiveI18n: (activeI18n: string) => void
   addThemeVariable: (data: IAddThemeVariableData) => void
   editThemeVariable: (data: IEditThemeVariableData) => void
   deleteThemeVariable: (themeVariable: IRemoveThemeVariableData) => void
@@ -735,9 +737,21 @@ export const useBuild = (): IUseBuild => {
     pushCommand(CommandType.RemoveStyleMixin, data)
   }
 
-  const setTranslations = (code: string, translations: INewTranslations) => {
+  const setTranslations = (
+    code: string,
+    translations: INewTranslations,
+    replace: boolean,
+  ) => {
     const data = makeSetTranslationsData(site.value.context, code, translations)
-    pushCommand(CommandType.SetTranslations, data)
+    if (replace) {
+      replaceLastCommand(CommandType.SetTranslations, data)
+    } else {
+      pushCommand(CommandType.SetTranslations, data)
+    }
+  }
+
+  const setActiveI18n = (activeI18n: string) => {
+    site.value.context.activeI18n = activeI18n
   }
 
   const addThemeVariable = (data: IAddThemeVariableData) => {
@@ -1081,6 +1095,7 @@ export const useBuild = (): IUseBuild => {
     editStyle,
     deleteStyle,
     setTranslations,
+    setActiveI18n,
     addThemeVariable,
     editThemeVariable,
     deleteThemeVariable,

@@ -100,7 +100,7 @@ describe('Set Translations', () => {
     const n1 = 'n1'
     const n2 = 'n2'
 
-    // Assert key does not exist
+    // Assert code does not exist
     expect(context.i18n[code]).toBe(undefined)
 
     // Set translation
@@ -115,6 +115,23 @@ describe('Set Translations', () => {
 
     undoSetTranslations(site, data)
     // Assert translation is removed
+    expect(context.i18n[code]).toBe(undefined)
+  })
+
+  it('should create a new code without adding keys', () => {
+    code = 'zh-tw'
+
+    // Assert code does not exist
+    expect(context.i18n[code]).toBe(undefined)
+
+    // Set translation
+    const data = makeSetTranslationsData(context, code, {})
+    applySetTranslations(site, data)
+    // Assert code is created
+    expect(context.i18n[code]).toEqual({})
+
+    undoSetTranslations(site, data)
+    // Assert code is removed
     expect(context.i18n[code]).toBe(undefined)
   })
 })

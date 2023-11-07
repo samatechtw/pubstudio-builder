@@ -30,6 +30,7 @@ export const deserializeEditor = (
         buildSubmenu: serializedEditor.buildSubmenu,
         styleMenu: serializedEditor.styleMenu,
         editBehavior: serializedEditor.editBehavior,
+        translations: serializedEditor.translations,
         themeTab: serializedEditor.themeTab,
         componentTab: serializedEditor.componentTab ?? {},
         mode: serializedEditor.mode,
@@ -112,7 +113,7 @@ export const deserializedHelper = (serialized: ISerializedSite): ISite => {
     breakpoints: context.breakpoints,
     // Added 231105
     i18n: context.i18n ?? {},
-    defaultI18n: context.defaultI18n,
+    activeI18n: context.activeI18n,
   }
   const site: ISite = {
     context: siteContext,
