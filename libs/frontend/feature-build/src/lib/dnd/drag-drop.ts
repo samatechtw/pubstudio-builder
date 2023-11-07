@@ -13,6 +13,18 @@ export interface IDropResult {
   to: IComponentPosition
 }
 
+export interface IOnDragOptions {
+  e: DragEvent
+  context: ISiteContext
+  dragSrc: IDraggedComponent
+  hoverCmpIndex: number
+  hoverCmp: IComponent
+  elementRef: HTMLElement | undefined
+  // Only check for top&bottom hover
+  verticalOnly?: boolean
+  stopAtFirstMatch?: boolean
+}
+
 const getMousePosition = (e: DragEvent): XYCoord => {
   return { x: e.clientX, y: e.clientY }
 }
@@ -41,16 +53,18 @@ const checkSelfDrop = (
   return false
 }
 
-export const onDrag = (
-  e: DragEvent,
-  context: ISiteContext,
-  dragSrc: IDraggedComponent,
-  targetIndex: number,
-  target: IComponent,
-  elementRef: HTMLElement | undefined,
-  // Only check for top&bottom hover
-  verticalOnly?: boolean,
-): IDropProps => {
+export const onDrag = (options: IOnDragOptions): IDropProps => {
+  const {
+    e,
+    context,
+    dragSrc,
+    hoverCmpIndex,
+    hoverCmp,
+    elementRef,
+    verticalOnly,
+    stopAtFirstMatch,
+  } = options
+
   const dropProps: IDropProps = {
     hoverSelf: false,
     hoverTop: false,
@@ -59,29 +73,35 @@ export const onDrag = (
     hoverLeft: false,
     destinationIndex: 0,
   }
+
   if (elementRef) {
     const dragCmpParentId = dragSrc.parentId
     const dragComponentIndex = dragSrc.index
 
-    const haveSameParent = dragCmpParentId === target.parent?.id
+    const haveSameParent = dragCmpParentId === hoverCmp.parent?.id
 
-    if (
-      dragCmpParentId !== target.id &&
-      (!haveSameParent || dragComponentIndex !== targetIndex)
-    ) {
-      const targetRect = elementRef.getBoundingClientRect()
+    if (!haveSameParent || dragComponentIndex !== hoverCmpIndex) {
+      const hoverCmpRect = elementRef.getBoundingClientRect()
       const targetMiddle: XYCoord = {
-        x: (targetRect.right + targetRect.left) / 2,
-        y: (targetRect.bottom + targetRect.top) / 2,
+        x: (hoverCmpRect.right + hoverCmpRect.left) / 2,
+        y: (hoverCmpRect.bottom + hoverCmpRect.top) / 2,
       }
 
       const mousePosition = getMousePosition(e)
-      const parentIsRow = isRowLayout(context, target.parent)
+      const parentIsRow = isRowLayout(context, hoverCmp.parent)
 
-      if (checkSelfDrop(target, parentIsRow, targetRect, mousePosition)) {
+      const hoverSelf = checkSelfDrop(hoverCmp, parentIsRow, hoverCmpRect, mousePosition)
+
+      if (hoverSelf) {
+        if (hoverCmp.id === dragCmpParentId) {
+          // Do nothing when a component is hovered on self if the dragged component is its children.
+          return dropProps
+        }
         dropProps.hoverSelf = true
-        dropProps.destinationIndex = target.children?.length ?? 0
-        return dropProps
+        dropProps.destinationIndex = hoverCmp.children?.length ?? 0
+        if (stopAtFirstMatch) {
+          return dropProps
+        }
       }
 
       if (!parentIsRow || verticalOnly) {
@@ -90,7 +110,7 @@ export const onDrag = (
           targetMiddle,
           haveSameParent,
           dragComponentIndex,
-          targetIndex,
+          hoverCmpIndex,
           dropProps,
         })
       } else {
@@ -99,7 +119,7 @@ export const onDrag = (
           targetMiddle,
           haveSameParent,
           dragComponentIndex,
-          targetIndex,
+          hoverCmpIndex,
           dropProps,
         })
       }
@@ -119,7 +139,11 @@ export const onDrop = (
       parentId: dragComponent.parentId as string,
       index: dragComponent.index,
     }
-    const toCmp = props.hoverSelf ? component : component.parent
+    const toCmp =
+      // hover-top/right/bottom/left should have a higher priority than hover-self.
+      props.hoverTop || props.hoverRight || props.hoverBottom || props.hoverLeft
+        ? component.parent
+        : component
     const to: IComponentPosition = {
       parentId: toCmp?.id as string,
       index: props.destinationIndex,
