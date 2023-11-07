@@ -1,6 +1,7 @@
 <template>
   <div
     :id="treeItemId"
+    ref="elementRef"
     class="component-tree-item"
     :class="{
       dragging: dndState?.dragging,
@@ -16,7 +17,6 @@
     @drop.stop="drop"
   >
     <div
-      ref="elementRef"
       class="component-title"
       :class="{
         selected: currentSelected,

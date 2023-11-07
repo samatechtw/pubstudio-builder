@@ -18,7 +18,7 @@ interface IHandleHoverProps {
   targetMiddle: XYCoord
   haveSameParent: boolean
   dragComponentIndex: number
-  targetIndex: number
+  hoverCmpIndex: number
   dropProps: IDropProps
 }
 
@@ -38,74 +38,78 @@ export const isRowLayout = (
   return direction === 'row' || direction === undefined
 }
 
-export const handleRowLayoutHover = ({
-  mousePosition,
-  targetMiddle,
-  haveSameParent,
-  dragComponentIndex,
-  targetIndex,
-  dropProps,
-}: IHandleHoverProps) => {
+export const handleRowLayoutHover = (props: IHandleHoverProps) => {
+  const {
+    mousePosition,
+    targetMiddle,
+    haveSameParent,
+    dragComponentIndex,
+    hoverCmpIndex,
+    dropProps,
+  } = props
+
   const hoverLeft =
     mousePosition.x < targetMiddle.x &&
-    (!haveSameParent || dragComponentIndex !== targetIndex - 1)
+    (!haveSameParent || dragComponentIndex !== hoverCmpIndex - 1)
 
   const hoverRight =
     mousePosition.x > targetMiddle.x &&
-    (!haveSameParent || dragComponentIndex !== targetIndex + 1)
+    (!haveSameParent || dragComponentIndex !== hoverCmpIndex + 1)
 
   dropProps.hoverLeft = hoverLeft
   dropProps.hoverRight = hoverRight
-  dropProps.destinationIndex = targetIndex
+  dropProps.destinationIndex = hoverCmpIndex
 
   // Calculate destination index
   if (hoverLeft) {
-    if (haveSameParent && dragComponentIndex <= targetIndex) {
-      dropProps.destinationIndex = targetIndex - 1
+    if (haveSameParent && dragComponentIndex <= hoverCmpIndex) {
+      dropProps.destinationIndex = hoverCmpIndex - 1
     }
   } else if (hoverRight) {
     if (haveSameParent) {
-      if (dragComponentIndex > targetIndex) {
-        dropProps.destinationIndex = targetIndex + 1
+      if (dragComponentIndex > hoverCmpIndex) {
+        dropProps.destinationIndex = hoverCmpIndex + 1
       }
     } else {
-      dropProps.destinationIndex = targetIndex + 1
+      dropProps.destinationIndex = hoverCmpIndex + 1
     }
   }
 }
 
-export const handleColumnLayoutHover = ({
-  mousePosition,
-  targetMiddle,
-  haveSameParent,
-  dragComponentIndex,
-  targetIndex,
-  dropProps,
-}: IHandleHoverProps) => {
+export const handleColumnLayoutHover = (props: IHandleHoverProps) => {
+  const {
+    mousePosition,
+    targetMiddle,
+    haveSameParent,
+    dragComponentIndex,
+    hoverCmpIndex,
+    dropProps,
+  } = props
+
   const hoverTop =
     mousePosition.y < targetMiddle.y &&
-    (!haveSameParent || dragComponentIndex !== targetIndex - 1)
+    (!haveSameParent || dragComponentIndex !== hoverCmpIndex - 1)
 
   const hoverBottom =
     mousePosition.y > targetMiddle.y &&
-    (!haveSameParent || dragComponentIndex !== targetIndex + 1)
+    (!haveSameParent || dragComponentIndex !== hoverCmpIndex + 1)
 
   dropProps.hoverTop = hoverTop
   dropProps.hoverBottom = hoverBottom
-  dropProps.destinationIndex = targetIndex
+  dropProps.destinationIndex = hoverCmpIndex
 
   // Calculate destination index
   if (hoverTop) {
-    if (haveSameParent && dragComponentIndex <= targetIndex) {
-      dropProps.destinationIndex = targetIndex - 1
+    if (haveSameParent && dragComponentIndex <= hoverCmpIndex) {
+      dropProps.destinationIndex = hoverCmpIndex - 1
     }
   } else if (hoverBottom) {
     if (haveSameParent) {
-      if (dragComponentIndex > targetIndex) {
-        dropProps.destinationIndex = targetIndex + 1
+      if (dragComponentIndex > hoverCmpIndex) {
+        dropProps.destinationIndex = hoverCmpIndex + 1
       }
     } else {
-      dropProps.destinationIndex = targetIndex + 1
+      dropProps.destinationIndex = hoverCmpIndex + 1
     }
   }
 }
