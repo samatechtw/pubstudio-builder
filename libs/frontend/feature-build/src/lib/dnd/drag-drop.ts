@@ -22,7 +22,6 @@ export interface IOnDragOptions {
   elementRef: HTMLElement | undefined
   // Only check for top&bottom hover
   verticalOnly?: boolean
-  stopAtFirstMatch?: boolean
 }
 
 const getMousePosition = (e: DragEvent): XYCoord => {
@@ -54,16 +53,8 @@ const checkSelfDrop = (
 }
 
 export const onDrag = (options: IOnDragOptions): IDropProps => {
-  const {
-    e,
-    context,
-    dragSrc,
-    hoverCmpIndex,
-    hoverCmp,
-    elementRef,
-    verticalOnly,
-    stopAtFirstMatch,
-  } = options
+  const { e, context, dragSrc, hoverCmpIndex, hoverCmp, elementRef, verticalOnly } =
+    options
 
   const dropProps: IDropProps = {
     hoverSelf: false,
@@ -90,20 +81,6 @@ export const onDrag = (options: IOnDragOptions): IDropProps => {
       const mousePosition = getMousePosition(e)
       const parentIsRow = isRowLayout(context, hoverCmp.parent)
 
-      const hoverSelf = checkSelfDrop(hoverCmp, parentIsRow, hoverCmpRect, mousePosition)
-
-      if (hoverSelf) {
-        if (hoverCmp.id === dragCmpParentId) {
-          // Do nothing when a component is hovered on self if the dragged component is its children.
-          return dropProps
-        }
-        dropProps.hoverSelf = true
-        dropProps.destinationIndex = hoverCmp.children?.length ?? 0
-        if (stopAtFirstMatch) {
-          return dropProps
-        }
-      }
-
       if (!parentIsRow || verticalOnly) {
         handleColumnLayoutHover({
           mousePosition,
@@ -113,6 +90,9 @@ export const onDrag = (options: IOnDragOptions): IDropProps => {
           hoverCmpIndex,
           dropProps,
         })
+        if (dropProps.hoverTop || dropProps.hoverBottom) {
+          return dropProps
+        }
       } else {
         handleRowLayoutHover({
           mousePosition,
@@ -122,6 +102,17 @@ export const onDrag = (options: IOnDragOptions): IDropProps => {
           hoverCmpIndex,
           dropProps,
         })
+        if (dropProps.hoverLeft || dropProps.hoverRight) {
+          return dropProps
+        }
+      }
+
+      if (
+        hoverCmp.id !== dragCmpParentId &&
+        checkSelfDrop(hoverCmp, parentIsRow, hoverCmpRect, mousePosition)
+      ) {
+        dropProps.hoverSelf = true
+        dropProps.destinationIndex = hoverCmp.children?.length ?? 0
       }
     }
   }

@@ -41,7 +41,6 @@ export interface IUseDragDropProps {
   // A parent of the target component is being dragged
   isParent?: boolean
   verticalOnly?: boolean
-  stopAtFirstMatch?: boolean
   getDraggedElement?: (e: DragEvent) => HTMLElement | null
 }
 
@@ -87,7 +86,6 @@ export const useDragDrop = (props: IUseDragDropProps): IUseDragDrop => {
     isParent,
     addData,
     verticalOnly,
-    stopAtFirstMatch,
     getDraggedElement,
   } = props
   const { moveComponent, moveAbsoluteComponent, addComponentData } = useBuild()
@@ -216,7 +214,6 @@ export const useDragDrop = (props: IUseDragDropProps): IUseDragDrop => {
           hoverCmp: component,
           elementRef: elementRef.value,
           verticalOnly,
-          stopAtFirstMatch,
         })
       }
     }
