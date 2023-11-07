@@ -133,7 +133,6 @@ export const BuilderDndComponent = defineComponent({
         getParentId: () => dragCmp?.parent?.id,
         getComponentIndex: () => componentIndex,
         isParent: component.value.id !== dragCmp?.id,
-        stopAtFirstMatch: true,
       })
     })
     onMounted(() => {
