@@ -5,6 +5,7 @@ import { store } from '@pubstudio/frontend/data-access-web-store'
 import { parseApiErrorKey, PSApi, toApiError } from '@pubstudio/frontend/util-api'
 import { serializeEditor, storeSite } from '@pubstudio/frontend/util-site-store'
 import {
+  IGetSiteApiRequest,
   IGetSiteApiResponse,
   IUpdateSiteApiRequest,
   IUpdateSiteApiResponse,
@@ -28,7 +29,10 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
   const platformApi = inject(ApiInjectionKey) as PSApi
   const siteId = ref(props.siteId)
   let saveTimer: ReturnType<typeof setTimeout> | undefined
-  let getFn: (siteId: string) => Promise<IGetSiteApiResponse>
+  let getFn: (
+    siteId: string,
+    query?: IGetSiteApiRequest,
+  ) => Promise<IGetSiteApiResponse | undefined>
   let updateFn: (
     siteId: string,
     payload: IUpdateSiteApiRequest,
@@ -140,9 +144,16 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
     }
   }
 
-  const restore = async (): Promise<ISiteRestore> => {
+  const restore = async (updateKey?: string): Promise<ISiteRestore | undefined> => {
     try {
-      const data = await getFn(siteId.value)
+      const siteData = await getFn(siteId.value, { update_key: updateKey })
+      if (!siteData) {
+        return undefined
+      }
+      const data = {
+        ...siteData,
+        updated_at: siteData?.updated_at.toString(),
+      }
       return restoreSiteHelper(data)
     } catch (e) {
       return restoreSiteError(parseApiErrorKey(toApiError(e)))

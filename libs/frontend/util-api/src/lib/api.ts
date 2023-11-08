@@ -19,8 +19,7 @@ export class PSApi extends FetchApi<ApiResponse> {
 
   constructor(options: PSApiOptions) {
     const responseInterceptors = [
-      ...(options.responseInterceptors ?? []),
-      ...defaultResponseInterceptors,
+      ...(options.responseInterceptors ?? defaultResponseInterceptors),
     ]
     super({
       ...options,

@@ -20,5 +20,5 @@ export interface ISiteStore {
   initialize(): Promise<void>
   save(site: ISite, immediate?: boolean): Promise<void>
   saveEditor(editor: IEditorContext): Promise<void>
-  restore(): Promise<ISiteRestore>
+  restore(updateKey?: string): Promise<ISiteRestore | undefined>
 }

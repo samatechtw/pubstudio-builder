@@ -1,9 +1,12 @@
 import { PSApi } from '@pubstudio/frontend/util-api'
 import {
+  IGetLocalSiteApiRequest,
   IGetLocalSiteApiResponse,
   IUpdateLocalSiteApiRequest,
   IUpdateLocalSiteApiResponse,
 } from '@pubstudio/shared/type-api-local-site'
+import { plainResponseInterceptors } from '@pubstudio/shared/util-fetch-api'
+import { RequestParams } from '@sampullman/fetch-api'
 
 export interface IApiLocalSite {
   updateLocalSite: (
@@ -11,10 +14,22 @@ export interface IApiLocalSite {
     data: IUpdateLocalSiteApiRequest,
     keepalive?: boolean,
   ) => Promise<IUpdateLocalSiteApiResponse>
-  getLocalSite(siteId: string): Promise<IGetLocalSiteApiResponse>
+  getLocalSite(
+    siteId: string,
+    query?: IGetLocalSiteApiRequest,
+  ): Promise<IGetLocalSiteApiResponse | undefined>
 }
 
-export const useLocalSiteApi = (api: PSApi): IApiLocalSite => {
+export const useLocalSiteApi = (_api: PSApi): IApiLocalSite => {
+  // TODO -- this is a workaround to avoid parsing Site updated_at so we can use it
+  // in preview mode as the update key. It would be better if the individual request could
+  // override the response interceptors
+  const api = new PSApi({
+    baseUrl: _api.baseUrl,
+    userToken: _api.userToken,
+    responseInterceptors: [...plainResponseInterceptors],
+  })
+
   const updateLocalSite = async (
     id: string,
     payload: IUpdateLocalSiteApiRequest,
@@ -29,12 +44,19 @@ export const useLocalSiteApi = (api: PSApi): IApiLocalSite => {
     return data as IUpdateLocalSiteApiResponse
   }
 
-  const getLocalSite = async (siteId: string): Promise<IGetLocalSiteApiResponse> => {
-    const { data } = await api.authRequest({
+  const getLocalSite = async (
+    siteId: string,
+    query?: IGetLocalSiteApiRequest,
+  ): Promise<IGetLocalSiteApiResponse | undefined> => {
+    const res = await api.authRequest({
       url: `local_sites/${siteId}`,
       method: 'GET',
+      params: query as RequestParams | undefined,
     })
-    const serialized = data as IGetLocalSiteApiResponse
+    if (res.status === 204) {
+      return undefined
+    }
+    const serialized = res.data as IGetLocalSiteApiResponse
     return {
       id: serialized.id,
       user_id: serialized.user_id,

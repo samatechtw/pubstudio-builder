@@ -8,17 +8,19 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, onUnmounted, watch } from 'vue'
+import { computed, onMounted, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { RenderMode } from '@pubstudio/frontend/util-render'
 import { useRenderPreview } from '@pubstudio/frontend/feature-preview'
 import { NotFound } from '@pubstudio/frontend/ui-widgets'
-import { useRootBackgroundWorkaround } from '@pubstudio/frontend/feature-render'
+import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { useBuild } from '../../lib/use-build'
 
 const route = useRoute()
 const { initializeBuilder, site } = useBuild()
+const { checkOutdated } = useSiteSource()
 const siteId = route.query.siteId ? route.query.siteId.toString() : undefined
+let checkInterval: ReturnType<typeof setInterval> | undefined
 // TODO -- API isn't working?
 await initializeBuilder(siteId)
 
@@ -49,6 +51,24 @@ const {
   renderMode: RenderMode.Preview,
   notFoundComponent: NotFound,
   unhead: true,
+})
+
+const pollOutdated = () => {
+  if (!document.hidden) {
+    checkOutdated()
+  }
+}
+
+onMounted(() => {
+  checkInterval = setInterval(checkOutdated, 3000)
+  document.addEventListener('visibilitychange', pollOutdated)
+})
+
+onUnmounted(() => {
+  if (checkInterval) {
+    clearInterval(checkInterval)
+  }
+  document.removeEventListener('visibilitychange', pollOutdated)
 })
 </script>
 

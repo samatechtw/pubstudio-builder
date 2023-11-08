@@ -104,6 +104,7 @@ export const storeSite = (site: ISite): IStoredSite => {
     pages: JSON.stringify(serialized.pages),
     editor: JSON.stringify(serialized.editor),
     history: JSON.stringify(serialized.history),
+    updated_at: serialized.updated_at,
   }
 }
 

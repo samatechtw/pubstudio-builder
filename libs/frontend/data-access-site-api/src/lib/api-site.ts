@@ -1,11 +1,14 @@
 import { IFrontendStore } from '@pubstudio/frontend/data-access-state'
 import { PSApi } from '@pubstudio/frontend/util-api'
 import {
+  IGetSiteApiRequest,
   IGetSiteApiResponse,
   IGetSiteUsageApiResponse,
   IUpdateSiteApiRequest,
   IUpdateSiteApiResponse,
 } from '@pubstudio/shared/type-api-site-sites'
+import { plainResponseInterceptors } from '@pubstudio/shared/util-fetch-api'
+import { RequestParams } from '@sampullman/fetch-api'
 
 export interface IUseSiteApiParams {
   serverAddress: string
@@ -13,7 +16,7 @@ export interface IUseSiteApiParams {
 }
 
 export interface IApiSite {
-  getSite(siteId: string): Promise<IGetSiteApiResponse>
+  getSite(siteId: string): Promise<IGetSiteApiResponse | undefined>
   getSiteUsage(siteId: string): Promise<IGetSiteUsageApiResponse>
   updateSite(
     siteId: string,
@@ -35,14 +38,22 @@ export const useSiteApi = (params: IUseSiteApiParams): IApiSite => {
   const api = new PSApi({
     baseUrl: `${address}/api/`,
     userToken: store.auth.token,
+    responseInterceptors: [...plainResponseInterceptors],
   })
 
-  const getSite = async (siteId: string): Promise<IGetSiteApiResponse> => {
-    const { data } = await api.authRequest({
+  const getSite = async (
+    siteId: string,
+    query?: IGetSiteApiRequest,
+  ): Promise<IGetSiteApiResponse | undefined> => {
+    const res = await api.authRequest({
       url: `sites/${siteId}`,
       method: 'GET',
+      params: query as RequestParams | undefined,
     })
-    const serialized = data as IGetSiteApiResponse
+    if (res.status === 204) {
+      return undefined
+    }
+    const serialized = res.data as IGetSiteApiResponse
     return {
       id: serialized.id,
       name: serialized.name,

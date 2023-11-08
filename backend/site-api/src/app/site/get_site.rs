@@ -1,12 +1,14 @@
 use axum::{
-    extract::{Path, State, Query},
+    extract::{Path, Query, State},
+    http::StatusCode,
+    response::{IntoResponse, Response},
     Extension, Json,
 };
-use chrono::DateTime;
 use axum_macros::debug_handler;
+use chrono::DateTime;
 use lib_shared_site_api::error::api_error::ApiError;
 use lib_shared_types::{
-    dto::site_api::get_site_dto::{to_api_response, GetSiteDto, GetSiteQuery},
+    dto::site_api::get_site_dto::{to_api_response, GetSiteQuery},
     entity::site_api::site_metadata_entity::SiteMetadataEntity,
     error::api_error::ApiErrorCode,
     shared::user::{RequestUser, UserType},
@@ -35,7 +37,19 @@ pub async fn get_site(
     Query(query): Query<GetSiteQuery>,
     Extension(user): Extension<RequestUser>,
     State(context): State<ApiContext>,
-) -> Result<Json<GetSiteDto>, ApiError> {
+) -> Response {
+    match get_site_result(site_id, query, user, context).await {
+        Ok(response) => response,
+        Err(e) => e.into_response(),
+    }
+}
+
+async fn get_site_result(
+    site_id: String,
+    query: GetSiteQuery,
+    user: RequestUser,
+    context: ApiContext,
+) -> Result<Response, ApiError> {
     verify_site_owner(&context, &user, &site_id).await?;
 
     let site_metadata = context
@@ -83,24 +97,28 @@ pub async fn get_site(
 
         if let Some(update_key) = query.update_key {
             return DateTime::parse_from_rfc3339(update_key.as_str())
-                .map_err(|e| ApiError::internal_error().message(format!("Date parsing error: {}", e)))
+                .map_err(|e| {
+                    ApiError::internal_error().message(format!("Date parsing error: {}", e))
+                })
                 .and_then(|date_time| {
                     if site.updated_at == date_time {
-                        Ok(Json(GetSiteDto::default()))
+                        Ok(StatusCode::NO_CONTENT.into_response())
                     } else {
                         Ok(Json(to_api_response(
                             site,
                             admin_or_owner,
                             site_metadata.disabled,
-                        )))
+                        ))
+                        .into_response())
                     }
-                })
+                });
         } else {
             return Ok(Json(to_api_response(
                 site,
                 admin_or_owner,
                 site_metadata.disabled,
-            )));
+            ))
+            .into_response());
         };
     }
     Err(ApiError::forbidden())
