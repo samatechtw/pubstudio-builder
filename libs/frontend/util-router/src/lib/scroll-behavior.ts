@@ -20,20 +20,6 @@ export interface ScrollPositionElement extends ScrollToOptions {
 
 export type ScrollPosition = ScrollPositionCoordinates | ScrollPositionElement
 
-function getElementPosition(
-  el: Element,
-  offset: ScrollPositionCoordinates,
-): _ScrollPositionNormalized {
-  const docRect = document.documentElement.getBoundingClientRect()
-  const elRect = el.getBoundingClientRect()
-
-  return {
-    behavior: offset.behavior,
-    left: elRect.left - docRect.left - (offset.left || 0),
-    top: elRect.top - docRect.top - (offset.top || 0),
-  }
-}
-
 export const computeScrollPosition = (
   scrollRoot: Element | null | undefined,
 ): _ScrollPositionNormalized => {
@@ -75,8 +61,6 @@ export function scrollToPosition(
   position: ScrollPosition,
   scrollRoot: Element | null | undefined,
 ): void {
-  let scrollToOptions: ScrollPositionCoordinates
-
   if ('el' in position) {
     const positionEl = position.el
 
@@ -87,15 +71,14 @@ export function scrollToPosition(
       console.log(`No el with selector: ${position.el} in scrollBehavior.`)
       return
     }
-    scrollToOptions = getElementPosition(el, position)
-  } else {
-    scrollToOptions = position
-  }
 
-  if (scrollRoot) {
-    scrollRoot.scroll(scrollToOptions)
+    el.scrollIntoView({ behavior: 'smooth' })
   } else {
-    window.scrollTo(scrollToOptions)
+    if (scrollRoot) {
+      scrollRoot.scroll(position)
+    } else {
+      window.scrollTo(position)
+    }
   }
 }
 
