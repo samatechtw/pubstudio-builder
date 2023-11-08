@@ -9,4 +9,5 @@ export interface ISiteViewModel {
   pages: string
   published: boolean
   disabled?: boolean
+  updated_at: Date
 }
