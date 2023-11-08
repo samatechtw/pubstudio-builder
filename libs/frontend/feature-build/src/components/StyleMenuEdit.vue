@@ -104,7 +104,7 @@ const getInheritedFrom = (entry: IInheritedStyleEntry): string | undefined => {
 
 const validateAndSave = () => {
   const allValuesValid = editingStyleEntries.value.every((style) =>
-    validateCssValue(style.property, style.value),
+    validateCssValue(site.value.context, style.property, style.value),
   )
   if (allValuesValid) {
     saveStyle()

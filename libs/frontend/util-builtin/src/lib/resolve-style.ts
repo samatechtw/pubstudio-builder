@@ -59,7 +59,7 @@ export const resolveStyle = (
 }
 
 // For example, ${color-text}
-export const themeVariableSyntaxRegex = new RegExp(/^\$\{(.*)\}$/)
+export const themeVariableSyntaxRegex = /\$\{(.*?)\}/g
 
 export const resolveThemeVariables = (
   context: ISiteContext,
