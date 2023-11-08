@@ -123,6 +123,7 @@ export const deserializedHelper = (serialized: ISerializedSite): ISite => {
     pages,
     editor: deserializeEditor(siteContext, editor),
     history: { back: history.back, forward: history.forward },
+    updated_at: serialized.updated_at,
   }
   return site
 }
@@ -156,6 +157,7 @@ export const unstoreSite = (stored: IStoredSite): ISite | undefined => {
           back: [],
           forward: [],
         },
+    updated_at: stored.updated_at || undefined,
   }
   return deserializedHelper(serialized)
 }

@@ -13,6 +13,7 @@ export interface IUseSiteSource {
   apiSiteId: Ref<string | undefined>
   siteStore: Ref<ISiteStore>
   initializeSite: (siteId: string | undefined) => Promise<void>
+  checkOutdated: () => Promise<void>
 }
 
 const siteStore = ref() as Ref<ISiteStore>
@@ -24,11 +25,26 @@ export const useSiteSource = (): IUseSiteSource => {
   const initializeSite = async (siteId: string | undefined) => {
     siteStore.value = useSiteStore({ siteId })
     await siteStore.value.initialize()
-    restoredSite = await siteStore.value.restore()
-    site.value = restoredSite.site
-    apiSiteId.value = siteId
-    siteError.value = restoredSite.error
+    const restored = await siteStore.value.restore()
+    if (restored) {
+      restoredSite = restored
+      site.value = restoredSite.site
+      apiSiteId.value = siteId
+      siteError.value = restoredSite.error
+    }
   }
 
-  return { initializeSite, apiSiteId, siteStore, site, siteError }
+  const checkOutdated = async () => {
+    const restored = await siteStore.value.restore(site.value.updated_at)
+    if (restored) {
+      console.log('Site updated:', site.value.updated_at)
+      restoredSite = restored
+      site.value = restoredSite.site
+      siteError.value = restoredSite.error
+    } else {
+      console.log('No site updates')
+    }
+  }
+
+  return { initializeSite, checkOutdated, apiSiteId, siteStore, site, siteError }
 }

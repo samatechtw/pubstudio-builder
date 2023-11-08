@@ -112,18 +112,9 @@ describe('Get Site', () => {
         .get(`${testEndpoint}/${siteId}`)
         .query({ update_key: prevBody.updated_at.toString() })
         .set('Authorization', adminAuth)
-        .expect(200)
-      const body: IGetSiteApiResponse = response.body
+        .expect(204)
 
-      expect(body.id).toEqual(0)
-      expect(body.name).toEqual('')
-      expect(body.published).toBeNull()
-      expect(body.version).toEqual('')
-      expect(body.context).toEqual('')
-      expect(body.defaults).toEqual('')
-      expect(body.editor).toBeNull()
-      expect(body.history).toBeNull()
-      expect(body.pages).toEqual('')
+      expect(response.body).toEqual({})
     })
 
     it('returns 401 when owner token has expired', async () => {

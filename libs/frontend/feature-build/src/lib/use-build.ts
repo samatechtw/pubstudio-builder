@@ -61,7 +61,6 @@ import {
   ISetDefaultsHeadData,
   ISetHomePageData,
   ISetPageHeadData,
-  ISetTranslationsData,
 } from '@pubstudio/shared/type-command-data'
 import {
   Css,

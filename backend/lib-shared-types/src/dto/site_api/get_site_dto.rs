@@ -1,7 +1,6 @@
-use chrono::{DateTime, Utc};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
-use crate::entity::site_api::site_entity::SiteEntity;
+use crate::{entity::site_api::site_entity::SiteEntity, shared::js_date::JsDate};
 
 #[derive(Serialize)]
 pub struct GetSiteDto {
@@ -13,8 +12,8 @@ pub struct GetSiteDto {
     pub editor: Option<String>,
     pub history: Option<String>,
     pub pages: String,
-    pub created_at: Option<DateTime<Utc>>,
-    pub updated_at: Option<DateTime<Utc>>,
+    pub created_at: Option<JsDate>,
+    pub updated_at: Option<JsDate>,
     pub published: Option<bool>,
     pub disabled: Option<bool>,
 }
@@ -22,25 +21,6 @@ pub struct GetSiteDto {
 #[derive(Deserialize)]
 pub struct GetSiteQuery {
     pub update_key: Option<String>,
-}
-
-impl GetSiteDto {
-    pub fn default() -> Self {
-        Self {
-            id: 0,
-            name: "".to_string(),
-            version: "".to_string(),
-            context: "".to_string(),
-            defaults: "".to_string(),
-            history: None,
-            editor: None,
-            pages: "".to_string(),
-            created_at: None,
-            updated_at: None,
-            published: None,
-            disabled: None,
-        }
-    }
 }
 
 pub fn to_api_response(site_entity: SiteEntity, with_editor: bool, disabled: bool) -> GetSiteDto {
@@ -54,8 +34,12 @@ pub fn to_api_response(site_entity: SiteEntity, with_editor: bool, disabled: boo
             history: Some(site_entity.history),
             editor: Some(site_entity.editor),
             pages: site_entity.pages,
-            created_at: Some(site_entity.created_at),
-            updated_at: Some(site_entity.updated_at),
+            created_at: Some(JsDate {
+                timestamp: site_entity.created_at,
+            }),
+            updated_at: Some(JsDate {
+                timestamp: site_entity.updated_at,
+            }),
             published: Some(site_entity.published),
             disabled: Some(disabled),
         }

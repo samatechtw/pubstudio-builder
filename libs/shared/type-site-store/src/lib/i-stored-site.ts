@@ -6,8 +6,9 @@ export interface IStoredSite {
   pages: string | null
   editor?: string | null
   history?: string | null
+  updated_at?: string | null
 }
 
 export type IStoredSiteDirty = {
-  [key in keyof IStoredSite]: boolean
+  [key in keyof Omit<IStoredSite, 'updated_at'>]: boolean
 }
