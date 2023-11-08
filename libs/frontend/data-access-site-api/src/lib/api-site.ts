@@ -54,6 +54,7 @@ export const useSiteApi = (params: IUseSiteApiParams): IApiSite => {
       pages: JSON.parse(serialized.pages),
       published: serialized.published,
       disabled: serialized.disabled,
+      updated_at: serialized.updated_at,
     }
   }
 
@@ -87,6 +88,7 @@ export const useSiteApi = (params: IUseSiteApiParams): IApiSite => {
       pages: JSON.parse(serialized.pages),
       disabled: serialized.disabled,
       published: serialized.published,
+      updated_at: serialized.updated_at,
     }
   }
 
