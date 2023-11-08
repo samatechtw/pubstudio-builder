@@ -61,8 +61,10 @@ import { StyleProperty, StyleValue } from '@pubstudio/frontend/ui-widgets'
 import { Check, Edit, InfoBubble, Minus, PSInput } from '@pubstudio/frontend/ui-widgets'
 import { Css, CssPseudoClass, cssValues, IStyleEntry } from '@pubstudio/shared/type-site'
 import { validateCssValue } from '../lib/validate-css-value'
+import { useBuild } from '../lib/use-build'
 
 const { t } = useI18n()
+const { site } = useBuild()
 
 const props = withDefaults(
   defineProps<{
@@ -145,7 +147,7 @@ const updateProperty = (property: Css) => {
 }
 
 const isValueValid = computed(() =>
-  validateCssValue(model.value.property, model.value.value),
+  validateCssValue(site.value.context, model.value.property, model.value.value),
 )
 
 const valueErrorMessage = computed(() => {
@@ -158,7 +160,7 @@ const valueErrorMessage = computed(() => {
 
 const updateValue = (value: string) => {
   if (modelValue.value) {
-    if (validateCssValue(modelValue.value.property, value)) {
+    if (validateCssValue(site.value.context, modelValue.value.property, value)) {
       const updatedEntry = {
         ...modelValue.value,
         value,
