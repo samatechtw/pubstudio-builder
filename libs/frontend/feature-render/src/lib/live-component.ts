@@ -76,7 +76,7 @@ export const LiveComponent = () => {
               ...renderProps,
               to: { path },
             },
-            children,
+            () => children,
           )
         }
 
