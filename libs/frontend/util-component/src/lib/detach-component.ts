@@ -30,6 +30,7 @@ export const resolveComponentProps = (
   let mixins = component.style.mixins ?? []
   let inputs = component.inputs
   let events = component.events
+  let editorEvents = component.editorEvents
 
   if (source !== undefined) {
     // Collect mixins
@@ -47,20 +48,23 @@ export const resolveComponentProps = (
     inputs = mergeRecord2(source.inputs, inputs)
     // Merge outputs
     events = mergeRecord2(source.events, events)
+    // Merge editor events
+    editorEvents = mergeRecord2(source.editorEvents, editorEvents)
   }
   // De-duplicate mixins
   mixins = Array.from(new Set(mixins))
   const style = { custom: customStyles, mixins: mixins.length === 0 ? undefined : mixins }
-  return { style, inputs, events }
+  return { style, inputs, events, editorEvents }
 }
 
 export const detachComponent = (
   component: IComponent,
   source: IComponent,
 ): IComponent => {
-  const { style, inputs, events } = resolveComponentProps(component, source)
+  const { style, inputs, events, editorEvents } = resolveComponentProps(component, source)
   component.style = style
   component.inputs = inputs
   component.events = events
+  component.editorEvents = editorEvents
   return component
 }

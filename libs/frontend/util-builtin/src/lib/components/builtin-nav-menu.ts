@@ -41,25 +41,29 @@ export const navMenuItemStyle: IStyle = {
   },
 }
 
-export const navMenu: IComponent = {
-  id: navMenuId,
-  name: 'NavMenu',
-  tag: Tag.Div,
-  style: {
-    custom: {},
-    mixins: [horizontalStyleId, navMenuStyle.id],
-  },
-  editorEvents: {
-    [EditorEventName.OnSelfAdded]: {
-      name: EditorEventName.OnSelfAdded,
-      behaviors: [{ behaviorId: navMenuBehaviorId }],
+export const makeNavMenu = (): IComponent => {
+  return {
+    id: navMenuId,
+    name: 'NavMenu',
+    tag: Tag.Div,
+    style: {
+      custom: {},
+      mixins: [horizontalStyleId, navMenuStyle.id],
     },
-    [EditorEventName.OnPageChange]: {
-      name: EditorEventName.OnPageChange,
-      behaviors: [{ behaviorId: navMenuBehaviorId }],
+    editorEvents: {
+      [EditorEventName.OnSelfAdded]: {
+        name: EditorEventName.OnSelfAdded,
+        behaviors: [{ behaviorId: navMenuBehaviorId }],
+      },
+      [EditorEventName.OnPageChange]: {
+        name: EditorEventName.OnPageChange,
+        behaviors: [{ behaviorId: navMenuBehaviorId }],
+      },
     },
-  },
+  }
 }
+
+export const navMenu = makeNavMenu()
 
 export const navMenuItem: IComponent = {
   id: navMenuItemId,

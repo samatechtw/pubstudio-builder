@@ -12,18 +12,8 @@ import { IComponent, ISite } from '@pubstudio/shared/type-site'
 
 export const applyAddComponent = (site: ISite, data: IAddComponentData) => {
   const context = site.context
-  const {
-    name,
-    tag,
-    content,
-    parentId,
-    events,
-    inputs,
-    parentIndex,
-    sourceId,
-    style,
-    editorEvents,
-  } = data
+  const { name, tag, content, parentId, events, inputs, parentIndex, sourceId, style } =
+    data
   const id = nextComponentId(context)
   data.id = id
   const parent = resolveComponent(context, parentId)
@@ -36,7 +26,7 @@ export const applyAddComponent = (site: ISite, data: IAddComponentData) => {
     children: undefined,
     inputs,
     events,
-    editorEvents,
+    editorEvents: data.editorEvents,
     style: style ?? { custom: {} },
   }
 
@@ -78,6 +68,7 @@ export const applyAddComponent = (site: ISite, data: IAddComponentData) => {
     componentTreeExpandedItems[id] = true
   }
   // Register editor events
+  const editorEvents = component.editorEvents
   if (editorEvents) {
     registerComponentEditorEvents(site, component, editorEvents)
     if (editorEvents.OnSelfAdded) {
