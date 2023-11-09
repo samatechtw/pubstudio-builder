@@ -7,6 +7,7 @@ import {
   isRowLayout,
   XYCoord,
 } from './row-layout'
+import { defaultDropProps } from './use-drag-drop'
 
 export interface IDropResult {
   from: IComponentPosition
@@ -28,88 +29,58 @@ const getMousePosition = (e: DragEvent): XYCoord => {
   return { x: e.clientX, y: e.clientY }
 }
 
-const checkSelfDrop = (
-  component: IComponent,
-  parentIsRow: boolean,
-  rect: DOMRect,
-  mouse: XYCoord,
-): boolean => {
-  if (!component.content && component.tag !== Tag.Img) {
-    if (parentIsRow) {
-      const borderX = Math.min(rect.width * 0.2, 100)
-      const left = rect.left + borderX
-      const right = rect.right - borderX
-
-      return mouse.x > left && mouse.x < right
-    } else {
-      const borderY = Math.min(rect.height * 0.2, 100)
-      const top = rect.top + borderY
-      const bottom = rect.bottom - borderY
-
-      return mouse.y > top && mouse.y < bottom
-    }
-  }
-  return false
-}
-
 export const onDrag = (options: IOnDragOptions): IDropProps => {
   const { e, context, dragSrc, hoverCmpIndex, hoverCmp, elementRef, verticalOnly } =
     options
 
-  const dropProps: IDropProps = {
-    hoverSelf: false,
-    hoverTop: false,
-    hoverRight: false,
-    hoverBottom: false,
-    hoverLeft: false,
-    destinationIndex: 0,
-  }
+  const dropProps = defaultDropProps()
 
   if (elementRef) {
     const dragCmpParentId = dragSrc.parentId
     const dragComponentIndex = dragSrc.index
 
+    const hoverOnRoot = !hoverCmp.parent
     const haveSameParent = dragCmpParentId === hoverCmp.parent?.id
 
     if (!haveSameParent || dragComponentIndex !== hoverCmpIndex) {
       const hoverCmpRect = elementRef.getBoundingClientRect()
-      const targetMiddle: XYCoord = {
-        x: (hoverCmpRect.right + hoverCmpRect.left) / 2,
-        y: (hoverCmpRect.bottom + hoverCmpRect.top) / 2,
-      }
 
       const mousePosition = getMousePosition(e)
       const parentIsRow = isRowLayout(context, hoverCmp.parent)
 
-      if (!parentIsRow || verticalOnly) {
-        handleColumnLayoutHover({
-          mousePosition,
-          targetMiddle,
-          haveSameParent,
-          dragComponentIndex,
-          hoverCmpIndex,
-          dropProps,
-        })
-        if (dropProps.hoverTop || dropProps.hoverBottom) {
-          return dropProps
-        }
-      } else {
-        handleRowLayoutHover({
-          mousePosition,
-          targetMiddle,
-          haveSameParent,
-          dragComponentIndex,
-          hoverCmpIndex,
-          dropProps,
-        })
-        if (dropProps.hoverLeft || dropProps.hoverRight) {
-          return dropProps
+      // User should not be able to drop component at the top/right/bottom/left side of root component.
+      if (!hoverOnRoot) {
+        if (!parentIsRow || verticalOnly) {
+          handleColumnLayoutHover({
+            mousePosition,
+            hoverCmpRect,
+            haveSameParent,
+            dragComponentIndex,
+            hoverCmpIndex,
+            dropProps,
+          })
+          if (dropProps.hoverTop || dropProps.hoverBottom) {
+            return dropProps
+          }
+        } else {
+          handleRowLayoutHover({
+            mousePosition,
+            hoverCmpRect,
+            haveSameParent,
+            dragComponentIndex,
+            hoverCmpIndex,
+            dropProps,
+          })
+          if (dropProps.hoverLeft || dropProps.hoverRight) {
+            return dropProps
+          }
         }
       }
 
       if (
         hoverCmp.id !== dragCmpParentId &&
-        checkSelfDrop(hoverCmp, parentIsRow, hoverCmpRect, mousePosition)
+        !hoverCmp.content &&
+        hoverCmp.tag !== Tag.Img
       ) {
         dropProps.hoverSelf = true
         dropProps.destinationIndex = hoverCmp.children?.length ?? 0
