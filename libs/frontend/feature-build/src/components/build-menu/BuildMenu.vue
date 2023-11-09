@@ -41,7 +41,7 @@
       <BuildMenuIcon
         v-if="store.auth.loggedIn.value"
         id="build-asset"
-        :text="t('build.assets')"
+        :text="t('i18n.title')"
         @click="toggleTranslations"
       >
         <Text></Text>

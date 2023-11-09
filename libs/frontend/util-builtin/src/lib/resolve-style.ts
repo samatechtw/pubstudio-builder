@@ -1,8 +1,4 @@
-import {
-  builtinFonts,
-  builtinThemeVariables,
-  globalContext,
-} from '@pubstudio/frontend/util-ids'
+import { builtinThemeVariables, globalContext } from '@pubstudio/frontend/util-ids'
 import { ISiteContext, IStyle } from '@pubstudio/shared/type-site'
 import { buttonStyle } from './components/builtin-button'
 import { horizontalStyle } from './components/builtin-container-horizontal'
@@ -71,10 +67,7 @@ export const resolveThemeVariables = (
         // Custom theme variable
         context.theme.variables[variableName] ??
         // Builtin theme variable
-        builtinThemeVariables[variableName as keyof typeof builtinThemeVariables] ??
-        // Builtin font
-        builtinFonts[variableName as keyof typeof builtinFonts]
-
+        builtinThemeVariables[variableName as keyof typeof builtinThemeVariables]
       if (value === undefined) {
         console.warn(`Variable not found: ${variableName}`)
       }
