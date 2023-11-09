@@ -49,14 +49,14 @@ const COMPONENT_TYPE = 'text/component-id'
 const dragSource = ref<IDraggedComponent>()
 const droppedFile = ref<IDroppedFile>()
 
-const defaultDropProps = (): IDropProps => {
+export const defaultDropProps = (): IDropProps => {
   return {
     hoverSelf: false,
     hoverTop: false,
     hoverRight: false,
     hoverBottom: false,
     hoverLeft: false,
-    destinationIndex: 0,
+    destinationIndex: -1,
   }
 }
 
