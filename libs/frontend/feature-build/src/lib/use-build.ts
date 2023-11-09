@@ -386,6 +386,7 @@ export const useBuild = (): IUseBuild => {
       tag: copiedComponent.tag,
       content: copiedComponent.content,
       sourceId: copiedComponent.id,
+      name: copiedComponent.name,
       parentId,
     }
     pushCommand(CommandType.AddComponent, data)
