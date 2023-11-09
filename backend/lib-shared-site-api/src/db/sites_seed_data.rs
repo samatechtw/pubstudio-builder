@@ -111,5 +111,20 @@ pub fn sites_seed_data() -> Vec<PlatformSiteEntity> {
             created_at: Utc::now() - Duration::days(61),
             updated_at: Utc::now() - Duration::days(61),
         },
+        PlatformSiteEntity {
+            id: Uuid::from_str("ad01f2e0-0f4b-4c86-a8af-800d5cc4f812").unwrap(),
+            name: "Test Site 7".into(),
+            site_server_id: Uuid::from_str("d8ebea55-0adf-4858-8ebb-72d6b35e92a3").unwrap(),
+            // user1@samatech.tw
+            owner_id: Uuid::from_str("903b3c28-deaa-45dc-a43f-511fe965d34e").unwrap(),
+            site_type: SiteType::Paid1,
+            published: false,
+            disabled: false,
+            subdomain_record_id: "user1-site7-record-id".into(),
+            subdomain: "user1-site7-subdomain".into(),
+            custom_domains: Vec::new(),
+            created_at: Utc::now() - Duration::days(60),
+            updated_at: Utc::now() - Duration::days(60),
+        },
     ]
 }
