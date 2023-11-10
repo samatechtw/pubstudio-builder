@@ -197,8 +197,10 @@ const updateName = async () => {
   justify-content: space-between;
   padding: 12px 0 8px;
 }
-.copy-text :deep(svg) {
-  @mixin size 16px;
+.copy-text {
+  :deep(svg) {
+    @mixin size 16px;
+  }
 }
 .asset-name {
   @mixin title-medium 16px;

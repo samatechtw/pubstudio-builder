@@ -21,6 +21,7 @@ export interface ISiteAssetsFeature {
   assets: Ref<ISiteAssetListItem[] | undefined>
   loading: Ref<boolean>
   usage: Ref<number | undefined>
+  updateKey: Ref<number>
   createAsset: (
     data: ICreatePlatformSiteAssetRequest,
     file: File,
@@ -40,11 +41,13 @@ export interface ISiteAssetsFeature {
   deleteAsset: (id: string) => Promise<void>
 }
 
+const assets = ref<ISiteAssetListItem[]>()
+const updateKey = ref(0)
+
 export const useSiteAssets = (): ISiteAssetsFeature => {
   const rootApi = inject(ApiInjectionKey) as PSApi
   const api = useSiteAssetApi(rootApi)
   const { uploadFileAndGetUrl, replaceFileAndGetUrl } = useAssets()
-  const assets = ref<ISiteAssetListItem[]>()
   const loading = ref(false)
   const usage = ref()
 
@@ -52,7 +55,8 @@ export const useSiteAssets = (): ISiteAssetsFeature => {
     data: ICreatePlatformSiteAssetRequest,
     file: File,
   ): Promise<IUploadFileResult> => {
-    return await uploadFileAndGetUrl(data, file)
+    const result = await uploadFileAndGetUrl(data, file)
+    return result
   }
 
   const replaceAsset = async (
@@ -64,7 +68,9 @@ export const useSiteAssets = (): ISiteAssetsFeature => {
   }
 
   const verifyAsset = async (id: string): Promise<IVerifyPlatformSiteAssetResponse> => {
-    return await api.verifySiteAsset(id)
+    const result = await api.verifySiteAsset(id)
+    updateKey.value += 1
+    return result
   }
 
   const updateAsset = async (
@@ -114,6 +120,7 @@ export const useSiteAssets = (): ISiteAssetsFeature => {
     assets,
     loading,
     usage,
+    updateKey,
     createAsset,
     replaceAsset,
     verifyAsset,
