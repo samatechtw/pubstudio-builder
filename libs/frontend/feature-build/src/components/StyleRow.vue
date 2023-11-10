@@ -229,7 +229,7 @@ const removeStyle = () => {
 }
 
 .label {
-  width: 100%;
+  flex-grow: 1;
   display: flex;
   align-items: center;
 }
@@ -244,7 +244,7 @@ const removeStyle = () => {
   margin-left: 6px;
 }
 .value-input {
-  width: 140px;
+  width: 120px;
   margin-left: 6px;
 }
 
