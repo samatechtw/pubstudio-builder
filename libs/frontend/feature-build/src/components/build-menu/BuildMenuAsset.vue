@@ -14,6 +14,7 @@
       <PSButton
         v-if="siteStore.siteId.value !== 'scratch'"
         class="add-button"
+        size="small"
         @click="emit('showCreate')"
       >
         <div class="button-content">
@@ -28,11 +29,12 @@
         {{ t('assets.no_assets') }}
       </div>
       <AssetCard
-        v-for="asset in assets"
+        v-for="(asset, index) in assets"
         :key="asset.id"
         :asset="asset"
         :small="true"
         class="asset-card"
+        :style="{ 'z-index': (assets?.length ?? 1) - index }"
         @update="updateAssetList"
       />
     </div>
@@ -40,7 +42,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { PSButton, PSSpinner, Plus } from '@pubstudio/frontend/ui-widgets'
 import { useSiteAssets, AssetCard } from '@pubstudio/frontend/feature-site-assets'
@@ -48,7 +50,13 @@ import { store } from '@pubstudio/frontend/data-access-web-store'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 
 const { siteStore } = useSiteSource()
-const { listAssets, updateAssetList, assets, loading: loadingAssets } = useSiteAssets()
+const {
+  listAssets,
+  updateAssetList,
+  assets,
+  updateKey,
+  loading: loadingAssets,
+} = useSiteAssets()
 const { t } = useI18n()
 
 const dragging = ref(false)
@@ -57,6 +65,10 @@ const selectedFile = ref<File>()
 const emit = defineEmits<{
   (e: 'showCreate'): void
 }>()
+
+watch(updateKey, () => {
+  listAssets({ user_id: store.auth.userId.value })
+})
 
 onMounted(() => {
   listAssets({ user_id: store.auth.userId.value })
@@ -82,11 +94,6 @@ const dragEnd = (e: Event) => {
 const dropUploadImage = (e: Event) => {
   e.preventDefault()
   handleFileSelect(e)
-}
-const clickInputFile = (e: MouseEvent) => {
-  if (e && e.target) {
-    ;(e.target as HTMLInputElement).value = ''
-  }
 }
 </script>
 
