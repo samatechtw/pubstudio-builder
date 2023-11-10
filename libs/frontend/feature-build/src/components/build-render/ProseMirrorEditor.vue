@@ -41,6 +41,11 @@ const mountProseMirrorEditor = (
       new Plugin({
         props: {
           attributes: { style: gradientColorStyle.value },
+          transformPastedHTML: (html) => {
+            const element = document.createElement('div')
+            element.innerHTML = html
+            return element.textContent ?? ''
+          },
         },
       }),
     )
