@@ -37,13 +37,16 @@ const renderImageHover = (
   componentClass: string[],
   content: IContent,
 ): VNode => {
-  const img = h(component.tag as string, props)
   const imgElement = document.getElementById(component.id)
 
   let [width, height] = ['', '']
 
-  const { width: styleWidth, height: styleHeight } = findStyles(
-    [Css.Width, Css.Height],
+  const {
+    width: styleWidth,
+    height: styleHeight,
+    margin,
+  } = findStyles(
+    [Css.Width, Css.Height, Css.Margin],
     site,
     component,
     descSortedBreakpoints.value,
@@ -79,6 +82,16 @@ const renderImageHover = (
     )
   }
 
+  // Pass the margin of img to the wrapper element, and set the margin of the rendered img
+  // to 0 during hover to avoid shifting issue.
+  const imgStyleProp = structuredClone(props.style ?? {}) as Record<string, unknown>
+  imgStyleProp['margin'] = '0'
+
+  const img = h(component.tag as string, {
+    ...props,
+    style: imgStyleProp,
+  })
+
   return h(
     'div',
     {
@@ -87,6 +100,7 @@ const renderImageHover = (
         display: 'flex',
         width,
         height,
+        margin,
         flexShrink: '0',
         // absolute positioning for wrapper
         top: imgStyles?.top,
