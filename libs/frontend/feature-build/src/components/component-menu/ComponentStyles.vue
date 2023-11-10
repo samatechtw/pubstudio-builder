@@ -9,6 +9,7 @@
       v-if="showNewStyle"
       :editing="true"
       class="new-style menu-row"
+      :focusProp="true"
       @update="addStyle"
       @remove="editStyle(undefined)"
     />

@@ -8,6 +8,7 @@
     :searchable="true"
     :caret="false"
     :clearable="false"
+    :openInitial="openInitial"
     @select="emit('update:modelValue', $event)"
     @click.stop
   />
@@ -22,7 +23,8 @@ import { Css, CssValues } from '@pubstudio/shared/type-site'
 const { t } = useI18n()
 
 const props = defineProps<{
-  modelValue: Css
+  modelValue: Css | undefined
+  openInitial?: boolean
 }>()
 
 const { modelValue } = toRefs(props)
@@ -35,7 +37,7 @@ const emit = defineEmits<{
   (e: 'update:modelValue', value: Css): void
 }>()
 
-const newVal = ref(Css.Empty)
+const newVal = ref<Css | undefined>(Css.Empty)
 const multiselectRef = ref(null)
 
 defineExpose({ multiselectRef })

@@ -45,11 +45,15 @@ const setRole = (newRole: AriaRole) => {
 </script>
 
 <style lang="postcss" scoped>
+@import '@theme/css/mixins.postcss';
+
 .menu-row {
   justify-content: space-between;
 }
 .label {
+  @mixin title-bold 13px;
   display: flex;
+  align-items: center;
 }
 .bubble {
   margin-left: 8px;

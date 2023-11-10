@@ -19,6 +19,7 @@
       :style="entry"
       :editing="!entry.property || editing(entry.property)"
       :inheritedFrom="getInheritedFrom(entry)"
+      :focusProp="!entry.property"
       class="menu-row"
       @edit="editStyle"
       @update="updateStyle(entry.property, $event)"
