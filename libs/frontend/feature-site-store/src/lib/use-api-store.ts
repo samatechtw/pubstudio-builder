@@ -84,14 +84,18 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
     const site = store.site.getSite.value
     try {
       const payload: IUpdateSiteApiRequest = {}
+      let hasUpdates = false
       for (const key in dirty.value) {
         const k = key as keyof IStoredSiteDirty
         const val = site[k]
         if (dirty.value[k] && val !== null) {
           payload[k] = val
+          hasUpdates = true
         }
       }
-      await updateFn(siteId.value, payload, keepalive)
+      if (hasUpdates) {
+        await updateFn(siteId.value, payload, keepalive)
+      }
       dirty.value = dirtyDefault()
     } catch (e) {
       console.log('Save site API call fail:', e)

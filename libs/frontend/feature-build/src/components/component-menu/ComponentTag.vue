@@ -38,8 +38,13 @@ const setTag = (newTag: Tag) => {
 </script>
 
 <style lang="postcss" scoped>
+@import '@theme/css/mixins.postcss';
+
 .menu-row {
   justify-content: space-between;
+}
+.label {
+  @mixin title-bold 13px;
 }
 .component-tag {
   max-width: 140px;

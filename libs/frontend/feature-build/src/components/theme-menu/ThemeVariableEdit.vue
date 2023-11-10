@@ -22,6 +22,7 @@
       :value="editingThemeVariable.value"
       :forceEdit="true"
       :immediateUpdate="true"
+      :focusInput="!!editingThemeVariable.key"
       class="value"
       @update="editingThemeVariable.value = $event || ''"
     />

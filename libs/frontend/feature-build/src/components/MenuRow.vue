@@ -114,7 +114,7 @@ defineExpose({ newValueRef })
 
 .menu-row {
   .label {
-    @mixin text 15px;
+    @mixin title-bold 13px;
   }
   .item {
     margin-left: auto;

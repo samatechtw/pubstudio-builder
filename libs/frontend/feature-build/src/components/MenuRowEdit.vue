@@ -14,8 +14,8 @@
     />
     <div v-else class="item edit-item" @click="editValue">
       {{ value || '' }}
-      <Edit v-if="editable" class="edit-icon" />
     </div>
+    <Edit v-if="!editing && editable" class="edit-icon" />
     <InfoBubble v-if="info" :message="info" :showArrow="false" class="info-bubble" />
   </div>
 </template>
@@ -70,10 +70,14 @@ const setValue = () => {
 
 .menu-row {
   .label {
-    @mixin text 15px;
+    @mixin title-bold 13px;
   }
   .item {
+    @mixin truncate;
     margin-left: auto;
+  }
+  .edit-item {
+    display: block;
   }
   .uneditable {
     cursor: default;

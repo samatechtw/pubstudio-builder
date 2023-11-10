@@ -4,6 +4,7 @@
       <StyleProperty
         :modelValue="model.property"
         class="property-multiselect"
+        :openInitial="focusProp"
         @update:modelValue="updateProperty"
         @keydown.enter="updateStyle"
       />
@@ -74,6 +75,7 @@ const props = withDefaults(
     error?: boolean
     inheritedFrom?: string
     modelValue?: IStyleEntry
+    focusProp?: boolean
   }>(),
   {
     immediateUpdate: false,
@@ -82,7 +84,8 @@ const props = withDefaults(
     modelValue: undefined,
   },
 )
-const { editing, immediateUpdate, style, inheritedFrom, modelValue } = toRefs(props)
+const { focusProp, editing, immediateUpdate, style, inheritedFrom, modelValue } =
+  toRefs(props)
 
 const emit = defineEmits<{
   (e: 'edit', propName: string): void
@@ -127,8 +130,11 @@ const propertyText = computed(() => {
 const edit = async () => {
   newStyle.value = propStyleOrNewStyle()
   emit('edit', model.value.property)
-  await nextTick()
-  valueInputRef.value?.inputRef.focus()
+  if (!focusProp.value) {
+    await nextTick()
+    // TODO -- look into why nextTick isn't enough here
+    setTimeout(() => valueInputRef.value?.inputRef.focus(), 1)
+  }
 }
 
 const updateProperty = (property: Css) => {
