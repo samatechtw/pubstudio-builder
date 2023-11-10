@@ -1,5 +1,5 @@
 <template>
-  <Modal :show="show" cls="create-asset-modal" @cancel="emit('cancel')">
+  <Modal :show="show" cls="create-asset-modal" @cancel="cancel">
     <div class="modal-title">
       {{ assetToUpdate ? t('assets.replace') : t('assets.new') }}
     </div>
@@ -174,7 +174,7 @@ const uploadReplaceAsset = async (id: string, validatedFile: ValidatedFile) => {
   const result = await replaceAsset(id, payload, validatedFile.file)
   const success = await verifyAsset(result.id)
   if (success) {
-    emit('complete', result)
+    complete(result)
   } else {
     error.value = t('errors.asset_upload_failed')
   }
@@ -192,7 +192,7 @@ const uploadCreateAsset = async (validatedFile: ValidatedFile) => {
   const result = await createAsset(payload, validatedFile.file)
   const success = await verifyAsset(result.id)
   if (success) {
-    emit('complete', result)
+    complete(result)
   } else {
     error.value = t('errors.asset_upload_failed')
   }
@@ -253,6 +253,23 @@ const initializeAssetUpdate = () => {
         : initialSiteId.value
     name.value = initialName.value ?? ''
   }
+}
+
+const cleanup = () => {
+  name.value = ''
+  error.value = undefined
+  validatedFile = undefined
+  assetBase64.value = ''
+}
+
+const cancel = () => {
+  cleanup()
+  emit('cancel')
+}
+
+const complete = (result: IUploadFileResult) => {
+  cleanup()
+  emit('complete', result)
 }
 
 watch(assetToUpdate, () => {
