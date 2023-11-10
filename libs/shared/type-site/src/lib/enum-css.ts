@@ -45,6 +45,7 @@ export enum Css {
   JustifyContent = 'justify-content',
   Left = 'left',
   LetterSpacing = 'letter-spacing',
+  LineHeight = 'line-height',
   Margin = 'margin',
   MaxHeight = 'max-height',
   MaxWidth = 'max-width',
