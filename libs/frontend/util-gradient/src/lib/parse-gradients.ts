@@ -42,3 +42,14 @@ export const parseGradientColors = (gradient: string | undefined): IGradientColo
 export const isGradient = (cssValue: string | undefined): boolean => {
   return GradientTypeValues.some((gradientType) => cssValue?.startsWith(gradientType))
 }
+
+export const isTextGradient = (
+  background: string | undefined,
+  backgroundClip: string | undefined,
+  textFillColor: string | undefined,
+): boolean => {
+  const gradientApplied = GradientTypeValues.some(
+    (gradientType) => background?.startsWith(gradientType),
+  )
+  return gradientApplied && backgroundClip === 'text' && textFillColor === 'transparent'
+}

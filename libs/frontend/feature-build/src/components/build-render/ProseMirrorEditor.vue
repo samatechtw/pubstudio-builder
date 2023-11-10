@@ -4,10 +4,18 @@
 
 <script lang="ts" setup>
 import { computed, onMounted, onBeforeUnmount, ref, toRefs, watch } from 'vue'
-import { IComponent, IEditorContext } from '@pubstudio/shared/type-site'
+import { Css, IComponent, IEditorContext } from '@pubstudio/shared/type-site'
 import { getProseMirrorContainerId } from '@pubstudio/frontend/feature-editor'
 import { prosemirrorSetup } from '@pubstudio/frontend/util-edit-text'
+import { findStyles } from '@pubstudio/frontend/util-component'
+import {
+  activeBreakpoint,
+  descSortedBreakpoints,
+} from '@pubstudio/frontend/feature-site-source'
+import { isTextGradient } from '@pubstudio/frontend/util-gradient'
+import { Plugin } from 'prosemirror-state'
 import { createComponentEditorView } from '../../lib/create-editor-view'
+import { useBuild } from '../../lib/use-build'
 
 const props = defineProps<{
   component: IComponent
@@ -15,6 +23,7 @@ const props = defineProps<{
 }>()
 
 const { component, editor } = toRefs(props)
+const { site } = useBuild()
 
 const container = ref<HTMLDivElement>()
 const containerId = computed(() => getProseMirrorContainerId(component.value))
@@ -25,17 +34,63 @@ const mountProseMirrorEditor = (
 ) => {
   const { selectedComponent } = editor ?? {}
   if (editor && container && selectedComponent) {
+    const plugins: Plugin[] = []
+
+    // Pass gradient color styles to the inner div of ProseMirror editor.
+    plugins.push(
+      new Plugin({
+        props: {
+          attributes: { style: gradientColorStyle.value },
+        },
+      }),
+    )
+
     editor.editView?.destroy()
     editor.editView = createComponentEditorView(
       {
         content: selectedComponent.content ?? '',
+        plugins,
       },
       container,
     )
   }
 }
 
+const gradientColorStyle = computed(() => {
+  const gradientColorStyles = findStyles(
+    [Css.WebkitTextFillColor, Css.WebkitBackgroundClip, Css.Background],
+    site.value,
+    component.value,
+    descSortedBreakpoints.value,
+    activeBreakpoint.value,
+  )
+
+  const background = gradientColorStyles[Css.Background]
+  const backgroundClip = gradientColorStyles[Css.WebkitBackgroundClip]
+  const textFillColor = gradientColorStyles[Css.WebkitTextFillColor]
+
+  const textGradientApplied = isTextGradient(background, backgroundClip, textFillColor)
+
+  if (textGradientApplied) {
+    return [
+      [Css.Background, background],
+      [Css.WebkitBackgroundClip, backgroundClip],
+      [Css.WebkitTextFillColor, textFillColor],
+    ]
+      .map(([prop, value]) => `${prop}:${value}`)
+      .join(';')
+  } else {
+    return ''
+  }
+})
+
 onMounted(() => {
+  mountProseMirrorEditor(editor.value, container.value)
+})
+
+// Use watch to re-mount ProseMirror editor so that text gradient styles can be
+// applied/removed to/from the component on the fly.
+watch(gradientColorStyle, () => {
   mountProseMirrorEditor(editor.value, container.value)
 })
 

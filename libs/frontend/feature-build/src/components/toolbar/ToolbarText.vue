@@ -31,10 +31,10 @@
       <FontFamily />
       <FontWeight :fontFamily="fontFamily" />
       <PSInput
-        ref="fontSizeRef"
+        ref="fontSizePsInputRef"
         v-model="fontSize"
         type="number"
-        suffix="px"
+        :suffix="fontSizeSuffix"
         :maxLength="3"
         class="font-size"
         @keyup.enter.stop="setFontSize"
@@ -44,7 +44,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, watch, ref } from 'vue'
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import {
   FontColor,
@@ -57,10 +57,7 @@ import { PSInput } from '@pubstudio/frontend/ui-widgets'
 import { useControlledClickaway } from '@pubstudio/frontend/util-clickaway'
 import { IRgba } from '@pubstudio/frontend/feature-color-picker'
 import { Css, StyleToolbarMenu } from '@pubstudio/shared/type-site'
-import {
-  GradientTypeValues,
-  parseGradientColors,
-} from '@pubstudio/frontend/util-gradient'
+import { isTextGradient, parseGradientColors } from '@pubstudio/frontend/util-gradient'
 import { ICommand } from '@pubstudio/shared/type-command'
 import FontFamily from '../FontFamily.vue'
 import FontWeight from '../FontWeight.vue'
@@ -68,6 +65,7 @@ import { useToolbar } from '../../lib/use-toolbar'
 import { useBuild } from '../../lib/use-build'
 import { useThemeColors } from '../../lib/use-theme-colors'
 import { setStyleToolbarMenu } from '@pubstudio/frontend/feature-editor'
+import { useToolbarFontSize } from '../../lib/use-toolbar-font-size'
 
 const { t } = useI18n()
 const { getStyleValue, setStyle, createSetComponentCustomStyleCommand } = useToolbar()
@@ -77,9 +75,6 @@ const { selectedThemeColors } = useThemeColors()
 defineProps<{
   show: boolean
 }>()
-
-const fontSize = ref()
-const fontSizeRef = ref()
 
 const { activate, deactivate } = useControlledClickaway(
   '.color-picker-wrap',
@@ -105,11 +100,7 @@ const setFontColor = (c: IRgba) => {
     )
     commands.push(setColorCommand)
 
-    const gradientApplied = GradientTypeValues.some(
-      (gradientType) => background?.startsWith(gradientType),
-    )
-    const textGradientApplied =
-      gradientApplied && backgroundClip === 'text' && textFillColor === 'transparent'
+    const textGradientApplied = isTextGradient(background, backgroundClip, textFillColor)
 
     if (textGradientApplied) {
       // Remove text gradient (background) because text-color and text-gradient are mutually exclusive
@@ -204,18 +195,6 @@ const togglePicker = (show: boolean) => {
   }
 }
 
-const setFontSize = () => {
-  try {
-    const size = parseInt(fontSize.value)
-    if (size > 1 && size < 1000) {
-      setStyle(Css.FontSize, `${size}px`)
-      fontSizeRef.value?.inputRef?.blur()
-    }
-  } catch (e) {
-    console.log('Font size error:', e)
-  }
-}
-
 const fontFamily = computed(() => {
   return getStyleValue(Css.FontFamily)
 })
@@ -251,16 +230,7 @@ const iconColor = computed(() => {
   return gradientColors[0]?.rgba ?? color
 })
 
-watch(
-  () => [editor?.value?.selectedComponent, editor.value?.cssPseudoClass],
-  () => {
-    const size = getStyleValue(Css.FontSize)
-    fontSize.value = size?.replace('px', '') ?? ''
-  },
-  {
-    immediate: true,
-  },
-)
+const { fontSizePsInputRef, fontSize, fontSizeSuffix, setFontSize } = useToolbarFontSize()
 </script>
 
 <style lang="postcss" scoped>
@@ -271,13 +241,16 @@ watch(
 }
 
 .font-size {
-  width: 72px;
+  width: 76px;
   margin-left: 4px;
   :deep(.ps-input) {
     border: 1px solid $color-light1;
     background-color: rgba(255, 255, 255, 0.8);
     font-size: 15px;
     padding-right: 32px;
+  }
+  :deep(.ps-input-suffix) {
+    user-select: none;
   }
 }
 </style>

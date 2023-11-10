@@ -123,8 +123,9 @@ const emit = defineEmits<{
 const { type, name, placeholder, maxLength, modelValue, required, datalistId } =
   toRefs(props)
 
-const inputRef = ref(null)
+const inputRef = ref<HTMLInputElement>()
 
+// TODO: consider adding an interface for the exposed value?
 defineExpose({ inputRef })
 
 const requiredStar = ` *`
@@ -157,7 +158,7 @@ const handleInput = (e: Event) => {
     const limitedValue = value.slice(0, maxLength.value)
     emit('update:modelValue', limitedValue)
     if (inputRef.value) {
-      ;(inputRef.value as HTMLInputElement).value = limitedValue
+      inputRef.value.value = limitedValue
     }
   } else {
     emit('update:modelValue', value)
