@@ -1,3 +1,4 @@
+import { IApiError } from '@pubstudio/shared/type-api'
 import { IEditorContext, ISite } from '@pubstudio/shared/type-site'
 
 import type { ComputedRef, Ref } from 'vue'
@@ -17,6 +18,7 @@ export enum SiteSaveState {
 export interface ISiteStore {
   saveState: Ref<SiteSaveState> | ComputedRef<SiteSaveState>
   siteId: Ref<string>
+  saveError: Ref<IApiError | undefined>
   initialize(): Promise<void>
   save(site: ISite, immediate?: boolean): Promise<void>
   saveEditor(editor: IEditorContext): Promise<void>

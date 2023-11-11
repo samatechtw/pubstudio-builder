@@ -15,6 +15,7 @@ let _storeName: StoreKey
 
 export const useLocalStore = (storeName?: StoreKey): ISiteStore => {
   const siteId = ref(storeName === 'scratchSite' ? 'scratch' : '')
+  const saveError = ref()
 
   // `storeName` must be included the first time `useLocalStore` is called
   if (storeName) {
@@ -38,5 +39,5 @@ export const useLocalStore = (storeName?: StoreKey): ISiteStore => {
     return restoreSiteHelper(store[_storeName].getSite.value)
   }
 
-  return { siteId, saveState, initialize, save, saveEditor, restore }
+  return { siteId, saveState, saveError, initialize, save, saveEditor, restore }
 }

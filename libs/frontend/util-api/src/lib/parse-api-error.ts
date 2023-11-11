@@ -1,4 +1,4 @@
-import { IApiError } from './i-api-error'
+import { IApiError } from '@pubstudio/shared/type-api'
 
 interface I18nWrap {
   t(key: string): string
