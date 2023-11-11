@@ -4,6 +4,7 @@ import { useSiteApi } from '@pubstudio/frontend/data-access-site-api'
 import { store } from '@pubstudio/frontend/data-access-web-store'
 import { parseApiErrorKey, PSApi, toApiError } from '@pubstudio/frontend/util-api'
 import { serializeEditor, storeSite } from '@pubstudio/frontend/util-site-store'
+import { IApiError } from '@pubstudio/shared/type-api'
 import {
   IGetSiteApiRequest,
   IGetSiteApiResponse,
@@ -28,6 +29,7 @@ export interface IUseApiStoreProps {
 export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
   const platformApi = inject(ApiInjectionKey) as PSApi
   const siteId = ref(props.siteId)
+  const saveError = ref<IApiError | undefined>()
   let saveTimer: ReturnType<typeof setTimeout> | undefined
   let getFn: (
     siteId: string,
@@ -81,6 +83,7 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
 
   // Post the updated Site fields to the API
   const updateApi = async (keepalive?: boolean) => {
+    saveError.value = undefined
     const site = store.site.getSite.value
     try {
       const payload: IUpdateSiteApiRequest = {}
@@ -98,6 +101,7 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
       }
       dirty.value = dirtyDefault()
     } catch (e) {
+      saveError.value = toApiError(e)
       console.log('Save site API call fail:', e)
     }
   }
@@ -167,6 +171,7 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
   return {
     siteId,
     saveState,
+    saveError,
     initialize,
     save,
     saveEditor,

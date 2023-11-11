@@ -43,7 +43,7 @@ impl SiteDataValidator {
     }
 
     pub fn validate_pages(&self, pages: &serde_json::Value) -> Result<(), ApiError> {
-        self.validate_field_length(pages, self.max_pages_length, "Pages length exceeds limit")?;
+        self.validate_field_length(pages, self.max_pages_length, "Site data exceeds limit")?;
         Ok(())
     }
 

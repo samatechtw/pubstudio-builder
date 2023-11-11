@@ -70,6 +70,7 @@
       "@pubstudio/frontend/util-vite-config": [
         "libs/frontend/util-vite-config/src/index.ts"
       ],
+      "@pubstudio/shared/type-api": ["libs/shared/type-api/src/index.ts"],
       "@pubstudio/shared/type-api-local-site": [
         "libs/shared/type-api-local-site/src/index.ts"
       ],
