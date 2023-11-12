@@ -73,6 +73,7 @@ import {
 import { ISiteViewModel } from '@pubstudio/shared/type-api-platform-site'
 import { useSites } from '@pubstudio/frontend/feature-sites'
 import { store } from '@pubstudio/frontend/data-access-web-store'
+import { DEFAULT_TEMPLATE_ID } from '@pubstudio/shared/type-api-platform-template'
 import { IUploadFileResult } from '../lib/upload-asset'
 import { useSiteAssets } from '../lib/use-site-assets'
 
@@ -138,7 +139,14 @@ let validatedFile: ValidatedFile | undefined = undefined
 
 const resolvedSites = computed<ISelectableSite[]>(() => {
   const resolved = (propSites.value || loadedSites.value) ?? []
-  return [store.user.identity.value, ...resolved]
+  const adminTemplate = []
+  if (store.user.isAdmin.value) {
+    adminTemplate.push({
+      id: DEFAULT_TEMPLATE_ID,
+      name: t('assets.template'),
+    })
+  }
+  return [...adminTemplate, store.user.identity.value, ...resolved]
 })
 
 const handleImageSelect = (validFile: ValidatedFile) => {
