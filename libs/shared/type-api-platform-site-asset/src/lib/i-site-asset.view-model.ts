@@ -8,7 +8,9 @@ export interface ISiteAssetViewModel {
   url: string
   state: SiteAssetState
   user_id: string
-  site_id: string
+  site_id?: string
+  local_site_id?: string
+  template_id: string
   upload_expires_at: Date
   created_at: Date
 }

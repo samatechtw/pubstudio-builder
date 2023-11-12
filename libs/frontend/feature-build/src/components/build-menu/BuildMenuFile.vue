@@ -16,7 +16,7 @@
       <Templates></Templates>
     </BuildMenuIconText>
     <BuildMenuIconText
-      v-if="store.user.userType.value === UserType.Admin"
+      v-if="store.user.isAdmin"
       :text="t('template.create')"
       @click="showTemplateModal"
     >
