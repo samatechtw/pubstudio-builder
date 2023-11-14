@@ -23,6 +23,13 @@ impl SitePaymentPeriod {
             SitePaymentPeriod::Yearly => date + Months::new(12),
         }
     }
+    pub fn days_from_due(&self) -> i32 {
+        match self {
+            SitePaymentPeriod::Daily => 1,
+            SitePaymentPeriod::Monthly => 2,
+            SitePaymentPeriod::Yearly => 2,
+        }
+    }
 }
 
 #[derive(
