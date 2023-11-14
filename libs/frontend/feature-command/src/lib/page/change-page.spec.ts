@@ -39,7 +39,7 @@ describe('Change Page', () => {
 
     // Select a component
     const pageRoot = site.pages[pageBefore].root
-    setSelectedComponent(site.editor, pageRoot)
+    setSelectedComponent(site, pageRoot)
 
     // Change page
     const data = mockChangePageData(
@@ -61,7 +61,7 @@ describe('Change Page', () => {
 
     // Select a component
     const pageRoot = site.pages[pageBefore].root
-    setSelectedComponent(site.editor, pageRoot)
+    setSelectedComponent(site, pageRoot)
 
     // Change page and undo
     const data = mockChangePageData(

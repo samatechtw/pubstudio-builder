@@ -1,3 +1,4 @@
+import { setSelectedComponent } from '@pubstudio/frontend/feature-editor'
 import { resolveComponent } from '@pubstudio/frontend/util-builtin'
 import { mergeArr, mergePseudoStyle } from '@pubstudio/frontend/util-component'
 import { CommandType, ICommand } from '@pubstudio/shared/type-command'
@@ -24,6 +25,8 @@ export const applyMergeComponentStyle = (site: ISite, data: IMergeComponentStyle
         newStyle.custom[breakpointId],
       )
     }
+    // Select edited component for redo
+    setSelectedComponent(site, component)
   }
 }
 
@@ -38,5 +41,7 @@ export const undoMergeComponentStyle = (site: ISite, data: IMergeComponentStyleD
         oldStyle.custom[breakpointId],
       )
     }
+    // Select edited component for undo
+    setSelectedComponent(site, component)
   }
 }

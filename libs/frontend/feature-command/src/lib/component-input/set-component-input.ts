@@ -1,3 +1,4 @@
+import { setSelectedComponent } from '@pubstudio/frontend/feature-editor'
 import { resolveComponent } from '@pubstudio/frontend/util-builtin'
 import { ISetComponentInputData } from '@pubstudio/shared/type-command-data'
 import { IComponent, IComponentInput, ISite } from '@pubstudio/shared/type-site'
@@ -39,10 +40,14 @@ export const applySetComponentInput = (site: ISite, data: ISetComponentInputData
   const { componentId, oldInput, newInput } = data
   const component = resolveComponent(site.context, componentId)
   setInputs(component, oldInput, newInput)
+  // Select edited component for redo
+  setSelectedComponent(site, component)
 }
 
 export const undoSetComponentInput = (site: ISite, data: ISetComponentInputData) => {
   const { componentId, oldInput, newInput } = data
   const component = resolveComponent(site.context, componentId)
   setInputs(component, newInput, oldInput)
+  // Select edited component for undo
+  setSelectedComponent(site, component)
 }

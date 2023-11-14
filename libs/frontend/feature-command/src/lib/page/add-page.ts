@@ -17,17 +17,18 @@ export const applyAddPage = (site: ISite, data: IAddPageData) => {
   site.pages[metadata.route] = createPage(metadata, root)
   context.components[root.id] = root
 
-  // Set active page and selected component
-  setActivePage(site.editor, metadata.route)
-  setSelectedComponent(site.editor, undefined)
-
   // Add component tree expand state
   const { componentTreeExpandedItems } = site.editor ?? {}
   if (componentTreeExpandedItems) {
     componentTreeExpandedItems[root.id] = true
   }
+
   // Trigger page change event
   triggerEditorEvent(site, EditorEventName.OnPageChange)
+
+  // Set active page and selected component
+  setActivePage(site.editor, metadata.route)
+  setSelectedComponent(site, undefined)
 }
 
 export const undoAddPage = (site: ISite, data: IAddPageData) => {
@@ -42,15 +43,16 @@ export const undoAddPage = (site: ISite, data: IAddPageData) => {
   const deleteCount = deleteComponentWithId(site, rootId)
   context.nextId -= deleteCount
 
-  // Set active page and selected component
-  setActivePage(site.editor, activePageRoute)
-  setSelectedComponent(site.editor, prevSelectedComponent)
-
   // Remove component tree expand state
   const { componentTreeExpandedItems } = site.editor ?? {}
   if (componentTreeExpandedItems) {
     delete componentTreeExpandedItems[rootId]
   }
+
   // Trigger page change event
   triggerEditorEvent(site, EditorEventName.OnPageChange)
+
+  // Set active page and selected component
+  setActivePage(site.editor, activePageRoute)
+  setSelectedComponent(site, prevSelectedComponent)
 }

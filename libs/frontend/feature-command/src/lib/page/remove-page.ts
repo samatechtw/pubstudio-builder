@@ -16,11 +16,6 @@ export const applyRemovePage = (site: ISite, data: IRemovePageData) => {
     throw new Error('Cannot remove page when page count is less than 2')
   }
 
-  // Set active page to another one
-  const nextActivePageRoute = pageRoutes.find((route) => route !== pageRoute) as string
-  setActivePage(site.editor, nextActivePageRoute)
-  setSelectedComponent(site.editor, undefined)
-
   // Remove page
   delete site.pages[pageRoute]
 
@@ -33,6 +28,11 @@ export const applyRemovePage = (site: ISite, data: IRemovePageData) => {
 
   // Trigger page change event
   triggerEditorEvent(site, EditorEventName.OnPageChange)
+
+  // Set active page to another one
+  const nextActivePageRoute = pageRoutes.find((route) => route !== pageRoute) as string
+  setActivePage(site.editor, nextActivePageRoute)
+  setSelectedComponent(site, undefined)
 }
 
 export const undoRemovePage = (site: ISite, data: IRemovePageData) => {
@@ -45,11 +45,11 @@ export const undoRemovePage = (site: ISite, data: IRemovePageData) => {
     site.context.components[componentId] = component
   })
 
+  // Trigger page change event
+  triggerEditorEvent(site, EditorEventName.OnPageChange)
+
   // Set active page and selected component back
   const prevSelectedComponent = site.context.components[selectedComponentId ?? '']
   setActivePage(site.editor, pageRoute)
-  setSelectedComponent(site.editor, prevSelectedComponent)
-
-  // Trigger page change event
-  triggerEditorEvent(site, EditorEventName.OnPageChange)
+  setSelectedComponent(site, prevSelectedComponent)
 }

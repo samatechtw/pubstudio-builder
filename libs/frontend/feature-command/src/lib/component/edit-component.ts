@@ -1,3 +1,4 @@
+import { setSelectedComponent } from '@pubstudio/frontend/feature-editor'
 import {
   defaultImageInputs,
   defaultLinkInputs,
@@ -36,6 +37,8 @@ export const applyEditComponent = (site: ISite, data: IEditComponentData) => {
   }
   addTagInputs(component, data.new)
   removeTagInputs(component, data.old)
+  // Select edited component for redo
+  setSelectedComponent(site, component)
 }
 
 const removeTagInputs = (component: IComponent, fields: IEditComponentFields) => {
@@ -59,5 +62,7 @@ export const undoEditComponent = (site: ISite, data: IEditComponentData) => {
     }
     addTagInputs(component, data.old)
     removeTagInputs(component, data.new)
+    // Select edited component for undo
+    setSelectedComponent(site, component)
   }
 }
