@@ -6,6 +6,7 @@ use file_rotate::{
     suffix::{AppendTimestamp, DateFrom, FileLimit},
     ContentLimit, FileRotate, TimeFrequency,
 };
+use lib_shared_types::shared::core::ExecEnv;
 use tower_http::{classify::ServerErrorsFailureClass, trace::TraceLayer};
 use tracing::{field, info, Span};
 
@@ -79,6 +80,7 @@ pub fn setup_logging(crate_name: &str) -> WorkerGuard {
 
 pub fn setup_slack_logging(
     crate_name: &str,
+    exec_env: &ExecEnv,
     slack_info_url: &str,
     slack_error_url: &str,
 ) -> (WorkerGuard, SlackBackgroundWorker) {
@@ -87,6 +89,7 @@ pub fn setup_slack_logging(
     let slack_params = SlackLayerParams {
         info_url: slack_info_url.into(),
         error_url: slack_error_url.into(),
+        exec_env: exec_env.clone(),
     };
     let (slack_layer, slack_worker) = SlackLayer::new(slack_params);
 

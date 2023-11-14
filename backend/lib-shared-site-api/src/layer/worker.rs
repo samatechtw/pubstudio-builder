@@ -14,14 +14,14 @@ pub(crate) async fn send_message(mut rx: ChannelReceiver) {
             WorkerMessage::Data(payload) => {
                 let webhook_url = payload.webhook_url().to_string();
 
-                let payload =
+                let payload_str =
                     serde_json::to_string(&payload).expect("failed to deserialize slack payload");
 
                 let mut retries = 0;
                 while retries < MAX_RETRIES {
                     match client
                         .post(webhook_url.clone())
-                        .body(payload.clone())
+                        .body(payload_str.clone())
                         .send()
                         .await
                     {
