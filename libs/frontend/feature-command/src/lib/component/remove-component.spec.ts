@@ -29,6 +29,10 @@ describe('Remove Component', () => {
   let componentCount: number
 
   beforeEach(() => {
+    // Select the component that will be deleted, so undo matches
+    // Undoing RemoveComponent selects the un-deleted component, which may not be
+    // the component that was previously selected.
+    mockSerializedSite.editor!.selectedComponentId = 'test-c-1'
     siteString = JSON.stringify(mockSerializedSite)
     site = deserializeSite(siteString) as ISite
     componentCount = Object.keys(site.context.components).length
@@ -118,6 +122,11 @@ describe('Remove Component', () => {
       const childData = mockAddComponentData(mockSerializedComponent(site))
       applyAddComponent(site, childData)
       applyAddComponent(site, childData)
+      // Select the component that will be deleted, so undo matches
+      site.editor!.selectedComponent = resolveComponent(
+        site.context,
+        'test-c-1',
+      ) as IComponent
       // Save the state to compare later
       siteCheckpoint = stringifySite(site)
       componentCount = Object.keys(site.context.components).length
