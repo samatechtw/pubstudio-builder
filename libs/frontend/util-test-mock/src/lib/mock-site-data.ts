@@ -12,7 +12,7 @@ export const mockSerializedSite: ISerializedSite = {
   version: '0.1',
   editor: {
     selectedComponentId: 'test-c-0',
-    active: 'home',
+    active: '/home',
     editorEvents: {},
     debugBounding: false,
     mode: EditorMode.SelectedComponent,
