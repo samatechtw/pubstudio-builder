@@ -75,7 +75,7 @@ export const useBuildEvent = () => {
   let buildWindow: HTMLElement | null = null
 
   const selectComponent = (component: IComponent) => {
-    setSelectedComponent(site.value.editor, component)
+    setSelectedComponent(site.value, component)
 
     // Scroll to the corresponding tree item if component tree is visible
     if (editor.value?.showComponentTree) {

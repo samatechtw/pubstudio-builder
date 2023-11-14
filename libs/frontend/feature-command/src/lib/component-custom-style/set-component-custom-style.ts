@@ -1,3 +1,4 @@
+import { setSelectedComponent } from '@pubstudio/frontend/feature-editor'
 import { resolveComponent } from '@pubstudio/frontend/util-builtin'
 import { CommandType, ICommand } from '@pubstudio/shared/type-command'
 import { ISetComponentCustomStyleData } from '@pubstudio/shared/type-command-data'
@@ -47,6 +48,8 @@ export const applySetComponentCustomStyle = (
   const { componentId, oldStyle, newStyle } = data
   const component = resolveComponent(site.context, componentId)
   setStyle(component, data.breakpointId, oldStyle, newStyle)
+  // Select edited component for redo
+  setSelectedComponent(site, component)
 }
 
 export const undoSetComponentCustomStyle = (
@@ -56,4 +59,6 @@ export const undoSetComponentCustomStyle = (
   const { componentId, oldStyle, newStyle } = data
   const component = resolveComponent(site.context, componentId)
   setStyle(component, data.breakpointId, newStyle, oldStyle)
+  // Select edited component for undo
+  setSelectedComponent(site, component)
 }

@@ -118,10 +118,9 @@ const currentSelected = computed(() => {
 })
 
 const selectComponent = () => {
-  setSelectedComponent(site.value.editor, component.value, {
+  setSelectedComponent(site.value, component.value, {
     expandTree: false,
   })
-  document.getElementById(component.value.id)?.scrollIntoView()
 }
 
 const toggleExpanded = () => {

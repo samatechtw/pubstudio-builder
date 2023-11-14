@@ -1,3 +1,4 @@
+import { setSelectedComponent } from '@pubstudio/frontend/feature-editor'
 import { resolveComponent } from '@pubstudio/frontend/util-builtin'
 import { triggerEventBehaviors } from '@pubstudio/frontend/util-runtime'
 import { ISetComponentEventData } from '@pubstudio/shared/type-command-data'
@@ -56,10 +57,14 @@ export const applySetComponentEvent = (site: ISite, data: ISetComponentEventData
   const { componentId, oldEvent, newEvent } = data
   const component = resolveComponent(site.context, componentId)
   setEvents(site, component, oldEvent, newEvent)
+  // Select edited component for redo
+  setSelectedComponent(site, component)
 }
 
 export const undoSetComponentEvent = (site: ISite, data: ISetComponentEventData) => {
   const { componentId, oldEvent, newEvent } = data
   const component = resolveComponent(site.context, componentId)
   setEvents(site, component, newEvent, oldEvent)
+  // Select edited component for undo
+  setSelectedComponent(site, component)
 }

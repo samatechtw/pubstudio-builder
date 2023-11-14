@@ -76,7 +76,8 @@ export const applyAddComponent = (site: ISite, data: IAddComponentData) => {
     }
   }
 
-  setSelectedComponent(site.editor, component)
+  // Select created component
+  setSelectedComponent(site, component)
 }
 
 export const deleteComponentWithId = (site: ISite, componentId?: string): number => {
@@ -125,7 +126,7 @@ export const undoAddComponent = (site: ISite, data: IAddComponentData) => {
   if (selectedComponentId) {
     const selectedComponent = context.components[selectedComponentId]
     if (selectedComponent) {
-      setSelectedComponent(site.editor, selectedComponent)
+      setSelectedComponent(site, selectedComponent)
     }
   }
 }

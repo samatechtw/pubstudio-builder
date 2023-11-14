@@ -171,7 +171,6 @@ export interface IUseBuild {
   changePage: (route: string) => void
   setHomePage: (route: string) => void
   deleteSelected: () => void
-  selectComponentParent: () => void
   moveComponent: (from: IComponentPosition, to: IComponentPosition) => void
   moveAbsoluteComponent: (component: IComponent, left: string, top: string) => void
   addDefaultsHead: (tag: IHeadTag, value: IHeadObject) => void
@@ -247,13 +246,6 @@ export const useBuild = (): IUseBuild => {
   const replaceSite = (newSite: ISite) => {
     site.value = newSite
     siteStore.value.save(site.value)
-  }
-
-  const selectComponentParent = () => {
-    const component = site.value.editor?.selectedComponent
-    if (component) {
-      setSelectedComponent(site.value.editor, component.parent)
-    }
   }
 
   const addComponent = (data?: Partial<IAddComponentData>) => {
@@ -860,13 +852,14 @@ export const useBuild = (): IUseBuild => {
     }
     const data = makeRemoveComponentData(site.value, selected)
     pushCommand(CommandType.RemoveComponent, data)
-    setSelectedComponent(site.value.editor, parent)
+    setSelectedComponent(site.value, parent)
   }
 
   const moveComponent = (from: IComponentPosition, to: IComponentPosition) => {
     const data: IMoveComponentData = {
       from,
       to,
+      selectedComponentId: editor.value?.selectedComponent?.id,
     }
     pushCommand(CommandType.MoveComponent, data)
   }
@@ -1065,7 +1058,6 @@ export const useBuild = (): IUseBuild => {
     clearSiteError,
     resetSite,
     replaceSite,
-    selectComponentParent,
     addComponent,
     addComponentData,
     duplicateComponent,

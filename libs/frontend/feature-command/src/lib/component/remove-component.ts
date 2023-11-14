@@ -1,6 +1,7 @@
 import {
   registerComponentEditorEvents,
   removeEditorEvents,
+  setSelectedComponent,
 } from '@pubstudio/frontend/feature-editor'
 import { resolveComponent } from '@pubstudio/frontend/util-builtin'
 import { triggerEventBehaviors } from '@pubstudio/frontend/util-runtime'
@@ -37,6 +38,9 @@ export const applyRemoveComponent = (site: ISite, data: IRemoveComponentData) =>
 
     // Clear editor events
     removeEditorEvents(site, component)
+
+    // Clear selected component state after delete
+    setSelectedComponent(site, undefined)
   }
 }
 
@@ -94,4 +98,7 @@ export const undoRemoveComponent = (site: ISite, data: IRemoveComponentData) => 
       triggerEventBehaviors(editorEvents.OnSelfAdded.behaviors, site, component)
     }
   }
+
+  // Select deleted component after undo
+  setSelectedComponent(site, component)
 }
