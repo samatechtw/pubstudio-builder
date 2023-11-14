@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+use lib_shared_types::shared::core::ExecEnv;
 use serde::Serialize;
 use serde::{ser::SerializeMap, Serializer};
 use serde_json::{Error, Value};
@@ -21,12 +22,14 @@ const KEYWORDS: [&str; 2] = ["message", "error"];
 pub struct SlackLayer {
     info_webhook_url: String,  // Slack webhook URL for INFO level
     error_webhook_url: String, // Slack webhook URL for ERROR level
+    exec_env: ExecEnv,
     slack_sender: ChannelSender,
 }
 
 pub struct SlackLayerParams {
     pub info_url: String,
     pub error_url: String,
+    pub exec_env: ExecEnv,
 }
 
 #[derive(Serialize)]
@@ -62,6 +65,7 @@ impl SlackLayer {
         let layer = SlackLayer {
             info_webhook_url: params.info_url,
             error_webhook_url: params.error_url,
+            exec_env: params.exec_env,
             slack_sender: tx.clone(),
         };
 
@@ -200,9 +204,16 @@ where
         let blocks_result = Self::build_blocks(message, event, metadata);
         match blocks_result {
             Ok(blocks) => {
+                if self.exec_env == ExecEnv::Dev || self.exec_env == ExecEnv::Ci {
+                    println!("Skip slack log: {blocks}");
+                    return;
+                }
                 let payload = SlackPayload::new(blocks, webhook_url.to_string());
                 if let Err(e) = self.slack_sender.send(WorkerMessage::Data(payload)) {
-                    tracing::error!(err = %e, "failed to send slack payload to given channel")
+                    println!(
+                        "ERROR: failed to send slack payload to given channel, {}",
+                        e.to_string()
+                    )
                 };
             }
             Err(e) => tracing::error!("failed to format slack message: {}", e),

@@ -1,6 +1,7 @@
+use serde::Serialize;
 use strum::{Display, EnumString, IntoStaticStr};
 
-#[derive(Debug, Clone, Copy, PartialEq, Display, EnumString, IntoStaticStr)]
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Display, EnumString, IntoStaticStr)]
 pub enum ExecEnv {
     #[strum(serialize = "dev")]
     Dev,
