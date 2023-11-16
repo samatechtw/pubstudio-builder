@@ -5,7 +5,11 @@ import {
   descSortedBreakpoints,
 } from '@pubstudio/frontend/feature-site-source'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
-import { createSite, resolvedComponentStyle } from '@pubstudio/frontend/util-build'
+import {
+  createSite,
+  resolvedComponentStyle,
+  selectAddParent,
+} from '@pubstudio/frontend/util-build'
 import {
   builtinStyles,
   resolveComponent,
@@ -116,7 +120,7 @@ export interface IUseBuild {
   addComponent: (data?: Partial<IAddComponentData>) => void
   addComponentData: (data: IAddComponentData) => void
   duplicateComponent: () => void
-  pasteComponent: (copiedComponentId: string, parentId: string) => void
+  pasteComponent: (copiedComponentId: string, parent: IComponent) => void
   addBuiltinComponent: (id: string) => void
   editComponent: (fields: IEditComponentFields) => void
   setCustomStyle: (
@@ -257,7 +261,7 @@ export const useBuild = (): IUseBuild => {
       name: data?.name,
       tag: data?.tag ?? Tag.Div,
       content: data?.content ?? 'test',
-      parentId: parent?.id ?? activePage.value.root.id,
+      ...selectAddParent(parent, activePage.value?.root.id),
       sourceId: data?.sourceId,
       style: {
         mixins: data?.style?.mixins,
@@ -370,7 +374,7 @@ export const useBuild = (): IUseBuild => {
     pushCommand(CommandType.AddComponent, data)
   }
 
-  const pasteComponent = (copiedComponentId: string, parentId: string) => {
+  const pasteComponent = (copiedComponentId: string, parent: IComponent) => {
     const copiedComponent = resolveComponent(site.value.context, copiedComponentId)
     if (!copiedComponent) return
 
@@ -379,7 +383,7 @@ export const useBuild = (): IUseBuild => {
       content: copiedComponent.content,
       sourceId: copiedComponent.id,
       name: copiedComponent.name,
-      parentId,
+      ...selectAddParent(parent, activePage.value?.root.id),
     }
     pushCommand(CommandType.AddComponent, data)
   }
