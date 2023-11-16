@@ -43,7 +43,10 @@
           class="ms-item"
           @click="select(index)"
         >
-          {{ l }}
+          <slot v-if="customLabel" :label="l"></slot>
+          <div v-else>
+            {{ l }}
+          </div>
         </div>
         <div
           v-if="!labels.length"
@@ -97,6 +100,10 @@ const props = withDefaults(
     tooltip?: string
     emptyText?: string
     openInitial?: boolean
+    // If true, the label is replaced with a slot
+    customLabel?: boolean
+    // Allow any search input to be selected, even if it's not in the list
+    allowAny?: boolean
     openControl?: () => boolean
   }>(),
   {
@@ -122,6 +129,7 @@ const {
   toggleId,
   value,
   valueKey,
+  allowAny,
 } = toRefs(props)
 
 const emit = defineEmits<{
@@ -129,6 +137,10 @@ const emit = defineEmits<{
   (e: 'selectEmpty'): void
   (e: 'open'): void
   (e: 'close'): void
+}>()
+
+defineSlots<{
+  default(props: { label: string }): void
 }>()
 
 const dataToggleId = `toggle-${toggleId.value ?? uidSingleton.next()}`
@@ -193,6 +205,7 @@ const setToggleRef = (element: Element | ComponentPublicInstance | null) => {
 }
 
 const closeMenu = () => {
+  // TODO -- should this call setMenuOpened(false) ?
   search.value = ''
   searchActive.value = false
   if (opened.value) {
@@ -262,6 +275,11 @@ const searchEnter = () => {
   if (filteredOptions.value[0]) {
     select(0)
     closeMenu()
+    setMenuOpened(false)
+  } else if (allowAny.value) {
+    emit('select', search.value as T)
+    search.value = ''
+    setMenuOpened(false)
   }
 }
 

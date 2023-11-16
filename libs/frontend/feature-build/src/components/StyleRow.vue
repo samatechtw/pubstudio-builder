@@ -127,13 +127,17 @@ const propertyText = computed(() => {
   }
 })
 
+const focusValue = async () => {
+  await nextTick()
+  // TODO -- look into why nextTick isn't enough here
+  setTimeout(() => valueInputRef.value?.inputRef.focus(), 1)
+}
+
 const edit = async () => {
   newStyle.value = propStyleOrNewStyle()
   emit('edit', model.value.property)
   if (!focusProp.value) {
-    await nextTick()
-    // TODO -- look into why nextTick isn't enough here
-    setTimeout(() => valueInputRef.value?.inputRef.focus(), 1)
+    focusValue()
   }
 }
 
@@ -147,6 +151,15 @@ const updateProperty = (property: Css) => {
   } else {
     newStyle.value.property = property
   }
+  // TODO -- decide if/how to autofocus value multiselect
+  if (valueOptions.value) {
+    try {
+      ;(document.activeElement as HTMLElement).blur()
+    } catch (_e) {
+      //
+    }
+  }
+  focusValue()
   if (immediateUpdate.value) {
     updateStyle()
   }
@@ -247,6 +260,7 @@ const removeStyle = () => {
   width: 120px;
 }
 .value-multiselect {
+  width: 120px;
   margin-left: 6px;
 }
 .value-input {

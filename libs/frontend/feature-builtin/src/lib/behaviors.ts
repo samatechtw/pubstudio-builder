@@ -19,6 +19,7 @@ import {
   navMenuItemId,
   navMenuItemStyleId,
   noBehaviorId,
+  setHiddenId,
   toggleHiddenId,
 } from '@pubstudio/frontend/util-ids'
 import { CommandType, ICommand } from '@pubstudio/shared/type-command'
@@ -66,6 +67,36 @@ export const toggleHidden: IBehavior = {
   },
 }
 registerBuiltinBehavior(toggleHidden)
+
+export const setHidden: IBehavior = {
+  id: setHiddenId,
+  name: 'Set Hidden',
+  args: {
+    id: {
+      name: 'id',
+      type: ComponentArgPrimitive.String,
+      help: 'The ID of the component which will be hidden.',
+    },
+    hide: {
+      name: 'hide',
+      type: ComponentArgPrimitive.Boolean,
+      help: 'Set true to hide, false to show',
+    },
+  },
+  builtin: (
+    helpers: IBehaviorHelpers,
+    behaviorContext: IBehaviorContext,
+    args?: IBehaviorCustomArgs,
+  ) => {
+    const { site } = behaviorContext
+    let cmp: IComponent | undefined = undefined
+    if (args?.id) {
+      cmp = resolveComponent(site.context, args.id as string)
+    }
+    helpers.setState(cmp, 'hide', !!args?.hide)
+  },
+}
+registerBuiltinBehavior(setHidden)
 
 export const homeLinkBehavior: IBehavior = {
   id: homeLinkBehaviorId,

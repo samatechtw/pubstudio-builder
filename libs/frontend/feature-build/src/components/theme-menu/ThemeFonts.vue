@@ -12,7 +12,7 @@
       <div v-if="fonts.length" class="theme-fonts">
         <div v-for="font in fonts" :key="font.name" class="font-entry edit-item">
           <div class="font-preview" @click="setEditingFont(font)">
-            <div class="font-name">
+            <div :style="{ 'font-family': fontFamily(font.name) }" class="font-name">
               {{ font.name }}
             </div>
             <div class="font-source">
@@ -43,6 +43,8 @@ const { t } = useI18n()
 
 const { fonts, newFont, setEditingFont } = useThemeMenuFonts()
 const { deleteThemeFont } = useBuild()
+
+const fontFamily = (name: string) => `"${name}"`
 
 const removeFont = (font: IThemeFont) => {
   deleteThemeFont({
@@ -78,24 +80,26 @@ const removeFont = (font: IThemeFont) => {
       justify-content: space-between;
       border-bottom: 1px solid $grey-100;
       cursor: default;
-      .font-preview {
-        @mixin flex-row;
-        flex-grow: 1;
-        cursor: pointer;
-        white-space: nowrap;
-        overflow: hidden;
-        align-items: center;
-        .font-source {
-          color: $grey-500;
-          margin-left: 16px;
-        }
-        .font-fallback {
-          color: $grey-500;
-          margin: 0 auto 0 16px;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
-      }
+    }
+    .font-preview {
+      @mixin flex-row;
+      flex-grow: 1;
+      cursor: pointer;
+      white-space: nowrap;
+      overflow: hidden;
+      align-items: center;
+    }
+    .font-source {
+      @mixin title-normal 13px;
+      color: $grey-500;
+      margin-left: 16px;
+    }
+    .font-fallback {
+      @mixin title-normal 13px;
+      color: $grey-500;
+      margin: 0 auto 0 16px;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     & + .theme-fonts-wrap {
       margin-top: 24px;

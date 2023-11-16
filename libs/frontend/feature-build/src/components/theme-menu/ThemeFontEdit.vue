@@ -75,14 +75,18 @@ const updateSource = (source: ThemeFontSource) => {
 <style lang="postcss" scoped>
 @import '@theme/css/mixins.postcss';
 
-.edit-theme-font {
-  .theme-font-actions {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 16px;
-    > button {
-      width: 48%;
-    }
+.label {
+  @mixin title-bold 13px;
+}
+.item {
+  width: 180px;
+}
+.theme-font-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 16px;
+  > button {
+    width: 48%;
   }
 }
 </style>

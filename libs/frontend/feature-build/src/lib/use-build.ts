@@ -175,6 +175,7 @@ export interface IUseBuild {
   changePage: (route: string) => void
   setHomePage: (route: string) => void
   deleteSelected: () => void
+  selectComponentParent: () => void
   moveComponent: (from: IComponentPosition, to: IComponentPosition) => void
   moveAbsoluteComponent: (component: IComponent, left: string, top: string) => void
   addDefaultsHead: (tag: IHeadTag, value: IHeadObject) => void
@@ -859,6 +860,12 @@ export const useBuild = (): IUseBuild => {
     setSelectedComponent(site.value, parent)
   }
 
+  const selectComponentParent = () => {
+    const selected = site.value.editor?.selectedComponent
+    const parent = selected?.parent
+    setSelectedComponent(site.value, parent)
+  }
+
   const moveComponent = (from: IComponentPosition, to: IComponentPosition) => {
     const data: IMoveComponentData = {
       from,
@@ -1084,6 +1091,7 @@ export const useBuild = (): IUseBuild => {
     removeComponentInput,
     setSelectedIsInput,
     deleteSelected,
+    selectComponentParent,
     setBehavior,
     removeBehavior,
     setBehaviorArg,

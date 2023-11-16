@@ -6,6 +6,7 @@ import { globalContext } from './global-context'
 // Public behaviors
 export const noBehaviorId = behaviorId(globalContext.namespace, 'none')
 export const toggleHiddenId = behaviorId(globalContext.namespace, 'toggleHidden')
+export const setHiddenId = behaviorId(globalContext.namespace, 'setHidden')
 export const navMenuBehaviorId = behaviorId(globalContext.namespace, 'navChildren')
 export const navItemBehaviorId = behaviorId(globalContext.namespace, 'navItem')
 export const homeLinkBehaviorId = behaviorId(globalContext.namespace, 'homeLink')

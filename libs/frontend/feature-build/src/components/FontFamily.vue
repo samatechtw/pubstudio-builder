@@ -1,5 +1,7 @@
 <template>
   <PSMultiselect
+    v-slot="{ label }"
+    :customLabel="true"
     :value="fontFamily?.value"
     :placeholder="t('style.toolbar.font_family')"
     :options="options"
@@ -14,7 +16,11 @@
     @selectEmpty="showFontMenu"
     @open="setStyleToolbarMenu(editor, StyleToolbarMenu.FontFamily)"
     @close="setStyleToolbarMenu(editor, undefined)"
-  />
+  >
+    <div :style="{ 'font-family': font(label) }">
+      {{ label }}
+    </div>
+  </PSMultiselect>
 </template>
 
 <script lang="ts" setup>
@@ -59,6 +65,10 @@ const showFontMenu = () => {
 
 const setFontFamily = (family: string | undefined) => {
   setStyle(Css.FontFamily, family)
+}
+
+const font = (label: string) => {
+  return `"${label}"`
 }
 
 onMounted(() => {
