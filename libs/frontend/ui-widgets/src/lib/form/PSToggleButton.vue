@@ -50,6 +50,9 @@ const emit = defineEmits<{
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
   }
+  &:not(:first-child):not(:last-child) {
+    border-radius: 0;
+  }
   .ps-toggle-button-text {
     @mixin title-thin 15px;
     &:not(:only-child) {
