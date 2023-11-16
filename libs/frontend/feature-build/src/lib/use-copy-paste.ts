@@ -47,20 +47,16 @@ export const useCopyPaste = (): IUseCopyPaste => {
     const { selectedComponent } = site.value.editor ?? {}
     if (!selectedComponent) return
 
-    if (selectedComponent.content) {
-      addHUD({ text: "Can't paste into a component with text content" })
-    } else {
-      // If the copied component is still selected, paste to its parent
-      if (copiedComponent.id === selectedComponent.id) {
-        const parentId = selectedComponent.parent?.id
-        if (parentId) {
-          executePasteComponent(copiedComponent.id, parentId)
-        }
-      } else {
-        executePasteComponent(copiedComponent.id, selectedComponent.id)
+    // If the copied component is still selected, paste to its parent
+    if (copiedComponent.id === selectedComponent.id) {
+      const parent = selectedComponent.parent
+      if (parent) {
+        executePasteComponent(copiedComponent.id, parent)
       }
-      addHUD({ text: 'Component Pasted' })
+    } else {
+      executePasteComponent(copiedComponent.id, selectedComponent)
     }
+    addHUD({ text: 'Component Pasted' })
   }
 
   const pressPaste = (evt: KeyboardEvent) => {

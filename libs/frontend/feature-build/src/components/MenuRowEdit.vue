@@ -15,7 +15,7 @@
     <div v-else class="item edit-item" @click="editValue">
       {{ value || '' }}
     </div>
-    <Edit v-if="!editing && editable" class="edit-icon" />
+    <Edit v-if="!editing && editable" class="edit-icon" @click="editValue" />
     <InfoBubble v-if="info" :message="info" :showArrow="false" class="info-bubble" />
   </div>
 </template>
