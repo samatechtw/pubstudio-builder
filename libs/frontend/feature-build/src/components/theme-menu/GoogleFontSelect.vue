@@ -7,6 +7,7 @@
     :searchable="true"
     :options="GoogleFontNames"
     :clearable="false"
+    :allowAny="true"
     @select="emit('update:modelValue', $event)"
     @click.stop
   />

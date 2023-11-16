@@ -164,7 +164,7 @@ const previewPageLink = computed(() => {
   align-items: center;
   flex-wrap: wrap;
   width: 100%;
-  padding: 0 24px 0 12px;
+  padding: 0 24px 0 8px;
   background-color: $color-toolbar-bg;
   :deep(.ps-input),
   :deep(.multiselect),
