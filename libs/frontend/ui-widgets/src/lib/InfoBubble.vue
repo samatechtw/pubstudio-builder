@@ -131,6 +131,7 @@ const hideBubble = () => {
   @mixin size 20px;
   cursor: pointer;
   position: relative;
+  flex-shrink: 0;
   &:hover {
     :deep(svg g) {
       fill: $color-light1;
