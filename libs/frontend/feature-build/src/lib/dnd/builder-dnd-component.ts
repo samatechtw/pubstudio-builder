@@ -179,23 +179,32 @@ export const BuilderDndComponent = defineComponent({
         dndState.value,
       )
       const { editView, selectedComponent } = site.value.editor ?? {}
-      // Don't drag/drop root component, and disable when ProseMirror is active
-      const dndProps =
-        component.value.parent && !editView?.hasFocus()
-          ? {
-              draggable: !editView || selectedComponent?.id !== component.value.id,
-              ...dndState,
-              onDragstart: dnd.dragstart,
-              onDrag: dnd.drag,
-              onDragenter: dnd.dragenter,
-              onDragover: dnd.dragover,
-              onDragleave: dnd.dragleave,
-              onDrop: dnd.drop,
-              onDragend: dnd.dragend,
-            }
-          : {
-              onDragend: dnd.dragend,
-            }
+      const isRoot = !component.value.parent
+      const editViewFocus = editView?.hasFocus()
+      const droppableDndProps = {
+        onDragenter: dnd.dragenter,
+        onDragover: dnd.dragover,
+        onDragleave: dnd.dragleave,
+        onDrop: dnd.drop,
+        onDragend: dnd.dragend,
+      }
+
+      // If ProseMirror editor is active, only allow dragend event to be fired.
+      // If the component is root component, only allow hover&drop events to be fired.
+      // Otherwise allow all drag, hover, and drop events to be fired.
+      let dndProps: Record<string, unknown> = {}
+      if (editViewFocus) {
+        dndProps = { onDragend: dnd.dragend }
+      } else if (isRoot) {
+        dndProps = droppableDndProps
+      } else {
+        dndProps = {
+          draggable: !editView || selectedComponent?.id !== component.value.id,
+          onDragstart: dnd.dragstart,
+          onDrag: dnd.drag,
+          ...droppableDndProps,
+        }
+      }
 
       if (
         dndState.value?.hoverSelf ||
@@ -220,7 +229,7 @@ export const BuilderDndComponent = defineComponent({
         ...dndProps,
         // TODO -- is this necessary?
         key: renderKey.value,
-        ref: component.value.parent ? dnd.elementRef : undefined,
+        ref: dnd.elementRef,
       } as Record<string, unknown>
 
       const tag = component.value.tag
