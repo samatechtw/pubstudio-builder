@@ -7,8 +7,9 @@ import { computed } from 'vue'
 import { runtimeContext } from '@pubstudio/frontend/util-runtime'
 import { useBuild } from '../lib/use-build'
 
-const hoverOutlineThickness = 3
-const outlineColor = '#F82389'
+const hoverOutlineThickness = 6
+const outlineColor = '#000'
+const selfOutlineColor = '#F82389'
 
 const { editor } = useBuild()
 
@@ -54,16 +55,14 @@ const overlayStyle = computed(() => {
       let [overlayTop, overlayLeft, overlayWidth, overlayHeight] = [0, 0, 0, 0]
       let [overlayBackgroundColor, overlayBorder] = ['', '']
 
+      overlayTop = elementRelativeTop
+      overlayLeft = elementRelativeLeft
       if (hoverSelf) {
-        overlayTop = elementRelativeTop
-        overlayLeft = elementRelativeLeft
         overlayWidth = elementWidth
         overlayHeight = elementHeight
-        overlayBorder = `1.5px solid ${outlineColor}`
+        overlayBorder = `1.5px solid ${selfOutlineColor}`
       } else if (hoverCmpParentIsRow) {
         if (hoverLeft) {
-          overlayTop = elementRelativeTop
-          overlayLeft = elementRelativeLeft
           overlayWidth = outlineThickness
           overlayHeight = elementHeight
           overlayBackgroundColor = outlineColor
@@ -76,22 +75,19 @@ const overlayStyle = computed(() => {
         }
       } else {
         if (hoverTop) {
-          overlayTop = elementRelativeTop
-          overlayLeft = elementRelativeLeft
           overlayWidth = elementWidth
           overlayHeight = outlineThickness
           overlayBackgroundColor = outlineColor
         } else if (hoverBottom) {
           overlayTop = elementRelativeBottom - outlineThickness
-          overlayLeft = elementRelativeLeft
           overlayWidth = elementWidth
           overlayHeight = outlineThickness
           overlayBackgroundColor = outlineColor
         }
       }
 
-      // Divide offsets by `builderScale` because `.build-content-window-inner` would scale
-      // based on the `builderScale` in the editor context.
+      // Divide offsets by `builderScale` because `.build-content-window-inner` scales
+      // based on `builderScale` in the editor context.
       overlayTop /= builderScale
       overlayLeft /= builderScale
       overlayWidth /= builderScale
@@ -120,5 +116,6 @@ const overlayStyle = computed(() => {
 .build-dnd-overlay {
   position: absolute;
   pointer-events: none;
+  border: 1px solid white;
 }
 </style>

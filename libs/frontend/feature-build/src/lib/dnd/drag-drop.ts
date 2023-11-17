@@ -38,10 +38,16 @@ export const onDrag = (options: IOnDragOptions): IDropProps => {
     const dragCmpParentId = dragSrc.parentId
     const dragComponentIndex = dragSrc.index
 
-    const hoverOnRoot = !hoverCmp.parent
+    const hoverOnRoot = !hoverCmp.id.startsWith('global') && !hoverCmp.parent
     const haveSameParent = dragCmpParentId === hoverCmp.parent?.id
 
-    if (!haveSameParent || dragComponentIndex !== hoverCmpIndex) {
+    const addNewComponentToRoot = hoverOnRoot && !!dragSrc.addData
+
+    if (
+      !haveSameParent ||
+      dragComponentIndex !== hoverCmpIndex ||
+      addNewComponentToRoot
+    ) {
       const hoverCmpRect = elementRef.getBoundingClientRect()
 
       const mousePosition = getMousePosition(e)
@@ -78,15 +84,15 @@ export const onDrag = (options: IOnDragOptions): IDropProps => {
       }
 
       if (
-        hoverCmp.id !== dragCmpParentId &&
-        !hoverCmp.content &&
-        hoverCmp.tag !== Tag.Img
+        addNewComponentToRoot ||
+        (hoverCmp.id !== dragCmpParentId && !hoverCmp.content && hoverCmp.tag !== Tag.Img)
       ) {
         dropProps.hoverSelf = true
         dropProps.destinationIndex = hoverCmp.children?.length ?? 0
       }
     }
   }
+
   return dropProps
 }
 

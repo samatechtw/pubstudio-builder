@@ -25,14 +25,17 @@ export const isRowLayout = (site: ISite, component: IComponent | undefined): boo
     return false
   }
   const styles = findStyles(
-    [Css.FlexDirection],
+    [Css.Display, Css.FlexDirection],
     site,
     component,
     descSortedBreakpoints.value,
     activeBreakpoint.value,
   )
-  const direction = styles[Css.FlexDirection]
-  return direction === 'row' || direction === 'row-reverse' || direction === undefined
+  const [display, direction] = [styles[Css.Display], styles[Css.FlexDirection]]
+  return (
+    display === 'flex' &&
+    (direction === 'row' || direction === 'row-reverse' || direction === undefined)
+  )
 }
 
 export const handleRowLayoutHover = (props: IHandleHoverProps) => {
