@@ -95,7 +95,7 @@ const {
   drop,
   dragend,
 } = useDragDrop({
-  context: site.value.context,
+  site: site.value,
   componentId: component.value.id,
   getParentId: () => component.value.parent?.id,
   getComponentIndex: () => componentIndex.value,

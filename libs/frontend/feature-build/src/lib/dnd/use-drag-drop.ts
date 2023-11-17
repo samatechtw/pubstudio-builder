@@ -3,12 +3,7 @@ import { resolvedComponentStyle } from '@pubstudio/frontend/util-build'
 import { resolveComponent } from '@pubstudio/frontend/util-builtin'
 import { isDynamicComponent } from '@pubstudio/frontend/util-ids'
 import { IAddComponentData } from '@pubstudio/shared/type-command-data'
-import {
-  Css,
-  CssPseudoClass,
-  IComponent,
-  ISiteContext,
-} from '@pubstudio/shared/type-site'
+import { Css, CssPseudoClass, IComponent, ISite } from '@pubstudio/shared/type-site'
 import { computed, ComputedRef, Ref, ref } from 'vue'
 import { useBuild } from '../use-build'
 import { IDndState, IDraggedComponent, IDroppedFile, IDropProps } from './builder-dnd'
@@ -33,7 +28,7 @@ export interface IUseDragDropData {
 }
 
 export interface IUseDragDropProps {
-  context: ISiteContext
+  site: ISite
   componentId: string | undefined
   getParentId: () => string | undefined
   getComponentIndex: () => number
@@ -42,6 +37,9 @@ export interface IUseDragDropProps {
   isParent?: boolean
   verticalOnly?: boolean
   getDraggedElement?: (e: DragEvent) => HTMLElement | null
+  dragleave?: () => void
+  dragend?: () => void
+  drop?: () => void
 }
 
 const COMPONENT_TYPE = 'text/component-id'
@@ -57,6 +55,7 @@ export const defaultDropProps = (): IDropProps => {
     hoverBottom: false,
     hoverLeft: false,
     destinationIndex: -1,
+    parentIsRow: false,
   }
 }
 
@@ -79,7 +78,7 @@ export const useDragDropData = (): IUseDragDropData => {
 
 export const useDragDrop = (props: IUseDragDropProps): IUseDragDrop => {
   const {
-    context,
+    site,
     componentId,
     getParentId,
     getComponentIndex,
@@ -87,6 +86,9 @@ export const useDragDrop = (props: IUseDragDropProps): IUseDragDrop => {
     addData,
     verticalOnly,
     getDraggedElement,
+    dragleave: dragleaveOption,
+    dragend: dragendOption,
+    drop: dropOption,
   } = props
   const { moveComponent, moveAbsoluteComponent, addComponentData } = useBuild()
   const hovering = ref(false)
@@ -125,8 +127,8 @@ export const useDragDrop = (props: IUseDragDropProps): IUseDragDrop => {
       return true
     }
 
-    const hoveredComponent = resolveComponent(context, componentId)
-    const draggedComponent = resolveComponent(context, dragSource.value?.componentId)
+    const hoveredComponent = resolveComponent(site.context, componentId)
+    const draggedComponent = resolveComponent(site.context, dragSource.value?.componentId)
     if (
       !hoveredComponent ||
       !draggedComponent ||
@@ -201,14 +203,14 @@ export const useDragDrop = (props: IUseDragDropProps): IUseDragDrop => {
   const dragover = (e: DragEvent) => {
     e.stopPropagation()
     e.preventDefault()
-    const component = resolveComponent(context, componentId)
+    const component = resolveComponent(site.context, componentId)
     if (component && e.dataTransfer && dragSource.value?.componentId !== componentId) {
       const isComponent = e.dataTransfer.types.includes(COMPONENT_TYPE)
       if (isComponent && dragSource.value && canDrop()) {
         e.preventDefault()
         dropProps.value = onDrag({
           e,
-          context,
+          site,
           dragSrc: dragSource.value,
           hoverCmpIndex: getComponentIndex(),
           hoverCmp: component,
@@ -223,6 +225,7 @@ export const useDragDrop = (props: IUseDragDropProps): IUseDragDrop => {
     e.stopPropagation()
     hovering.value = false
     dropProps.value = defaultDropProps()
+    dragleaveOption?.()
   }
 
   const drop = (e: DragEvent) => {
@@ -242,10 +245,10 @@ export const useDragDrop = (props: IUseDragDropProps): IUseDragDrop => {
     } else if (dragSource.value) {
       // Component drag from builder or component tree
       const { parentId: dragSourceParentId, clickOffset } = dragSource.value
-      const sourceComponent = resolveComponent(context, dragSource.value.componentId)
-      const component = resolveComponent(context, componentId)
+      const sourceComponent = resolveComponent(site.context, dragSource.value.componentId)
+      const component = resolveComponent(site.context, componentId)
       const position = resolvedComponentStyle(
-        context,
+        site.context,
         sourceComponent,
         CssPseudoClass.Default,
         Css.Position,
@@ -281,6 +284,7 @@ export const useDragDrop = (props: IUseDragDropProps): IUseDragDrop => {
     dragSource.value = undefined
     dropProps.value = defaultDropProps()
     hovering.value = false
+    dropOption?.()
   }
 
   const dragend = (e: DragEvent) => {
@@ -288,6 +292,7 @@ export const useDragDrop = (props: IUseDragDropProps): IUseDragDrop => {
     hovering.value = false
     dropProps.value = defaultDropProps()
     dragSource.value = undefined
+    dragendOption?.()
   }
 
   return {

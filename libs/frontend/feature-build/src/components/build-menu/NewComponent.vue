@@ -36,7 +36,7 @@ const { site, editor, activePage, addBuiltinComponent } = useBuild()
 
 const { dndState, elementRef, dragstart, drag, dragenter, dragover, dragleave, dragend } =
   useDragDrop({
-    context: site.value.context,
+    site: site.value,
     componentId: builtinComponentId.value,
     getParentId: () => undefined,
     getComponentIndex: () => 0,

@@ -85,7 +85,7 @@ const dndProps = computed(() => {
     return undefined
   }
   const dnd = useDragDrop({
-    context: site.value.context,
+    site: site.value,
     componentId: asset.value.id,
     getParentId: () => undefined,
     getComponentIndex: () => 0,

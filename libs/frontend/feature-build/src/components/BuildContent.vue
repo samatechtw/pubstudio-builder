@@ -10,6 +10,7 @@
         <ComponentStyle />
         <GoogleFontLink />
         <PageContent />
+        <BuildDndOverlay />
       </div>
     </div>
   </div>
@@ -30,6 +31,7 @@ import {
   activeBreakpoint,
   descSortedBreakpoints,
 } from '@pubstudio/frontend/feature-site-source'
+import BuildDndOverlay from './BuildDndOverlay.vue'
 
 const { site, activePage, editor } = useBuild()
 
@@ -47,7 +49,7 @@ const {
   unhead: false,
 })
 
-const contentWindowRef = ref()
+const contentWindowRef = ref<HTMLDivElement>()
 
 const innerStyle = computed<StyleValue>(() => {
   const { builderWidth = 0, builderScale = 1 } = editor.value ?? {}
@@ -99,7 +101,9 @@ const resizeObserver = new ResizeObserver(
 )
 
 onMounted(() => {
-  resizeObserver.observe(contentWindowRef.value)
+  if (contentWindowRef.value) {
+    resizeObserver.observe(contentWindowRef.value)
+  }
 })
 
 onUnmounted(() => {
@@ -128,11 +132,12 @@ $border-offset: 0px;
     margin: auto;
     border: 1px solid $grey-300;
     .build-content-window-inner {
+      position: relative;
       margin: auto;
       transform-origin: 0 0;
       overflow: auto;
       /* Page root */
-      & > div {
+      & > div:not(.build-dnd-overlay) {
         min-height: v-bind(rootComponentMinHeight);
         /* Select anything that is the direct children of page root */
         & > :deep(*) {

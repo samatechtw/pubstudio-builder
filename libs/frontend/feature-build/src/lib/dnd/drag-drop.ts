@@ -1,5 +1,5 @@
 import { IComponentPosition } from '@pubstudio/shared/type-command-data'
-import { IComponent, ISiteContext, Tag } from '@pubstudio/shared/type-site'
+import { IComponent, ISite, Tag } from '@pubstudio/shared/type-site'
 import { IDraggedComponent, IDropProps } from './builder-dnd'
 import {
   handleColumnLayoutHover,
@@ -16,7 +16,7 @@ export interface IDropResult {
 
 export interface IOnDragOptions {
   e: DragEvent
-  context: ISiteContext
+  site: ISite
   dragSrc: IDraggedComponent
   hoverCmpIndex: number
   hoverCmp: IComponent
@@ -30,8 +30,7 @@ const getMousePosition = (e: DragEvent): XYCoord => {
 }
 
 export const onDrag = (options: IOnDragOptions): IDropProps => {
-  const { e, context, dragSrc, hoverCmpIndex, hoverCmp, elementRef, verticalOnly } =
-    options
+  const { e, site, dragSrc, hoverCmpIndex, hoverCmp, elementRef, verticalOnly } = options
 
   const dropProps = defaultDropProps()
 
@@ -46,7 +45,8 @@ export const onDrag = (options: IOnDragOptions): IDropProps => {
       const hoverCmpRect = elementRef.getBoundingClientRect()
 
       const mousePosition = getMousePosition(e)
-      const parentIsRow = isRowLayout(context, hoverCmp.parent)
+      const parentIsRow = isRowLayout(site, hoverCmp.parent)
+      dropProps.parentIsRow = parentIsRow
 
       // User should not be able to drop component at the top/right/bottom/left side of root component.
       if (!hoverOnRoot) {
