@@ -1,12 +1,10 @@
-import { activeBreakpoint } from '@pubstudio/frontend/feature-site-source'
-import { resolvedComponentStyle } from '@pubstudio/frontend/util-build'
 import {
-  Css,
-  CssPseudoClass,
-  IComponent,
-  ISiteContext,
-} from '@pubstudio/shared/type-site'
+  activeBreakpoint,
+  descSortedBreakpoints,
+} from '@pubstudio/frontend/feature-site-source'
+import { Css, IComponent, ISite } from '@pubstudio/shared/type-site'
 import { IDropProps } from './builder-dnd'
+import { findStyles } from '@pubstudio/frontend/util-component'
 
 export interface XYCoord {
   x: number
@@ -22,20 +20,19 @@ interface IHandleHoverProps {
   dropProps: IDropProps
 }
 
-export const isRowLayout = (
-  context: ISiteContext,
-  component: IComponent | undefined,
-): boolean => {
-  const direction = resolvedComponentStyle(
-    context,
+export const isRowLayout = (site: ISite, component: IComponent | undefined): boolean => {
+  if (!component) {
+    return false
+  }
+  const styles = findStyles(
+    [Css.FlexDirection],
+    site,
     component,
-    CssPseudoClass.Default,
-    Css.FlexDirection,
-    activeBreakpoint.value.id,
+    descSortedBreakpoints.value,
+    activeBreakpoint.value,
   )
-  // TODO -- if not set in custom or mixins, `flex-direction` may be inherited. Otherwise it defaults to
-  // the DOM parent's direction (or `row` if no parent sets a direction)
-  return direction === 'row' || direction === undefined
+  const direction = styles[Css.FlexDirection]
+  return direction === 'row' || direction === 'row-reverse' || direction === undefined
 }
 
 export const handleRowLayoutHover = (props: IHandleHoverProps) => {

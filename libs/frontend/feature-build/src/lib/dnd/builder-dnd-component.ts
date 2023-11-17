@@ -23,6 +23,7 @@ import {
 } from 'vue'
 import { computePropsContent } from '../render-builder'
 import { findNonDynamic, useDragDrop } from './use-drag-drop'
+import { runtimeContext } from '@pubstudio/frontend/util-runtime'
 
 export interface IDndComponentProps {
   site: ISite
@@ -142,11 +143,22 @@ export const BuilderDndComponent = defineComponent({
         component.value.parent?.children?.findIndex((c) => c.id === component.value.id) ??
         0
       return useDragDrop({
-        context: site.value.context,
+        site: site.value,
         componentId: dragCmp?.id,
         getParentId: () => dragCmp?.parent?.id,
         getComponentIndex: () => componentIndex,
         isParent: component.value.id !== dragCmp?.id,
+        dragleave: () => {
+          if (runtimeContext.buildDndState.value?.hoverCmpId === component.value.id) {
+            runtimeContext.buildDndState.value = undefined
+          }
+        },
+        dragend: () => {
+          runtimeContext.buildDndState.value = undefined
+        },
+        drop: () => {
+          runtimeContext.buildDndState.value = undefined
+        },
       })
     })
     onMounted(() => {
@@ -184,6 +196,24 @@ export const BuilderDndComponent = defineComponent({
           : {
               onDragend: dnd.dragend,
             }
+
+      if (
+        dndState.value?.hoverSelf ||
+        dndState.value?.hoverTop ||
+        dndState.value?.hoverRight ||
+        dndState.value?.hoverBottom ||
+        dndState.value?.hoverLeft
+      ) {
+        runtimeContext.buildDndState.value = {
+          hoverSelf: dndState.value.hoverSelf,
+          hoverTop: dndState.value.hoverTop,
+          hoverRight: dndState.value.hoverRight,
+          hoverBottom: dndState.value.hoverBottom,
+          hoverLeft: dndState.value.hoverLeft,
+          hoverCmpId: component.value.id,
+          hoverCmpParentIsRow: dndState.value.parentIsRow,
+        }
+      }
 
       const props = {
         ...propsContent.props,

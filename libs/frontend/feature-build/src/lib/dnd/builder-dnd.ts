@@ -26,6 +26,7 @@ export interface IDropProps {
   hoverBottom: boolean
   hoverLeft: boolean
   destinationIndex: number
+  parentIsRow: boolean
 }
 
 export type IDndState = IDragProps & IDropProps

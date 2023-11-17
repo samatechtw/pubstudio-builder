@@ -9,11 +9,22 @@ export interface IRuntimeContext {
   }
   buildContentWindowSize: Ref<ISize>
   hoveredComponentIdInComponentTree: Ref<string | undefined>
+  buildDndState: Ref<IBuildDndState | undefined>
 }
 
 export interface ISize {
   width: number
   height: number
+}
+
+export interface IBuildDndState {
+  hoverSelf: boolean
+  hoverTop: boolean
+  hoverRight: boolean
+  hoverBottom: boolean
+  hoverLeft: boolean
+  hoverCmpId: string
+  hoverCmpParentIsRow: boolean
 }
 
 export type EventHandler = (e: Event) => void
@@ -24,6 +35,7 @@ export const runtimeContext: IRuntimeContext = {
   eventHandlers: initialHandlers(),
   buildContentWindowSize: ref<ISize>({ width: 0, height: 0 }),
   hoveredComponentIdInComponentTree: ref<string>(),
+  buildDndState: ref<IBuildDndState>(),
 }
 
 export const resetRuntimeContext = () => {
@@ -31,4 +43,5 @@ export const resetRuntimeContext = () => {
   // We shouldn't reset `buildContentWindowSize` here. The height of build content window
   // will be re-calculated by resize observer.
   runtimeContext.hoveredComponentIdInComponentTree.value = undefined
+  runtimeContext.buildDndState.value = undefined
 }

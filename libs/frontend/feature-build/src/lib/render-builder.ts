@@ -141,32 +141,6 @@ export const computeBuilderStyleProps = (
     } else if (dndState.hovering) {
       builderStyle.opacity = '0.8'
     }
-
-    if (dndState.hoverSelf) {
-      builderStyle.border = '1.5px solid #F82389'
-    }
-
-    // Drop
-    if (dndState.hoverTop) {
-      builderStyle['border-top'] = '8px solid black'
-      builderStyle['border-top-left-radius'] = '0'
-      builderStyle['border-top-right-radius'] = '0'
-    }
-    if (dndState.hoverRight) {
-      builderStyle['border-right'] = '8px solid black'
-      builderStyle['border-top-right-radius'] = '0'
-      builderStyle['border-bottom-right-radius'] = '0'
-    }
-    if (dndState.hoverBottom) {
-      builderStyle['border-bottom'] = '8px solid black'
-      builderStyle['border-bottom-left-radius'] = '0'
-      builderStyle['border-bottom-right-radius'] = '0'
-    }
-    if (dndState.hoverLeft) {
-      builderStyle['border-left'] = '8px solid black'
-      builderStyle['border-top-left-radius'] = '0'
-      builderStyle['border-bottom-left-radius'] = '0'
-    }
   }
   return { builderStyle, builderProps, builderClass, extraChildren }
 }
