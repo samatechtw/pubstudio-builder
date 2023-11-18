@@ -27,6 +27,7 @@ export enum StyleToolbarMenu {
   TextColor = 'textColor',
   FontFamily = 'fontFamily',
   FontWeight = 'fontWeight',
+  PseudoClass = 'pseudoClass',
 }
 
 export enum ThemeTab {

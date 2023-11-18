@@ -397,6 +397,7 @@ $padding-x: 8px;
   transition: transform 0.2s ease-in-out;
   transform-origin: v-bind(dropdownTransformOrigin);
   border: var(--ms-border-width, 1px) solid var(--ms-border-color, #d1d5db);
+  background-color: white;
 }
 .ms-item {
   width: 100%;

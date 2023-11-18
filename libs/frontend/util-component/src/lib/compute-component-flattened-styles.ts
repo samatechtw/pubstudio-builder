@@ -16,7 +16,7 @@ export const computeComponentFlattenedStyles = (
 ): IRawStylesWithSource => {
   const result: IRawStylesWithSource = {}
 
-  // Add styles with default breakpoint&default pseudo class to the result
+  // Add styles with default breakpoint & default pseudo class to the result
   const defaultStyle =
     breakpointStyles[DEFAULT_BREAKPOINT_ID]?.[CssPseudoClass.Default] ?? {}
 

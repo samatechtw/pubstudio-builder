@@ -63,6 +63,7 @@ import ComponentEvents from './ComponentEvents.vue'
 import ComponentEventEdit from './ComponentEventEdit.vue'
 import StyleMenuEdit from '../StyleMenuEdit.vue'
 import { useReusableStyleMenu } from '../../lib/use-reusable-style-menu'
+import { serializeComponent } from '@pubstudio/frontend/util-site-store'
 
 const { t } = useI18n()
 const { editor } = useBuild()
@@ -92,7 +93,8 @@ const usedEvents = computed(
 
 const debugComponent = () => {
   if (editor.value?.selectedComponent) {
-    console.log(editor.value.selectedComponent)
+    const serialized = serializeComponent(editor.value.selectedComponent)
+    console.log(JSON.parse(JSON.stringify(serialized)))
   }
 }
 </script>

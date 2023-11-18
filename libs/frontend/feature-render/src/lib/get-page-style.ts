@@ -38,12 +38,16 @@ export const getBuildPageStyle = (site: ISite, page: IPage): IRawStyleRecord => 
     )
     const resolvedStyle = rawStyleToResolvedStyleWithSource(site.context, flattenedStyles)
     pageStyle[`#${component.id}`] = resolvedStyle
-
-    // Children
-    component.children?.forEach(appendStyle)
   }
-
-  appendStyle(page.root)
+  // Tree iteration
+  const stack = [page.root]
+  while (stack.length > 0) {
+    const cmp = stack.pop()
+    appendStyle(cmp as IComponent)
+    if (cmp?.children) {
+      stack.push(...cmp.children)
+    }
+  }
 
   return pageStyle
 }
