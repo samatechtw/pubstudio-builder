@@ -32,6 +32,7 @@ const isEditingVariable = computed(() => editState.value !== IThemeVariableEditS
 .theme-menu {
   .theme-menu-content {
     width: 100%;
+    padding: 16px;
   }
 }
 </style>

@@ -24,6 +24,7 @@ onUnmounted(() => {
 @import '@theme/css/mixins.postcss';
 
 .styles-menu {
+  padding: 16px;
   .styles-menu-content {
     width: 100%;
   }

@@ -27,7 +27,7 @@ import {
   computeComponentFlattenedStyles,
   flattenedComponentStyle,
 } from '@pubstudio/frontend/util-component'
-import { DEFAULT_BREAKPOINT_ID } from '@pubstudio/frontend/util-ids'
+import { DEFAULT_BREAKPOINT_ID, styleId } from '@pubstudio/frontend/util-ids'
 import { serializePage } from '@pubstudio/frontend/util-site-store'
 import { uiAlert } from '@pubstudio/frontend/util-ui-alert'
 import { CommandType, ICommand } from '@pubstudio/shared/type-command'
@@ -159,6 +159,7 @@ export interface IUseBuild {
     newArg: IBehaviorArg | undefined,
   ) => void
   addStyle: (style: IStyle) => void
+  convertComponentStyle: (componentId: string, style: IStyle) => void
   editStyle: (style: IStyle) => void
   deleteStyle: (style: IStyle) => void
   setTranslations: (code: string, translations: INewTranslations, first: boolean) => void
@@ -712,6 +713,57 @@ export const useBuild = (): IUseBuild => {
     pushCommand(CommandType.AddStyleMixin, data)
   }
 
+  const convertComponentStyle = (componentId: string, style: IStyle) => {
+    const component = resolveComponent(site.value.context, componentId)
+    if (component) {
+      // Create the new mixin
+      const styleData: IAddStyleMixinData = {
+        name: style.name,
+        breakpoints: style.breakpoints,
+      }
+      // Add the new mixin to the component
+      const { nextId, namespace } = site.value.context
+      const addToComponent: IAddComponentMixinData = {
+        componentId,
+        // Precalculate the expected mixin ID
+        mixinId: styleId(namespace, nextId.toString()),
+      }
+      const commands: ICommand[] = [
+        { type: CommandType.AddStyleMixin, data: styleData },
+        { type: CommandType.AddComponentMixin, data: addToComponent },
+      ]
+      // Delete the old component styles
+      for (const [bpId, bp] of Object.entries(component.style.custom)) {
+        for (const [pClass, pseudo] of Object.entries(bp)) {
+          const pseudoClass = pClass as CssPseudoClass
+          for (const [prop, val] of Object.entries(pseudo)) {
+            const pseudos = style.breakpoints[bpId]?.[pseudoClass]
+            if (pseudos?.[prop as Css] !== undefined) {
+              const styleData: ISetComponentCustomStyleData = {
+                componentId,
+                breakpointId: bpId,
+                oldStyle: {
+                  pseudoClass,
+                  property: prop as Css,
+                  value: val,
+                },
+                newStyle: undefined,
+              }
+              commands.push({
+                type: CommandType.SetComponentCustomStyle,
+                data: styleData,
+              })
+            }
+          }
+        }
+      }
+      const data: ICommandGroupData = {
+        commands,
+      }
+      pushCommand(CommandType.Group, data)
+    }
+  }
+
   const editStyle = (style: IStyle) => {
     const oldStyle = structuredClone(toRaw(resolveStyle(site.value.context, style.id)))
     if (!oldStyle) {
@@ -1096,6 +1148,7 @@ export const useBuild = (): IUseBuild => {
     removeBehavior,
     setBehaviorArg,
     addStyle,
+    convertComponentStyle,
     editStyle,
     deleteStyle,
     setTranslations,

@@ -257,14 +257,16 @@ const removeStyle = () => {
   flex-shrink: 0;
 }
 .property-multiselect {
-  width: 120px;
+  width: 130px;
 }
 .value-multiselect {
-  width: 120px;
+  width: auto;
+  min-width: 100px;
   margin-left: 6px;
 }
 .value-input {
-  width: 120px;
+  min-width: 90px;
+  flex-grow: 1;
   margin-left: 6px;
 }
 

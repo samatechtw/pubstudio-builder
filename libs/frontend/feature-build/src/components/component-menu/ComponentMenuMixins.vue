@@ -1,7 +1,6 @@
 <template>
   <div class="component-menu-mixins">
-    <StyleMenuEdit v-if="editing" class="wrap" />
-    <div v-else class="wrap">
+    <div class="wrap">
       <EditMenuTitle :title="t('style.reusable')" @add="showNewMixin = true" />
       <div v-if="showNewMixin" class="mixin new-mixin">
         <MixinSelect
@@ -35,7 +34,6 @@ import { useBuild } from '../../lib/use-build'
 import { useReusableStyleMenu } from '../../lib/use-reusable-style-menu'
 import EditMenuTitle from '../EditMenuTitle.vue'
 import MixinSelect from './MixinSelect.vue'
-import StyleMenuEdit from '../StyleMenuEdit.vue'
 
 const props = defineProps<{
   mixinIds: string[]
@@ -45,7 +43,7 @@ const { mixinIds } = toRefs(props)
 const { t } = useI18n()
 const { site, addComponentMixin, replaceComponentMixin, removeComponentMixin } =
   useBuild()
-const { setEditingStyle, editing } = useReusableStyleMenu()
+const { setEditingStyle } = useReusableStyleMenu()
 
 const showNewMixin = ref(false)
 
@@ -97,11 +95,12 @@ const removeMixin = (mixinId: string | undefined) => {
 </script>
 
 <style lang="postcss" scoped>
+@import '@theme/css/mixins.postcss';
+
 .component-menu-mixins {
+  background-color: $menu-bg2;
   width: 100%;
-}
-.wrap {
-  width: 100%;
+  padding: 0 16px;
 }
 .edit-icon {
   margin-left: auto;

@@ -119,6 +119,9 @@ defineExpose({ newValueRef })
   .item {
     margin-left: auto;
   }
+  .edit-item {
+    cursor: default;
+  }
   .uneditable {
     cursor: default;
   }
