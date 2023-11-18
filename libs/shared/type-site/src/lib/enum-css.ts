@@ -34,6 +34,7 @@ export enum Css {
   Color = 'color',
   Cursor = 'cursor',
   Display = 'display',
+  Fill = 'fill',
   Flex = 'flex',
   FlexDirection = 'flex-direction',
   FlexWrap = 'flex-wrap',
@@ -65,6 +66,7 @@ export enum Css {
   // Scale function
   Scale = 'scale',
   ScrollBehavior = 'scroll-behavior',
+  Stroke = 'stroke',
   TextAlign = 'text-align',
   TextDecoration = 'text-decoration',
   TextOverflow = 'text-overflow',

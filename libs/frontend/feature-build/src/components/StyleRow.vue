@@ -230,6 +230,7 @@ const removeStyle = () => {
   margin-left: auto;
   overflow: hidden;
   .value-preview {
+    @mixin text 14px;
     text-overflow: ellipsis;
     overflow: hidden;
   }

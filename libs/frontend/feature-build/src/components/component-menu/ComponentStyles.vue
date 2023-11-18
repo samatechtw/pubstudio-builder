@@ -2,9 +2,13 @@
   <div class="component-styles">
     <EditMenuTitle
       :title="t('style.styles')"
-      :subTitle="menuSubTitle"
+      :collapsed="collapsed"
       @add="editStyle('')"
+      @toggleCollapse="collapsed = !collapsed"
     >
+      <div class="sub-label" @click="clickSubTitle">
+        {{ menuSubTitle }}
+      </div>
       <div
         ref="itemRef"
         class="to-mixin"
@@ -17,38 +21,44 @@
         </div>
       </div>
     </EditMenuTitle>
-    <StyleRow
-      v-if="showNewStyle"
-      :editing="true"
-      class="new-style menu-row"
-      :focusProp="true"
-      @update="addStyle"
-      @remove="editStyle(undefined)"
-    />
-    <StyleRow
-      v-for="entry in styleEntries"
-      :key="`${entry.pseudoClass}-${entry.property}-${entry.value}`"
-      :style="entry"
-      :editing="editing(entry.property)"
-      :error="!resolveThemeVariables(site.context, entry.value)"
-      :inheritedFrom="getInheritedFrom(entry)"
-      class="menu-row"
-      @edit="editStyle"
-      @update="updateStyle(entry, $event)"
-      @remove="removeStyle(entry)"
-    />
+    <div class="style-rows" :class="{ collapsed }">
+      <StyleRow
+        v-if="showNewStyle"
+        :editing="true"
+        class="new-style menu-row"
+        :focusProp="true"
+        @update="addStyle"
+        @remove="editStyle(undefined)"
+      />
+      <StyleRow
+        v-for="entry in styleEntries"
+        :key="`${entry.pseudoClass}-${entry.property}-${entry.value}`"
+        :style="entry"
+        :editing="editing(entry.property)"
+        :error="!resolveThemeVariables(site.context, entry.value)"
+        :inheritedFrom="getInheritedFrom(entry)"
+        class="menu-row"
+        @edit="editStyle"
+        @update="updateStyle(entry, $event)"
+        @remove="removeStyle(entry)"
+      />
+    </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { computed } from 'vue'
+import { computed, ref, toRefs } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { setComponentEditStyle } from '@pubstudio/frontend/feature-editor'
+import {
+  setComponentEditStyle,
+  setStyleToolbarMenu,
+} from '@pubstudio/frontend/feature-editor'
 import { resolveThemeVariables } from '@pubstudio/frontend/util-builtin'
 import {
   IInheritedStyleEntry,
   IStyleEntry,
   StyleSourceType,
+  StyleToolbarMenu,
 } from '@pubstudio/shared/type-site'
 import { activeBreakpoint } from '@pubstudio/frontend/feature-site-source'
 import { ScaleIn } from '@pubstudio/frontend/ui-widgets'
@@ -71,10 +81,12 @@ const {
   tooltipStyle,
   show,
 } = useTooltipDelay({ placement: 'top', globalShowDuration: 0 })
+const collapsed = ref(false)
 
-defineProps<{
+const props = defineProps<{
   styleEntries: IInheritedStyleEntry[]
 }>()
+const { styleEntries } = toRefs(props)
 
 const emit = defineEmits<{
   (e: 'addStyle', newStyle: IStyleEntry): void
@@ -83,6 +95,18 @@ const emit = defineEmits<{
 }>()
 
 const menuSubTitle = computed(() => `(${currentPseudoClass.value})`)
+
+const styleRowCount = computed(() => {
+  return styleEntries.value.length + (showNewStyle.value ? 1 : 0)
+})
+
+const clickSubTitle = () => {
+  const newVal =
+    editor.value?.styleMenu === StyleToolbarMenu.PseudoClass
+      ? undefined
+      : StyleToolbarMenu.PseudoClass
+  setStyleToolbarMenu(editor.value, newVal)
+}
 
 const editStyle = (propName: string | undefined) => {
   setComponentEditStyle(editor.value, propName)
@@ -161,6 +185,10 @@ const convertToMixin = () => {
   padding: 0 16px;
   width: 100%;
 }
+.sub-label {
+  cursor: pointer;
+  margin: 0 8px 0 0;
+}
 .to-mixin {
   @mixin size 22px;
   cursor: pointer;
@@ -175,5 +203,13 @@ const convertToMixin = () => {
 .tooltip {
   @mixin tooltip;
   margin-bottom: 8px;
+}
+.style-rows {
+  transition: max-height 0.2s;
+  overflow: hidden;
+  max-height: v-bind(styleRowCount * 37 + 'px');
+  &.collapsed {
+    max-height: 0;
+  }
 }
 </style>

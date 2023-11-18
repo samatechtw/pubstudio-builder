@@ -72,6 +72,7 @@ const font = (label: string) => {
 }
 
 onMounted(() => {
+  // TODO -- why is this necessary, is there a better way to handle it?
   if (editor.value?.styleMenu === StyleToolbarMenu.FontFamily) {
     setStyleToolbarMenu(editor.value, undefined)
   }
