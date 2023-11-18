@@ -61,7 +61,9 @@ export const useTooltipDelay = (options?: IUseTooltipDelayOptions): IUseTooltipD
 
   const tooltipMouseLeave = () => {
     cancelHoverTimer()
-    if (!globalShowTimer) {
+    if (globalShowDuration === 0) {
+      globalShow.value = false
+    } else if (!globalShowTimer) {
       globalShowTimer = setTimeout(() => {
         globalShow.value = false
       }, globalShowDuration)

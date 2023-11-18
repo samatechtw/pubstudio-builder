@@ -1,7 +1,8 @@
 <template>
   <div class="component-menu">
+    <StyleMenuEdit v-if="editingStyle" class="style-edit" />
     <ComponentInputEdit
-      v-if="isEditingInput"
+      v-else-if="isEditingInput"
       :editInput="editedInput"
       @save="upsertInput($event)"
       @remove="removeInput($event)"
@@ -15,10 +16,8 @@
       @remove="removeEvent"
       @cancel="setEditedEvent(undefined)"
     />
-    <div v-else>
+    <template v-else>
       <ComponentTabInfo :component="component" />
-      <ComponentTag :tag="component.tag" @setTag="setTag" />
-      <ComponentRole :role="component.role" @setRole="setRole" />
       <ComponentTabStyle :component="component" />
       <ComponentInputs
         :component="component"
@@ -36,9 +35,14 @@
         @edit="setEditedEvent($event)"
       />
       <div class="actions">
-        <PSButton class="debug-button" :text="t('debug')" @click="debugComponent" />
+        <PSButton
+          class="debug-button"
+          size="small"
+          :text="t('debug')"
+          @click="debugComponent"
+        />
       </div>
-    </div>
+    </template>
   </div>
 </template>
 
@@ -48,21 +52,21 @@ import { useI18n } from 'vue-i18n'
 import { PSButton } from '@pubstudio/frontend/ui-widgets'
 import { IComponent } from '@pubstudio/shared/type-site'
 import { noBehaviorId } from '@pubstudio/frontend/util-ids'
-import { Tag, AriaRole } from '@pubstudio/shared/type-site'
 import ComponentTabInfo from './ComponentTabInfo.vue'
 import ComponentTabStyle from './ComponentTabStyle.vue'
 import { useBuild } from '../../lib/use-build'
 import { useEditComponentInput } from '../../lib/use-edit-component-input'
 import { useEditComponentEvent } from '../../lib/use-edit-component-event'
 import ComponentInputEdit from './ComponentInputEdit.vue'
-import ComponentTag from './ComponentTag.vue'
-import ComponentRole from './ComponentRole.vue'
 import ComponentInputs from './ComponentInputs.vue'
 import ComponentEvents from './ComponentEvents.vue'
 import ComponentEventEdit from './ComponentEventEdit.vue'
+import StyleMenuEdit from '../StyleMenuEdit.vue'
+import { useReusableStyleMenu } from '../../lib/use-reusable-style-menu'
 
 const { t } = useI18n()
-const { editor, editComponent } = useBuild()
+const { editor } = useBuild()
+const { editing: editingStyle } = useReusableStyleMenu()
 
 const props = defineProps<{
   component: IComponent
@@ -91,22 +95,22 @@ const debugComponent = () => {
     console.log(editor.value.selectedComponent)
   }
 }
-
-const setTag = (value: Tag) => {
-  editComponent({ tag: value })
-}
-
-const setRole = (value: AriaRole) => {
-  editComponent({ role: value })
-}
 </script>
 
 <style lang="postcss" scoped>
 @import '@theme/css/mixins.postcss';
 
+.component-menu {
+  background-color: $menu-bg1;
+}
+
 .actions {
   display: flex;
   align-items: flex-end;
   margin-top: 40px;
+  padding: 0 16px;
+}
+.style-edit {
+  padding: 16px;
 }
 </style>

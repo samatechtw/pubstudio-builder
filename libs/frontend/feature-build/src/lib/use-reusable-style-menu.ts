@@ -7,6 +7,7 @@ import {
   Css,
   CssPseudoClass,
   IBreakpointStylesWithSource,
+  IComponent,
   IInheritedStyleEntry,
   IRawStylesWithSource,
   IStyle,
@@ -23,7 +24,7 @@ export interface IUseStyleMenuFeature {
   styleError: Ref<string | undefined>
   styles: ComputedRef<IStyle[]>
   clearEditingState: () => void
-  newStyle: () => void
+  newStyle: (source?: IComponent) => void
   setEditingStyle: (style: IStyle) => void
   newEditingStyleProp: () => void
   updateEditingStyleProp: (oldProperty: Css, newEntry: IStyleEntry) => void
@@ -33,6 +34,7 @@ export interface IUseStyleMenuFeature {
 
 export interface IEditingStyle extends Omit<IStyle, 'id'> {
   id?: string
+  sourceComponentId?: string
 }
 
 const emptyStyle = (): IEditingStyle => ({
@@ -52,7 +54,8 @@ export const resetStyleMenu = () => {
 }
 
 export const useReusableStyleMenu = (): IUseStyleMenuFeature => {
-  const { site, editor, currentPseudoClass, addStyle, editStyle } = useBuild()
+  const { site, editor, currentPseudoClass, addStyle, convertComponentStyle, editStyle } =
+    useBuild()
 
   const styles = computed(() => {
     return Object.values(site.value?.context.styles ?? {})
@@ -64,8 +67,16 @@ export const useReusableStyleMenu = (): IUseStyleMenuFeature => {
     editing.value = false
   }
 
-  const newStyle = () => {
-    Object.assign(editingStyle, emptyStyle())
+  const newStyle = (source?: IComponent) => {
+    if (source) {
+      editingStyle.value = {
+        sourceComponentId: source.id,
+        name: `${source.name}_Style`,
+        breakpoints: JSON.parse(JSON.stringify(source.style.custom)),
+      }
+    } else {
+      Object.assign(editingStyle, emptyStyle())
+    }
     editing.value = true
   }
 
@@ -177,11 +188,16 @@ export const useReusableStyleMenu = (): IUseStyleMenuFeature => {
       if (!validateStyle()) {
         return
       }
-      const newStyle = structuredClone(toRaw(editingStyle.value))
+      const newStyle = structuredClone(toRaw(editingStyle.value)) as IStyle
       if (editingStyle.value.id) {
-        editStyle(newStyle as IStyle)
+        editStyle(newStyle)
       } else {
-        addStyle(newStyle as IStyle)
+        const componentId = editingStyle.value.sourceComponentId
+        if (componentId) {
+          convertComponentStyle(componentId, newStyle)
+        } else {
+          addStyle(newStyle)
+        }
       }
     }
     clearEditingState()

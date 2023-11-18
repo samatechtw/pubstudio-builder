@@ -4,7 +4,19 @@
       :title="t('style.styles')"
       :subTitle="menuSubTitle"
       @add="editStyle('')"
-    />
+    >
+      <div
+        ref="itemRef"
+        class="to-mixin"
+        @mouseenter="tooltipMouseEnter"
+        @mouseleave="tooltipMouseLeave"
+      >
+        <ScaleIn @click="convertToMixin"></ScaleIn>
+        <div v-if="show" ref="tooltipRef" class="tooltip" :style="tooltipStyle">
+          {{ t('style.to_mixin') }}
+        </div>
+      </div>
+    </EditMenuTitle>
     <StyleRow
       v-if="showNewStyle"
       :editing="true"
@@ -39,12 +51,26 @@ import {
   StyleSourceType,
 } from '@pubstudio/shared/type-site'
 import { activeBreakpoint } from '@pubstudio/frontend/feature-site-source'
+import { ScaleIn } from '@pubstudio/frontend/ui-widgets'
+import { useTooltipDelay } from '@pubstudio/frontend/util-tooltip'
 import { useBuild } from '../../lib/use-build'
 import StyleRow from '../StyleRow.vue'
 import EditMenuTitle from '../EditMenuTitle.vue'
+import { useReusableStyleMenu } from '../../lib/use-reusable-style-menu'
 
 const { t } = useI18n()
 const { site, editor, currentPseudoClass } = useBuild()
+const { newStyle } = useReusableStyleMenu()
+
+const {
+  itemRef,
+  tooltipMouseEnter,
+  tooltipMouseLeave,
+  cancelHoverTimer,
+  tooltipRef,
+  tooltipStyle,
+  show,
+} = useTooltipDelay({ placement: 'top', globalShowDuration: 0 })
 
 defineProps<{
   styleEntries: IInheritedStyleEntry[]
@@ -118,18 +144,36 @@ const getInheritedFrom = (entry: IInheritedStyleEntry): string | undefined => {
     return 'UNKNOWN_STYLE_SOURCE'
   }
 }
+
+const convertToMixin = () => {
+  cancelHoverTimer()
+  const cmp = editor.value?.selectedComponent
+  if (cmp) {
+    newStyle(cmp)
+  }
+}
 </script>
 
 <style lang="postcss" scoped>
+@import '@theme/css/mixins.postcss';
+
 .component-styles {
+  padding: 0 16px;
   width: 100%;
-  :deep(.style) {
-    .label {
-      width: 45%;
-    }
-    .item {
-      width: 55%;
-    }
+}
+.to-mixin {
+  @mixin size 22px;
+  cursor: pointer;
+  margin-right: auto;
+  :deep(svg) {
+    @mixin size 100%;
   }
+  &:hover :deep(path) {
+    fill: $color-toolbar-button-active;
+  }
+}
+.tooltip {
+  @mixin tooltip;
+  margin-bottom: 8px;
 }
 </style>

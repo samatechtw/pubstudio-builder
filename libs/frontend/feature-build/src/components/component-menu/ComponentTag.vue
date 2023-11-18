@@ -25,12 +25,12 @@ const props = defineProps<{
 }>()
 const { tag } = toRefs(props)
 const emit = defineEmits<{
-  (e: 'setTag', value: Tag): void
+  (e: 'setTag', value: Tag | undefined): void
 }>()
 
 const { t } = useI18n()
 
-const setTag = (newTag: Tag) => {
+const setTag = (newTag: Tag | undefined) => {
   if (newTag !== tag.value) {
     emit('setTag', newTag)
   }
@@ -48,6 +48,6 @@ const setTag = (newTag: Tag) => {
 }
 .component-tag {
   max-width: 140px;
-  margin: 0 0 0 16px;
+  margin: 0 16px 0 0;
 }
 </style>

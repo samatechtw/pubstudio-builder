@@ -34,3 +34,12 @@ const events = computed(() => {
   return Object.values(component.value.events ?? {})
 })
 </script>
+
+<style lang="postcss" scoped>
+@import '@theme/css/mixins.postcss';
+
+.component-events {
+  background-color: $menu-bg2;
+  padding: 0 16px;
+}
+</style>

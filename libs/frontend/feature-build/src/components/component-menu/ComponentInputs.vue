@@ -85,6 +85,7 @@ const setInput = (property: string, newValue: unknown) => {
 <style lang="postcss" scoped>
 .component-inputs {
   width: 100%;
+  padding: 0 16px;
   :deep(.component-input-row) {
     padding-left: 16px;
   }

@@ -32,12 +32,12 @@ const props = withDefaults(
 )
 const { role } = toRefs(props)
 const emit = defineEmits<{
-  (e: 'setRole', value: AriaRole): void
+  (e: 'setRole', value: AriaRole | undefined): void
 }>()
 
 const { t } = useI18n()
 
-const setRole = (newRole: AriaRole) => {
+const setRole = (newRole: AriaRole | undefined) => {
   if (newRole !== role.value) {
     emit('setRole', newRole)
   }
@@ -60,6 +60,6 @@ const setRole = (newRole: AriaRole) => {
 }
 .component-role {
   max-width: 140px;
-  margin: 0 0 0 16px;
+  margin: 0 0 0 4px;
 }
 </style>

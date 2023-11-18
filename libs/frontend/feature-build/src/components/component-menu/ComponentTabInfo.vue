@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="tab-info">
     <MenuRowEdit
       :label="t('name')"
       :value="component.name"
@@ -21,6 +21,10 @@
       @edit="editContent"
       @update="setContent"
     />
+    <div class="tag-role">
+      <ComponentTag :tag="component.tag" @setTag="setTag" />
+      <ComponentRole :role="component.role" @setRole="setRole" />
+    </div>
     <!-- TODO: children UI
     <div v-if="component.children" class="children">
       <div v-for="child in children" :key="child.id" class="child">
@@ -33,7 +37,7 @@
 <script lang="ts" setup>
 import { computed, toRefs } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { ComponentTabState, IComponent } from '@pubstudio/shared/type-site'
+import { AriaRole, ComponentTabState, IComponent, Tag } from '@pubstudio/shared/type-site'
 import {
   setComponentTabState,
   setComponentTabEditInfo,
@@ -41,6 +45,8 @@ import {
 import MenuRow from '../MenuRow.vue'
 import { useBuild } from '../../lib/use-build'
 import MenuRowEdit from '../MenuRowEdit.vue'
+import ComponentTag from './ComponentTag.vue'
+import ComponentRole from './ComponentRole.vue'
 
 const props = defineProps<{
   component: IComponent
@@ -83,15 +89,34 @@ const setName = (value: string | undefined) => {
   editComponent({ name: value })
   setComponentTabState(editor.value, undefined)
 }
+
+const setTag = (value: Tag | undefined) => {
+  editComponent({ tag: value })
+}
+
+const setRole = (value: AriaRole | undefined) => {
+  editComponent({ role: value })
+}
 </script>
 
 <style lang="postcss" scoped>
 @import '@theme/css/mixins.postcss';
 
+.tab-info {
+  padding: 8px 16px 0;
+  background-color: $menu-bg2;
+}
 .content-hidden {
   color: $color-disabled;
   :deep(.edit-icon path) {
     stroke: $color-disabled;
+  }
+}
+.tag-role {
+  display: flex;
+  :deep(.ps-multiselect) {
+    width: auto;
+    flex-grow: 1;
   }
 }
 </style>
