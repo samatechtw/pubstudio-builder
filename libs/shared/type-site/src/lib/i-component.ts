@@ -88,6 +88,8 @@ export type IComponentEvents = Record<string, IComponentEvent>
 export interface IComponentStyle {
   custom: IBreakpointStyles
   mixins?: string[]
+  // Custom style selectors scoped to this component
+  overrides?: Record<string, IBreakpointStyles>
 }
 
 export interface IComponent {

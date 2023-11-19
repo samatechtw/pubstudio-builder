@@ -9,6 +9,7 @@ import { applySetComponentInput } from './component-input/set-component-input'
 import { applyAddComponentMixin } from './component-mixin/add-component-mixin'
 import { applyRemoveComponentMixin } from './component-mixin/remove-component-mixin'
 import { applyReplaceComponentMixin } from './component-mixin/replace-component-mixin'
+import { applySetComponentOverrideStyle } from './component-override-style/set-component-override-style'
 import { applyMergeComponentStyle } from './component-style/merge-component-style'
 import { applyAddComponent } from './component/add-component'
 import { applyEditComponent } from './component/edit-component'
@@ -50,6 +51,7 @@ export const applyCommand = (
     [CommandType.EditComponent]: applyEditComponent,
     [CommandType.RemoveComponent]: applyRemoveComponent,
     [CommandType.SetComponentCustomStyle]: applySetComponentCustomStyle,
+    [CommandType.SetComponentOverrideStyle]: applySetComponentOverrideStyle,
     [CommandType.MergeComponentStyle]: applyMergeComponentStyle,
     [CommandType.AddComponentMixin]: applyAddComponentMixin,
     [CommandType.RemoveComponentMixin]: applyRemoveComponentMixin,

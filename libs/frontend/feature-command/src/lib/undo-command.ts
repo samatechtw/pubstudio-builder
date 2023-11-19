@@ -9,6 +9,7 @@ import { undoSetComponentInput } from './component-input/set-component-input'
 import { undoAddComponentMixin } from './component-mixin/add-component-mixin'
 import { undoRemoveComponentMixin } from './component-mixin/remove-component-mixin'
 import { undoReplaceComponentMixin } from './component-mixin/replace-component-mixin'
+import { undoSetComponentOverrideStyle } from './component-override-style/set-component-override-style'
 import { undoMergeComponentStyle } from './component-style/merge-component-style'
 import { undoAddComponent } from './component/add-component'
 import { undoEditComponent } from './component/edit-component'
@@ -44,6 +45,7 @@ export const undoCommand = (site: ISite, command: ICommand) => {
     [CommandType.EditComponent]: undoEditComponent,
     [CommandType.RemoveComponent]: undoRemoveComponent,
     [CommandType.SetComponentCustomStyle]: undoSetComponentCustomStyle,
+    [CommandType.SetComponentOverrideStyle]: undoSetComponentOverrideStyle,
     [CommandType.MergeComponentStyle]: undoMergeComponentStyle,
     [CommandType.AddComponentMixin]: undoAddComponentMixin,
     [CommandType.RemoveComponentMixin]: undoRemoveComponentMixin,

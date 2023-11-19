@@ -3,7 +3,7 @@
     <EditMenuTitle
       :title="t('style.styles')"
       :collapsed="collapsed"
-      @add="editStyle('')"
+      @add="setEditStyle('')"
       @toggleCollapse="collapsed = !collapsed"
     >
       <div class="sub-label" @click="clickSubTitle">
@@ -28,7 +28,7 @@
         class="new-style menu-row"
         :focusProp="true"
         @update="addStyle"
-        @remove="editStyle(undefined)"
+        @remove="setEditStyle(undefined)"
       />
       <StyleRow
         v-for="entry in styleEntries"
@@ -38,7 +38,7 @@
         :error="!resolveThemeVariables(site.context, entry.value)"
         :inheritedFrom="getInheritedFrom(entry)"
         class="menu-row"
-        @edit="editStyle"
+        @edit="setEditStyle"
         @update="updateStyle(entry, $event)"
         @remove="removeStyle(entry)"
       />
@@ -47,7 +47,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref, toRefs } from 'vue'
+import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import {
   setComponentEditStyle,
@@ -55,6 +55,7 @@ import {
 } from '@pubstudio/frontend/feature-editor'
 import { resolveThemeVariables } from '@pubstudio/frontend/util-builtin'
 import {
+  Css,
   IInheritedStyleEntry,
   IStyleEntry,
   StyleSourceType,
@@ -67,9 +68,18 @@ import { useBuild } from '../../lib/use-build'
 import StyleRow from '../StyleRow.vue'
 import EditMenuTitle from '../EditMenuTitle.vue'
 import { useReusableStyleMenu } from '../../lib/use-reusable-style-menu'
+import { omitSourceBreakpointId } from '@pubstudio/frontend/util-component'
 
 const { t } = useI18n()
-const { site, editor, currentPseudoClass } = useBuild()
+const {
+  site,
+  editor,
+  currentPseudoClass,
+  selectedComponentFlattenedStyles,
+  setPositionAbsolute,
+  setComponentCustomStyle,
+  removeComponentCustomStyle,
+} = useBuild()
 const { newStyle } = useReusableStyleMenu()
 
 const {
@@ -83,21 +93,26 @@ const {
 } = useTooltipDelay({ placement: 'top', globalShowDuration: 0 })
 const collapsed = ref(false)
 
-const props = defineProps<{
-  styleEntries: IInheritedStyleEntry[]
-}>()
-const { styleEntries } = toRefs(props)
-
-const emit = defineEmits<{
-  (e: 'addStyle', newStyle: IStyleEntry): void
-  (e: 'updateStyle', oldStyle: IStyleEntry | undefined, newStyle: IStyleEntry): void
-  (e: 'removeStyle', style: IStyleEntry): void
-}>()
+const styleEntries = computed(() =>
+  Object.entries(selectedComponentFlattenedStyles.value).map(
+    ([css, source]) =>
+      ({
+        pseudoClass: currentPseudoClass.value,
+        property: css as Css,
+        value: source.value,
+        sourceType: source.sourceType,
+        sourceId: source.sourceId,
+        sourceBreakpointId: source.sourceBreakpointId,
+      }) as IInheritedStyleEntry,
+  ),
+)
 
 const menuSubTitle = computed(() => `(${currentPseudoClass.value})`)
 
 const styleRowCount = computed(() => {
-  return styleEntries.value.length + (showNewStyle.value ? 1 : 0)
+  const entries = 37 * styleEntries.value.length
+  const newStyle = showNewStyle.value ? 57 : 0
+  return entries + newStyle
 })
 
 const clickSubTitle = () => {
@@ -108,28 +123,35 @@ const clickSubTitle = () => {
   setStyleToolbarMenu(editor.value, newVal)
 }
 
-const editStyle = (propName: string | undefined) => {
+const setEditStyle = (propName: string | undefined) => {
   setComponentEditStyle(editor.value, propName)
 }
 
-const omitSourceBreakpointId = (entry: IInheritedStyleEntry): IStyleEntry => ({
-  pseudoClass: entry.pseudoClass,
-  property: entry.property,
-  value: entry.value,
-})
+const setStyle = (oldStyle: IStyleEntry | undefined, newStyle: IStyleEntry) => {
+  const newStyleEntry = { ...newStyle }
+
+  if (newStyle.property === Css.Position && newStyle.value === 'absolute') {
+    // Makes sure the parent has `relative` or `absolute` style.
+    // Otherwise the component might jump to an unexpected location
+    setPositionAbsolute(oldStyle, newStyleEntry)
+  } else {
+    setComponentCustomStyle(oldStyle, newStyleEntry)
+  }
+}
 
 const updateStyle = (oldStyle: IInheritedStyleEntry, newStyle: IStyleEntry) => {
   const oldStyleEntry: IStyleEntry | undefined =
     oldStyle.sourceBreakpointId === activeBreakpoint.value.id
       ? omitSourceBreakpointId(oldStyle)
       : undefined
-  emit('updateStyle', oldStyleEntry, { ...newStyle })
-  setComponentEditStyle(editor.value, undefined)
+
+  setStyle(oldStyleEntry, newStyle)
+  setEditStyle(undefined)
 }
 
 const removeStyle = (style: IStyleEntry) => {
-  emit('removeStyle', style)
-  setComponentEditStyle(editor.value, undefined)
+  removeComponentCustomStyle(style)
+  setEditStyle(undefined)
 }
 
 const showNewStyle = computed(() => {
@@ -142,8 +164,8 @@ const editing = (propName: string) => {
 
 const addStyle = (newStyle: IStyleEntry) => {
   newStyle.pseudoClass = currentPseudoClass.value
-  emit('addStyle', newStyle)
-  editStyle(undefined)
+  setStyle(undefined, newStyle)
+  setEditStyle(undefined)
 }
 
 const getInheritedFrom = (entry: IInheritedStyleEntry): string | undefined => {
@@ -206,10 +228,11 @@ const convertToMixin = () => {
 }
 .style-rows {
   transition: max-height 0.2s;
-  overflow: hidden;
-  max-height: v-bind(styleRowCount * 37 + 'px');
+  overflow: visible;
+  max-height: v-bind(styleRowCount + 'px');
   &.collapsed {
     max-height: 0;
+    overflow: hidden;
   }
 }
 </style>
