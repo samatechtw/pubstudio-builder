@@ -2,8 +2,11 @@ import { resolveStyle } from '@pubstudio/frontend/util-builtin'
 import {
   Css,
   CssPseudoClass,
+  IBreakpointOverrideStylesWithSource,
   IBreakpointStylesWithSource,
   IComponent,
+  IPseudoStyle,
+  IPseudoStyleWithSource,
   IRawStylesWithSource,
   ISiteContext,
   StyleSourceType,
@@ -15,6 +18,10 @@ export interface IComputeComponentBreakpointStylesOptions {
    * @default true
    */
   computeMixins?: boolean
+  /**
+   * @default false
+   */
+  computeOverrides?: boolean
 }
 
 export const computeComponentBreakpointStyles = (
@@ -79,12 +86,59 @@ const computeMixinBreakpointStyles = (
   return result
 }
 
+const computePseudoStyleWithSource = (
+  componentId: string,
+  breakpointId: string,
+  pseudo: IPseudoStyle,
+  result: IPseudoStyleWithSource,
+) => {
+  Object.entries(pseudo).forEach(([pseudoClass, customRawStyle]) => {
+    if (!result[pseudoClass as CssPseudoClass]) {
+      result[pseudoClass as CssPseudoClass] = {}
+    }
+    const rawStyle = result[pseudoClass as CssPseudoClass] as IRawStylesWithSource
+
+    Object.entries(customRawStyle).forEach(([css, value]) => {
+      rawStyle[css as Css] = {
+        sourceType: StyleSourceType.Custom,
+        sourceId: componentId,
+        sourceBreakpointId: breakpointId,
+        value,
+      }
+    })
+  })
+}
+
 const computeCustomBreakpointStyles = (
   component: IComponent,
 ): IBreakpointStylesWithSource => {
   const result: IBreakpointStylesWithSource = {}
-
   Object.entries(component.style.custom).forEach(([breakpointId, customPseudoStyle]) => {
+    if (!result[breakpointId]) {
+      result[breakpointId] = {}
+    }
+    computePseudoStyleWithSource(
+      component.id,
+      breakpointId,
+      customPseudoStyle,
+      result[breakpointId],
+    )
+  })
+
+  return result
+}
+
+export const computeComponentOverrideStyle = (
+  component: IComponent,
+  selector: string,
+): IBreakpointStylesWithSource => {
+  const result: IBreakpointStylesWithSource = {}
+  const styles = component.style.overrides?.[selector]
+  if (!styles) {
+    return result
+  }
+
+  Object.entries(styles).forEach(([breakpointId, customPseudoStyle]) => {
     if (!result[breakpointId]) {
       result[breakpointId] = {}
     }
@@ -107,5 +161,31 @@ const computeCustomBreakpointStyles = (
     })
   })
 
+  return result
+}
+
+export const computeComponentOverrideStyles = (
+  component: IComponent,
+): IBreakpointOverrideStylesWithSource | undefined => {
+  if (!component.style.overrides) {
+    return undefined
+  }
+  const result: IBreakpointOverrideStylesWithSource = {}
+  Object.entries(component.style.overrides).forEach(([selector, breakpointStyles]) => {
+    Object.entries(breakpointStyles).forEach(([breakpointId, pseudoStyle]) => {
+      if (!result[breakpointId]) {
+        result[breakpointId] = {}
+      }
+      if (!result[breakpointId][selector]) {
+        result[breakpointId][selector] = {}
+      }
+      computePseudoStyleWithSource(
+        component.id,
+        breakpointId,
+        pseudoStyle,
+        result[breakpointId][selector],
+      )
+    })
+  })
   return result
 }

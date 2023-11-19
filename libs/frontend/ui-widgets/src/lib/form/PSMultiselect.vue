@@ -43,7 +43,7 @@
           class="ms-item"
           @click="select(index)"
         >
-          <slot v-if="customLabel" :label="l"></slot>
+          <slot v-if="customLabel" :label="l" :index="index"></slot>
           <div v-else>
             {{ l }}
           </div>
@@ -140,7 +140,7 @@ const emit = defineEmits<{
 }>()
 
 defineSlots<{
-  default(props: { label: string }): void
+  default(props: { label: string; index: number }): void
 }>()
 
 const dataToggleId = `toggle-${toggleId.value ?? uidSingleton.next()}`

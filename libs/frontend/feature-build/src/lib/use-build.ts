@@ -62,6 +62,7 @@ import {
   ISetComponentCustomStyleData,
   ISetComponentEventData,
   ISetComponentInputData,
+  ISetComponentOverrideStyleData,
   ISetDefaultsHeadData,
   ISetHomePageData,
   ISetPageHeadData,
@@ -141,6 +142,12 @@ export interface IUseBuild {
   ) => void
   setPositionAbsolute: (oldStyle: IStyleEntry | undefined, newStyle: IStyleEntry) => void
   removeComponentCustomStyle: (style: IRemoveStyleEntry) => void
+  setOverrideStyle: (
+    selector: string,
+    oldStyle: IStyleEntry | undefined,
+    newStyle: IStyleEntry,
+  ) => void
+  removeComponentOverrideStyle: (selector: string, style: IRemoveStyleEntry) => void
   mergeComponentStyle: (from: ISerializedComponent) => void
   addComponentMixin: (mixinId: string) => void
   removeComponentMixin: (mixinId: string) => void
@@ -542,6 +549,45 @@ export const useBuild = (): IUseBuild => {
       }
       pushCommand(CommandType.MergeComponentStyle, data)
     }
+  }
+
+  const setOverrideStyle = (
+    selector: string,
+    oldStyle: IStyleEntry | undefined,
+    newStyle: IStyleEntry,
+  ) => {
+    const selected = site.value.editor?.selectedComponent
+    if (selected) {
+      const data: ISetComponentOverrideStyleData = {
+        componentId: selected.id,
+        selector,
+        breakpointId: activeBreakpoint.value.id,
+        oldStyle,
+        newStyle,
+      }
+      pushCommand(CommandType.SetComponentOverrideStyle, data)
+    }
+  }
+
+  const removeComponentOverrideStyle = (selector: string, style: IRemoveStyleEntry) => {
+    const selected = site.value.editor?.selectedComponent
+    const oldValue =
+      selected?.style.overrides?.[selector][activeBreakpoint.value.id][
+        style.pseudoClass
+      ]?.[style.property]
+    if (!oldValue) {
+      return
+    }
+    const data: ISetComponentOverrideStyleData = {
+      componentId: selected.id,
+      breakpointId: activeBreakpoint.value.id,
+      selector: selector,
+      oldStyle: {
+        ...style,
+        value: oldValue,
+      },
+    }
+    pushCommand(CommandType.SetComponentOverrideStyle, data)
   }
 
   const addComponentMixin = (mixinId: string) => {
@@ -1132,6 +1178,8 @@ export const useBuild = (): IUseBuild => {
     setComponentCustomStyle,
     setPositionAbsolute,
     removeComponentCustomStyle,
+    setOverrideStyle,
+    removeComponentOverrideStyle,
     mergeComponentStyle,
     addComponentMixin,
     removeComponentMixin,
