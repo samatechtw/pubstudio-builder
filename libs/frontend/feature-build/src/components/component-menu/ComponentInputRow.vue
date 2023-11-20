@@ -3,28 +3,26 @@
     <div class="label">
       {{ property }}
     </div>
-    <div class="input-item item">
-      <div v-if="editing" class="edit">
-        <PSInput
-          ref="valueInputRef"
-          v-model="newValue"
-          :placeholder="t('value')"
-          :datalistId="componentId"
-          :datalist="datalist"
-          :isError="!inputValid"
-          @keydown.enter="updateValue"
-          @keyup.esc="$event.srcElement.blur()"
-        />
-        <Check class="item-save" color="#009879" @click="updateValue" />
-      </div>
-      <div v-else class="edit-item">
-        <div class="value-preview" :class="{ error }">
-          {{ value }}
-        </div>
-        <Edit class="edit-icon" @click="edit" />
-        <Settings v-if="showEditInput" class="edit-icon" @click="emit('editInput')" />
-      </div>
+    <div v-if="editing" class="edit">
+      <PSInput
+        ref="valueInputRef"
+        v-model="newValue"
+        :placeholder="t('value')"
+        :datalistId="componentId"
+        :datalist="datalist"
+        :isError="!inputValid"
+        @keydown.enter="updateValue"
+        @keyup.esc="$event.srcElement.blur()"
+      />
+      <Check class="item-save" color="#009879" @click="updateValue" />
     </div>
+    <template v-else>
+      <div class="value-preview" :class="{ error }">
+        {{ value }}
+      </div>
+      <Edit class="edit-icon" @click="edit" />
+      <Settings v-if="showEditInput" class="edit-icon" @click="emit('editInput')" />
+    </template>
   </div>
 </template>
 
@@ -107,37 +105,22 @@ const datalist = computed<IDatalistOption[] | undefined>(() => {
 
 .value-preview {
   @mixin truncate;
+  @mixin text 14px;
 }
 
 .edit-icon {
   flex-shrink: 0;
 }
-.label {
+.menu-row .label {
   max-width: 100px;
-}
-.item.input-item {
-  display: flex;
-  align-items: center;
-  flex-grow: 1;
-  margin-left: 6px;
-  width: auto;
+  margin-right: 12px;
 }
 .edit {
   @mixin flex-row;
   align-items: center;
   margin-left: auto;
 }
-
-.edit-item {
-  margin-left: auto;
-  max-width: 100%;
-}
 .error {
   color: $color-error;
-}
-
-.label,
-.item {
-  width: 50%;
 }
 </style>
