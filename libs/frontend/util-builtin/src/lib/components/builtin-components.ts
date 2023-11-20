@@ -9,6 +9,7 @@ import { image } from './builtin-image'
 import { input } from './builtin-input'
 import { link } from './builtin-link'
 import { navMenu, navMenuItem } from './builtin-nav-menu'
+import { svg } from './builtin-svg'
 import { text } from './builtin-text'
 
 export const builtinComponents: Record<string, ISerializedComponent> = {
@@ -22,6 +23,7 @@ export const builtinComponents: Record<string, ISerializedComponent> = {
   [h5.id]: h5,
   [h6.id]: h6,
   [image.id]: image,
+  [svg.id]: svg,
   [link.id]: link,
   [button.id]: button,
   [navMenu.id]: navMenu,

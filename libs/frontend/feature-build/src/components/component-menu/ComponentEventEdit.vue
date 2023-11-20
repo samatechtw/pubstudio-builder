@@ -304,6 +304,7 @@ const save = () => {
 @import '@theme/css/mixins.postcss';
 
 .component-event-edit {
+  padding: 16px;
   .label,
   .item {
     @mixin text 15px;
@@ -314,8 +315,10 @@ const save = () => {
   }
   .event-actions {
     @mixin menu-actions;
+    justify-content: space-between;
     > button {
       width: 31%;
+      min-width: 31%;
     }
   }
 }

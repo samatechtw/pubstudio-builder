@@ -16,6 +16,7 @@
         :text="t('build.image')"
         :builtinComponentId="image.id"
       />
+      <NewComponent class="new-svg" :text="t('build.svg')" :builtinComponentId="svg.id" />
       <NewComponent
         class="new-link"
         :text="t('build.link')"
@@ -82,6 +83,7 @@ import {
   header,
   footer,
   input,
+  svg,
 } from '@pubstudio/frontend/util-builtin'
 import NewComponent from './NewComponent.vue'
 

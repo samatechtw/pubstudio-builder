@@ -61,6 +61,10 @@ export interface IEditBehavior extends Omit<IBehavior, 'id'> {
   id?: string
 }
 
+export interface IEditSvg {
+  content: string
+}
+
 export interface IResizeData {
   component: IComponent
   // Used to determine if width prop should be removed from style during undo
@@ -100,6 +104,8 @@ export interface IEditorContext {
   styleMenu?: StyleToolbarMenu
   // Saved state of behavior edit modal
   editBehavior?: IEditBehavior
+  // Saved state of SVG edit modal
+  editSvg?: IEditSvg
   // Toggle translations modal
   translations?: boolean
   // Active theme tab

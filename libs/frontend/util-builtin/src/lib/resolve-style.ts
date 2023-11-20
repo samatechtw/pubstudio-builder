@@ -17,6 +17,7 @@ import { imageStyle } from './components/builtin-image'
 import { inputStyle } from './components/builtin-input'
 import { linkStyle } from './components/builtin-link'
 import { navMenuItemStyle, navMenuStyle } from './components/builtin-nav-menu'
+import { svgStyle } from './components/builtin-svg'
 import { textStyle } from './components/builtin-text'
 import { parseId } from './resolve'
 
@@ -33,6 +34,7 @@ export const builtinStyles: Record<string, IStyle> = {
   [imageStyle.id]: imageStyle,
   [navMenuStyle.id]: navMenuStyle,
   [navMenuItemStyle.id]: navMenuItemStyle,
+  [svgStyle.id]: svgStyle,
   [linkStyle.id]: linkStyle,
   [buttonStyle.id]: buttonStyle,
   [headerStyle.id]: headerStyle,

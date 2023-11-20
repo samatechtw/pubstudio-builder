@@ -10,6 +10,7 @@ import {
 } from '@pubstudio/frontend/feature-site-source'
 import { findStyles } from '@pubstudio/frontend/util-component'
 import { RenderMode } from '@pubstudio/frontend/util-render'
+import { runtimeContext } from '@pubstudio/frontend/util-runtime'
 import { Css, IComponent, IRawStyle, ISite, Tag } from '@pubstudio/shared/type-site'
 import {
   computed,
@@ -23,7 +24,6 @@ import {
 } from 'vue'
 import { computePropsContent } from '../render-builder'
 import { findNonDynamic, useDragDrop } from './use-drag-drop'
-import { runtimeContext } from '@pubstudio/frontend/util-runtime'
 
 export interface IDndComponentProps {
   site: ISite
@@ -244,6 +244,8 @@ export const BuilderDndComponent = defineComponent({
           componentClass,
           propsContent.content,
         )
+      } else if (tag === Tag.Svg) {
+        return h(Tag.Div, props, propsContent.content)
       } else {
         return h(component.value.tag as string, props, propsContent.content)
       }

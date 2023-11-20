@@ -7,9 +7,9 @@ import {
 import { IComponent, ISite, Tag } from '@pubstudio/shared/type-site'
 import { defineComponent, h, onMounted, onUnmounted, PropType, toRefs } from 'vue'
 import { RouterLink } from 'vue-router'
-import { computePropsContent } from './render-preview'
-import { mergeSearch } from './merge-search'
 import { hrefToUrl } from './href-to-url'
+import { mergeSearch } from './merge-search'
+import { computePropsContent } from './render-preview'
 
 export interface ILiveComponentProps {
   site: ISite
@@ -45,17 +45,21 @@ export const PreviewComponent = () => {
 
         let renderProps = props
         let children: IContent
+        let tag = component.value.tag
 
         if (typeof content === 'string') {
           // `innerHTML` should not exist in `props` when content (children) is a
           // non-string value because Vue will use whatever value it contains to
           // render components when using `h()`.
           renderProps = { ...props, innerHTML: content }
+          if (tag === Tag.Svg && content.includes('<svg')) {
+            tag = Tag.Div
+          }
         } else {
           children = content
         }
 
-        if (component.value.tag === Tag.A) {
+        if (tag === Tag.A) {
           // TODO: merge back with `live-comopnent.ts` once the custom router is used for `web`
           const hrefProp = (props.href ?? '') as string
 
@@ -108,7 +112,7 @@ export const PreviewComponent = () => {
           }
         }
 
-        return h(component.value.tag as string, renderProps, children)
+        return h(tag as string, renderProps, children)
       }
     },
   })
