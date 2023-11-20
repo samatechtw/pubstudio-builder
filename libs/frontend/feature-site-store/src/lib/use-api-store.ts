@@ -26,6 +26,11 @@ export interface IUseApiStoreProps {
   siteId: string
 }
 
+interface IUpdateApiOptions {
+  keepalive?: boolean
+  clearTimer?: boolean
+}
+
 export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
   const platformApi = inject(ApiInjectionKey) as PSApi
   const siteId = ref(props.siteId)
@@ -82,7 +87,8 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
   }
 
   // Post the updated Site fields to the API
-  const updateApi = async (keepalive?: boolean) => {
+  const updateApi = async (options: IUpdateApiOptions) => {
+    const { keepalive, clearTimer } = options
     saveError.value = undefined
     const site = store.site.getSite.value
     try {
@@ -100,6 +106,11 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
         await updateFn(siteId.value, payload, keepalive)
       }
       dirty.value = dirtyDefault()
+      if (clearTimer) {
+        // `clearTimeout` is not being called here because we want to avoid canceling any queued updates
+        // when the previous update has completed.
+        saveTimer = undefined
+      }
     } catch (e) {
       saveError.value = toApiError(e)
       console.log('Save site API call fail:', e)
@@ -113,7 +124,11 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
       }
       clearTimeout(saveTimer)
     }
-    saveTimer = setTimeout(updateApi, timeout)
+    saveTimer = setTimeout(() => {
+      updateApi({
+        clearTimer: true,
+      })
+    }, timeout)
   }
 
   // Save the Site to localstorage, and start the API update timer
@@ -131,7 +146,10 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
     }
     if (changed) {
       if (immediate) {
-        await updateApi(true)
+        await updateApi({
+          keepalive: true,
+          clearTimer: false,
+        })
       } else {
         startSaveTimer(3000)
       }
