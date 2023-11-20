@@ -19,19 +19,19 @@ import { useBuild } from '../../lib/use-build'
 import ThemeMetaFavicon from './ThemeMetaFavicon.vue'
 import ThemeMetaHead from './ThemeMetaHead.vue'
 import { IThemeMetaEditData } from './i-theme-meta-edit-data'
-import { IHeadTag } from '@pubstudio/shared/type-site'
+import { IHeadTag, IHeadObject } from '@pubstudio/shared/type-site'
 
 const { site, setFavicon, addDefaultsHead, setDefaultsHead, removeDefaultsHead } =
   useBuild()
 
 const add = (data: IThemeMetaEditData) => {
   const { tag, meta } = data
-  addDefaultsHead(tag, meta)
+  addDefaultsHead(tag as IHeadTag, meta as IHeadObject)
 }
 
 const set = (data: IThemeMetaEditData) => {
   const { tag, index, meta } = data
-  setDefaultsHead(tag, index, meta)
+  setDefaultsHead(tag as IHeadTag, index, meta as IHeadObject)
 }
 
 const remove = (tag: IHeadTag, index: number) => {

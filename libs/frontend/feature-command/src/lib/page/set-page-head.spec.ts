@@ -81,6 +81,7 @@ describe('Set Page Head', () => {
     let data1: ISetPageHeadData
     let data2: ISetPageHeadData
     let data3: ISetPageHeadData
+    let data4: ISetPageHeadData
 
     beforeEach(() => {
       data1 = {
@@ -113,11 +114,18 @@ describe('Set Page Head', () => {
         },
       }
       applySetPageHead(site, data3)
-      expect(site.pages[route]?.head.meta?.length).toEqual(3)
+      data4 = {
+        route,
+        tag: 'title',
+        index: 0,
+        newValue: 'My Custom Title',
+      }
+      applySetPageHead(site, data4)
+      expect(site.pages[route]?.head.title).toEqual('My Custom Title')
     })
 
     it('removes multiple items in meta array', () => {
-      const remove1 = {
+      const remove1: ISetPageHeadData = {
         route,
         tag: 'meta',
         index: 2,
@@ -130,7 +138,7 @@ describe('Set Page Head', () => {
       expect(site.pages[route]?.head.meta?.[1]).toEqual(data2.newValue)
 
       // Remove first
-      const remove2 = {
+      const remove2: ISetPageHeadData = {
         route,
         tag: 'meta',
         index: 0,
@@ -141,7 +149,7 @@ describe('Set Page Head', () => {
       expect(site.pages[route]?.head.meta?.[0]).toEqual(data2.newValue)
 
       // Remove remaining
-      const remove3 = {
+      const remove3: ISetPageHeadData = {
         route,
         tag: 'meta',
         index: 0,
@@ -169,7 +177,7 @@ describe('Set Page Head', () => {
 
     it('adds multiple items in meta array', () => {
       // Add to start
-      const add1 = {
+      const add1: ISetPageHeadData = {
         route,
         tag: 'meta',
         index: 0,
@@ -183,7 +191,7 @@ describe('Set Page Head', () => {
       expect(site.pages[route]?.head.meta?.[0]).toEqual(add1.newValue)
 
       // Add to end
-      const add2 = {
+      const add2: ISetPageHeadData = {
         route,
         tag: 'meta',
         index: 4,
@@ -201,7 +209,7 @@ describe('Set Page Head', () => {
       expect(site.pages[route]?.head.meta?.[4]).toEqual(add2.newValue)
 
       // Add to middle
-      const add3 = {
+      const add3: ISetPageHeadData = {
         route,
         tag: 'meta',
         index: 2,
@@ -241,7 +249,7 @@ describe('Set Page Head', () => {
 
     it('updates multiple items in meta array', () => {
       // Update first
-      const update1 = {
+      const update1: ISetPageHeadData = {
         route,
         tag: 'meta',
         index: 0,
@@ -256,7 +264,7 @@ describe('Set Page Head', () => {
       expect(site.pages[route]?.head.meta?.[0]).toEqual(update1.newValue)
 
       // Update second
-      const update2 = {
+      const update2: ISetPageHeadData = {
         route,
         tag: 'meta',
         index: 1,
@@ -271,7 +279,7 @@ describe('Set Page Head', () => {
       expect(site.pages[route]?.head.meta?.[1]).toEqual(update2.newValue)
 
       // Update second
-      const update3 = {
+      const update3: ISetPageHeadData = {
         route,
         tag: 'meta',
         index: 2,
@@ -298,6 +306,17 @@ describe('Set Page Head', () => {
       expect(site.pages[route]?.head.meta?.[0]).toEqual(data1.newValue)
       expect(site.pages[route]?.head.meta?.[1]).toEqual(data2.newValue)
       expect(site.pages[route]?.head.meta?.[2]).toEqual(data3.newValue)
+    })
+
+    it('removes title from page head', () => {
+      const removeData: ISetPageHeadData = {
+        route,
+        tag: 'title',
+        index: 0,
+        oldValue: 'My Custom Title',
+      }
+      applySetPageHead(site, removeData)
+      expect(site.pages[route].head.title).toBeUndefined()
     })
   })
 })

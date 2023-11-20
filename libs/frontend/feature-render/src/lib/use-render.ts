@@ -145,16 +145,19 @@ export const useRender = (options: IUseRenderOptions): IUseRender => {
         ...(site.value?.defaults.head.link ?? []),
         ...(activePage.value?.head.link ?? []),
       ].map((l) => (l.rel === 'icon' ? { ...l, key: 'favicon' } : l))
+
+      const activePageTitle = activePage.value?.head.title || activePageName
+
       return {
-        title: activePageName,
+        title: activePageTitle,
         meta: [
           {
             name: 'og:title',
-            content: activePageName,
+            content: activePageTitle,
           },
           {
             name: 'twitter:title',
-            content: activePageName,
+            content: activePageTitle,
           },
           ...((site.value?.defaults.head.meta ?? []) as Meta[]),
           ...((activePage.value?.head.meta ?? []) as Meta[]),

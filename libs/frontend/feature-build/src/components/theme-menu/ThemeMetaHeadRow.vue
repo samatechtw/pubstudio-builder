@@ -13,22 +13,24 @@
 
 <script lang="ts" setup>
 import { Edit, Minus } from '@pubstudio/frontend/ui-widgets'
-import { IHeadObject } from '@pubstudio/shared/type-site'
+import { IHeadObject, IHeadTagStr } from '@pubstudio/shared/type-site'
 import { computed, toRefs } from 'vue'
 
 const props = defineProps<{
-  tag: 'base' | 'link' | 'meta' | 'script'
-  element: IHeadObject
+  tag: IHeadTagStr
+  element: IHeadObject | string
 }>()
 const emit = defineEmits<{
-  (e: 'edit', element: IHeadObject): void
+  (e: 'edit', element: IHeadObject | string): void
   (e: 'remove'): void
 }>()
 const { element } = toRefs(props)
 
 const label = computed(() => {
   const el = element.value
-  if ('name' in el) {
+  if (typeof el === 'string') {
+    return el
+  } else if ('name' in el) {
     return el.name
   } else if ('title' in el) {
     return el.title

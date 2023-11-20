@@ -1,9 +1,9 @@
-import { IHeadObject, IHeadTag } from '@pubstudio/shared/type-site'
+import { IHeadObject, IPageHeadTag } from '@pubstudio/shared/type-site'
 
 export interface ISetPageHeadData {
   route: string
-  tag: IHeadTag
+  tag: IPageHeadTag
   index: number
-  oldValue?: IHeadObject
-  newValue?: IHeadObject
+  oldValue?: IHeadObject | string
+  newValue?: IHeadObject | string
 }

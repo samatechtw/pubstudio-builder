@@ -17,7 +17,7 @@
             class="tag"
             :placeholder="t('tag')"
             :options="tags"
-            @select="data.tag = $event"
+            @select="updateTag"
           />
         </div>
         <div v-if="data.tag === 'base'" class="meta-row">
@@ -34,7 +34,15 @@
             @update:modelValue="update('target', $event)"
           />
         </div>
-        <div v-if="data.tag === 'link'">
+        <div v-else-if="data.tag === 'title'" class="meta-row">
+          <PSInput
+            :modelValue="data.meta"
+            name="title"
+            placeholder="title"
+            @update:modelValue="update('title', $event)"
+          />
+        </div>
+        <div v-else-if="data.tag === 'link'">
           <div class="meta-row">
             <PSInput
               :modelValue="data.meta.href || ''"
@@ -112,7 +120,7 @@
             />
           </div>
         </div>
-        <div v-if="data.tag === 'meta'">
+        <div v-else-if="data.tag === 'meta'">
           <div class="meta-row">
             <PSInput
               :modelValue="data.meta.content || ''"
@@ -142,7 +150,7 @@
             />
           </div>
         </div>
-        <div v-if="data.tag === 'script'">
+        <div v-else-if="data.tag === 'script'">
           <div class="meta-row">
             <PSInput
               :modelValue="data.meta.src || ''"
@@ -185,14 +193,15 @@
 import { computed, ref, toRefs, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Modal, PSButton, PSInput, PSMultiselect } from '@pubstudio/frontend/ui-widgets'
-import { IHeadObject } from '@pubstudio/shared/type-site'
+import { IHeadObject, IHeadTagStr } from '@pubstudio/shared/type-site'
 import { IThemeMetaEditData } from './i-theme-meta-edit-data'
 
 const props = defineProps<{
   editData: IThemeMetaEditData | undefined
   allowBase?: boolean
+  allowTitle?: boolean
 }>()
-const { editData, allowBase } = toRefs(props)
+const { editData, allowBase, allowTitle } = toRefs(props)
 const emit = defineEmits<{
   (e: 'save', data: IThemeMetaEditData): void
   (e: 'cancel'): void
@@ -201,17 +210,21 @@ const emit = defineEmits<{
 const data = ref()
 
 const tags = computed(() => {
-  if (allowBase.value) {
-    return ['base', 'link', 'meta', 'script']
-  } else {
-    return ['link', 'meta', 'script']
+  const strs: IHeadTagStr[] = ['link', 'meta', 'script']
+  if (allowTitle.value && typeof data.value.meta !== 'string') {
+    strs.unshift('title')
   }
+  if (allowBase.value) {
+    strs.unshift('base')
+  }
+  return strs
 })
 
 const copyData = (d: IThemeMetaEditData): IThemeMetaEditData => {
+  const copiedMeta = typeof d.meta === 'string' ? d.meta : { ...d.meta }
   return {
     ...d,
-    meta: { ...d.meta },
+    meta: copiedMeta,
   }
 }
 
@@ -229,8 +242,21 @@ const save = () => {
   emit('save', data.value)
 }
 
+const updateTag = (tag: IHeadTagStr) => {
+  data.value.tag = tag
+  if (tag === 'title') {
+    data.value.meta = ''
+  } else {
+    data.value.meta = {}
+  }
+}
+
 const update = (key: unknown, value: string) => {
-  data.value.meta[key as keyof IHeadObject] = value || undefined
+  if (key === 'title') {
+    data.value.meta = value
+  } else {
+    data.value.meta[key as keyof IHeadObject] = value || undefined
+  }
 }
 </script>
 

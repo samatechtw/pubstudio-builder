@@ -7,6 +7,7 @@
     <ThemeMetaHead
       v-if="activePage"
       :head="activePage.head"
+      :includeTitle="true"
       @add="add"
       @set="set"
       @remove="remove"
@@ -17,7 +18,7 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { IHeadTag } from '@pubstudio/shared/type-site'
+import { IHeadTagStr, IPageHeadTag } from '@pubstudio/shared/type-site'
 import { useBuild } from '../../lib/use-build'
 import ThemeMetaFavicon from '../theme-menu/ThemeMetaFavicon.vue'
 import ThemeMetaHead from '../theme-menu/ThemeMetaHead.vue'
@@ -35,20 +36,20 @@ const setFavicon = (newFavicon: string | undefined) => {
 const add = (data: IThemeMetaEditData) => {
   if (activePage.value) {
     const { tag, meta } = data
-    addPageHead(activePage.value.route, tag, meta)
+    addPageHead(activePage.value.route, tag as IPageHeadTag, meta)
   }
 }
 
 const set = (data: IThemeMetaEditData) => {
   if (activePage.value) {
     const { tag, index, meta } = data
-    setPageHead(activePage.value.route, tag, index, meta)
+    setPageHead(activePage.value.route, tag as IPageHeadTag, index, meta)
   }
 }
 
-const remove = (tag: IHeadTag, index: number) => {
+const remove = (tag: IHeadTagStr, index: number) => {
   if (activePage.value) {
-    removePageHead(activePage.value.route, tag, index)
+    removePageHead(activePage.value.route, tag as IPageHeadTag, index)
   }
 }
 
