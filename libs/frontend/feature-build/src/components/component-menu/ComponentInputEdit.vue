@@ -123,6 +123,9 @@ const save = () => {
 <style lang="postcss" scoped>
 @import '@theme/css/mixins.postcss';
 
+.component-input-new {
+  padding: 16px;
+}
 .input-actions {
   @mixin menu-actions;
   > button {

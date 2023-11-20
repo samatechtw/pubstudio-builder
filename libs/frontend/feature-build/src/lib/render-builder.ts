@@ -1,3 +1,4 @@
+import { setEditSvg } from '@pubstudio/frontend/feature-editor'
 import {
   computeAttrsInputsMixins,
   computeEvents,
@@ -10,6 +11,7 @@ import {
   activeBreakpoint,
   descSortedBreakpoints,
 } from '@pubstudio/frontend/feature-site-source'
+import { Edit } from '@pubstudio/frontend/ui-widgets'
 import { findStyles } from '@pubstudio/frontend/util-component'
 import { RenderMode } from '@pubstudio/frontend/util-render'
 import { resetRuntimeContext, runtimeContext } from '@pubstudio/frontend/util-runtime'
@@ -48,6 +50,8 @@ export const computeBuilderStyleProps = (
   let extraChildren: VNode[] | undefined = undefined
   const builderClass: string[] = []
 
+  const selected = editor?.selectedComponent?.id === component.id
+
   if (data.attrs.href !== undefined && component.tag === Tag.A) {
     extraChildren = [h(LinkTooltip, { link: data.attrs.href, text: component.content })]
     data.mixins.push('__link')
@@ -55,6 +59,18 @@ export const computeBuilderStyleProps = (
   }
   if (component.tag === Tag.Img && !data.attrs.src) {
     data.mixins.push('__image')
+  }
+  if (selected && component.tag === Tag.Svg) {
+    // Make sure wrapper is `position: relative;` so we can position the edit icon
+    builderClass.push('svg-sel')
+    // Add an icon that shows SvgEditModal on click
+    extraChildren = [
+      h(Edit, {
+        color: 'white',
+        class: 'svg-edit',
+        onClick: () => setEditSvg(site.editor, { content: component.content ?? '' }),
+      }),
+    ]
   }
 
   const hoveredInComponentTree =
@@ -125,7 +141,6 @@ export const computeBuilderStyleProps = (
     ])
   }
 
-  const selected = editor?.selectedComponent?.id === component.id
   if (selected) {
     builderStyle.border = '1.5px solid #3768FF'
   } else if (editor?.debugBounding) {
@@ -164,14 +179,17 @@ export const computePropsContent = (
 
   const { editor } = site
   const content: IBuildContent = []
-
   if (component.children?.length) {
     content.push(
       ...component.children.map((child, index) => renderComponent(site, child, index)),
     )
   } else if (component.content) {
     const isSelected = editor?.selectedComponent?.id === component.id
-    if (isSelected) {
+    if (component.tag === Tag.Svg) {
+      content.push(
+        h('div', { class: 'component-content-container', innerHTML: component.content }),
+      )
+    } else if (isSelected) {
       content.push(h(ProseMirrorEditor, { component, editor }))
     } else {
       content.push(

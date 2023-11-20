@@ -13,6 +13,7 @@ export enum Tag {
   Header = 'header',
   Img = 'img',
   Span = 'span',
+  Svg = 'svg',
   Input = 'input',
 }
 

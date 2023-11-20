@@ -8,6 +8,7 @@ import {
   IComponent,
   IEditBehavior,
   IEditorContext,
+  IEditSvg,
   IPage,
   ISite,
   StyleToolbarMenu,
@@ -259,6 +260,16 @@ export const setEditBehavior = (
 ) => {
   if (editor && behavior !== editor.editBehavior) {
     editor.editBehavior = behavior
+    siteStore.value.saveEditor(editor)
+  }
+}
+
+export const setEditSvg = (
+  editor: IEditorContext | undefined,
+  svg: IEditSvg | undefined,
+) => {
+  if (editor && svg !== editor.editSvg) {
+    editor.editSvg = svg
     siteStore.value.saveEditor(editor)
   }
 }

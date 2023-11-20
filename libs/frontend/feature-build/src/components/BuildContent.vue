@@ -147,6 +147,17 @@ $border-offset: 0px;
           z-index: 1;
         }
       }
+      :deep(.svg-sel) {
+        position: relative;
+        .svg-edit {
+          position: absolute;
+          cursor: pointer;
+          fill: black;
+          top: -32px;
+          right: -24px;
+          width: 26px;
+        }
+      }
       :deep(.hover-in-tree) {
         position: relative;
         opacity: 0.5;

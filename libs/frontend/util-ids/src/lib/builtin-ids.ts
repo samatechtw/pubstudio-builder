@@ -48,6 +48,8 @@ export const h5StyleId = nextStyleId(globalContext)
 export const h5Id = componentId(globalContext.namespace, 'h5')
 export const h6StyleId = nextStyleId(globalContext)
 export const h6Id = componentId(globalContext.namespace, 'h6')
+export const svgStyleId = nextStyleId(globalContext)
+export const svgId = componentId(globalContext.namespace, 'svg')
 
 // Form
 export const inputStyleId = nextStyleId(globalContext)

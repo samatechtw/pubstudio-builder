@@ -31,6 +31,7 @@
         {{ child.id }}
       </div>
     </div>  -->
+    <SvgEditModal />
   </div>
 </template>
 
@@ -41,12 +42,14 @@ import { AriaRole, ComponentTabState, IComponent, Tag } from '@pubstudio/shared/
 import {
   setComponentTabState,
   setComponentTabEditInfo,
+  setEditSvg,
 } from '@pubstudio/frontend/feature-editor'
 import MenuRow from '../MenuRow.vue'
 import { useBuild } from '../../lib/use-build'
 import MenuRowEdit from '../MenuRowEdit.vue'
 import ComponentTag from './ComponentTag.vue'
 import ComponentRole from './ComponentRole.vue'
+import SvgEditModal from './SvgEditModal.vue'
 
 const props = defineProps<{
   component: IComponent
@@ -70,11 +73,15 @@ const setContent = (value: string | undefined) => {
 }
 
 const editContent = () => {
-  setComponentTabEditInfo(
-    editor.value,
-    ComponentTabState.EditContent,
-    component.value.content,
-  )
+  if (component.value.tag === Tag.Svg) {
+    setEditSvg(editor.value, { content: component.value.content ?? '' })
+  } else {
+    setComponentTabEditInfo(
+      editor.value,
+      ComponentTabState.EditContent,
+      component.value.content,
+    )
+  }
 }
 
 const editingName = computed(() => {

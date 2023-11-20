@@ -7,5 +7,6 @@ export const validateCssValue = (
   value: string,
 ): boolean => {
   const resolved = resolveThemeVariables(context, value)
-  return !resolved || CSS.supports(property, resolved)
+  // TODO -- add font validation (for typos, etc)
+  return property === Css.FontFamily || !resolved || CSS.supports(property, resolved)
 }

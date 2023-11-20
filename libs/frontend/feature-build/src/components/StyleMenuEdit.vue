@@ -120,9 +120,7 @@ onUnmounted(() => {
 <style lang="postcss" scoped>
 @import '@theme/css/mixins.postcss';
 
-.style-menu-edit {
-  .styles-actions {
-    @mixin menu-actions;
-  }
+.styles-actions {
+  @mixin menu-actions;
 }
 </style>
