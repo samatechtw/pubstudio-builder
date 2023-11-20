@@ -17,6 +17,13 @@
       @remove="removeMeta('base', 0)"
     />
     <ThemeMetaHeadRow
+      v-if="'title' in head && head.title"
+      tag="title"
+      :element="head.title"
+      @edit="showEditMeta('title', 0, $event)"
+      @remove="removeMeta('title', 0)"
+    />
+    <ThemeMetaHeadRow
       v-for="(link, index) in head.link"
       :key="`l-${index}`"
       tag="link"
@@ -43,6 +50,7 @@
     <ThemeMetaEditModal
       :editData="editMeta || newMeta"
       :allowBase="includeBase"
+      :allowTitle="includeTitle"
       @save="saveMeta"
       @cancel="hideMetaModal"
     />
@@ -53,30 +61,23 @@
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import ThemeMetaHeadRow from './ThemeMetaHeadRow.vue'
-import { useBuild } from '../../lib/use-build'
 import { Plus } from '@pubstudio/frontend/ui-widgets'
 import ThemeMetaEditModal from './ThemeMetaEditModal.vue'
-import {
-  IHead,
-  IHeadObject,
-  IHeadTag,
-  IHeadTagStr,
-  IPageHead,
-} from '@pubstudio/shared/type-site'
+import { IHead, IHeadObject, IHeadTagStr, IPageHead } from '@pubstudio/shared/type-site'
 import { IThemeMetaEditData } from './i-theme-meta-edit-data'
 
 const { t } = useI18n()
-const { site } = useBuild()
 
 defineProps<{
   head: IHead | IPageHead
   includeBase?: boolean
+  includeTitle?: boolean
 }>()
 
 const emit = defineEmits<{
   (e: 'add', data: IThemeMetaEditData): void
   (e: 'set', data: IThemeMetaEditData): void
-  (e: 'remove', tag: IHeadTag, index: number): void
+  (e: 'remove', tag: IHeadTagStr, index: number): void
 }>()
 
 const editMeta = ref<IThemeMetaEditData>()
@@ -90,7 +91,7 @@ const showNewMeta = () => {
   }
 }
 
-const showEditMeta = (tag: IHeadTagStr, index: number, meta: IHeadObject) => {
+const showEditMeta = (tag: IHeadTagStr, index: number, meta: IHeadObject | string) => {
   editMeta.value = {
     tag,
     index,
@@ -107,7 +108,7 @@ const saveMeta = (data: IThemeMetaEditData) => {
   hideMetaModal()
 }
 
-const removeMeta = (tag: IHeadTag, index: number) => {
+const removeMeta = (tag: IHeadTagStr, index: number) => {
   emit('remove', tag, index)
 }
 

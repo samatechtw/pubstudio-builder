@@ -78,7 +78,7 @@ describe('Set Defaults Head', () => {
       href: 'https://mysite.com',
       target: '_blank',
     }
-    const addData = {
+    const addData: ISetDefaultsHeadData = {
       tag: 'base',
       index: 0,
       newValue,
@@ -90,7 +90,7 @@ describe('Set Defaults Head', () => {
     const updatedValue = {
       href: 'https://anothersite.com',
     }
-    const updateData = {
+    const updateData: ISetDefaultsHeadData = {
       tag: 'base',
       index: 0,
       oldValue: newValue,
@@ -100,7 +100,7 @@ describe('Set Defaults Head', () => {
     applySetDefaultsHead(site, updateData)
     expect(site.defaults.head.base).toEqual(updatedValue)
 
-    const removeData = {
+    const removeData: ISetDefaultsHeadData = {
       tag: 'base',
       index: 0,
       oldValue: updatedValue,
@@ -156,7 +156,7 @@ describe('Set Defaults Head', () => {
     })
 
     it('removes multiple items in meta array', () => {
-      const remove1 = {
+      const remove1: ISetDefaultsHeadData = {
         tag: 'meta',
         index: 2,
         oldValue: data3.newValue,
@@ -168,7 +168,7 @@ describe('Set Defaults Head', () => {
       expect(site.defaults.head.meta?.[1]).toEqual(data2.newValue)
 
       // Remove first
-      const remove2 = {
+      const remove2: ISetDefaultsHeadData = {
         tag: 'meta',
         index: 0,
         oldValue: data1.newValue,
@@ -178,7 +178,7 @@ describe('Set Defaults Head', () => {
       expect(site.defaults.head.meta?.[0]).toEqual(data2.newValue)
 
       // Remove remaining
-      const remove3 = {
+      const remove3: ISetDefaultsHeadData = {
         tag: 'meta',
         index: 0,
         oldValue: data2.newValue,
@@ -205,7 +205,7 @@ describe('Set Defaults Head', () => {
 
     it('adds multiple items in meta array', () => {
       // Add to start
-      const add1 = {
+      const add1: ISetDefaultsHeadData = {
         tag: 'meta',
         index: 0,
         newValue: {
@@ -218,7 +218,7 @@ describe('Set Defaults Head', () => {
       expect(site.defaults.head.meta?.[0]).toEqual(add1.newValue)
 
       // Add to end
-      const add2 = {
+      const add2: ISetDefaultsHeadData = {
         tag: 'meta',
         index: 4,
         newValue: {
@@ -235,7 +235,7 @@ describe('Set Defaults Head', () => {
       expect(site.defaults.head.meta?.[4]).toEqual(add2.newValue)
 
       // Add to middle
-      const add3 = {
+      const add3: ISetDefaultsHeadData = {
         tag: 'meta',
         index: 2,
         newValue: {
@@ -274,7 +274,7 @@ describe('Set Defaults Head', () => {
 
     it('updates multiple items in meta array', () => {
       // Update first
-      const update1 = {
+      const update1: ISetDefaultsHeadData = {
         tag: 'meta',
         index: 0,
         oldValue: data1.newValue,
@@ -288,7 +288,7 @@ describe('Set Defaults Head', () => {
       expect(site.defaults.head.meta?.[0]).toEqual(update1.newValue)
 
       // Update second
-      const update2 = {
+      const update2: ISetDefaultsHeadData = {
         tag: 'meta',
         index: 1,
         oldValue: data2.newValue,
@@ -302,7 +302,7 @@ describe('Set Defaults Head', () => {
       expect(site.defaults.head.meta?.[1]).toEqual(update2.newValue)
 
       // Update second
-      const update3 = {
+      const update3: ISetDefaultsHeadData = {
         tag: 'meta',
         index: 2,
         oldValue: data3.newValue,

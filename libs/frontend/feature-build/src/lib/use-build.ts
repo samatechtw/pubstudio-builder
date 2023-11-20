@@ -80,7 +80,7 @@ import {
   IHeadObject,
   IHeadTag,
   IPage,
-  IPageHead,
+  IPageHeadTag,
   IPageMetadata,
   IRawStylesWithSource,
   ISerializedComponent,
@@ -190,9 +190,14 @@ export interface IUseBuild {
   setDefaultsHead: (tag: IHeadTag, index: number, value: IHeadObject) => void
   removeDefaultsHead: (tag: IHeadTag, index: number) => void
   setFavicon: (newFavicon: string | undefined) => void
-  addPageHead: (route: string, tag: IHeadTag, value: IHeadObject) => void
-  setPageHead: (route: string, tag: IHeadTag, index: number, value: IHeadObject) => void
-  removePageHead: (route: string, tag: IHeadTag, index: number) => void
+  addPageHead: (route: string, tag: IPageHeadTag, value: IHeadObject | string) => void
+  setPageHead: (
+    route: string,
+    tag: IPageHeadTag,
+    index: number,
+    value: IHeadObject | string,
+  ) => void
+  removePageHead: (route: string, tag: IPageHeadTag, index: number) => void
   setPageFavicon: (route: string, newFavicon: string | undefined) => void
   setBreakpoint: (newBreakpoints: Record<string, IBreakpoint>) => void
   pushGroupCommands: (data: ICommandGroupData) => void
@@ -1045,7 +1050,7 @@ export const useBuild = (): IUseBuild => {
     if (tag === 'base') {
       oldValue = site.value.defaults.head.base
     } else {
-      oldValue = site.value.defaults.head[tag as keyof IPageHead]?.[index] as IHeadObject
+      oldValue = site.value.defaults.head[tag]?.[index] as IHeadObject
     }
     const data: ISetDefaultsHeadData = {
       tag,
@@ -1061,7 +1066,7 @@ export const useBuild = (): IUseBuild => {
     if (tag === 'base') {
       oldValue = site.value.defaults.head.base
     } else {
-      oldValue = site.value.defaults.head[tag as keyof IPageHead]?.[index] as IHeadObject
+      oldValue = site.value.defaults.head[tag]?.[index] as IHeadObject
     }
     const data: ISetDefaultsHeadData = {
       tag,
@@ -1071,7 +1076,7 @@ export const useBuild = (): IUseBuild => {
     pushCommand(CommandType.SetDefaultsHead, data)
   }
 
-  const addPageHead = (route: string, tag: IHeadTag, value: IHeadObject) => {
+  const addPageHead = (route: string, tag: IPageHeadTag, value: IHeadObject | string) => {
     const data: ISetPageHeadData = {
       route,
       tag,
@@ -1083,13 +1088,16 @@ export const useBuild = (): IUseBuild => {
 
   const setPageHead = (
     route: string,
-    tag: IHeadTag,
+    tag: IPageHeadTag,
     index: number,
-    value: IHeadObject,
+    value: IHeadObject | string,
   ) => {
-    const oldValue = site.value.pages[route]?.head[tag as keyof IPageHead]?.[
-      index
-    ] as IHeadObject
+    let oldValue: IHeadObject | string | undefined
+    if (tag === 'title') {
+      oldValue = site.value.pages[route]?.head.title
+    } else {
+      oldValue = site.value.pages[route]?.head[tag]?.[index]
+    }
 
     const data: ISetPageHeadData = {
       route,
@@ -1101,10 +1109,13 @@ export const useBuild = (): IUseBuild => {
     pushCommand(CommandType.SetPageHead, data)
   }
 
-  const removePageHead = (route: string, tag: IHeadTag, index: number) => {
-    const oldValue = site.value.pages[route]?.head[tag as keyof IPageHead]?.[
-      index
-    ] as IHeadObject
+  const removePageHead = (route: string, tag: IPageHeadTag, index: number) => {
+    let oldValue: IHeadObject | string | undefined
+    if (tag === 'title') {
+      oldValue = site.value.pages[route]?.head.title
+    } else {
+      oldValue = site.value.pages[route]?.head[tag]?.[index]
+    }
 
     const data: ISetPageHeadData = {
       route,

@@ -1,22 +1,31 @@
 import { ISetPageHeadData } from '@pubstudio/shared/type-command-data'
 import {
   IHeadObject,
-  IHeadTag,
+  IPageHeadTag,
   IPageHead,
   IPageHeadObject,
   ISite,
 } from '@pubstudio/shared/type-site'
 
-const removeHeadField = (site: ISite, route: string, tag: IHeadTag, index: number) => {
+const removeHeadField = (
+  site: ISite,
+  route: string,
+  tag: IPageHeadTag,
+  index: number,
+) => {
   // TODO -- find a better way to handle these types
   const page = site.pages[route]
   if (page) {
-    const head = page.head[tag as keyof IPageHead] as IPageHeadObject[]
-    if (head) {
-      head.splice(index, 1)
-    }
-    if (head.length === 0) {
-      page.head[tag as keyof IPageHead] = undefined
+    if (tag === 'title') {
+      page.head.title = undefined
+    } else {
+      const head = page.head[tag as keyof IPageHead] as IPageHeadObject[]
+      if (head) {
+        head.splice(index, 1)
+      }
+      if (head.length === 0) {
+        page.head[tag as keyof IPageHead] = undefined
+      }
     }
   }
 }
@@ -24,31 +33,39 @@ const removeHeadField = (site: ISite, route: string, tag: IHeadTag, index: numbe
 const setHeadField = (
   site: ISite,
   route: string,
-  tag: IHeadTag,
+  tag: IPageHeadTag,
   index: number,
-  newValue: IHeadObject,
+  newValue: IHeadObject | string,
 ) => {
   const page = site.pages[route]
   if (page) {
-    ;(page.head[tag as keyof IPageHead] as IPageHeadObject[])[index] = newValue
+    if (tag === 'title') {
+      page.head.title = newValue as string
+    } else {
+      ;(page.head[tag] as IPageHeadObject[])[index] = newValue as IHeadObject
+    }
   }
 }
 
 const addHeadField = (
   site: ISite,
   route: string,
-  tag: IHeadTag,
+  tag: IPageHeadTag,
   index: number,
-  newValue: IHeadObject,
+  newValue: IHeadObject | string,
 ) => {
   const page = site.pages[route]
   if (page) {
-    const head = page.head[tag as keyof IPageHead] as IPageHeadObject[]
-    if (head) {
-      head.splice(index, 0, newValue)
+    if (tag === 'title') {
+      page.head.title = newValue as string
     } else {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      page.head[tag as keyof IPageHead] = [newValue] as any
+      const head = page.head[tag as keyof IPageHead] as IPageHeadObject[]
+      if (head) {
+        head.splice(index, 0, newValue as IHeadObject)
+      } else {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        page.head[tag as keyof IPageHead] = [newValue] as any
+      }
     }
   }
 }
@@ -56,10 +73,10 @@ const addHeadField = (
 const setEvents = (
   site: ISite,
   route: string,
-  tag: IHeadTag,
+  tag: IPageHeadTag,
   index: number,
-  oldValue: IHeadObject | undefined,
-  newValue: IHeadObject | undefined,
+  oldValue: IHeadObject | string | undefined,
+  newValue: IHeadObject | string | undefined,
 ) => {
   // Remove
   if (oldValue && !newValue) {
