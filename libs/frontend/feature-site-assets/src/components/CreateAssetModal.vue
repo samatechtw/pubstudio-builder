@@ -168,7 +168,8 @@ const updateAsset = async (file: File | null | undefined) => {
       const validFile = await validateMedia({ size: 10000000 }, file)
       handleImageSelect(validFile)
     } catch (e) {
-      error.value = t((e as IValidateMediaError).fileErrors[0])
+      const key = (e as IValidateMediaError).fileErrors[0]
+      error.value = t(`errors.${key}`)
     }
   }
 }
