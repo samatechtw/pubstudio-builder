@@ -20,7 +20,7 @@
 
 import { DOMOutputSpec, MarkSpec, NodeSpec, Schema } from 'prosemirror-model'
 
-const pDOM: DOMOutputSpec = ['p', 0],
+const pDOM: DOMOutputSpec = ['div', { class: 'pm-p' }, 0],
   blockquoteDOM: DOMOutputSpec = ['blockquote', 0],
   hrDOM: DOMOutputSpec = ['hr'],
   brDOM: DOMOutputSpec = ['br']
@@ -33,11 +33,11 @@ export const nodes = {
   } as NodeSpec,
 
   /// A plain paragraph textblock. Represented in the DOM
-  /// as a `<p>` element.
+  /// as a `<div>` element so that i18n nodes can be nested
   paragraph: {
     content: 'inline*',
     group: 'block',
-    parseDOM: [{ tag: 'p' }],
+    parseDOM: [{ tag: 'div' }, { tag: 'p' }],
     toDOM() {
       return pDOM
     },

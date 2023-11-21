@@ -63,7 +63,7 @@ import { createCodeEditorView } from '../../lib/create-code-editor-view'
 hljs.registerLanguage('xml', xml)
 
 const { t } = useI18n()
-const { editor, editComponent } = useBuild()
+const { editor, editSelectedComponent } = useBuild()
 
 const newSvg = ref<IEditSvg>({ content: '' })
 const lightPreview = ref(false)
@@ -135,7 +135,7 @@ watch(svgCodeEditor, (domElement) => {
 })
 
 const set = () => {
-  editComponent({ content: newSvg.value.content })
+  editSelectedComponent({ content: newSvg.value.content })
   clearSvg()
 }
 

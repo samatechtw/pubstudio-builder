@@ -4,7 +4,7 @@ import {
 } from '@pubstudio/frontend/util-edit-text'
 import hljs from 'highlight.js/lib/core'
 import { keymap } from 'prosemirror-keymap'
-import { Plugin, Selection, Transaction } from 'prosemirror-state'
+import { Plugin, Selection } from 'prosemirror-state'
 import { EditorView } from 'prosemirror-view'
 import { highlightPlugin } from './prosemirror-highlighthjs-plugin'
 

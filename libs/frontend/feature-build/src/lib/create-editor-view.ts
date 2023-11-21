@@ -11,7 +11,7 @@ export function createComponentEditorView(
   options: IProsemirrorSetupOptions,
   container: HTMLElement,
 ): EditorView | undefined {
-  const { editComponent } = useBuild()
+  const { editSelectedComponent } = useBuild()
   if (!container) {
     return undefined
   }
@@ -22,7 +22,7 @@ export function createComponentEditorView(
     dispatchTransaction(transaction) {
       const newState = view.state.apply(transaction)
       const content = editorStateToHtml(newState)
-      editComponent({ content })
+      editSelectedComponent({ content })
       view.updateState(newState)
     },
   })
@@ -61,11 +61,11 @@ export function createTranslationEditorView(
       const content = editorStateToHtml(newState)
       if (translation.value) {
         translation.value.text = content
-        setTranslations(
-          translation.value.code,
-          { [translation.value.originalKey ?? '']: content },
-          !first,
-        )
+        setTranslations({
+          code: translation.value.code,
+          translations: { [translation.value.originalKey ?? '']: content },
+          replace: !first,
+        })
       }
       first = false
       view.updateState(newState)

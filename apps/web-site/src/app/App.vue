@@ -172,6 +172,9 @@ body {
 p {
   margin: 0;
 }
+.pm-p {
+  min-height: 18px;
+}
 
 a {
   text-decoration: none;

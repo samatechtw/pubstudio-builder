@@ -36,15 +36,11 @@
     <div class="label">
       {{ propertyText }}
     </div>
-    <div class="item">
-      <div class="edit-item" :class="{ ['edit-item-inherited']: inheritedFrom }">
-        <div class="value-preview" :class="{ error }">
-          {{ model.value }}
-        </div>
-        <Edit class="edit-icon" @click="edit" />
-      </div>
-      <Minus v-if="!inheritedFrom" class="item-delete" @click.stop="removeStyle" />
+    <div class="value-preview" :class="{ error, ['value-inherited']: inheritedFrom }">
+      {{ model.value }}
     </div>
+    <Edit class="edit-icon" @click="edit" />
+    <Minus v-if="!inheritedFrom" class="item-delete" @click.stop="removeStyle" />
     <InfoBubble v-if="inheritedFrom" class="inherited-from" :message="inheritedFrom" />
   </div>
 </template>
@@ -218,34 +214,19 @@ const removeStyle = () => {
     border: 1px solid $color-primary;
   }
 }
-
-.item {
-  display: flex;
-  align-items: center;
-  margin-left: 6px;
-  overflow: hidden;
-}
-
-.edit-item {
-  margin-left: auto;
-  overflow: hidden;
-  .value-preview {
-    @mixin text 14px;
-    text-overflow: ellipsis;
-    overflow: hidden;
-  }
-  .error {
-    color: $color-error;
-  }
-  .edit-icon {
-    flex-shrink: 0;
-  }
-  &.edit-item-inherited {
+.value-preview {
+  @mixin text 14px;
+  @mixin truncate;
+  &.value-inherited {
     cursor: default;
-    .value-preview {
-      color: $color-disabled;
-    }
+    color: $color-disabled;
   }
+}
+.error {
+  color: $color-error;
+}
+.edit-icon {
+  flex-shrink: 0;
 }
 
 .label {
@@ -258,7 +239,8 @@ const removeStyle = () => {
   flex-shrink: 0;
 }
 .property-multiselect {
-  width: 130px;
+  width: 100%;
+  max-width: 120px;
 }
 .value-multiselect {
   width: auto;
@@ -266,8 +248,8 @@ const removeStyle = () => {
   margin-left: 6px;
 }
 .value-input {
-  min-width: 90px;
-  flex-grow: 1;
+  max-width: 114px;
+  width: 114px;
   margin-left: 6px;
 }
 

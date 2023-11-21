@@ -34,20 +34,21 @@ const { deleteStyle } = useBuild()
 .style-menu-list {
   .styles {
     width: 100%;
-    .style-entry {
-      padding: 12px 0;
-      justify-content: space-between;
-      border-bottom: 1px solid $grey-100;
-      cursor: default;
-      .style-name {
-        flex-grow: 1;
-        cursor: pointer;
-      }
-    }
+  }
+  .style-entry {
+    padding: 10px 0;
+    justify-content: space-between;
+    border-bottom: 1px solid $grey-100;
+    cursor: default;
+  }
+  .style-name {
+    @mixin text 14px;
+    flex-grow: 1;
+    cursor: pointer;
   }
   .styles-empty {
-    padding-top: 24px;
     @mixin text-medium 18px;
+    padding-top: 24px;
     color: $grey-500;
   }
 }

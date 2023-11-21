@@ -18,7 +18,7 @@ export interface IProsemirrorSetupOptions {
 }
 
 export function prosemirrorSetup(options: IProsemirrorSetupOptions): EditorState {
-  const { content: contentnOption, mapKeys, plugins: pluginsOption } = options
+  const { content: contentOption, mapKeys, plugins: pluginsOption } = options
   const plugins = [
     buildInputRules(schema),
     keymap(buildKeymap(schema, mapKeys)),
@@ -32,7 +32,7 @@ export function prosemirrorSetup(options: IProsemirrorSetupOptions): EditorState
     }),
     ...(pluginsOption ?? []),
   ]
-  const content = new DOMParser().parseFromString(contentnOption, 'text/html')
+  const content = new DOMParser().parseFromString(contentOption, 'text/html')
   return EditorState.create({
     doc: ProseDOMParser.fromSchema(schema).parse(content),
     plugins,

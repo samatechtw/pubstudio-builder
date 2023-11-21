@@ -23,7 +23,7 @@ const props = defineProps<{
 }>()
 
 const { component, editor } = toRefs(props)
-const { site } = useBuild()
+const { site, editComponent } = useBuild()
 
 const container = ref<HTMLDivElement>()
 const containerId = computed(() => getProseMirrorContainerId(component.value))
@@ -53,7 +53,7 @@ const mountProseMirrorEditor = (
     editor.editView?.destroy()
     editor.editView = createComponentEditorView(
       {
-        content: selectedComponent.content ?? '',
+        content: selectedComponent.content || '<div class="pm-p"></div>',
         plugins,
       },
       container,
@@ -100,7 +100,10 @@ watch(gradientColorStyle, () => {
 })
 
 onBeforeUnmount(() => {
-  if (editor.value) {
+  if (editor.value?.editView) {
+    if (editor.value.editView.state.doc.content.size <= 2) {
+      editComponent(component.value, { content: '' })
+    }
     editor.value.editView?.destroy()
     editor.value.editView = undefined
   }

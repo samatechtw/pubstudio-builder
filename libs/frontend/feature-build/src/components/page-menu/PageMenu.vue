@@ -16,9 +16,8 @@ const { editing } = usePageMenu()
 <style lang="postcss" scoped>
 @import '@theme/css/mixins.postcss';
 
-.page-menu {
-  .page-menu-content {
-    width: 100%;
-  }
+.page-menu-content {
+  width: 100%;
+  padding: 16px;
 }
 </style>

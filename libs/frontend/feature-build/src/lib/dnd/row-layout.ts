@@ -2,9 +2,9 @@ import {
   activeBreakpoint,
   descSortedBreakpoints,
 } from '@pubstudio/frontend/feature-site-source'
+import { findStyles } from '@pubstudio/frontend/util-component'
 import { Css, IComponent, ISite } from '@pubstudio/shared/type-site'
 import { IDropProps } from './builder-dnd'
-import { findStyles } from '@pubstudio/frontend/util-component'
 
 export interface XYCoord {
   x: number

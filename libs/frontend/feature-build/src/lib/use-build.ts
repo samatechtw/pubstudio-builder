@@ -103,6 +103,13 @@ export type IOldNewStyleEntry = {
   newStyle?: IStyleEntry
 }
 
+export type ISetTranslationsProps = {
+  code: string
+  translations: INewTranslations
+  replace?: boolean
+  forceSave?: boolean
+}
+
 // The element id of build content window
 export const buildContentWindowId = 'build-content-window'
 
@@ -123,7 +130,8 @@ export interface IUseBuild {
   duplicateComponent: () => void
   pasteComponent: (copiedComponentId: string, parent: IComponent) => void
   addBuiltinComponent: (id: string) => void
-  editComponent: (fields: IEditComponentFields) => void
+  editSelectedComponent: (fields: IEditComponentFields) => void
+  editComponent: (component: IComponent, fields: IEditComponentFields) => void
   setCustomStyle: (
     component: IComponent,
     oldStyle: IStyleEntry | undefined,
@@ -169,7 +177,7 @@ export interface IUseBuild {
   convertComponentStyle: (componentId: string, style: IStyle) => void
   editStyle: (style: IStyle) => void
   deleteStyle: (style: IStyle) => void
-  setTranslations: (code: string, translations: INewTranslations, first: boolean) => void
+  setTranslations: (props: ISetTranslationsProps) => void
   setActiveI18n: (activeI18n: string) => void
   addThemeVariable: (data: IAddThemeVariableData) => void
   editThemeVariable: (data: IEditThemeVariableData) => void
@@ -341,8 +349,10 @@ export const useBuild = (): IUseBuild => {
     pushCommand(CommandType.Group, { commands } as ICommandGroupData)
   }
 
-  const editComponent = (fields: IEditComponentFields) => {
-    const component = site.value.editor?.selectedComponent
+  const editComponent = (
+    component: IComponent | undefined,
+    fields: IEditComponentFields,
+  ) => {
     const keys = Object.keys(fields)
     if (!activePage.value || !component || keys.length === 0) {
       return
@@ -367,6 +377,11 @@ export const useBuild = (): IUseBuild => {
       }
     }
     pushCommand(CommandType.EditComponent, data)
+  }
+
+  const editSelectedComponent = (fields: IEditComponentFields) => {
+    const component = site.value.editor?.selectedComponent
+    editComponent(component, fields)
   }
 
   const duplicateComponent = () => {
@@ -837,14 +852,11 @@ export const useBuild = (): IUseBuild => {
     pushCommand(CommandType.RemoveStyleMixin, data)
   }
 
-  const setTranslations = (
-    code: string,
-    translations: INewTranslations,
-    replace: boolean,
-  ) => {
+  const setTranslations = (props: ISetTranslationsProps) => {
+    const { code, translations, replace, forceSave } = props
     const data = makeSetTranslationsData(site.value.context, code, translations)
     if (replace) {
-      replaceLastCommand(CommandType.SetTranslations, data)
+      replaceLastCommand(CommandType.SetTranslations, data, forceSave ?? false)
     } else {
       pushCommand(CommandType.SetTranslations, data)
     }
@@ -1184,6 +1196,7 @@ export const useBuild = (): IUseBuild => {
     pasteComponent,
     addBuiltinComponent,
     editComponent,
+    editSelectedComponent,
     setCustomStyle,
     setCustomStyles,
     setComponentCustomStyle,

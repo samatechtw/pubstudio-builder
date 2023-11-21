@@ -72,9 +72,12 @@ onUnmounted(() => {
 })
 </script>
 
-<style lang="postcss" scoped>
+<style lang="postcss">
 html {
   background-color: black;
+}
+.pm-p {
+  min-height: 18.69px;
 }
 .preview-content {
   width: 100%;
