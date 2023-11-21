@@ -57,7 +57,7 @@ const props = defineProps<{
 const { component } = toRefs(props)
 
 const { t } = useI18n()
-const { editComponent, editor } = useBuild()
+const { editSelectedComponent, editor } = useBuild()
 
 const contentInfo = computed(() => {
   return component.value.children?.length ? t('build.content_info') : undefined
@@ -68,7 +68,7 @@ const editingContent = computed(() => {
 })
 
 const setContent = (value: string | undefined) => {
-  editComponent({ content: value })
+  editSelectedComponent({ content: value })
   setComponentTabState(editor.value, undefined)
 }
 
@@ -93,16 +93,16 @@ const editName = () => {
 }
 
 const setName = (value: string | undefined) => {
-  editComponent({ name: value })
+  editSelectedComponent({ name: value })
   setComponentTabState(editor.value, undefined)
 }
 
 const setTag = (value: Tag | undefined) => {
-  editComponent({ tag: value })
+  editSelectedComponent({ tag: value })
 }
 
 const setRole = (value: AriaRole | undefined) => {
-  editComponent({ role: value })
+  editSelectedComponent({ role: value })
 }
 </script>
 

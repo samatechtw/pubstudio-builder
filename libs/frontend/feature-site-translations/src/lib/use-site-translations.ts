@@ -77,7 +77,7 @@ export const useSiteTranslations = (): ISiteTranslationsFeature => {
 
   const confirmAddLanguage = () => {
     if (newLanguage.value && !site.value.context.i18n[newLanguage.value]) {
-      setTranslations(newLanguage.value, {}, false)
+      setTranslations({ code: newLanguage.value, translations: {} })
     }
     newLanguage.value = undefined
     addLanguage.value = false
@@ -129,7 +129,12 @@ export const useSiteTranslations = (): ISiteTranslationsFeature => {
     if (edit.key !== edit.originalKey) {
       updates[edit.originalKey ?? ''] = undefined
     }
-    setTranslations(getActiveI18n(), updates, true)
+    setTranslations({
+      code: getActiveI18n(),
+      translations: updates,
+      replace: true,
+      forceSave: true,
+    })
     editTranslation.value = undefined
     editorView?.destroy()
     editorView = undefined
@@ -164,7 +169,7 @@ export const useSiteTranslations = (): ISiteTranslationsFeature => {
     const key = confirmDeleteTranslation.value
     if (key !== undefined) {
       const code = getActiveI18n()
-      setTranslations(code, { [key]: undefined }, false)
+      setTranslations({ code, translations: { [key]: undefined }, replace: false })
       confirmDeleteTranslation.value = undefined
     }
   }

@@ -8,7 +8,7 @@ import { undoCommand } from './undo-command'
 
 export interface IUseCommand {
   pushCommand: <Data>(type: CommandType, data: Data) => void
-  replaceLastCommand: <Data>(type: CommandType, data: Data) => void
+  replaceLastCommand: <Data>(type: CommandType, data: Data, save?: boolean) => void
   mergeLastCommand: (commands: ICommand[]) => void
   getLastCommand: () => ICommand | undefined
   undoCommand: (context: ISite, command: ICommand) => void
@@ -49,10 +49,13 @@ export const useCommand = (): IUseCommand => {
   }
 
   // Applies a command and replaces the last command on the command stack
-  const replaceLastCommand = <Data>(type: CommandType, data: Data) => {
+  const replaceLastCommand = <Data>(type: CommandType, data: Data, save?: boolean) => {
     const history = site.value.history
     const command = applyCommand(site.value, type, data)
     history.back[history.back.length - 1] = command
+    if (save) {
+      siteStore.value?.save(site.value)
+    }
   }
 
   // Groups a list of commands with the previous command

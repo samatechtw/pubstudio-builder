@@ -107,7 +107,7 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
       }
       dirty.value = dirtyDefault()
       if (clearTimer) {
-        // `clearTimeout` is not being called here because we want to avoid canceling any queued updates
+        // `clearTimeout` is not called here because we want to avoid canceling any queued updates
         // when the previous update has completed.
         saveTimer = undefined
       }
