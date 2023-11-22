@@ -36,7 +36,11 @@ const emit = defineEmits<{
 
 const newVal = ref(modelValue.value)
 
-const multiselectRef = ref(null)
+const multiselectRef = ref()
 
-defineExpose({ multiselectRef })
+const toggleDropdown = () => {
+  multiselectRef.value?.toggleDropdown()
+}
+
+defineExpose({ multiselectRef, toggleDropdown })
 </script>

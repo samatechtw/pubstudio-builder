@@ -1,5 +1,5 @@
 <template>
-  <div class="style-menu-edit">
+  <div class="style-menu-edit" @keydown.stop.prevent="keydown">
     <MenuRow
       :label="t('name')"
       :value="editingStyle.name"
@@ -22,8 +22,10 @@
       :focusProp="!entry.property"
       class="menu-row"
       @edit="editStyle"
-      @update="updateStyle(entry.property, $event)"
+      @update="updateEditData(entry.property, $event)"
+      @save="saveStyle(entry.property, $event)"
       @remove="removeStyle(entry.property)"
+      @escape="cancelEdit(entry.property, $event)"
     />
     <ErrorMessage :error="styleError" />
     <div class="styles-actions">
@@ -68,7 +70,7 @@ const {
   newEditingStyleProp,
   updateEditingStyleProp,
   removeEditingStyleProp,
-  saveStyle,
+  saveStyle: saveReusableStyle,
 } = useReusableStyleMenu()
 
 const { site, editor, currentPseudoClass } = useBuild()
@@ -77,11 +79,21 @@ const editing = (propName: string) => {
   return editor.value?.componentTab.editStyle === propName
 }
 
+const cancelEdit = (property: Css, originalStyle: IStyleEntry) => {
+  updateEditingStyleProp(property, originalStyle)
+  setComponentEditStyle(editor.value, undefined)
+}
+
 const editStyle = (propName: string | undefined) => {
   setComponentEditStyle(editor.value, propName)
 }
 
-const updateStyle = (property: Css, entry: IStyleEntry) => {
+const updateEditData = (property: Css, entry: IStyleEntry) => {
+  updateEditingStyleProp(property, entry)
+  setComponentEditStyle(editor.value, entry.property)
+}
+
+const saveStyle = (property: Css, entry: IStyleEntry) => {
   updateEditingStyleProp(property, entry)
   setComponentEditStyle(editor.value, undefined)
 }
@@ -108,7 +120,7 @@ const validateAndSave = () => {
     validateCssValue(site.value.context, style.property, style.value),
   )
   if (allValuesValid) {
-    saveStyle()
+    saveReusableStyle()
   }
 }
 

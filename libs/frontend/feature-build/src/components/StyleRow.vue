@@ -2,15 +2,16 @@
   <div v-if="editing" class="style-row">
     <div class="label">
       <StyleProperty
-        :modelValue="model.property"
+        :modelValue="newStyle.property"
         class="property-multiselect"
         :openInitial="focusProp"
         @update:modelValue="updateProperty"
-        @keydown.enter="updateStyle"
+        @keydown.enter="updateProperty"
       />
       <StyleValue
         v-if="valueOptions"
-        :modelValue="model.value"
+        ref="valueSelectRef"
+        :modelValue="newStyle.value"
         class="value-multiselect"
         :options="valueOptions"
         @update:modelValue="updateValue"
@@ -18,13 +19,13 @@
       <PSInput
         v-else
         ref="valueInputRef"
-        :modelValue="model.value"
+        :modelValue="newStyle.value"
         class="value-input"
         :placeholder="t('value')"
         :isError="!!valueErrorMessage"
         @update:modelValue="updateValue"
         @keydown.enter="updateStyle"
-        @keyup.esc="$event.srcElement.blur()"
+        @keyup.esc="escapePressed"
       />
     </div>
     <div class="item">
@@ -37,7 +38,7 @@
       {{ propertyText }}
     </div>
     <div class="value-preview" :class="{ error, ['value-inherited']: inheritedFrom }">
-      {{ model.value }}
+      {{ style?.value }}
     </div>
     <Edit class="edit-icon" @click="edit" />
     <Minus v-if="!inheritedFrom" class="item-delete" @click.stop="removeStyle" />
@@ -66,34 +67,38 @@ const { site } = useBuild()
 const props = withDefaults(
   defineProps<{
     editing?: boolean
-    immediateUpdate?: boolean
     style?: IStyleProp
     error?: boolean
     inheritedFrom?: string
-    modelValue?: IStyleEntry
     focusProp?: boolean
   }>(),
   {
-    immediateUpdate: false,
     style: undefined,
     inheritedFrom: undefined,
-    modelValue: undefined,
   },
 )
-const { focusProp, editing, immediateUpdate, style, inheritedFrom, modelValue } =
-  toRefs(props)
+const { focusProp, editing, style, inheritedFrom } = toRefs(props)
 
 const emit = defineEmits<{
   (e: 'edit', propName: string): void
   (e: 'update', newStyle: IStyleEntry): void
+  (e: 'save', newStyle: IStyleEntry): void
+  (e: 'escape', originalStyle: IStyleEntry): void
   (e: 'remove'): void
-  (e: 'update:modelValue', newStyle: IStyleEntry): void
 }>()
 
 const valueInputRef = ref()
+const valueSelectRef = ref()
 const newStyle = ref<IStyleEntry>(propStyleOrNewStyle())
+let originalStyle = propStyleOrNewStyle()
 
-const valueOptions = computed(() => cssValues.get(model.value.property))
+const valueOptions = computed(() => cssValues.get(newStyle.value.property))
+
+const escapePressed = (event: KeyboardEvent) => {
+  const el = event.target as HTMLElement | undefined
+  el?.blur()
+  emit('escape', originalStyle)
+}
 
 function propStyleOrNewStyle(): IStyleEntry {
   if (style?.value) {
@@ -107,46 +112,16 @@ function propStyleOrNewStyle(): IStyleEntry {
   }
 }
 
-// In reusable styles menu, we want to save the pending values when the save button of reusable style
-// is clicked, whether the user has saved the edited style entry or not.
-// So both `modelValue` and `newStyle` are declared here for controlled and uncontrolled behavior,
-// respectively.
-// This means when editing a style entry, `modelValue` should be updated by emitting `update:modelValue`
-// event, if it's present. Otherwise, update `newStyle`.
-const model = computed(() => modelValue.value ?? newStyle.value)
-
 const propertyText = computed(() => {
-  if (model.value.pseudoClass === CssPseudoClass.Default) {
-    return model.value.property
+  if (newStyle.value.pseudoClass === CssPseudoClass.Default) {
+    return newStyle.value.property
   } else {
-    return `${model.value.pseudoClass} ${model.value.property}`
+    return `${newStyle.value.pseudoClass} ${newStyle.value.property}`
   }
 })
 
 const focusValue = async () => {
   await nextTick()
-  // TODO -- look into why nextTick isn't enough here
-  setTimeout(() => valueInputRef.value?.inputRef.focus(), 1)
-}
-
-const edit = async () => {
-  newStyle.value = propStyleOrNewStyle()
-  emit('edit', model.value.property)
-  if (!focusProp.value) {
-    focusValue()
-  }
-}
-
-const updateProperty = (property: Css) => {
-  if (modelValue.value) {
-    const updatedEntry = {
-      ...modelValue.value,
-      property,
-    }
-    emit('update:modelValue', updatedEntry)
-  } else {
-    newStyle.value.property = property
-  }
   // TODO -- decide if/how to autofocus value multiselect
   if (valueOptions.value) {
     try {
@@ -154,15 +129,32 @@ const updateProperty = (property: Css) => {
     } catch (_e) {
       //
     }
-  }
-  focusValue()
-  if (immediateUpdate.value) {
-    updateStyle()
+    if (!newStyle.value.value) {
+      setTimeout(() => valueSelectRef.value?.toggleDropdown(), 1)
+    }
+  } else {
+    // TODO -- look into why nextTick isn't enough here
+    setTimeout(() => valueInputRef.value?.inputRef.focus(), 1)
   }
 }
 
+const edit = async () => {
+  newStyle.value = propStyleOrNewStyle()
+  originalStyle = propStyleOrNewStyle()
+  emit('edit', newStyle.value.property)
+  if (!focusProp.value) {
+    focusValue()
+  }
+}
+
+const updateProperty = (property: Css) => {
+  newStyle.value.property = property
+  emit('update', newStyle.value)
+  focusValue()
+}
+
 const isValueValid = computed(() =>
-  validateCssValue(site.value.context, model.value.property, model.value.value),
+  validateCssValue(site.value.context, newStyle.value.property, newStyle.value.value),
 )
 
 const valueErrorMessage = computed(() => {
@@ -174,25 +166,13 @@ const valueErrorMessage = computed(() => {
 })
 
 const updateValue = (value: string) => {
-  if (modelValue.value) {
-    if (validateCssValue(site.value.context, modelValue.value.property, value)) {
-      const updatedEntry = {
-        ...modelValue.value,
-        value,
-      }
-      emit('update:modelValue', updatedEntry)
-    }
-  } else {
-    newStyle.value.value = value
-  }
-  if (immediateUpdate.value) {
-    updateStyle()
-  }
+  newStyle.value.value = value
+  emit('update', newStyle.value)
 }
 
 const updateStyle = () => {
-  if (model.value.property && isValueValid.value) {
-    emit('update', model.value)
+  if (newStyle.value.property && isValueValid.value) {
+    emit('save', newStyle.value)
   }
 }
 

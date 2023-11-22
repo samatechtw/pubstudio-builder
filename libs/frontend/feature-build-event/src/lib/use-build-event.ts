@@ -158,8 +158,9 @@ export const useBuildEvent = () => {
   }
 
   const pressEscape = () => {
-    if (editor.value?.editBehavior) {
-      // Handled directly in `BehaviorModal.vue`'s modal widget
+    if (editor.value?.editBehavior || editor.value?.translations) {
+      // Handled directly in `BehaviorModal.vue` or `TranslationsModal.vue`
+      // This is also checked in `hotkeysDisabled`
     } else if (editor.value?.styleMenu) {
       setStyleToolbarMenu(editor.value, undefined)
     } else if (editor.value?.buildSubmenu) {

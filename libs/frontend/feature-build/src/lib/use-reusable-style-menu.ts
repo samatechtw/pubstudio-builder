@@ -14,7 +14,7 @@ import {
   IStyleEntry,
   StyleSourceType,
 } from '@pubstudio/shared/type-site'
-import { computed, ComputedRef, Ref, ref, toRaw } from 'vue'
+import { computed, ComputedRef, Ref, ref, toRaw, watch } from 'vue'
 import { useBuild } from './use-build'
 
 export interface IUseStyleMenuFeature {
@@ -62,9 +62,7 @@ export const useReusableStyleMenu = (): IUseStyleMenuFeature => {
   })
 
   const clearEditingState = () => {
-    Object.assign(editingStyle, emptyStyle())
-    styleError.value = undefined
-    editing.value = false
+    resetStyleMenu()
   }
 
   const newStyle = (source?: IComponent) => {
@@ -157,6 +155,7 @@ export const useReusableStyleMenu = (): IUseStyleMenuFeature => {
   }
 
   const updateEditingStyleProp = (oldProperty: Css, newEntry: IStyleEntry) => {
+    styleError.value = undefined
     const rawStyle = getActiveRawStyle()
     if (oldProperty !== newEntry.property) {
       delete rawStyle[oldProperty]

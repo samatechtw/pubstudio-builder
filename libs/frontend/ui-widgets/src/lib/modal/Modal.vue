@@ -12,7 +12,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, onUnmounted, toRefs, watch } from 'vue'
+import { onMounted, onUnmounted, ref, toRefs, watch } from 'vue'
 import ModalClose from './ModalClose.vue'
 
 const props = withDefaults(
@@ -33,6 +33,8 @@ const emit = defineEmits<{
   (e: 'cancel'): void
 }>()
 
+const listenersActive = ref(false)
+
 function clickOutside(e: Event) {
   if (
     e.target &&
@@ -50,29 +52,28 @@ function escape(e: KeyboardEvent) {
   }
 }
 
-watch(
-  () => show,
-  (show) => {
-    if (show?.value) {
-      document.addEventListener('keydown', escape)
-      document.body.classList.add('noscroll')
-    } else {
-      document.removeEventListener('keydown', escape)
-      document.body.classList.remove('noscroll')
-    }
-  },
-)
-
-onMounted(() => {
-  if (show?.value) {
+const modalSetup = (show: boolean) => {
+  if (show === listenersActive.value) {
+    return
+  }
+  if (show) {
     document.addEventListener('keydown', escape)
     document.body.classList.add('noscroll')
+  } else {
+    document.removeEventListener('keydown', escape)
+    document.body.classList.remove('noscroll')
   }
+  listenersActive.value = show
+}
+
+watch(show, modalSetup)
+
+onMounted(() => {
+  modalSetup(show.value)
 })
 
 onUnmounted(() => {
-  document.removeEventListener('keydown', escape)
-  document.body.classList.remove('noscroll')
+  modalSetup(false)
 })
 </script>
 

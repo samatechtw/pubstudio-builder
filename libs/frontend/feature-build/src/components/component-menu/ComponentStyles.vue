@@ -27,7 +27,7 @@
         :editing="true"
         class="new-style menu-row"
         :focusProp="true"
-        @update="addStyle"
+        @save="addStyle"
         @remove="setEditStyle(undefined)"
       />
       <StyleRow
@@ -39,7 +39,7 @@
         :inheritedFrom="getInheritedFrom(entry)"
         class="menu-row"
         @edit="setEditStyle"
-        @update="updateStyle(entry, $event)"
+        @save="updateStyle(entry, $event)"
         @remove="removeStyle(entry)"
       />
     </div>
