@@ -1,10 +1,10 @@
 module.exports = {
-  extends: ['../../tools/web-site.eslintrc.js'],
+  extends: ['../../../tools/web.eslintrc.cjs'],
   rules: {
     'vue/multi-word-component-names': [
       'error',
       {
-        ignores: ['Info'],
+        ignores: [],
       },
     ],
   },

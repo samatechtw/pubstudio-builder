@@ -17,6 +17,7 @@ export interface IUseCommand {
   redoCommand: () => void
   redoN: (n: number) => void
   clearAll: () => void
+  clearPartial: (percent: number) => void
 }
 
 export const useCommand = (): IUseCommand => {
@@ -116,6 +117,18 @@ export const useCommand = (): IUseCommand => {
     siteStore.value?.save(site.value)
   }
 
+  // Clear a percentage of undo/redo history
+  // `percent` is a decimal number between 0 and 1
+  const clearPartial = (percent: number) => {
+    const back = site.value.history.back
+    const clearCount = Math.floor(back.length * percent)
+    if (clearCount < back.length) {
+      site.value.history.back = back.slice(0, -1 * clearCount)
+      console.log(`Cleared ${clearCount} items from history`)
+      siteStore.value?.save(site.value)
+    }
+  }
+
   return {
     pushCommand,
     replaceLastCommand,
@@ -127,5 +140,6 @@ export const useCommand = (): IUseCommand => {
     redoCommand,
     redoN,
     clearAll,
+    clearPartial,
   }
 }

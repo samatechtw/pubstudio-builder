@@ -9,7 +9,7 @@
       "outputs": ["{options.outputFile}"],
       "options": {
         "lintFilePatterns": ["libs/frontend/ui-widgets/**/*.ts"],
-        "eslintConfig": "libs/frontend/ui-widgets/.eslintrc.js"
+        "eslintConfig": "libs/frontend/ui-widgets/.eslintrc.cjs"
       }
     }
   },

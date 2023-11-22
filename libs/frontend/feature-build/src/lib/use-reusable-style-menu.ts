@@ -14,7 +14,7 @@ import {
   IStyleEntry,
   StyleSourceType,
 } from '@pubstudio/shared/type-site'
-import { computed, ComputedRef, Ref, ref, toRaw, watch } from 'vue'
+import { computed, ComputedRef, Ref, ref, toRaw } from 'vue'
 import { useBuild } from './use-build'
 
 export interface IUseStyleMenuFeature {
