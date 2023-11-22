@@ -3,6 +3,7 @@ import {
   FetchRequestConfig,
   IJsonObject,
   RequestInterceptor,
+  ResponseInterceptor,
 } from '@sampullman/fetch-api'
 import { ApiResponse } from './api-response'
 import { transformRequestData } from './api-transforms'
@@ -28,7 +29,9 @@ export class BasicFetchApi extends FetchApi<ApiResponse> {
     const responseInterceptors = [
       ...(options.responseInterceptors ?? []),
       ...defaultResponseInterceptors,
-    ]
+      // TODO -- figure out why Jest suddenly requires this after packages updates
+      // Consider upgrading to Vitest
+    ] as unknown as ResponseInterceptor<ApiResponse>[]
     super({
       ...options,
       responseInterceptors,

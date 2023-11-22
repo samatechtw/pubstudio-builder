@@ -32,7 +32,7 @@ export const plainResponseInterceptors = [
     if (status === 400 || status === 404) {
       throw data
     }
-    const apiRes = res as ApiResponse
+    const apiRes = res as unknown as ApiResponse
     apiRes.data = data
     return apiRes
   },
