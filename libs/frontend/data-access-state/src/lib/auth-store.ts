@@ -1,4 +1,4 @@
-import jwtDecode, { JwtPayload } from 'jwt-decode'
+import { jwtDecode, JwtPayload } from 'jwt-decode'
 import { LocalStoragePlugin, useModule } from '@samatech/vue-store'
 
 interface PSJwt extends JwtPayload {
