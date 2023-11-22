@@ -33,7 +33,7 @@ COPY libs/frontend ./libs/frontend
 COPY apps/builder-demo/*.json ./apps/builder-demo/
 COPY apps/builder-demo/index.html ./apps/builder-demo/
 COPY apps/builder-demo/vite.config.ts ./apps/builder-demo/
-COPY apps/builder-demo/postcss.config.js ./apps/builder-demo/
+COPY apps/builder-demo/postcss.config.mjs ./apps/builder-demo/
 COPY apps/builder-demo/src ./apps/builder-demo/src
 COPY tools/nginx nginx
 
