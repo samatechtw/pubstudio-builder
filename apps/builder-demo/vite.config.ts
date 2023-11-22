@@ -21,7 +21,12 @@ export default defineConfig({
       ...tsconfigBaseAliases(__dirname),
     },
   },
-  build: appConfigBuild,
+  build: {
+    ...appConfigBuild,
+    rollupOptions: {
+      external: ['vue-i18n'],
+    },
+  },
   server: appConfigServer,
   publicDir: resolve('./src/public'),
   optimizeDeps: {
