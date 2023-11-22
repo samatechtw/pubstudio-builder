@@ -9,7 +9,7 @@
       "outputs": ["{options.outputFile}"],
       "options": {
         "lintFilePatterns": ["libs/frontend/feature-site-assets/**/*.ts"],
-        "eslintConfig": "libs/frontend/feature-site-assets/.eslintrc.js"
+        "eslintConfig": "libs/frontend/feature-site-assets/.eslintrc.cjs"
       }
     },
     "test": {

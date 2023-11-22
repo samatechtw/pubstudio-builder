@@ -1,7 +1,7 @@
 import Vue from '@vitejs/plugin-vue'
 import { tsconfigBaseAliases } from 'nx-vue3-vite'
 import path from 'path'
-import { BuildOptions, defineConfig, splitVendorChunkPlugin } from 'vite'
+import { defineConfig, splitVendorChunkPlugin } from 'vite'
 // TODO -- is it possible to get tsconfig paths to work in vite.config.ts?
 // eslint-disable-next-line @nrwl/nx/enforce-module-boundaries
 import {
