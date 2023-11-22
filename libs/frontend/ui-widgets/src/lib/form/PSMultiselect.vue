@@ -1,5 +1,6 @@
 <template>
   <div
+    ref="multiselectRef"
     class="ps-multiselect"
     :class="{ disabled }"
     :data-toggle-id="dataToggleId"
@@ -187,6 +188,8 @@ const search = ref('')
 const searchActive = ref(false)
 const searchRef = ref()
 
+const multiselectRef = ref()
+
 const {
   itemRef: tooltipAnchorRef,
   tooltipMouseEnter,
@@ -313,6 +316,8 @@ onMounted(() => {
     toggleDropdown()
   }
 })
+
+defineExpose({ multiselectRef, toggleDropdown })
 </script>
 
 <style lang="postcss" scoped>

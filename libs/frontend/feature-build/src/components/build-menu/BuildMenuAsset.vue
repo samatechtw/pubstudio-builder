@@ -114,6 +114,7 @@ const dropUploadImage = (e: Event) => {
   padding-top: 32px;
   background-color: white;
   align-items: center;
+  overflow-y: auto;
   > div:not(:first-child) {
     margin-top: 4px;
   }

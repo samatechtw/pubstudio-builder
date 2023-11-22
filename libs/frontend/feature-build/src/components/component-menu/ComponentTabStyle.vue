@@ -1,5 +1,5 @@
 <template>
-  <div class="component-style">
+  <div class="component-tab-style">
     <ComponentStyles />
     <ComponentChildStyles v-if="!!component.children?.length" :component="component" />
     <ComponentMenuMixins :mixinIds="component.style.mixins ?? []" />
@@ -20,7 +20,7 @@ const { component } = toRefs(props)
 </script>
 
 <style lang="postcss" scoped>
-.component-styles {
+.component-tab-style {
   width: 100%;
 }
 </style>

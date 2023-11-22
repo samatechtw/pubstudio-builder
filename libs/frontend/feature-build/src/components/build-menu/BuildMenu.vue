@@ -150,6 +150,7 @@ const toggleSubMenu = (newSubmenu: BuildSubmenu) => {
   width: $build-menu-width;
   padding-bottom: 8px;
   overflow: visible;
+  overflow-y: scroll;
   align-items: center;
   z-index: 2;
   > div {
