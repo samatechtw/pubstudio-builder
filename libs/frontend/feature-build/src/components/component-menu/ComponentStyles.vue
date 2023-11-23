@@ -109,9 +109,10 @@ const styleEntries = computed(() =>
 
 const menuSubTitle = computed(() => `(${currentPseudoClass.value})`)
 
-const styleRowCount = computed(() => {
+const styleRowHeight = computed(() => {
   const entries = 37 * styleEntries.value.length
-  const newStyle = showNewStyle.value ? 57 : 0
+  const editing = !!editor.value?.componentTab.editStyle
+  const newStyle = showNewStyle.value || editing ? 51 : 0
   return entries + newStyle
 })
 
@@ -229,7 +230,7 @@ const convertToMixin = () => {
 .style-rows {
   transition: max-height 0.2s;
   overflow: visible;
-  max-height: v-bind(styleRowCount + 'px');
+  max-height: v-bind(styleRowHeight + 'px');
   &.collapsed {
     max-height: 0;
     overflow: hidden;

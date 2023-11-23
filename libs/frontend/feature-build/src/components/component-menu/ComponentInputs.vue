@@ -17,7 +17,7 @@
       :key="input[0]"
       :property="input[0]"
       :value="(input[1] ?? '').toString()"
-      :argType="component.inputs?.[input[0]]?.type"
+      :argType="getArgType(input[0])"
       :tag="component.tag"
       :componentId="component.id"
       :showEditInput="input[0] in (component.inputs ?? {})"
@@ -61,15 +61,16 @@ import {
 import { RenderMode } from '@pubstudio/frontend/util-render'
 import { computeAttrsInputsMixins } from '@pubstudio/frontend/feature-render'
 import { Assets } from '@pubstudio/frontend/ui-widgets'
-import ComponentInputRow from './ComponentInputRow.vue'
-import { useBuild } from '../../lib/use-build'
-import EditMenuTitle from '../EditMenuTitle.vue'
 import { SelectAssetModal } from '@pubstudio/frontend/feature-site-assets'
-import { validateComponentArg } from '../../lib/validate-component-arg'
+import { urlFromAsset } from '@pubstudio/frontend/util-asset'
 import {
   AssetContentType,
   ISiteAssetViewModel,
 } from '@pubstudio/shared/type-api-platform-site-asset'
+import ComponentInputRow from './ComponentInputRow.vue'
+import { useBuild } from '../../lib/use-build'
+import EditMenuTitle from '../EditMenuTitle.vue'
+import { validateComponentArg } from '../../lib/validate-component-arg'
 
 const { t } = useI18n()
 const { site } = useBuild()
@@ -88,8 +89,12 @@ const emit = defineEmits<{
 const showSelectAssetModal = ref(false)
 
 const getError = (property: string, value: unknown): boolean => {
-  const argType = component.value.inputs?.[property]?.type as ComponentArgType
+  const argType = getArgType(property)
   return !validateComponentArg(argType, value)
+}
+
+const getArgType = (property: string): ComponentArgType => {
+  return component.value.inputs?.[property]?.type ?? ComponentArgPrimitive.String
 }
 
 const inputArray = computed(() => {
@@ -110,7 +115,7 @@ const isImgSrcInput = (property: string) => {
 
 const onImageAssetSelected = (asset: ISiteAssetViewModel) => {
   showSelectAssetModal.value = false
-  setInput('src', asset.url)
+  setInput('src', urlFromAsset(asset))
 }
 </script>
 
