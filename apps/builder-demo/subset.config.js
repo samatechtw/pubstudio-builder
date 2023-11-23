@@ -3,7 +3,7 @@ Control which npm packages from the root package.json are included app Dockerfil
 See tools/scripts/package-subset.js
 */
 
-module.exports = {
+export default {
   'builder-demo': {
     include: [
       // dependencies
