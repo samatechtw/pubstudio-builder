@@ -7,8 +7,8 @@
 
 <script lang="ts" setup>
 import { onMounted, ref, toRefs, watch } from 'vue'
+import { IRgba } from '@pubstudio/frontend/util-gradient'
 import { createAlphaSquare, createLinearGradient } from '../lib/color-picker-util'
-import { IRgba } from '../lib/i-rgba'
 
 const props = withDefaults(
   defineProps<{

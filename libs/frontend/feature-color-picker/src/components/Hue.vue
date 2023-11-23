@@ -7,8 +7,8 @@
 
 <script lang="ts" setup>
 import { onMounted, ref, toRefs } from 'vue'
+import { IRgba } from '@pubstudio/frontend/util-gradient'
 import { IHsv } from '../lib/i-hsv'
-import { IRgba } from '../lib/i-rgba'
 
 const props = withDefaults(
   defineProps<{

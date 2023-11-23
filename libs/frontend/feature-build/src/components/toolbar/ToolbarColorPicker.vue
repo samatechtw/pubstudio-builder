@@ -8,8 +8,9 @@
       :color="color"
       :gradient="gradient"
       :selectedThemeColors="selectedThemeColors"
+      :resolveThemeVar="resolveThemeVar"
       class="font-color"
-      @selectColor="emit('selectColor', $event.rgba)"
+      @selectColor="emit('selectColor', $event)"
       @applyGradient="emit('applyGradient', $event)"
       @click.stop
     />
@@ -17,9 +18,18 @@
 </template>
 
 <script lang="ts" setup>
-import { ColorPicker, IRgba } from '@pubstudio/frontend/feature-color-picker'
+import { ColorPicker, IPickerColor } from '@pubstudio/frontend/feature-color-picker'
 import { IThemeVariable } from '@pubstudio/shared/type-site'
-import ToolbarItem from './ToolbarItem.vue'
+import { IThemedGradient } from '@pubstudio/frontend/util-gradient'
+import { resolveThemeVariables } from '@pubstudio/frontend/util-builtin'
+import { ToolbarItem } from '@pubstudio/frontend/ui-widgets'
+import { useBuild } from '../../lib/use-build'
+
+const { site } = useBuild()
+
+const resolveThemeVar = (themeVar: string): string | undefined => {
+  return resolveThemeVariables(site.value.context, themeVar)
+}
 
 withDefaults(
   defineProps<{
@@ -38,7 +48,7 @@ withDefaults(
 )
 const emit = defineEmits<{
   (e: 'click', event: Event): void
-  (e: 'selectColor', color: IRgba): void
-  (e: 'applyGradient', gradient: string): void
+  (e: 'selectColor', color: IPickerColor): void
+  (e: 'applyGradient', gradient: IThemedGradient): void
 }>()
 </script>
