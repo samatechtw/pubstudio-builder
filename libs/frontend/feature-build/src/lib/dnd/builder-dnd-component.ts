@@ -42,32 +42,23 @@ const renderImageHover = (
 
   let [width, height] = ['', '']
 
-  const {
-    width: styleWidth,
-    height: styleHeight,
-    margin,
-  } = findStyles(
-    [Css.Width, Css.Height, Css.Margin],
+  const { margin } = findStyles(
+    [Css.Margin],
     site,
     component,
     descSortedBreakpoints.value,
     activeBreakpoint.value,
   )
 
-  if (styleWidth !== '100%' || styleHeight !== '100%') {
-    width = styleWidth ?? ''
-    height = styleHeight ?? ''
-  } else {
-    const { width: rectWidth = 0, height: rectHeight = 0 } =
-      imgElement?.getBoundingClientRect() ?? {}
+  const { width: rectWidth = 0, height: rectHeight = 0 } =
+    imgElement?.getBoundingClientRect() ?? {}
 
-    const { builderScale = 1 } = site.editor ?? {}
-    const unscaledWidth = Math.floor(rectWidth / builderScale)
-    const unscaledHeight = Math.floor(rectHeight / builderScale)
+  const { builderScale = 1 } = site.editor ?? {}
+  const unscaledWidth = Math.floor(rectWidth / builderScale)
+  const unscaledHeight = Math.floor(rectHeight / builderScale)
 
-    width = `${unscaledWidth}px`
-    height = `${unscaledHeight}px`
-  }
+  width = `${unscaledWidth}px`
+  height = `${unscaledHeight}px`
 
   let hoverWrapClass = 'hover hover-wrap'
   let imgStyles: IRawStyle | undefined
@@ -86,7 +77,12 @@ const renderImageHover = (
   // Pass the margin of img to the wrapper element, and set the margin of the rendered img
   // to 0 during hover to avoid shifting issue.
   const imgStyleProp = structuredClone(props.style ?? {}) as Record<string, unknown>
-  imgStyleProp['margin'] = '0'
+  // Set the width&height of <img> to 100% because the width&height of the hover wrap (parent) is defined.
+  // In HTML, if the width or height of the parent of <img> is a length value (i.e. 100%, 100px, 1rem, etc.),
+  // the % in the dimensions of <img> will be calculated based on the size of its parent element.
+  imgStyleProp.width = '100%'
+  imgStyleProp.height = '100%'
+  imgStyleProp.margin = '0'
 
   const img = h(component.tag as string, {
     ...props,
@@ -236,7 +232,12 @@ export const BuilderDndComponent = defineComponent({
       const componentClass = (propsContent.props.class ?? []) as string[]
 
       // Img can't contain divs, so add a wrapper for the hover UI
-      if (tag === Tag.Img && componentClass.includes('hover')) {
+      if (
+        tag === Tag.Img &&
+        componentClass.includes('hover') &&
+        // Don't render hover wrap if the image is currently being resized
+        site.value.editor?.resizeData?.component.id !== component.value.id
+      ) {
         return renderImageHover(
           site.value,
           component.value,

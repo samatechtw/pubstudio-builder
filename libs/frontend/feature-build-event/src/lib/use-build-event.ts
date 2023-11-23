@@ -33,6 +33,7 @@ import {
   calcNextWidth,
   getHeightPxPerPercent,
   getWidthPxPerPercent,
+  isLengthValue,
 } from './util-resize'
 
 const clickEventType = document.ontouchstart !== null ? 'click' : 'touchend'
@@ -220,7 +221,8 @@ export const useBuildEvent = () => {
       // This is for elements that use an additional wrapper for hover edges, such as img.
       // Kebab case "component-id" will be converted to camel case "componentId".
       // See https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/dataset#name_conversion
-      resolveComponent(site.value.context, target?.dataset.componentId)
+      resolveComponent(site.value.context, target?.dataset.componentId) ??
+      editor?.resizeData?.component
     if (editor) {
       const data = editor.resizeData
       if (component && data) {
@@ -342,7 +344,12 @@ export const useBuildEvent = () => {
       const resizeCmpRect = resizeCmp.getBoundingClientRect()
       const parentRect = (resizeCmp.parentElement as HTMLElement).getBoundingClientRect()
 
-      const startHeight = initialHeightProp || `${resizeCmpRect.height}px`
+      let startHeight = initialHeightProp || `${resizeCmpRect.height}px`
+      if (!isLengthValue(startHeight)) {
+        // Use the current height (px) of the resized component as the inital height
+        startHeight = `${resizeCmpRect.height}px`
+      }
+
       let startWidth = initialWidthProp
       if (!startWidth) {
         const resizeCmpIsAbsolute =
@@ -354,6 +361,9 @@ export const useBuildEvent = () => {
         } else {
           startWidth = '100%'
         }
+      } else if (!isLengthValue(startWidth)) {
+        // Use the current width (px) of the resized component as the inital width
+        startWidth = `${resizeCmpRect.width}px`
       }
 
       const heightUnit = startHeight.replace(/[-\d.]/g, '') as CssUnit
