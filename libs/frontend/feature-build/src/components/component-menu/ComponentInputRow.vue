@@ -21,6 +21,7 @@
         {{ value }}
       </div>
       <Edit class="edit-icon" @click="edit" />
+      <slot />
       <Settings v-if="showEditInput" class="edit-icon" @click="emit('editInput')" />
     </template>
   </div>
@@ -106,6 +107,7 @@ const datalist = computed<IDatalistOption[] | undefined>(() => {
 .value-preview {
   @mixin truncate;
   @mixin text 14px;
+  flex-grow: 1;
 }
 
 .edit-icon {
