@@ -1,7 +1,7 @@
-const fs = require('fs')
-const path = require('path')
+import fs from 'fs'
+import path from 'path'
 
-const packageSubset = ({
+export const packageSubset = async ({
   target,
   subsetFile,
   packageSource,
@@ -32,11 +32,10 @@ const packageSubset = ({
   try {
     const subsetPath = path.resolve(subsetFile)
     checkParam(fs.existsSync(subsetPath), 'Subset file not found')
-
-    subset = require(subsetPath)
+    subset = (await import(subsetPath)).default
     checkParam(subset && subset[target], `Target ${target} not found in subset.config.js`)
   } catch (_e) {
-    errorExit(`Unable to resolve subset file: ${subsetFile}`)
+    onError(`Unable to resolve subset file: ${subsetFile}`)
   }
 
   let pkg
@@ -44,9 +43,10 @@ const packageSubset = ({
     checkParam(packageSource, 'Missing source package.json location')
     checkParam(packageDestination, 'Missing destination package.json location')
 
-    pkg = require(path.resolve(packageSource))
+    pkg = await import(path.resolve(packageSource), { assert: { type: 'json' } })
+    pkg = pkg.default
   } catch (_e) {
-    errorExit(`Unable to resolve source package.json: ${packageSource}`)
+    onError(`Unable to resolve source package.json: ${packageSource}`)
   }
 
   const { dependencies, devDependencies } = pkg
@@ -54,7 +54,9 @@ const packageSubset = ({
   const patch = subset[target].patch || {}
 
   // Delete scripts prepare section in the generated file
-  delete pkg.scripts.prepare
+  if (pkg.scripts.prepare) {
+    delete pkg.scripts.prepare
+  }
 
   if (dependencies) {
     pkg.dependencies = filterDeps(dependencies, include)
@@ -71,8 +73,6 @@ const packageSubset = ({
     fs.writeFileSync(destPath, JSON.stringify(pkg, null, 2))
     console.info(`Successfully wrote package subset to ${destPath}`)
   } catch (_e) {
-    errorExit('Failed to write to pkgDest')
+    onError('Failed to write to pkgDest')
   }
 }
-
-exports.packageSubset = packageSubset

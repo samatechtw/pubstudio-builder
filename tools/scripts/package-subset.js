@@ -1,5 +1,5 @@
 // Generate a filtered package.json according to rules in subset.config.js
-const { packageSubset } = require('./package-subset-module')
+import { packageSubset } from './package-subset-module.js'
 
 const usage = () => {
   console.info(`
@@ -37,7 +37,7 @@ const subsetFile = process.argv[3]
 const packageSource = process.argv[4]
 const packageDestination = process.argv[5]
 
-packageSubset({
+await packageSubset({
   target,
   subsetFile,
   packageSource,

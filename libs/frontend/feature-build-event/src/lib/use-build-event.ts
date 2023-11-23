@@ -346,7 +346,7 @@ export const useBuildEvent = () => {
 
       let startHeight = initialHeightProp || `${resizeCmpRect.height}px`
       if (!isLengthValue(startHeight)) {
-        // Use the current height (px) of the resized component as the inital height
+        // Use the current height (px) of the resized component as the initial height
         startHeight = `${resizeCmpRect.height}px`
       }
 
@@ -362,7 +362,7 @@ export const useBuildEvent = () => {
           startWidth = '100%'
         }
       } else if (!isLengthValue(startWidth)) {
-        // Use the current width (px) of the resized component as the inital width
+        // Use the current width (px) of the resized component as the initial width
         startWidth = `${resizeCmpRect.width}px`
       }
 
