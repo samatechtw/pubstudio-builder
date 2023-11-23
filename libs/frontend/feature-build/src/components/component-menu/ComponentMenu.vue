@@ -21,6 +21,7 @@
       <ComponentTabStyle :component="component" />
       <ComponentInputs
         :component="component"
+        :siteId="siteId"
         @setInput="setInputIs($event)"
         @showEditInput="setEditedInput($event)"
       />
@@ -71,6 +72,7 @@ const { editing: editingStyle } = useReusableStyleMenu()
 
 const props = defineProps<{
   component: IComponent
+  siteId: string
 }>()
 const { component } = toRefs(props)
 

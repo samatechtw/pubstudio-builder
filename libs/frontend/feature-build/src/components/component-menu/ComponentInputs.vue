@@ -24,6 +24,19 @@
       :error="getError(input[0], input[1])"
       @editInput="emit('showEditInput', (component.inputs ?? {})[input[0]])"
       @update="setInput(input[0], $event)"
+    >
+      <Assets
+        v-if="isImgSrcInput(input[0])"
+        class="edit-icon asset-icon"
+        @click="showSelectAssetModal = true"
+      />
+    </ComponentInputRow>
+    <SelectAssetModal
+      :show="showSelectAssetModal"
+      :initialSiteId="siteIdProp"
+      :contentTypes="[AssetContentType.Jpeg, AssetContentType.Png, AssetContentType.Gif]"
+      @cancel="showSelectAssetModal = false"
+      @select="onImageAssetSelected"
     />
   </div>
 </template>
@@ -36,33 +49,43 @@ export interface IInputUpdate {
 </script>
 
 <script lang="ts" setup>
-import { computed, toRefs } from 'vue'
+import { computed, ref, toRefs } from 'vue'
 import { useI18n } from 'vue-i18n'
 import {
   ComponentArgPrimitive,
   ComponentArgType,
   IComponent,
   IComponentInput,
+  Tag,
 } from '@pubstudio/shared/type-site'
 import { RenderMode } from '@pubstudio/frontend/util-render'
 import { computeAttrsInputsMixins } from '@pubstudio/frontend/feature-render'
+import { Assets } from '@pubstudio/frontend/ui-widgets'
 import ComponentInputRow from './ComponentInputRow.vue'
 import { useBuild } from '../../lib/use-build'
 import EditMenuTitle from '../EditMenuTitle.vue'
+import { SelectAssetModal } from '@pubstudio/frontend/feature-site-assets'
 import { validateComponentArg } from '../../lib/validate-component-arg'
+import {
+  AssetContentType,
+  ISiteAssetViewModel,
+} from '@pubstudio/shared/type-api-platform-site-asset'
 
 const { t } = useI18n()
 const { site } = useBuild()
 
 const props = defineProps<{
   component: IComponent
+  siteId: string
 }>()
-const { component } = toRefs(props)
+const { component, siteId: siteIdProp } = toRefs(props)
 
 const emit = defineEmits<{
   (e: 'setInput', data: IInputUpdate): void
   (e: 'showEditInput', input: IComponentInput | undefined): void
 }>()
+
+const showSelectAssetModal = ref(false)
 
 const getError = (property: string, value: unknown): boolean => {
   const argType = component.value.inputs?.[property]?.type as ComponentArgType
@@ -79,6 +102,15 @@ const inputArray = computed(() => {
 
 const setInput = (property: string, newValue: unknown) => {
   emit('setInput', { property, newValue })
+}
+
+const isImgSrcInput = (property: string) => {
+  return component.value.tag === Tag.Img && property === 'src'
+}
+
+const onImageAssetSelected = (asset: ISiteAssetViewModel) => {
+  showSelectAssetModal.value = false
+  setInput('src', asset.url)
 }
 </script>
 
