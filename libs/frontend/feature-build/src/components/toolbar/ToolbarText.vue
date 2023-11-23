@@ -18,8 +18,8 @@
       </ToolbarItem>
       <ToolbarColorPicker
         :tooltip="t('style.toolbar.font_color')"
-        :color="getStyleValue(Css.Color)"
-        :gradient="getStyleValue(Css.Background)"
+        :color="getRawStyle(Css.BackgroundColor)"
+        :gradient="getRawStyle(Css.Background)"
         :showPicker="showColorPicker"
         :selectedThemeColors="selectedThemeColors"
         @selectColor="setFontColor($event)"
@@ -46,18 +46,16 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import {
-  FontColor,
-  Italic,
-  ToolbarColorPicker,
-  ToolbarItem,
-  Underline,
-} from '@pubstudio/frontend/ui-widgets'
+import { FontColor, Italic, ToolbarItem, Underline } from '@pubstudio/frontend/ui-widgets'
 import { PSInput } from '@pubstudio/frontend/ui-widgets'
 import { useControlledClickaway } from '@pubstudio/frontend/util-clickaway'
-import { IRgba } from '@pubstudio/frontend/feature-color-picker'
+import { IPickerColor, colorToCssValue } from '@pubstudio/frontend/feature-color-picker'
 import { Css, StyleToolbarMenu } from '@pubstudio/shared/type-site'
-import { isTextGradient, parseGradientColors } from '@pubstudio/frontend/util-gradient'
+import {
+  IThemedGradient,
+  isTextGradient,
+  parseGradientColors,
+} from '@pubstudio/frontend/util-gradient'
 import { ICommand } from '@pubstudio/shared/type-command'
 import FontFamily from '../FontFamily.vue'
 import FontWeight from '../FontWeight.vue'
@@ -66,9 +64,11 @@ import { useBuild } from '../../lib/use-build'
 import { useThemeColors } from '../../lib/use-theme-colors'
 import { setStyleToolbarMenu } from '@pubstudio/frontend/feature-editor'
 import { useToolbarFontSize } from '../../lib/use-toolbar-font-size'
+import ToolbarColorPicker from './ToolbarColorPicker.vue'
 
 const { t } = useI18n()
-const { getStyleValue, setStyle, createSetComponentCustomStyleCommand } = useToolbar()
+const { getRawStyle, getStyleValue, setStyle, createSetComponentCustomStyleCommand } =
+  useToolbar()
 const { editor, pushGroupCommands } = useBuild()
 const { selectedThemeColors } = useThemeColors()
 
@@ -82,23 +82,20 @@ const { activate, deactivate } = useControlledClickaway(
   true,
 )
 
-const setFontColor = (c: IRgba) => {
+const setFontColor = (pickerColor: IPickerColor) => {
   const { selectedComponent } = editor.value ?? {}
 
   if (selectedComponent) {
-    const commands: ICommand[] = []
-    const color = c ? `rgba(${c.r},${c.g},${c.b},${c.a})` : undefined
-    const currentColor = getStyleValue(Css.Color)
+    const cmdList: (ICommand | undefined)[] = []
     const background = getStyleValue(Css.Background)
     const backgroundClip = getStyleValue(Css.WebkitBackgroundClip)
     const textFillColor = getStyleValue(Css.WebkitTextFillColor)
 
     const setColorCommand = createSetComponentCustomStyleCommand(
       Css.Color,
-      currentColor,
-      color,
+      colorToCssValue(pickerColor),
     )
-    commands.push(setColorCommand)
+    cmdList.push(setColorCommand)
 
     const textGradientApplied = isTextGradient(background, backgroundClip, textFillColor)
 
@@ -106,76 +103,66 @@ const setFontColor = (c: IRgba) => {
       // Remove text gradient (background) because text-color and text-gradient are mutually exclusive
       const removeBackgroundCommand = createSetComponentCustomStyleCommand(
         Css.Background,
-        background,
         undefined,
       )
 
       const removeBackgroundClipCommand = createSetComponentCustomStyleCommand(
         Css.WebkitBackgroundClip,
-        backgroundClip,
         undefined,
       )
 
       const removeTextFillColorCommand = createSetComponentCustomStyleCommand(
         Css.WebkitTextFillColor,
-        textFillColor,
         undefined,
       )
 
-      commands.push(
+      cmdList.push(
         removeBackgroundCommand,
         removeBackgroundClipCommand,
         removeTextFillColorCommand,
       )
     }
 
+    const commands = cmdList.filter((c) => !!c) as ICommand[]
     pushGroupCommands({ commands })
   }
 
   setStyleToolbarMenu(editor.value, undefined)
 }
 
-const setGradient = (gradient: string) => {
+const setGradient = (themedGradient: IThemedGradient) => {
+  const { raw, themed } = themedGradient
   const { selectedComponent } = editor.value ?? {}
 
   if (selectedComponent) {
-    const commands: ICommand[] = []
-    const currentColor = getStyleValue(Css.Color)
-    const background = getStyleValue(Css.Background)
-    const backgroundClip = getStyleValue(Css.WebkitBackgroundClip)
-    const textFillColor = getStyleValue(Css.WebkitTextFillColor)
-
-    if (currentColor) {
-      // Remove color from text because text-color and text-gradient are mutually exclusive
-      const removeColorCommand = createSetComponentCustomStyleCommand(
-        Css.Color,
-        currentColor,
-        undefined,
-      )
-      commands.push(removeColorCommand)
-    }
+    // Remove color from text because text-color and text-gradient are mutually exclusive
+    const removeColorCommand = createSetComponentCustomStyleCommand(Css.Color, undefined)
 
     const setBackgroundCommand = createSetComponentCustomStyleCommand(
       Css.Background,
-      background,
-      gradient,
+      themed ?? raw,
     )
 
     const setBackgroundClipCommand = createSetComponentCustomStyleCommand(
       Css.WebkitBackgroundClip,
-      backgroundClip,
       'text',
     )
 
     const setTextFillColorCommand = createSetComponentCustomStyleCommand(
       Css.WebkitTextFillColor,
-      textFillColor,
       'transparent',
     )
 
-    commands.push(setBackgroundCommand, setBackgroundClipCommand, setTextFillColorCommand)
+    const commands = [
+      removeColorCommand,
+      setBackgroundCommand,
+      setBackgroundClipCommand,
+      setTextFillColorCommand,
+    ].filter((c) => !!c) as ICommand[]
 
-    pushGroupCommands({ commands })
+    if (commands.length > 0) {
+      pushGroupCommands({ commands })
+    }
   }
 
   setStyleToolbarMenu(editor.value, undefined)

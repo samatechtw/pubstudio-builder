@@ -59,7 +59,7 @@
             :key="variable.key"
             class="theme-color-cell"
             :style="{ 'background-color': variable.value }"
-            @click="selectThemeColor(variable.value)"
+            @click="selectThemeColor(variable)"
           />
         </div>
         <div v-else class="theme-color-empty">
@@ -73,7 +73,7 @@
         :gradientType="gradientType"
         :gradientDegree="gradientDegree"
         :gradientColors="gradientColors"
-        :computedGradient="computedGradient"
+        :computedGradient="computedGradient.raw"
         :computedGradientForBar="computedGradientForBar"
         @select="selectGradientColor"
         @update:type="gradientType = $event"
@@ -92,6 +92,8 @@ import { computed, nextTick, onMounted, reactive, ref, toRefs, watch } from 'vue
 import { useI18n } from 'vue-i18n'
 import { IThemeVariable } from '@pubstudio/shared/type-site'
 import { Plus } from '@pubstudio/frontend/ui-widgets'
+import { IThemedGradient, ResolveThemeVarFn } from '@pubstudio/frontend/util-gradient'
+import { IRgba } from '@pubstudio/frontend/util-gradient'
 import Saturation from './Saturation.vue'
 import Hue from './Hue.vue'
 import Alpha from './Alpha.vue'
@@ -102,7 +104,6 @@ import Colors from './Colors.vue'
 import ColorPickerButton from './ColorPickerButton.vue'
 import { setColorValue, rgb2hex, colorCodeToRgbaString } from '../lib/color-picker-util'
 import { IPickerColor } from '../lib/i-picker-color'
-import { IRgba } from '../lib/i-rgba'
 import { IHsv } from '../lib/i-hsv'
 import { useGradient } from '../lib/use-gradient'
 
@@ -120,6 +121,7 @@ const props = withDefaults(
     gradient?: string
     theme?: string
     colorsDefault?: string[]
+    resolveThemeVar: ResolveThemeVarFn
     selectedThemeColors: IThemeVariable[]
   }>(),
   {
@@ -148,11 +150,11 @@ const props = withDefaults(
     ],
   },
 )
-const { color, gradient, theme } = toRefs(props)
+const { color, gradient, theme, resolveThemeVar } = toRefs(props)
 const emit = defineEmits<{
   (e: 'changeColor', color: IPickerColor): void
   (e: 'selectColor', color: IPickerColor): void
-  (e: 'applyGradient', gradient: string): void
+  (e: 'applyGradient', gradient: IThemedGradient): void
 }>()
 
 const modelRgba = ref('')
@@ -165,6 +167,7 @@ const c = reactive({
   h: 0,
   s: 0,
   v: 0,
+  themeVar: undefined,
 })
 const saturation = ref()
 const hue = ref()
@@ -185,6 +188,7 @@ const {
   deleteGradientColor,
 } = useGradient({
   gradient: gradient.value,
+  resolveThemeVar: resolveThemeVar.value,
 })
 
 const isGradient = computed(() => gradientColors.value.length > 1)
@@ -219,6 +223,7 @@ const colorEmit = () => ({
   rgba: rgba.value,
   hsv: hsv.value,
   hex: modelHex.value,
+  themeVar: c.themeVar,
 })
 
 watch(rgba, () => {
@@ -277,9 +282,9 @@ const setText = () => {
   modelHex.value = hexString.value
   modelRgba.value = rgbaStringShort.value
 }
-const selectColor = async (color: string) => {
+const selectColor = async (color: string, themeVar?: string) => {
   const { r, g, b, a, h, s, v } = setColorValue(color)
-  Object.assign(c, { r, g, b, a, h, s, v })
+  Object.assign(c, { r, g, b, a, h, s, v, themeVar })
   setText()
   await rerender()
 }
@@ -290,11 +295,11 @@ const selectGradientColor = async (index: number) => {
   selectedIndex.value = index
 }
 
-const selectThemeColor = async (value: string) => {
-  const rgba = colorCodeToRgbaString(value)
-  await selectColor(rgba)
+const selectThemeColor = async (themeVar: IThemeVariable) => {
+  const rgba = colorCodeToRgbaString(themeVar.value)
+  await selectColor(rgba, themeVar.key)
   if (isGradient.value) {
-    updateSelectedGradientColor(rgba)
+    updateSelectedGradientColor(rgba, themeVar.key)
   } else {
     emit('selectColor', colorEmit())
   }

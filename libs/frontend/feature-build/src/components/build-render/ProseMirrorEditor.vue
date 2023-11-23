@@ -3,6 +3,7 @@
 </template>
 
 <script lang="ts" setup>
+import { Plugin } from 'prosemirror-state'
 import { computed, onMounted, onBeforeUnmount, ref, toRefs, watch } from 'vue'
 import { Css, IComponent, IEditorContext } from '@pubstudio/shared/type-site'
 import { getProseMirrorContainerId } from '@pubstudio/frontend/feature-editor'
@@ -13,7 +14,7 @@ import {
   descSortedBreakpoints,
 } from '@pubstudio/frontend/feature-site-source'
 import { isTextGradient } from '@pubstudio/frontend/util-gradient'
-import { Plugin } from 'prosemirror-state'
+import { resolveThemeVariables } from '@pubstudio/frontend/util-builtin'
 import { createComponentEditorView } from '../../lib/create-editor-view'
 import { useBuild } from '../../lib/use-build'
 
@@ -70,7 +71,10 @@ const gradientColorStyle = computed(() => {
     activeBreakpoint.value,
   )
 
-  const background = gradientColorStyles[Css.Background]
+  const background = resolveThemeVariables(
+    site.value.context,
+    gradientColorStyles[Css.Background] ?? '',
+  )
   const backgroundClip = gradientColorStyles[Css.WebkitBackgroundClip]
   const textFillColor = gradientColorStyles[Css.WebkitTextFillColor]
 

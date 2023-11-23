@@ -2,18 +2,23 @@ import { activeBreakpoint } from '@pubstudio/frontend/feature-site-source'
 import { resolveThemeVariables } from '@pubstudio/frontend/util-builtin'
 import { CommandType, ICommand } from '@pubstudio/shared/type-command'
 import { ISetComponentCustomStyleData } from '@pubstudio/shared/type-command-data'
-import { Css, IRawStyleWithSource, IStyleEntry } from '@pubstudio/shared/type-site'
+import {
+  Css,
+  IRawStyleWithSource,
+  IStyleEntry,
+  StyleSourceType,
+} from '@pubstudio/shared/type-site'
 import { useBuild } from './use-build'
 
 export interface IUseToolbar {
+  getRawStyle(property: Css): string | undefined
   getStyleValue(property: Css): string | undefined
   getResolvedStyle(property: Css): IRawStyleWithSource | undefined
   setStyle(property: Css, value: string | undefined, replace?: boolean): void
   createSetComponentCustomStyleCommand(
     property: Css,
-    oldValue: string | undefined,
     newValue: string | undefined,
-  ): ICommand<ISetComponentCustomStyleData>
+  ): ICommand<ISetComponentCustomStyleData> | undefined
 }
 
 export const useToolbar = (): IUseToolbar => {
@@ -25,6 +30,10 @@ export const useToolbar = (): IUseToolbar => {
     removeComponentCustomStyle,
     setComponentCustomStyle,
   } = useBuild()
+
+  const getRawStyle = (property: Css): string | undefined => {
+    return selectedComponentFlattenedStyles.value[property]?.value ?? ''
+  }
 
   const getStyleValue = (property: Css): string | undefined => {
     const value = selectedComponentFlattenedStyles.value[property]?.value ?? ''
@@ -74,14 +83,22 @@ export const useToolbar = (): IUseToolbar => {
 
   const createSetComponentCustomStyleCommand = (
     property: Css,
-    oldValue: string | undefined,
     newValue: string | undefined,
-  ): ICommand<ISetComponentCustomStyleData> => {
+  ): ICommand<ISetComponentCustomStyleData> | undefined => {
     const { selectedComponent } = editor.value ?? {}
     if (!selectedComponent) {
       throw new Error(
         'Cannot create set component custom style command when no component is selected',
       )
+    }
+    const oldStyle = selectedComponentFlattenedStyles.value[property]
+    // Style inherited from mixin should not be set as oldStyle,
+    // otherwise undo will create a duplicate custom style that didn't exist before
+    const oldValue =
+      oldStyle?.sourceType === StyleSourceType.Custom ? oldStyle.value : undefined
+
+    if (!oldValue && !newValue) {
+      return undefined
     }
     const data: ISetComponentCustomStyleData = {
       breakpointId: activeBreakpoint.value.id,
@@ -108,6 +125,7 @@ export const useToolbar = (): IUseToolbar => {
   }
 
   return {
+    getRawStyle,
     getStyleValue,
     getResolvedStyle,
     setStyle,

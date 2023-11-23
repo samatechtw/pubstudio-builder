@@ -27,8 +27,8 @@
       <SizeDropdown />
       <ToolbarColorPicker
         :tooltip="t('style.toolbar.background_color')"
-        :color="getStyleValue(Css.BackgroundColor)"
-        :gradient="getStyleValue(Css.Background)"
+        :color="getRawStyle(Css.BackgroundColor)"
+        :gradient="getRawStyle(Css.Background)"
         :showPicker="showBackgroundPicker"
         :selectedThemeColors="selectedThemeColors"
         class="toolbar-menu"
@@ -57,47 +57,46 @@ import {
   FlexColumn,
   FlexWrap,
   ToolbarItem,
-  ToolbarColorPicker,
   ToolbarItemDropdown,
   IToolbarDropdownItem,
 } from '@pubstudio/frontend/ui-widgets'
-import { IRgba } from '@pubstudio/frontend/feature-color-picker'
+import { IPickerColor, colorToCssValue } from '@pubstudio/frontend/feature-color-picker'
 import {
   GradientTypeValues,
+  IThemedGradient,
   parseGradientColors,
 } from '@pubstudio/frontend/util-gradient'
 import { setStyleToolbarMenu } from '@pubstudio/frontend/feature-editor'
 import { useControlledClickaway } from '@pubstudio/frontend/util-clickaway'
 import { Css, StyleToolbarMenu } from '@pubstudio/shared/type-site'
+import { ICommand } from '@pubstudio/shared/type-command'
 import { useToolbar } from '../../lib/use-toolbar'
 import { useBuild } from '../../lib/use-build'
 import { useThemeColors } from '../../lib/use-theme-colors'
 import SizeDropdown from './SizeDropdown.vue'
-import { ICommand } from '@pubstudio/shared/type-command'
+import ToolbarColorPicker from './ToolbarColorPicker.vue'
 
 const { t } = useI18n()
 
-const { getStyleValue, setStyle, createSetComponentCustomStyleCommand } = useToolbar()
+const { getRawStyle, getStyleValue, setStyle, createSetComponentCustomStyleCommand } =
+  useToolbar()
 const { editor, pushGroupCommands } = useBuild()
 const { selectedThemeColors } = useThemeColors()
 
-const setBackgroundColor = (c: IRgba) => {
+const setBackgroundColor = (pickerColor: IPickerColor) => {
   const { selectedComponent } = editor.value ?? {}
 
   if (selectedComponent) {
-    const commands: ICommand[] = []
-    const color = c ? `rgba(${c.r},${c.g},${c.b},${c.a})` : undefined
+    const cmdList: (ICommand | undefined)[] = []
     const background = getStyleValue(Css.Background)
-    const backgroundColor = getStyleValue(Css.BackgroundColor)
     const backgroundClip = getStyleValue(Css.WebkitBackgroundClip)
     const textFillColor = getStyleValue(Css.WebkitTextFillColor)
 
     const setBackgroundColorCommand = createSetComponentCustomStyleCommand(
       Css.BackgroundColor,
-      backgroundColor,
-      color,
+      colorToCssValue(pickerColor),
     )
-    commands.push(setBackgroundColorCommand)
+    cmdList.push(setBackgroundColorCommand)
 
     const gradientBackgroundApplied = GradientTypeValues.some(
       (gradientType) => background?.startsWith(gradientType),
@@ -107,10 +106,9 @@ const setBackgroundColor = (c: IRgba) => {
       // Remove background because color-background and gradient-background are mutually exclusive
       const removeBackgroundCommand = createSetComponentCustomStyleCommand(
         Css.Background,
-        background,
         undefined,
       )
-      commands.push(removeBackgroundCommand)
+      cmdList.push(removeBackgroundCommand)
 
       const textGradientApplied =
         backgroundClip === 'text' && textFillColor === 'transparent'
@@ -120,48 +118,44 @@ const setBackgroundColor = (c: IRgba) => {
         // make the gradient be applied to text content instead of element background.
         const removeBackgroundClipCommand = createSetComponentCustomStyleCommand(
           Css.WebkitBackgroundClip,
-          backgroundClip,
           undefined,
         )
         const removeTextFillColorCommand = createSetComponentCustomStyleCommand(
           Css.WebkitTextFillColor,
-          textFillColor,
           undefined,
         )
-        commands.push(removeBackgroundClipCommand, removeTextFillColorCommand)
+        cmdList.push(removeBackgroundClipCommand, removeTextFillColorCommand)
       }
     }
 
+    const commands = cmdList.filter((c) => !!c) as ICommand[]
     pushGroupCommands({ commands })
   }
 
   setStyleToolbarMenu(editor.value, undefined)
 }
 
-const setGradientBackground = (gradient: string) => {
+const setGradientBackground = (themedGradient: IThemedGradient) => {
+  const { raw, themed } = themedGradient
   const { selectedComponent } = editor.value ?? {}
 
   if (selectedComponent) {
-    const commands: ICommand[] = []
-    const background = getStyleValue(Css.Background)
     const backgroundColor = getStyleValue(Css.BackgroundColor)
     const backgroundClip = getStyleValue(Css.WebkitBackgroundClip)
 
     const setBackgroundCommand = createSetComponentCustomStyleCommand(
       Css.Background,
-      background,
-      gradient,
+      themed ?? raw,
     )
-    commands.push(setBackgroundCommand)
+    const cmdList = [setBackgroundCommand]
 
     if (backgroundColor) {
       // Remove background-color because background and background-color are mutually exclusive
       const removeBackgroundColorCommand = createSetComponentCustomStyleCommand(
         Css.BackgroundColor,
-        backgroundColor,
         undefined,
       )
-      commands.push(removeBackgroundColorCommand)
+      cmdList.push(removeBackgroundColorCommand)
     }
 
     if (backgroundClip === 'text') {
@@ -169,12 +163,12 @@ const setGradientBackground = (gradient: string) => {
       // element background instead of text content.
       const removeBackgroundClipCommand = createSetComponentCustomStyleCommand(
         Css.WebkitBackgroundClip,
-        backgroundClip,
         undefined,
       )
-      commands.push(removeBackgroundClipCommand)
+      cmdList.push(removeBackgroundClipCommand)
     }
 
+    const commands = cmdList.filter((c) => !!c) as ICommand[]
     pushGroupCommands({ commands })
   }
 
