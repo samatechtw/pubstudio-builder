@@ -1,5 +1,5 @@
 <template>
-  <div class="style-menu-edit" @keydown.stop.prevent="keydown">
+  <div class="style-menu-edit" @keydown.esc.stop.prevent="escPress">
     <MenuRow
       :label="t('name')"
       :value="editingStyle.name"
@@ -63,6 +63,7 @@ import { useReusableStyleMenu } from '../lib/use-reusable-style-menu'
 const { t } = useI18n()
 
 const {
+  editing: editingMenu,
   editingStyle,
   editingStyleEntries,
   styleError,
@@ -77,6 +78,11 @@ const { site, editor, currentPseudoClass } = useBuild()
 
 const editing = (propName: string) => {
   return editor.value?.componentTab.editStyle === propName
+}
+
+const escPress = () => {
+  console.log('ESCCC')
+  editingMenu.value = false
 }
 
 const cancelEdit = (property: Css, originalStyle: IStyleEntry) => {
