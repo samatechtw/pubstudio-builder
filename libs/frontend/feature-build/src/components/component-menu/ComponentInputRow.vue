@@ -104,6 +104,10 @@ const datalist = computed<IDatalistOption[] | undefined>(() => {
 <style lang="postcss" scoped>
 @import '@theme/css/mixins.postcss';
 
+.label {
+  @mixin text 14px;
+}
+
 .value-preview {
   @mixin truncate;
   @mixin text 14px;

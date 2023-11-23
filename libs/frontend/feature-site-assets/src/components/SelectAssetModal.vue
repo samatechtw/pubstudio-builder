@@ -21,13 +21,6 @@
         :placeholder="t('assets.name')"
         @update:modelValue="updateSearch"
       />
-      <PSButton
-        class="select-button"
-        size="medium"
-        :text="t('build.select')"
-        :disabled="!selectedAsset"
-        @click="emitSelect"
-      />
     </div>
     <div class="asset-filter-row">
       <PSMultiselect
@@ -41,6 +34,13 @@
         class="asset-content-type"
         @select="updateContentType"
       />
+      <PSButton
+        class="select-button"
+        size="medium"
+        :text="t('build.select')"
+        :disabled="!selectedAsset"
+        @click="emitSelect"
+      />
     </div>
     <div class="assets-wrap">
       <div v-if="loading" class="assets-spinner-wrap">
@@ -50,14 +50,15 @@
         {{ t('build.no_matching_results') }}
       </div>
       <div
-        v-else
         v-for="asset in siteAssets"
+        v-else
+        :key="asset.id"
         class="asset-item"
         :class="{ 'asset-item-selected': selectedAsset?.id === asset.id }"
         :title="asset.name"
         @click="selectedAsset = asset"
       >
-        <img class="asset-image" :src="asset.url" :alt="asset.name" />
+        <img class="asset-image" :src="urlFromAsset(asset)" :alt="asset.name" />
         <div class="asset-name">
           {{ asset.name }}
         </div>
@@ -93,6 +94,10 @@ import { debounce } from '@pubstudio/shared/util-debounce'
 import { ApiInjectionKey } from '@pubstudio/frontend/data-access-injection'
 import { PSApi } from '@pubstudio/frontend/util-api'
 import { useSiteAssetApi } from '@pubstudio/frontend/data-access-api'
+import { ILocalSiteRelationViewModel } from '@pubstudio/shared/type-api-platform-user'
+import { urlFromAsset } from '@pubstudio/frontend/util-asset'
+
+type ILocalOrApiSite = ILocalSiteRelationViewModel | ISiteViewModel
 
 const { t } = useI18n()
 
@@ -140,9 +145,12 @@ const siteAssets = ref<ISiteAssetViewModel[]>()
 const filter = ref<IListPlatformSiteAssetsRequest>(defaultFilter())
 const selectedAsset = ref<ISiteAssetViewModel>()
 
-const resolvedSites = computed(() => [store.user.identity.value, ...(sites.value ?? [])])
+const resolvedSites = computed<ILocalOrApiSite[]>(() => [
+  store.user.identity.value,
+  ...(sites.value ?? []),
+])
 
-const updateSite = async (site: ISiteViewModel | undefined) => {
+const updateSite = async (site: ILocalOrApiSite | undefined) => {
   filter.value.site_id = site?.id
   await listAssets()
 }
@@ -221,14 +229,17 @@ watch(show, async (modalShown) => {
     margin-top: 8px;
   }
   .site-select {
-    width: 120px;
+    width: 132px;
+  }
+  .asset-content-type {
+    width: 132px;
   }
   .asset-name-input {
     flex-grow: 1;
     margin-left: 12px;
   }
   .select-button {
-    margin-left: 8px;
+    margin-left: auto;
     min-width: 80px;
     width: 80px;
     white-space: nowrap;
@@ -239,6 +250,9 @@ watch(show, async (modalShown) => {
     height: 40px;
     margin-top: 8px;
   }
+  .no-asset {
+    @mixin title-thin 16px;
+  }
   .assets-wrap {
     display: flex;
     flex-wrap: wrap;
@@ -247,41 +261,42 @@ watch(show, async (modalShown) => {
     margin-top: 16px;
     max-height: 50vh;
     overflow: auto;
-    .asset-item {
-      position: relative;
-      width: calc((100% - 24px) / 3);
-      height: 100px;
-      display: flex;
-      flex-direction: column;
-      border: 2px solid $grey-300;
-      cursor: pointer;
-      &.asset-item-selected {
-        border-color: $green-500;
-      }
+  }
+  .asset-item {
+    position: relative;
+    width: calc((100% - 24px) / 3);
+    height: 100px;
+    display: flex;
+    flex-direction: column;
+    border: 2px solid $grey-300;
+    cursor: pointer;
+    &.asset-item-selected {
+      border-color: $green-500;
     }
-    .asset-image {
-      height: 100%;
-      object-fit: cover;
-    }
-    .asset-name {
-      position: absolute;
-      bottom: 0;
-      padding: 2px 8px;
-      width: 100%;
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-      text-align: center;
-      color: white;
-      background-color: $black-opaque-4;
-    }
-    .asset-selected-mark {
-      position: absolute;
-      right: 0;
-      top: 0;
-      .check-mark {
-        @mixin size 24px;
-      }
+  }
+  .asset-image {
+    height: 100%;
+    object-fit: cover;
+  }
+  .asset-name {
+    @mixin text 13px;
+    position: absolute;
+    bottom: 0;
+    padding: 2px 8px;
+    width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    text-align: center;
+    color: white;
+    background-color: $grey-500;
+  }
+  .asset-selected-mark {
+    position: absolute;
+    right: 0;
+    top: 0;
+    .check-mark {
+      @mixin size 24px;
     }
   }
 }

@@ -112,25 +112,23 @@ defineExpose({ newValueRef })
 <style lang="postcss" scoped>
 @import '@theme/css/mixins.postcss';
 
-.menu-row {
-  .label {
-    @mixin title-bold 13px;
-  }
-  .item {
-    margin-left: auto;
-  }
-  .edit-item {
-    cursor: default;
-  }
-  .uneditable {
-    cursor: default;
-  }
-  .info-bubble {
-    margin-left: 8px;
-  }
-  :deep(.ps-input) {
-    padding: 0 10px;
-    height: 32px;
-  }
+.label {
+  @mixin title-bold 13px;
+}
+.item {
+  margin-left: auto;
+}
+.edit-item {
+  cursor: default;
+}
+.uneditable {
+  cursor: default;
+}
+.info-bubble {
+  margin-left: 8px;
+}
+:deep(.ps-input) {
+  padding: 0 10px;
+  height: 32px;
 }
 </style>

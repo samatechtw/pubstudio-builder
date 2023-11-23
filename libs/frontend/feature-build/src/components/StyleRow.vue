@@ -221,6 +221,7 @@ const removeStyle = () => {
 .property-multiselect {
   width: 100%;
   max-width: 120px;
+  height: 34px;
 }
 .value-multiselect {
   width: auto;
@@ -231,6 +232,9 @@ const removeStyle = () => {
   max-width: 114px;
   width: 114px;
   margin-left: 6px;
+  :deep(.ps-input) {
+    height: 34px;
+  }
 }
 
 .inherited-from {

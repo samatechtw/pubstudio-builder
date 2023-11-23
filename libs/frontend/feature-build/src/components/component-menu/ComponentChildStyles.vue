@@ -110,9 +110,10 @@ const labelLeave = () => {
   runtimeContext.hoveredComponentIdInComponentTree.value = undefined
 }
 
-const styleRowCount = computed(() => {
+const styleRowHeight = computed(() => {
   const entries = 37 * childStyles.value.length
-  const newStyle = showNewStyle.value ? 57 : 0
+  const editing = !!editStyleProp.value
+  const newStyle = showNewStyle.value || editing ? 51 : 0
   return entries + newStyle
 })
 
@@ -196,7 +197,7 @@ const removeStyle = (style: IStyleEntry) => {
 .style-rows {
   transition: max-height 0.2s;
   overflow: visible;
-  max-height: v-bind(styleRowCount + 'px');
+  max-height: v-bind(styleRowHeight + 'px');
   &.collapsed {
     max-height: 0;
     overflow: hidden;
