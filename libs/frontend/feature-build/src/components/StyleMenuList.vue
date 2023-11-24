@@ -16,7 +16,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useI18n } from 'vue-i18n'
+import { useI18n } from 'petite-vue-i18n'
 import { Minus } from '@pubstudio/frontend/ui-widgets'
 import { useReusableStyleMenu } from '../lib/use-reusable-style-menu'
 import { useBuild } from '../lib/use-build'

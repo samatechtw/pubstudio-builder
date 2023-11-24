@@ -5,7 +5,6 @@ module.exports = {
   extends: [
     '../.eslintrc.json',
     'plugin:vue/vue3-recommended',
-    'plugin:@intlify/vue-i18n/recommended',
     '@vue/typescript/recommended',
     'prettier',
   ],
@@ -13,11 +12,6 @@ module.exports = {
   parser: 'vue-eslint-parser',
   parserOptions: { ecmaVersion: 2020 },
   ignorePatterns: ['!**/*', 'node_modules/'],
-  settings: {
-    'vue-i18n': {
-      localeDir: '../../../libs/frontend/util-translations/src/lib/*.json',
-    },
-  },
   rules: {
     'no-console': 'off',
     'no-debugger': process.env.NODE_ENV === 'prod' ? 'error' : 'off',
@@ -61,14 +55,5 @@ module.exports = {
     ],
     'vue/no-v-html': 'off',
     'vue/v-on-event-hyphenation': 'off',
-    '@intlify/vue-i18n/no-v-html': 'off',
-    '@intlify/vue-i18n/no-unused-keys': [
-      'error',
-      {
-        src: './src',
-        extensions: ['.js', '.vue'],
-      },
-    ],
-    '@intlify/vue-i18n/no-raw-text': 'error',
   },
 }

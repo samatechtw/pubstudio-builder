@@ -29,7 +29,7 @@
 
 <script lang="ts" setup>
 import { computed, toRefs } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useI18n } from 'petite-vue-i18n'
 import { IBreakpoint } from '@pubstudio/shared/type-site'
 import { useTooltipDelay } from '@pubstudio/frontend/util-tooltip'
 import { useBreakpoint } from '@pubstudio/frontend/feature-breakpoint'

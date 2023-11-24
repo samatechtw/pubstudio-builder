@@ -20,7 +20,7 @@ import { ref, toRefs } from 'vue'
 import { copy } from '@pubstudio/frontend/util-doc'
 import { useTooltip } from '@pubstudio/frontend/util-tooltip'
 import { Copy } from '@pubstudio/frontend/ui-widgets'
-import { useI18n } from 'vue-i18n'
+import { useI18n } from 'petite-vue-i18n'
 
 const props = defineProps<{
   text: string

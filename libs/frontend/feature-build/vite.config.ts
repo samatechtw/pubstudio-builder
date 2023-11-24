@@ -1,4 +1,3 @@
-import VueI18n from '@intlify/unplugin-vue-i18n/vite'
 import Vue from '@vitejs/plugin-vue'
 import { tsconfigBaseAliases } from 'nx-vue3-vite'
 import path from 'path'
@@ -10,7 +9,7 @@ const resolve = (p: string): string => path.resolve(__dirname, p)
 
 module.exports = defineConfig({
   assetsInclude,
-  plugins: [Vue(), VueI18n({})],
+  plugins: [Vue()],
   resolve: {
     alias: {
       '@theme/': `${resolve('../ui-theme/src')}/`,

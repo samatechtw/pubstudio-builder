@@ -26,7 +26,7 @@
 
 <script lang="ts" setup>
 import { computed, ref, toRefs } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useI18n } from 'petite-vue-i18n'
 import { IStyle } from '@pubstudio/shared/type-site'
 import { resolveStyle } from '@pubstudio/frontend/util-builtin'
 import { builtinStyles } from '@pubstudio/frontend/util-builtin'

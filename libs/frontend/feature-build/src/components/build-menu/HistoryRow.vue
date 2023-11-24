@@ -16,7 +16,7 @@
 
 <script lang="ts" setup>
 import { computed, toRefs } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useI18n } from 'petite-vue-i18n'
 import { Check } from '@pubstudio/frontend/ui-widgets'
 import { CommandType, ICommand } from '@pubstudio/shared/type-command'
 import { ICommandGroupData } from '@pubstudio/shared/type-command-data'

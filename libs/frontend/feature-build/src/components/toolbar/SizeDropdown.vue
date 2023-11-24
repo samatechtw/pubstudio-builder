@@ -106,7 +106,7 @@
 
 <script lang="ts" setup>
 import { computed, watch } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useI18n } from 'petite-vue-i18n'
 import { useDropdown } from '@pubstudio/frontend/util-dropdown'
 import { ToolbarItem, Size } from '@pubstudio/frontend/ui-widgets'
 import { Eye, Hide, Scroll } from '@pubstudio/frontend/ui-widgets'

@@ -19,7 +19,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useI18n } from 'vue-i18n'
+import { useI18n } from 'petite-vue-i18n'
 import { IDropdownMenuItem } from '@pubstudio/frontend/type-ui-widgets'
 import Spinner from '../Spinner.vue'
 

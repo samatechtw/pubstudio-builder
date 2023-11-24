@@ -47,7 +47,7 @@
 
 <script lang="ts" setup>
 import { computed, ref } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useI18n } from 'petite-vue-i18n'
 import { store } from '@pubstudio/frontend/data-access-web-store'
 import { Export, Import } from '@pubstudio/frontend/ui-widgets'
 import {

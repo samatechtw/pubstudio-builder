@@ -54,7 +54,7 @@ interface IStyleProp extends Omit<IStyleEntry, 'pseudoClass'> {
 
 <script lang="ts" setup>
 import { computed, nextTick, ref, toRefs } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useI18n } from 'petite-vue-i18n'
 import { StyleProperty, StyleValue } from '@pubstudio/frontend/ui-widgets'
 import { Check, Edit, InfoBubble, Minus, PSInput } from '@pubstudio/frontend/ui-widgets'
 import { Css, CssPseudoClass, cssValues, IStyleEntry } from '@pubstudio/shared/type-site'

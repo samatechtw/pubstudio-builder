@@ -13,7 +13,7 @@
 
 <script lang="ts" setup>
 import { computed, ref, toRefs } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useI18n } from 'petite-vue-i18n'
 import { PSMultiselect } from '@pubstudio/frontend/ui-widgets'
 import { IMultiselectObj } from '@pubstudio/frontend/type-ui-widgets'
 import { ThemeFontSource, ThemeFontSourceValues } from '@pubstudio/shared/type-site'

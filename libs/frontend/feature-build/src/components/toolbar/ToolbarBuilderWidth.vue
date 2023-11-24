@@ -1,4 +1,3 @@
-<!-- eslint-disable @intlify/vue-i18n/no-raw-text -->
 <template>
   <div class="builder-width-wrap">
     <ToolbarItem :ref="setToggleRef" :active="opened" @click="toggleMenu">
@@ -45,7 +44,7 @@
 
 <script lang="ts" setup>
 import { ref, computed, ComponentPublicInstance, watch } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useI18n } from 'petite-vue-i18n'
 import { useDropdown } from '@pubstudio/frontend/util-dropdown'
 import { ToolbarItem } from '@pubstudio/frontend/ui-widgets'
 import { PSInput } from '@pubstudio/frontend/ui-widgets'

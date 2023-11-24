@@ -43,7 +43,7 @@
 
 <script lang="ts" setup>
 import { onMounted, ref, watch } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useI18n } from 'petite-vue-i18n'
 import { PSButton, PSSpinner, Plus } from '@pubstudio/frontend/ui-widgets'
 import { useSiteAssets, AssetCard } from '@pubstudio/frontend/feature-site-assets'
 import { store } from '@pubstudio/frontend/data-access-web-store'

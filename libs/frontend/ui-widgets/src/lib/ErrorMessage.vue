@@ -4,14 +4,9 @@
       <div v-if="error" class="error-message">
         <div class="error">
           <Info color="#f46a6a" class="error-icon" />
-          <i18n-t
-            v-if="interpolationKey"
-            scope="global"
-            :keypath="interpolationKey"
-            tag="div"
-          >
+          <I18nT v-if="interpolationKey" :keypath="interpolationKey" tag="div">
             <slot />
-          </i18n-t>
+          </I18nT>
           <span v-else v-html="error" />
         </div>
       </div>
@@ -20,6 +15,7 @@
 </template>
 
 <script lang="ts" setup>
+import { I18nT } from '@pubstudio/frontend/util-i18n'
 import Info from './svg/Info.vue'
 
 withDefaults(

@@ -17,7 +17,7 @@
 
 <script lang="ts" setup>
 import { computed } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useI18n } from 'petite-vue-i18n'
 import { IHeadTagStr, IPageHeadTag } from '@pubstudio/shared/type-site'
 import { useBuild } from '../../lib/use-build'
 import ThemeMetaFavicon from '../theme-menu/ThemeMetaFavicon.vue'

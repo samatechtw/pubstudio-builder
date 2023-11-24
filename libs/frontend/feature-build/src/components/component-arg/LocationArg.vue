@@ -11,7 +11,7 @@
 
 <script lang="ts" setup>
 import { computed, toRefs } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useI18n } from 'petite-vue-i18n'
 import { IBehaviorArg, IComponentInput } from '@pubstudio/shared/type-site'
 import { PSMultiselect } from '@pubstudio/frontend/ui-widgets'
 import { IUpdateComponentArgPayload } from './i-update-component-arg-payload'

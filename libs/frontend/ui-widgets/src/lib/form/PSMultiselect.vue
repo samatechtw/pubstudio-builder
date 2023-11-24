@@ -73,7 +73,7 @@
 
 <script lang="ts" setup generic="T extends IMultiselectOption">
 import { ComponentPublicInstance, computed, nextTick, onMounted, ref, toRefs } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useI18n } from 'petite-vue-i18n'
 import { Placement } from '@floating-ui/vue'
 import { useDropdown, observePlacementChange } from '@pubstudio/frontend/util-dropdown'
 import { Keys, useKeyListener } from '@pubstudio/frontend/util-key-listener'

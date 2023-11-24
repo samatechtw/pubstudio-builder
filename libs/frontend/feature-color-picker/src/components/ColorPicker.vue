@@ -89,7 +89,7 @@
 
 <script lang="ts" setup>
 import { computed, nextTick, onMounted, reactive, ref, toRefs, watch } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useI18n } from 'petite-vue-i18n'
 import { IThemeVariable } from '@pubstudio/shared/type-site'
 import { Plus } from '@pubstudio/frontend/ui-widgets'
 import { IThemedGradient, ResolveThemeVarFn } from '@pubstudio/frontend/util-gradient'

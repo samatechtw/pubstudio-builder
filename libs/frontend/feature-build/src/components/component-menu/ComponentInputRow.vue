@@ -29,7 +29,7 @@
 
 <script lang="ts" setup>
 import { computed, ref, toRefs } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useI18n } from 'petite-vue-i18n'
 import { setComponentEditInputValue } from '@pubstudio/frontend/feature-editor'
 import { Check, Edit, PSInput } from '@pubstudio/frontend/ui-widgets'
 import { IDatalistOption } from '@pubstudio/frontend/type-ui-widgets'

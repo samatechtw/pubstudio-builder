@@ -9,14 +9,13 @@ export default {
       // dependencies
       'vue',
       '@sampullman/fetch-api',
-      'vue-i18n',
+      'petite-vue-i18n',
       'vue-router',
       'date-fns',
       'date-fns-tz',
       'jwt-decode',
       '@vuepic/vue-datepicker',
       // devDependencies
-      '@intlify/unplugin-vue-i18n',
       '@samatech/image-api-types',
       '@samatech/postcss-basics',
       '@vitejs/plugin-vue',

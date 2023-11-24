@@ -48,7 +48,7 @@
 
 <script lang="ts" setup>
 import { computed, onUnmounted } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useI18n } from 'petite-vue-i18n'
 import { ErrorMessage, PSButton } from '@pubstudio/frontend/ui-widgets'
 import { setComponentEditStyle } from '@pubstudio/frontend/feature-editor'
 import { Css, IInheritedStyleEntry, IStyleEntry } from '@pubstudio/shared/type-site'

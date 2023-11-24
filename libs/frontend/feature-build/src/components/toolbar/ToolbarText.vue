@@ -45,7 +45,7 @@
 
 <script lang="ts" setup>
 import { computed } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useI18n } from 'petite-vue-i18n'
 import { FontColor, Italic, ToolbarItem, Underline } from '@pubstudio/frontend/ui-widgets'
 import { PSInput } from '@pubstudio/frontend/ui-widgets'
 import { useControlledClickaway } from '@pubstudio/frontend/util-clickaway'

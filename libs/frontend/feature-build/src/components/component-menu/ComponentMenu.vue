@@ -49,7 +49,7 @@
 
 <script lang="ts" setup>
 import { computed, toRefs } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useI18n } from 'petite-vue-i18n'
 import { PSButton } from '@pubstudio/frontend/ui-widgets'
 import { IComponent } from '@pubstudio/shared/type-site'
 import { noBehaviorId } from '@pubstudio/frontend/util-ids'

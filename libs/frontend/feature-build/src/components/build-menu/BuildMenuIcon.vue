@@ -3,16 +3,18 @@
     ref="itemRef"
     class="build-icon"
     @click="emit('click')"
-    @mouseenter="tooltipMouseEnter"
+    @mouseenter="tooltipMouseEnter()"
     @mouseleave="tooltipMouseLeave"
   >
     <slot />
-    <div v-if="text && show" ref="tooltipRef" class="tooltip" :style="tooltipStyle">
-      <div ref="arrowRef" :style="arrowStyle" class="arrow" />
-      <div class="tooltip-text">
-        {{ text }}
+    <Teleport to="body">
+      <div v-if="text && show" ref="tooltipRef" class="tooltip" :style="tooltipStyle">
+        <div ref="arrowRef" :style="arrowStyle" class="arrow" />
+        <div class="tooltip-text">
+          {{ text }}
+        </div>
       </div>
-    </div>
+    </Teleport>
   </div>
 </template>
 

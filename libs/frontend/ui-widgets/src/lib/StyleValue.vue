@@ -14,7 +14,7 @@
 
 <script lang="ts" setup>
 import { ref, toRefs, watch } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useI18n } from 'petite-vue-i18n'
 import { PSMultiselect } from '@pubstudio/frontend/ui-widgets'
 
 const { t } = useI18n()

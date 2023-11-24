@@ -9,7 +9,7 @@ import { ISerializedComponent, ISite } from '@pubstudio/shared/type-site'
 import { IUseBuild, useBuild } from './use-build'
 import { IUseCopyPaste, useCopyPaste } from './use-copy-paste'
 
-jest.mock('vue-i18n', () => ({ useI18n: () => ({ t: jest.fn() }) }))
+jest.mock('petite-vue-i18n', () => ({ useI18n: () => ({ t: jest.fn() }) }))
 jest.mock('@pubstudio/frontend/ui-widgets', () => ({
   useHUD: () => ({ addHUD: jest.fn() }),
 }))

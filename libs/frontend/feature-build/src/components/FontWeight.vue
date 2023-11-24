@@ -16,7 +16,7 @@
 
 <script lang="ts" setup>
 import { computed, onMounted, toRefs } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useI18n } from 'petite-vue-i18n'
 import { Css, StyleToolbarMenu, ThemeFontSource } from '@pubstudio/shared/type-site'
 import { setStyleToolbarMenu } from '@pubstudio/frontend/feature-editor'
 import { PSMultiselect } from '@pubstudio/frontend/ui-widgets'

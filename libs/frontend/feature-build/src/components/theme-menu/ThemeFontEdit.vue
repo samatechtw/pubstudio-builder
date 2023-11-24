@@ -50,7 +50,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useI18n } from 'vue-i18n'
+import { useI18n } from 'petite-vue-i18n'
 import { ThemeFontSource } from '@pubstudio/shared/type-site'
 import { ErrorMessage, PSButton } from '@pubstudio/frontend/ui-widgets'
 import { useThemeMenuFonts } from '../../lib/use-theme-menu-fonts'

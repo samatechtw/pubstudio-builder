@@ -23,9 +23,6 @@ export default defineConfig({
   },
   build: {
     ...appConfigBuild,
-    rollupOptions: {
-      external: ['vue-i18n'],
-    },
   },
   server: appConfigServer,
   publicDir: resolve('./src/public'),
