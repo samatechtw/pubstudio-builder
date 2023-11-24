@@ -39,14 +39,21 @@ export function prosemirrorSetup(options: IProsemirrorSetupOptions): EditorState
   })
 }
 
-export function editorStateToHtml(state: EditorState): string {
+export function editorStateToHtml(state: EditorState): string | undefined {
   const fragment = DOMSerializer.fromSchema(schema).serializeFragment(state.doc.content)
   const div = document.createElement('div')
   div.id = '__pm-serialize__'
   div.appendChild(fragment)
   const html = div.innerHTML
+  const textContent = div.textContent
   div.parentNode?.removeChild(div)
-  return html
+  if (textContent) {
+    return html
+  } else {
+    // Returns undefined so that components like horizontal&vertical container can include other components
+    // as children again when the text content is cleared.
+    return undefined
+  }
 }
 
 export function editorStateTextContent(state: EditorState): string {

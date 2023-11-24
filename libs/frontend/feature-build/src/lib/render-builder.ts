@@ -1,4 +1,4 @@
-import { setEditSvg } from '@pubstudio/frontend/feature-editor'
+import { setEditSvg, setSelectedComponent } from '@pubstudio/frontend/feature-editor'
 import {
   computeAttrsInputsMixins,
   computeEvents,
@@ -178,13 +178,14 @@ export const computePropsContent = (
   const events = computeEvents(site, component)
 
   const { editor } = site
+  const isSelected = editor?.selectedComponent?.id === component.id
+
   const content: IBuildContent = []
   if (component.children?.length) {
     content.push(
       ...component.children.map((child, index) => renderComponent(site, child, index)),
     )
   } else if (component.content) {
-    const isSelected = editor?.selectedComponent?.id === component.id
     if (component.tag === Tag.Svg) {
       content.push(
         h('div', { class: 'component-content-container', innerHTML: component.content }),
@@ -196,6 +197,21 @@ export const computePropsContent = (
         h('div', {
           class: 'component-content-container',
           innerHTML: parseI18n(site, component.content),
+        }),
+      )
+    }
+  } else if (
+    component.tag !== Tag.Img &&
+    component.tag !== Tag.Svg &&
+    component.children === undefined
+  ) {
+    if (isSelected) {
+      content.push(h(ProseMirrorEditor, { component, editor }))
+    } else {
+      content.push(
+        h('div', {
+          class: 'pm-p pm-p-placeholder',
+          onclick: () => setSelectedComponent(site, component),
         }),
       )
     }

@@ -54,8 +54,8 @@ const renderImageHover = (
     imgElement?.getBoundingClientRect() ?? {}
 
   const { builderScale = 1 } = site.editor ?? {}
-  const unscaledWidth = Math.floor(rectWidth / builderScale)
-  const unscaledHeight = Math.floor(rectHeight / builderScale)
+  const unscaledWidth = rectWidth / builderScale
+  const unscaledHeight = rectHeight / builderScale
 
   width = `${unscaledWidth}px`
   height = `${unscaledHeight}px`
@@ -94,7 +94,9 @@ const renderImageHover = (
     {
       'data-component-id': component.id,
       style: {
-        display: 'flex',
+        // Use inline-block to simulate the bottom space caused by the inline behavior of <img>.
+        // See https://stackoverflow.com/a/5804278/19772349 for more information.
+        display: 'inline-block',
         width,
         height,
         margin,

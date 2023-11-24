@@ -24,7 +24,7 @@ const props = defineProps<{
 }>()
 
 const { component, editor } = toRefs(props)
-const { site, editComponent } = useBuild()
+const { site } = useBuild()
 
 const container = ref<HTMLDivElement>()
 const containerId = computed(() => getProseMirrorContainerId(component.value))
@@ -104,13 +104,8 @@ watch(gradientColorStyle, () => {
 })
 
 onBeforeUnmount(() => {
-  if (editor.value?.editView) {
-    if (editor.value.editView.state.doc.content.size <= 2) {
-      editComponent(component.value, { content: '' })
-    }
-    editor.value.editView?.destroy()
-    editor.value.editView = undefined
-  }
+  editor.value.editView?.destroy()
+  editor.value.editView = undefined
 })
 
 watch(
