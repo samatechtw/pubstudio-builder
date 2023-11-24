@@ -150,7 +150,7 @@ const editOrNewEvent = (
 
 <script lang="ts" setup>
 import { ref, toRefs } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useI18n } from 'petite-vue-i18n'
 import { ErrorMessage, PSButton, PSMultiselect } from '@pubstudio/frontend/ui-widgets'
 import { resolveBehavior } from '@pubstudio/frontend/util-builtin'
 import { builtinBehaviors } from '@pubstudio/frontend/util-builtin'

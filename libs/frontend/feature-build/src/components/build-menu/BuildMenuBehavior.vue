@@ -23,7 +23,7 @@
 
 <script lang="ts" setup>
 import { computed } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useI18n } from 'petite-vue-i18n'
 import { setEditBehavior } from '@pubstudio/frontend/feature-editor'
 import { Edit, Plus } from '@pubstudio/frontend/ui-widgets'
 import { useBuild } from '../../lib/use-build'

@@ -59,7 +59,7 @@
 
 <script lang="ts" setup>
 import { ref } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useI18n } from 'petite-vue-i18n'
 import ThemeMetaHeadRow from './ThemeMetaHeadRow.vue'
 import { Plus } from '@pubstudio/frontend/ui-widgets'
 import ThemeMetaEditModal from './ThemeMetaEditModal.vue'

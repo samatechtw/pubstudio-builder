@@ -31,7 +31,7 @@
 
 <script lang="ts" setup>
 import { onMounted, ref, toRefs } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useI18n } from 'petite-vue-i18n'
 import Modal from './Modal.vue'
 import PSInput from '../form/PSInput.vue'
 import PSButton from '../form/PSButton.vue'

@@ -50,7 +50,7 @@
 
 <script lang="ts" setup>
 import { computed, ref } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useI18n } from 'petite-vue-i18n'
 import { useCommand } from '@pubstudio/frontend/feature-command'
 import { CommandType } from '@pubstudio/shared/type-command'
 import { ConfirmModal, PSButton } from '@pubstudio/frontend/ui-widgets'

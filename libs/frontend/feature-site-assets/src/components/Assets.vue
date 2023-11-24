@@ -54,7 +54,7 @@
 
 <script lang="ts" setup>
 import { ref, onMounted, computed } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useI18n } from 'petite-vue-i18n'
 import { InfoBubble, PSSpinner, UsageProgress } from '@pubstudio/frontend/ui-widgets'
 import { useSites } from '@pubstudio/frontend/feature-sites'
 import { IListPlatformSiteAssetsRequest } from '@pubstudio/shared/type-api-platform-site-asset'

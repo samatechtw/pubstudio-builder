@@ -44,7 +44,7 @@
 
 <script lang="ts" setup>
 import { ref, computed } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useI18n } from 'petite-vue-i18n'
 import { useBuild } from '@pubstudio/frontend/feature-build'
 import { PSButton, ConfirmModal } from '@pubstudio/frontend/ui-widgets'
 import { usePageMenu } from '../../lib/use-page-menu'

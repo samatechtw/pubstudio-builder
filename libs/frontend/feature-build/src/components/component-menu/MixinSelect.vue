@@ -16,7 +16,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useI18n } from 'vue-i18n'
+import { useI18n } from 'petite-vue-i18n'
 import { IStyle } from '@pubstudio/shared/type-site'
 import { Edit, Minus, PSMultiselect } from '@pubstudio/frontend/ui-widgets'
 

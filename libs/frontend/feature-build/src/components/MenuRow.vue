@@ -36,7 +36,7 @@
 
 <script lang="ts" setup>
 import { nextTick, onMounted, ref, toRefs } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useI18n } from 'petite-vue-i18n'
 import { Copy, Edit, InfoBubble, PSInput } from '@pubstudio/frontend/ui-widgets'
 import { copy } from '@pubstudio/frontend/util-doc'
 

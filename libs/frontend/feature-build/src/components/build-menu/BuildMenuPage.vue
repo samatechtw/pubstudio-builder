@@ -17,7 +17,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useI18n } from 'vue-i18n'
+import { useI18n } from 'petite-vue-i18n'
 import { setActivePage } from '@pubstudio/frontend/feature-editor'
 import { Plus } from '@pubstudio/frontend/ui-widgets'
 import { useBuild } from '../../lib/use-build'

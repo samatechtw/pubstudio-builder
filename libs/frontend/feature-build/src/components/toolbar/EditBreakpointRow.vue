@@ -26,7 +26,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useI18n } from 'vue-i18n'
+import { useI18n } from 'petite-vue-i18n'
 import { IBreakpoint } from '@pubstudio/shared/type-site'
 import { ErrorMessage, PSInput } from '@pubstudio/frontend/ui-widgets'
 import { toRefs } from 'vue'

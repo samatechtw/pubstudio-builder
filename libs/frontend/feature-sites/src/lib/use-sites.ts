@@ -21,8 +21,8 @@ import {
   ISiteViewModel,
   IUpdatePlatformSiteRequest,
 } from '@pubstudio/shared/type-api-platform-site'
+import { useI18n } from 'petite-vue-i18n'
 import { inject, Ref, ref } from 'vue'
-import { useI18n } from 'vue-i18n'
 
 const subdomainFormatRegex = new RegExp(/^[a-z]([a-z\d-]+)?$/g)
 

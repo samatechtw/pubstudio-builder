@@ -17,7 +17,7 @@
 
 <script lang="ts" setup>
 import { onMounted } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useI18n } from 'petite-vue-i18n'
 import {
   setCssPseudoClass,
   setStyleToolbarMenu,

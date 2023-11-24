@@ -7,9 +7,9 @@ import { showTranslations } from '@pubstudio/frontend/feature-editor'
 import { IMultiselectObj } from '@pubstudio/frontend/type-ui-widgets'
 import { INewTranslations } from '@pubstudio/shared/type-command-data'
 import { ITranslations } from '@pubstudio/shared/type-site'
+import { useI18n } from 'petite-vue-i18n'
 import { EditorView } from 'prosemirror-view'
 import { computed, ComputedRef, nextTick, Ref, ref, watch } from 'vue'
-import { useI18n } from 'vue-i18n'
 import { languageDict } from './supported-languages'
 
 export interface ISiteTranslationsFeature {

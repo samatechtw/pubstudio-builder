@@ -11,7 +11,7 @@
 
 <script lang="ts" setup>
 import { computed } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useI18n } from 'petite-vue-i18n'
 import { PSMultiselect } from '@pubstudio/frontend/ui-widgets'
 import { IBehaviorArg, IComponentInput } from '@pubstudio/shared/type-site'
 import { useBuild } from '../../lib/use-build'

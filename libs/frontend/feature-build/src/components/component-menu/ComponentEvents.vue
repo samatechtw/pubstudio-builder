@@ -13,7 +13,7 @@
 
 <script lang="ts" setup>
 import { computed, toRefs } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useI18n } from 'petite-vue-i18n'
 import { IComponent, IComponentEvent } from '@pubstudio/shared/type-site'
 import EditMenuTitle from '../EditMenuTitle.vue'
 import EventRow from './EventRow.vue'

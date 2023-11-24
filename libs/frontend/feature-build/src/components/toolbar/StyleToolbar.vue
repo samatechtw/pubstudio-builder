@@ -76,7 +76,7 @@
 <script lang="ts" setup>
 import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
-import { useI18n } from 'vue-i18n'
+import { useI18n } from 'petite-vue-i18n'
 import { useBuild, useHistory } from '@pubstudio/frontend/feature-build'
 import {
   setDebugBounding,

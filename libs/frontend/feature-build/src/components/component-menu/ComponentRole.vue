@@ -18,7 +18,7 @@
 
 <script lang="ts" setup>
 import { toRefs } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useI18n } from 'petite-vue-i18n'
 import { AriaRole, AriaRoleValues } from '@pubstudio/shared/type-site'
 import { InfoBubble, PSMultiselect } from '@pubstudio/frontend/ui-widgets'
 

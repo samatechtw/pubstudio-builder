@@ -39,7 +39,7 @@
 
 <script lang="ts" setup>
 import { onUnmounted } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useI18n } from 'petite-vue-i18n'
 import { Css } from '@pubstudio/shared/type-site'
 import { PSButton, PSInput } from '@pubstudio/frontend/ui-widgets'
 import { stringToCssValue } from '@pubstudio/shared/util-parse'

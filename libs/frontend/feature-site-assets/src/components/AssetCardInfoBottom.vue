@@ -41,7 +41,7 @@
 
 <script lang="ts" setup>
 import { toRefs } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useI18n } from 'petite-vue-i18n'
 import { InfoBubble, MenuHorizontal } from '@pubstudio/frontend/ui-widgets'
 import {
   ISiteAssetViewModel,

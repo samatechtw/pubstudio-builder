@@ -191,7 +191,7 @@
 
 <script lang="ts" setup>
 import { computed, ref, toRefs, watch } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useI18n } from 'petite-vue-i18n'
 import { Modal, PSButton, PSInput, PSMultiselect } from '@pubstudio/frontend/ui-widgets'
 import { IHeadObject, IHeadTagStr } from '@pubstudio/shared/type-site'
 import { IThemeMetaEditData } from './i-theme-meta-edit-data'

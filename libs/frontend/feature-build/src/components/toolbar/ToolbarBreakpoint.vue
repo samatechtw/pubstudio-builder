@@ -43,7 +43,7 @@
 
 <script lang="ts" setup>
 import { ComponentPublicInstance, ref } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useI18n } from 'petite-vue-i18n'
 import { useDropdown } from '@pubstudio/frontend/util-dropdown'
 import { Edit } from '@pubstudio/frontend/ui-widgets'
 import { useTooltipDelay } from '@pubstudio/frontend/util-tooltip'

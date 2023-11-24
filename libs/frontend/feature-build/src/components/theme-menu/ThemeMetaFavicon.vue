@@ -53,7 +53,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useI18n } from 'vue-i18n'
+import { useI18n } from 'petite-vue-i18n'
 import { CreateAssetModal } from '@pubstudio/frontend/feature-site-assets'
 import { useSites } from '@pubstudio/frontend/feature-sites'
 import {

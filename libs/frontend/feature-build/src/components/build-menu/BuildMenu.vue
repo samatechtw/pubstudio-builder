@@ -84,7 +84,7 @@
 
 <script lang="ts" setup>
 import { computed } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useI18n } from 'petite-vue-i18n'
 import { setBuildSubmenu, showTranslations } from '@pubstudio/frontend/feature-editor'
 import { store } from '@pubstudio/frontend/data-access-web-store'
 import { Assets, BuildNew, Command, Pages, Text } from '@pubstudio/frontend/ui-widgets'

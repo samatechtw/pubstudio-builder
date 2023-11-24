@@ -5,7 +5,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useI18n } from 'vue-i18n'
+import { useI18n } from 'petite-vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 
 const { t } = useI18n()
