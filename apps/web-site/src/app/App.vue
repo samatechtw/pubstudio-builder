@@ -169,11 +169,12 @@ body {
   }
 }
 
+.pm-p:after {
+  content: '\200b';
+}
+
 p {
   margin: 0;
-}
-.pm-p {
-  min-height: 18px;
 }
 
 a {

@@ -81,7 +81,6 @@ const editing = (propName: string) => {
 }
 
 const escPress = () => {
-  console.log('ESCCC')
   editingMenu.value = false
 }
 
