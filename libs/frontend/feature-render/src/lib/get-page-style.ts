@@ -26,7 +26,7 @@ import {
 
 type ComponentIterFn = (component: IComponent) => void
 
-const iteratePage = (page: IPage, fn: ComponentIterFn) => {
+export const iteratePage = (page: IPage, fn: ComponentIterFn) => {
   // Tree iteration
   const stack = [page.root]
   while (stack.length > 0) {

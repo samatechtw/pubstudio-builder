@@ -141,6 +141,10 @@ export const computeBuilderStyleProps = (
     ])
   }
 
+  if (site.editor?.componentsHidden[component.id]) {
+    builderStyle.opacity = '0'
+  }
+
   if (selected) {
     builderStyle.border = '1.5px solid #3768FF'
   } else if (editor?.debugBounding) {
@@ -247,9 +251,6 @@ export const renderComponent = (
   component: IComponent,
   componentIndex: number,
 ): VNode | undefined => {
-  if (component.state?.hide) {
-    return undefined
-  }
   const childrenLen = component.children?.length ?? 0
   return h(BuilderDndComponent, {
     site,

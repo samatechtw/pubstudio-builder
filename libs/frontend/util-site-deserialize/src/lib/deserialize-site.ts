@@ -36,6 +36,8 @@ export const deserializeEditor = (
         mode: serializedEditor.mode,
         showComponentTree: serializedEditor.showComponentTree,
         componentTreeExpandedItems: serializedEditor.componentTreeExpandedItems,
+        // Added 231125
+        componentsHidden: serializedEditor.componentsHidden ?? {},
         selectedThemeColors: new Set(serializedEditor.selectedThemeColors),
         builderWidth: serializedEditor.builderWidth,
         builderScale: serializedEditor.builderScale,

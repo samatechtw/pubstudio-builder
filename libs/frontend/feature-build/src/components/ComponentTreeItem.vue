@@ -19,6 +19,7 @@
     <div
       class="component-title"
       :class="{
+        [`cmp-title-${level}`]: true,
         selected: currentSelected,
       }"
       :draggable="canDrag"
@@ -35,7 +36,12 @@
       <div class="component-name" :class="{ 'no-children': !haveChildren }">
         {{ component.name }}
       </div>
-      <Eye v-if="!component.state?.hide" class="eye" />
+      <Hide
+        v-if="editor?.componentsHidden[component.id]"
+        class="eye"
+        @click="toggleHidden"
+      />
+      <Eye v-else class="eye" @click="toggleHidden" />
     </div>
     <div v-if="haveChildren && expanded" class="component-children">
       <ComponentTreeItem
@@ -59,8 +65,9 @@ import {
   expandComponentTreeItem,
   setSelectedComponent,
   getComponentTreeItemId,
+  toggleComponentHidden,
 } from '@pubstudio/frontend/feature-editor'
-import { Eye } from '@pubstudio/frontend/ui-widgets'
+import { Eye, Hide } from '@pubstudio/frontend/ui-widgets'
 import { runtimeContext } from '@pubstudio/frontend/util-runtime'
 
 const props = defineProps<{
@@ -117,6 +124,10 @@ const currentSelected = computed(() => {
   return component.value.id === selectedComponent?.id
 })
 
+const toggleHidden = () => {
+  toggleComponentHidden(site.value.editor, component.value.id)
+}
+
 const selectComponent = () => {
   setSelectedComponent(site.value, component.value, {
     expandTree: false,
@@ -130,89 +141,4 @@ const toggleExpanded = () => {
     expandComponentTreeItem(site.value.editor, component.value)
   }
 }
-
-// Instead of adding padding directly to the container of children, we use
-// level prop to calculate padding and add it to title so that the background-color
-// during hover can have the same width as the component tree.
-const titlePadding = computed(() => {
-  let paddingLevel = 0
-  if (!haveChildren.value) {
-    paddingLevel = level.value - 1
-  } else {
-    paddingLevel = level.value
-  }
-  return paddingLevel * 12
-})
 </script>
-
-<style lang="postcss" scoped>
-@import '@theme/css/mixins.postcss';
-
-.component-tree-item {
-  $border-width: 2px;
-  border: $border-width solid transparent;
-
-  &.dragging {
-    opacity: 0.2;
-  }
-  &.hover-self {
-    border: $border-width solid #f82389;
-  }
-  &.hover-top {
-    border: $border-width solid transparent;
-    border-top-color: black;
-  }
-  &.hover-bottom {
-    border: $border-width solid transparent;
-    border-bottom-color: black;
-  }
-}
-
-.component-title {
-  @mixin flex-row;
-  align-items: center;
-  border: 1px solid transparent;
-  height: 26px;
-  padding-left: v-bind(titlePadding + 'px');
-  .caret-wrap {
-    @mixin flex-row;
-    align-items: center;
-    cursor: pointer;
-    padding: 0 4px;
-    height: 100%;
-  }
-  .caret {
-    @mixin size 18px;
-    transition: transform 0.2s;
-    &-expanded {
-      transform: rotate(90deg);
-    }
-  }
-  &.selected {
-    border-color: #3768ff;
-  }
-  &:hover {
-    background-color: rgba(0, 0, 0, 0.1);
-  }
-}
-.eye {
-  @mixin size 12px;
-  flex-shrink: 0;
-}
-.component-name {
-  @mixin title-medium 13px;
-  @mixin truncate;
-  color: $color-text;
-  user-select: none;
-  &.no-children {
-    padding-left: 28px;
-  }
-}
-
-.expanded {
-  padding-bottom: 4px;
-  & + .component-tree-item {
-    margin-top: -4px;
-  }
-}
-</style>
