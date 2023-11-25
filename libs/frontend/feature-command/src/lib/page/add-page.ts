@@ -5,22 +5,27 @@ import {
 } from '@pubstudio/frontend/feature-editor'
 import { createPage, createRootComponent } from '@pubstudio/frontend/util-build'
 import { IAddPageData } from '@pubstudio/shared/type-command-data'
-import { EditorEventName, ISite } from '@pubstudio/shared/type-site'
-import { deleteComponentWithId } from '../component/add-component'
+import { EditorEventName, IComponent, ISite } from '@pubstudio/shared/type-site'
+import { addComponentHelper, deleteComponentWithId } from '../component/add-component'
 
 export const applyAddPage = (site: ISite, data: IAddPageData) => {
   const context = site.context
-  const { metadata } = data
-  const root = createRootComponent(context.namespace, context)
+  const { metadata, root } = data
+  let pageRoot: IComponent
+  if (root) {
+    pageRoot = addComponentHelper(site, root)
+  } else {
+    pageRoot = createRootComponent(context.namespace, context)
+  }
 
   // Add page
-  site.pages[metadata.route] = createPage(metadata, root)
-  context.components[root.id] = root
+  site.pages[metadata.route] = createPage(metadata, pageRoot)
+  context.components[pageRoot.id] = pageRoot
 
   // Add component tree expand state
   const { componentTreeExpandedItems } = site.editor ?? {}
   if (componentTreeExpandedItems) {
-    componentTreeExpandedItems[root.id] = true
+    componentTreeExpandedItems[pageRoot.id] = true
   }
 
   // Trigger page change event

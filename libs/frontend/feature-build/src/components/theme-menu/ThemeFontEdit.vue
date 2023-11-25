@@ -3,7 +3,7 @@
     <!-- Source -->
     <div class="menu-row source-row">
       <div class="label">
-        {{ t('theme.font_source') }}
+        {{ t('source') }}
       </div>
       <FontSourceSelect
         class="item"

@@ -185,7 +185,7 @@ export interface IUseBuild {
   addThemeFont: (source: ThemeFontSource, name: string, fallback?: WebSafeFont) => void
   editThemeFont: (oldFont: IThemeFont, newFold: IThemeFont) => void
   deleteThemeFont: (font: IThemeFont) => void
-  addPage: (page: IPageMetadata) => void
+  addPage: (page: IPageMetadata, copyFrom?: string) => void
   editPage: (oldPage: IPageMetadata, newPage: IPageMetadata) => void
   removePage: (route: string) => void
   changePage: (route: string) => void
@@ -416,6 +416,26 @@ export const useBuild = (): IUseBuild => {
     }
     pushCommand(CommandType.AddComponent, data)
   }
+
+  // Currently it is assumed this command will be applied in a group with AddPage
+  // It can be extended to work with an existing route by saving the old root data
+  // and using it to properly implement undoReplaceRootComponent
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  /* TODO -- uncomment to continue implementation
+  const replaceRootComponent = (route: string, copyFromId: string) => {
+    const copyFrom = resolveComponent(site.value.context, copyFromId)
+    if (!copyFrom) return
+
+    const data: IReplacePageRootData = {
+      tag: copyFrom.tag,
+      content: copyFrom.content,
+      sourceId: copyFrom.id,
+      name: copyFrom.name,
+      route,
+    }
+    pushCommand(CommandType.ReplacePageRoot, data)
+  }
+  */
 
   const setPositionAbsolute = (
     oldStyle: IStyleEntry | undefined,
@@ -907,13 +927,25 @@ export const useBuild = (): IUseBuild => {
     pushCommand(CommandType.RemoveThemeFont, data)
   }
 
-  const addPage = (metadata: IPageMetadata) => {
+  const addPage = (metadata: IPageMetadata, copyFrom?: string) => {
     const { editor } = site.value
     if (editor) {
+      let root: IAddComponentData | undefined
+      if (copyFrom && site.value.pages[copyFrom]) {
+        const copyCmp = site.value.pages[copyFrom].root
+        root = {
+          parentId: '',
+          tag: copyCmp.tag,
+          content: copyCmp.content,
+          sourceId: copyCmp.id,
+          name: copyCmp.name,
+        }
+      }
       const data: IAddPageData = {
         metadata,
         activePageRoute: editor.active,
         selectedComponentId: editor.selectedComponent?.id,
+        root,
       }
       pushCommand(CommandType.AddPage, data)
     }

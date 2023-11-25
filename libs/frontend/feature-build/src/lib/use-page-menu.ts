@@ -1,3 +1,4 @@
+import { IMultiselectOptions } from '@pubstudio/frontend/type-ui-widgets'
 import { IPage, IPageMetadata } from '@pubstudio/shared/type-site'
 import { useI18n } from 'petite-vue-i18n'
 import { computed, ComputedRef, reactive, Ref, ref, UnwrapNestedRefs } from 'vue'
@@ -5,14 +6,21 @@ import { useBuild } from './use-build'
 
 export interface IUsePageMenuFeature {
   editing: Ref<boolean>
-  editingPage: UnwrapNestedRefs<IPageMetadata>
+  editingPage: UnwrapNestedRefs<IPageEdit>
   pageError: Ref<IPageError>
   pages: ComputedRef<IPage[]>
+  isNew: ComputedRef<boolean>
+  pageOptions: ComputedRef<IMultiselectOptions>
   clearEditingState: () => void
   newPage: () => void
   setEditingPage: (name: string) => void
   savePage: () => void
   removePage: (name: string) => void
+}
+
+interface IPageEdit extends IPageMetadata {
+  // Route of page to copy from
+  copyFrom?: string
 }
 
 interface IPageError {
@@ -22,7 +30,7 @@ interface IPageError {
 
 const getDefaultError = (): IPageError => ({ name: '', route: '' })
 
-const emptyPage = (): IPageMetadata => ({
+const emptyPage = (): IPageEdit => ({
   name: '',
   public: true,
   route: '/',
@@ -30,12 +38,12 @@ const emptyPage = (): IPageMetadata => ({
 })
 
 const editing = ref(false)
-const editingPage = reactive<IPageMetadata>(emptyPage())
+const editingPage = reactive<IPageEdit>(emptyPage())
 const editingPageSource = reactive<IPageMetadata>(emptyPage())
 const pageError = ref<IPageError>(getDefaultError())
 
 // Use this to avoid `head` being passed by reference
-const getMetadataCopy = (page: IPage | IPageMetadata): IPageMetadata => ({
+const getMetadataCopy = (page: IPage | IPageEdit): IPageMetadata => ({
   name: page.name,
   public: page.public,
   route: page.route,
@@ -113,6 +121,17 @@ export const usePageMenu = (): IUsePageMenuFeature => {
     return !pageError.value.name && !pageError.value.route
   }
 
+  const isNew = computed(() => {
+    return !(editingPageSource.route in site.value.pages)
+  })
+
+  const pageOptions = computed<IMultiselectOptions>(() => {
+    return Object.values(site.value.pages).map((page) => ({
+      label: page.name,
+      value: page.route,
+    }))
+  })
+
   const savePage = () => {
     if (editing.value) {
       if (!validatePage()) {
@@ -120,10 +139,10 @@ export const usePageMenu = (): IUsePageMenuFeature => {
       }
       const newPage = getMetadataCopy(editingPage)
 
-      if (editingPageSource.route in site.value.pages) {
-        editPage(getMetadataCopy(editingPageSource), newPage)
+      if (isNew.value) {
+        addPage(newPage, editingPage.copyFrom)
       } else {
-        addPage(newPage)
+        editPage(getMetadataCopy(editingPageSource), newPage)
       }
     }
     clearEditingState()
@@ -138,6 +157,8 @@ export const usePageMenu = (): IUsePageMenuFeature => {
     editingPage,
     pageError,
     pages,
+    isNew,
+    pageOptions,
     clearEditingState,
     newPage,
     setEditingPage,
