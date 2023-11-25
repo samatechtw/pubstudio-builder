@@ -10,7 +10,7 @@ import { triggerEventBehaviors } from '@pubstudio/frontend/util-runtime'
 import { IAddComponentData } from '@pubstudio/shared/type-command-data'
 import { IComponent, ISite } from '@pubstudio/shared/type-site'
 
-export const applyAddComponent = (site: ISite, data: IAddComponentData) => {
+export const addComponentHelper = (site: ISite, data: IAddComponentData): IComponent => {
   const context = site.context
   const { name, tag, content, parentId, events, inputs, parentIndex, sourceId, style } =
     data
@@ -51,7 +51,7 @@ export const applyAddComponent = (site: ISite, data: IAddComponentData) => {
       if (isDynamicComponent(child.id)) {
         console.log('Skip adding dynamic component', child.id)
       } else {
-        applyAddComponent(site, {
+        addComponentHelper(site, {
           name: child.name,
           tag: child.tag,
           content: child.content,
@@ -75,8 +75,14 @@ export const applyAddComponent = (site: ISite, data: IAddComponentData) => {
       triggerEventBehaviors(editorEvents.OnSelfAdded.behaviors, site, component)
     }
   }
+  return component
+}
+
+export const applyAddComponent = (site: ISite, data: IAddComponentData) => {
+  const component = addComponentHelper(site, data)
 
   // Select created component
+  // Split helper function to enable creating components without a page
   setSelectedComponent(site, component)
 }
 

@@ -35,6 +35,7 @@ export enum CommandType {
   ChangePage = 'changeP',
   SetHomePage = 'shP',
   MoveComponent = 'mvC',
+  // ReplacePageRoot = 'rpPR',
   SetDefaultsHead = 'setDH',
   SetPageHead = 'setPH',
   SetBreakpoint = 'setBP',

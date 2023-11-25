@@ -3,7 +3,7 @@
     ref="multiselectRef"
     :value="newVal"
     class="font-source-select"
-    :placeholder="t('theme.font_source')"
+    :placeholder="t('source')"
     :options="options"
     :clearable="false"
     @select="updateValue"

@@ -31,6 +31,20 @@
         :isError="!!pageError.route"
       />
     </div>
+    <div v-if="isNew" class="menu-row">
+      <div class="label">
+        {{ t('source') }}
+      </div>
+      <InfoBubble :message="t('build.source_info')" class="source-info" />
+      <PSMultiselect
+        :value="editingPage.copyFrom"
+        :options="pageOptions"
+        :clearable="true"
+        class="item copy-from"
+        :placeholder="t('build.page')"
+        @select="editingPage.copyFrom = $event?.value"
+      />
+    </div>
     <div class="menu-row route-row">
       <div class="label">
         {{ t('build.public') }}
@@ -70,12 +84,14 @@ import {
   Checkbox,
   ErrorMessage,
   InfoBubble,
+  PSMultiselect,
 } from '@pubstudio/frontend/ui-widgets'
 import { usePageMenu } from '../../lib/use-page-menu'
 
 const { t } = useI18n()
 
-const { pageError, editingPage, savePage, clearEditingState } = usePageMenu()
+const { pageError, editingPage, pageOptions, isNew, savePage, clearEditingState } =
+  usePageMenu()
 
 const publicCheckboxData = computed(() => ({
   checked: editingPage.public,
@@ -94,6 +110,15 @@ const predefinedRoutes = [{ label: notFoundRoute, value: notFoundRoute }]
 }
 .public-checkbox {
   margin: 8px 0;
+}
+.label {
+  @mixin title 13px;
+}
+.source-info {
+  margin-right: auto;
+}
+.copy-from {
+  width: 168px;
 }
 .page-menu-edit-actions {
   display: flex;

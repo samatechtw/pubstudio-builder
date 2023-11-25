@@ -87,6 +87,39 @@ describe('Add Page', () => {
     expect(site.pages[newPageMetadata.route].root.id).toEqual(rootId)
   })
 
+  it('should create page by copying root', () => {
+    const idBefore = site.context.nextId
+    const data = mockAddPageData(newPageMetadata, site.editor as IEditorContext)
+    const copyCmp = site.pages['/home'].root
+    data.root = {
+      parentId: '',
+      tag: copyCmp.tag,
+      content: copyCmp.content,
+      sourceId: copyCmp.id,
+      name: copyCmp.name,
+    }
+
+    // Add page and undo
+    applyAddPage(site, data)
+    // Assert two components added (root and one child)
+    expect(idBefore + 2).toEqual(site.context.nextId)
+    expect(site.pages[newPageMetadata.route].root.children?.[0].name).toEqual(
+      'ContainerHorizontal',
+    )
+
+    const newPageRootId = site.pages[newPageMetadata.route].root.id
+    undoAddPage(site, data)
+
+    // Assert new page does not exist
+    expect(Object.keys(site.pages)).toHaveLength(pageCount)
+    expect(site.pages[newPageMetadata.route]).toBeUndefined()
+    expect(Object.keys(site.context.components)).toHaveLength(componentCount)
+    expect(idBefore).toEqual(site.context.nextId)
+
+    // Assert component tree expand state is removed
+    expect(site.editor?.componentTreeExpandedItems?.[newPageRootId]).toBeUndefined()
+  })
+
   it('should trigger page change editor event', () => {
     const {
       oldBehavior,
