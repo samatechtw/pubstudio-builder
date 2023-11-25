@@ -127,6 +127,8 @@ export interface IEditorContext {
   showComponentTree: boolean
   // Record of expanded components in the component tree
   componentTreeExpandedItems: Record<string, boolean>
+  // Record of components hidden in the editor
+  componentsHidden: Record<string, boolean>
   // Ids of theme variables (colors) to show in color picker
   selectedThemeColors: Set<string>
   // Set to actual builder window size on page load

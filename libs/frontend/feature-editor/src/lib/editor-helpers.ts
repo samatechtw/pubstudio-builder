@@ -330,6 +330,19 @@ export const collapseComponentTreeItem = (
   }
 }
 
+export const toggleComponentHidden = (
+  editor: IEditorContext | undefined,
+  componentId: string,
+) => {
+  if (editor) {
+    if (editor.componentsHidden[componentId]) {
+      delete editor.componentsHidden[componentId]
+    } else {
+      editor.componentsHidden[componentId] = true
+    }
+  }
+}
+
 export const getComponentTreeItemId = (component: IComponent) => `cti-${component.id}`
 
 export const setShowComponentTree = (
