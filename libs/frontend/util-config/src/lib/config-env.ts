@@ -1,6 +1,7 @@
 import { ExecEnv } from '@pubstudio/shared/util-core'
 
-export const API_HOST = import.meta.env.VITE_API_HOST || ''
+export const SITE_API_URL = import.meta.env.VITE_SITE_API_URL || ''
+export const SITE_ID = import.meta.env.VITE_SITE_ID || ''
 export const EXEC_ENV = import.meta.env.VITE_EXEC_ENV || ExecEnv.Development
 
 export const WEB_URL = import.meta.env.VITE_WEB_URL

@@ -24,6 +24,7 @@ import { restoreSiteHelper } from './restore-site-helper'
 
 export interface IUseApiStoreProps {
   siteId: string
+  siteApiUrl?: string
 }
 
 interface IUpdateApiOptions {
@@ -76,11 +77,17 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
       getFn = platformSiteApi.getLocalSite
       updateFn = platformSiteApi.updateLocalSite
     } else {
-      // Get site server address from Platform API
-      const { getSite } = usePlatformSiteApi(platformApi)
-      const site = await getSite(siteId.value)
+      let serverAddress: string
+      if (props.siteApiUrl) {
+        serverAddress = props.siteApiUrl
+      } else {
+        // Get site server address from Platform API
+        const { getSite } = usePlatformSiteApi(platformApi)
+        const site = await getSite(siteId.value)
+        serverAddress = site.site_server.address
+      }
 
-      const siteApi = useSiteApi({ store, serverAddress: site.site_server.address })
+      const siteApi = useSiteApi({ store, serverAddress })
       getFn = siteApi.getSite
       updateFn = siteApi.updateSite
     }

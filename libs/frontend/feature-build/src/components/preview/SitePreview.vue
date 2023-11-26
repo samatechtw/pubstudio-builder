@@ -17,12 +17,12 @@ import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { useBuild } from '../../lib/use-build'
 
 const route = useRoute()
-const { initializeBuilder, site } = useBuild()
-const { checkOutdated } = useSiteSource()
+const { site } = useBuild()
+const { checkOutdated, initializeSite } = useSiteSource()
 const siteId = route.query.siteId ? route.query.siteId.toString() : undefined
 let checkInterval: ReturnType<typeof setInterval> | undefined
 // TODO -- API isn't working?
-await initializeBuilder(siteId)
+await initializeSite(siteId)
 
 const notFoundPage = computed(() => {
   return Object.values(site.value?.pages ?? {}).find(

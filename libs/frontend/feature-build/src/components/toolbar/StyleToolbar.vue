@@ -31,16 +31,11 @@
     <ToolbarBuilderWidth class="toolbar-builder-width" />
     <ToolbarBreakpoint class="toolbar-breakpoint" />
     <ToolbarItem
-      :tooltip="saving ? t('build.preview_saving') : t('build.preview')"
-      :disabled="saving"
+      :tooltip="isSaving ? t('build.preview_saving') : t('build.preview')"
+      :disabled="isSaving"
       class="preview-link"
     >
-      <span v-if="saving">
-        <Eye />
-      </span>
-      <router-link v-else :to="previewPageLink">
-        <Eye />
-      </router-link>
+      <slot name="preview" />
     </ToolbarItem>
     <ToolbarItem
       :active="editor?.debugBounding"
@@ -75,7 +70,6 @@
 
 <script lang="ts" setup>
 import { computed, ref } from 'vue'
-import { useRoute } from 'vue-router'
 import { useI18n } from 'petite-vue-i18n'
 import { useBuild, useHistory } from '@pubstudio/frontend/feature-build'
 import {
@@ -91,7 +85,7 @@ import {
   Settings,
 } from '@pubstudio/frontend/ui-widgets'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
-import { ConfirmModal, Eye } from '@pubstudio/frontend/ui-widgets'
+import { ConfirmModal } from '@pubstudio/frontend/ui-widgets'
 import { BoundingBox } from '@pubstudio/frontend/ui-widgets'
 import { CommandType } from '@pubstudio/shared/type-command'
 import ToolbarText from './ToolbarText.vue'
@@ -99,7 +93,6 @@ import ToolbarContainer from './ToolbarContainer.vue'
 import ToolbarPseudoClass from './ToolbarPseudoClass.vue'
 import ToolbarBuilderWidth from './ToolbarBuilderWidth.vue'
 import ToolbarBreakpoint from './ToolbarBreakpoint.vue'
-import { SiteSaveState } from '@pubstudio/shared/type-site-store'
 
 defineProps<{
   hideSettings?: boolean
@@ -109,10 +102,9 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
-const route = useRoute()
 
-const { site, commandAlert, editor, resetSite } = useBuild()
-const { siteStore } = useSiteSource()
+const { commandAlert, editor, resetSite } = useBuild()
+const { siteStore, isSaving } = useSiteSource()
 const { canUndo, canRedo, undo, redo } = useHistory()
 const { apiSiteId } = useSiteSource()
 const showConfirmReset = ref(false)
@@ -136,24 +128,6 @@ const toggleComponentTree = () => {
     setShowComponentTree(editor.value, !show)
   }
 }
-
-const saving = computed(() => {
-  // FIXME: the `.value` of `saveState` is omitted because it's unwrapped by site source.
-  // Correct the typing to get rid of the type casting below.
-  const saveState = siteStore.value?.saveState as unknown as SiteSaveState | undefined
-  return saveState === SiteSaveState.Saving
-})
-
-const previewPageLink = computed(() => {
-  const { homePage } = site.value.defaults
-  const page = editor.value?.active ?? homePage
-  const siteId = route.params.siteId ? route.params.siteId.toString() : ''
-  return {
-    name: 'Preview',
-    params: { pathMatch: page.replace(/^\//, '') },
-    query: { siteId },
-  }
-})
 </script>
 
 <style lang="postcss" scoped>

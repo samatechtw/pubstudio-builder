@@ -1,6 +1,9 @@
 <template>
-  <ExamplePreview v-if="showPreview" @close="showPreview = false" />
-  <ExampleBuilder v-else @showPreview="showPreview = true" />
+  <Suspense
+    ><ExamplePreview v-if="showPreview" @close="showPreview = false" />
+    <ExampleBuilder v-else @showPreview="showPreview = true" />
+  </Suspense>
+
   <AppHUD />
 </template>
 
@@ -18,20 +21,43 @@ onMounted(async () => {
 </script>
 
 <style lang="postcss">
+@import '@theme/css/components/app.postcss';
+@import '@theme/css/mixins.postcss';
+
 #app {
   height: 100%;
 }
 
 .app {
-  display: flex;
-  flex-direction: column;
+  @mixin flex-col;
   height: 100%;
   overflow-y: auto;
   & > .app-content {
-    display: flex;
-    flex-direction: column;
+    @mixin flex-col;
+    padding-top: $header-height;
     flex-shrink: 0;
     flex-grow: 1;
+    background-color: white;
+    & > .app-router-view {
+      flex-grow: 1;
+    }
+  }
+}
+
+.pm-p {
+  &:after {
+    content: '\200b';
+  }
+  &.pm-p-placeholder {
+    cursor: text;
+  }
+}
+
+@media (max-width: 640px) {
+  .app {
+    & > .app-content {
+      padding-top: $header-height-mobile;
+    }
   }
 }
 </style>
