@@ -121,7 +121,6 @@ export interface IUseBuild {
   currentPseudoClass: ComputedRef<CssPseudoClass>
   selectedComponentFlattenedStyles: ComputedRef<IRawStylesWithSource>
   commandAlert: Ref<CommandType | undefined>
-  initializeBuilder: (siteId: string | undefined) => Promise<void>
   clearSiteError: () => void
   resetSite: () => void
   replaceSite: (newSite: ISite) => void
@@ -215,12 +214,8 @@ export interface IUseBuild {
 const commandAlert = uiAlert<CommandType | undefined>(ref())
 
 export const useBuild = (): IUseBuild => {
-  const { initializeSite, site, siteError, siteStore } = useSiteSource()
+  const { site, siteError, siteStore } = useSiteSource()
   const { pushCommand, replaceLastCommand, getLastCommand } = useCommand()
-
-  const initializeBuilder = async (siteId: string | undefined): Promise<void> => {
-    await initializeSite(siteId)
-  }
 
   const activePage = computed(() => {
     const route = site.value.editor?.active
@@ -1226,7 +1221,6 @@ export const useBuild = (): IUseBuild => {
     selectedComponentFlattenedStyles,
     activePage,
     commandAlert,
-    initializeBuilder,
     clearSiteError,
     resetSite,
     replaceSite,

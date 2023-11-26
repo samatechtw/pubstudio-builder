@@ -1,146 +1,246 @@
 <template>
-  <div class="example-builder">
-    <h2>PubStudio Builder Library Example Usage</h2>
-    <div class="info">
-      <p>
-        This is an example of how <span>@pubstudio/builder</span> can be used to set up a
-        custom WYSIWYG editor
-      </p>
-      <p>The public API is a work in progress, and not yet ready for production use.</p>
-      <p>The builder comes with:</p>
-      <ul>
-        <li>A WYSIWYG drag and drop editor for placing components and editing text.</li>
-        <li>Menus for creating components, styles, and theme.</li>
-        <li>Component tree view</li>
-        <li>Style editing toolbar</li>
-        <li>Component detail view</li>
-      </ul>
-      <p>
-        Click <span class="preview" @click="emit('showPreview')">here</span> for a full
-        screen preview
-      </p>
-      <p>This checkbox toggles the component tree.</p>
-      <div class="checks">
-        <Checkbox
-          :item="{ label: 'Component Tree', checked: showTree }"
-          @checked="showTree = !showTree"
-        />
-      </div>
-      <p>
-        In this example, the menus and component detail view are disabled. The buttons can
-        be used to create custom components:
-      </p>
-      <div class="buttons">
-        <PSButton text="Container" @click="createContainer" />
-        <PSButton text="Text" @click="createText" />
-        <PSButton text="Divider" @click="createDivider" />
-      </div>
+  <div v-if="site" class="build-wrap">
+    <div class="style-toolbar-wrap">
+      <StyleToolbar />
     </div>
-    <!--
-      TODO -- figure out how to include without enabling i18n
-    <StyleToolbar :hideSettings="true" />
-    -->
     <div class="build">
+      <BuildMenu
+        @toggleStyleMenu="toggleEditorMenu(editor, EditorMode.Styles, $event)"
+        @toggleThemeMenu="toggleEditorMenu(editor, EditorMode.Theme, $event)"
+        @openPageMenu="toggleEditorMenu(editor, EditorMode.Page, true)"
+        @showCreateModal="showCreateModal = true"
+      />
+      <ComponentTree />
       <BuildContent />
-      <ComponentTree v-if="showTree" />
+      <div class="build-right-menu">
+        <Transition name="fade">
+          <ComponentMenu
+            v-if="showComponentMenu"
+            :component="editor?.selectedComponent!"
+            :siteId="siteId ?? ''"
+            class="build-right-menu-content"
+          />
+          <ThemeMenu
+            v-else-if="editor?.mode === EditorMode.Theme"
+            class="build-right-menu-content"
+          />
+          <StyleMenu
+            v-else-if="editor?.mode === EditorMode.Styles"
+            class="build-right-menu-content"
+          />
+          <PageMenu
+            v-else-if="editor?.mode === EditorMode.Page"
+            class="build-right-menu-content"
+          />
+          <div v-else class="build-right-menu-empty">
+            {{ t('build.menu_empty') }}
+          </div>
+        </Transition>
+      </div>
+      <!-- TODO -- decouple from platform API
+      <CreateAssetModal
+        :show="showCreateModal"
+        :sites="sites"
+        :initialSiteId="apiSiteId"
+        :initialFile="droppedFile?.file"
+        :loadSites="true"
+        @complete="showCreateComplete"
+        @cancel="showCreateCancel"
+      />
+      -->
+      <AlertModal
+        :show="siteError === 'errors.Unauthorized'"
+        :title="t('errors.unauthorized_title')"
+        :text="t('errors.Unauthorized')"
+        @done="siteError = undefined"
+      />
+      <AlertModal
+        v-if="apiSiteId === 'scratch'"
+        :show="!store.misc.scratchPopupViewed.value"
+        :title="t('build.scratch_title')"
+        :text="t('build.scratch_text')"
+        @done="store.misc.setScratchPopupViewed(true)"
+      />
+      <SiteErrorModal
+        :show="!!siteError && siteError !== 'errors.Unauthorized' && showSiteErrorModal"
+        :siteId="apiSiteId ?? ''"
+        :siteError="siteError ?? ''"
+        :showSupport="false"
+        @cancel="showSiteErrorModal = false"
+      />
     </div>
+    <SiteSaveErrorModal />
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
-import { Checkbox, PSButton } from '@pubstudio/frontend/ui-widgets'
-import { BuildContent, ComponentTree, useBuild } from '@pubstudio/frontend/feature-build'
-import { useBuildEvent } from '@pubstudio/frontend/feature-build-event'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { useI18n } from 'petite-vue-i18n'
+import { store } from '@pubstudio/frontend/data-access-web-store'
+import {
+  AlertModal,
+  Logo,
+  SiteErrorModal,
+  SiteSaveErrorModal,
+} from '@pubstudio/frontend/ui-widgets'
+import {
+  BuildContent,
+  BuildMenu,
+  StyleMenu,
+  ComponentMenu,
+  ComponentTree,
+  ThemeMenu,
+  PageMenu,
+  StyleToolbar,
+  useBuild,
+  useHistory,
+  useDragDropData,
+} from '@pubstudio/frontend/feature-build'
+import { makeAddImageData } from '@pubstudio/frontend/util-command'
+import { useBuildEvent, hotkeysDisabled } from '@pubstudio/frontend/feature-build-event'
+import { Keys, useKeyListener } from '@pubstudio/frontend/util-key-listener'
+import { EditorMode } from '@pubstudio/shared/type-site'
+import { toggleEditorMenu } from '@pubstudio/frontend/feature-editor'
+import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
+import { ICreatePlatformSiteAssetResponse } from '@pubstudio/shared/type-api-platform-site-asset'
+import { SITE_ID, SITE_API_URL } from '@pubstudio/frontend/util-config'
 
-const emit = defineEmits<{
-  (e: 'showPreview'): void
-}>()
+const { t } = useI18n()
 
-const { addComponent } = useBuild()
+const { activePage, addComponentData, site, editor, siteError } = useBuild()
+const showSiteErrorModal = ref(true)
+const { droppedFile } = useDragDropData()
+
+const siteId = SITE_ID || 'scratch'
+const { siteStore, apiSiteId, isSaving, initializeSite } = useSiteSource()
+await initializeSite(siteId, SITE_API_URL)
 useBuildEvent()
+const { undo, redo } = useHistory()
 
-const showTree = ref(false)
+const showCreateModal = ref(false)
 
-const createContainer = () => {
-  addComponent({
-    name: 'Container',
-    content: '',
-    style: {
-      custom: {
-        default: {
-          width: '100%',
-          'min-height': '120px',
-          'background-color': '#AEDCFF',
-        },
-      },
-    },
-  })
+watch(droppedFile, (newVal) => {
+  if (newVal) {
+    showCreateModal.value = true
+  }
+})
+
+const showCreateComplete = (asset: ICreatePlatformSiteAssetResponse) => {
+  if (droppedFile.value && activePage.value) {
+    const addImageData = makeAddImageData(site.value, activePage.value.root, asset)
+    if (addImageData) {
+      addComponentData({
+        ...addImageData,
+        parentId: droppedFile.value.componentId,
+        parentIndex: droppedFile.value.index,
+      })
+    }
+  }
+  droppedFile.value = undefined
+  showCreateModal.value = false
 }
 
-const createText = () => {
-  addComponent({
-    name: 'Some text...',
-    style: {
-      custom: {
-        default: {
-          width: '100%',
-          padding: '6px 0',
-          color: '#333',
-          'font-family': "'Courier New', monospace",
-          'font-size': '17px',
-        },
-      },
-    },
-  })
+const showCreateCancel = () => {
+  showCreateModal.value = false
+  droppedFile.value = undefined
 }
 
-const createDivider = () => {
-  addComponent({
-    name: 'Divider',
-    content: '',
-    style: {
-      custom: {
-        default: {
-          width: '90%',
-          margin: '16px auto',
-          height: '1px',
-          'background-color': '#aaa',
-        },
-      },
-    },
-  })
+// For debugging editor mode state
+const showComponentMenu = computed(() => {
+  return (
+    editor.value?.mode === EditorMode.SelectedComponent &&
+    !!editor.value?.selectedComponent
+  )
+})
+
+useKeyListener(
+  Keys.Z,
+  (evt: KeyboardEvent) => {
+    evt.stopImmediatePropagation()
+    if (hotkeysDisabled(evt, editor.value)) {
+      return
+    }
+    const isZ = evt.key === 'Z' || evt.key === 'z'
+    if (isZ && (evt.ctrlKey || evt.metaKey) && evt.shiftKey) {
+      redo(true)
+    } else if (isZ && (evt.ctrlKey || evt.metaKey)) {
+      undo(true)
+    }
+  },
+  'keydown',
+)
+
+const beforeWindowUnload = (e: BeforeUnloadEvent) => {
+  if (isSaving.value) {
+    e.preventDefault()
+    // Chrome requires returnValue to be set
+    e.returnValue = t('build.unsaved')
+    // Note: Most modern browsers no longer allow custom messages
+    return e.returnValue
+  } else {
+    siteStore.value.save(site.value, true)
+  }
 }
+
+const saveSiteBeforeLeave = () => {
+  if (isSaving.value) {
+    siteStore.value.save(site.value, true)
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('beforeunload', beforeWindowUnload)
+})
+onBeforeUnmount(() => {
+  window.removeEventListener('beforeunload', beforeWindowUnload)
+})
 </script>
 
 <style lang="postcss" scoped>
-.example-builder {
-  color: black;
-  padding: 64px 40px 32px 40px;
-  font-family: 'Trebuchet MS', sans-serif;
-  font-size: 15px;
-  span {
-    font-weight: bold;
-  }
+@import '@theme/css/mixins.postcss';
+
+.build-wrap {
+  height: 100%;
 }
 .build {
+  @mixin flex-row;
+}
+.build-right-menu {
+  @mixin menu;
+  height: auto;
+  max-height: $view-height;
+  position: relative;
+  overflow: scroll;
+}
+.build-right-menu-content {
+  width: 100%;
+}
+.build-right-menu-empty {
+  @mixin title-medium 20px;
+  color: $grey-500;
+  padding: 16px;
+}
+.style-toolbar-wrap {
   display: flex;
-  flex-direction: row;
 }
-.build {
+.home {
+  @mixin flex-center;
+  background-color: $purple-button;
+  padding: 0 2px;
+  width: 48px;
 }
-.preview {
-  cursor: pointer;
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s ease;
 }
-.buttons {
-  margin-top: 12px;
-  > div:not(:first-child) {
-    margin-left: 8px;
-  }
+
+.fade-enter-from {
+  opacity: 0;
 }
-@media (max-width: 640px) {
-  .example-builder {
-    padding: 48px 24px;
-  }
+.fade-leave-to {
+  position: absolute;
+  padding: 0 24px;
+  opacity: 0;
 }
 </style>

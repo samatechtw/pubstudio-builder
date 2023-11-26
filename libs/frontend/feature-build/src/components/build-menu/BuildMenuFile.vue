@@ -65,7 +65,6 @@ import {
   validateSite,
 } from '@pubstudio/frontend/util-site-store'
 import { loadFile } from '@pubstudio/frontend/util-doc'
-import { UserType } from '@pubstudio/shared/type-api-platform-user'
 import { deserializeSite } from '@pubstudio/frontend/util-site-deserialize'
 import { ISerializedSite } from '@pubstudio/shared/type-site'
 import { useBuild } from '../../lib/use-build'

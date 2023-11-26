@@ -4,10 +4,11 @@ import { useLocalStore } from './use-local-store'
 
 export interface IUseSiteStoreProps {
   siteId: string | undefined
+  siteApiUrl?: string
 }
 
 export const useSiteStore = (props: IUseSiteStoreProps): ISiteStore => {
-  const { siteId } = props
+  const { siteId, siteApiUrl } = props
   // The reason we initialize localstore like this is not obvious, the purpose
   // is to allow other code to later call `useLocalStore` without calculating the key,
   // since it's cached in the module.
@@ -15,7 +16,7 @@ export const useSiteStore = (props: IUseSiteStoreProps): ISiteStore => {
   const localStoreKey = isScratch ? 'scratchSite' : 'site'
   const localStore = useLocalStore(localStoreKey)
 
-  const siteStore = isScratch ? localStore : useApiStore({ siteId })
+  const siteStore = isScratch ? localStore : useApiStore({ siteId, siteApiUrl })
   return {
     ...siteStore,
   }
