@@ -32,6 +32,7 @@
         :text="t('build.nav_menu')"
         :builtinComponentId="navMenu.id"
       />
+      <NewComponent class="new-ul" :text="t('build.ul')" :builtinComponentId="ul.id" />
       <NewComponent
         class="new-header"
         :text="t('build.header')"
@@ -55,6 +56,7 @@
       <NewComponent class="new-h4" :text="t('build.h4')" :builtinComponentId="h4.id" />
       <NewComponent class="new-h5" :text="t('build.h5')" :builtinComponentId="h5.id" />
       <NewComponent class="new-h6" :text="t('build.h6')" :builtinComponentId="h6.id" />
+      <NewComponent class="new-ol" :text="t('build.ol')" :builtinComponentId="ol.id" />
       <NewComponent
         class="new-input"
         :text="t('build.input')"
@@ -77,6 +79,8 @@ import {
   h5,
   h6,
   image,
+  ol,
+  ul,
   link,
   navMenu,
   button,

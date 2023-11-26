@@ -129,7 +129,7 @@ export interface IUseBuild {
   addComponentData: (data: IAddComponentData) => void
   duplicateComponent: () => void
   pasteComponent: (copiedComponentId: string, parent: IComponent) => void
-  addBuiltinComponent: (id: string) => void
+  addBuiltinComponent: (id: string, parentId?: string) => void
   editSelectedComponent: (fields: IEditComponentFields) => void
   editComponent: (component: IComponent, fields: IEditComponentFields) => void
   setCustomStyle: (
@@ -275,7 +275,11 @@ export const useBuild = (): IUseBuild => {
   }
 
   const addComponent = (data?: Partial<IAddComponentData>) => {
-    const parent = site.value.editor?.selectedComponent
+    let parent: IComponent | undefined
+    if (data?.parentId) {
+      parent = resolveComponent(site.value.context, data.parentId)
+    }
+    parent = parent ?? site.value.editor?.selectedComponent
     if (!activePage.value) {
       return
     }
@@ -304,11 +308,15 @@ export const useBuild = (): IUseBuild => {
     pushCommand(CommandType.AddComponent, data)
   }
 
-  const addBuiltinComponent = (id: string) => {
+  const addBuiltinComponent = (id: string, parentId?: string) => {
     if (!activePage.value) {
       return
     }
-    const parent = site.value.editor?.selectedComponent ?? activePage.value.root
+    let parent: IComponent | undefined
+    if (parentId) {
+      parent = resolveComponent(site.value.context, parentId)
+    }
+    parent = parent ?? site.value.editor?.selectedComponent ?? activePage.value.root
 
     const builtinComponent = resolveComponent(site.value.context, id)
     const addBuiltinComponentData = makeAddBuiltinComponentData(

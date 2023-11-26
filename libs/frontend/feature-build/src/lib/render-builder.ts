@@ -25,6 +25,7 @@ import {
 } from '@pubstudio/shared/type-site'
 import { h, VNode } from 'vue'
 import LinkTooltip from '../components/build-render/LinkTooltip.vue'
+import { ListAdd } from '../components/build-render/ListAdd'
 import ProseMirrorEditor from '../components/build-render/ProseMirrorEditor.vue'
 import { IDndState } from './dnd/builder-dnd'
 import { BuilderDndComponent } from './dnd/builder-dnd-component'
@@ -49,28 +50,57 @@ export const computeBuilderStyleProps = (
   const builderProps: Record<string, string> = {}
   let extraChildren: VNode[] | undefined = undefined
   const builderClass: string[] = []
+  let position: string | null | undefined = undefined
+
+  // Cache the CSS position. Must be called before using `position`
+  const getPosition = (): string | null => {
+    if (position !== undefined) {
+      return position
+    }
+    position =
+      findStyles(
+        [Css.Position],
+        site,
+        component,
+        descSortedBreakpoints.value,
+        activeBreakpoint.value,
+      ).position ?? null
+    return position
+  }
 
   const selected = editor?.selectedComponent?.id === component.id
 
-  if (data.attrs.href !== undefined && component.tag === Tag.A) {
-    extraChildren = [h(LinkTooltip, { link: data.attrs.href, text: component.content })]
-    data.mixins.push('__link')
-    data.attrs.href = 'javascript:'
-  }
   if (component.tag === Tag.Img && !data.attrs.src) {
     data.mixins.push('__image')
   }
-  if (selected && component.tag === Tag.Svg) {
-    // Make sure wrapper is `position: relative;` so we can position the edit icon
-    builderClass.push('svg-sel')
-    // Add an icon that shows SvgEditModal on click
-    extraChildren = [
-      h(Edit, {
-        color: 'white',
-        class: 'svg-edit',
-        onClick: () => setEditSvg(site.editor, { content: component.content ?? '' }),
-      }),
-    ]
+  if (selected) {
+    if (data.attrs.href !== undefined && component.tag === Tag.A) {
+      extraChildren = [h(LinkTooltip, { link: data.attrs.href, text: component.content })]
+      data.mixins.push('__link')
+      data.attrs.href = 'javascript:'
+      getPosition()
+      if (position !== 'absolute' && position !== 'relative') {
+        builderClass.push('force-relative')
+      }
+    }
+    if (component.tag === Tag.Ul || component.tag === Tag.Ol) {
+      extraChildren = [h(ListAdd, { componentId: component.id })]
+      getPosition()
+      if (position !== 'absolute' && position !== 'relative') {
+        builderClass.push('force-relative')
+      }
+    } else if (component.tag === Tag.Svg) {
+      // Make sure wrapper is `position: relative;` so we can position the edit icon
+      builderClass.push('svg-sel')
+      // Add an icon that shows SvgEditModal on click
+      extraChildren = [
+        h(Edit, {
+          color: 'white',
+          class: 'svg-edit',
+          onClick: () => setEditSvg(site.editor, { content: component.content ?? '' }),
+        }),
+      ]
+    }
   }
 
   const hoveredInComponentTree =
@@ -79,14 +109,7 @@ export const computeBuilderStyleProps = (
   if (hoveredInComponentTree) {
     builderClass.push('hover-in-tree')
 
-    const { position } = findStyles(
-      [Css.Position],
-      site,
-      component,
-      descSortedBreakpoints.value,
-      activeBreakpoint.value,
-    )
-    if (position === 'absolute') {
+    if (getPosition() === 'absolute') {
       builderClass.push('hover-in-tree--absolute')
     }
 
@@ -98,15 +121,9 @@ export const computeBuilderStyleProps = (
   if (hoveredInEditor) {
     builderClass.push('hover')
 
-    const { position } = findStyles(
-      [Css.Position],
-      site,
-      component,
-      descSortedBreakpoints.value,
-      activeBreakpoint.value,
-    )
-    if (position === 'absolute') {
-      builderClass.push('hover-absolute')
+    getPosition()
+    if (position !== 'absolute' && position !== 'relative') {
+      builderClass.push('force-relative')
     }
 
     const onDragstart = (e: DragEvent) => {

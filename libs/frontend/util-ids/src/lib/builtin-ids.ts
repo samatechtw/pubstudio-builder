@@ -50,6 +50,11 @@ export const h6StyleId = nextStyleId(globalContext)
 export const h6Id = componentId(globalContext.namespace, 'h6')
 export const svgStyleId = nextStyleId(globalContext)
 export const svgId = componentId(globalContext.namespace, 'svg')
+export const listStyleId = nextStyleId(globalContext)
+export const listItemStyleId = nextStyleId(globalContext)
+export const ulId = componentId(globalContext.namespace, 'ul')
+export const ollId = componentId(globalContext.namespace, 'ol')
+export const liId = componentId(globalContext.namespace, 'li')
 
 // Form
 export const inputStyleId = nextStyleId(globalContext)
