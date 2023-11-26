@@ -83,8 +83,8 @@ export const useGradient = (options: IGradientOptions): IGradientFeature => {
     const gradientColor = gradientColors.value[selectedIndex.value]
     if (gradientColor) {
       gradientColor.rgba = rgba
+      gradientColor.themeVar = themeVar
     }
-    gradientColor.themeVar = themeVar
   }
 
   const updateGradientStop = (params: IUpdateGradientStopParams) => {

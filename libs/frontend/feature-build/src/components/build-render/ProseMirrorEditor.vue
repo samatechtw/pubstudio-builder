@@ -131,6 +131,10 @@ watch(
   content: '\00a0';
 }
 
+.ProseMirror-focused {
+  padding: 0 6px;
+}
+
 /* Style when ProseMirror editor is active */
 .ProseMirror > p {
   margin-top: 0;

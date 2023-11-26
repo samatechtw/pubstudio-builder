@@ -9,15 +9,16 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { ref, toRefs } from 'vue'
 import { copy } from '@pubstudio/frontend/util-doc'
 import { useTooltip } from '@pubstudio/frontend/util-tooltip'
 import { Copy } from '@pubstudio/frontend/ui-widgets'
 import { useClickaway } from '@pubstudio/frontend/util-clickaway'
 
-defineProps<{
+const props = defineProps<{
   link: string
 }>()
+const { link } = toRefs(props)
 
 const { itemRef, arrowStyle, tooltipRef, tooltipStyle } = useTooltip({
   placement: 'top',
@@ -49,6 +50,17 @@ const showLink = () => {
   @mixin overlay;
   z-index: 1000;
   pointer-events: none;
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+.edit {
+  @mixin size 28px;
+  cursor: pointer;
+  filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.8));
+  position: absolute;
+  top: -20px;
+  right: -20px;
 }
 .link {
   @mixin tooltip;

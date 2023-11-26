@@ -173,13 +173,10 @@ $border-offset: 0px;
           position: absolute;
         }
       }
-      :deep(.hover) {
+      :deep(.force-relative) {
         position: relative;
-        /* Absolute position elements don't display correctly if we override their position,
-          so they're marked with a `hover-absolute` class in `computeBuilderStyleProps` */
-        &.hover-absolute {
-          position: absolute;
-        }
+      }
+      :deep(.hover) {
         /* An absolute-positioned img is wrapped with div.hover-wrap on hover. We need to match the original
         image insets to avoid display issues. */
         &.hover-wrap-absolute {

@@ -16,6 +16,7 @@ import { headerStyle } from './components/builtin-header'
 import { imageStyle } from './components/builtin-image'
 import { inputStyle } from './components/builtin-input'
 import { linkStyle } from './components/builtin-link'
+import { listStyle } from './components/builtin-list'
 import { navMenuItemStyle, navMenuStyle } from './components/builtin-nav-menu'
 import { svgStyle } from './components/builtin-svg'
 import { textStyle } from './components/builtin-text'
@@ -40,6 +41,7 @@ export const builtinStyles: Record<string, IStyle> = {
   [headerStyle.id]: headerStyle,
   [footerStyle.id]: footerStyle,
   [inputStyle.id]: inputStyle,
+  [listStyle.id]: listStyle,
 }
 
 export const resolveStyle = (

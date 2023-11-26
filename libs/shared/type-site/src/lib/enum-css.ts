@@ -47,6 +47,8 @@ export enum Css {
   Left = 'left',
   LetterSpacing = 'letter-spacing',
   LineHeight = 'line-height',
+  ListStylePosition = 'list-style-position',
+  ListStyleType = 'list-style-type',
   Margin = 'margin',
   MaxHeight = 'max-height',
   MaxWidth = 'max-width',

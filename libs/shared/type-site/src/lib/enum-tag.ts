@@ -15,6 +15,9 @@ export enum Tag {
   Span = 'span',
   Svg = 'svg',
   Input = 'input',
+  Ul = 'ul',
+  Ol = 'ol',
+  Li = 'li',
 }
 
 export const TagValues: Tag[] = Object.values(Tag)

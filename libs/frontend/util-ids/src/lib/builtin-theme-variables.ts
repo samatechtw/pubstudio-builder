@@ -9,6 +9,7 @@ export const builtinThemeVariables = {
   'size-h6': '16px',
   'color-text': '#1b2125',
   'size-text': '16px',
+  'size-list': '1.3rem',
   'color-link': '#0765d3',
   'color-link-visited': '#6E00FF',
   'color-primary': '#95b1d1',
