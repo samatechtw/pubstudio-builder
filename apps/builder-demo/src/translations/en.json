@@ -285,6 +285,8 @@
     "to_mixin": "Convert to reusable style",
     "child": "Child Styles",
     "child_info": "Set styles for this component's children",
+    "child_missing": "Some of the selectors' corresponding children of this component are not present.",
+    "child_missing_current": "This selector's corresponding child is not present.",
     "selector": "Selector",
     "toolbar": {
       "component_tree": "Component Tree",
@@ -357,6 +359,8 @@
       "editC": "Edit Component",
       "rmC": "Remove Component",
       "setCCS": "Set Component Style",
+      "setCOS": "Set Component Override Style",
+      "rmCOS": "Remove Component Override Style",
       "mergeCS": "Merge Styles",
       "addCM": "Add Reusable Style",
       "rmCM": "Remove Reusable Style",

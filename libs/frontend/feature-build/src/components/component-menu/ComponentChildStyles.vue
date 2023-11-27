@@ -3,7 +3,7 @@
     <EditMenuTitle
       :title="t('style.child')"
       :collapsed="collapsed"
-      :showAdd="selector !== undefined"
+      :showAdd="selector !== undefined && !isMissingSelector(selector)"
       @add="setEditStyle('')"
       @toggleCollapse="collapsed = !collapsed"
     >
@@ -15,13 +15,37 @@
         :placeholder="t('style.selector')"
         :customLabel="true"
         class="selector"
+        :class="{
+          'has-missing-selector': hasMissingSelector,
+          'current-selector-missing': currentSelectorMissing,
+        }"
         @select="setSelector"
         @close="labelLeave"
       >
-        <div @mouseenter="labelEnter(label)" @mouseleave="labelLeave">
+        <div
+          :class="{ 'missing-selector': isMissingSelector(label) }"
+          @mouseenter="labelEnter(label)"
+          @mouseleave="labelLeave"
+        >
           {{ label }}
         </div>
       </PSMultiselect>
+      <template v-if="selector !== undefined && isMissingSelector(selector)">
+        <InfoBubble
+          :message="t('style.child_missing_current')"
+          color="#ef4444"
+          placement="top"
+          class="missing-info-current"
+        />
+        <Minus class="delete-selector" @click="removeSelector" />
+      </template>
+      <InfoBubble
+        v-else-if="hasMissingSelector"
+        :message="t('style.child_missing')"
+        color="#ef4444"
+        placement="top"
+        class="missing-info"
+      />
     </EditMenuTitle>
     <div class="style-rows" :class="{ collapsed }">
       <StyleRow
@@ -37,20 +61,21 @@
         :key="`${entry.pseudoClass}-${entry.property}-${entry.value}`"
         :style="entry"
         :editing="editing(entry.property)"
+        :inheritedFrom="getInheritedFrom(entry)"
         :error="!resolveThemeVariables(site.context, entry.value)"
         class="menu-row"
         @edit="setEditStyle"
         @save="updateStyle(entry, $event)"
-        @remove="removeStyle(entry)"
+        @remove="removeEntry(entry)"
       />
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { computed, ref, toRefs } from 'vue'
+import { computed, ref, toRefs, watch } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
-import { InfoBubble, PSMultiselect } from '@pubstudio/frontend/ui-widgets'
+import { InfoBubble, PSMultiselect, Minus } from '@pubstudio/frontend/ui-widgets'
 import {
   Css,
   IComponent,
@@ -78,6 +103,7 @@ const {
   editor,
   currentPseudoClass,
   setOverrideStyle,
+  removeComponentOverrideStyleEntry,
   removeComponentOverrideStyle,
 } = useBuild()
 
@@ -86,13 +112,38 @@ const props = defineProps<{
 }>()
 const { component } = toRefs(props)
 
-const selector = ref()
+const getDefaultSelector = (): string | undefined => {
+  return Object.keys(component.value.style.overrides ?? {})[0]
+}
+
+const selector = ref(getDefaultSelector())
 const collapsed = ref(true)
 const editStyleProp = ref<string | undefined>()
 
+const childrenIdSet = computed(
+  () => new Set(component.value.children?.map((child) => child.id)),
+)
+
+const overriddenChildrenIdSet = computed(
+  () => new Set(Object.keys(component.value.style.overrides ?? {})),
+)
+
 const selectors = computed(() => {
-  return (component.value.children ?? []).map((c) => c.id)
+  const allIds = [...childrenIdSet.value, ...overriddenChildrenIdSet.value]
+  const uniqueIds = new Set(allIds)
+  return Array.from(uniqueIds)
 })
+
+const hasMissingSelector = computed(() => {
+  const overriddenChildrenIds = Array.from(overriddenChildrenIdSet.value)
+  return overriddenChildrenIds.some((id) => !childrenIdSet.value.has(id))
+})
+
+const currentSelectorMissing = computed(
+  () =>
+    !!selector.value &&
+    !component.value.children?.some((child) => child.id === selector.value),
+)
 
 const showNewStyle = computed(() => {
   return editStyleProp.value === ''
@@ -100,6 +151,10 @@ const showNewStyle = computed(() => {
 
 const editing = (propName: string) => {
   return editStyleProp.value === propName
+}
+
+const isMissingSelector = (childId: string) => {
+  return !childrenIdSet.value.has(childId)
 }
 
 const labelEnter = (id: string) => {
@@ -146,6 +201,16 @@ const childStyles = computed<IInheritedStyleEntry[]>(() => {
   }
 })
 
+const getInheritedFrom = (entry: IInheritedStyleEntry) => {
+  if (entry.sourceBreakpointId !== activeBreakpoint.value.id) {
+    return t('style.inherited_breakpoint', {
+      breakpoint: site.value.context.breakpoints[entry.sourceBreakpointId]?.name,
+    })
+  } else {
+    return undefined
+  }
+}
+
 const setSelector = (sel: string | undefined) => {
   selector.value = sel
   if (collapsed.value) {
@@ -161,25 +226,46 @@ const setEditStyle = (prop: string | undefined) => {
 }
 
 const updateStyle = (oldStyle: IInheritedStyleEntry, newStyle: IStyleEntry) => {
-  const oldStyleEntry: IStyleEntry | undefined =
-    oldStyle.sourceBreakpointId === activeBreakpoint.value.id
-      ? omitSourceBreakpointId(oldStyle)
-      : undefined
+  if (selector.value) {
+    const oldStyleEntry: IStyleEntry | undefined =
+      oldStyle.sourceBreakpointId === activeBreakpoint.value.id
+        ? omitSourceBreakpointId(oldStyle)
+        : undefined
 
-  setOverrideStyle(selector.value, oldStyleEntry, newStyle)
-  setEditStyle(undefined)
+    setOverrideStyle(selector.value, oldStyleEntry, newStyle)
+    setEditStyle(undefined)
+  }
 }
 
 const addStyle = (newStyle: IStyleEntry) => {
-  newStyle.pseudoClass = currentPseudoClass.value
-  setOverrideStyle(selector.value, undefined, newStyle)
-  setEditStyle(undefined)
+  if (selector.value) {
+    newStyle.pseudoClass = currentPseudoClass.value
+    setOverrideStyle(selector.value, undefined, newStyle)
+    setEditStyle(undefined)
+  }
 }
 
-const removeStyle = (style: IStyleEntry) => {
-  removeComponentOverrideStyle(selector.value, style)
-  setEditStyle(undefined)
+const removeEntry = (style: IStyleEntry) => {
+  if (selector.value) {
+    removeComponentOverrideStyleEntry(selector.value, style)
+    setEditStyle(undefined)
+  }
 }
+
+const removeSelector = () => {
+  if (selector.value) {
+    removeComponentOverrideStyle(selector.value)
+    selector.value = undefined
+  }
+}
+
+watch(selectors, (newSelectors) => {
+  // Ensure that the current selector doesn't retain a deleted/non-existent value after selecting
+  // another component, or after redoing an override style removal for a specific selector.
+  if (!selector.value || (selector.value && !newSelectors.includes(selector.value))) {
+    selector.value = getDefaultSelector()
+  }
+})
 </script>
 
 <style lang="postcss" scoped>
@@ -193,6 +279,30 @@ const removeStyle = (style: IStyleEntry) => {
   @mixin text 13px;
   width: 120px;
   margin: 0 auto 0 6px;
+  .missing-selector {
+    color: $color-error;
+  }
+  &.has-missing-selector {
+    border-color: $color-error;
+  }
+  &.current-selector-missing {
+    :deep(.label-text) {
+      color: $color-error;
+    }
+    :deep(.caret) {
+      background-color: $color-error;
+    }
+  }
+}
+.missing-info,
+.missing-info-current {
+  margin-left: 4px;
+}
+.delete-selector {
+  width: 22px;
+  height: 22px;
+  cursor: pointer;
+  margin-left: 4px;
 }
 .style-rows {
   transition: max-height 0.2s;

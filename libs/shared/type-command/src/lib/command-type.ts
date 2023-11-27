@@ -12,6 +12,7 @@ export enum CommandType {
   RemoveComponent = 'rmC',
   SetComponentCustomStyle = 'setCCS',
   SetComponentOverrideStyle = 'setCOS',
+  RemoveComponentOverrideStyle = 'rmCOS',
   MergeComponentStyle = 'mergeCS',
   AddComponentMixin = 'addCM',
   RemoveComponentMixin = 'rmCM',

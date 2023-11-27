@@ -51,6 +51,7 @@ import {
   IMoveComponentData,
   INewTranslations,
   IRemoveComponentMixinData,
+  IRemoveComponentOverrideStyleData,
   IRemovePageData,
   IRemoveStyleMixinData,
   IRemoveThemeFontData,
@@ -154,7 +155,8 @@ export interface IUseBuild {
     oldStyle: IStyleEntry | undefined,
     newStyle: IStyleEntry,
   ) => void
-  removeComponentOverrideStyle: (selector: string, style: IRemoveStyleEntry) => void
+  removeComponentOverrideStyleEntry: (selector: string, style: IRemoveStyleEntry) => void
+  removeComponentOverrideStyle: (selector: string) => void
   mergeComponentStyle: (from: ISerializedComponent) => void
   addComponentMixin: (mixinId: string) => void
   removeComponentMixin: (mixinId: string) => void
@@ -612,7 +614,10 @@ export const useBuild = (): IUseBuild => {
     }
   }
 
-  const removeComponentOverrideStyle = (selector: string, style: IRemoveStyleEntry) => {
+  const removeComponentOverrideStyleEntry = (
+    selector: string,
+    style: IRemoveStyleEntry,
+  ) => {
     const selected = site.value.editor?.selectedComponent
     const oldValue =
       selected?.style.overrides?.[selector][activeBreakpoint.value.id][
@@ -631,6 +636,19 @@ export const useBuild = (): IUseBuild => {
       },
     }
     pushCommand(CommandType.SetComponentOverrideStyle, data)
+  }
+
+  const removeComponentOverrideStyle = (selector: string) => {
+    const selected = site.value.editor?.selectedComponent
+    if (selected) {
+      const styles = structuredClone(toRaw(selected.style.overrides?.[selector]) ?? {})
+      const data: IRemoveComponentOverrideStyleData = {
+        selector,
+        componentId: selected.id,
+        styles,
+      }
+      pushCommand(CommandType.RemoveComponentOverrideStyle, data)
+    }
   }
 
   const addComponentMixin = (mixinId: string) => {
@@ -1237,6 +1255,7 @@ export const useBuild = (): IUseBuild => {
     setPositionAbsolute,
     removeComponentCustomStyle,
     setOverrideStyle,
+    removeComponentOverrideStyleEntry,
     removeComponentOverrideStyle,
     mergeComponentStyle,
     addComponentMixin,

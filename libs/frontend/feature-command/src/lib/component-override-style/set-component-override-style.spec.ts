@@ -5,7 +5,7 @@ import {
   mockAddComponentData,
   mockAddComponentOverrideStyleData,
   mockEditComponentOverrideStyleData,
-  mockRemoveComponentOverrideStyleData,
+  mockRemoveComponentOverrideStyleEntryData,
   mockSerializedComponent,
   mockSerializedSite,
 } from '@pubstudio/frontend/util-test-mock'
@@ -221,7 +221,7 @@ describe('Set Component Override Style', () => {
       expect(oldPseudo?.[style.property]).toEqual(style.value)
 
       // Remove override style
-      const data = mockRemoveComponentOverrideStyleData(
+      const data = mockRemoveComponentOverrideStyleEntryData(
         component.id,
         selector,
         DEFAULT_BREAKPOINT_ID,
@@ -236,7 +236,7 @@ describe('Set Component Override Style', () => {
 
     it('should undo remove component override style', () => {
       // Remove style and undo
-      const data = mockRemoveComponentOverrideStyleData(
+      const data = mockRemoveComponentOverrideStyleEntryData(
         component.id,
         selector,
         DEFAULT_BREAKPOINT_ID,
