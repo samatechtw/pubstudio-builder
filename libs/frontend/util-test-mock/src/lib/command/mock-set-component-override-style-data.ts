@@ -33,7 +33,7 @@ export const mockAddComponentOverrideStyleData = (
   return data
 }
 
-export const mockRemoveComponentOverrideStyleData = (
+export const mockRemoveComponentOverrideStyleEntryData = (
   componentId: string,
   selector: string,
   breakpointId: string,
