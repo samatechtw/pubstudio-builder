@@ -4,8 +4,11 @@ import {
   prosemirrorSetup,
 } from '@pubstudio/frontend/util-edit-text'
 import { EditorView } from 'prosemirror-view'
-import { Ref } from 'vue'
+import { ref, Ref } from 'vue'
 import { useBuild } from './use-build'
+
+// Use to detect updates in the ProseMirror component edit view
+export const editViewTxCount = ref(0)
 
 export function createComponentEditorView(
   options: IProsemirrorSetupOptions,
@@ -24,6 +27,7 @@ export function createComponentEditorView(
       const content = editorStateToHtml(newState)
       editSelectedComponent({ content })
       view.updateState(newState)
+      editViewTxCount.value += 1
     },
   })
   return view
@@ -60,7 +64,7 @@ export function createTranslationEditorView(
       const newState = view.state.apply(transaction)
       const content = editorStateToHtml(newState)
       if (translation.value) {
-        translation.value.text = content
+        translation.value.text = content || ''
         setTranslations({
           code: translation.value.code,
           translations: { [translation.value.originalKey ?? '']: content },

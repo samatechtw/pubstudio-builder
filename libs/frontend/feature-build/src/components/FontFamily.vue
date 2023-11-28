@@ -17,7 +17,7 @@
     @open="setStyleToolbarMenu(editor, StyleToolbarMenu.FontFamily)"
     @close="setStyleToolbarMenu(editor, undefined)"
   >
-    <div :style="{ 'font-family': font(label) }">
+    <div :style="{ 'font-family': label === addFontText ? undefined : font(label) }">
       {{ label }}
     </div>
   </PSMultiselect>
@@ -44,14 +44,20 @@ import { useBuild } from '../lib/use-build'
 
 const { t } = useI18n()
 const { site, editor } = useBuild()
-const { getResolvedStyle, setStyle } = useToolbar()
+const { getResolvedOrSelectedStyle, setStyle } = useToolbar()
+
+const addFontText = t('style.toolbar.add_font')
 
 const options = computed(() => {
-  return Object.keys(site.value.context.theme.fonts)
+  const options = Object.keys(site.value.context.theme.fonts)
+  if (options.length) {
+    options.push(addFontText)
+  }
+  return options
 })
 
 const fontFamily = computed(() => {
-  return getResolvedStyle(Css.FontFamily)
+  return getResolvedOrSelectedStyle(Css.FontFamily)
 })
 
 const inherited = computed(() => {
@@ -64,7 +70,11 @@ const showFontMenu = () => {
 }
 
 const setFontFamily = (family: string | undefined) => {
-  setStyle(Css.FontFamily, family)
+  if (family === addFontText) {
+    showFontMenu()
+  } else {
+    setStyle(Css.FontFamily, family)
+  }
 }
 
 const font = (label: string) => {
@@ -83,6 +93,7 @@ onMounted(() => {
 @import '@theme/css/mixins.postcss';
 
 .font-family-select {
+  @mixin title-medium 13px;
   width: 110px;
   margin: 0 0 0 4px;
   :deep(.multiselect-placeholder) {

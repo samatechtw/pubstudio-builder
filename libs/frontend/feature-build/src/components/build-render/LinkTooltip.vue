@@ -1,6 +1,6 @@
 <template>
   <div ref="itemRef" class="link-wrap" @click="showLink">
-    <div v-if="show" ref="tooltipRef" class="link" :style="tooltipStyle">
+    <div v-if="true || show" ref="tooltipRef" class="link" :style="tooltipStyle">
       <a :href="link" target="_blank">{{ link }}</a>
       <Copy class="copy" @click="copy(link)" />
       <div ref="arrowRef" :style="arrowStyle" class="arrow" />
