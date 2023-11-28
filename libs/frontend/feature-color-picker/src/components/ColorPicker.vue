@@ -238,8 +238,9 @@ const selectSaturation = (color: IRgba) => {
 }
 
 const selectHue = async (color: any) => {
-  const { r, g, b, h, s, v } = setColorValue(color)
-  Object.assign(c, { r, g, b, h, s, v })
+  const { r, g, b, h } = setColorValue(color)
+  // Retain previous saturation
+  Object.assign(c, { r, g, b, h })
   setText()
   await nextTick()
   saturation.value.renderColor()

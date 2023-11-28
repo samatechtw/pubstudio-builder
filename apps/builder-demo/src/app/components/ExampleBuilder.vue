@@ -79,7 +79,6 @@ import { useI18n } from 'petite-vue-i18n'
 import { store } from '@pubstudio/frontend/data-access-web-store'
 import {
   AlertModal,
-  Logo,
   SiteErrorModal,
   SiteSaveErrorModal,
 } from '@pubstudio/frontend/ui-widgets'
@@ -125,6 +124,7 @@ watch(droppedFile, (newVal) => {
   }
 })
 
+/*
 const showCreateComplete = (asset: ICreatePlatformSiteAssetResponse) => {
   if (droppedFile.value && activePage.value) {
     const addImageData = makeAddImageData(site.value, activePage.value.root, asset)
@@ -144,6 +144,13 @@ const showCreateCancel = () => {
   showCreateModal.value = false
   droppedFile.value = undefined
 }
+
+const saveSiteBeforeLeave = () => {
+  if (isSaving.value) {
+    siteStore.value.save(site.value, true)
+  }
+}
+*/
 
 // For debugging editor mode state
 const showComponentMenu = computed(() => {
@@ -178,12 +185,6 @@ const beforeWindowUnload = (e: BeforeUnloadEvent) => {
     // Note: Most modern browsers no longer allow custom messages
     return e.returnValue
   } else {
-    siteStore.value.save(site.value, true)
-  }
-}
-
-const saveSiteBeforeLeave = () => {
-  if (isSaving.value) {
     siteStore.value.save(site.value, true)
   }
 }

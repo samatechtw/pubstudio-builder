@@ -14,7 +14,7 @@ const removeOverrideStyle = (component: IComponent | undefined, selector: string
     const overrides = component.style.overrides ?? {}
     if (!(selector in overrides)) {
       throw new Error(
-        `Selector ${selector} is not in the override styles of component with ID ${component.id}`,
+        `Selector ${selector} not in override styles of component ${component.id}`,
       )
     }
     delete overrides[selector]
