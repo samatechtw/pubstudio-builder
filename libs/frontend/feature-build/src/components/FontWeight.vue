@@ -1,7 +1,7 @@
 <template>
   <PSMultiselect
     :options="options"
-    :value="fontWeight"
+    :value="fontWeight?.value"
     :placeholder="t('style.toolbar.font_weight')"
     :clearable="true"
     :caret="false"
@@ -25,7 +25,7 @@ import { useToolbar } from '../lib/use-toolbar'
 
 const { t } = useI18n()
 const { site, editor } = useBuild()
-const { getStyleValue, setStyle } = useToolbar()
+const { getResolvedOrSelectedStyle, setStyle } = useToolbar()
 
 const props = withDefaults(
   defineProps<{
@@ -56,7 +56,7 @@ const options = computed(() => {
 })
 
 const fontWeight = computed(() => {
-  return getStyleValue(Css.FontWeight)
+  return getResolvedOrSelectedStyle(Css.FontWeight)
 })
 
 onMounted(() => {

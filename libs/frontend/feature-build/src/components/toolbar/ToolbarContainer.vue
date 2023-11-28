@@ -27,13 +27,14 @@
       <SizeDropdown />
       <ToolbarColorPicker
         :tooltip="t('style.toolbar.background_color')"
-        :color="getRawStyle(Css.BackgroundColor)"
+        :color="getRawOrSelectedStyle(Css.BackgroundColor)"
         :gradient="getRawStyle(Css.Background)"
         :showPicker="showBackgroundPicker"
         :selectedThemeColors="selectedThemeColors"
         class="toolbar-menu"
         @selectColor="setBackgroundColor($event)"
         @applyGradient="setGradientBackground($event)"
+        @mousedown.prevent
         @click.stop="togglePicker(!showBackgroundPicker)"
       >
         <BackgroundColor :fill="iconColor" />
@@ -78,15 +79,25 @@ import ToolbarColorPicker from './ToolbarColorPicker.vue'
 
 const { t } = useI18n()
 
-const { getRawStyle, getStyleValue, setStyle, createSetComponentCustomStyleCommand } =
-  useToolbar()
+const {
+  selectionStyles,
+  getRawStyle,
+  getRawOrSelectedStyle,
+  getStyleValue,
+  setStyle,
+  createSetComponentCustomStyleCommand,
+  setProseMirrorStyle,
+} = useToolbar()
 const { editor, pushGroupCommands } = useBuild()
 const { selectedThemeColors } = useThemeColors()
 
 const setBackgroundColor = (pickerColor: IPickerColor) => {
   const { selectedComponent } = editor.value ?? {}
 
-  if (selectedComponent) {
+  const editView = editor.value?.editView
+  if (editView?.hasFocus()) {
+    setProseMirrorStyle(editView, Css.BackgroundColor, colorToCssValue(pickerColor))
+  } else if (selectedComponent) {
     const cmdList: (ICommand | undefined)[] = []
     const background = getStyleValue(Css.Background)
     const backgroundClip = getStyleValue(Css.WebkitBackgroundClip)
@@ -339,6 +350,10 @@ const alignVerticalItems: IToolbarDropdownItem[] = [
 ]
 
 const iconColor = computed(() => {
+  const view = editor.value?.editView
+  if (view && selectionStyles[Css.BackgroundColor]) {
+    return selectionStyles[Css.BackgroundColor]
+  }
   const backgroundColor = getStyleValue(Css.BackgroundColor)
   const background = getStyleValue(Css.Background)
   const gradientColors = parseGradientColors(background)

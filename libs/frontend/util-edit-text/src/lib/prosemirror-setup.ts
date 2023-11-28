@@ -3,17 +3,14 @@ import { gapCursor } from 'prosemirror-gapcursor'
 import { history } from 'prosemirror-history'
 import { keymap } from 'prosemirror-keymap'
 import { DOMParser as ProseDOMParser, DOMSerializer } from 'prosemirror-model'
-import { EditorState, EditorStateConfig, Plugin } from 'prosemirror-state'
+import { Command, EditorState, EditorStateConfig, Plugin } from 'prosemirror-state'
 import { buildInputRules } from './input-rules'
 import { buildKeymap } from './keymap'
 import { schema } from './schema-basic'
 
-export { buildKeymap, buildInputRules }
-
 export interface IProsemirrorSetupOptions {
   content: string
-  /// Can be used to the key bindings created.
-  mapKeys?: { [key: string]: string | false }
+  mapKeys?: { [key: string]: Command }
   plugins?: EditorStateConfig['plugins']
 }
 

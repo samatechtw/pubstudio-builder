@@ -155,7 +155,7 @@ export const nodes = {
 }
 
 const emDOM: DOMOutputSpec = ['em', 0],
-  strongDOM: DOMOutputSpec = ['strong', 0],
+  uDOM: DOMOutputSpec = ['u', 0],
   codeDOM: DOMOutputSpec = ['code', 0]
 
 /// [Specs](#model.MarkSpec) for the marks in the schema.
@@ -183,8 +183,7 @@ export const marks = {
     },
   } as MarkSpec,
 
-  /// An emphasis mark. Rendered as an `<em>` element. Has parse rules
-  /// that also match `<i>` and `font-style: italic`.
+  /// Emphasis mark. Rendered as `<em>`. Parses `<i>` and `font-style: italic`
   em: {
     parseDOM: [
       { tag: 'i' },
@@ -197,26 +196,131 @@ export const marks = {
     },
   } as MarkSpec,
 
-  /// A strong mark. Rendered as `<strong>`, parse rules also match
-  /// `<b>` and `font-weight: bold`.
-  strong: {
+  // Underline mark. Rendered as `<u>`.
+  u: {
     parseDOM: [
-      { tag: 'strong' },
+      {
+        tag: 'u',
+        style: 'font-style=underline',
+      },
+      {
+        style: 'text-decoration=underline',
+      },
+    ],
+    toDOM() {
+      return uDOM
+    },
+  },
+
+  // Text color mark
+  color: {
+    attrs: {
+      color: { default: '' },
+    },
+    parseDOM: [
+      {
+        style: 'color',
+        getAttrs(value) {
+          return { color: value }
+        },
+      },
+    ],
+    toDOM(mark) {
+      return ['span', { style: `color:${mark.attrs.color}` }, 0]
+    },
+  } as MarkSpec,
+
+  // Background color mark
+  bg: {
+    attrs: {
+      'background-color': { default: '' },
+    },
+    parseDOM: [
+      {
+        style: 'background-color',
+        getAttrs(value) {
+          return { 'background-color': value }
+        },
+      },
+    ],
+    toDOM(mark) {
+      return ['span', { style: `background-color:${mark.attrs['background-color']}` }, 0]
+    },
+  } as MarkSpec,
+
+  // Font size color mark
+  size: {
+    attrs: {
+      'font-size': { default: '' },
+    },
+    parseDOM: [
+      {
+        style: 'font-size',
+        getAttrs(value) {
+          return { 'font-size': value }
+        },
+      },
+    ],
+    toDOM(mark) {
+      return ['span', { style: `font-size:${mark.attrs['font-size']}` }, 0]
+    },
+  } as MarkSpec,
+
+  // Font size color mark
+  font: {
+    attrs: {
+      'font-family': { default: '' },
+    },
+    parseDOM: [
+      {
+        style: 'font-family',
+        getAttrs(value) {
+          return { 'font-family': value }
+        },
+      },
+    ],
+    toDOM(mark) {
+      return ['span', { style: `font-family:${mark.attrs['font-family']}` }, 0]
+    },
+  } as MarkSpec,
+
+  /// A strong mark. Rendered as `<span>`, parse rules also match
+  /// `<b>`, `<strong>` and `font-weight:`.
+  strong: {
+    attrs: {
+      'font-weight': { default: '' },
+    },
+    parseDOM: [
+      {
+        tag: 'strong',
+        getAttrs(value) {
+          return { 'font-weight': value }
+        },
+      },
       // This works around a Google Docs misbehavior where
       // pasted content will be inexplicably wrapped in `<b>`
       // tags with a font-weight normal.
       {
         tag: 'b',
-        getAttrs: (node: HTMLElement) => node.style.fontWeight != 'normal' && null,
+        getAttrs: (node: HTMLElement) => {
+          if (node.style.fontWeight === 'normal') {
+            return { 'font-weight': '400' }
+          }
+          return { 'font-weight': '700' }
+        },
       },
-      { style: 'font-weight=400', clearMark: (m) => m.type.name == 'strong' },
       {
         style: 'font-weight',
-        getAttrs: (value: string) => /^(bold(er)?|[5-9]\d{2,})$/.test(value) && null,
+        getAttrs: (value: string) => {
+          if (/^(bold(er)?|[0-9]\d{2,})$/.test(value)) {
+            return { 'font-weight': value }
+          }
+          return null
+        },
       },
     ],
-    toDOM() {
-      return strongDOM
+    toDOM(mark) {
+      return ['span', { style: `font-weight:${mark.attrs['font-weight']}` }, 0]
     },
   } as MarkSpec,
 
@@ -229,11 +333,4 @@ export const marks = {
   } as MarkSpec,
 }
 
-/// This schema roughly corresponds to the document schema used by
-/// [CommonMark](http://commonmark.org/), minus the list elements,
-/// which are defined in the [`prosemirror-schema-list`](#schema-list)
-/// module.
-///
-/// To reuse elements from this schema, extend or read from its
-/// `spec.nodes` and `spec.marks` [properties](#model.Schema.spec).
 export const schema = new Schema({ nodes, marks })

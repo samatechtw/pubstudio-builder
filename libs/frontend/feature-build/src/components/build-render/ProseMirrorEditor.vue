@@ -3,11 +3,23 @@
 </template>
 
 <script lang="ts" setup>
-import { Plugin } from 'prosemirror-state'
-import { computed, onMounted, onBeforeUnmount, ref, toRefs, watch } from 'vue'
+import {
+  Command,
+  EditorState,
+  Plugin,
+  TextSelection,
+  Transaction,
+} from 'prosemirror-state'
+import { Decoration, DecorationSet } from 'prosemirror-view'
+import { computed, onMounted, onBeforeUnmount, ref, toRefs, watch, toRaw } from 'vue'
 import { Css, IComponent, IEditorContext } from '@pubstudio/shared/type-site'
 import { getProseMirrorContainerId } from '@pubstudio/frontend/feature-editor'
-import { prosemirrorSetup } from '@pubstudio/frontend/util-edit-text'
+import {
+  prosemirrorSetup,
+  setOrRemoveStyleMark,
+  schema,
+  firstMarkInSelection,
+} from '@pubstudio/frontend/util-edit-text'
 import { findStyles } from '@pubstudio/frontend/util-component'
 import {
   activeBreakpoint,
@@ -17,6 +29,7 @@ import { isTextGradient } from '@pubstudio/frontend/util-gradient'
 import { resolveThemeVariables } from '@pubstudio/frontend/util-builtin'
 import { createComponentEditorView } from '../../lib/create-editor-view'
 import { useBuild } from '../../lib/use-build'
+import { useToolbar } from '../../lib/use-toolbar'
 
 const props = defineProps<{
   component: IComponent
@@ -25,9 +38,23 @@ const props = defineProps<{
 
 const { component, editor } = toRefs(props)
 const { site } = useBuild()
+const { getStyleValue } = useToolbar()
 
 const container = ref<HTMLDivElement>()
 const containerId = computed(() => getProseMirrorContainerId(component.value))
+
+const markStrong = (state: EditorState, dispatch?: (tr: Transaction) => void) => {
+  const fallbackStyle = getStyleValue(Css.FontWeight)
+  const mark = firstMarkInSelection(state, schema.marks.strong)
+  const newWeight = mark?.attrs[Css.FontWeight] === '700' ? '400' : '700'
+  const cmd = setOrRemoveStyleMark(
+    schema.marks.strong,
+    Css.FontWeight,
+    newWeight,
+    fallbackStyle,
+  )
+  return cmd(state, dispatch)
+}
 
 const mountProseMirrorEditor = (
   editor: IEditorContext | undefined,
@@ -35,10 +62,7 @@ const mountProseMirrorEditor = (
 ) => {
   const { selectedComponent } = editor ?? {}
   if (editor && container && selectedComponent) {
-    const plugins: Plugin[] = []
-
-    // Pass gradient color styles to the inner div of ProseMirror editor.
-    plugins.push(
+    const plugins: Plugin[] = [
       new Plugin({
         props: {
           attributes: { style: gradientColorStyle.value },
@@ -49,13 +73,37 @@ const mountProseMirrorEditor = (
           },
         },
       }),
-    )
+    ]
+    const selPlugin: Plugin = new Plugin({
+      state: {
+        init() {},
+        apply(tr, _state) {
+          if (tr.getMeta('selDeco')) {
+            const sel = tr.selection as TextSelection
+            if (!sel || sel.empty || sel.$cursor) {
+              return undefined
+            }
+            const decorations: Decoration[] = [
+              Decoration.inline(sel.$from.pos, sel.$to.pos, { class: 'sel' }),
+            ]
+            return DecorationSet.create(tr.doc, decorations)
+          }
+        },
+      },
+      props: {
+        decorations(state) {
+          return selPlugin.getState(state)
+        },
+      },
+    })
+    plugins.push(selPlugin)
 
     editor.editView?.destroy()
     editor.editView = createComponentEditorView(
       {
         content: selectedComponent.content || '<div class="pm-p"></div>',
         plugins,
+        mapKeys: { 'Mod-b': markStrong, 'Mod-B': markStrong },
       },
       container,
     )
@@ -95,6 +143,14 @@ const gradientColorStyle = computed(() => {
 
 onMounted(() => {
   mountProseMirrorEditor(editor.value, container.value)
+  const el = container.value
+  el?.addEventListener('focusout', () => {
+    const view = toRaw(editor.value?.editView)
+    if (view) {
+      const tr = view.state.tr.setMeta('selDeco', {})
+      view.dispatch(tr)
+    }
+  })
 })
 
 // Use watch to re-mount ProseMirror editor so that text gradient styles can be

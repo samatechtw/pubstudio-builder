@@ -5,6 +5,7 @@
         :active="isUnderline"
         :tooltip="t('style.toolbar.underline')"
         class="underline"
+        @mousedown.prevent
         @click="toggleTextDecoration('underline')"
       >
         <Underline />
@@ -12,29 +13,31 @@
       <ToolbarItem
         :active="isItalic"
         :tooltip="t('style.toolbar.italic')"
+        @mousedown.prevent
         @click="toggleFontStyle('italic')"
       >
         <Italic />
       </ToolbarItem>
       <ToolbarColorPicker
         :tooltip="t('style.toolbar.font_color')"
-        :color="getRawStyle(Css.BackgroundColor)"
+        :color="getRawOrSelectedStyle(Css.Color)"
         :gradient="getRawStyle(Css.Background)"
         :showPicker="showColorPicker"
         :selectedThemeColors="selectedThemeColors"
         @selectColor="setFontColor($event)"
         @applyGradient="setGradient($event)"
+        @mousedown.prevent
         @click.stop="togglePicker(!showColorPicker)"
       >
         <FontColor :color="iconColor" />
       </ToolbarColorPicker>
-      <FontFamily />
-      <FontWeight :fontFamily="fontFamily" />
+      <FontFamily @mousedown.prevent />
+      <FontWeight :fontFamily="fontFamily" @mousedown.prevent />
       <PSInput
         ref="fontSizePsInputRef"
-        v-model="fontSize"
+        v-model="fontSize.size"
         type="number"
-        :suffix="fontSizeSuffix"
+        :suffix="fontSize.suffix"
         :maxLength="3"
         class="font-size"
         @keyup.enter.stop="setFontSize"
@@ -67,10 +70,18 @@ import { useToolbarFontSize } from '../../lib/use-toolbar-font-size'
 import ToolbarColorPicker from './ToolbarColorPicker.vue'
 
 const { t } = useI18n()
-const { getRawStyle, getStyleValue, setStyle, createSetComponentCustomStyleCommand } =
-  useToolbar()
+const {
+  selectionStyles,
+  getRawStyle,
+  getRawOrSelectedStyle,
+  getStyleValue,
+  setStyle,
+  setProseMirrorStyle,
+  createSetComponentCustomStyleCommand,
+} = useToolbar()
 const { editor, pushGroupCommands } = useBuild()
 const { selectedThemeColors } = useThemeColors()
+const { fontSizePsInputRef, fontSize, setFontSize } = useToolbarFontSize()
 
 defineProps<{
   show: boolean
@@ -85,7 +96,10 @@ const { activate, deactivate } = useControlledClickaway(
 const setFontColor = (pickerColor: IPickerColor) => {
   const { selectedComponent } = editor.value ?? {}
 
-  if (selectedComponent) {
+  const editView = editor.value?.editView
+  if (editView?.hasFocus()) {
+    setProseMirrorStyle(editView, Css.Color, colorToCssValue(pickerColor))
+  } else if (selectedComponent) {
     const cmdList: (ICommand | undefined)[] = []
     const background = getStyleValue(Css.Background)
     const backgroundClip = getStyleValue(Css.WebkitBackgroundClip)
@@ -182,12 +196,21 @@ const togglePicker = (show: boolean) => {
   }
 }
 
+const getEditorOrSelectedStyle = (property: Css): string | undefined => {
+  const view = editor.value?.editView
+  if (view) {
+    return selectionStyles[property as keyof typeof selectionStyles]
+  } else {
+    return getStyleValue(property)
+  }
+}
+
 const fontFamily = computed(() => {
   return getStyleValue(Css.FontFamily)
 })
 
 const isUnderline = computed(() => {
-  return getStyleValue(Css.TextDecoration) === 'underline'
+  return getEditorOrSelectedStyle(Css.TextDecoration) === 'underline'
 })
 
 const toggleTextDecoration = (value: string) => {
@@ -199,7 +222,7 @@ const toggleTextDecoration = (value: string) => {
 }
 
 const isItalic = computed(() => {
-  return getStyleValue(Css.FontStyle) === 'italic'
+  return getEditorOrSelectedStyle(Css.FontStyle) === 'italic'
 })
 
 const toggleFontStyle = (value: string) => {
@@ -211,13 +234,15 @@ const toggleFontStyle = (value: string) => {
 }
 
 const iconColor = computed(() => {
+  const view = editor.value?.editView
+  if (view && selectionStyles[Css.Color]) {
+    return selectionStyles[Css.Color]
+  }
   const color = getStyleValue(Css.Color)
   const background = getStyleValue(Css.Background)
   const gradientColors = parseGradientColors(background)
   return gradientColors[0]?.rgba ?? color
 })
-
-const { fontSizePsInputRef, fontSize, fontSizeSuffix, setFontSize } = useToolbarFontSize()
 </script>
 
 <style lang="postcss" scoped>
