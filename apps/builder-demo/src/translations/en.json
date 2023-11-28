@@ -285,8 +285,8 @@
     "to_mixin": "Convert to reusable style",
     "child": "Child Styles",
     "child_info": "Set styles for this component's children",
-    "child_missing": "Some of the selectors' corresponding children of this component are not present.",
-    "child_missing_current": "This selector's corresponding child is not present.",
+    "child_missing": "Some children have been removed, but their styles are still present.",
+    "child_missing_current": "This component corresponding to this selector is not present.",
     "selector": "Selector",
     "toolbar": {
       "component_tree": "Component Tree",
