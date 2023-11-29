@@ -1,59 +1,69 @@
 <template>
-  <div ref="itemRef" class="link-wrap" @click="showLink">
-    <div v-if="true || show" ref="tooltipRef" class="link" :style="tooltipStyle">
-      <a :href="link" target="_blank">{{ link }}</a>
-      <Copy class="copy" @click="copy(link)" />
-      <div ref="arrowRef" :style="arrowStyle" class="arrow" />
+  <div class="link" @mousedown.stop>
+    <PSInput
+      v-if="editing"
+      ref="linkInput"
+      v-model="editedLink"
+      class="link-input"
+      :draggable="true"
+      @dragstart.stop.prevent
+      @keyup.enter="updateLink"
+    />
+    <a v-else-if="link" :href="link" target="_blank" class="link-view">{{ link }}</a>
+    <div v-else class="empty">
+      {{ t('build.no_link') }}
+    </div>
+    <Check v-if="editing" class="link-save" color="#009879" @click="updateLink" />
+    <div v-else class="icon-wrap">
+      <IconTooltip :tip="t('edit')">
+        <Edit class="edit-link" @click="edit" />
+      </IconTooltip>
+      <CopyText :text="link" class="copy-text" />
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ref, toRefs } from 'vue'
-import { copy } from '@pubstudio/frontend/util-doc'
-import { useTooltip } from '@pubstudio/frontend/util-tooltip'
-import { Copy } from '@pubstudio/frontend/ui-widgets'
-import { useClickaway } from '@pubstudio/frontend/util-clickaway'
+import { nextTick, ref, toRefs } from 'vue'
+import { useI18n } from 'petite-vue-i18n'
+import {
+  Check,
+  IconTooltip,
+  CopyText,
+  Edit,
+  PSInput,
+} from '@pubstudio/frontend/ui-widgets'
+import { useBuild } from '../../lib/use-build'
+
+const { t } = useI18n()
+const { setSelectedIsInput } = useBuild()
 
 const props = defineProps<{
   link: string
 }>()
 const { link } = toRefs(props)
 
-const { itemRef, arrowStyle, tooltipRef, tooltipStyle } = useTooltip({
-  placement: 'top',
-  arrow: true,
-  shift: true,
-  offset: 8,
-})
-const show = ref(false)
+const linkInput = ref()
+const editing = ref(false)
+const editedLink = ref('')
 
-const { activate, deactivate } = useClickaway(
-  '.arrow',
-  () => {
-    show.value = false
-    deactivate()
-  },
-  true,
-)
+const edit = async () => {
+  editing.value = true
+  editedLink.value = link.value
+  await nextTick()
+  linkInput.value?.inputRef?.focus()
+}
 
-const showLink = () => {
-  show.value = true
-  activate()
+const updateLink = () => {
+  setSelectedIsInput('href', editedLink.value)
+  editing.value = false
+  editedLink.value = ''
 }
 </script>
 
 <style lang="postcss" scoped>
 @import '@theme/css/mixins.postcss';
 
-.link-wrap {
-  @mixin overlay;
-  z-index: 1000;
-  pointer-events: none;
-  position: absolute;
-  top: 0;
-  right: 0;
-}
 .edit {
   @mixin size 28px;
   cursor: pointer;
@@ -62,25 +72,61 @@ const showLink = () => {
   top: -20px;
   right: -20px;
 }
+.empty {
+  @mixin title-medium 14px;
+  color: $grey-500;
+}
 .link {
-  @mixin tooltip;
   display: flex;
+  background-color: white;
+  border-radius: 2px;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 12px;
+  user-select: none;
+  padding: 4px 6px 3px;
+  height: 36px;
   position: absolute;
-  min-width: 220px;
+  top: -38px;
+  left: 0;
+  min-width: 240px;
   z-index: 1000;
-  a {
-    @mixin truncate;
-    max-width: calc(100% - 30px);
+  cursor: default;
+}
+.link-view {
+  @mixin truncate;
+  @mixin title-normal 14px;
+  max-width: 200px;
+  margin-right: 6px;
+}
+.link-input {
+  height: 100%;
+  width: 100%;
+  margin-right: 6px;
+  :deep(.ps-input) {
+    height: 100%;
+    width: 100%;
   }
+}
+.icon-wrap {
+  margin-left: auto;
+  display: flex;
+}
+.link-save,
+.edit-link {
+  @mixin size 22px;
+  cursor: pointer;
+}
+.copy-wrap {
+  display: flex;
+  align-items: center;
 }
 .copy {
   @mixin size 18px;
-  margin-left: 6px;
+  margin-left: 8px;
   flex-shrink: 0;
   cursor: pointer;
+  display: flex;
+  align-items: center;
   &:hover :deep(path) {
     fill: $color-toolbar-button-active;
     stroke: $color-toolbar-button-active;
