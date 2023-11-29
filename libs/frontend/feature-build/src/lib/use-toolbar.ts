@@ -119,7 +119,10 @@ export const useToolbar = (): IUseToolbar => {
     if (view) {
       // Mimic raw style
       return {
-        value: selectionStyles[property as keyof typeof selectionStyles] ?? '',
+        value:
+          selectionStyles[property as keyof typeof selectionStyles] ??
+          resolved?.value ??
+          '',
         sourceType: StyleSourceType.Custom,
         sourceId: resolved?.sourceId ?? '',
         sourceBreakpointId: resolved?.sourceBreakpointId ?? '',
