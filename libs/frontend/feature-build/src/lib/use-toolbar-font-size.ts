@@ -7,11 +7,12 @@ export interface IUseToolbarFontSize {
   fontSizePsInputRef: Ref
   fontSize: Ref<IFontSize>
   setFontSize: () => void
+  setFontUnit: (unit: string | undefined) => void
 }
 
 export interface IFontSize {
   size: string
-  suffix: string
+  unit: string
 }
 
 export const useToolbarFontSize = (): IUseToolbarFontSize => {
@@ -19,15 +20,20 @@ export const useToolbarFontSize = (): IUseToolbarFontSize => {
   const { getResolvedOrSelectedStyle, setStyle, selectionStyles } = useToolbar()
 
   const psInputRef = ref()
-  const fontSize = ref<IFontSize>({ size: '', suffix: 'px' })
+  const fontSize = ref<IFontSize>({ size: '', unit: 'px' })
 
   const updateFontSize = () => {
     const value = getResolvedOrSelectedStyle(Css.FontSize)?.value
     const unit = value?.replace(/[\d\s.]/g, '')
     fontSize.value = {
       size: value?.replace(/[^0-9.]/g, '') ?? '',
-      suffix: unit || 'px',
+      unit: unit || 'px',
     }
+  }
+
+  const setFontUnit = (unit: string | undefined) => {
+    fontSize.value.unit = unit || 'px'
+    setFontSize()
   }
 
   const setFontSize = () => {
@@ -37,7 +43,7 @@ export const useToolbarFontSize = (): IUseToolbarFontSize => {
     try {
       const size = parseInt(fontSize.value.size)
       if (size > 1 && size < 1000) {
-        setStyle(Css.FontSize, `${size}${fontSize.value.suffix}`)
+        setStyle(Css.FontSize, `${size}${fontSize.value.unit}`)
         psInputRef.value?.inputRef?.blur()
       }
     } catch (e) {
@@ -64,5 +70,6 @@ export const useToolbarFontSize = (): IUseToolbarFontSize => {
     fontSizePsInputRef: psInputRef,
     fontSize,
     setFontSize,
+    setFontUnit,
   }
 }

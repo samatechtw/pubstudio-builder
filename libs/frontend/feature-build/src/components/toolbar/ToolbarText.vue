@@ -37,11 +37,17 @@
         ref="fontSizePsInputRef"
         v-model="fontSize.size"
         type="number"
-        :suffix="fontSize.suffix"
         :maxLength="3"
         class="font-size"
         @keyup.enter.stop="setFontSize"
-      />
+      >
+        <PSMultiselect
+          :value="fontSize.unit"
+          :options="fontUnits"
+          class="font-unit"
+          @select="setFontUnit"
+        />
+      </PSInput>
     </div>
   </Transition>
 </template>
@@ -49,7 +55,13 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
-import { FontColor, Italic, ToolbarItem, Underline } from '@pubstudio/frontend/ui-widgets'
+import {
+  FontColor,
+  Italic,
+  PSMultiselect,
+  ToolbarItem,
+  Underline,
+} from '@pubstudio/frontend/ui-widgets'
 import { PSInput } from '@pubstudio/frontend/ui-widgets'
 import { useControlledClickaway } from '@pubstudio/frontend/util-clickaway'
 import { IPickerColor, colorToCssValue } from '@pubstudio/frontend/feature-color-picker'
@@ -81,7 +93,7 @@ const {
 } = useToolbar()
 const { editor, pushGroupCommands } = useBuild()
 const { selectedThemeColors } = useThemeColors()
-const { fontSizePsInputRef, fontSize, setFontSize } = useToolbarFontSize()
+const { fontSizePsInputRef, fontSize, setFontSize, setFontUnit } = useToolbarFontSize()
 
 defineProps<{
   show: boolean
@@ -92,6 +104,8 @@ const { activate, deactivate } = useControlledClickaway(
   () => togglePicker(false),
   true,
 )
+
+const fontUnits = ['px', 'em', 'rem', '%']
 
 const setFontColor = (pickerColor: IPickerColor) => {
   const { selectedComponent } = editor.value ?? {}
@@ -253,16 +267,31 @@ const iconColor = computed(() => {
 }
 
 .font-size {
-  width: 76px;
+  display: flex;
   margin-left: 4px;
   :deep(.ps-input) {
     border: 1px solid $color-light1;
+    width: 70px;
     background-color: rgba(255, 255, 255, 0.8);
-    font-size: 15px;
-    padding-right: 32px;
+    font-size: 14px;
+    padding: 9px 0 7px 6px;
   }
-  :deep(.ps-input-suffix) {
-    user-select: none;
+}
+.font-unit {
+  width: 32px;
+  right: 33px;
+  top: 1px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  :deep(.label-text) {
+    overflow: visible;
+  }
+  :deep(.ms-item) {
+    padding: 4px 4px 3px;
+  }
+  :deep(.label) {
+    padding: 4px 4px 3px 5px;
   }
 }
 </style>
