@@ -2,6 +2,7 @@ import {
   editorStateToHtml,
   IProsemirrorSetupOptions,
   prosemirrorSetup,
+  schemaText,
 } from '@pubstudio/frontend/util-edit-text'
 import { EditorView } from 'prosemirror-view'
 import { ref, Ref } from 'vue'
@@ -11,20 +12,23 @@ import { useBuild } from './use-build'
 export const editViewTxCount = ref(0)
 
 export function createComponentEditorView(
-  options: IProsemirrorSetupOptions,
+  options: Omit<IProsemirrorSetupOptions, 'schema'>,
   container: HTMLElement,
 ): EditorView | undefined {
   const { editSelectedComponent } = useBuild()
   if (!container) {
     return undefined
   }
-  const state = prosemirrorSetup(options)
+  const state = prosemirrorSetup({
+    ...options,
+    schema: schemaText,
+  })
 
   const view = new EditorView(container, {
     state,
     dispatchTransaction(transaction) {
       const newState = view.state.apply(transaction)
-      const content = editorStateToHtml(newState)
+      const content = editorStateToHtml(schemaText, newState)
       editSelectedComponent({ content })
       view.updateState(newState)
       editViewTxCount.value += 1
@@ -41,7 +45,8 @@ export interface IEditTranslation {
   isNew: boolean
 }
 
-export interface ITranslationEditorViewOptions extends IProsemirrorSetupOptions {
+export interface ITranslationEditorViewOptions
+  extends Omit<IProsemirrorSetupOptions, 'schema'> {
   translation: Ref<IEditTranslation | undefined>
 }
 
@@ -54,15 +59,16 @@ export function createTranslationEditorView(
   if (!container) {
     return undefined
   }
+  const schema = schemaText
   const { translation } = options
-  const state = prosemirrorSetup(options)
+  const state = prosemirrorSetup({ ...options, schema })
   let first = true
 
   const view = new EditorView(container, {
     state,
     dispatchTransaction(transaction) {
       const newState = view.state.apply(transaction)
-      const content = editorStateToHtml(newState)
+      const content = editorStateToHtml(schema, newState)
       if (translation.value) {
         translation.value.text = content || ''
         setTranslations({

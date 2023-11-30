@@ -93,7 +93,7 @@ const newInput = ref<IComponentInput>(
     name: '',
     type: ComponentArgPrimitive.String,
     default: '',
-    attr: false,
+    attr: true,
     is: '',
   },
 )

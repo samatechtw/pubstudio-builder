@@ -23,6 +23,26 @@
   display: none;
 }
 
+.code-wrap {
+  width: 100%;
+  max-height: 250px;
+  overflow: auto;
+  margin-top: 16px;
+  .ProseMirror-focused {
+    padding: 0;
+  }
+  .ProseMirror {
+    .hljs {
+      margin: 0;
+      min-height: 250px;
+      padding: 8px;
+    }
+  }
+  .ProseMirror-trailingBreak {
+    display: block;
+  }
+}
+
 .ProseMirror li {
   position: relative;
 }
