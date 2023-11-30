@@ -361,6 +361,9 @@ export const setShowComponentTree = (
 export const setActivePage = (editor: IEditorContext | undefined, pageRoute: string) => {
   if (editor) {
     editor.active = pageRoute
+    if (editor.buildSubmenu === BuildSubmenu.Page) {
+      editor.buildSubmenu = undefined
+    }
     siteStore.value.saveEditor(editor)
   }
 }

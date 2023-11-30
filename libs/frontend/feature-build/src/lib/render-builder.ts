@@ -33,7 +33,7 @@ import { BuilderDndComponent } from './dnd/builder-dnd-component'
 // Style and props for a component rendered in the builder
 export interface IBuilderStyleProps {
   builderStyle: IRawStyle | undefined
-  builderProps: Record<string, string> | undefined
+  builderProps: Record<string, unknown> | undefined
   extraChildren: VNode[] | undefined
   builderClass: string[]
 }
@@ -47,7 +47,7 @@ export const computeBuilderStyleProps = (
   const { editor } = site
 
   const builderStyle: IRawStyle = {}
-  const builderProps: Record<string, string> = {}
+  const builderProps: Record<string, unknown> = {}
   let extraChildren: VNode[] | undefined = undefined
   const builderClass: string[] = []
   let position: string | null | undefined = undefined
@@ -73,8 +73,13 @@ export const computeBuilderStyleProps = (
   if (component.tag === Tag.Img && !data.attrs.src) {
     data.mixins.push('__image')
   }
+  if (component.tag === Tag.A) {
+    builderProps['onClick'] = (e: Event) => {
+      e.preventDefault()
+    }
+  }
   if (selected) {
-    if (data.attrs.href !== undefined && component.tag === Tag.A) {
+    if (component.tag === Tag.A) {
       extraChildren = [h(LinkTooltip, { link: data.attrs.href, text: component.content })]
       data.mixins.push('__link')
       data.attrs.href = 'javascript:'
@@ -166,9 +171,6 @@ export const computeBuilderStyleProps = (
     builderStyle.border = '1.5px solid #3768FF'
   } else if (editor?.debugBounding) {
     builderStyle.border = '1.5px dashed #999'
-  }
-  if (component?.inputs?.href?.is !== undefined) {
-    builderProps.target = '__blank'
   }
   if (dndState) {
     // Drag

@@ -4,7 +4,6 @@ import { IUseTooltip, IUseTooltipOptions, useTooltip } from './use-tooltip'
 
 export interface IUseTooltipDelay extends IUseTooltip {
   cancelHoverTimer: () => void
-  tooltipMouseEnter: () => void
 }
 
 export interface IUseTooltipDelayOptions extends IUseTooltipOptions {
@@ -24,6 +23,7 @@ export const useTooltipDelay = (options?: IUseTooltipDelayOptions): IUseTooltipD
     shift: true,
     placement: options?.placement,
     offset: options?.offset,
+    arrow: options?.arrow,
   })
   let mouseover = false
   let hoverTimer: ReturnType<typeof setTimeout> | undefined

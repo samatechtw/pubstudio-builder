@@ -9,7 +9,10 @@
       @dragstart.stop.prevent
       @keyup.enter="updateLink"
     />
-    <a v-else-if="link" :href="link" target="_blank" class="link-view">{{ link }}</a>
+    <div v-else-if="internalLink" class="link-view" @click="gotoPage">
+      {{ link }}
+    </div>
+    <a v-else-if="link" :href="link" target="_blank" class="link-view"> {{ link }}</a>
     <div v-else class="empty">
       {{ t('build.no_link') }}
     </div>
@@ -24,7 +27,7 @@
 </template>
 
 <script lang="ts" setup>
-import { nextTick, ref, toRefs } from 'vue'
+import { computed, nextTick, ref, toRefs } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import {
   Check,
@@ -36,7 +39,7 @@ import {
 import { useBuild } from '../../lib/use-build'
 
 const { t } = useI18n()
-const { setSelectedIsInput } = useBuild()
+const { site, changePage, setSelectedIsInput } = useBuild()
 
 const props = defineProps<{
   link: string
@@ -46,6 +49,14 @@ const { link } = toRefs(props)
 const linkInput = ref()
 const editing = ref(false)
 const editedLink = ref('')
+
+const internalLink = computed(() => {
+  return link.value?.startsWith('/') && link.value in site.value.pages
+})
+
+const gotoPage = () => {
+  changePage(link.value)
+}
 
 const edit = async () => {
   editing.value = true
@@ -97,6 +108,7 @@ const updateLink = () => {
   @mixin title-normal 14px;
   max-width: 200px;
   margin-right: 6px;
+  cursor: pointer;
 }
 .link-input {
   height: 100%;
