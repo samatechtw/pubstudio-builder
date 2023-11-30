@@ -9,6 +9,8 @@ import { useBuild } from '../use-build'
 import { IDndState, IDraggedComponent, IDroppedFile, IDropProps } from './builder-dnd'
 import { onDrag, onDrop } from './drag-drop'
 import { XYCoord } from './row-layout'
+import { setBuildSubmenu } from '@pubstudio/frontend/feature-editor'
+import { BuildSubmenu } from '@pubstudio/shared/type-site'
 
 export interface IUseDragDrop {
   dndState: ComputedRef<IDndState | undefined>
@@ -44,7 +46,7 @@ export interface IUseDragDropProps {
 
 const COMPONENT_TYPE = 'text/component-id'
 
-const dragSource = ref<IDraggedComponent>()
+export const dragSource = ref<IDraggedComponent>()
 const droppedFile = ref<IDroppedFile>()
 
 export const defaultDropProps = (): IDropProps => {
@@ -281,6 +283,12 @@ export const useDragDrop = (props: IUseDragDropProps): IUseDragDrop => {
         }
       }
     }
+
+    if (site.editor?.buildSubmenu === BuildSubmenu.New && dragSource.value?.addData) {
+      // Hide new component menu when a new component is dropped
+      setBuildSubmenu(site.editor, undefined)
+    }
+
     dragSource.value = undefined
     dropProps.value = defaultDropProps()
     hovering.value = false
