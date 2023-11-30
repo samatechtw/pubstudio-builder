@@ -175,6 +175,7 @@ export interface IUseBuild {
     newArg: IBehaviorArg | undefined,
   ) => void
   addStyle: (style: IStyle) => void
+  flattenComponentMixin: (componentId: string, mixinId: string) => void
   convertComponentStyle: (componentId: string, style: IStyle) => void
   editStyle: (style: IStyle) => void
   deleteStyle: (style: IStyle) => void
@@ -820,6 +821,63 @@ export const useBuild = (): IUseBuild => {
     pushCommand(CommandType.AddStyleMixin, data)
   }
 
+  const flattenComponentMixin = (componentId: string, mixinId: string) => {
+    const component = resolveComponent(site.value.context, componentId)
+    const mixin = site.value.context.styles[mixinId]
+    if (component && mixin) {
+      const removeMixinData: IRemoveComponentMixinData = {
+        componentId,
+        mixinId,
+      }
+      const removeMixin: ICommand = {
+        type: CommandType.RemoveComponentMixin,
+        data: removeMixinData,
+      }
+      // Build array of set-component-custom-style commands
+      const commands: ICommand[] = [removeMixin]
+      for (const [bpId, bp] of Object.entries(mixin.breakpoints)) {
+        for (const [pClass, pseudo] of Object.entries(bp)) {
+          const pseudoClass = pClass as CssPseudoClass
+          for (const [prop, val] of Object.entries(pseudo)) {
+            const css = prop as Css
+            const oldValue = component.style.custom[bpId]?.[pseudoClass]?.[css]
+            if (val === oldValue) {
+              // Skip if component already has the same style as the mixin
+              continue
+            }
+            const styleData: ISetComponentCustomStyleData = {
+              componentId,
+              breakpointId: bpId,
+              oldStyle:
+                oldValue === undefined
+                  ? undefined
+                  : {
+                      pseudoClass,
+                      property: css,
+                      value: oldValue,
+                    },
+              newStyle: {
+                pseudoClass,
+                property: css,
+                value: val,
+              },
+            }
+            commands.push({
+              type: CommandType.SetComponentCustomStyle,
+              data: styleData,
+            })
+          }
+        }
+      }
+      if (commands.length) {
+        const data: ICommandGroupData = {
+          commands,
+        }
+        pushCommand(CommandType.Group, data)
+      }
+    }
+  }
+
   const convertComponentStyle = (componentId: string, style: IStyle) => {
     const component = resolveComponent(site.value.context, componentId)
     if (component) {
@@ -1274,6 +1332,7 @@ export const useBuild = (): IUseBuild => {
     setBehaviorArg,
     addStyle,
     convertComponentStyle,
+    flattenComponentMixin,
     editStyle,
     deleteStyle,
     setTranslations,

@@ -1,7 +1,7 @@
 <template>
   <div
     ref="itemRef"
-    class="icon-tooltip"
+    class="icon-tooltip-delay"
     @mouseenter="mouseEnter"
     @mouseleave="tooltipMouseLeave"
   >
@@ -17,7 +17,7 @@
 
 <script lang="ts" setup>
 import { toRefs } from 'vue'
-import { useTooltip } from '@pubstudio/frontend/util-tooltip'
+import { useTooltipDelay } from '@pubstudio/frontend/util-tooltip'
 
 const props = defineProps<{
   tip: string
@@ -36,7 +36,8 @@ const {
   show,
   tooltipMouseEnter,
   tooltipMouseLeave,
-} = useTooltip({
+  cancelHoverTimer,
+} = useTooltipDelay({
   placement: 'top',
   arrow: true,
   shift: true,
@@ -47,14 +48,16 @@ const mouseEnter = () => {
   emit('mouseenter')
   tooltipMouseEnter()
 }
+
+defineExpose({ cancelHoverTimer })
 </script>
 
 <style lang="postcss" scoped>
 @import '@theme/css/mixins.postcss';
 
-.icon-tooltip {
-  cursor: pointer;
+.icon-tooltip-delay {
   position: relative;
+  cursor: pointer;
 }
 
 .tip {

@@ -9,17 +9,9 @@
       <div class="sub-label" @click="clickSubTitle">
         {{ menuSubTitle }}
       </div>
-      <div
-        ref="itemRef"
-        class="to-mixin"
-        @mouseenter="tooltipMouseEnter"
-        @mouseleave="tooltipMouseLeave"
-      >
+      <IconTooltipDelay ref="toMixinRef" :tip="t('style.to_mixin')" class="to-mixin">
         <ScaleIn @click="convertToMixin"></ScaleIn>
-        <div v-if="show" ref="tooltipRef" class="tooltip" :style="tooltipStyle">
-          {{ t('style.to_mixin') }}
-        </div>
-      </div>
+      </IconTooltipDelay>
     </EditMenuTitle>
     <div class="style-rows" :class="{ collapsed }">
       <StyleRow
@@ -62,8 +54,7 @@ import {
   StyleToolbarMenu,
 } from '@pubstudio/shared/type-site'
 import { activeBreakpoint } from '@pubstudio/frontend/feature-site-source'
-import { ScaleIn } from '@pubstudio/frontend/ui-widgets'
-import { useTooltipDelay } from '@pubstudio/frontend/util-tooltip'
+import { IconTooltipDelay, ScaleIn } from '@pubstudio/frontend/ui-widgets'
 import { useBuild } from '../../lib/use-build'
 import StyleRow from '../StyleRow.vue'
 import EditMenuTitle from '../EditMenuTitle.vue'
@@ -82,15 +73,7 @@ const {
 } = useBuild()
 const { newStyle } = useReusableStyleMenu()
 
-const {
-  itemRef,
-  tooltipMouseEnter,
-  tooltipMouseLeave,
-  cancelHoverTimer,
-  tooltipRef,
-  tooltipStyle,
-  show,
-} = useTooltipDelay({ placement: 'top', globalShowDuration: 0 })
+const toMixinRef = ref()
 const collapsed = ref(false)
 
 const styleEntries = computed(() =>
@@ -193,7 +176,7 @@ const getInheritedFrom = (entry: IInheritedStyleEntry): string | undefined => {
 }
 
 const convertToMixin = () => {
-  cancelHoverTimer()
+  toMixinRef.value?.cancelHoverTimer()
   const cmp = editor.value?.selectedComponent
   if (cmp) {
     newStyle(cmp)
@@ -214,7 +197,6 @@ const convertToMixin = () => {
 }
 .to-mixin {
   @mixin size 22px;
-  cursor: pointer;
   margin-right: auto;
   :deep(svg) {
     @mixin size 100%;

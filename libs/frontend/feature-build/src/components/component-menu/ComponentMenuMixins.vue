@@ -6,6 +6,7 @@
         <MixinSelect
           :mixin="undefined"
           :mixinOptions="mixinOptions"
+          :isNew="true"
           @set="setMixin($event.oldMixinId, $event.newMixinId)"
           @remove="showNewMixin = false"
         />
@@ -19,6 +20,7 @@
         @set="setMixin($event.oldMixinId, $event.newMixinId)"
         @edit="edit"
         @remove="removeMixin($event)"
+        @flatten="flattenMixin(mixin.id)"
       />
     </div>
   </div>
@@ -41,8 +43,14 @@ const props = defineProps<{
 const { mixinIds } = toRefs(props)
 
 const { t } = useI18n()
-const { site, addComponentMixin, replaceComponentMixin, removeComponentMixin } =
-  useBuild()
+const {
+  site,
+  editor,
+  addComponentMixin,
+  replaceComponentMixin,
+  removeComponentMixin,
+  flattenComponentMixin,
+} = useBuild()
 const { setEditingStyle } = useReusableStyleMenu()
 
 const showNewMixin = ref(false)
@@ -84,6 +92,13 @@ const edit = (mixinId: string) => {
   const style = resolveStyle(site.value.context, mixinId)
   if (style) {
     setEditingStyle(style)
+  }
+}
+
+const flattenMixin = (mixinId: string) => {
+  const component = editor.value?.selectedComponent
+  if (component) {
+    flattenComponentMixin(component.id, mixinId)
   }
 }
 
