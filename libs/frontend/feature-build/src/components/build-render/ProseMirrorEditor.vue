@@ -30,6 +30,7 @@ import { resolveThemeVariables } from '@pubstudio/frontend/util-builtin'
 import { createComponentEditorView } from '../../lib/create-editor-view'
 import { useBuild } from '../../lib/use-build'
 import { useToolbar } from '../../lib/use-toolbar'
+import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 
 const props = defineProps<{
   component: IComponent
@@ -38,6 +39,7 @@ const props = defineProps<{
 
 const { component, editor } = toRefs(props)
 const { site } = useBuild()
+const { siteStore } = useSiteSource()
 const { getStyleValue } = useToolbar()
 
 const container = ref<HTMLDivElement>()
@@ -160,6 +162,7 @@ watch(gradientColorStyle, () => {
 })
 
 onBeforeUnmount(() => {
+  siteStore.value.save(site.value)
   editor.value.editView?.destroy()
   editor.value.editView = undefined
 })

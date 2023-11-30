@@ -72,7 +72,7 @@
     <Transition name="submenu">
       <component
         :is="submenu"
-        v-if="!!editor?.buildSubmenu"
+        v-if="showSubmenu"
         class="submenu"
         @openPageMenu="emit('openPageMenu')"
         @showCreate="emit('showCreateModal')"
@@ -99,6 +99,7 @@ import BuildMenuAsset from './BuildMenuAsset.vue'
 import { useBuild } from '../../lib/use-build'
 import BuildMenuBehavior from './BuildMenuBehavior.vue'
 import BuildMenuHistory from './BuildMenuHistory.vue'
+import { dragSource } from '../../lib/dnd/use-drag-drop'
 
 const { t } = useI18n()
 const { editor } = useBuild()
@@ -132,6 +133,17 @@ const toggleSubMenu = (newSubmenu: BuildSubmenu) => {
   const submenu = editor.value?.buildSubmenu
   setBuildSubmenu(editor.value, submenu === newSubmenu ? undefined : newSubmenu)
 }
+
+const showSubmenu = computed(() => {
+  const { buildSubmenu } = editor.value ?? {}
+  if (buildSubmenu === BuildSubmenu.New) {
+    // Only show the new component menu when no new
+    // component is being dragged.
+    return !dragSource.value?.addData
+  } else {
+    return !!buildSubmenu
+  }
+})
 </script>
 
 <style lang="postcss" scoped>
