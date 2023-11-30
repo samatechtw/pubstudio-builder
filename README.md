@@ -21,6 +21,7 @@
 - [Technical Notes](docs/tech-notes.md)
   - Technical design and terminology of the web builder and renderer
 - [Site Data Format](docs/site-data-format.md)
+- [Events, Inputs, and Behaviors](docs/events-inputs-behaviors.md)
 - [Site Versioning](docs/versioning.md)
 - [Renderer Specification](docs/renderer.md)
 - [Text Editing](docs/text-editing.md)

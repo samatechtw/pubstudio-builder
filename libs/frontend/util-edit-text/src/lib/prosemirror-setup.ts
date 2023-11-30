@@ -2,20 +2,20 @@ import { baseKeymap } from 'prosemirror-commands'
 import { gapCursor } from 'prosemirror-gapcursor'
 import { history } from 'prosemirror-history'
 import { keymap } from 'prosemirror-keymap'
-import { DOMParser as ProseDOMParser, DOMSerializer } from 'prosemirror-model'
+import { DOMParser as ProseDOMParser, DOMSerializer, Schema } from 'prosemirror-model'
 import { Command, EditorState, EditorStateConfig, Plugin } from 'prosemirror-state'
 import { buildInputRules } from './input-rules'
 import { buildKeymap } from './keymap'
-import { schema } from './schema-basic'
 
 export interface IProsemirrorSetupOptions {
   content: string
+  schema: Schema
   mapKeys?: { [key: string]: Command }
   plugins?: EditorStateConfig['plugins']
 }
 
 export function prosemirrorSetup(options: IProsemirrorSetupOptions): EditorState {
-  const { content: contentOption, mapKeys, plugins: pluginsOption } = options
+  const { content: contentOption, mapKeys, plugins: pluginsOption, schema } = options
   const plugins = [
     buildInputRules(schema),
     keymap(buildKeymap(schema, mapKeys)),
@@ -36,7 +36,10 @@ export function prosemirrorSetup(options: IProsemirrorSetupOptions): EditorState
   })
 }
 
-export function editorStateToHtml(state: EditorState): string | undefined {
+export function editorStateToHtml(
+  schema: Schema,
+  state: EditorState,
+): string | undefined {
   const fragment = DOMSerializer.fromSchema(schema).serializeFragment(state.doc.content)
   const div = document.createElement('div')
   div.id = '__pm-serialize__'
@@ -53,7 +56,7 @@ export function editorStateToHtml(state: EditorState): string | undefined {
   }
 }
 
-export function editorStateTextContent(state: EditorState): string {
+export function editorStateTextContent(schema: Schema, state: EditorState): string {
   const fragment = DOMSerializer.fromSchema(schema).serializeFragment(state.doc.content)
   return fragment.textContent ?? ''
 }

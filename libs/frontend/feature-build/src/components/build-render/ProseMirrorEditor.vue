@@ -17,7 +17,7 @@ import { getProseMirrorContainerId } from '@pubstudio/frontend/feature-editor'
 import {
   prosemirrorSetup,
   setOrRemoveStyleMark,
-  schema,
+  schemaText,
   firstMarkInSelection,
 } from '@pubstudio/frontend/util-edit-text'
 import { findStyles } from '@pubstudio/frontend/util-component'
@@ -47,10 +47,10 @@ const containerId = computed(() => getProseMirrorContainerId(component.value))
 
 const markStrong = (state: EditorState, dispatch?: (tr: Transaction) => void) => {
   const fallbackStyle = getStyleValue(Css.FontWeight)
-  const mark = firstMarkInSelection(state, schema.marks.strong)
+  const mark = firstMarkInSelection(state, schemaText.marks.strong)
   const newWeight = mark?.attrs[Css.FontWeight] === '700' ? '400' : '700'
   const cmd = setOrRemoveStyleMark(
-    schema.marks.strong,
+    schemaText.marks.strong,
     Css.FontWeight,
     newWeight,
     fallbackStyle,
@@ -177,7 +177,10 @@ watch(
     // because `updateState()` will cause the editor to lose its' focus and selection.
     const proseMirrorFocused = document.activeElement?.classList.contains('ProseMirror')
     if (!proseMirrorFocused) {
-      const newState = prosemirrorSetup({ content: component.value.content ?? '' })
+      const newState = prosemirrorSetup({
+        schema: schemaText,
+        content: component.value.content ?? '',
+      })
       editor.value?.editView?.updateState(newState)
     }
   },

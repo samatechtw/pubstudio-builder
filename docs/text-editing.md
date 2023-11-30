@@ -21,7 +21,7 @@ Editing procedure:
 - `@pubstudio/web/feature-edit-text` - includes a high level function for creating a new ProseMirror `EditView` for a PubStudio component. It hooks into ProseMirror's `dispatchTransaction` to save the latest state in PubStudio history.
 - `@pubstudio/frontend/util-edit-text` - interface to the ProseMirror libraries.
   - `input-rules.ts` - Supports some markdown-like behavior. For example, entering a dash and adding a space will start an unordered list.
-  - `schema-basic.ts` - Originally copied from [prosemirror-schema-basic](https://github.com/ProseMirror/prosemirror-schema-basic), contains our custom document schema.
+  - `schema-text.ts` - Originally copied from [prosemirror-schema-basic](https://github.com/ProseMirror/prosemirror-schema-basic), contains our custom document schema.
   - `keymap.ts` - Defines keybindings supported while editing text.
 
 ## Future Improvements

@@ -5,7 +5,7 @@ import {
   firstMarkInSelection,
   isMarkInSelection,
   replaceMark,
-  schema,
+  schemaText as schema,
   setOrRemoveStyleMark,
 } from '@pubstudio/frontend/util-edit-text'
 import { CommandType, ICommand } from '@pubstudio/shared/type-command'

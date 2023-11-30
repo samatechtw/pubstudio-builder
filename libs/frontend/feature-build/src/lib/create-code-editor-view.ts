@@ -1,6 +1,7 @@
 import {
   editorStateTextContent,
   prosemirrorSetup,
+  schemaCode,
 } from '@pubstudio/frontend/util-edit-text'
 import hljs from 'highlight.js/lib/core'
 import { keymap } from 'prosemirror-keymap'
@@ -29,6 +30,7 @@ export function createCodeEditorView(
   }
 
   const state = prosemirrorSetup({
+    schema: schemaCode,
     content: `<pre><code>${code}</code></pre>`,
     plugins: [...codeEditorPlugins],
   })
@@ -42,7 +44,7 @@ export function createCodeEditorView(
         // When using hljs with ProseMirror editor, the code must be wrapped inside
         // `<pre><code>...</code></pre>` for highlighting&styling feature to work. If a user
         // removes all the text from the editor (i.e. select all text then press backspace),
-        // the leading&ending <pre><code> well also be removed, causing the highlighting&styleing
+        // the leading&ending <pre><code> well also be removed, causing the highlighting & styling
         // feature to stop working. We need to manually wrap the content inside <pre><code> in such cases.
 
         // FIXME
@@ -51,6 +53,7 @@ export function createCodeEditorView(
         // 2. New line characters are ignored if the text is copied from a source other than ProseMirror
         //    editor. For example, VSCode.
         newState = prosemirrorSetup({
+          schema: schemaCode,
           content: `<pre><code>${textContent}</code></pre>`,
           plugins: [...codeEditorPlugins],
         })
@@ -58,7 +61,7 @@ export function createCodeEditorView(
       }
       view.updateState(newState)
 
-      const code = editorStateTextContent(newState)
+      const code = editorStateTextContent(schemaCode, newState)
       onChange(code)
     },
   })

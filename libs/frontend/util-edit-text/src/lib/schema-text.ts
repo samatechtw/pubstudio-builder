@@ -333,4 +333,4 @@ export const marks = {
   } as MarkSpec,
 }
 
-export const schema = new Schema({ nodes, marks })
+export const schemaText = new Schema({ nodes, marks })

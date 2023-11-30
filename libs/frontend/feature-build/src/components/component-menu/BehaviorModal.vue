@@ -227,18 +227,6 @@ onUnmounted(() => {
     max-height: 90vh;
     overflow-y: auto;
   }
-  .code-wrap {
-    width: 100%;
-    max-height: 250px;
-    overflow: auto;
-    .ProseMirror {
-      .hljs {
-        margin: 0;
-        min-height: 250px;
-        padding: 8px;
-      }
-    }
-  }
   .menu-row {
     justify-content: flex-start;
     .item {
