@@ -2,6 +2,7 @@ import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { runtimeContext } from '@pubstudio/frontend/util-runtime'
 import {
   BuildSubmenu,
+  ComponentMenuCollapsible,
   ComponentTabState,
   CssPseudoClass,
   EditorMode,
@@ -441,3 +442,14 @@ export const setTemplatesShown = (editor: IEditorContext | undefined, shown: boo
 
 export const getProseMirrorContainerId = (component: IComponent) =>
   `${component.id}-pm-container`
+
+export const setComponentMenuCollapses = (
+  editor: IEditorContext | undefined,
+  collapsible: ComponentMenuCollapsible,
+  collapsed: boolean,
+) => {
+  if (editor) {
+    editor.componentMenuCollapses[collapsible] = collapsed
+    siteStore.value.saveEditor(editor)
+  }
+}

@@ -3,6 +3,7 @@ import {
   DEFAULT_BREAKPOINT_ID,
 } from '@pubstudio/frontend/util-ids'
 import {
+  ComponentMenuCollapsible,
   CssPseudoClass,
   EditorMode,
   IEditorContext,
@@ -31,6 +32,11 @@ export const createEditorContext = (homePage: IPage): IEditorContext => {
     builderWidth: 1080,
     builderScale: 1,
     cssPseudoClass: CssPseudoClass.Default,
+    componentMenuCollapses: {
+      [ComponentMenuCollapsible.Dimensions]: false,
+      [ComponentMenuCollapsible.Styles]: false,
+      [ComponentMenuCollapsible.ChildStyles]: true,
+    },
   }
 }
 

@@ -95,18 +95,16 @@ import {
   useHistory,
   useDragDropData,
 } from '@pubstudio/frontend/feature-build'
-import { makeAddImageData } from '@pubstudio/frontend/util-command'
 import { useBuildEvent, hotkeysDisabled } from '@pubstudio/frontend/feature-build-event'
 import { Keys, useKeyListener } from '@pubstudio/frontend/util-key-listener'
 import { EditorMode } from '@pubstudio/shared/type-site'
 import { toggleEditorMenu } from '@pubstudio/frontend/feature-editor'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
-import { ICreatePlatformSiteAssetResponse } from '@pubstudio/shared/type-api-platform-site-asset'
 import { SITE_ID, SITE_API_URL } from '@pubstudio/frontend/util-config'
 
 const { t } = useI18n()
 
-const { activePage, addComponentData, site, editor, siteError } = useBuild()
+const { site, editor, siteError } = useBuild()
 const showSiteErrorModal = ref(true)
 const { droppedFile } = useDragDropData()
 

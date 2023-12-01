@@ -24,7 +24,6 @@
       </ToolbarItem>
       <ToolbarItemDropdown :items="alignHorizontalItems" />
       <ToolbarItemDropdown :items="alignVerticalItems" />
-      <SizeDropdown />
       <ToolbarColorPicker
         :tooltip="t('style.toolbar.background_color')"
         :color="getRawOrSelectedStyle(Css.BackgroundColor)"
@@ -74,7 +73,6 @@ import { ICommand } from '@pubstudio/shared/type-command'
 import { useToolbar } from '../../lib/use-toolbar'
 import { useBuild } from '../../lib/use-build'
 import { useThemeColors } from '../../lib/use-theme-colors'
-import SizeDropdown from './SizeDropdown.vue'
 import ToolbarColorPicker from './ToolbarColorPicker.vue'
 
 const { t } = useI18n()

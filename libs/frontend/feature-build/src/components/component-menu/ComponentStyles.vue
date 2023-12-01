@@ -3,8 +3,8 @@
     <EditMenuTitle
       :title="t('style.styles')"
       :collapsed="collapsed"
-      @add="setEditStyle('')"
-      @toggleCollapse="collapsed = !collapsed"
+      @add="onAddClick"
+      @toggleCollapse="toggleCollapse"
     >
       <div class="sub-label" @click="clickSubTitle">
         {{ menuSubTitle }}
@@ -44,9 +44,11 @@ import { useI18n } from 'petite-vue-i18n'
 import {
   setComponentEditStyle,
   setStyleToolbarMenu,
+  setComponentMenuCollapses,
 } from '@pubstudio/frontend/feature-editor'
 import { resolveThemeVariables } from '@pubstudio/frontend/util-builtin'
 import {
+  ComponentMenuCollapsible,
   Css,
   IInheritedStyleEntry,
   IStyleEntry,
@@ -74,7 +76,23 @@ const {
 const { newStyle } = useReusableStyleMenu()
 
 const toMixinRef = ref()
-const collapsed = ref(false)
+
+const collapsed = computed(
+  () => !!editor.value?.componentMenuCollapses?.[ComponentMenuCollapsible.Styles],
+)
+
+const toggleCollapse = () => {
+  setComponentMenuCollapses(
+    editor.value,
+    ComponentMenuCollapsible.Styles,
+    !collapsed.value,
+  )
+}
+
+const onAddClick = () => {
+  setComponentMenuCollapses(editor.value, ComponentMenuCollapsible.Styles, false)
+  setEditStyle('')
+}
 
 const styleEntries = computed(() =>
   Object.entries(selectedComponentFlattenedStyles.value).map(

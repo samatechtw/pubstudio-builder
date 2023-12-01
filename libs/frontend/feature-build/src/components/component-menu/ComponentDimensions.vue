@@ -1,14 +1,12 @@
 <template>
-  <div class="size-wrap toolbar-menu" data-toggle-id="toggle-style-menu">
-    <ToolbarItem :ref="setToggleRef" :active="opened" @click="toggleMenu">
-      <Size />
-    </ToolbarItem>
-    <div
-      ref="menuRef"
-      class="ps-dropdown size-dropdown"
-      :class="{ 'ps-dropdown-opened': opened }"
-      :style="menuStyle"
-    >
+  <div class="component-dimensions">
+    <EditMenuTitle
+      :title="t('build.dimensions')"
+      :collapsed="collapsed"
+      :showAdd="false"
+      @toggleCollapse="toggleCollapse"
+    />
+    <div class="dimensions-wrap" :class="{ collapsed }">
       <div class="size-row">
         <div class="size-label label-title">
           {{ t('build.width') }}
@@ -105,51 +103,39 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, watch } from 'vue'
+import { computed } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
-import { useDropdown } from '@pubstudio/frontend/util-dropdown'
-import { ToolbarItem, Size } from '@pubstudio/frontend/ui-widgets'
+import { ToolbarItem } from '@pubstudio/frontend/ui-widgets'
 import { Eye, Hide, Scroll } from '@pubstudio/frontend/ui-widgets'
-import { Css, StyleToolbarMenu } from '@pubstudio/shared/type-site'
-import { setStyleToolbarMenu } from '@pubstudio/frontend/feature-editor'
-import { useBuild } from '../../lib/use-build'
+import { ComponentMenuCollapsible, Css } from '@pubstudio/shared/type-site'
 import { useToolbar } from '../../lib/use-toolbar'
 import SizeInput from './SizeInput.vue'
 import PaddingMarginEdit from './PaddingMarginEdit.vue'
+import EditMenuTitle from '../EditMenuTitle.vue'
+import { useBuild } from '../../lib/use-build'
+import { setComponentMenuCollapses } from '@pubstudio/frontend/feature-editor'
 import { usePaddingMarginEdit } from '../../lib/use-padding-margin-edit'
 
 const { t } = useI18n()
 const { editor } = useBuild()
 const { getStyleValue, setStyle } = useToolbar()
+const { editValueData } = usePaddingMarginEdit()
 
-const { disableClose } = usePaddingMarginEdit()
-
-const { setToggleRef, menuRef, opened, menuStyle, setMenuOpened } = useDropdown({
-  clickawayIgnoreSelector: 'div[data-toggle-id="toggle-style-menu"]',
-  offset: { mainAxis: 2, crossAxis: 6 },
-  openedInit: editor.value?.styleMenu === StyleToolbarMenu.Size,
-  disableClose,
-  openChanged: (open: boolean) => {
-    // When useDropdown internal clickaway hides the menu, it's necessary to sync state
-    if (!open && editor.value?.styleMenu === StyleToolbarMenu.Size) {
-      setStyleToolbarMenu(editor.value, undefined)
-    }
-  },
-})
-
-watch(
-  () => editor.value?.styleMenu,
-  (newMenu) => {
-    setMenuOpened(newMenu === StyleToolbarMenu.Size)
-  },
+const collapsed = computed(
+  () => !!editor.value?.componentMenuCollapses?.[ComponentMenuCollapsible.Dimensions],
 )
 
-const toggleMenu = () => {
-  const menu = editor.value?.styleMenu
-  const newMenu = menu === StyleToolbarMenu.Size ? undefined : StyleToolbarMenu.Size
-  setStyleToolbarMenu(editor.value, newMenu)
-  setMenuOpened(!!newMenu)
+const toggleCollapse = () => {
+  setComponentMenuCollapses(
+    editor.value,
+    ComponentMenuCollapsible.Dimensions,
+    !collapsed.value,
+  )
 }
+
+const sectionHeight = computed(() => {
+  return editValueData.value ? '313.5px' : '262px'
+})
 
 const overflowVisible = computed(() => {
   return getStyleValue(Css.Overflow) === 'visible'
@@ -175,6 +161,19 @@ const toggleOverflow = (value: string) => {
 <style lang="postcss" scoped>
 @import '@theme/css/mixins.postcss';
 
+.component-dimensions {
+  padding: 8px 16px;
+}
+
+.dimensions-wrap {
+  max-height: v-bind(sectionHeight);
+  transition: max-height 0.2s;
+  &.collapsed {
+    max-height: 0;
+    overflow: hidden;
+  }
+}
+
 .size-wrap {
   .size-dropdown {
     width: 326px;
@@ -183,16 +182,17 @@ const toggleOverflow = (value: string) => {
 }
 .divider {
   @mixin divider;
-  margin: 6px 0 8px;
+  margin: 3px 0 4px;
 }
 .size-row {
   @mixin flex-center;
   justify-content: center;
-  padding: 6px 0 6px 8px;
+  padding: 5px 0 4px;
 }
 .size-label {
-  @mixin title 13px;
+  @mixin title 12px;
   color: $color-text;
+  margin-top: 2px;
   width: 40px;
   text-align: right;
 }
@@ -200,7 +200,7 @@ const toggleOverflow = (value: string) => {
   font-weight: 600;
 }
 .size {
-  margin-left: 6px;
+  margin-left: 2px;
 }
 .size-row.overflow {
   padding: 0;

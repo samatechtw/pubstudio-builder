@@ -60,6 +60,7 @@ export const serializeEditor = (
         builderScale: editor.builderScale,
         cssPseudoClass: editor.cssPseudoClass,
         templatesShown: editor.templatesShown,
+        componentMenuCollapses: editor.componentMenuCollapses,
       }
     : undefined
 }
