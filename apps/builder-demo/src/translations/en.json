@@ -101,7 +101,7 @@
   },
   "build": {
     "scratch_title": "Scratch Site",
-    "scratch_text": "This is a sandbox for testing the builder, the site cannot be deployed. If you create an account, it can be accessed in the Sites Dashboard.",
+    "scratch_text": "This is a sandbox for testing the builder, the site cannot be deployed. Connect a Site API to persist and deploy sites.",
     "assets": "Assets",
     "button": "Button",
     "event": "Event",
@@ -242,7 +242,8 @@
     "menu_empty": "No component selected",
     "select_asset": "Select Asset",
     "no_matching_results": "No matching results.",
-    "select": "Select"
+    "select": "Select",
+    "dimensions": "Dimensions"
   },
   "theme": {
     "title": "Theme",

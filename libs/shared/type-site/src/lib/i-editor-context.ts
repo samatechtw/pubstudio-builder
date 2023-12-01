@@ -21,8 +21,13 @@ export enum BuildSubmenu {
   History = 'history',
 }
 
+export enum ComponentMenuCollapsible {
+  Dimensions = 'dimensions',
+  Styles = 'styles',
+  ChildStyles = 'childStyles',
+}
+
 export enum StyleToolbarMenu {
-  Size = 'size',
   BackgroundColor = 'bgColor',
   TextColor = 'textColor',
   FontFamily = 'fontFamily',
@@ -123,6 +128,10 @@ export interface IEditorContext {
     editStyle?: string
     // Name of editing info value
     editInfo?: string
+  }
+  // true if the collapsible is collapsed, otherwise expanded.
+  componentMenuCollapses: {
+    [key in ComponentMenuCollapsible]?: boolean
   }
   showComponentTree: boolean
   // Record of expanded components in the component tree

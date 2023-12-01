@@ -110,6 +110,7 @@ $edit-height: 36px;
   transition: height 0.2s;
   width: calc($height * 2);
   position: relative;
+  user-select: none;
   &.edit-value-wrap {
     height: calc($height + $edit-height);
   }
@@ -153,6 +154,7 @@ $edit-height: 36px;
   position: absolute;
   left: 6px;
   top: 2px;
+  color: $color-primary;
 }
 
 .p-label {
@@ -161,6 +163,7 @@ $edit-height: 36px;
   left: calc($mw + 4px);
   top: calc($mh + 1px);
   pointer-events: none;
+  color: $color-primary;
 }
 
 .value {

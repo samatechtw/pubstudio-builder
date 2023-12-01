@@ -21,6 +21,7 @@ export const mockSerializedSite: ISerializedSite = {
       'test-c-0': true,
       'test-c-1': false,
     },
+    componentMenuCollapses: {},
     componentsHidden: {},
     componentTab: {},
     selectedThemeColors: [],

@@ -18,6 +18,7 @@
     />
     <template v-else>
       <ComponentTabInfo :component="component" />
+      <ComponentDimensions />
       <ComponentTabStyle :component="component" />
       <ComponentInputs
         :component="component"
@@ -54,6 +55,7 @@ import { PSButton } from '@pubstudio/frontend/ui-widgets'
 import { IComponent } from '@pubstudio/shared/type-site'
 import { noBehaviorId } from '@pubstudio/frontend/util-ids'
 import ComponentTabInfo from './ComponentTabInfo.vue'
+import ComponentDimensions from './ComponentDimensions.vue'
 import ComponentTabStyle from './ComponentTabStyle.vue'
 import { useBuild } from '../../lib/use-build'
 import { useEditComponentInput } from '../../lib/use-edit-component-input'

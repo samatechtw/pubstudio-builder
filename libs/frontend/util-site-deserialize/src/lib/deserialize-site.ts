@@ -43,6 +43,8 @@ export const deserializeEditor = (
         builderScale: serializedEditor.builderScale,
         cssPseudoClass: serializedEditor.cssPseudoClass,
         templatesShown: serializedEditor.templatesShown,
+        // Added 231201
+        componentMenuCollapses: serializedEditor.componentMenuCollapses ?? {},
       }
     : undefined
 }

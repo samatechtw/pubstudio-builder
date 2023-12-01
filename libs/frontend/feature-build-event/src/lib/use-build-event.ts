@@ -24,7 +24,6 @@ import {
   CssUnit,
   IComponent,
   IStyleEntry,
-  StyleToolbarMenu,
 } from '@pubstudio/shared/type-site'
 import { onMounted, onUnmounted } from 'vue'
 import { hotkeysDisabled } from './util-build-event'
@@ -72,7 +71,7 @@ export const useBuildEvent = () => {
   const { siteStore } = useSiteSource()
   const { pressCopy, pressPaste } = useCopyPaste()
   const { pressDuplicate } = useDuplicateComponent()
-  const { drag, stopDrag } = usePaddingMarginEdit()
+  const { dragging: paddingMarginDragData, drag, stopDrag } = usePaddingMarginEdit()
   let buildWindow: HTMLElement | null = null
 
   const selectComponent = (component: IComponent) => {
@@ -211,7 +210,7 @@ export const useBuildEvent = () => {
 
   const handleMousemove = (e: MouseEvent) => {
     const editor = site.value.editor
-    if (editor?.styleMenu === StyleToolbarMenu.Size) {
+    if (paddingMarginDragData.value) {
       drag(e)
       return
     }
@@ -402,7 +401,7 @@ export const useBuildEvent = () => {
       editor.resizeData = undefined
       siteStore.value.save(site.value)
     }
-    if (editor?.styleMenu === StyleToolbarMenu.Size) {
+    if (paddingMarginDragData.value) {
       stopDrag(e)
       return
     }

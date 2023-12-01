@@ -176,7 +176,7 @@ onMounted(() => {
   }
 }
 .size-input {
-  width: 40px;
+  width: 38px;
   &.invalid {
     outline: none;
     border-radius: 2px;
@@ -184,8 +184,11 @@ onMounted(() => {
   }
 }
 .size-unit-wrap {
-  @mixin title 13px;
-  margin-left: 4px;
+  @mixin title 11px;
+  display: flex;
+  align-items: center;
+  margin-left: 2px;
+  color: $color-primary;
 }
 .size-unit {
   cursor: pointer;

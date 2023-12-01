@@ -4,8 +4,8 @@
       :title="t('style.child')"
       :collapsed="collapsed"
       :showAdd="selector !== undefined && !isMissingSelector(selector)"
-      @add="setEditStyle('')"
-      @toggleCollapse="collapsed = !collapsed"
+      @add="onAddClick"
+      @toggleCollapse="toggleCollapse"
     >
       <InfoBubble :message="t('style.child_info')" placement="top" class="info" />
       <PSMultiselect
@@ -77,6 +77,7 @@ import { computed, ref, toRefs, watch } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { InfoBubble, PSMultiselect, Minus } from '@pubstudio/frontend/ui-widgets'
 import {
+  ComponentMenuCollapsible,
   Css,
   IComponent,
   IInheritedStyleEntry,
@@ -96,6 +97,7 @@ import {
 } from '@pubstudio/frontend/feature-site-source'
 import StyleRow from '../StyleRow.vue'
 import { runtimeContext } from '@pubstudio/frontend/util-runtime'
+import { setComponentMenuCollapses } from '@pubstudio/frontend/feature-editor'
 
 const { t } = useI18n()
 const {
@@ -117,8 +119,24 @@ const getDefaultSelector = (): string | undefined => {
 }
 
 const selector = ref(getDefaultSelector())
-const collapsed = ref(true)
 const editStyleProp = ref<string | undefined>()
+
+const collapsed = computed(
+  () => !!editor.value?.componentMenuCollapses?.[ComponentMenuCollapsible.ChildStyles],
+)
+
+const toggleCollapse = () => {
+  setComponentMenuCollapses(
+    editor.value,
+    ComponentMenuCollapsible.ChildStyles,
+    !collapsed.value,
+  )
+}
+
+const onAddClick = () => {
+  setComponentMenuCollapses(editor.value, ComponentMenuCollapsible.ChildStyles, false)
+  setEditStyle('')
+}
 
 const childrenIdSet = computed(
   () => new Set(component.value.children?.map((child) => child.id)),
