@@ -92,7 +92,11 @@ import { computed, nextTick, onMounted, reactive, ref, toRefs, watch } from 'vue
 import { useI18n } from 'petite-vue-i18n'
 import { IThemeVariable } from '@pubstudio/shared/type-site'
 import { Plus } from '@pubstudio/frontend/ui-widgets'
-import { IThemedGradient, ResolveThemeVarFn } from '@pubstudio/frontend/util-gradient'
+import {
+  IThemedGradient,
+  ResolveThemeVarFn,
+  normalizeHex,
+} from '@pubstudio/frontend/util-gradient'
 import { IRgba } from '@pubstudio/frontend/util-gradient'
 import Saturation from './Saturation.vue'
 import Hue from './Hue.vue'
@@ -255,7 +259,8 @@ const selectAlpha = (a: any) => {
 }
 
 const inputHex = async (color: string) => {
-  const { r, g, b, a, h, s, v } = setColorValue(color)
+  const normalized = normalizeHex(color)
+  const { r, g, b, a, h, s, v } = setColorValue(normalized)
   Object.assign(c, { r, g, b, a, h, s, v })
   modelHex.value = color
   modelRgba.value = rgbaStringShort.value

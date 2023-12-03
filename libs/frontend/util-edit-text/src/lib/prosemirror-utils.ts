@@ -128,11 +128,7 @@ export const replaceMark = (markType: MarkType, attrs: Attrs | null = null): Com
     if ((empty && !$cursor) || !markApplies(state, ranges, markType)) return false
     if (dispatch) {
       if ($cursor) {
-        if (markType.isInSet(state.storedMarks || $cursor.marks())) {
-          dispatch(state.tr.removeStoredMark(markType))
-        } else {
-          dispatch(state.tr.addStoredMark(markType.create(attrs)))
-        }
+        dispatch(state.tr.addStoredMark(markType.create(attrs)))
       } else {
         const tr = state.tr
 

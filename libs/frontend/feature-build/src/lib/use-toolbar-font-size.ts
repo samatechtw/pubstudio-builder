@@ -17,7 +17,8 @@ export interface IFontSize {
 
 export const useToolbarFontSize = (): IUseToolbarFontSize => {
   const { editor } = useBuild()
-  const { getResolvedOrSelectedStyle, setStyle, selectionStyles } = useToolbar()
+  const { getResolvedOrSelectedStyle, setStyle, refocusSelection, selectionStyles } =
+    useToolbar()
 
   const psInputRef = ref()
   const fontSize = ref<IFontSize>({ size: '', unit: 'px' })
@@ -37,9 +38,7 @@ export const useToolbarFontSize = (): IUseToolbarFontSize => {
   }
 
   const setFontSize = () => {
-    if (!editor.value?.editView?.state.selection?.empty) {
-      editor.value?.editView?.focus()
-    }
+    refocusSelection()
     try {
       const size = parseInt(fontSize.value.size)
       if (size > 1 && size < 1000) {

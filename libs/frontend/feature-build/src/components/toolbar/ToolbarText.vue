@@ -26,7 +26,6 @@
         :selectedThemeColors="selectedThemeColors"
         @selectColor="setFontColor($event)"
         @applyGradient="setGradient($event)"
-        @mousedown.prevent
         @click.stop="togglePicker(!showColorPicker)"
       >
         <FontColor :color="iconColor" />
@@ -90,6 +89,7 @@ const {
   setStyle,
   setProseMirrorStyle,
   createSetComponentCustomStyleCommand,
+  refocusSelection,
 } = useToolbar()
 const { editor, pushGroupCommands } = useBuild()
 const { selectedThemeColors } = useThemeColors()
@@ -111,6 +111,7 @@ const setFontColor = (pickerColor: IPickerColor) => {
   const { selectedComponent } = editor.value ?? {}
 
   const editView = editor.value?.editView
+  refocusSelection()
   if (editView?.hasFocus()) {
     setProseMirrorStyle(editView, Css.Color, colorToCssValue(pickerColor))
   } else if (selectedComponent) {

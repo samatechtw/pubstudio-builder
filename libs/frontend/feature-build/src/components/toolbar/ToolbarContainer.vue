@@ -33,7 +33,6 @@
         class="toolbar-menu"
         @selectColor="setBackgroundColor($event)"
         @applyGradient="setGradientBackground($event)"
-        @mousedown.prevent
         @click.stop="togglePicker(!showBackgroundPicker)"
       >
         <BackgroundColor :fill="iconColor" />
@@ -85,6 +84,7 @@ const {
   setStyle,
   createSetComponentCustomStyleCommand,
   setProseMirrorStyle,
+  refocusSelection,
 } = useToolbar()
 const { editor, pushGroupCommands } = useBuild()
 const { selectedThemeColors } = useThemeColors()
@@ -93,6 +93,7 @@ const setBackgroundColor = (pickerColor: IPickerColor) => {
   const { selectedComponent } = editor.value ?? {}
 
   const editView = editor.value?.editView
+  refocusSelection()
   if (editView?.hasFocus()) {
     setProseMirrorStyle(editView, Css.BackgroundColor, colorToCssValue(pickerColor))
   } else if (selectedComponent) {

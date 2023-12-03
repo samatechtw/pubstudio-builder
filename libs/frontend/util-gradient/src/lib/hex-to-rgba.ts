@@ -1,7 +1,7 @@
 import { IRgba } from './i-rgba'
 
 // Converts 3/4 char hex to 6/8 char, and adds # if not present
-function normalizeHex(hex: string): string | undefined {
+export function normalizeHex(hex: string): string | undefined {
   if (!/^#?[0-9A-Fa-f]{3,}$/g.test(hex)) {
     return undefined
   }
