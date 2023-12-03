@@ -17,7 +17,7 @@ import {
   StyleSourceType,
 } from '@pubstudio/shared/type-site'
 import { toggleMark } from 'prosemirror-commands'
-import { Command } from 'prosemirror-state'
+import { Command, TextSelection } from 'prosemirror-state'
 import { EditorView } from 'prosemirror-view'
 import { reactive, toRaw, UnwrapNestedRefs, watch } from 'vue'
 import { editViewTxCount } from './create-editor-view'
@@ -36,6 +36,7 @@ export interface IUseToolbar {
     property: Css,
     newValue: string | undefined,
   ): ICommand<ISetComponentCustomStyleData> | undefined
+  refocusSelection(): void
 }
 
 export interface IEditViewSelectionStyles {
@@ -190,7 +191,7 @@ export const useToolbar = (): IUseToolbar => {
         break
       }
       case Css.FontFamily: {
-        const parentStyle = getStyleValue(Css.FontWeight)
+        const parentStyle = getStyleValue(Css.FontFamily)
         cmd = setOrRemoveStyleMark(schema.marks.font, Css.FontFamily, value, parentStyle)
         break
       }
@@ -283,6 +284,13 @@ export const useToolbar = (): IUseToolbar => {
     }
   }
 
+  const refocusSelection = () => {
+    const selection = editor.value?.editView?.state.selection as TextSelection
+    if (!selection?.empty || selection.$cursor) {
+      editor.value?.editView?.focus()
+    }
+  }
+
   return {
     selectionStyles,
     getRawStyle,
@@ -293,5 +301,6 @@ export const useToolbar = (): IUseToolbar => {
     setStyle,
     setProseMirrorStyle,
     createSetComponentCustomStyleCommand,
+    refocusSelection,
   }
 }
