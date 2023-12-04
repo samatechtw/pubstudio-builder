@@ -5,6 +5,9 @@
   "compilerOptions": {
     "rootDir": "../../",
     "types": ["node"],
-    "lib": ["dom"]
+    "lib": ["es2022", "dom"],
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "target": "es2022"
   }
 }

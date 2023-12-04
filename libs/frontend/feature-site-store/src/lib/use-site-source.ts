@@ -6,7 +6,6 @@ import {
   SiteSaveState,
 } from '@pubstudio/shared/type-site-store'
 import { computed, ComputedRef, Ref, ref } from 'vue'
-import { useSiteStore } from './use-site-store'
 
 // This file is here, instead of frontend/feature-site-source, to decouple the `site`
 // instance from the dependencies required by this lib.
@@ -17,8 +16,13 @@ export interface IUseSiteSource {
   apiSiteId: Ref<string | undefined>
   siteStore: Ref<ISiteStore>
   isSaving: ComputedRef<boolean>
-  initializeSite: (siteId: string | undefined, siteApiUrl?: string) => Promise<void>
+  initializeSite: (options: IInitializeSiteOptions) => Promise<void>
   checkOutdated: () => Promise<void>
+}
+
+export interface IInitializeSiteOptions {
+  store: ISiteStore
+  siteId: string | undefined
 }
 
 const siteStore = ref() as Ref<ISiteStore>
@@ -33,8 +37,12 @@ const isSaving = computed(() => {
 })
 
 export const useSiteSource = (): IUseSiteSource => {
-  const initializeSite = async (siteId: string | undefined, siteApiUrl?: string) => {
-    siteStore.value = useSiteStore({ siteId, siteApiUrl })
+  const initializeSite = async (options: IInitializeSiteOptions) => {
+    const { siteId, store } = options
+    siteStore.value = {
+      ...store,
+    }
+
     await siteStore.value.initialize()
     const restored = await siteStore.value.restore()
     if (restored) {

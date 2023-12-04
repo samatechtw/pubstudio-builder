@@ -262,7 +262,7 @@ export const useBuild = (): IUseBuild => {
   }
 
   const resetSite = () => {
-    replaceSite(createSite('test'))
+    replaceSite(createSite(site.value.name ?? 'test'))
     resetStyleMenu()
     resetThemeMenuVariables()
   }

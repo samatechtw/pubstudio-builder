@@ -7,7 +7,7 @@ import { restoreSiteError } from './restore-site-error'
 export const restoreSiteHelper = (data: IStoredSite): ISiteRestore => {
   let site = unstoreSite(data)
   if (!site) {
-    site = createSite('test')
+    site = createSite('scratch')
   }
   if (!site) {
     return restoreSiteError('errors.site_restore_fail')

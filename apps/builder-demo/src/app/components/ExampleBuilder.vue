@@ -91,15 +91,15 @@ import {
   ThemeMenu,
   PageMenu,
   StyleToolbar,
-  useBuild,
-  useHistory,
-  useDragDropData,
-} from '@pubstudio/frontend/feature-build'
+} from '@pubstudio/frontend/ui-build'
+import { useBuild, useHistory } from '@pubstudio/frontend/feature-build'
+import { useDragDropData } from '@pubstudio/frontend/feature-render-builder'
 import { useBuildEvent, hotkeysDisabled } from '@pubstudio/frontend/feature-build-event'
 import { Keys, useKeyListener } from '@pubstudio/frontend/util-key-listener'
 import { EditorMode } from '@pubstudio/shared/type-site'
 import { toggleEditorMenu } from '@pubstudio/frontend/feature-editor'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
+import { initializeSiteStore } from '@pubstudio/frontend/feature-site-store-init'
 import { SITE_ID, SITE_API_URL } from '@pubstudio/frontend/util-config'
 
 const { t } = useI18n()
@@ -109,8 +109,8 @@ const showSiteErrorModal = ref(true)
 const { droppedFile } = useDragDropData()
 
 const siteId = SITE_ID || 'scratch'
-const { siteStore, apiSiteId, isSaving, initializeSite } = useSiteSource()
-await initializeSite(siteId, SITE_API_URL)
+const { siteStore, apiSiteId, isSaving } = useSiteSource()
+await initializeSiteStore({ siteId, apiSiteUrl: SITE_API_URL })
 useBuildEvent()
 const { undo, redo } = useHistory()
 

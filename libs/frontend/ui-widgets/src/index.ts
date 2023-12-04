@@ -113,7 +113,6 @@ export * from './lib/toast/use-toast'
 
 // hud
 export { default as AppHUD } from './lib/hud/AppHUD.vue'
-export * from './lib/hud/use-hud'
 
 export { default as StyleProperty } from './lib/StyleProperty.vue'
 export { default as StyleValue } from './lib/StyleValue.vue'

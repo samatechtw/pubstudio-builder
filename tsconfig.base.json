@@ -120,6 +120,9 @@
         "libs/frontend/feature-breakpoint/src/index.ts"
       ],
       "@pubstudio/frontend/feature-build": ["libs/frontend/feature-build/src/index.ts"],
+      "@pubstudio/frontend/feature-render-builder": [
+        "libs/frontend/feature-render-builder/src/index.ts"
+      ],
       "@pubstudio/frontend/feature-build-event": [
         "libs/frontend/feature-build-event/src/index.ts"
       ],
@@ -145,8 +148,12 @@
       "@pubstudio/frontend/feature-site-store": [
         "libs/frontend/feature-site-store/src/index.ts"
       ],
+      "@pubstudio/frontend/feature-site-store-init": [
+        "libs/frontend/feature-site-store-init/src/index.ts"
+      ],
       "@pubstudio/frontend/feature-sites": ["libs/frontend/feature-sites/src/index.ts"],
       "@pubstudio/web/type-builtins": ["libs/web/type-builtins/src/index.ts"],
+      "@pubstudio/frontend/ui-build": ["libs/frontend/ui-build/src/index.ts"],
       "@pubstudio/frontend/ui-theme": ["libs/frontend/ui-theme/src"],
       "@pubstudio/frontend/util-build": ["libs/frontend/util-build/src/index.ts"],
       "@pubstudio/frontend/util-command": ["libs/frontend/util-command/src/index.ts"],

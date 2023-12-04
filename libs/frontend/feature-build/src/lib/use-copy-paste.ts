@@ -1,5 +1,5 @@
-import { useHUD } from '@pubstudio/frontend/ui-widgets'
 import { serializeComponent } from '@pubstudio/frontend/util-site-store'
+import { useHUD } from '@pubstudio/frontend/util-ui-alert'
 import { ISerializedComponent } from '@pubstudio/shared/type-site'
 import { useBuild } from './use-build'
 
