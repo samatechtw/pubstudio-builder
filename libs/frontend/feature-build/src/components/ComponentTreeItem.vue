@@ -34,14 +34,23 @@
         <Caret class="caret" :class="{ 'caret-expanded': expanded }" />
       </div>
       <div class="component-name" :class="{ 'no-children': !haveChildren }">
-        {{ component.name }}
+        <ComponentTreeItemRename
+          v-if="isBeingRenamed()"
+          :component="component"
+          :treeItemId="treeItemId"
+          class="component-tree-item-rename"
+        />
+        <template v-else>
+          {{ component.name }}
+        </template>
       </div>
       <Hide
         v-if="editor?.componentsHidden[component.id]"
         class="eye"
+        :data-tree-item-id="treeItemId"
         @click="toggleHidden"
       />
-      <Eye v-else class="eye" @click="toggleHidden" />
+      <Eye v-else class="eye" :data-tree-item-id="treeItemId" @click="toggleHidden" />
     </div>
     <div v-if="haveChildren && expanded" class="component-children">
       <ComponentTreeItem
@@ -69,6 +78,7 @@ import {
 } from '@pubstudio/frontend/feature-editor'
 import { Eye, Hide } from '@pubstudio/frontend/ui-widgets'
 import { runtimeContext } from '@pubstudio/frontend/util-runtime'
+import ComponentTreeItemRename from './ComponentTreeItemRename.vue'
 
 const props = defineProps<{
   component: IComponent
@@ -140,5 +150,11 @@ const toggleExpanded = () => {
   } else {
     expandComponentTreeItem(site.value.editor, component.value)
   }
+}
+
+const isBeingRenamed = () => {
+  const { treeItemId: contextTreeItemId, renaming } =
+    runtimeContext.componentTreeItemRenameData.value
+  return renaming && contextTreeItemId === treeItemId.value
 }
 </script>

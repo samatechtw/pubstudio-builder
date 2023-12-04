@@ -10,6 +10,8 @@ export interface IRuntimeContext {
   buildContentWindowSize: Ref<ISize>
   hoveredComponentIdInComponentTree: Ref<string | undefined>
   buildDndState: Ref<IBuildDndState | undefined>
+  componentTreeItemRenameData: Ref<IComponentTreeItemRenameData>
+  resetComponentTreeItemRenameData: () => void
 }
 
 export interface ISize {
@@ -27,15 +29,29 @@ export interface IBuildDndState {
   hoverCmpParentIsRow: boolean
 }
 
+export interface IComponentTreeItemRenameData {
+  treeItemId: string | undefined
+  renaming: boolean
+}
+
 export type EventHandler = (e: Event) => void
 
 const initialHandlers = () => ({ click: {}, periodic: {}, scrollIntoView: {} })
+
+const defaultComponentTreItemRenameData = (): IComponentTreeItemRenameData => ({
+  treeItemId: undefined,
+  renaming: false,
+})
 
 export const runtimeContext: IRuntimeContext = {
   eventHandlers: initialHandlers(),
   buildContentWindowSize: ref<ISize>({ width: 0, height: 0 }),
   hoveredComponentIdInComponentTree: ref<string>(),
   buildDndState: ref<IBuildDndState>(),
+  componentTreeItemRenameData: ref(defaultComponentTreItemRenameData()),
+  resetComponentTreeItemRenameData: () => {
+    runtimeContext.componentTreeItemRenameData.value = defaultComponentTreItemRenameData()
+  },
 }
 
 export const resetRuntimeContext = () => {
@@ -44,4 +60,5 @@ export const resetRuntimeContext = () => {
   // will be re-calculated by resize observer.
   runtimeContext.hoveredComponentIdInComponentTree.value = undefined
   runtimeContext.buildDndState.value = undefined
+  runtimeContext.componentTreeItemRenameData.value = defaultComponentTreItemRenameData()
 }

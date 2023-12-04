@@ -34,14 +34,37 @@ import {
   getWidthPxPerPercent,
   isLengthValue,
 } from './util-resize'
+import { runtimeContext } from '@pubstudio/frontend/util-runtime'
 
 const clickEventType = document.ontouchstart !== null ? 'click' : 'touchend'
 
 const isRenderer = (target: HTMLElement | undefined): boolean => {
   return !!target?.closest('.build-content')
 }
-const isComponentTree = (target: HTMLElement | undefined): boolean => {
-  return !!target?.closest('.component-tree')
+const findClickedComponentTreeItemId = (
+  target: HTMLElement | undefined,
+): string | undefined => {
+  const componentTreeItem = target?.closest('.component-tree-item')
+  if (componentTreeItem) {
+    return componentTreeItem.id
+  } else {
+    // When the eye button in a component tree item is clicked, the editor will scroll to
+    // the corresponding component, so the "press enter to rename" feature should also
+    // work. We use `element.closest` to find the corresponding tree item when click event
+    // happens, but `element.closest` does not work on <svg> and <path> (their parentElements
+    // will always be null). Thus, we have to add dataset on the eye buttons (<svg>) to store
+    // tree item id for retrieving later.
+    // Also, when a component is being renamed in the tree, clicking the rename input should not
+    // lose the renaming state (click on the rename input should not be considered as clicking outside).
+    // So we have to add dataset on the rename input to store tree item id for retrieving later as well.
+    let element: HTMLElement | undefined | null
+    if (target?.tagName === 'svg' || target?.tagName === 'input') {
+      element = target
+    } else if (target?.tagName === 'path') {
+      element = target.parentElement
+    }
+    return element?.dataset.treeItemId
+  }
 }
 const isBuildMenu = (target: HTMLElement | undefined): boolean => {
   return !!target?.closest('.build-menu')
@@ -136,11 +159,21 @@ export const useBuildEvent = () => {
   const clickRightMenu = (_target: HTMLElement | undefined) => {
     setBuildSubmenu(editor.value, undefined)
   }
-  const clickComponentTree = (_target: HTMLElement | undefined) => {
+  const clickComponentTree = (componentTreeItemId: string) => {
     setBuildSubmenu(editor.value, undefined)
+    runtimeContext.componentTreeItemRenameData.value.treeItemId = componentTreeItemId
   }
   const handleClick = (event: Event) => {
     const target = event.target as HTMLElement | undefined
+    const clickedComponentTreeItemId = findClickedComponentTreeItemId(target)
+
+    if (
+      clickedComponentTreeItemId !==
+      runtimeContext.componentTreeItemRenameData.value.treeItemId
+    ) {
+      runtimeContext.resetComponentTreeItemRenameData()
+    }
+
     if (isRenderer(target)) {
       if (!mouseDownOnTextEditableComponent) {
         clickRenderer(target)
@@ -151,9 +184,10 @@ export const useBuildEvent = () => {
       clickBuildMenu(target)
     } else if (isRightMenu(target)) {
       clickRightMenu(target)
-    } else if (isComponentTree(target)) {
-      clickComponentTree(target)
+    } else if (clickedComponentTreeItemId) {
+      clickComponentTree(clickedComponentTreeItemId)
     }
+
     mouseDownOnTextEditableComponent = false
   }
 
@@ -161,6 +195,11 @@ export const useBuildEvent = () => {
     if (editor.value?.editBehavior || editor.value?.translations) {
       // Handled directly in `BehaviorModal.vue` or `TranslationsModal.vue`
       // This is also checked in `hotkeysDisabled`
+    } else if (runtimeContext.componentTreeItemRenameData.value.renaming) {
+      // This is for the case where rename input is still visible in the tree, but
+      // the input has lost focus. i.e. clicking on the hide/show button of the
+      // same component in the tree during rename.
+      runtimeContext.componentTreeItemRenameData.value.renaming = false
     } else if (editor.value?.styleMenu) {
       setStyleToolbarMenu(editor.value, undefined)
     } else if (editor.value?.buildSubmenu) {
@@ -178,6 +217,13 @@ export const useBuildEvent = () => {
     }
   }
 
+  const pressEnter = () => {
+    const { treeItemId, renaming } = runtimeContext.componentTreeItemRenameData.value
+    if (treeItemId && !renaming) {
+      runtimeContext.componentTreeItemRenameData.value.renaming = true
+    }
+  }
+
   const pressHotkey = (e: KeyboardEvent, hotkeyFn: (e: KeyboardEvent) => void) => {
     // Don't activate hotkey if an input/textarea has focus, or a modal is active
     // TODO -- is there a general way to make sure another element doesn't have focus?
@@ -190,6 +236,8 @@ export const useBuildEvent = () => {
   const handleKeyup = (event: KeyboardEvent) => {
     if (event.key === Keys.Escape) {
       pressHotkey(event, pressEscape)
+    } else if (event.key === Keys.Enter) {
+      pressHotkey(event, pressEnter)
     }
   }
 

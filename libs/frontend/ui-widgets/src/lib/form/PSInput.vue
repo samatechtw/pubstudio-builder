@@ -24,6 +24,7 @@
       :list="normalizedDatalistId"
       @input="handleInput"
       @focusout="emit('focusout', modelValue)"
+      @keyup="emit('keyup', $event)"
       @keyup.enter="emit('handle-enter')"
     />
     <datalist v-if="datalist" :id="normalizedDatalistId">
@@ -117,6 +118,7 @@ const props = withDefaults(
 const emit = defineEmits<{
   (e: 'update:modelValue', value: string): void
   (e: 'focusout', value: string | number | undefined): void
+  (e: 'keyup', event: KeyboardEvent): void
   (e: 'handle-enter'): void
 }>()
 
