@@ -3,8 +3,8 @@ use lib_shared_site_api::{
     db::{
         db_error::DbError,
         sites_seed_data::{
-            sites_seed_data, SITE_SEED_CONTEXT, SITE_SEED_DEFAULTS, SITE_SEED_EDITOR,
-            SITE_SEED_HISTORY, SITE_SEED_PAGES, SITE_SEED_VERSION,
+            make_namespace, make_site_context, make_site_editor, make_site_history,
+            make_site_pages, sites_seed_data, SITE_SEED_DEFAULTS, SITE_SEED_VERSION,
         },
     },
     error::api_error::ApiError,
@@ -54,6 +54,7 @@ pub async fn reset_all(
     for site_id in dto.seeds.into_iter() {
         match seed_data.iter().find(|s| s.id.to_string() == site_id) {
             Some(data) => {
+                let namespace = make_namespace(&data.name);
                 create_site_helper(
                     &context,
                     CreateSiteDto {
@@ -61,11 +62,11 @@ pub async fn reset_all(
                         owner_id: data.owner_id.to_string(),
                         name: data.name.clone(),
                         version: SITE_SEED_VERSION.into(),
-                        context: SITE_SEED_CONTEXT.into(),
+                        context: make_site_context(&namespace).into(),
                         defaults: SITE_SEED_DEFAULTS.into(),
-                        editor: SITE_SEED_EDITOR.into(),
-                        history: SITE_SEED_HISTORY.into(),
-                        pages: SITE_SEED_PAGES.into(),
+                        editor: make_site_editor(&namespace).into(),
+                        history: make_site_history(&namespace).into(),
+                        pages: make_site_pages(&namespace).into(),
                         published: data.published.clone(),
                         domains: merge_domains(
                             data.custom_domains.clone(),

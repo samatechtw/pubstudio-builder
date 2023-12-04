@@ -3,8 +3,9 @@ import {
   setSelectedComponent,
   triggerEditorEvent,
 } from '@pubstudio/frontend/feature-editor'
-import { useLocalStore, useSiteSource } from '@pubstudio/frontend/feature-site-store'
-import { deserializePages } from '@pubstudio/frontend/util-site-deserialize'
+import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
+import { deserializePages, unstoreSite } from '@pubstudio/frontend/util-site-deserialize'
+import { storeSite } from '@pubstudio/frontend/util-site-store'
 import { IRemovePageData } from '@pubstudio/shared/type-command-data'
 import { EditorEventName, ISite } from '@pubstudio/shared/type-site'
 
@@ -20,11 +21,8 @@ export const applyRemovePage = (site: ISite, data: IRemovePageData) => {
   delete site.pages[pageRoute]
 
   // Serialize and deserialize site to clean up everything
-  const { siteStore } = useSiteSource()
-  siteStore.value.save(site)
-  const { restore } = useLocalStore()
-  // Deserialize from localstorage to avoid a long API call
-  restore()
+  const { site: sourceSite } = useSiteSource()
+  sourceSite.value = unstoreSite(storeSite(site)) as ISite
 
   // Trigger page change event
   triggerEditorEvent(site, EditorEventName.OnPageChange)

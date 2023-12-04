@@ -40,7 +40,12 @@ export const createEditorContext = (homePage: IPage): IEditorContext => {
   }
 }
 
-export const createSite = (namespace: string): ISite => {
+const makeNamespace = (name: string): string => {
+  return name.replace(' ', '-').toLocaleLowerCase()
+}
+
+export const createSite = (_namespace: string): ISite => {
+  const namespace = makeNamespace(_namespace)
   // Site context
   const context: ISiteContext = {
     namespace,

@@ -3,7 +3,7 @@ import { ISiteRestore } from '@pubstudio/shared/type-site-store'
 
 export const restoreSiteError = (error: string): ISiteRestore => {
   return {
-    site: createSite('test'),
+    site: createSite('scratch'),
     error,
   }
 }

@@ -11,7 +11,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useHUD } from './use-hud'
+import { useHUD } from '@pubstudio/frontend/util-ui-alert'
 
 const { huds } = useHUD()
 </script>

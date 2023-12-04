@@ -1,11 +1,11 @@
-import { globalContext } from '@pubstudio/frontend/util-ids'
+import { defaultContext } from '@pubstudio/frontend/util-ids'
 import {
   ComponentEventType,
   IBehavior,
   IResolvedBehavior,
   ISiteContext,
 } from '@pubstudio/shared/type-site'
-import { parseId } from './resolve'
+import { parseId } from './resolve-util'
 
 export const builtinBehaviors: Record<string, IBehavior> = {
   // Populated by '@pubstudio/frontend/feature-builtin' to avoid circular dependencies
@@ -48,7 +48,7 @@ export const resolveBehavior = (
   let behavior: IBehavior | undefined
   if (namespace === context.namespace) {
     behavior = context.behaviors[behaviorId]
-  } else if (namespace === globalContext.namespace) {
+  } else if (namespace === defaultContext.namespace) {
     // Builtins are native code and don't need to be eval'd
     return builtinBehaviors[behaviorId]
   } else {

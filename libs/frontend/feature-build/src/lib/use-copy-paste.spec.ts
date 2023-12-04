@@ -1,5 +1,5 @@
 import { applyAddComponent } from '@pubstudio/frontend/feature-command'
-import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
+import { initializeSiteStore } from '@pubstudio/frontend/feature-site-store-init'
 import { resolveComponent } from '@pubstudio/frontend/util-builtin'
 import { DEFAULT_BREAKPOINT_ID } from '@pubstudio/frontend/util-ids'
 import {
@@ -23,7 +23,7 @@ describe('use-build composable', () => {
 
   beforeEach(async () => {
     build = useBuild()
-    await useSiteSource().initializeSite(undefined)
+    await initializeSiteStore({ siteId: undefined })
     site = build.site.value
     copyPaste = useCopyPaste()
 

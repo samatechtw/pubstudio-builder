@@ -260,7 +260,7 @@ const selectAlpha = (a: any) => {
 
 const inputHex = async (color: string) => {
   const normalized = normalizeHex(color)
-  const { r, g, b, a, h, s, v } = setColorValue(normalized)
+  const { r, g, b, a, h, s, v } = setColorValue(normalized ?? color)
   Object.assign(c, { r, g, b, a, h, s, v })
   modelHex.value = color
   modelRgba.value = rgbaStringShort.value

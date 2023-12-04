@@ -1,4 +1,4 @@
-import { builtinThemeVariables, globalContext } from '@pubstudio/frontend/util-ids'
+import { builtinThemeVariables, defaultContext } from '@pubstudio/frontend/util-ids'
 import { ISiteContext, IStyle } from '@pubstudio/shared/type-site'
 import { buttonStyle } from './components/builtin-button'
 import { horizontalStyle } from './components/builtin-container-horizontal'
@@ -20,7 +20,7 @@ import { listStyle } from './components/builtin-list'
 import { navMenuItemStyle, navMenuStyle } from './components/builtin-nav-menu'
 import { svgStyle } from './components/builtin-svg'
 import { textStyle } from './components/builtin-text'
-import { parseId } from './resolve'
+import { parseId } from './resolve-util'
 
 export const builtinStyles: Record<string, IStyle> = {
   [horizontalStyle.id]: horizontalStyle,
@@ -50,7 +50,7 @@ export const resolveStyle = (
 ): IStyle | undefined => {
   const { namespace } = parseId(styleId)
   let style: IStyle | undefined
-  if (namespace === context.namespace || namespace === globalContext.namespace) {
+  if (namespace === context.namespace || namespace === defaultContext.namespace) {
     style = context.styles[styleId]
   } else {
     // TODO -- resolve external namespaces
