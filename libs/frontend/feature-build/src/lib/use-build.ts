@@ -568,7 +568,7 @@ export const useBuild = (): IUseBuild => {
   const removeComponentCustomStyle = (style: IRemoveStyleEntry) => {
     const selected = site.value.editor?.selectedComponent
     const oldValue =
-      selected?.style.custom[activeBreakpoint.value.id][style.pseudoClass]?.[
+      selected?.style.custom[activeBreakpoint.value.id]?.[style.pseudoClass]?.[
         style.property
       ]
     if (!oldValue) {

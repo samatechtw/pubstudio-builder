@@ -6,9 +6,7 @@ import {
 } from '@pubstudio/frontend/feature-build'
 import {
   clearComponentTabState,
-  getComponentTreeItemId,
   setBuildSubmenu,
-  setSelectedComponent,
   setStyleToolbarMenu,
 } from '@pubstudio/frontend/feature-editor'
 import { activeBreakpoint } from '@pubstudio/frontend/feature-site-source'
@@ -17,15 +15,20 @@ import { resolvedComponentStyle } from '@pubstudio/frontend/util-build'
 import { resolveComponent } from '@pubstudio/frontend/util-builtin'
 import { isDynamicComponent } from '@pubstudio/frontend/util-ids'
 import { Keys } from '@pubstudio/frontend/util-key-listener'
+import { runtimeContext } from '@pubstudio/frontend/util-runtime'
 import {
   BuildSubmenu,
   Css,
   CssPseudoClass,
   CssUnit,
-  IComponent,
   IStyleEntry,
 } from '@pubstudio/shared/type-site'
 import { onMounted, onUnmounted } from 'vue'
+import {
+  selectComponent,
+  selectNextComponent,
+  selectPreviousComponent,
+} from './select-component'
 import { hotkeysDisabled } from './util-build-event'
 import {
   calcNextHeight,
@@ -34,7 +37,6 @@ import {
   getWidthPxPerPercent,
   isLengthValue,
 } from './util-resize'
-import { runtimeContext } from '@pubstudio/frontend/util-runtime'
 
 const clickEventType = document.ontouchstart !== null ? 'click' : 'touchend'
 
@@ -97,17 +99,6 @@ export const useBuildEvent = () => {
   const { dragging: paddingMarginDragData, drag, stopDrag } = usePaddingMarginEdit()
   let buildWindow: HTMLElement | null = null
 
-  const selectComponent = (component: IComponent) => {
-    setSelectedComponent(site.value, component)
-
-    // Scroll to the corresponding tree item if component tree is visible
-    if (editor.value?.showComponentTree) {
-      const treeItemId = getComponentTreeItemId(component)
-      const treeItemElement = document.getElementById(treeItemId)
-      treeItemElement?.scrollIntoView()
-    }
-  }
-
   const clickRenderer = (target: HTMLElement | undefined) => {
     setBuildSubmenu(editor.value, undefined)
     if (site.value.editor?.resizeData) {
@@ -119,14 +110,14 @@ export const useBuildEvent = () => {
       if (componentId) {
         const component = site.value.context.components[componentId]
         if (component) {
-          selectComponent(component)
+          selectComponent(site.value, component)
         } else if (target.parentElement && isDynamicComponent(target.id)) {
           // TODO -- this is fragile, it's probably better to add dynamic components to the
           // Site's `context.components`
           const index = parseInt(target.id.split('_').pop() ?? '')
           const parent = site.value.context.components[target.parentElement.id]
           if (parent.children?.[index]) {
-            selectComponent(parent.children[index])
+            selectComponent(site.value, parent.children[index])
           }
         }
       }
@@ -224,6 +215,20 @@ export const useBuildEvent = () => {
     }
   }
 
+  const pressTab = async (e: KeyboardEvent) => {
+    const { selectedComponent } = editor.value ?? {}
+
+    if (selectedComponent) {
+      if (e.shiftKey) {
+        selectPreviousComponent(site.value, selectedComponent)
+      } else {
+        selectNextComponent(site.value, selectedComponent, true)
+      }
+      // Remove focus, some browsers will select the next DOM element on Tab keydown
+      ;(document.activeElement as HTMLElement)?.blur()
+    }
+  }
+
   const pressHotkey = (e: KeyboardEvent, hotkeyFn: (e: KeyboardEvent) => void) => {
     // Don't activate hotkey if an input/textarea has focus, or a modal is active
     // TODO -- is there a general way to make sure another element doesn't have focus?
@@ -238,6 +243,8 @@ export const useBuildEvent = () => {
       pressHotkey(event, pressEscape)
     } else if (event.key === Keys.Enter) {
       pressHotkey(event, pressEnter)
+    } else if (event.key === Keys.Tab) {
+      pressHotkey(event, pressTab)
     }
   }
 
