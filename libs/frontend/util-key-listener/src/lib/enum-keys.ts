@@ -6,6 +6,7 @@ export enum Keys {
   ArrowRight = 'ArrowRight',
   Enter = 'Enter',
   Delete = 'Backspace',
+  Tab = 'Tab',
   LowerC = 'c',
   UpperC = 'C',
   LowerD = 'd',
