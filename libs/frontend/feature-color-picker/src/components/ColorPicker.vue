@@ -33,9 +33,9 @@
           :height="previewHeight"
         />
         <ColorPickerButton
-          class="add-gradient-color-button"
+          class="add-gradient-color"
           :class="{ gradient: isGradient }"
-          @click="addGradientColor(rgbaString)"
+          @click="addGradientColor(rgbaString, c.themeVar)"
         >
           <Plus color="white" class="plus" />
           {{ t('style.toolbar.add_gradient') }}
@@ -48,9 +48,12 @@
         :colors-default="colorsDefault"
         @selectColor="selectColor"
       />
-      <ColorPickerButton class="color-select" @click="emitResult">
-        {{ t('style.toolbar.select_color') }}
-      </ColorPickerButton>
+      <div class="select-wrap">
+        <ColorPickerButton class="color-select" @click="emitResult">
+          {{ t('style.toolbar.select_color') }}
+        </ColorPickerButton>
+        <Trash color="#b7436a" @click="clearColor" />
+      </div>
       <!-- Selected theme colors -->
       <div class="theme-colors">
         <div v-if="selectedThemeColors.length" class="theme-color-grid">
@@ -91,7 +94,7 @@
 import { computed, nextTick, onMounted, reactive, ref, toRefs, watch } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { IThemeVariable } from '@pubstudio/shared/type-site'
-import { Plus } from '@pubstudio/frontend/ui-widgets'
+import { Plus, Trash } from '@pubstudio/frontend/ui-widgets'
 import {
   IThemedGradient,
   ResolveThemeVarFn,
@@ -123,6 +126,9 @@ const props = withDefaults(
   defineProps<{
     color?: string
     gradient?: string
+    // Hack to force non-gradient color for ProseMirror editor.
+    // If we implement gradient colors for ProseMirror selections, this can be removed
+    forceNonGradient?: boolean
     theme?: string
     colorsDefault?: string[]
     resolveThemeVar: ResolveThemeVarFn
@@ -154,16 +160,26 @@ const props = withDefaults(
     ],
   },
 )
-const { color, gradient, theme, resolveThemeVar } = toRefs(props)
+const { color, gradient, forceNonGradient, theme, resolveThemeVar } = toRefs(props)
 const emit = defineEmits<{
-  (e: 'changeColor', color: IPickerColor): void
-  (e: 'selectColor', color: IPickerColor): void
-  (e: 'applyGradient', gradient: IThemedGradient): void
+  (e: 'selectColor', color: IPickerColor | undefined): void
+  (e: 'applyGradient', gradient: IThemedGradient | undefined): void
 }>()
+
+interface IColor {
+  r: number
+  g: number
+  b: number
+  a: number
+  h: number
+  s: number
+  v: number
+  themeVar: string | undefined
+}
 
 const modelRgba = ref('')
 const modelHex = ref('')
-const c = reactive({
+const c = reactive<IColor>({
   r: 0,
   g: 0,
   b: 0,
@@ -230,9 +246,13 @@ const colorEmit = () => ({
   themeVar: c.themeVar,
 })
 
-watch(rgba, () => {
-  emit('changeColor', colorEmit())
-})
+const clearColor = () => {
+  if (isGradient.value) {
+    emit('applyGradient', undefined)
+  } else {
+    emit('selectColor', undefined)
+  }
+}
 
 const selectSaturation = (color: IRgba) => {
   const { r, g, b, h, s, v } = setColorValue(color)
@@ -320,8 +340,15 @@ const emitResult = () => {
 }
 
 onMounted(() => {
-  const initialColor = gradientColors.value[0]?.rgba || color.value
-  Object.assign(c, setColorValue(initialColor))
+  let initialColor = gradientColors.value[0]?.rgba || color.value
+  if (forceNonGradient.value) {
+    initialColor = color.value
+  }
+  const resolved = resolveThemeVar.value(initialColor) ?? ''
+  Object.assign(c, setColorValue(resolved))
+  if (initialColor !== resolved) {
+    c.themeVar = initialColor.match(/\$\{(.*?)\}/)?.[1] || undefined
+  }
   setText()
   rerender()
 })
@@ -381,12 +408,21 @@ onMounted(() => {
     width: 100%;
     margin-top: 6px;
   }
-  .color-select {
-    padding: 6px 4px;
+  .select-wrap {
+    display: flex;
     margin: 8px 6px 0 0;
     width: 100%;
+    :deep(svg) {
+      @mixin size 22px;
+      margin-left: 6px;
+      cursor: pointer;
+    }
   }
-  .add-gradient-color-button {
+  .color-select {
+    padding: 6px 4px;
+    flex-grow: 1;
+  }
+  .add-gradient-color {
     padding: 6px 4px;
     margin-left: 6px;
     flex-grow: 1;

@@ -30,7 +30,7 @@ export interface IGradientFeature {
   computedGradient: ComputedRef<IThemedGradient>
   // Computed linear-gradient CSS value for gradient bar
   computedGradientForBar: ComputedRef<string>
-  addGradientColor: (rgba: string) => void
+  addGradientColor: (rgba: string, themeVar?: string) => void
   updateGradientDegree: (degree: number) => void
   updateSelectedGradientColor: (rgba: string, themeVar?: string) => void
   updateGradientStop: (params: IUpdateGradientStopParams) => void
@@ -55,10 +55,11 @@ export const useGradient = (options: IGradientOptions): IGradientFeature => {
     () => computeGradient(GradientType.Linear, 90, gradientColors.value).raw,
   )
 
-  const addGradientColor = (rgba: string) => {
+  const addGradientColor = (rgba: string, themeVar?: string) => {
     const selectedColor: IGradientColor = {
       rgba,
       stop: 0,
+      themeVar,
     }
     if (gradientColors.value.length < 2) {
       gradientColors.value = [

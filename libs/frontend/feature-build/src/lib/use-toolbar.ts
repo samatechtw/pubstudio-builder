@@ -19,12 +19,13 @@ import {
 import { toggleMark } from 'prosemirror-commands'
 import { Command, TextSelection } from 'prosemirror-state'
 import { EditorView } from 'prosemirror-view'
-import { reactive, toRaw, UnwrapNestedRefs, watch } from 'vue'
+import { computed, ComputedRef, reactive, toRaw, UnwrapNestedRefs, watch } from 'vue'
 import { editViewTxCount } from './create-editor-view'
 import { useBuild } from './use-build'
 
 export interface IUseToolbar {
   selectionStyles: UnwrapNestedRefs<IEditViewSelectionStyles>
+  isProsemirrorEditing: ComputedRef<boolean>
   getRawStyle(property: Css): string | undefined
   getRawOrSelectedStyle(property: Css): string | undefined
   getResolvedOrSelectedStyle(property: Css): IRawStyleWithSource | undefined
@@ -100,6 +101,11 @@ export const useToolbar = (): IUseToolbar => {
     removeComponentCustomStyle,
     setComponentCustomStyle,
   } = useBuild()
+
+  const isProsemirrorEditing = computed(() => {
+    const selection = editor.value?.editView?.state.selection as TextSelection
+    return !selection?.empty || !!selection.$cursor
+  })
 
   const getRawStyle = (property: Css): string | undefined => {
     return selectedComponentFlattenedStyles.value[property]?.value ?? ''
@@ -285,14 +291,14 @@ export const useToolbar = (): IUseToolbar => {
   }
 
   const refocusSelection = () => {
-    const selection = editor.value?.editView?.state.selection as TextSelection
-    if (!selection?.empty || selection.$cursor) {
+    if (isProsemirrorEditing.value) {
       editor.value?.editView?.focus()
     }
   }
 
   return {
     selectionStyles,
+    isProsemirrorEditing,
     getRawStyle,
     getRawOrSelectedStyle,
     getResolvedOrSelectedStyle,

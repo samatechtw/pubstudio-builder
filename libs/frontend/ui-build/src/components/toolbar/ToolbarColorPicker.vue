@@ -7,6 +7,7 @@
       v-if="showPicker"
       :color="color"
       :gradient="gradient"
+      :forceNonGradient="forceNonGradient"
       :selectedThemeColors="selectedThemeColors"
       :resolveThemeVar="resolveThemeVar"
       class="font-color"
@@ -37,6 +38,7 @@ withDefaults(
     showPicker?: boolean
     color?: string | undefined
     gradient?: string | undefined
+    forceNonGradient?: boolean
     selectedThemeColors: IThemeVariable[]
   }>(),
   {
@@ -48,7 +50,7 @@ withDefaults(
 )
 const emit = defineEmits<{
   (e: 'click', event: Event): void
-  (e: 'selectColor', color: IPickerColor): void
-  (e: 'applyGradient', gradient: IThemedGradient): void
+  (e: 'selectColor', color: IPickerColor | undefined): void
+  (e: 'applyGradient', gradient: IThemedGradient | undefined): void
 }>()
 </script>

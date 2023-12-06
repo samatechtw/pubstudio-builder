@@ -30,6 +30,7 @@
         :gradient="getRawStyle(Css.Background)"
         :showPicker="showBackgroundPicker"
         :selectedThemeColors="selectedThemeColors"
+        :isGradient="isProsemirrorEditing"
         class="toolbar-menu"
         @selectColor="setBackgroundColor($event)"
         @applyGradient="setGradientBackground($event)"
@@ -76,6 +77,7 @@ const { t } = useI18n()
 
 const {
   selectionStyles,
+  isProsemirrorEditing,
   getRawStyle,
   getRawOrSelectedStyle,
   getStyleValue,
@@ -87,7 +89,7 @@ const {
 const { editor, pushGroupCommands } = useBuild()
 const { selectedThemeColors } = useThemeColors()
 
-const setBackgroundColor = (pickerColor: IPickerColor) => {
+const setBackgroundColor = (pickerColor: IPickerColor | undefined) => {
   const { selectedComponent } = editor.value ?? {}
 
   const editView = editor.value?.editView
@@ -143,8 +145,7 @@ const setBackgroundColor = (pickerColor: IPickerColor) => {
   setStyleToolbarMenu(editor.value, undefined)
 }
 
-const setGradientBackground = (themedGradient: IThemedGradient) => {
-  const { raw, themed } = themedGradient
+const setGradientBackground = (themedGradient: IThemedGradient | undefined) => {
   const { selectedComponent } = editor.value ?? {}
 
   if (selectedComponent) {
@@ -153,7 +154,7 @@ const setGradientBackground = (themedGradient: IThemedGradient) => {
 
     const setBackgroundCommand = createSetComponentCustomStyleCommand(
       Css.Background,
-      themed ?? raw,
+      themedGradient?.themed ?? themedGradient?.raw,
     )
     const cmdList = [setBackgroundCommand]
 

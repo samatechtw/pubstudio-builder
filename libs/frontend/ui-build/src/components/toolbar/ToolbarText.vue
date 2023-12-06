@@ -22,6 +22,7 @@
         :tooltip="t('style.toolbar.font_color')"
         :color="getRawOrSelectedStyle(Css.Color)"
         :gradient="getRawStyle(Css.Background)"
+        :forceNonGradient="isProsemirrorEditing"
         :showPicker="showColorPicker"
         :selectedThemeColors="selectedThemeColors"
         @selectColor="setFontColor($event)"
@@ -85,6 +86,7 @@ import ToolbarColorPicker from './ToolbarColorPicker.vue'
 const { t } = useI18n()
 const {
   selectionStyles,
+  isProsemirrorEditing,
   getRawStyle,
   getRawOrSelectedStyle,
   getStyleValue,
@@ -109,7 +111,7 @@ const { activate, deactivate } = useControlledClickaway(
 
 const fontUnits = ['px', 'em', 'rem', '%']
 
-const setFontColor = (pickerColor: IPickerColor) => {
+const setFontColor = (pickerColor: IPickerColor | undefined) => {
   const { selectedComponent } = editor.value ?? {}
 
   const editView = editor.value?.editView
@@ -161,8 +163,7 @@ const setFontColor = (pickerColor: IPickerColor) => {
   setStyleToolbarMenu(editor.value, undefined)
 }
 
-const setGradient = (themedGradient: IThemedGradient) => {
-  const { raw, themed } = themedGradient
+const setGradient = (themedGradient: IThemedGradient | undefined) => {
   const { selectedComponent } = editor.value ?? {}
 
   if (selectedComponent) {
@@ -171,17 +172,17 @@ const setGradient = (themedGradient: IThemedGradient) => {
 
     const setBackgroundCommand = createSetComponentCustomStyleCommand(
       Css.Background,
-      themed ?? raw,
+      themedGradient?.themed ?? themedGradient?.raw,
     )
 
     const setBackgroundClipCommand = createSetComponentCustomStyleCommand(
       Css.WebkitBackgroundClip,
-      'text',
+      themedGradient ? 'text' : undefined,
     )
 
     const setTextFillColorCommand = createSetComponentCustomStyleCommand(
       Css.WebkitTextFillColor,
-      'transparent',
+      themedGradient ? 'transparent' : undefined,
     )
 
     const commands = [
