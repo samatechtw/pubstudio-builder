@@ -23,12 +23,7 @@ export const useCopyPaste = (): IUseCopyPaste => {
   const pressCopy = (evt: KeyboardEvent) => {
     evt.stopImmediatePropagation()
     const component = editor.value?.selectedComponent
-    if (
-      site.value.editor &&
-      // Make sure selected component is not page root before copying
-      component?.parent &&
-      (evt.ctrlKey || evt.metaKey)
-    ) {
+    if (site.value.editor && component && (evt.ctrlKey || evt.metaKey)) {
       site.value.editor.copiedComponent = serializeComponent(component)
       // TODO -- find a good way to handle translations without requiring library consumers
       // to use `vue-i18n`
@@ -64,7 +59,12 @@ export const useCopyPaste = (): IUseCopyPaste => {
     const { selectedComponent } = editor.value ?? {}
     const { copiedComponent } = site.value.editor ?? {}
     if (selectedComponent && copiedComponent && (evt.ctrlKey || evt.metaKey)) {
-      if (evt.shiftKey) {
+      if (!copiedComponent.parentId) {
+        // Root component should not be pasted through paste hotkey.
+        addHUD({
+          text: 'Root component can only be used to replace another root component',
+        })
+      } else if (evt.shiftKey) {
         // Make sure we don't paste style to the same component
         if (selectedComponent.id !== copiedComponent.id) {
           pasteStyle(copiedComponent)

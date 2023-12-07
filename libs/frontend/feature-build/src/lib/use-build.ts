@@ -57,6 +57,7 @@ import {
   IRemoveThemeFontData,
   IRemoveThemeVariableData,
   IReplaceComponentMixinData,
+  IReplacePageRootData,
   ISetBehaviorArgData,
   ISetBehaviorData,
   ISetBreakpointData,
@@ -129,6 +130,7 @@ export interface IUseBuild {
   addComponentData: (data: IAddComponentData) => void
   duplicateComponent: () => void
   pasteComponent: (copiedComponentId: string, parent: IComponent) => void
+  replacePageRoot: (copiedComponentId: string, pageRoute: string) => void
   addBuiltinComponent: (id: string, parentId?: string) => void
   editSelectedComponent: (fields: IEditComponentFields) => void
   editComponent: (component: IComponent, fields: IEditComponentFields) => void
@@ -423,25 +425,28 @@ export const useBuild = (): IUseBuild => {
     pushCommand(CommandType.AddComponent, data)
   }
 
-  // Currently it is assumed this command will be applied in a group with AddPage
-  // It can be extended to work with an existing route by saving the old root data
-  // and using it to properly implement undoReplaceRootComponent
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  /* TODO -- uncomment to continue implementation
-  const replaceRootComponent = (route: string, copyFromId: string) => {
-    const copyFrom = resolveComponent(site.value.context, copyFromId)
-    if (!copyFrom) return
+  const replacePageRoot = (copiedComponentId: string, pageRoute: string) => {
+    const copiedComponent = resolveComponent(site.value.context, copiedComponentId)
+    if (!copiedComponent) return
+
+    const page = site.value.pages[pageRoute]
+    if (!page) {
+      throw new Error(`Cannot find page with route ${pageRoute}`)
+    }
 
     const data: IReplacePageRootData = {
-      tag: copyFrom.tag,
-      content: copyFrom.content,
-      sourceId: copyFrom.id,
-      name: copyFrom.name,
-      route,
+      pageRoute: page.route,
+      oldRoot: makeRemoveComponentData(site.value, page.root, true),
+      replacementComponent: {
+        name: copiedComponent.name,
+        tag: copiedComponent.tag,
+        content: copiedComponent.content,
+        sourceId: copiedComponent.id,
+        parentId: '',
+      },
     }
     pushCommand(CommandType.ReplacePageRoot, data)
   }
-  */
 
   const setPositionAbsolute = (
     oldStyle: IStyleEntry | undefined,
@@ -1304,6 +1309,7 @@ export const useBuild = (): IUseBuild => {
     addComponentData,
     duplicateComponent,
     pasteComponent,
+    replacePageRoot,
     addBuiltinComponent,
     editComponent,
     editSelectedComponent,
