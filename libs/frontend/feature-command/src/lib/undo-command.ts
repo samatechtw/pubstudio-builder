@@ -15,6 +15,7 @@ import { undoMergeComponentStyle } from './component-style/merge-component-style
 import { undoAddComponent } from './component/add-component'
 import { undoEditComponent } from './component/edit-component'
 import { undoRemoveComponent } from './component/remove-component'
+import { undoReplacePageRoot } from './component/replace-page-root'
 import { undoSetDefaultsHead } from './defaults/set-defaults-head'
 import { undoCommandGroup } from './group/command-group'
 import { undoMoveComponent } from './move-component/move-component'
@@ -45,6 +46,7 @@ export const undoCommand = (site: ISite, command: ICommand) => {
     [CommandType.AddComponent]: undoAddComponent,
     [CommandType.EditComponent]: undoEditComponent,
     [CommandType.RemoveComponent]: undoRemoveComponent,
+    [CommandType.ReplacePageRoot]: undoReplacePageRoot,
     [CommandType.SetComponentCustomStyle]: undoSetComponentCustomStyle,
     [CommandType.SetComponentOverrideStyle]: undoSetComponentOverrideStyle,
     [CommandType.RemoveComponentOverrideStyle]: undoRemoveComponentOverrideStyle,

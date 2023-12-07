@@ -43,6 +43,18 @@
           :text="t('debug')"
           @click="debugComponent"
         />
+        <div v-if="showPasteReplaceButton" className="paste-replace-wrap">
+          <PSButton
+            class="paste-replace-button"
+            size="small"
+            :text="t('build.paste_replace')"
+            @click="replaceRootWithCopiedComponent"
+          />
+          <InfoBubble
+            class="paste-replace-info"
+            :message="t('build.paste_replace_info')"
+          />
+        </div>
       </div>
     </template>
   </div>
@@ -51,7 +63,7 @@
 <script lang="ts" setup>
 import { computed, toRefs } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
-import { PSButton } from '@pubstudio/frontend/ui-widgets'
+import { PSButton, InfoBubble } from '@pubstudio/frontend/ui-widgets'
 import { IComponent } from '@pubstudio/shared/type-site'
 import { noBehaviorId } from '@pubstudio/frontend/util-ids'
 import ComponentTabInfo from './ComponentTabInfo.vue'
@@ -69,10 +81,12 @@ import ComponentEvents from './ComponentEvents.vue'
 import ComponentEventEdit from './ComponentEventEdit.vue'
 import StyleMenuEdit from '../StyleMenuEdit.vue'
 import { serializeComponent } from '@pubstudio/frontend/util-site-store'
+import { useHUD } from '@pubstudio/frontend/util-ui-alert'
 
 const { t } = useI18n()
-const { editor } = useBuild()
+const { editor, replacePageRoot } = useBuild()
 const { editing: editingStyle } = useReusableStyleMenu()
+const { addHUD } = useHUD()
 
 const props = defineProps<{
   component: IComponent
@@ -103,6 +117,25 @@ const debugComponent = () => {
     console.log(JSON.parse(JSON.stringify(serialized)))
   }
 }
+
+const showPasteReplaceButton = computed(() => {
+  const { selectedComponent, copiedComponent } = editor.value ?? {}
+  return (
+    !!selectedComponent &&
+    !selectedComponent.parent &&
+    copiedComponent &&
+    selectedComponent.id !== copiedComponent.id
+  )
+})
+
+const replaceRootWithCopiedComponent = () => {
+  const { active, copiedComponent } = editor.value ?? {}
+  if (active && copiedComponent && editor.value) {
+    replacePageRoot(copiedComponent.id, active)
+    addHUD({ text: t('build.replaced') })
+    editor.value.copiedComponent = undefined
+  }
+}
 </script>
 
 <style lang="postcss" scoped>
@@ -117,6 +150,14 @@ const debugComponent = () => {
   align-items: flex-end;
   margin-top: 40px;
   padding: 0 16px;
+}
+.paste-replace-wrap {
+  display: flex;
+  align-items: center;
+  margin-left: 8px;
+  .paste-replace-info {
+    margin-left: 8px;
+  }
 }
 .style-edit {
   padding: 16px;

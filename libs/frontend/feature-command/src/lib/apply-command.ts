@@ -15,6 +15,7 @@ import { applyMergeComponentStyle } from './component-style/merge-component-styl
 import { applyAddComponent } from './component/add-component'
 import { applyEditComponent } from './component/edit-component'
 import { applyRemoveComponent } from './component/remove-component'
+import { applyReplacePageRoot } from './component/replace-page-root'
 import { applySetDefaultsHead } from './defaults/set-defaults-head'
 import { applyCommandGroup } from './group/command-group'
 import { applyMoveComponent } from './move-component/move-component'
@@ -51,6 +52,7 @@ export const applyCommand = (
     [CommandType.AddComponent]: applyAddComponent,
     [CommandType.EditComponent]: applyEditComponent,
     [CommandType.RemoveComponent]: applyRemoveComponent,
+    [CommandType.ReplacePageRoot]: applyReplacePageRoot,
     [CommandType.SetComponentCustomStyle]: applySetComponentCustomStyle,
     [CommandType.SetComponentOverrideStyle]: applySetComponentOverrideStyle,
     [CommandType.RemoveComponentOverrideStyle]: applyRemoveComponentOverrideStyle,

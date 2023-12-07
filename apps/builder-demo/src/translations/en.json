@@ -243,7 +243,10 @@
     "select_asset": "Select Asset",
     "no_matching_results": "No matching results.",
     "select": "Select",
-    "dimensions": "Dimensions"
+    "dimensions": "Dimensions",
+    "paste_replace": "Paste & Replace",
+    "paste_replace_info": "Replace this page's root component with the component copied from the clipboard.",
+    "replaced": "Replaced"
   },
   "theme": {
     "title": "Theme",

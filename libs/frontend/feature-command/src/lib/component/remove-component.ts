@@ -45,8 +45,17 @@ export const applyRemoveComponent = (site: ISite, data: IRemoveComponentData) =>
 }
 
 // We can almost reuse `applyAddComponent`, but we don't want to generate a new ID
-// and we need to recover the children
+// and we need to recover the children.
 export const undoRemoveComponent = (site: ISite, data: IRemoveComponentData) => {
+  undoRemoveComponentHelper(site, data, true)
+}
+
+// Declare a new function so that we don't have to add additional arguments to `undoRemoveComponent`.
+export const undoRemoveComponentHelper = (
+  site: ISite,
+  data: IRemoveComponentData,
+  selectAfterUndo: boolean,
+) => {
   const context = site.context
   const {
     id,
@@ -83,7 +92,7 @@ export const undoRemoveComponent = (site: ISite, data: IRemoveComponentData) => 
   }
   // Add the component to Context first so children can resolve us
   context.components[id] = component
-  data.children?.forEach((c) => undoRemoveComponent(site, c))
+  data.children?.forEach((c) => undoRemoveComponentHelper(site, c, selectAfterUndo))
 
   // Add back component tree expand state
   const { componentTreeExpandedItems } = site.editor ?? {}
@@ -99,6 +108,8 @@ export const undoRemoveComponent = (site: ISite, data: IRemoveComponentData) => 
     }
   }
 
-  // Select deleted component after undo
-  setSelectedComponent(site, component)
+  if (selectAfterUndo) {
+    // Select deleted component after undo
+    setSelectedComponent(site, component)
+  }
 }
