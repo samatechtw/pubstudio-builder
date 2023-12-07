@@ -59,18 +59,21 @@ export const useCopyPaste = (): IUseCopyPaste => {
     const { selectedComponent } = editor.value ?? {}
     const { copiedComponent } = site.value.editor ?? {}
     if (selectedComponent && copiedComponent && (evt.ctrlKey || evt.metaKey)) {
-      if (!copiedComponent.parentId) {
-        // Root component should not be pasted through paste hotkey.
-        addHUD({
-          text: 'Root component can only be used to replace another root component',
-        })
-      } else if (evt.shiftKey) {
+      if (evt.shiftKey) {
         // Make sure we don't paste style to the same component
         if (selectedComponent.id !== copiedComponent.id) {
           pasteStyle(copiedComponent)
         }
       } else {
-        pasteComponent(copiedComponent)
+        if (!copiedComponent.parentId) {
+          // Root component should not be pasted through paste hotkey.
+          addHUD({
+            text: 'Root component can only be used to replace another root component',
+            duration: 2000,
+          })
+        } else {
+          pasteComponent(copiedComponent)
+        }
       }
     }
   }

@@ -77,7 +77,7 @@ describe('Replace Page Root', () => {
     site = deserializeSite(siteString) as ISite
     page = site.pages['/home']
 
-    // Add the following component to the site:
+    // Add the following components to the site:
     // <HorizontalContainer name="copyMe">
     //   <H1>Hello</H1>
     //   <Text>World</Text>
