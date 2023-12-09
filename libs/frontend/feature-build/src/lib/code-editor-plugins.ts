@@ -25,6 +25,8 @@ const transformPasteContentPlugin = new Plugin({
 
 // Manually insert a new line instead of using the default behavior to avoid creating
 // a new block of <p> as a sibling of <pre>.
+// Use handleDOMEvents insead of keymap because combinations like 'Shift-Enter' didn't
+// work for some reason; our callback function never gets executed.
 const interceptNewLineEventPlugin = new Plugin({
   props: {
     handleDOMEvents: {
