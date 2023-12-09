@@ -3,9 +3,9 @@ import {
   prosemirrorSetup,
   schemaCode,
 } from '@pubstudio/frontend/util-edit-text'
+import { Fragment, Slice } from 'prosemirror-model'
 import { Selection } from 'prosemirror-state'
 import { EditorView } from 'prosemirror-view'
-import { Slice, Fragment } from 'prosemirror-model'
 import { codeEditorPlugins } from './code-editor-plugins'
 
 export function createCodeEditorView(
@@ -38,7 +38,7 @@ export function createCodeEditorView(
         const codeBlockNode = schemaCode.node(
           'code_block',
           undefined,
-          schemaCode.text(textContent),
+          textContent ? schemaCode.text(textContent) : undefined,
         )
         const slice = new Slice(Fragment.from(codeBlockNode), 0, 0)
         newState = newState.apply(
