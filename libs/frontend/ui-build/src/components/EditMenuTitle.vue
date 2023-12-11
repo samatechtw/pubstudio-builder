@@ -18,7 +18,9 @@
     </div>
     <slot />
     <div v-if="showAdd" class="item">
-      <Plus class="item-add" @click="emit('add')" />
+      <slot name="add">
+        <Plus class="item-add" @click="emit('add')" />
+      </slot>
     </div>
   </div>
 </template>

@@ -15,8 +15,12 @@
           @click.stop
         />
       </div>
-      <div v-if="!eventBehavior.behavior.builtin" class="item">
-        <Edit class="edit-icon" @click.stop="emit('editBehavior')" />
+      <div class="item">
+        <InfoBubble
+          v-if="!!eventBehavior.behavior.builtin"
+          :message="t('build.behavior_builtin_uneditable')"
+        />
+        <Edit v-else class="edit-icon" @click.stop="emit('editBehavior')" />
       </div>
       <div class="item">
         <Minus class="item-delete" @click.stop="emit('remove')" />
@@ -41,7 +45,7 @@
 import { computed, toRefs } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { IBehavior } from '@pubstudio/shared/type-site'
-import { Edit, Minus, PSMultiselect } from '@pubstudio/frontend/ui-widgets'
+import { Edit, InfoBubble, Minus, PSMultiselect } from '@pubstudio/frontend/ui-widgets'
 import ComponentArgRow from '../component-arg/ComponentArgRow.vue'
 import { IUpdateComponentArgPayload } from '../component-arg/i-update-component-arg-payload'
 import { IResolvedComponentEventBehavior } from './ComponentEventEdit.vue'

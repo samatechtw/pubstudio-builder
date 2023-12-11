@@ -115,6 +115,7 @@
       }
     },
     "behavior_args": "Behavior Args",
+    "behavior_builtin_uneditable": "This is a builtin behavior, which cannot be edited.",
     "args": "Args",
     "behavior": "Behavior",
     "behaviors": "Behaviors",
