@@ -21,18 +21,11 @@ const root = computed(() => activePage.value?.root)
 
 const show = computed(() => editor.value?.showComponentTree)
 
-interface IterNode {
-  cmp: IComponent
-  depth: number
-}
-const makeNode = (component: IComponent, depth: number): IterNode => ({
-  cmp: component,
-  depth,
-})
-
 const levelStyles = computed(() => {
   const styles: string[] = []
-  for (let i = 0; i <= treeDepth.value; i += 1) {
+  // -1 because depth starts from 1 and level starts from 0
+  const maxLevel = treeDepth.value - 1
+  for (let i = 0; i <= maxLevel; i += 1) {
     styles.push(`.cmp-title-${i} {padding-left: ${i * 12}px;}`)
   }
   return styles.join('\n')
@@ -44,25 +37,27 @@ const treeDepth = computed(() => {
   if (!root || !expandedCmp) {
     return 0
   }
-  let depth = 0
+
   // Tree iteration
-  const stack = [makeNode(root, 0)]
-  while (stack.length > 0) {
-    const node = stack.pop()
-    if (node && expandedCmp[node.cmp.id]) {
-      if (node.depth > depth) {
-        depth = node.depth
-      }
-      if (node.cmp.children) {
-        stack.push(...node.cmp.children.map((c) => makeNode(c, depth + 1)))
+  let depth = 0
+  const queue: IComponent[] = [root]
+
+  while (queue.length) {
+    const { length } = queue
+    for (let i = 0; i < length; i++) {
+      const cmp = queue.shift() as IComponent
+      if (expandedCmp[cmp.id]) {
+        cmp.children?.forEach((child) => queue.push(child))
       }
     }
+    depth++
   }
+
   return depth
 })
 
 const treeStyles = computed(() => {
-  const largeTree = treeDepth.value > 5
+  const largeTree = treeDepth.value > 6
   return largeTree
     ? {
         overflowX: 'auto',
