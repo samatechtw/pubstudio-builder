@@ -42,7 +42,16 @@
       </div>
     </div>
     <!-- Event Behaviors -->
-    <EditMenuTitle :title="t('build.behaviors')" @add="addEventBehavior" />
+    <EditMenuTitle :title="t('build.behaviors')">
+      <template #add>
+        <PSButton
+          class="new-behavior-button"
+          size="small"
+          :text="t('new')"
+          @click="showNewBehavior"
+        />
+      </template>
+    </EditMenuTitle>
     <EventBehaviorRow
       v-for="(eventBehavior, i) in newEvent.behaviors"
       :key="i"
@@ -53,6 +62,9 @@
       @remove="removeEventBehavior(i)"
       @editBehavior="showEditBehavior(eventBehavior.behavior)"
     />
+    <div className="menu-row add-event-behavior-row">
+      <Plus class="add-event-behavior" @click="addEventBehavior" />
+    </div>
     <!-- Actions -->
     <ErrorMessage :error="inputError" />
     <div class="event-actions">
@@ -90,6 +102,7 @@ import {
   IComponentEventBehavior,
 } from '@pubstudio/shared/type-site'
 import { setEditBehavior } from '@pubstudio/frontend/feature-editor'
+import { Plus } from '@pubstudio/frontend/ui-widgets'
 import EditMenuTitle from '../EditMenuTitle.vue'
 import EventBehaviorRow from './EventBehaviorRow.vue'
 import { useBuild } from '@pubstudio/frontend/feature-build'
@@ -262,6 +275,12 @@ const removeEventBehavior = (index: number) => {
   newEvent.value.behaviors.splice(index, 1)
 }
 
+const showNewBehavior = () => {
+  setEditBehavior(editor.value, {
+    name: '',
+  })
+}
+
 const showEditBehavior = (behavior: IBehavior) => {
   setEditBehavior(editor.value, site.value.context.behaviors?.[behavior.id])
 }
@@ -309,6 +328,13 @@ const save = () => {
   .item {
     @mixin text 15px;
     width: 50%;
+  }
+  .add-event-behavior-row {
+    padding: 0 0 12px 0;
+    .add-event-behavior {
+      @mixin size 26px;
+      cursor: pointer;
+    }
   }
   .event-params {
     margin-top: 16px;
