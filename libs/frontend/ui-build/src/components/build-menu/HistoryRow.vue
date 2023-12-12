@@ -63,7 +63,7 @@ const handleClick = () => {
   }
   &.current {
     cursor: default;
-    background-color: $grey-100;
+    background-color: $blue-300;
   }
 }
 .history-row {

@@ -6,7 +6,6 @@
     fill="none"
     viewBox="0 0 24 24"
   >
-    <path fill="#fff" d="M0 0h24v24H0z" />
     <circle cx="12" cy="12" r="11" :fill="color" />
     <line
       x1="6.5"

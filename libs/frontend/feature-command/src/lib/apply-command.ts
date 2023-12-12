@@ -38,13 +38,7 @@ import { applyRemoveThemeVariable } from './theme-variable/remove-theme-variable
 import { applySetTranslations } from './translations/set-translations'
 
 // Applies a command to the current site context
-export const applyCommand = (
-  site: ISite,
-  type: CommandType,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  data: any,
-): ICommand => {
-  const command: ICommand = { type, data }
+export const applyCommand = (site: ISite, command: ICommand): ICommand => {
   const applyFunctions = {
     [CommandType.Redo]: noop,
     [CommandType.Undo]: noop,
@@ -84,6 +78,7 @@ export const applyCommand = (
     [CommandType.SetDefaultsHead]: applySetDefaultsHead,
     [CommandType.SetBreakpoint]: applySetBreakpoint,
   }
-  applyFunctions[type](site, data)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  applyFunctions[command.type](site, command.data as any)
   return command
 }

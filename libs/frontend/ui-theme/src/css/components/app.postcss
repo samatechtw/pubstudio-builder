@@ -42,6 +42,31 @@ a {
   position: absolute;
 }
 
+.scrollbar-small {
+  scrollbar-width: $scrollsize;
+  &::-webkit-scrollbar {
+    width: $scrollsize;
+    height: $scrollsize;
+  }
+  &::-webkit-scrollbar-track {
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.1);
+  }
+  &::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.2);
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.4);
+  }
+  &::-webkit-scrollbar-thumb:active {
+    background: rgba(0, 0, 0, 0.9);
+  }
+  &::-webkit-scrollbar-corner {
+    display: none;
+  }
+}
+
 .swipe-anim-wrap {
   width: 100%;
   min-height: 680px;

@@ -1,15 +1,16 @@
-import { useCommand } from '@pubstudio/frontend/feature-command'
+import {
+  getLastCommand,
+  pushCommand,
+  pushCommandObject,
+  replaceLastCommand,
+} from '@pubstudio/frontend/feature-command'
 import { setSelectedComponent } from '@pubstudio/frontend/feature-editor'
 import {
   activeBreakpoint,
   descSortedBreakpoints,
 } from '@pubstudio/frontend/feature-site-source'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
-import {
-  createSite,
-  resolvedComponentStyle,
-  selectAddParent,
-} from '@pubstudio/frontend/util-build'
+import { createSite, selectAddParent } from '@pubstudio/frontend/util-build'
 import {
   builtinStyles,
   resolveComponent,
@@ -95,10 +96,14 @@ import {
   WebSafeFont,
 } from '@pubstudio/shared/type-site'
 import { computed, ComputedRef, Ref, ref, toRaw } from 'vue'
+import {
+  IRemoveStyleEntry,
+  removeComponentCustomStyleCommand,
+  setCustomStyleCommand,
+  setPositionAbsoluteCommands,
+} from './build-command-helpers'
 import { resetStyleMenu } from './use-reusable-style-menu'
 import { resetThemeMenuVariables } from './use-theme-menu-variables'
-
-type IRemoveStyleEntry = Omit<IStyleEntry, 'value'>
 
 export type IOldNewStyleEntry = {
   oldStyle?: IStyleEntry
@@ -221,7 +226,6 @@ const commandAlert = uiAlert<CommandType | undefined>(ref())
 
 export const useBuild = (): IUseBuild => {
   const { site, siteError, siteStore } = useSiteSource()
-  const { pushCommand, replaceLastCommand, getLastCommand } = useCommand()
 
   const activePage = computed(() => {
     const route = site.value.editor?.active
@@ -381,7 +385,7 @@ export const useBuild = (): IUseBuild => {
           new: fields,
           old: lastCommandData.old,
         }
-        replaceLastCommand(CommandType.EditComponent, dataToReplace)
+        replaceLastCommand({ type: CommandType.EditComponent, data: dataToReplace })
         return
       }
     }
@@ -453,58 +457,10 @@ export const useBuild = (): IUseBuild => {
     oldStyle: IStyleEntry | undefined,
     newStyle: IStyleEntry,
   ) => {
-    const pseudoClass = newStyle.pseudoClass
-    const selected = site.value.editor?.selectedComponent
-    if (!selected) {
-      return
-    }
-    const parent = selected.parent
-    const parentPosition = resolvedComponentStyle(
-      site.value.context,
-      parent,
-      pseudoClass,
-      Css.Position,
-      activeBreakpoint.value.id,
-    )
-    // No action if parent already has relative position
-    if (!parent || parentPosition === 'relative' || parentPosition === 'absolute') {
-      setComponentCustomStyle(oldStyle, newStyle)
-    } else {
-      const oldValue =
-        parent.style.custom[activeBreakpoint.value.id][pseudoClass]?.[Css.Position]
-      const data: ICommandGroupData = {
-        commands: [
-          {
-            type: CommandType.SetComponentCustomStyle,
-            data: {
-              componentId: selected.id,
-              breakpointId: activeBreakpoint.value.id,
-              oldStyle,
-              newStyle,
-            },
-          },
-          {
-            type: CommandType.SetComponentCustomStyle,
-            data: {
-              componentId: parent.id,
-              breakpointId: activeBreakpoint.value.id,
-              oldStyle: oldValue
-                ? {
-                    pseudoClass,
-                    property: Css.Position,
-                    value: oldValue,
-                  }
-                : undefined,
-              newStyle: {
-                pseudoClass,
-                property: Css.Position,
-                value: 'relative',
-              },
-            },
-          },
-        ],
-      }
-      pushCommand(CommandType.Group, data)
+    const commands = setPositionAbsoluteCommands(site.value, oldStyle, newStyle)
+    if (commands.length) {
+      const data: ICommandGroupData = { commands }
+      pushCommand(CommandType.Group, { data })
     }
   }
 
@@ -514,23 +470,11 @@ export const useBuild = (): IUseBuild => {
     newStyle: IStyleEntry,
     replace = false,
   ) => {
-    const data: ISetComponentCustomStyleData = {
-      componentId: component.id,
-      breakpointId: activeBreakpoint.value.id,
-      oldStyle,
-      newStyle,
-    }
+    const command = setCustomStyleCommand(component, oldStyle, newStyle, replace)
     if (replace) {
-      // Keep the original "old" data in a chain of commands
-      const lastCommand = getLastCommand()
-      const oldStyle = (lastCommand?.data as ISetComponentCustomStyleData | undefined)
-        ?.oldStyle
-      replaceLastCommand(CommandType.SetComponentCustomStyle, {
-        ...data,
-        oldStyle: oldStyle ?? data.oldStyle,
-      })
+      replaceLastCommand(command)
     } else {
-      pushCommand(CommandType.SetComponentCustomStyle, data)
+      pushCommandObject(command)
     }
   }
 
@@ -554,7 +498,7 @@ export const useBuild = (): IUseBuild => {
       }),
     }
     if (replace) {
-      replaceLastCommand(CommandType.Group, data)
+      replaceLastCommand({ type: CommandType.Group, data })
     } else {
       pushCommand(CommandType.Group, data)
     }
@@ -572,23 +516,10 @@ export const useBuild = (): IUseBuild => {
   }
 
   const removeComponentCustomStyle = (style: IRemoveStyleEntry) => {
-    const selected = site.value.editor?.selectedComponent
-    const oldValue =
-      selected?.style.custom[activeBreakpoint.value.id]?.[style.pseudoClass]?.[
-        style.property
-      ]
-    if (!oldValue) {
-      return
+    const command = removeComponentCustomStyleCommand(site.value, style)
+    if (command) {
+      pushCommandObject(command)
     }
-    const data: ISetComponentCustomStyleData = {
-      componentId: selected.id,
-      breakpointId: activeBreakpoint.value.id,
-      oldStyle: {
-        ...style,
-        value: oldValue,
-      },
-    }
-    pushCommand(CommandType.SetComponentCustomStyle, data)
   }
 
   const mergeComponentStyle = (from: ISerializedComponent) => {
@@ -961,7 +892,7 @@ export const useBuild = (): IUseBuild => {
     const { code, translations, replace, forceSave } = props
     const data = makeSetTranslationsData(site.value.context, code, translations)
     if (replace) {
-      replaceLastCommand(CommandType.SetTranslations, data, forceSave ?? false)
+      replaceLastCommand({ type: CommandType.SetTranslations, data }, forceSave ?? false)
     } else {
       pushCommand(CommandType.SetTranslations, data)
     }

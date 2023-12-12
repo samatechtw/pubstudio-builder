@@ -38,6 +38,7 @@
       />
       <div class="actions">
         <PSButton
+          v-if="isDev"
           class="debug-button"
           size="small"
           :text="t('debug')"
@@ -66,6 +67,9 @@ import { useI18n } from 'petite-vue-i18n'
 import { PSButton, InfoBubble } from '@pubstudio/frontend/ui-widgets'
 import { IComponent } from '@pubstudio/shared/type-site'
 import { noBehaviorId } from '@pubstudio/frontend/util-ids'
+import { serializeComponent } from '@pubstudio/frontend/util-site-store'
+import { useHUD } from '@pubstudio/frontend/util-ui-alert'
+import { isDev } from '@pubstudio/frontend/util-config'
 import ComponentTabInfo from './ComponentTabInfo.vue'
 import ComponentDimensions from './ComponentDimensions.vue'
 import ComponentTabStyle from './ComponentTabStyle.vue'
@@ -80,8 +84,6 @@ import ComponentInputs from './ComponentInputs.vue'
 import ComponentEvents from './ComponentEvents.vue'
 import ComponentEventEdit from './ComponentEventEdit.vue'
 import StyleMenuEdit from '../StyleMenuEdit.vue'
-import { serializeComponent } from '@pubstudio/frontend/util-site-store'
-import { useHUD } from '@pubstudio/frontend/util-ui-alert'
 
 const { t } = useI18n()
 const { editor, replacePageRoot } = useBuild()
@@ -148,8 +150,8 @@ const replaceRootWithCopiedComponent = () => {
 .actions {
   display: flex;
   align-items: flex-end;
-  margin-top: 40px;
-  padding: 0 16px;
+  margin-top: 24px;
+  padding-left: 16px;
 }
 .paste-replace-wrap {
   display: flex;

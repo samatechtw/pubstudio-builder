@@ -55,7 +55,7 @@ const behaviors = computed(() => {
   height: 100%;
   width: 200px;
   padding-top: 24px;
-  background-color: white;
+  background-color: $blue-100;
   align-items: center;
   padding: 24px 8px 0;
   .top {

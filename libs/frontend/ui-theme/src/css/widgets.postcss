@@ -127,3 +127,17 @@
   color: #fff;
   background: #2e333a;
 }
+
+@define-mixin input {
+  background-color: rgba(255, 255, 255, 0.3);
+  border-color: black;
+  border-width: 1px;
+  border-radius: 2px;
+  box-shadow: none;
+  &:focus {
+    outline: none;
+    background-color: rgba(255, 255, 255, 0.7);
+    border-color: $blue-500;
+    border-width: 1.5px;
+  }
+}

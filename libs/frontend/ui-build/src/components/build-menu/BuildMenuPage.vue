@@ -50,7 +50,8 @@ const switchPage = (route: string) => {
   height: 100%;
   width: 120px;
   padding-top: 24px;
-  background-color: white;
+  background-color: $blue-100;
+  box-shadow: $file-menu-shadow;
   align-items: center;
   .top {
     display: flex;

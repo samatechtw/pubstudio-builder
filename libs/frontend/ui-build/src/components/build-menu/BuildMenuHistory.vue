@@ -1,5 +1,5 @@
 <template>
-  <div class="history-menu">
+  <div class="history-menu scrollbar-small">
     <div class="top">
       <div class="title">
         {{ t('history.title') }}
@@ -51,7 +51,7 @@
 <script lang="ts" setup>
 import { computed, ref } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
-import { useCommand } from '@pubstudio/frontend/feature-command'
+import { undoN, redoN, clearAll } from '@pubstudio/frontend/feature-command'
 import { CommandType } from '@pubstudio/shared/type-command'
 import { ConfirmModal, PSButton } from '@pubstudio/frontend/ui-widgets'
 import { useBuild } from '@pubstudio/frontend/feature-build'
@@ -59,7 +59,6 @@ import HistoryRow from './HistoryRow.vue'
 
 const { t } = useI18n()
 const { site } = useBuild()
-const { undoN, redoN, clearAll } = useCommand()
 const showClearModal = ref(false)
 
 const forwardHistory = computed(() => {
@@ -88,9 +87,8 @@ const clearHistory = () => {
   height: 100%;
   overflow-y: scroll;
   width: 200px;
-  padding-top: 24px;
-  background-color: white;
-  padding: 24px 8px 0;
+  background-color: $blue-100;
+  padding: 16px 8px 0;
 }
 .top {
   display: flex;
@@ -110,7 +108,7 @@ const clearHistory = () => {
 }
 .subtitle {
   @mixin title-medium 13px;
-  color: $grey-500;
+  color: $grey-700;
 }
 .commands {
   margin-top: 8px;

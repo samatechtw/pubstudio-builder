@@ -4,6 +4,7 @@ import {
   BuildSubmenu,
   ComponentMenuCollapsible,
   ComponentTabState,
+  Css,
   CssPseudoClass,
   EditorMode,
   IComponent,
@@ -167,7 +168,7 @@ export const clearComponentTabState = (editor: IEditorContext | undefined) => {
     editor.componentTab.editEvent = undefined
     editor.componentTab.editInput = undefined
     editor.componentTab.editInputValue = undefined
-    editor.componentTab.editStyle = undefined
+    editor.editStyles.clear()
     editor.componentTab.editInfo = undefined
     siteStore.value.saveEditor(editor)
   }
@@ -203,15 +204,36 @@ export const setComponentTabEditInfo = (
   }
 }
 
+export const clearComponentEditStyle = (
+  editor: IEditorContext | undefined,
+  propName: Css,
+) => {
+  if (editor) {
+    if (editor.editStyles.has(propName)) {
+      editor.editStyles.delete(propName)
+      if (editor.editStyles.size === 0) {
+        setComponentTabState(editor, undefined, false)
+      }
+      siteStore.value.saveEditor(editor)
+    }
+  }
+}
+
+export const clearAllEditStyles = (editor: IEditorContext | undefined) => {
+  if (editor && editor.editStyles.size > 0) {
+    editor.editStyles.clear()
+    siteStore.value.saveEditor(editor)
+  }
+}
+
 export const setComponentEditStyle = (
   editor: IEditorContext | undefined,
-  propName: string | undefined,
+  propName: Css,
 ) => {
-  const state = propName === undefined ? undefined : ComponentTabState.EditStyle
   if (editor) {
-    const changed = setComponentTabState(editor, state, false)
-    if (changed || editor.componentTab.editStyle !== propName) {
-      editor.componentTab.editStyle = propName
+    const changed = setComponentTabState(editor, ComponentTabState.EditStyle, false)
+    if (changed || !editor.editStyles.has(propName)) {
+      editor.editStyles.add(propName)
       siteStore.value.saveEditor(editor)
     }
   }

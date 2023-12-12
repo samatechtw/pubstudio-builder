@@ -209,6 +209,7 @@ onBeforeUnmount(() => {
   max-height: $view-height;
   position: relative;
   overflow: scroll;
+  border-left: 1px solid $border1;
 }
 .build-right-menu-content {
   width: 100%;

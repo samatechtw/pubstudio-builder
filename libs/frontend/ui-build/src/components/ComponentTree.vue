@@ -1,5 +1,5 @@
 <template>
-  <div class="component-tree-wrap" :class="{ visible: show }">
+  <div class="component-tree-wrap scrollbar-small" :class="{ visible: show }">
     <component :is="'style'" v-cloak>
       {{ levelStyles }}
     </component>
@@ -78,6 +78,7 @@ const treeStyles = computed(() => {
 .component-tree-wrap {
   width: 0;
   max-height: $view-height;
+  background-color: $blue-100;
   flex-shrink: 0;
   overflow-x: v-bind(treeStyles.overflowX);
   overflow-y: auto;

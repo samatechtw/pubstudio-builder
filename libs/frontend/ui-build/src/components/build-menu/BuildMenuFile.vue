@@ -23,6 +23,9 @@
       <Templates></Templates>
     </BuildMenuIconText>
     <SaveTemplateModal :template="storedTemplate" @cancel="storedTemplate = undefined" />
+    <BuildMenuIconText :text="t('build.reset')" @click="showConfirmReset = true">
+      <Trash color="#b7436a" />
+    </BuildMenuIconText>
     <ExportModal
       :show="showExport"
       :defaultFileName="defaultFileName"
@@ -42,6 +45,13 @@
       @confirm="confirmImport"
       @cancel="pendingSiteImport = undefined"
     />
+    <ConfirmModal
+      :show="showConfirmReset"
+      :title="t('build.confirm_reset')"
+      :text="t('build.confirm_reset_text')"
+      @confirm="resetConfirmed"
+      @cancel="showConfirmReset = false"
+    />
   </div>
 </template>
 
@@ -49,7 +59,7 @@
 import { computed, ref } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { store } from '@pubstudio/frontend/data-access-web-store'
-import { Export, Import } from '@pubstudio/frontend/ui-widgets'
+import { Export, Import, Trash } from '@pubstudio/frontend/ui-widgets'
 import {
   ExportModal,
   AlertModal,
@@ -71,7 +81,7 @@ import { useBuild } from '@pubstudio/frontend/feature-build'
 import BuildMenuIconText from './BuildMenuIconText.vue'
 
 const { t } = useI18n()
-const { site, replaceSite } = useBuild()
+const { site, replaceSite, resetSite } = useBuild()
 
 const emit = defineEmits<{
   (e: 'showTemplates'): void
@@ -81,6 +91,7 @@ const showExport = ref(false)
 const storedTemplate = ref<ISerializedSite>()
 const pendingSiteImport = ref()
 const parseError = ref()
+const showConfirmReset = ref(false)
 
 const defaultFileName = computed(() => defaultExportedFileName(site.value.name))
 
@@ -112,6 +123,11 @@ const importSite = async (file: File) => {
 const showTemplateModal = () => {
   storedTemplate.value = serializeSite(site.value)
 }
+
+const resetConfirmed = () => {
+  resetSite()
+  showConfirmReset.value = false
+}
 </script>
 
 <style lang="postcss" scoped>
@@ -121,8 +137,9 @@ const showTemplateModal = () => {
   @mixin flex-col;
   height: 100%;
   width: 80px;
-  padding-top: 32px;
-  background-color: white;
+  padding-top: 24px;
+  background-color: $blue-100;
+  box-shadow: $file-menu-shadow;
   align-items: center;
   > div:not(:first-child) {
     margin-top: 24px;

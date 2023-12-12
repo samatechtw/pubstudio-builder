@@ -7,7 +7,7 @@ export const mergeLastCommandHelper = (site: ISite, commands: ICommand[]) => {
     return
   }
   for (const command of commands) {
-    applyCommand(site, command.type, command.data)
+    applyCommand(site, command)
   }
   const last = getLastCommandHelper(site)
   if (last) {
