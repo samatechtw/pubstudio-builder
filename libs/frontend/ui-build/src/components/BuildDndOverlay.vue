@@ -5,7 +5,7 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
 import { runtimeContext } from '@pubstudio/frontend/util-runtime'
-import { useBuild } from '@pubstudio/frontend/feature-build'
+import { buildContentWindowInnerId, useBuild } from '@pubstudio/frontend/feature-build'
 
 const hoverOutlineThickness = 6
 const outlineColor = '#000'
@@ -16,7 +16,7 @@ const { editor } = useBuild()
 const overlayStyle = computed(() => {
   const buildDndState = runtimeContext.buildDndState.value
   if (buildDndState) {
-    const buildContentWindowInner = document.getElementById('build-content-window-inner')
+    const buildContentWindowInner = document.getElementById(buildContentWindowInnerId)
     const hoverElement = document.getElementById(buildDndState.hoverCmpId)
 
     if (buildContentWindowInner && hoverElement) {

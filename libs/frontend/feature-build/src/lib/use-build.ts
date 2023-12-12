@@ -114,6 +114,7 @@ export type ISetTranslationsProps = {
 
 // The element id of build content window
 export const buildContentWindowId = 'build-content-window'
+export const buildContentWindowInnerId = 'build-content-window-inner'
 
 export interface IUseBuild {
   activePage: Ref<IPage | undefined>

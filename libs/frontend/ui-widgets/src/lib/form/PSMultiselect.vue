@@ -9,7 +9,7 @@
     <div
       :ref="setToggleRef"
       class="label"
-      @mouseenter="tooltipMouseEnter"
+      @mouseenter="tooltipMouseEnter()"
       @mouseleave="tooltipMouseLeave"
     >
       <PSInput

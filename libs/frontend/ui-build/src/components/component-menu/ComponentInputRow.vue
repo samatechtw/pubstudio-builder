@@ -35,11 +35,11 @@ import { Check, Edit, PSInput } from '@pubstudio/frontend/ui-widgets'
 import { IDatalistOption } from '@pubstudio/frontend/type-ui-widgets'
 import { Settings } from '@pubstudio/frontend/ui-widgets'
 import { ComponentArgType, Tag } from '@pubstudio/shared/type-site'
-import { getLinkDatalistOptions } from './link-datalist-options'
 import {
   useBuild,
   validateComponentArg,
   convertComponentArg,
+  getLinkDatalistOptions,
 } from '@pubstudio/frontend/feature-build'
 
 const { t } = useI18n()

@@ -12,6 +12,7 @@ import { findStyles } from '@pubstudio/frontend/util-component'
 import { RenderMode } from '@pubstudio/frontend/util-render'
 import { runtimeContext } from '@pubstudio/frontend/util-runtime'
 import { Css, IComponent, IRawStyle, ISite, Tag } from '@pubstudio/shared/type-site'
+import { buildContentWindowInnerId } from '@pubstudio/frontend/feature-build'
 import {
   computed,
   defineComponent,
@@ -132,7 +133,7 @@ export const BuilderDndComponent = defineComponent({
     const { site, component, renderKey } = toRefs(props)
 
     const { custom } = computeEvents(site.value, component.value)
-    const root = document.getElementById('build-content-window-inner')
+    const root = document.getElementById(buildContentWindowInnerId)
     registerCustomEvents(component.value, custom, root, false)
 
     const dndRef = computed(() => {
@@ -161,7 +162,7 @@ export const BuilderDndComponent = defineComponent({
     })
     onMounted(() => {
       const { custom } = computeEvents(site.value, component.value)
-      const root = document.getElementById('build-content-window-inner')
+      const root = document.getElementById(buildContentWindowInnerId)
       registerCustomEvents(component.value, custom, root, true)
     })
     onUnmounted(() => {

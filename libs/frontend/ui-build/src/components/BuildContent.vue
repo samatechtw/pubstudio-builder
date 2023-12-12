@@ -2,7 +2,7 @@
   <div class="build-content">
     <div :id="buildContentWindowId" ref="contentWindowRef">
       <div
-        id="build-content-window-inner"
+        :id="buildContentWindowInnerId"
         class="build-content-window-inner"
         :style="innerStyle"
       >
@@ -30,7 +30,11 @@ import {
   descSortedBreakpoints,
 } from '@pubstudio/frontend/feature-site-source'
 import BuildDndOverlay from './BuildDndOverlay.vue'
-import { useBuild, buildContentWindowId } from '@pubstudio/frontend/feature-build'
+import {
+  useBuild,
+  buildContentWindowId,
+  buildContentWindowInnerId,
+} from '@pubstudio/frontend/feature-build'
 import { useRenderBuilder } from '@pubstudio/frontend/feature-render-builder'
 
 const { site, activePage, editor } = useBuild()
