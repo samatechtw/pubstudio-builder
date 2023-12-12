@@ -46,14 +46,13 @@ import { useBuild } from '@pubstudio/frontend/feature-build'
 import { Modal, PSButton } from '@pubstudio/frontend/ui-widgets'
 import { saveSite, defaultExportedFileName } from '@pubstudio/frontend/util-site-store'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
-import { useCommand } from '@pubstudio/frontend/feature-command'
+import { clearAll, clearPartial } from '@pubstudio/frontend/feature-command'
 import { IApiError } from '@pubstudio/shared/type-api'
 
 const { t } = useI18n()
 
 const { siteStore } = useSiteSource()
 const { site } = useBuild()
-const { clearAll, clearPartial } = useCommand()
 const show = ref(false)
 
 const isHistory = computed(() => {

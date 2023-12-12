@@ -23,7 +23,7 @@
       class="menu-row"
       @edit="editStyle"
       @update="updateEditData(entry.property, $event)"
-      @save="saveStyle(entry.property, $event)"
+      @save="saveStyle(entry)"
       @remove="removeStyle(entry.property)"
       @escape="cancelEdit(entry.property, $event)"
     />
@@ -50,7 +50,11 @@
 import { computed, onUnmounted } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { ErrorMessage, PSButton } from '@pubstudio/frontend/ui-widgets'
-import { setComponentEditStyle } from '@pubstudio/frontend/feature-editor'
+import {
+  clearComponentEditStyle,
+  clearAllEditStyles,
+  setComponentEditStyle,
+} from '@pubstudio/frontend/feature-editor'
 import { Css, IInheritedStyleEntry, IStyleEntry } from '@pubstudio/shared/type-site'
 import { activeBreakpoint } from '@pubstudio/frontend/feature-site-source'
 import {
@@ -79,7 +83,7 @@ const {
 const { site, editor, currentPseudoClass } = useBuild()
 
 const editing = (propName: string) => {
-  return editor.value?.componentTab.editStyle === propName
+  return editor.value?.editStyles.has(propName)
 }
 
 const escPress = () => {
@@ -88,11 +92,11 @@ const escPress = () => {
 
 const cancelEdit = (property: Css, originalStyle: IStyleEntry) => {
   updateEditingStyleProp(property, originalStyle)
-  setComponentEditStyle(editor.value, undefined)
+  clearComponentEditStyle(editor.value, property)
 }
 
-const editStyle = (propName: string | undefined) => {
-  setComponentEditStyle(editor.value, propName)
+const editStyle = (propName: string) => {
+  setComponentEditStyle(editor.value, propName as Css)
 }
 
 const updateEditData = (property: Css, entry: IStyleEntry) => {
@@ -100,14 +104,14 @@ const updateEditData = (property: Css, entry: IStyleEntry) => {
   setComponentEditStyle(editor.value, entry.property)
 }
 
-const saveStyle = (property: Css, entry: IStyleEntry) => {
+const saveStyle = (entry: IStyleEntry) => {
   updateEditingStyleProp(property, entry)
-  setComponentEditStyle(editor.value, undefined)
+  clearComponentEditStyle(editor.value, property)
 }
 
 const removeStyle = (property: Css) => {
   removeEditingStyleProp(property)
-  setComponentEditStyle(editor.value, undefined)
+  clearComponentEditStyle(editor.value, property)
 }
 
 const menuSubTitle = computed(() => `(${currentPseudoClass.value})`)
@@ -132,7 +136,7 @@ const validateAndSave = () => {
 }
 
 onUnmounted(() => {
-  setComponentEditStyle(editor.value, undefined)
+  clearAllEditStyles(editor.value)
 })
 </script>
 

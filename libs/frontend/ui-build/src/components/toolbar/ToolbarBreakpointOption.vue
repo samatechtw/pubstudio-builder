@@ -1,19 +1,14 @@
 <template>
-  <div
-    ref="itemRef"
-    class="ps-dropdown-item breakpoint-option"
-    :class="{ 'breakpoint-option-active': breakpoint.id === activeBreakpoint.id }"
-    @mouseenter="tooltipMouseEnter()"
-    @mouseleave="tooltipMouseLeave"
+  <ToolbarItem
+    :active="activeBreakpoint.id === breakpoint.id"
+    :customTooltip="true"
+    @mousedown.prevent
     @click="click"
   >
-    <ToolbarBreakpointIcon :breakpoint="breakpoint" />
-    <div
-      v-if="show"
-      ref="tooltipRef"
-      class="tooltip"
-      :style="{ ...tooltipStyle, width: '280px' }"
-    >
+    <template #default>
+      <ToolbarBreakpointIcon :breakpoint="breakpoint" />
+    </template>
+    <template #tooltip>
       <div class="breakpoint-name">
         {{ breakpoint.name }}
       </div>
@@ -23,18 +18,18 @@
       <div class="breakpoint-hint">
         {{ breakpointHint }}
       </div>
-    </div>
-  </div>
+    </template>
+  </ToolbarItem>
 </template>
 
 <script lang="ts" setup>
 import { computed, toRefs } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { IBreakpoint } from '@pubstudio/shared/type-site'
-import { useTooltipDelay } from '@pubstudio/frontend/util-tooltip'
 import { useBreakpoint } from '@pubstudio/frontend/feature-breakpoint'
 import { useBuild } from '@pubstudio/frontend/feature-build'
 import ToolbarBreakpointIcon from './ToolbarBreakpointIcon.vue'
+import { ToolbarItem } from '@pubstudio/frontend/ui-widgets'
 
 const { t } = useI18n()
 
@@ -47,19 +42,8 @@ const { breakpoint } = toRefs(props)
 const { editor } = useBuild()
 const { activeBreakpoint, applyBreakpoint } = useBreakpoint(editor)
 
-const {
-  itemRef,
-  tooltipMouseEnter,
-  tooltipMouseLeave,
-  cancelHoverTimer,
-  tooltipRef,
-  tooltipStyle,
-  show,
-} = useTooltipDelay()
-
 const click = () => {
   applyBreakpoint(breakpoint.value)
-  cancelHoverTimer()
 }
 
 const breakpointRange = computed(() => {
@@ -104,10 +88,9 @@ const breakpointHint = computed(() => {
   }
 }
 
-.tooltip {
+.toolbar-item :deep(.tooltip) {
   @mixin tooltip;
-  margin-top: 4px;
-  padding: 12px;
+  max-width: 280px;
 }
 .breakpoint-name {
   @mixin title 18px;

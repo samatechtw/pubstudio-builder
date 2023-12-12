@@ -21,7 +21,7 @@ export const deserializeEditor = (
   serializedEditor: ISerializedEditorContext | undefined | null,
 ): IEditorContext | undefined => {
   const selectedId = serializedEditor?.selectedComponentId
-  return serializedEditor
+  const editor = serializedEditor
     ? {
         selectedComponent: selectedId ? context.components[selectedId] : undefined,
         active: serializedEditor.active,
@@ -33,6 +33,8 @@ export const deserializeEditor = (
         translations: serializedEditor.translations,
         themeTab: serializedEditor.themeTab,
         componentTab: serializedEditor.componentTab ?? {},
+        // Added 231211
+        editStyles: new Set(serializedEditor.editStyles),
         mode: serializedEditor.mode,
         showComponentTree: serializedEditor.showComponentTree,
         componentTreeExpandedItems: serializedEditor.componentTreeExpandedItems,
@@ -47,6 +49,8 @@ export const deserializeEditor = (
         componentMenuCollapses: serializedEditor.componentMenuCollapses ?? {},
       }
     : undefined
+
+  return editor
 }
 
 const deserializeComponent = (ser: ISerializedComponent): IComponent => {

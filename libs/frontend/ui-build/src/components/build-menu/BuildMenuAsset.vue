@@ -111,8 +111,8 @@ const dropUploadImage = (e: Event) => {
   position: relative;
   height: 100%;
   width: 200px;
-  padding-top: 32px;
-  background-color: white;
+  padding-top: 24px;
+  background-color: $blue-100;
   align-items: center;
   overflow-y: auto;
   > div:not(:first-child) {

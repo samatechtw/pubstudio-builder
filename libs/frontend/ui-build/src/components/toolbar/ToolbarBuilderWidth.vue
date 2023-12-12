@@ -90,7 +90,7 @@ const builderWidthText = computed(() =>
 
 const scaleText = computed(() => {
   const scale = editor.value?.builderScale ?? 1
-  return scale * 100
+  return Math.round(scale * 1000) / 10
 })
 
 const updateBuilderWidth = () => {
@@ -141,5 +141,8 @@ const updateBuilderScale = () => {
 .width-input,
 .scale-input {
   width: 60px;
+  :deep(.ps-input) {
+    height: 30px;
+  }
 }
 </style>

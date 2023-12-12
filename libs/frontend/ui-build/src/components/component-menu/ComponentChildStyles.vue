@@ -232,14 +232,14 @@ const getInheritedFrom = (entry: IInheritedStyleEntry) => {
 const setSelector = (sel: string | undefined) => {
   selector.value = sel
   if (collapsed.value) {
-    collapsed.value = false
+    setComponentMenuCollapses(editor.value, ComponentMenuCollapsible.ChildStyles, false)
   }
 }
 
 const setEditStyle = (prop: string | undefined) => {
   editStyleProp.value = prop
   if (collapsed.value && prop !== undefined) {
-    collapsed.value = false
+    setComponentMenuCollapses(editor.value, ComponentMenuCollapsible.ChildStyles, false)
   }
 }
 
@@ -296,6 +296,7 @@ watch(selectors, (newSelectors) => {
 .selector {
   @mixin text 13px;
   width: 120px;
+  height: 32px;
   margin: 0 auto 0 6px;
   .missing-selector {
     color: $color-error;

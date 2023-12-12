@@ -101,8 +101,8 @@ const { t } = useI18n()
   @mixin flex-row;
   height: 100%;
   width: 200px;
-  padding-top: 32px;
-  background-color: white;
+  padding-top: 12px;
+  background-color: $blue-100;
   overflow: auto;
 }
 .new-left,

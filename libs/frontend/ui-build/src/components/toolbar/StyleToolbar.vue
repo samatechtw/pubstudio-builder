@@ -28,9 +28,9 @@
     <ToolbarContainer :show="showContainer" class="toolbar-section" />
     <ToolbarText :show="showTextStyle" class="toolbar-section" />
     <ToolbarPage class="toolbar-page" />
+    <ToolbarBreakpoint class="toolbar-breakpoint" />
     <ToolbarPseudoClass class="toolbar-pseudo-class" />
     <ToolbarBuilderWidth class="toolbar-builder-width" />
-    <ToolbarBreakpoint class="toolbar-breakpoint" />
     <ToolbarItem
       :tooltip="isSaving ? t('build.preview_saving') : t('build.preview')"
       :disabled="isSaving"
@@ -46,9 +46,6 @@
     >
       <BoundingBox />
     </ToolbarItem>
-    <ToolbarItem :tooltip="t('style.toolbar.reset')">
-      <Trash color="#b7436a" @click="showConfirmReset = true" />
-    </ToolbarItem>
     <ToolbarItem
       v-if="!hideSettings && apiSiteId && apiSiteId !== 'scratch'"
       :tooltip="t('sites.settings')"
@@ -59,18 +56,11 @@
     <ToolbarItem :tooltip="t(`style.toolbar.save.${siteStore.saveState}`)">
       <div class="save-state" :class="siteStore.saveState" />
     </ToolbarItem>
-    <ConfirmModal
-      :show="showConfirmReset"
-      :title="t('build.confirm_reset')"
-      :text="t('build.confirm_reset_text')"
-      @confirm="resetConfirmed"
-      @cancel="showConfirmReset = false"
-    />
   </div>
 </template>
 
 <script lang="ts" setup>
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { useBuild, useHistory } from '@pubstudio/frontend/feature-build'
 import {
@@ -80,13 +70,11 @@ import {
 import {
   Redo,
   ToolbarItem,
-  Trash,
   Undo,
   Hierarchy,
   Settings,
 } from '@pubstudio/frontend/ui-widgets'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
-import { ConfirmModal } from '@pubstudio/frontend/ui-widgets'
 import { BoundingBox } from '@pubstudio/frontend/ui-widgets'
 import { CommandType } from '@pubstudio/shared/type-command'
 import ToolbarText from './ToolbarText.vue'
@@ -105,11 +93,10 @@ const emit = defineEmits<{
 
 const { t } = useI18n()
 
-const { commandAlert, editor, resetSite } = useBuild()
+const { commandAlert, editor } = useBuild()
 const { siteStore, isSaving } = useSiteSource()
 const { canUndo, canRedo, undo, redo } = useHistory()
 const { apiSiteId } = useSiteSource()
-const showConfirmReset = ref(false)
 
 const showTextStyle = computed(() => {
   return !!editor.value?.selectedComponent?.content
@@ -118,11 +105,6 @@ const showTextStyle = computed(() => {
 const showContainer = computed(() => {
   return !!editor.value?.selectedComponent
 })
-
-const resetConfirmed = () => {
-  resetSite()
-  showConfirmReset.value = false
-}
 
 const toggleComponentTree = () => {
   if (editor.value) {
@@ -142,11 +124,12 @@ const toggleComponentTree = () => {
   width: 100%;
   padding: 0 24px 0 8px;
   background-color: $color-toolbar-bg;
-  :deep(.ps-input),
-  :deep(.multiselect),
-  :deep(.ps-multiselect) {
-    height: calc($style-toolbar-height - 2px);
-  }
+}
+
+:deep(.ps-input),
+:deep(.multiselect),
+:deep(.ps-multiselect) {
+  height: calc($style-toolbar-height - 2px);
 }
 .toolbar-section {
   display: flex;
@@ -155,6 +138,13 @@ const toggleComponentTree = () => {
 .toolbar-page {
   margin-left: auto;
   margin-right: 4px;
+}
+.toolbar-breakpoint {
+  margin-left: auto;
+  margin-right: auto;
+}
+.toolbar-pseudo-class {
+  margin-left: 8px;
 }
 .save-state {
   @mixin size 14px;

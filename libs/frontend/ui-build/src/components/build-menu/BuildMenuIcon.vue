@@ -65,8 +65,8 @@ $arrow-size: 8px;
   &:hover :deep(svg) {
     path,
     circle {
-      fill: $color-toolbar-button-active;
-      stroke: $color-toolbar-button-active;
+      fill: $color-toolbar-button-hover;
+      stroke: $color-toolbar-button-hover;
     }
   }
 }

@@ -51,6 +51,7 @@ export const serializeEditor = (
         translations: editor.translations,
         themeTab: editor.themeTab,
         componentTab: editor.componentTab,
+        editStyles: Array.from(editor.editStyles),
         mode: editor.mode,
         showComponentTree: editor.showComponentTree,
         componentTreeExpandedItems: editor.componentTreeExpandedItems,

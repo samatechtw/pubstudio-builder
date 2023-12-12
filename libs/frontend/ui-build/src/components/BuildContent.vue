@@ -3,7 +3,7 @@
     <div :id="buildContentWindowId" ref="contentWindowRef">
       <div
         :id="buildContentWindowInnerId"
-        class="build-content-window-inner"
+        class="build-content-window-inner scrollbar-small"
         :style="innerStyle"
       >
         <ReusableStyle />
@@ -124,107 +124,108 @@ $border-offset: 0px;
   @mixin flex-col;
   width: 100%;
   height: $view-height;
+  background-color: white;
   padding: 12px 16px 12px;
   transition: width 0.2s ease;
   flex-grow: 1;
   overflow: hidden;
-  #build-content-window {
-    /* -2px because of the border so that scrollbar doesn't show up */
-    width: calc(100% - 2px);
-    min-height: 100%;
-    max-height: 100%;
+}
+#build-content-window {
+  /* -2px because of the border so that scrollbar doesn't show up */
+  width: calc(100% - 2px);
+  min-height: 100%;
+  max-height: 100%;
+  margin: auto;
+  .build-content-window-inner {
+    position: relative;
     margin: auto;
+    transform-origin: 0 0;
+    overflow: auto;
     border: 1px solid $grey-300;
-    .build-content-window-inner {
+    /* Page root */
+    & > div:not(.build-dnd-overlay) {
+      min-height: v-bind(rootComponentMinHeight);
+      /* Select anything that is the direct children of page root */
+      & > :deep(*) {
+        flex-shrink: 0;
+      }
+      & > :deep(img) {
+        z-index: 1;
+      }
+    }
+    :deep(.svg-sel) {
       position: relative;
-      margin: auto;
-      transform-origin: 0 0;
-      overflow: auto;
-      /* Page root */
-      & > div:not(.build-dnd-overlay) {
-        min-height: v-bind(rootComponentMinHeight);
-        /* Select anything that is the direct children of page root */
-        & > :deep(*) {
-          flex-shrink: 0;
-        }
-        & > :deep(img) {
-          z-index: 1;
-        }
+      .svg-edit {
+        position: absolute;
+        cursor: pointer;
+        fill: black;
+        top: -32px;
+        right: -24px;
+        width: 26px;
       }
-      :deep(.svg-sel) {
-        position: relative;
-        .svg-edit {
-          position: absolute;
-          cursor: pointer;
-          fill: black;
-          top: -32px;
-          right: -24px;
-          width: 26px;
-        }
+    }
+    :deep(.hover-in-tree) {
+      position: relative;
+      opacity: 0.5;
+      .hover-overlay {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        background-color: rgba(255, 255, 255, 0.1);
       }
-      :deep(.hover-in-tree) {
-        position: relative;
-        opacity: 0.5;
-        .hover-overlay {
-          position: absolute;
-          width: 100%;
-          height: 100%;
-          top: 0;
-          left: 0;
-          background-color: rgba(255, 255, 255, 0.1);
-        }
-        &--absolute {
-          position: absolute;
-        }
+      &--absolute {
+        position: absolute;
       }
-      :deep(.force-relative) {
-        position: relative;
-      }
-      :deep(.hover) {
-        /* An absolute-positioned img is wrapped with div.hover-wrap on hover. We need to match the original
+    }
+    :deep(.force-relative) {
+      position: relative;
+    }
+    :deep(.hover) {
+      /* An absolute-positioned img is wrapped with div.hover-wrap on hover. We need to match the original
         image insets to avoid display issues. */
-        &.hover-wrap-absolute {
-          position: absolute;
-          img {
-            inset: 0;
-          }
+      &.hover-wrap-absolute {
+        position: absolute;
+        img {
+          inset: 0;
         }
-        .hover-edge {
-          position: absolute;
-        }
-        .top,
-        .bottom {
-          left: 0;
-          height: 5px;
-          width: 100%;
-          cursor: ns-resize;
-        }
-        .top {
-          top: $border-offset;
-        }
-        .bottom {
-          bottom: $border-offset;
-        }
-        .left,
-        .right {
-          width: 5px;
-          height: 100%;
-          top: 0;
-          cursor: ew-resize;
-        }
-        .left {
-          left: $border-offset;
-        }
-        .right {
-          right: $border-offset;
-        }
-        .bottom-right {
-          width: 5px;
-          height: 5px;
-          bottom: $border-offset;
-          right: $border-offset;
-          cursor: nwse-resize;
-        }
+      }
+      .hover-edge {
+        position: absolute;
+      }
+      .top,
+      .bottom {
+        left: 0;
+        height: 5px;
+        width: 100%;
+        cursor: ns-resize;
+      }
+      .top {
+        top: $border-offset;
+      }
+      .bottom {
+        bottom: $border-offset;
+      }
+      .left,
+      .right {
+        width: 5px;
+        height: 100%;
+        top: 0;
+        cursor: ew-resize;
+      }
+      .left {
+        left: $border-offset;
+      }
+      .right {
+        right: $border-offset;
+      }
+      .bottom-right {
+        width: 5px;
+        height: 5px;
+        bottom: $border-offset;
+        right: $border-offset;
+        cursor: nwse-resize;
       }
     }
   }

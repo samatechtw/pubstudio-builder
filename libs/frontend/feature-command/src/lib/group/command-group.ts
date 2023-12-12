@@ -5,7 +5,7 @@ import { undoCommand } from '../undo-command'
 
 export const applyCommandGroup = (site: ISite, data: ICommandGroupData) => {
   for (const command of data.commands) {
-    applyCommand(site, command.type, command.data)
+    applyCommand(site, command)
   }
 }
 

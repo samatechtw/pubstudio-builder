@@ -125,11 +125,11 @@ export interface IEditorContext {
     editInput?: string
     // Name of editing input value
     editInputValue?: string
-    // Name of editing style property
-    editStyle?: string
     // Name of editing info value
     editInfo?: string
   }
+  // Names of editing style properties
+  editStyles: Set<string>
   // true if the collapsible is collapsed, otherwise expanded.
   componentMenuCollapses: {
     [key in ComponentMenuCollapsible]?: boolean

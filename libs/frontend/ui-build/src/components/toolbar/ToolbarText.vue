@@ -267,7 +267,7 @@ const iconColor = computed(() => {
 @import '@theme/css/mixins.postcss';
 
 .underline {
-  margin-left: 32px;
+  margin-left: 16px;
 }
 
 .font-size {

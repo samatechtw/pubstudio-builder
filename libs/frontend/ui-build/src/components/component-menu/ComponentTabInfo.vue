@@ -111,7 +111,6 @@ const setRole = (value: AriaRole | undefined) => {
 
 .tab-info {
   padding: 8px 16px 0;
-  background-color: $menu-bg2;
 }
 .content-hidden {
   color: $color-disabled;

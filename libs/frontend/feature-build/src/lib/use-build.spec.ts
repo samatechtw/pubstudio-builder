@@ -1,4 +1,4 @@
-import { useCommand } from '@pubstudio/frontend/feature-command'
+import { redoCommand, undoLastCommand } from '@pubstudio/frontend/feature-command'
 import { initializeSiteStore } from '@pubstudio/frontend/feature-site-store-init'
 import { h1 } from '@pubstudio/frontend/util-builtin'
 import { stringifySite } from '@pubstudio/frontend/util-site-store'
@@ -14,8 +14,6 @@ describe('Use Build', () => {
   })
 
   it('add a builtin component, redo, and undo', () => {
-    const { undoLastCommand, redoCommand } = useCommand()
-
     expect(build.site.value.context.nextId).toEqual(1)
 
     build.addBuiltinComponent(h1.id)

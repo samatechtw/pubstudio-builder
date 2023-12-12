@@ -1,8 +1,8 @@
 <template>
   <div v-if="editing" class="style-row">
-    <div class="label">
+    <div class="label" :class="{ 'edit-wrap': editWrap }">
       <StyleProperty
-        :modelValue="newStyle.property"
+        :modelValue="style.property"
         class="property-multiselect"
         :openInitial="focusProp"
         @update:modelValue="updateProperty"
@@ -11,7 +11,7 @@
       <StyleValue
         v-if="valueOptions"
         ref="valueSelectRef"
-        :modelValue="newStyle.value"
+        :modelValue="style.value"
         class="value-multiselect"
         :options="valueOptions"
         @update:modelValue="updateValue"
@@ -19,17 +19,17 @@
       <PSInput
         v-else
         ref="valueInputRef"
-        :modelValue="newStyle.value"
+        :modelValue="style.value"
         class="value-input"
         :placeholder="t('value')"
         :isError="!!valueErrorMessage"
         @update:modelValue="updateValue"
-        @keydown.enter="updateStyle"
+        @keydown.enter="saveStyle"
         @keyup.esc="escapePressed"
       />
     </div>
     <div class="item">
-      <Check class="item-save" color="#009879" @click.stop="updateStyle" />
+      <Check class="item-save" color="#009879" @click.stop="saveStyle" />
       <Minus class="item-delete" @click.stop="removeStyle" />
     </div>
   </div>
@@ -66,13 +66,12 @@ const { site } = useBuild()
 const props = withDefaults(
   defineProps<{
     editing?: boolean
-    style?: IStyleProp
+    style: IStyleProp
     error?: boolean
     inheritedFrom?: string
     focusProp?: boolean
   }>(),
   {
-    style: undefined,
     inheritedFrom: undefined,
   },
 )
@@ -80,55 +79,52 @@ const { focusProp, editing, style, inheritedFrom } = toRefs(props)
 
 const emit = defineEmits<{
   (e: 'edit', propName: string): void
-  (e: 'update', newStyle: IStyleEntry): void
-  (e: 'save', newStyle: IStyleEntry): void
+  (e: 'setProperty', prop: Css): void
+  (e: 'setValue', val: string): void
+  (e: 'save'): void
   (e: 'escape', originalStyle: IStyleEntry): void
   (e: 'remove'): void
 }>()
 
 const valueInputRef = ref()
 const valueSelectRef = ref()
-const newStyle = ref<IStyleEntry>(propStyleOrNewStyle())
-let originalStyle = propStyleOrNewStyle()
 
-const valueOptions = computed(() => cssValues.get(newStyle.value.property))
+const valueOptions = computed(() => {
+  const prop = style.value?.property
+  return prop ? cssValues.get(prop) : undefined
+})
+
+// Wrap the property/value inputs when they overflow
+const editWrap = computed(() => {
+  const s = style.value
+  return editing.value && (s.property.length > 16 || s.value.length > 12)
+})
 
 const escapePressed = (event: KeyboardEvent) => {
+  /*
   const el = event.target as HTMLElement | undefined
   el?.blur()
   emit('escape', originalStyle)
-}
-
-function propStyleOrNewStyle(): IStyleEntry {
-  if (style?.value) {
-    // Use destructing assignment to prevent Ref from being passed by reference
-    return { pseudoClass: CssPseudoClass.Default, ...style.value }
-  }
-  return {
-    pseudoClass: CssPseudoClass.Default,
-    property: Css.Empty,
-    value: '',
-  }
+  */
 }
 
 const propertyText = computed(() => {
-  if (newStyle.value.pseudoClass === CssPseudoClass.Default) {
-    return newStyle.value.property
+  if (style.value?.pseudoClass === CssPseudoClass.Default) {
+    return style.value.property
   } else {
-    return `${newStyle.value.pseudoClass} ${newStyle.value.property}`
+    return `${style.value.pseudoClass} ${style.value.property}`
   }
 })
 
 const focusValue = async () => {
   await nextTick()
-  // TODO -- decide if/how to autofocus value multiselect
   if (valueOptions.value) {
     try {
       ;(document.activeElement as HTMLElement).blur()
     } catch (_e) {
       //
     }
-    if (!newStyle.value.value) {
+    if (!style.value.value) {
       setTimeout(() => valueSelectRef.value?.toggleDropdown(), 1)
     }
   } else {
@@ -138,22 +134,19 @@ const focusValue = async () => {
 }
 
 const edit = async () => {
-  newStyle.value = propStyleOrNewStyle()
-  originalStyle = propStyleOrNewStyle()
-  emit('edit', newStyle.value.property)
+  emit('edit', style.value.property)
   if (!focusProp.value) {
     focusValue()
   }
 }
 
 const updateProperty = (property: Css) => {
-  newStyle.value.property = property
-  emit('update', newStyle.value)
+  emit('setProperty', property)
   focusValue()
 }
 
 const isValueValid = computed(() =>
-  validateCssValue(site.value.context, newStyle.value.property, newStyle.value.value),
+  validateCssValue(site.value.context, style.value.property, style.value.value),
 )
 
 const valueErrorMessage = computed(() => {
@@ -165,13 +158,12 @@ const valueErrorMessage = computed(() => {
 })
 
 const updateValue = (value: string) => {
-  newStyle.value.value = value
-  emit('update', newStyle.value)
+  emit('setValue', value)
 }
 
-const updateStyle = () => {
-  if (newStyle.value.property && isValueValid.value) {
-    emit('save', newStyle.value)
+const saveStyle = () => {
+  if (style.value.property && isValueValid.value) {
+    emit('save')
   }
 }
 
@@ -192,6 +184,14 @@ const removeStyle = () => {
   :deep(.ps-multiselect:hover) {
     border: 1px solid $color-primary;
   }
+  .label {
+    margin-right: 0;
+  }
+}
+.label {
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
 }
 .value-preview {
   @mixin text 14px;
@@ -207,32 +207,40 @@ const removeStyle = () => {
 .edit-icon {
   flex-shrink: 0;
 }
-
-.label {
-  flex-grow: 1;
-  display: flex;
-  align-items: center;
-}
 .item {
   margin-left: auto;
   flex-shrink: 0;
 }
 .property-multiselect {
   width: 100%;
-  max-width: 120px;
+  max-width: 130px;
   height: 34px;
 }
 .value-multiselect {
   width: auto;
-  min-width: 100px;
+  min-width: 110px;
   margin-left: 6px;
+  height: 34px;
 }
 .value-input {
-  max-width: 114px;
-  width: 114px;
+  max-width: 110px;
+  width: 110px;
   margin-left: 6px;
   :deep(.ps-input) {
     height: 34px;
+  }
+}
+.edit-wrap {
+  flex-wrap: wrap;
+  max-width: 240px;
+  > * {
+    width: 100%;
+    max-width: unset;
+    flex-grow: 1;
+  }
+  .value-multiselect,
+  .value-input {
+    margin: 6px 0 0 0;
   }
 }
 

@@ -175,6 +175,7 @@ onMounted(() => {
   }
 }
 .size-input {
+  @mixin input;
   width: 38px;
   &.invalid {
     outline: none;

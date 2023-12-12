@@ -219,6 +219,7 @@ const handleInput = (e: Event) => {
 }
 .ps-input {
   @mixin text-medium 13px;
+  @mixin input;
   box-sizing: border-box;
   color: $color-title;
   width: 100%;

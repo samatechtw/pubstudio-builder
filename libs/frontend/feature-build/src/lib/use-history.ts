@@ -1,4 +1,4 @@
-import { useCommand } from '@pubstudio/frontend/feature-command'
+import { redoCommand, undoLastCommand } from '@pubstudio/frontend/feature-command'
 import { CommandType } from '@pubstudio/shared/type-command'
 import { computed, ComputedRef } from 'vue'
 import { useBuild } from './use-build'
@@ -12,7 +12,6 @@ export interface IUseHistory {
 
 export const useHistory = (): IUseHistory => {
   const { site, activePage, commandAlert } = useBuild()
-  const { undoLastCommand, redoCommand } = useCommand()
   const canRedo = computed(() => !!site.value.history.forward.length)
   const canUndo = computed(() => !!site.value.history.back.length)
 

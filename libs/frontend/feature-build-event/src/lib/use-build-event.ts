@@ -199,7 +199,7 @@ export const useBuildEvent = () => {
       editor.value?.componentTab.editEvent !== undefined ||
       editor.value?.componentTab.editInput !== undefined ||
       editor.value?.componentTab.editInputValue !== undefined ||
-      editor.value?.componentTab.editStyle !== undefined ||
+      (editor.value?.editStyles.size ?? 0) > 0 ||
       editor.value?.componentTab.editInfo !== undefined
     ) {
       clearComponentTabState(editor.value)

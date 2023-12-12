@@ -8,7 +8,7 @@
     />
     <div class="dimensions-wrap" :class="{ collapsed }">
       <div class="size-row">
-        <div class="size-label label-title">
+        <div class="size-label label-title label-large">
           {{ t('build.width') }}
         </div>
         <SizeInput
@@ -35,7 +35,7 @@
       </div>
       <div class="divider" />
       <div class="size-row">
-        <div class="size-label label-title">
+        <div class="size-label label-title label-large">
           {{ t('build.height') }}
         </div>
         <SizeInput
@@ -164,7 +164,8 @@ const toggleOverflow = (value: string) => {
 @import '@theme/css/mixins.postcss';
 
 .component-dimensions {
-  padding: 8px 16px;
+  background-color: $menu-bg2;
+  padding: 4px 16px;
 }
 
 .dimensions-wrap {
@@ -192,14 +193,17 @@ const toggleOverflow = (value: string) => {
   padding: 5px 0 4px;
 }
 .size-label {
-  @mixin title 12px;
+  @mixin title 11px;
   color: $color-text;
-  margin-top: 2px;
-  width: 40px;
+  margin-top: 1px;
+  min-width: 28px;
   text-align: right;
 }
 .label-title {
   font-weight: 600;
+}
+.label-large {
+  min-width: 40px;
 }
 .size {
   margin-left: 2px;

@@ -94,13 +94,13 @@ $height: 108px;
 $width: 214px;
 $mh: 24px;
 $mw: 38px;
-$m-color: $grey-300;
-$hover-color: $grey-500;
+$m-color: $blue-300;
+$hover-color: rgba($blue-300, 0.8);
 $inner-h: calc($height - ($mh * 2) - 2px);
 $inner-w: calc($width - ($mw * 2) - 2px);
 $ph: calc($inner-h / 2);
 $pw: 42px;
-$p-color: $grey-200;
+$p-color: $blue-100;
 $edit-height: 36px;
 
 .pm-edit-wrap {

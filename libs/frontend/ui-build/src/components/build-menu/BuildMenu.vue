@@ -150,11 +150,12 @@ const showSubmenu = computed(() => {
 .build-menu-wrap {
   @mixin flex-row;
   position: relative;
+  background-color: $color-toolbar-bg;
 }
 .build-menu {
   @mixin flex-col;
+  background-color: $color-toolbar-bg;
   max-height: $view-height;
-  background-color: white;
   overflow-y: scroll;
   height: 100%;
   width: $build-menu-width;

@@ -27,7 +27,7 @@ export interface IUseTooltip {
   arrowRef: Ref<HTMLElement | null> | undefined
   arrowStyle: Ref<CSSProperties | undefined>
   update: () => void
-  tooltipMouseEnter: (show?: boolean) => void
+  tooltipMouseEnter: () => void
   tooltipMouseLeave: () => void
 }
 
@@ -131,10 +131,8 @@ export const useTooltip = (options?: IUseTooltipOptions): IUseTooltip => {
     }
   }
 
-  const tooltipMouseEnter = async (setShow = true) => {
-    if (setShow) {
-      show.value = true
-    }
+  const tooltipMouseEnter = async () => {
+    show.value = true
     await nextTick()
     if (itemRef.value && tooltipRef.value) {
       autoUpdateCleanup = autoUpdate(itemRef.value, tooltipRef.value, updatePosition, {
