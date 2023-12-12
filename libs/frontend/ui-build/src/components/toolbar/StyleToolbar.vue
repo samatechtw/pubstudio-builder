@@ -27,6 +27,7 @@
     </ToolbarItem>
     <ToolbarContainer :show="showContainer" class="toolbar-section" />
     <ToolbarText :show="showTextStyle" class="toolbar-section" />
+    <ToolbarPage class="toolbar-page" />
     <ToolbarPseudoClass class="toolbar-pseudo-class" />
     <ToolbarBuilderWidth class="toolbar-builder-width" />
     <ToolbarBreakpoint class="toolbar-breakpoint" />
@@ -90,6 +91,7 @@ import { BoundingBox } from '@pubstudio/frontend/ui-widgets'
 import { CommandType } from '@pubstudio/shared/type-command'
 import ToolbarText from './ToolbarText.vue'
 import ToolbarContainer from './ToolbarContainer.vue'
+import ToolbarPage from './ToolbarPage.vue'
 import ToolbarPseudoClass from './ToolbarPseudoClass.vue'
 import ToolbarBuilderWidth from './ToolbarBuilderWidth.vue'
 import ToolbarBreakpoint from './ToolbarBreakpoint.vue'
@@ -150,8 +152,9 @@ const toggleComponentTree = () => {
   display: flex;
   align-items: center;
 }
-.toolbar-pseudo-class {
+.toolbar-page {
   margin-left: auto;
+  margin-right: 4px;
 }
 .save-state {
   @mixin size 14px;

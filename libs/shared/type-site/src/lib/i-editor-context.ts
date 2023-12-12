@@ -32,6 +32,7 @@ export enum StyleToolbarMenu {
   TextColor = 'textColor',
   FontFamily = 'fontFamily',
   FontWeight = 'fontWeight',
+  Page = 'page',
   PseudoClass = 'pseudoClass',
 }
 
