@@ -1,18 +1,23 @@
 <template>
-  <div class="link" @mousedown.stop>
+  <div ref="tooltipRef" class="link-tooltip" :style="tooltipStyle" @mousedown.stop>
     <PSInput
       v-if="editing"
       ref="linkInput"
       v-model="editedLink"
       class="link-input"
+      :datalistId="componentId"
+      :datalist="linkDatalist"
       :draggable="true"
       @dragstart.stop.prevent
       @keyup.enter="updateLink"
+      @keyup.esc="$event.srcElement.blur()"
     />
     <div v-else-if="internalLink" class="link-view" @click="gotoPage">
       {{ link }}
     </div>
-    <a v-else-if="link" :href="link" target="_blank" class="link-view"> {{ link }}</a>
+    <a v-else-if="link" :href="link" target="_blank" class="link-view" @click="openLink">
+      {{ link }}
+    </a>
     <div v-else class="empty">
       {{ t('build.no_link') }}
     </div>
@@ -27,7 +32,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, nextTick, ref, toRefs } from 'vue'
+import { computed, nextTick, ref, toRefs, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import {
   Check,
@@ -36,19 +41,23 @@ import {
   Edit,
   PSInput,
 } from '@pubstudio/frontend/ui-widgets'
-import { useBuild } from '@pubstudio/frontend/feature-build'
+import { useBuild, getLinkDatalistOptions } from '@pubstudio/frontend/feature-build'
+import { useTooltip } from '@pubstudio/frontend/util-tooltip'
 
 const { t } = useI18n()
 const { site, changePage, setSelectedIsInput } = useBuild()
 
 const props = defineProps<{
   link: string
+  componentId: string
 }>()
-const { link } = toRefs(props)
+const { link, componentId } = toRefs(props)
 
 const linkInput = ref()
 const editing = ref(false)
 const editedLink = ref('')
+
+const linkDatalist = computed(() => getLinkDatalistOptions(site.value, componentId.value))
 
 const internalLink = computed(() => {
   return link.value?.startsWith('/') && link.value in site.value.pages
@@ -56,6 +65,17 @@ const internalLink = computed(() => {
 
 const gotoPage = () => {
   changePage(link.value)
+}
+
+// FIXME: this is a workaround for link not being opened on click
+const openLink = (e: Event) => {
+  e.preventDefault()
+  if (link.value.startsWith('#')) {
+    const anchorId = link.value.substring(1)
+    document.getElementById(anchorId)?.scrollIntoView()
+  } else {
+    window.open(link.value, '_blank')
+  }
 }
 
 const edit = async () => {
@@ -70,6 +90,22 @@ const updateLink = () => {
   editing.value = false
   editedLink.value = ''
 }
+
+const { itemRef, tooltipRef, tooltipStyle, tooltipMouseEnter, tooltipMouseLeave } =
+  useTooltip({
+    placement: 'top-start',
+    shift: true,
+    flip: true,
+  })
+
+onMounted(() => {
+  itemRef.value = document.getElementById(componentId.value)
+  tooltipMouseEnter()
+})
+
+onUnmounted(() => {
+  tooltipMouseLeave()
+})
 </script>
 
 <style lang="postcss" scoped>
@@ -87,7 +123,7 @@ const updateLink = () => {
   @mixin title-medium 14px;
   color: $grey-500;
 }
-.link {
+.link-tooltip {
   display: flex;
   background-color: white;
   border-radius: 2px;
@@ -96,9 +132,6 @@ const updateLink = () => {
   user-select: none;
   padding: 4px 6px 3px;
   height: 36px;
-  position: absolute;
-  top: -38px;
-  left: 0;
   min-width: 240px;
   z-index: 1000;
   cursor: default;
@@ -109,6 +142,7 @@ const updateLink = () => {
   max-width: 200px;
   margin-right: 6px;
   cursor: pointer;
+  color: $color-text;
 }
 .link-input {
   height: 100%;

@@ -5,7 +5,7 @@
     class="toolbar-item"
     :class="{ active, alert }"
     :disabled="disabled"
-    @mouseenter="tooltipMouseEnter"
+    @mouseenter="tooltipMouseEnter()"
     @mouseleave="tooltipMouseLeave"
     @click="click"
   >

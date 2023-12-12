@@ -18,7 +18,7 @@
       <div
         ref="itemRef"
         class="ps-dropdown-item edit-breakpoint-wrap"
-        @mouseenter="tooltipMouseEnter"
+        @mouseenter="tooltipMouseEnter()"
         @mouseleave="tooltipMouseLeave"
         @click="openEditBreakpointMenu"
       >

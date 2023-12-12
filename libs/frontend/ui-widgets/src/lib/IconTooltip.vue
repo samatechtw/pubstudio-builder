@@ -30,6 +30,7 @@ const emit = defineEmits<{
 
 const {
   itemRef,
+  arrowRef,
   arrowStyle,
   tooltipRef,
   tooltipStyle,

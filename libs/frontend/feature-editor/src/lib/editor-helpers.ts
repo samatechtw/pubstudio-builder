@@ -15,6 +15,7 @@ import {
   StyleToolbarMenu,
   ThemeTab,
 } from '@pubstudio/shared/type-site'
+import { buildContentWindowInnerId } from '@pubstudio/frontend/feature-build'
 import { nextTick } from 'vue'
 
 const { siteStore } = useSiteSource()
@@ -122,7 +123,7 @@ export const setSelectedComponent = (
         // Scroll to the target element. Use `nextTick` to wait for the new component (element)
         // to be inserted to the DOM tree before scrolling.
         nextTick(() => {
-          const buildContentWindow = document.getElementById('build-content-window-inner')
+          const buildContentWindow = document.getElementById(buildContentWindowInnerId)
           const element = document.getElementById(component.id)
           if (buildContentWindow && element) {
             // Use intersection observer to check if the target element is in the viewport.

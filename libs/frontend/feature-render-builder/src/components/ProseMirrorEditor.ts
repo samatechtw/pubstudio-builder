@@ -203,7 +203,7 @@ export const ProseMirrorEditor = defineComponent({
 
     return () => {
       return h('div', {
-        id: containerId,
+        id: containerId.value,
         ref: container,
         class: 'prose-mirror-editor-container',
       })

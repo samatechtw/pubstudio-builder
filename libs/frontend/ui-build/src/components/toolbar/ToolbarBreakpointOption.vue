@@ -3,7 +3,7 @@
     ref="itemRef"
     class="ps-dropdown-item breakpoint-option"
     :class="{ 'breakpoint-option-active': breakpoint.id === activeBreakpoint.id }"
-    @mouseenter="tooltipMouseEnter"
+    @mouseenter="tooltipMouseEnter()"
     @mouseleave="tooltipMouseLeave"
     @click="click"
   >

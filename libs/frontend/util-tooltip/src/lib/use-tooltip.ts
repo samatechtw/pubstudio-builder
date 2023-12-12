@@ -2,6 +2,7 @@ import {
   arrow,
   autoUpdate,
   computePosition,
+  flip,
   Middleware,
   offset,
   Placement,
@@ -35,6 +36,7 @@ export interface IUseTooltipOptions {
   arrow?: boolean
   offset?: number
   shift?: boolean
+  flip?: boolean
 }
 
 export const useTooltip = (options?: IUseTooltipOptions): IUseTooltip => {
@@ -49,6 +51,9 @@ export const useTooltip = (options?: IUseTooltipOptions): IUseTooltip => {
   }
   if (options?.shift) {
     middleware.push(shift())
+  }
+  if (options?.flip) {
+    middleware.push(flip())
   }
   if (options?.arrow) {
     arrowRef = ref(null)

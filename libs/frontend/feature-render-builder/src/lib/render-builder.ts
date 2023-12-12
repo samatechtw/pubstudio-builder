@@ -80,7 +80,12 @@ export const computeBuilderStyleProps = (
   }
   if (selected) {
     if (component.tag === Tag.A) {
-      extraChildren = [h(LinkTooltip, { link: data.attrs.href, text: component.content })]
+      extraChildren = [
+        h(LinkTooltip, {
+          link: data.attrs.href,
+          componentId: component.id,
+        }),
+      ]
       data.mixins.push('__link')
       data.attrs.href = 'javascript:'
       getPosition()
