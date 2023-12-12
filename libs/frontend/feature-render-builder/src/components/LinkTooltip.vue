@@ -15,7 +15,7 @@
     <div v-else-if="internalLink" class="link-view" @click="gotoPage">
       {{ link }}
     </div>
-    <a v-else-if="link" :href="link" target="_blank" class="link-view" @click="openLink">
+    <a v-else-if="link" :href="link" target="_blank" class="link-view" @click.stop>
       {{ link }}
     </a>
     <div v-else class="empty">
@@ -65,17 +65,6 @@ const internalLink = computed(() => {
 
 const gotoPage = () => {
   changePage(link.value)
-}
-
-// FIXME: this is a workaround for link not being opened on click
-const openLink = (e: Event) => {
-  e.preventDefault()
-  if (link.value.startsWith('#')) {
-    const anchorId = link.value.substring(1)
-    document.getElementById(anchorId)?.scrollIntoView()
-  } else {
-    window.open(link.value, '_blank')
-  }
 }
 
 const edit = async () => {
