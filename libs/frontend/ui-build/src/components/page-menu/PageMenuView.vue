@@ -17,10 +17,11 @@
       />
     </MenuRow>
     <div class="actions">
-      <PSButton :text="t('build.edit_page')" @click="edit" />
+      <PSButton :text="t('build.edit_page')" size="small" @click="edit" />
       <PSButton
         v-if="removable"
         class="remove-button"
+        size="small"
         :text="t('build.remove_page')"
         @click="showConfirmRemove = true"
       />

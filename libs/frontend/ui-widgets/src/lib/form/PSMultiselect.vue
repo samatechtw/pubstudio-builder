@@ -25,8 +25,8 @@
         @keydown.enter.stop="searchEnter"
         @click.stop="toggleDropdown"
       />
-      <div v-else-if="label" class="label-text">
-        {{ label }}
+      <div v-else-if="forceLabel ?? label" class="label-text">
+        {{ forceLabel ?? label }}
       </div>
       <div v-else class="placeholder">
         {{ placeholder ?? '' }}
@@ -49,8 +49,9 @@
             {{ l }}
           </div>
         </div>
+        <slot v-if="customSlot" name="customSlot" />
         <div
-          v-if="!labels.length"
+          v-else="!labels.length"
           class="ms-item no-options"
           @click="emit('selectEmpty')"
         >
@@ -92,6 +93,9 @@ const props = withDefaults(
     searchable?: boolean
     disabled?: boolean
     options?: T[]
+    // Overrides the active label. Useful to avoid including the selected entry in the list
+    // TODO -- should we automatically filter out the selected value from options instead?
+    forceLabel?: string
     // TODO -- implement multiple selection via array
     value: string | undefined
     labelKey?: string
@@ -100,6 +104,8 @@ const props = withDefaults(
     toggleId?: string
     tooltip?: string
     emptyText?: string
+    // Adds a slot after options, instead of an option with `emptyText`
+    customSlot?: boolean
     openInitial?: boolean
     // If true, the label is replaced with a slot
     customLabel?: boolean
@@ -111,11 +117,11 @@ const props = withDefaults(
     placeholder: undefined,
     openControl: undefined,
     toggleId: undefined,
+    forceLabel: undefined,
     labelKey: 'label',
     valueKey: 'value',
     caret: true,
     options: () => [] as T[],
-    searchable: false,
     tooltip: undefined,
     emptyText: undefined,
   },
@@ -142,6 +148,7 @@ const emit = defineEmits<{
 
 defineSlots<{
   default(props: { label: string; index: number }): void
+  customSlot(): void
 }>()
 
 const dataToggleId = `toggle-${toggleId.value ?? uidSingleton.next()}`
@@ -323,8 +330,6 @@ defineExpose({ multiselectRef, toggleDropdown })
 <style lang="postcss" scoped>
 @import '@theme/css/mixins.postcss';
 
-$padding-x: 8px;
-
 .ps-multiselect {
   width: 140px;
   position: relative;
@@ -335,14 +340,6 @@ $padding-x: 8px;
 }
 .disabled {
   opacity: 0.6;
-}
-.label {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  padding: 4px $padding-x;
-  align-items: center;
-  justify-content: space-between;
 }
 .search {
   height: 100%;
@@ -403,17 +400,6 @@ $padding-x: 8px;
   transform-origin: v-bind(dropdownTransformOrigin);
   border: var(--ms-border-width, 1px) solid var(--ms-border-color, #d1d5db);
   background-color: white;
-}
-.ms-item {
-  width: 100%;
-  padding: 7px $padding-x 5px;
-  background: var(--ms-dropdown-bg);
-  &:hover {
-    background: var(--ms-option-bg-pointed);
-  }
-  &:last-child {
-    padding-bottom: 8px;
-  }
 }
 
 .multiselect-tooltip {

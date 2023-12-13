@@ -74,7 +74,6 @@
         :is="submenu"
         v-if="showSubmenu"
         class="submenu"
-        @openPageMenu="emit('openPageMenu')"
         @showCreate="emit('showCreateModal')"
         @showTemplates="emit('showTemplateModal')"
       />
@@ -107,7 +106,6 @@ const { editor } = useBuild()
 const emit = defineEmits<{
   (e: 'toggleStyleMenu', show?: boolean): void
   (e: 'toggleThemeMenu', show?: boolean): void
-  (e: 'openPageMenu', show?: boolean): void
   (e: 'showCreateModal'): void
   (e: 'showTemplateModal'): void
 }>()

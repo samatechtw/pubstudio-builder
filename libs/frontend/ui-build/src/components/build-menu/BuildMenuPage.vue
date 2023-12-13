@@ -18,21 +18,17 @@
 
 <script lang="ts" setup>
 import { useI18n } from 'petite-vue-i18n'
-import { setActivePage } from '@pubstudio/frontend/feature-editor'
+import { setActivePage, toggleEditorMenu } from '@pubstudio/frontend/feature-editor'
 import { Plus } from '@pubstudio/frontend/ui-widgets'
 import { useBuild, usePageMenu } from '@pubstudio/frontend/feature-build'
 import BuildMenuText from './BuildMenuText.vue'
+import { EditorMode } from '@pubstudio/shared/type-site'
 
 const { t } = useI18n()
 const { editor, changePage } = useBuild()
 const { pages, newPage, clearEditingState } = usePageMenu()
 
-const emit = defineEmits<{
-  (e: 'openPageMenu'): void
-}>()
-
 const showCreatePage = () => {
-  emit('openPageMenu')
   newPage()
 }
 
@@ -42,7 +38,7 @@ const switchPage = (route: string) => {
     changePage(route)
     setActivePage(editor.value, route)
   }
-  emit('openPageMenu')
+  toggleEditorMenu(editor.value, EditorMode.Page, true)
 }
 </script>
 
