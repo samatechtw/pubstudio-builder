@@ -7,7 +7,6 @@
       <BuildMenu
         @toggleStyleMenu="toggleEditorMenu(editor, EditorMode.Styles, $event)"
         @toggleThemeMenu="toggleEditorMenu(editor, EditorMode.Theme, $event)"
-        @openPageMenu="toggleEditorMenu(editor, EditorMode.Page, true)"
         @showCreateModal="showCreateModal = true"
       />
       <ComponentTree />

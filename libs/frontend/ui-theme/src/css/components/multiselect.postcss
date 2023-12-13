@@ -1,5 +1,7 @@
 @import '../colors.postcss';
 
+$padding-x: 8px;
+
 .multiselect,
 .ps-multiselect {
   color: $color-text;
@@ -27,5 +29,24 @@
     padding-right: 32px;
     width: 100%;
     padding-left: 10px;
+  }
+  .label {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    padding: 4px $padding-x;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+.ms-item {
+  width: 100%;
+  padding: 7px $padding-x 5px;
+  background: var(--ms-dropdown-bg);
+  &:hover {
+    background: var(--ms-option-bg-pointed);
+  }
+  &:last-child {
+    padding-bottom: 8px;
   }
 }

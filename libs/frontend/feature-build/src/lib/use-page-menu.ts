@@ -1,5 +1,6 @@
+import { toggleEditorMenu } from '@pubstudio/frontend/feature-editor'
 import { IMultiselectOptions } from '@pubstudio/frontend/type-ui-widgets'
-import { IPage, IPageMetadata } from '@pubstudio/shared/type-site'
+import { EditorMode, IPage, IPageMetadata } from '@pubstudio/shared/type-site'
 import { useI18n } from 'petite-vue-i18n'
 import { computed, ComputedRef, reactive, Ref, ref, UnwrapNestedRefs } from 'vue'
 import { useBuild } from './use-build'
@@ -61,7 +62,7 @@ export const resetPageMenu = () => {
 
 export const usePageMenu = (): IUsePageMenuFeature => {
   const { t } = useI18n()
-  const { site, editPage, addPage, removePage: removePageBuild } = useBuild()
+  const { site, editor, editPage, addPage, removePage: removePageBuild } = useBuild()
 
   const pages = computed(() => {
     return Object.values(site.value?.pages ?? {})
@@ -75,6 +76,7 @@ export const usePageMenu = (): IUsePageMenuFeature => {
   }
 
   const newPage = () => {
+    toggleEditorMenu(editor.value, EditorMode.Page, true)
     Object.assign(editingPage, emptyPage())
     Object.assign(editingPageSource, emptyPage())
     editing.value = true
