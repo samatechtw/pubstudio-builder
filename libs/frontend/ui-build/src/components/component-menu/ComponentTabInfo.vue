@@ -43,9 +43,9 @@ import {
   setComponentTabState,
   setComponentTabEditInfo,
   setEditSvg,
-} from '@pubstudio/frontend/feature-editor'
+  useBuild,
+} from '@pubstudio/frontend/feature-build'
 import MenuRow from '../MenuRow.vue'
-import { useBuild } from '@pubstudio/frontend/feature-build'
 import MenuRowEdit from '../MenuRowEdit.vue'
 import ComponentTag from './ComponentTag.vue'
 import ComponentRole from './ComponentRole.vue'

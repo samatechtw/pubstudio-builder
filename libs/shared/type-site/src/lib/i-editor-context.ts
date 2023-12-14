@@ -3,6 +3,7 @@ import { CssPseudoClass } from './enum-css-pseudo-class'
 import { CssUnit } from './enum-css-unit'
 import { IBehavior, IComponent, IComponentEvent } from './i-component'
 import { ISerializedComponent } from './i-serialized-site'
+import { ISiteStore } from './i-site-store'
 
 export enum EditorMode {
   None = 'none',
@@ -90,6 +91,8 @@ export interface IResizeData {
 }
 
 export interface IEditorContext {
+  // Reference to store used to save/restore the site, populated on initialization
+  store?: ISiteStore
   copiedComponent?: ISerializedComponent
   hoveredComponent?: IComponent
   selectedComponent?: IComponent
@@ -128,8 +131,6 @@ export interface IEditorContext {
     // Name of editing info value
     editInfo?: string
   }
-  // Names of editing style properties
-  editStyles: Set<string>
   // true if the collapsible is collapsed, otherwise expanded.
   componentMenuCollapses: {
     [key in ComponentMenuCollapsible]?: boolean

@@ -1,4 +1,4 @@
-import { triggerEditorEvent } from '@pubstudio/frontend/feature-editor'
+import { triggerEditorEvent } from '@pubstudio/frontend/util-build'
 import { ISetHomePageData } from '@pubstudio/shared/type-command-data'
 import { EditorEventName, ISite } from '@pubstudio/shared/type-site'
 

@@ -13,7 +13,7 @@
       :subTitle="menuSubTitle"
       @add="newEditingStyleProp"
     />
-    <StyleRow
+    <ChildStyleRow
       v-for="entry in editingStyleEntries"
       :key="`${entry.sourceBreakpointId}-${entry.property}`"
       :style="entry"
@@ -23,7 +23,7 @@
       class="menu-row"
       @edit="editStyle"
       @update="updateEditData(entry.property, $event)"
-      @save="saveStyle(entry)"
+      @save="saveStyle(entry.property, $event)"
       @remove="removeStyle(entry.property)"
       @escape="cancelEdit(entry.property, $event)"
     />
@@ -47,14 +47,9 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onUnmounted } from 'vue'
+import { computed, onUnmounted, ref } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { ErrorMessage, PSButton } from '@pubstudio/frontend/ui-widgets'
-import {
-  clearComponentEditStyle,
-  clearAllEditStyles,
-  setComponentEditStyle,
-} from '@pubstudio/frontend/feature-editor'
 import { Css, IInheritedStyleEntry, IStyleEntry } from '@pubstudio/shared/type-site'
 import { activeBreakpoint } from '@pubstudio/frontend/feature-site-source'
 import {
@@ -64,7 +59,7 @@ import {
 } from '@pubstudio/frontend/feature-build'
 import EditMenuTitle from './EditMenuTitle.vue'
 import MenuRow from './MenuRow.vue'
-import StyleRow from './StyleRow.vue'
+import ChildStyleRow from './component-menu/ChildStyleRow.vue'
 
 const { t } = useI18n()
 
@@ -80,10 +75,12 @@ const {
   saveStyle: saveReusableStyle,
 } = useReusableStyleMenu()
 
-const { site, editor, currentPseudoClass } = useBuild()
+const { site, currentPseudoClass } = useBuild()
+
+const editingProp = ref<string | undefined>()
 
 const editing = (propName: string) => {
-  return editor.value?.editStyles.has(propName)
+  return editingProp.value === propName
 }
 
 const escPress = () => {
@@ -92,26 +89,26 @@ const escPress = () => {
 
 const cancelEdit = (property: Css, originalStyle: IStyleEntry) => {
   updateEditingStyleProp(property, originalStyle)
-  clearComponentEditStyle(editor.value, property)
+  editingProp.value = undefined
 }
 
-const editStyle = (propName: string) => {
-  setComponentEditStyle(editor.value, propName as Css)
+const editStyle = (propName: string | undefined) => {
+  editingProp.value = propName
 }
 
 const updateEditData = (property: Css, entry: IStyleEntry) => {
   updateEditingStyleProp(property, entry)
-  setComponentEditStyle(editor.value, entry.property)
+  editingProp.value = entry.property
 }
 
-const saveStyle = (entry: IStyleEntry) => {
+const saveStyle = (property: Css, entry: IStyleEntry) => {
   updateEditingStyleProp(property, entry)
-  clearComponentEditStyle(editor.value, property)
+  editingProp.value = undefined
 }
 
 const removeStyle = (property: Css) => {
   removeEditingStyleProp(property)
-  clearComponentEditStyle(editor.value, property)
+  editingProp.value = undefined
 }
 
 const menuSubTitle = computed(() => `(${currentPseudoClass.value})`)
@@ -136,7 +133,7 @@ const validateAndSave = () => {
 }
 
 onUnmounted(() => {
-  clearAllEditStyles(editor.value)
+  editingProp.value = undefined
 })
 </script>
 

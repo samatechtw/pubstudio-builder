@@ -115,8 +115,8 @@ import {
   useBuild,
   usePaddingMarginEdit,
   useToolbar,
+  setComponentMenuCollapses,
 } from '@pubstudio/frontend/feature-build'
-import { setComponentMenuCollapses } from '@pubstudio/frontend/feature-editor'
 
 const { t } = useI18n()
 const { editor } = useBuild()

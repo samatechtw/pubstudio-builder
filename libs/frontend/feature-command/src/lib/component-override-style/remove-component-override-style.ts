@@ -1,4 +1,4 @@
-import { setSelectedComponent } from '@pubstudio/frontend/feature-editor'
+import { setSelectedComponent } from '@pubstudio/frontend/util-build'
 import { resolveComponent } from '@pubstudio/frontend/util-builtin'
 import { CommandType, ICommand } from '@pubstudio/shared/type-command'
 import { IRemoveComponentOverrideStyleData } from '@pubstudio/shared/type-command-data'

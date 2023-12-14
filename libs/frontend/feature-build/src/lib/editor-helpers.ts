@@ -4,19 +4,15 @@ import {
   BuildSubmenu,
   ComponentMenuCollapsible,
   ComponentTabState,
-  Css,
   CssPseudoClass,
   EditorMode,
   IComponent,
   IEditBehavior,
   IEditorContext,
   IEditSvg,
-  IPage,
-  ISite,
   StyleToolbarMenu,
   ThemeTab,
 } from '@pubstudio/shared/type-site'
-import { nextTick } from 'vue'
 
 const { siteStore } = useSiteSource()
 
@@ -75,105 +71,6 @@ export const setStyleToolbarMenu = (
   }
 }
 
-export interface ISetSelectedComponentOptions {
-  /**
-   * @default true
-   */
-  expandTree?: boolean
-  /**
-   * @default true
-   */
-  scrollToComponent?: boolean
-}
-
-export const setSelectedComponent = (
-  site: ISite,
-  component: IComponent | undefined,
-  options?: ISetSelectedComponentOptions,
-) => {
-  const { editor } = site
-
-  if (editor) {
-    // Remember old state to see if we should save to local storage
-    const prevComponent = editor.selectedComponent
-    const prevMode = editor.mode
-
-    editor.selectedComponent = component
-    const isSelectMode = editor.mode === EditorMode.SelectedComponent
-    const { expandTree = true, scrollToComponent = true } = options ?? {}
-    if (component) {
-      if (!isSelectMode) {
-        editor.mode = EditorMode.SelectedComponent
-      }
-      if (expandTree) {
-        expandComponentTreeItem(editor, component)
-      }
-      // Check for the type of `document` here because unit tests are run in Node environment
-      // where `document` is not available. `document !== undefined` is not viable here because
-      // that'll lead to "ReferenceError: window is not defined" error in Node environment.
-      if (scrollToComponent && typeof document !== 'undefined') {
-        // Switch to the target page before scrolling
-        const componentPage = findComponentPage(site, component)
-        if (!componentPage) {
-          throw new Error(`Cannot find page for component with ID ${component.id}`)
-        } else if (editor.active !== componentPage.route) {
-          setActivePage(editor, componentPage.route)
-        }
-
-        // Scroll to the target element. Use `nextTick` to wait for the new component (element)
-        // to be inserted to the DOM tree before scrolling.
-        nextTick(() => {
-          const buildContentWindow = document.getElementById('build-content-window-inner')
-          const element = document.getElementById(component.id)
-          if (buildContentWindow && element) {
-            // Use intersection observer to check if the target element is in the viewport.
-            // Only scroll to the target element if it's outside of viewport for better UX.
-            const intersectionObserver = new IntersectionObserver(
-              // The callback of intersection observer will be executed immediately after setup.
-              ([entry]) => {
-                if (!entry.intersectionRatio) {
-                  element.scrollIntoView()
-                }
-                intersectionObserver.disconnect()
-              },
-              {
-                root: buildContentWindow,
-              },
-            )
-            intersectionObserver.observe(element)
-          }
-        })
-      }
-    } else if (isSelectMode) {
-      editor.mode = EditorMode.None
-    }
-    // Save editor state to local storage if anything changed
-    if (editor.mode !== prevMode || component !== prevComponent) {
-      clearComponentTabState(editor)
-    }
-  }
-}
-
-const findComponentPage = (site: ISite, component: IComponent): IPage | undefined => {
-  let root = component
-  while (root.parent) {
-    root = root.parent
-  }
-  return Object.values(site.pages).find((page) => page.root.id === root.id)
-}
-
-export const clearComponentTabState = (editor: IEditorContext | undefined) => {
-  if (editor) {
-    editor.componentTab.state = undefined
-    editor.componentTab.editEvent = undefined
-    editor.componentTab.editInput = undefined
-    editor.componentTab.editInputValue = undefined
-    editor.editStyles.clear()
-    editor.componentTab.editInfo = undefined
-    siteStore.value.saveEditor(editor)
-  }
-}
-
 export const setComponentTabState = (
   editor: IEditorContext | undefined,
   state: ComponentTabState | undefined,
@@ -199,41 +96,6 @@ export const setComponentTabEditInfo = (
     setComponentTabState(editor, state, false)
     if (value !== editor.componentTab.editInfo) {
       editor.componentTab.editInfo = value
-      siteStore.value.saveEditor(editor)
-    }
-  }
-}
-
-export const clearComponentEditStyle = (
-  editor: IEditorContext | undefined,
-  propName: Css,
-) => {
-  if (editor) {
-    if (editor.editStyles.has(propName)) {
-      editor.editStyles.delete(propName)
-      if (editor.editStyles.size === 0) {
-        setComponentTabState(editor, undefined, false)
-      }
-      siteStore.value.saveEditor(editor)
-    }
-  }
-}
-
-export const clearAllEditStyles = (editor: IEditorContext | undefined) => {
-  if (editor && editor.editStyles.size > 0) {
-    editor.editStyles.clear()
-    siteStore.value.saveEditor(editor)
-  }
-}
-
-export const setComponentEditStyle = (
-  editor: IEditorContext | undefined,
-  propName: Css,
-) => {
-  if (editor) {
-    const changed = setComponentTabState(editor, ComponentTabState.EditStyle, false)
-    if (changed || !editor.editStyles.has(propName)) {
-      editor.editStyles.add(propName)
       siteStore.value.saveEditor(editor)
     }
   }
@@ -318,41 +180,6 @@ export const setDebugBounding = (editor: IEditorContext | undefined, enable: boo
   }
 }
 
-export const expandComponentTreeItem = (
-  editor: IEditorContext | undefined,
-  component: IComponent,
-) => {
-  const treeItems = editor?.componentTreeExpandedItems
-  let changed = false
-  let currentComponent: IComponent | undefined = component
-  if (treeItems) {
-    // Expand component and ancestors
-    while (currentComponent) {
-      changed = changed || !treeItems[currentComponent.id]
-
-      treeItems[currentComponent.id] = true
-      currentComponent = currentComponent.parent
-    }
-    if (editor && changed) {
-      siteStore.value.saveEditor(editor)
-    }
-  }
-}
-
-export const collapseComponentTreeItem = (
-  editor: IEditorContext | undefined,
-  component: IComponent,
-) => {
-  const treeItems = editor?.componentTreeExpandedItems
-  if (treeItems) {
-    const prevExpanded = treeItems[component.id]
-    treeItems[component.id] = false
-    if (editor && prevExpanded) {
-      siteStore.value.saveEditor(editor)
-    }
-  }
-}
-
 export const toggleComponentHidden = (
   editor: IEditorContext | undefined,
   componentId: string,
@@ -378,16 +205,6 @@ export const setShowComponentTree = (
       editor.showComponentTree = showComponentTree
       siteStore.value.saveEditor(editor)
     }
-  }
-}
-
-export const setActivePage = (editor: IEditorContext | undefined, pageRoute: string) => {
-  if (editor) {
-    editor.active = pageRoute
-    if (editor.buildSubmenu === BuildSubmenu.Page) {
-      editor.buildSubmenu = undefined
-    }
-    siteStore.value.saveEditor(editor)
   }
 }
 

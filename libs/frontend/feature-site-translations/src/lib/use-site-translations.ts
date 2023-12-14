@@ -1,9 +1,9 @@
 import {
   createTranslationEditorView,
   IEditTranslation,
+  showTranslations,
   useBuild,
 } from '@pubstudio/frontend/feature-build'
-import { showTranslations } from '@pubstudio/frontend/feature-editor'
 import { IMultiselectObj } from '@pubstudio/frontend/type-ui-widgets'
 import { INewTranslations } from '@pubstudio/shared/type-command-data'
 import { ITranslations } from '@pubstudio/shared/type-site'

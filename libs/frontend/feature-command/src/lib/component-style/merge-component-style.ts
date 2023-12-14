@@ -1,4 +1,4 @@
-import { setSelectedComponent } from '@pubstudio/frontend/feature-editor'
+import { setSelectedComponent } from '@pubstudio/frontend/util-build'
 import { resolveComponent } from '@pubstudio/frontend/util-builtin'
 import { mergeArr, mergePseudoStyle } from '@pubstudio/frontend/util-component'
 import { CommandType, ICommand } from '@pubstudio/shared/type-command'

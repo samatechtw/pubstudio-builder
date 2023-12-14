@@ -1,9 +1,9 @@
-import { selectColor } from '@pubstudio/frontend/feature-editor'
 import { isColor } from '@pubstudio/frontend/util-doc'
 import { builtinThemeVariables } from '@pubstudio/frontend/util-ids'
 import { IThemeVariable } from '@pubstudio/shared/type-site'
 import { useI18n } from 'petite-vue-i18n'
 import { computed, ComputedRef, reactive, Ref, ref, UnwrapNestedRefs } from 'vue'
+import { selectColor } from './editor-helpers'
 import { useBuild } from './use-build'
 import { MAX_SELECTED_THEME_COLORS, useThemeColors } from './use-theme-colors'
 

@@ -1,9 +1,9 @@
+import { setSelectedComponent } from '@pubstudio/frontend/util-build'
+import { resolveComponent } from '@pubstudio/frontend/util-builtin'
 import { CommandType, ICommand } from '@pubstudio/shared/type-command'
 import { IReplaceComponentMixinData } from '@pubstudio/shared/type-command-data'
 import { ISite } from '@pubstudio/shared/type-site'
 import { addComponentMixin, removeComponentMixin } from './component-mixin-common'
-import { resolveComponent } from '@pubstudio/frontend/util-builtin'
-import { setSelectedComponent } from '@pubstudio/frontend/feature-editor'
 
 export interface ReplaceComponentMixin extends ICommand<IReplaceComponentMixinData> {
   type: CommandType.ReplaceComponentMixin

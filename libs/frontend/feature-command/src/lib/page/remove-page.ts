@@ -1,9 +1,9 @@
+import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import {
   setActivePage,
   setSelectedComponent,
   triggerEditorEvent,
-} from '@pubstudio/frontend/feature-editor'
-import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
+} from '@pubstudio/frontend/util-build'
 import { deserializePages, unstoreSite } from '@pubstudio/frontend/util-site-deserialize'
 import { storeSite } from '@pubstudio/frontend/util-site-store'
 import { IRemovePageData } from '@pubstudio/shared/type-command-data'

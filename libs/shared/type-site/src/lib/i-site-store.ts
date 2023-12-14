@@ -1,8 +1,8 @@
 import { IApiError } from '@pubstudio/shared/type-api'
-import { IEditorContext, ISite } from '@pubstudio/shared/type-site'
+import { IEditorContext } from './i-editor-context'
+import { ISite } from './i-site'
 
 import type { ComputedRef, Ref } from 'vue'
-
 export interface ISiteRestore {
   site: ISite
   error: string | undefined

@@ -175,6 +175,51 @@ describe('Set Component Custom Style', () => {
       const updatedRawStyle = getDefaultPseudo(component.id, oldStyle.pseudoClass)
       expect(updatedRawStyle?.[oldStyle.property]).toEqual(oldStyle.value)
     })
+
+    // When a new custom component style is added in the editor, it starts with the empty
+    // string as its property. This simulates adding and modifying a new style in the editor.
+    it('should add and edit empty component style', () => {
+      const newStyle = {
+        pseudoClass: CssPseudoClass.Default,
+        property: '' as Css,
+        value: '',
+      }
+      const pseudo = getDefaultPseudo(component.id, newStyle.pseudoClass)
+      expect(pseudo?.[newStyle.property]).toBeUndefined()
+
+      // Add custom style with empty property
+      const addData = mockAddComponentCustomStyleData(
+        component.id,
+        DEFAULT_BREAKPOINT_ID,
+        newStyle,
+      )
+      applySetComponentCustomStyle(site, addData)
+
+      // Assert style is added
+      const newPseudo = getDefaultPseudo(component.id, newStyle.pseudoClass)
+      expect(newPseudo?.[newStyle.property]).toEqual(newStyle.value)
+
+      // Set empty property to new value
+      const editStyle: IStyleEntry = {
+        ...newStyle,
+        property: Css.Margin,
+      }
+      const editData = mockEditComponentCustomStyleData(
+        component.id,
+        DEFAULT_BREAKPOINT_ID,
+        newStyle,
+        editStyle,
+      )
+      applySetComponentCustomStyle(site, editData)
+
+      // Assert empty property no longer exists
+      const updatedPseudo = getDefaultPseudo(component.id, newStyle.pseudoClass)
+      expect(updatedPseudo?.[newStyle.property]).toBeUndefined()
+
+      // Assert property is updated, and value is not
+      const updatedRawStyle = getDefaultPseudo(component.id, editStyle.pseudoClass)
+      expect(updatedRawStyle?.[editStyle.property]).toEqual(newStyle.value)
+    })
   })
 
   describe('remove component custom style', () => {

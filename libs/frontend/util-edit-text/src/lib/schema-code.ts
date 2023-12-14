@@ -4,7 +4,7 @@ const pDOM: DOMOutputSpec = ['p', 0],
   brDOM: DOMOutputSpec = ['br']
 
 /// [Specs](#model.NodeSpec) for the nodes defined in this schema.
-export const nodes = {
+const nodes = {
   /// NodeSpec The top level document node.
   doc: {
     content: 'block+',
@@ -64,7 +64,7 @@ export const nodes = {
 const codeDOM: DOMOutputSpec = ['code', 0]
 
 /// [Specs](#model.MarkSpec) for the marks in the schema.
-export const marks = {
+const marks = {
   /// Code font mark. Represented as a `<code>` element.
   code: {
     parseDOM: [{ tag: 'code' }],

@@ -48,7 +48,7 @@
       />
     </EditMenuTitle>
     <div class="style-rows" :class="{ collapsed }">
-      <StyleRow
+      <ChildStyleRow
         v-if="showNewStyle"
         :editing="true"
         class="new-style menu-row"
@@ -56,7 +56,7 @@
         @save="addStyle"
         @remove="setEditStyle(undefined)"
       />
-      <StyleRow
+      <ChildStyleRow
         v-for="entry in childStyles"
         :key="`${entry.pseudoClass}-${entry.property}-${entry.value}`"
         :style="entry"
@@ -84,7 +84,7 @@ import {
   IStyleEntry,
 } from '@pubstudio/shared/type-site'
 import EditMenuTitle from '../EditMenuTitle.vue'
-import { useBuild } from '@pubstudio/frontend/feature-build'
+import { useBuild, setComponentMenuCollapses } from '@pubstudio/frontend/feature-build'
 import { resolveThemeVariables } from '@pubstudio/frontend/util-builtin'
 import {
   computeComponentOverrideStyle,
@@ -95,9 +95,8 @@ import {
   activeBreakpoint,
   descSortedBreakpoints,
 } from '@pubstudio/frontend/feature-site-source'
-import StyleRow from '../StyleRow.vue'
+import ChildStyleRow from './ChildStyleRow.vue'
 import { runtimeContext } from '@pubstudio/frontend/util-runtime'
-import { setComponentMenuCollapses } from '@pubstudio/frontend/feature-editor'
 
 const { t } = useI18n()
 const {
@@ -232,14 +231,14 @@ const getInheritedFrom = (entry: IInheritedStyleEntry) => {
 const setSelector = (sel: string | undefined) => {
   selector.value = sel
   if (collapsed.value) {
-    setComponentMenuCollapses(editor.value, ComponentMenuCollapsible.ChildStyles, false)
+    collapsed.value = false
   }
 }
 
 const setEditStyle = (prop: string | undefined) => {
   editStyleProp.value = prop
   if (collapsed.value && prop !== undefined) {
-    setComponentMenuCollapses(editor.value, ComponentMenuCollapsible.ChildStyles, false)
+    collapsed.value = false
   }
 }
 
@@ -296,7 +295,6 @@ watch(selectors, (newSelectors) => {
 .selector {
   @mixin text 13px;
   width: 120px;
-  height: 32px;
   margin: 0 auto 0 6px;
   .missing-selector {
     color: $color-error;

@@ -14,13 +14,9 @@ export interface ISerializedSite extends Omit<ISite, 'context' | 'pages' | 'edit
 export interface ISerializedSiteContext extends Omit<ISiteContext, 'components'> {}
 
 export interface ISerializedEditorContext
-  extends Omit<
-    IEditorContext,
-    'selectedComponent' | 'selectedThemeColors' | 'editStyles'
-  > {
+  extends Omit<IEditorContext, 'selectedComponent' | 'selectedThemeColors'> {
   selectedComponentId?: string
   selectedThemeColors: string[]
-  editStyles: string[]
 }
 
 export interface ISerializedPage extends Omit<IPage, 'root'> {

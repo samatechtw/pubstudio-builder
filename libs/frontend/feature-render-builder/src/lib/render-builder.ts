@@ -1,4 +1,4 @@
-import { setEditSvg, setSelectedComponent } from '@pubstudio/frontend/feature-editor'
+import { setEditSvg } from '@pubstudio/frontend/feature-build'
 import {
   computeAttrsInputsMixins,
   computeEvents,
@@ -12,6 +12,7 @@ import {
   descSortedBreakpoints,
 } from '@pubstudio/frontend/feature-site-source'
 import { Edit } from '@pubstudio/frontend/ui-widgets'
+import { setSelectedComponent } from '@pubstudio/frontend/util-build'
 import { findStyles } from '@pubstudio/frontend/util-component'
 import { RenderMode } from '@pubstudio/frontend/util-render'
 import { resetRuntimeContext, runtimeContext } from '@pubstudio/frontend/util-runtime'

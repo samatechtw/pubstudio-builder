@@ -1,16 +1,17 @@
 <template>
   <div v-if="editing" class="style-row">
-    <div class="label" :class="{ 'edit-wrap': editWrap }">
+    <div class="label">
       <StyleProperty
-        :modelValue="style.property"
+        :modelValue="newStyle.property"
         class="property-multiselect"
-        :openInitial="!style.property"
+        :openInitial="focusProp"
         @update:modelValue="updateProperty"
+        @keydown.enter="updateProperty"
       />
       <StyleValue
         v-if="valueOptions"
         ref="valueSelectRef"
-        :modelValue="style.value"
+        :modelValue="newStyle.value"
         class="value-multiselect"
         :options="valueOptions"
         @update:modelValue="updateValue"
@@ -18,17 +19,17 @@
       <PSInput
         v-else
         ref="valueInputRef"
-        :modelValue="style.value"
+        :modelValue="newStyle.value"
         class="value-input"
         :placeholder="t('value')"
         :isError="!!valueErrorMessage"
         @update:modelValue="updateValue"
-        @keydown.enter="saveStyle"
-        @keyup.esc="saveStyle"
+        @keydown.enter="updateStyle"
+        @keyup.esc="escapePressed"
       />
     </div>
     <div class="item">
-      <Check class="item-save" color="#009879" @click.stop="saveStyle" />
+      <Check class="item-save" color="#009879" @click.stop="updateStyle" />
       <Minus class="item-delete" @click.stop="removeStyle" />
     </div>
   </div>
@@ -52,7 +53,7 @@ interface IStyleProp extends Omit<IStyleEntry, 'pseudoClass'> {
 </script>
 
 <script lang="ts" setup>
-import { computed, nextTick, onMounted, ref, toRefs } from 'vue'
+import { computed, nextTick, ref, toRefs } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { StyleProperty, StyleValue } from '@pubstudio/frontend/ui-widgets'
 import { Check, Edit, InfoBubble, Minus, PSInput } from '@pubstudio/frontend/ui-widgets'
@@ -65,80 +66,94 @@ const { site } = useBuild()
 const props = withDefaults(
   defineProps<{
     editing?: boolean
-    style: IStyleProp
+    style?: IStyleProp
     error?: boolean
     inheritedFrom?: string
     focusProp?: boolean
   }>(),
   {
+    style: undefined,
     inheritedFrom: undefined,
   },
 )
-const { editing, style, inheritedFrom } = toRefs(props)
+const { focusProp, editing, style, inheritedFrom } = toRefs(props)
 
 const emit = defineEmits<{
   (e: 'edit', propName: string): void
-  (e: 'setProperty', prop: Css): void
-  (e: 'setValue', val: string): void
-  (e: 'save'): void
+  (e: 'update', newStyle: IStyleEntry): void
+  (e: 'save', newStyle: IStyleEntry): void
+  (e: 'escape', originalStyle: IStyleEntry): void
   (e: 'remove'): void
 }>()
 
 const valueInputRef = ref()
 const valueSelectRef = ref()
+const newStyle = ref<IStyleEntry>(propStyleOrNewStyle())
+let originalStyle = propStyleOrNewStyle()
 
-const valueOptions = computed(() => {
-  const prop = style.value?.property
-  return prop ? cssValues.get(prop) : undefined
-})
+const valueOptions = computed(() => cssValues.get(newStyle.value.property))
 
-// Wrap the property/value inputs when they overflow
-const editWrap = computed(() => {
-  const s = style.value
-  return editing.value && (s.property.length > 16 || s.value.length > 12)
-})
+const escapePressed = (event: KeyboardEvent) => {
+  const el = event.target as HTMLElement | undefined
+  el?.blur()
+  emit('escape', originalStyle)
+}
+
+function propStyleOrNewStyle(): IStyleEntry {
+  if (style?.value) {
+    // Use destructing assignment to prevent Ref from being passed by reference
+    return { pseudoClass: CssPseudoClass.Default, ...style.value }
+  }
+  return {
+    pseudoClass: CssPseudoClass.Default,
+    property: Css.Empty,
+    value: '',
+  }
+}
 
 const propertyText = computed(() => {
-  if (style.value?.pseudoClass === CssPseudoClass.Default) {
-    return style.value.property
+  if (newStyle.value.pseudoClass === CssPseudoClass.Default) {
+    return newStyle.value.property
   } else {
-    return `${style.value.pseudoClass} ${style.value.property}`
+    return `${newStyle.value.pseudoClass} ${newStyle.value.property}`
   }
 })
 
 const focusValue = async () => {
   await nextTick()
+  // TODO -- decide if/how to autofocus value multiselect
   if (valueOptions.value) {
     try {
       ;(document.activeElement as HTMLElement).blur()
     } catch (_e) {
       //
     }
-    if (!style.value.value) {
+    if (!newStyle.value.value) {
       setTimeout(() => valueSelectRef.value?.toggleDropdown(), 1)
     }
   } else {
     // TODO -- look into why nextTick isn't enough here
-    setTimeout(() => {
-      valueInputRef.value?.inputRef.focus()
-    }, 1)
+    setTimeout(() => valueInputRef.value?.inputRef.focus(), 1)
   }
 }
 
 const edit = async () => {
-  emit('edit', style.value.property)
-  if (style.value.property) {
+  newStyle.value = propStyleOrNewStyle()
+  originalStyle = propStyleOrNewStyle()
+  emit('edit', newStyle.value.property)
+  if (!focusProp.value) {
     focusValue()
   }
 }
 
 const updateProperty = (property: Css) => {
-  emit('setProperty', property)
+  newStyle.value.property = property
+  emit('update', newStyle.value)
   focusValue()
 }
 
 const isValueValid = computed(() =>
-  validateCssValue(site.value.context, style.value.property, style.value.value),
+  validateCssValue(site.value.context, newStyle.value.property, newStyle.value.value),
 )
 
 const valueErrorMessage = computed(() => {
@@ -150,26 +165,19 @@ const valueErrorMessage = computed(() => {
 })
 
 const updateValue = (value: string) => {
-  emit('setValue', value)
+  newStyle.value.value = value
+  emit('update', newStyle.value)
 }
 
-const saveStyle = () => {
-  if (style.value.property && isValueValid.value) {
-    emit('save')
+const updateStyle = () => {
+  if (newStyle.value.property && isValueValid.value) {
+    emit('save', newStyle.value)
   }
 }
 
 const removeStyle = () => {
   emit('remove')
 }
-
-onMounted(() => {
-  // Component is re-mounted on property change. Ideally we would avoid this,
-  // but it's difficult because there is no consistent key in that case
-  if (style.value.property) {
-    focusValue()
-  }
-})
 </script>
 
 <style lang="postcss" scoped>
@@ -184,14 +192,6 @@ onMounted(() => {
   :deep(.ps-multiselect:hover) {
     border: 1px solid $color-primary;
   }
-  .label {
-    margin-right: 0;
-  }
-}
-.label {
-  flex-grow: 1;
-  display: flex;
-  align-items: center;
 }
 .value-preview {
   @mixin text 14px;
@@ -207,43 +207,32 @@ onMounted(() => {
 .edit-icon {
   flex-shrink: 0;
 }
+
+.label {
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+}
 .item {
   margin-left: auto;
   flex-shrink: 0;
 }
 .property-multiselect {
   width: 100%;
-  max-width: 130px;
+  max-width: 120px;
   height: 34px;
 }
 .value-multiselect {
   width: auto;
-  min-width: 110px;
+  min-width: 100px;
   margin-left: 6px;
-  height: 34px;
 }
 .value-input {
-  max-width: 110px;
-  width: 110px;
+  max-width: 114px;
+  width: 114px;
   margin-left: 6px;
   :deep(.ps-input) {
     height: 34px;
-  }
-}
-.edit-wrap {
-  flex-wrap: wrap;
-  max-width: 240px;
-  > * {
-    width: 100%;
-    max-width: unset;
-    flex-grow: 1;
-  }
-  .value-multiselect,
-  .value-input {
-    margin: 6px 0 0 0;
-  }
-  :deep(.ps-input-wrap.search) {
-    flex-grow: 1;
   }
 }
 

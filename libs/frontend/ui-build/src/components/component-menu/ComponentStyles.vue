@@ -4,7 +4,7 @@
       :title="t('style.styles')"
       :collapsed="collapsed"
       :showAdd="!editing('')"
-      @add="addComponentStyle"
+      @add="addStyle"
       @toggleCollapse="toggleCollapse"
     >
       <div class="sub-label" @click="clickSubTitle">
@@ -36,10 +36,6 @@
 <script lang="ts" setup>
 import { computed, ref } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
-import {
-  setStyleToolbarMenu,
-  setComponentMenuCollapses,
-} from '@pubstudio/frontend/feature-editor'
 import { resolveThemeVariables } from '@pubstudio/frontend/util-builtin'
 import {
   ComponentMenuCollapsible,
@@ -51,7 +47,10 @@ import {
   useBuild,
   useReusableStyleMenu,
   useEditComponentStyles,
+  setStyleToolbarMenu,
+  setComponentMenuCollapses,
 } from '@pubstudio/frontend/feature-build'
+import { StyleType } from '@pubstudio/frontend/util-build'
 import StyleRow from '../StyleRow.vue'
 import EditMenuTitle from '../EditMenuTitle.vue'
 
@@ -67,7 +66,8 @@ const {
   saveStyle,
   removeStyle,
   getInheritedFrom,
-} = useEditComponentStyles()
+  editStyles,
+} = useEditComponentStyles({ styleType: StyleType.ComponentCustom })
 
 const toMixinRef = ref()
 
@@ -85,13 +85,18 @@ const toggleCollapse = () => {
 
 const menuSubTitle = computed(() => `(${currentPseudoClass.value})`)
 
+const addStyle = () => {
+  setComponentMenuCollapses(editor.value, ComponentMenuCollapsible.Styles, false)
+  addComponentStyle()
+}
+
 const styleRowHeight = computed(() => {
   const getEditingHeight = (prop: string): number => {
     const val = selectedComponentFlattenedStyles.value[prop as Css]?.value ?? ''
     const wrap = prop.length > 16 || val.length > 12
     return wrap ? 91 : 51
   }
-  const editing = Array.from(editor.value?.editStyles ?? [])
+  const editing = Array.from(editStyles.value ?? [])
   const editHeight = editing.map(getEditingHeight).reduce((prev, cur) => prev + cur, 0)
   const viewing = styleEntries.value.length - editing.length
   return editHeight + viewing * 37
@@ -106,7 +111,7 @@ const clickSubTitle = () => {
 }
 
 const editing = (propName: string) => {
-  return editor.value?.editStyles.has(propName)
+  return editStyles.value?.has(propName)
 }
 
 const convertToMixin = () => {

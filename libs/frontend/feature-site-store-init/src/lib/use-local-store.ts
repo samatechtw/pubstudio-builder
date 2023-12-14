@@ -1,12 +1,13 @@
 import { store, WebStore } from '@pubstudio/frontend/data-access-web-store'
 import { restoreSiteHelper } from '@pubstudio/frontend/feature-site-store'
 import { serializeEditor, storeSite } from '@pubstudio/frontend/util-site-store'
-import { IEditorContext, ISite } from '@pubstudio/shared/type-site'
 import {
+  IEditorContext,
+  ISite,
   ISiteRestore,
   ISiteStore,
   SiteSaveState,
-} from '@pubstudio/shared/type-site-store'
+} from '@pubstudio/shared/type-site'
 import { ref } from 'vue'
 
 type StoreKey = keyof Pick<WebStore, 'site' | 'scratchSite'>

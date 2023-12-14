@@ -98,7 +98,6 @@
         "libs/shared/type-command-data/src/index.ts"
       ],
       "@pubstudio/shared/type-site": ["libs/shared/type-site/src/index.ts"],
-      "@pubstudio/shared/type-site-store": ["libs/shared/type-site-store/src/index.ts"],
       "@pubstudio/shared/type-sort": ["libs/shared/type-sort/src/index.ts"],
       "@pubstudio/shared/type-utils": ["libs/shared/type-utils/src/index.ts"],
       "@pubstudio/shared/util-core": ["libs/shared/util-core/src/index.ts"],
@@ -129,7 +128,6 @@
       "@pubstudio/frontend/feature-command": [
         "libs/frontend/feature-command/src/index.ts"
       ],
-      "@pubstudio/frontend/feature-editor": ["libs/frontend/feature-editor/src/index.ts"],
       "@pubstudio/frontend/feature-preview": [
         "libs/frontend/feature-preview/src/index.ts"
       ],

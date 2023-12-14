@@ -1,9 +1,9 @@
+import { setSelectedComponent } from '@pubstudio/frontend/util-build'
+import { resolveComponent } from '@pubstudio/frontend/util-builtin'
 import { CommandType, ICommand } from '@pubstudio/shared/type-command'
 import { IAddComponentMixinData } from '@pubstudio/shared/type-command-data'
 import { ISite } from '@pubstudio/shared/type-site'
 import { addComponentMixin, removeComponentMixin } from './component-mixin-common'
-import { setSelectedComponent } from '@pubstudio/frontend/feature-editor'
-import { resolveComponent } from '@pubstudio/frontend/util-builtin'
 
 export interface AddComponentMixin extends ICommand<IAddComponentMixinData> {
   type: CommandType.AddComponentMixin

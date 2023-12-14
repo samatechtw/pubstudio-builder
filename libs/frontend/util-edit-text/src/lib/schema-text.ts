@@ -26,7 +26,7 @@ const pDOM: DOMOutputSpec = ['div', { class: 'pm-p' }, 0],
   brDOM: DOMOutputSpec = ['br']
 
 /// [Specs](#model.NodeSpec) for the nodes defined in this schema.
-export const nodes = {
+const nodes = {
   /// NodeSpec The top level document node.
   doc: {
     content: 'block+',
@@ -159,7 +159,7 @@ const emDOM: DOMOutputSpec = ['em', 0],
   codeDOM: DOMOutputSpec = ['code', 0]
 
 /// [Specs](#model.MarkSpec) for the marks in the schema.
-export const marks = {
+const marks = {
   /// A link. Has `href` and `title` attributes. `title`
   /// defaults to the empty string. Rendered and parsed as an `<a>`
   /// element.

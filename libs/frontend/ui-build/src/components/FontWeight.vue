@@ -18,9 +18,12 @@
 import { computed, onMounted, toRefs } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { Css, StyleToolbarMenu, ThemeFontSource } from '@pubstudio/shared/type-site'
-import { setStyleToolbarMenu } from '@pubstudio/frontend/feature-editor'
 import { PSMultiselect } from '@pubstudio/frontend/ui-widgets'
-import { useBuild, useToolbar } from '@pubstudio/frontend/feature-build'
+import {
+  useBuild,
+  useToolbar,
+  setStyleToolbarMenu,
+} from '@pubstudio/frontend/feature-build'
 
 const { t } = useI18n()
 const { site, editor } = useBuild()

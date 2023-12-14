@@ -28,18 +28,19 @@ import { computed, onMounted } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { PSMultiselect } from '@pubstudio/frontend/ui-widgets'
 import {
-  setStyleToolbarMenu,
-  setThemeTab,
-  toggleEditorMenu,
-} from '@pubstudio/frontend/feature-editor'
-import {
   Css,
   EditorMode,
   StyleSourceType,
   StyleToolbarMenu,
   ThemeTab,
 } from '@pubstudio/shared/type-site'
-import { useBuild, useToolbar } from '@pubstudio/frontend/feature-build'
+import {
+  useBuild,
+  useToolbar,
+  setStyleToolbarMenu,
+  setThemeTab,
+  toggleEditorMenu,
+} from '@pubstudio/frontend/feature-build'
 
 const { t } = useI18n()
 const { site, editor } = useBuild()

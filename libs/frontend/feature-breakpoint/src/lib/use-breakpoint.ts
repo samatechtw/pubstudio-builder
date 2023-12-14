@@ -1,4 +1,4 @@
-import { setBuilderWidth } from '@pubstudio/frontend/feature-editor'
+import { setBuilderWidth } from '@pubstudio/frontend/feature-build'
 import {
   activeBreakpoint,
   sortedBreakpoints,

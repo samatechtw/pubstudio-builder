@@ -1,7 +1,7 @@
 import { createSite } from '@pubstudio/frontend/util-build'
 import { unstoreSite } from '@pubstudio/frontend/util-site-deserialize'
 import { validateSite } from '@pubstudio/frontend/util-site-store'
-import { ISiteRestore, IStoredSite } from '@pubstudio/shared/type-site-store'
+import { ISiteRestore, IStoredSite } from '@pubstudio/shared/type-site'
 import { restoreSiteError } from './restore-site-error'
 
 export const restoreSiteHelper = (data: IStoredSite): ISiteRestore => {

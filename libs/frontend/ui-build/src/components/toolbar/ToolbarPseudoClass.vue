@@ -21,14 +21,14 @@ import { useI18n } from 'petite-vue-i18n'
 import {
   setCssPseudoClass,
   setStyleToolbarMenu,
-} from '@pubstudio/frontend/feature-editor'
+  useBuild,
+} from '@pubstudio/frontend/feature-build'
 import { PSMultiselect } from '@pubstudio/frontend/ui-widgets'
 import {
   CssPseudoClass,
   CssPseudoClassValues,
   StyleToolbarMenu,
 } from '@pubstudio/shared/type-site'
-import { useBuild } from '@pubstudio/frontend/feature-build'
 
 const { t } = useI18n()
 const { editor } = useBuild()

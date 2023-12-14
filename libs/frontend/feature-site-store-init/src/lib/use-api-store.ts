@@ -15,13 +15,14 @@ import {
   IUpdateSiteApiRequest,
   IUpdateSiteApiResponse,
 } from '@pubstudio/shared/type-api-site-sites'
-import { IEditorContext, ISite } from '@pubstudio/shared/type-site'
 import {
+  IEditorContext,
+  ISite,
   ISiteRestore,
   ISiteStore,
   IStoredSiteDirty,
   SiteSaveState,
-} from '@pubstudio/shared/type-site-store'
+} from '@pubstudio/shared/type-site'
 import { computed, inject, ref } from 'vue'
 
 export interface IUseApiStoreProps {

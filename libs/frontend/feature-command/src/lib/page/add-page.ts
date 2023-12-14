@@ -1,9 +1,10 @@
 import {
+  createPage,
+  createRootComponent,
   setActivePage,
   setSelectedComponent,
   triggerEditorEvent,
-} from '@pubstudio/frontend/feature-editor'
-import { createPage, createRootComponent } from '@pubstudio/frontend/util-build'
+} from '@pubstudio/frontend/util-build'
 import { IAddPageData } from '@pubstudio/shared/type-command-data'
 import { EditorEventName, IComponent, ISite } from '@pubstudio/shared/type-site'
 import { addComponentHelper, deleteComponentWithId } from '../component/add-component'
