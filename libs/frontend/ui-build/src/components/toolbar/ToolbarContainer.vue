@@ -66,11 +66,15 @@ import {
   IThemedGradient,
   parseGradientColors,
 } from '@pubstudio/frontend/util-gradient'
-import { setStyleToolbarMenu } from '@pubstudio/frontend/feature-editor'
 import { useControlledClickaway } from '@pubstudio/frontend/util-clickaway'
 import { Css, StyleToolbarMenu } from '@pubstudio/shared/type-site'
 import { ICommand } from '@pubstudio/shared/type-command'
-import { useBuild, useToolbar, useThemeColors } from '@pubstudio/frontend/feature-build'
+import {
+  useBuild,
+  useToolbar,
+  useThemeColors,
+  setStyleToolbarMenu,
+} from '@pubstudio/frontend/feature-build'
 import ToolbarColorPicker from './ToolbarColorPicker.vue'
 
 const { t } = useI18n()

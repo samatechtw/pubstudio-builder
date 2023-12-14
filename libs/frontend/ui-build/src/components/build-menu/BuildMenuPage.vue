@@ -18,9 +18,13 @@
 
 <script lang="ts" setup>
 import { useI18n } from 'petite-vue-i18n'
-import { setActivePage, toggleEditorMenu } from '@pubstudio/frontend/feature-editor'
+import {
+  toggleEditorMenu,
+  useBuild,
+  usePageMenu,
+} from '@pubstudio/frontend/feature-build'
+import { setActivePage } from '@pubstudio/frontend/util-build'
 import { Plus } from '@pubstudio/frontend/ui-widgets'
-import { useBuild, usePageMenu } from '@pubstudio/frontend/feature-build'
 import BuildMenuText from './BuildMenuText.vue'
 import { EditorMode } from '@pubstudio/shared/type-site'
 

@@ -79,8 +79,8 @@ import {
   useToolbar,
   useThemeColors,
   useToolbarFontSize,
+  setStyleToolbarMenu,
 } from '@pubstudio/frontend/feature-build'
-import { setStyleToolbarMenu } from '@pubstudio/frontend/feature-editor'
 import ToolbarColorPicker from './ToolbarColorPicker.vue'
 
 const { t } = useI18n()

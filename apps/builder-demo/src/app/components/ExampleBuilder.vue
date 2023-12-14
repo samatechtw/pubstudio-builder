@@ -91,12 +91,11 @@ import {
   PageMenu,
   StyleToolbar,
 } from '@pubstudio/frontend/ui-build'
-import { useBuild, useHistory } from '@pubstudio/frontend/feature-build'
+import { useBuild, useHistory, toggleEditorMenu } from '@pubstudio/frontend/feature-build'
 import { useDragDropData } from '@pubstudio/frontend/feature-render-builder'
 import { useBuildEvent, hotkeysDisabled } from '@pubstudio/frontend/feature-build-event'
 import { Keys, useKeyListener } from '@pubstudio/frontend/util-key-listener'
 import { EditorMode } from '@pubstudio/shared/type-site'
-import { toggleEditorMenu } from '@pubstudio/frontend/feature-editor'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { initializeSiteStore } from '@pubstudio/frontend/feature-site-store-init'
 import { SITE_ID, SITE_API_URL } from '@pubstudio/frontend/util-config'

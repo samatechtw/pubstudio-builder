@@ -48,8 +48,11 @@ import { useI18n } from 'petite-vue-i18n'
 import { useDropdown } from '@pubstudio/frontend/util-dropdown'
 import { ToolbarItem } from '@pubstudio/frontend/ui-widgets'
 import { PSInput } from '@pubstudio/frontend/ui-widgets'
-import { useBuild } from '@pubstudio/frontend/feature-build'
-import { setBuilderScale, setBuilderWidth } from '@pubstudio/frontend/feature-editor'
+import {
+  setBuilderScale,
+  setBuilderWidth,
+  useBuild,
+} from '@pubstudio/frontend/feature-build'
 
 const { t } = useI18n()
 const { editor } = useBuild()

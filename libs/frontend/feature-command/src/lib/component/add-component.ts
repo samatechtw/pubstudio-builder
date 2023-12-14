@@ -2,7 +2,7 @@ import {
   registerComponentEditorEvents,
   removeEditorEvents,
   setSelectedComponent,
-} from '@pubstudio/frontend/feature-editor'
+} from '@pubstudio/frontend/util-build'
 import { resolveComponent } from '@pubstudio/frontend/util-builtin'
 import { detachComponent } from '@pubstudio/frontend/util-component'
 import { isDynamicComponent, nextComponentId } from '@pubstudio/frontend/util-ids'

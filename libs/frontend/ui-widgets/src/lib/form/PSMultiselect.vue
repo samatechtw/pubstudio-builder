@@ -23,6 +23,7 @@
         autocomplete="off"
         @update:modelValue="updateSearch"
         @keydown.enter.stop="searchEnter"
+        @keydown.enter.tab="searchEnter"
         @click.stop="toggleDropdown"
       />
       <div v-else-if="forceLabel ?? label" class="label-text">
@@ -51,7 +52,7 @@
         </div>
         <slot v-if="customSlot" name="customSlot" />
         <div
-          v-else="!labels.length"
+          v-else-if="!labels.length"
           class="ms-item no-options"
           @click="emit('selectEmpty')"
         >

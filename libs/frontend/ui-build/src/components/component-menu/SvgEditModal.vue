@@ -55,9 +55,12 @@ import hljs from 'highlight.js/lib/core'
 import xml from 'highlight.js/lib/languages/xml'
 import { EditorView } from 'prosemirror-view'
 import { Modal, PSButton } from '@pubstudio/frontend/ui-widgets'
-import { setEditSvg } from '@pubstudio/frontend/feature-editor'
 import { IEditSvg } from '@pubstudio/shared/type-site'
-import { createCodeEditorView, useBuild } from '@pubstudio/frontend/feature-build'
+import {
+  createCodeEditorView,
+  useBuild,
+  setEditSvg,
+} from '@pubstudio/frontend/feature-build'
 
 hljs.registerLanguage('xml', xml)
 

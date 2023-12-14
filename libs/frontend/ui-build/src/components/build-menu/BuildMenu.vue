@@ -84,14 +84,17 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
-import { setBuildSubmenu, showTranslations } from '@pubstudio/frontend/feature-editor'
+import {
+  setBuildSubmenu,
+  showTranslations,
+  useBuild,
+} from '@pubstudio/frontend/feature-build'
 import { store } from '@pubstudio/frontend/data-access-web-store'
 import { Assets, BuildNew, Command, Pages, Text } from '@pubstudio/frontend/ui-widgets'
 import { Code, Theme, Style, File } from '@pubstudio/frontend/ui-widgets'
 import { TranslationsModal } from '@pubstudio/frontend/feature-site-translations'
 import { BuildSubmenu } from '@pubstudio/shared/type-site'
 import { dragSource } from '@pubstudio/frontend/feature-render-builder'
-import { useBuild } from '@pubstudio/frontend/feature-build'
 import BuildMenuIcon from './BuildMenuIcon.vue'
 import BuildMenuNew from './BuildMenuNew.vue'
 import BuildMenuPage from './BuildMenuPage.vue'

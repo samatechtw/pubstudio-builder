@@ -7,21 +7,30 @@ import { undoCommand } from './undo-command'
 
 const { site, siteStore } = useSiteSource()
 
-// Helper for pushing a command to separate siteStore.save
-const pushCommandHelper = <Data>(command: ICommand, clearRedo = true) => {
+const optimizeGroup = <Data>(command: ICommand): ICommand | undefined => {
   // Unwrap a group of 1 command to improve performance
   if (command.type === CommandType.Group) {
     const { commands } = command.data as ICommandGroupData
     if (commands.length === 1) {
       command.type = commands[0].type
       command.data = commands[0].data as Data
+    } else if (commands.length === 0) {
+      // Ignore empty command group
+      return undefined
     }
   }
+  return command
+}
 
-  applyCommand(site.value, command)
-  site.value.history.back.push(command)
-  if (clearRedo) {
-    site.value.history.forward = []
+// Helper for pushing a command to separate siteStore.save
+const pushCommandHelper = (command: ICommand, clearRedo = true) => {
+  const cmd = optimizeGroup(command)
+  if (cmd) {
+    applyCommand(site.value, cmd)
+    site.value.history.back.push(cmd)
+    if (clearRedo) {
+      site.value.history.forward = []
+    }
   }
 }
 
@@ -37,11 +46,14 @@ export const pushCommandObject = (command: ICommand, clearRedo = true) => {
 
 // Applies a command and replaces the last command on the command stack
 export const replaceLastCommand = (command: ICommand, save?: boolean) => {
-  const history = site.value.history
-  applyCommand(site.value, command)
-  history.back[history.back.length - 1] = command
-  if (save) {
-    siteStore.value?.save(site.value)
+  const cmd = optimizeGroup(command)
+  if (cmd) {
+    const history = site.value.history
+    applyCommand(site.value, command)
+    history.back[history.back.length - 1] = command
+    if (save) {
+      siteStore.value?.save(site.value)
+    }
   }
 }
 

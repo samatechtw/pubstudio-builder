@@ -1,4 +1,4 @@
-import { setActivePage, setSelectedComponent } from '@pubstudio/frontend/feature-editor'
+import { setActivePage, setSelectedComponent } from '@pubstudio/frontend/util-build'
 import { deserializeSite } from '@pubstudio/frontend/util-site-deserialize'
 import {
   mockAddPageData,

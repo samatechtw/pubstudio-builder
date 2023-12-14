@@ -4,13 +4,16 @@ import {
   pushCommandObject,
   replaceLastCommand,
 } from '@pubstudio/frontend/feature-command'
-import { setSelectedComponent } from '@pubstudio/frontend/feature-editor'
 import {
   activeBreakpoint,
   descSortedBreakpoints,
 } from '@pubstudio/frontend/feature-site-source'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
-import { createSite, selectAddParent } from '@pubstudio/frontend/util-build'
+import {
+  createSite,
+  selectAddParent,
+  setSelectedComponent,
+} from '@pubstudio/frontend/util-build'
 import {
   builtinStyles,
   resolveComponent,

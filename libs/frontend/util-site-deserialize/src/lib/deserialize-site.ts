@@ -8,8 +8,8 @@ import {
   ISerializedSite,
   ISite,
   ISiteContext,
+  IStoredSite,
 } from '@pubstudio/shared/type-site'
-import { IStoredSite } from '@pubstudio/shared/type-site-store'
 
 interface IDeserializePagesResult {
   pages: Record<string, IPage>
@@ -33,8 +33,6 @@ export const deserializeEditor = (
         translations: serializedEditor.translations,
         themeTab: serializedEditor.themeTab,
         componentTab: serializedEditor.componentTab ?? {},
-        // Added 231211
-        editStyles: new Set(serializedEditor.editStyles),
         mode: serializedEditor.mode,
         showComponentTree: serializedEditor.showComponentTree,
         componentTreeExpandedItems: serializedEditor.componentTreeExpandedItems,

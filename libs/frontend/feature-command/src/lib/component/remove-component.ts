@@ -2,7 +2,7 @@ import {
   registerComponentEditorEvents,
   removeEditorEvents,
   setSelectedComponent,
-} from '@pubstudio/frontend/feature-editor'
+} from '@pubstudio/frontend/util-build'
 import { resolveComponent } from '@pubstudio/frontend/util-builtin'
 import { triggerEventBehaviors } from '@pubstudio/frontend/util-runtime'
 import { IRemoveComponentData } from '@pubstudio/shared/type-command-data'

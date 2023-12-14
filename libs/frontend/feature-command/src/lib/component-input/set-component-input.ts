@@ -1,4 +1,4 @@
-import { setSelectedComponent } from '@pubstudio/frontend/feature-editor'
+import { setSelectedComponent } from '@pubstudio/frontend/util-build'
 import { resolveComponent } from '@pubstudio/frontend/util-builtin'
 import { ISetComponentInputData } from '@pubstudio/shared/type-command-data'
 import { IComponent, IComponentInput, ISite } from '@pubstudio/shared/type-site'

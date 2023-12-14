@@ -1,4 +1,4 @@
-import { setActivePage, triggerEditorEvent } from '@pubstudio/frontend/feature-editor'
+import { setActivePage, triggerEditorEvent } from '@pubstudio/frontend/util-build'
 import { IEditPageData } from '@pubstudio/shared/type-command-data'
 import { EditorEventName, ISite } from '@pubstudio/shared/type-site'
 

@@ -69,11 +69,14 @@ import { EditorView } from 'prosemirror-view'
 import { Modal, PSButton } from '@pubstudio/frontend/ui-widgets'
 import { setOrCreate } from '@pubstudio/shared/type-utils'
 import { nextBehaviorId } from '@pubstudio/frontend/util-ids'
-import { setEditBehavior } from '@pubstudio/frontend/feature-editor'
 import { IBehaviorArg, IEditBehavior } from '@pubstudio/shared/type-site'
 import MenuRow from '../MenuRow.vue'
 import BehaviorArgs from './BehaviorArgs.vue'
-import { useBuild, createCodeEditorView } from '@pubstudio/frontend/feature-build'
+import {
+  useBuild,
+  createCodeEditorView,
+  setEditBehavior,
+} from '@pubstudio/frontend/feature-build'
 import BehaviorContextVars from './BehaviorContextVars.vue'
 
 hljs.registerLanguage('javascript', js)

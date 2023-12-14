@@ -9,8 +9,8 @@ import {
   ISerializedSiteContext,
   ISite,
   ISiteContext,
+  IStoredSite,
 } from '@pubstudio/shared/type-site'
-import { IStoredSite } from '@pubstudio/shared/type-site-store'
 
 export const serializeComponent = (component: IComponent): ISerializedComponent => {
   return {
@@ -51,7 +51,6 @@ export const serializeEditor = (
         translations: editor.translations,
         themeTab: editor.themeTab,
         componentTab: editor.componentTab,
-        editStyles: Array.from(editor.editStyles),
         mode: editor.mode,
         showComponentTree: editor.showComponentTree,
         componentTreeExpandedItems: editor.componentTreeExpandedItems,

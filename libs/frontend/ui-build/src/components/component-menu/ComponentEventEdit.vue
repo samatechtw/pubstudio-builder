@@ -101,11 +101,10 @@ import {
   IComponentEvent,
   IComponentEventBehavior,
 } from '@pubstudio/shared/type-site'
-import { setEditBehavior } from '@pubstudio/frontend/feature-editor'
 import { Plus } from '@pubstudio/frontend/ui-widgets'
 import EditMenuTitle from '../EditMenuTitle.vue'
 import EventBehaviorRow from './EventBehaviorRow.vue'
-import { useBuild } from '@pubstudio/frontend/feature-build'
+import { useBuild, setEditBehavior } from '@pubstudio/frontend/feature-build'
 import { IUpdateComponentArgPayload } from '../component-arg/i-update-component-arg-payload'
 import BehaviorModal from './BehaviorModal.vue'
 

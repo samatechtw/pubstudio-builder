@@ -1,9 +1,9 @@
 import {
   createComponentEditorView,
+  getProseMirrorContainerId,
   useBuild,
   useToolbar,
 } from '@pubstudio/frontend/feature-build'
-import { getProseMirrorContainerId } from '@pubstudio/frontend/feature-editor'
 import {
   activeBreakpoint,
   descSortedBreakpoints,

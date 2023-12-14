@@ -1,4 +1,4 @@
-import { setSelectedComponent } from '@pubstudio/frontend/feature-editor'
+import { setSelectedComponent } from '@pubstudio/frontend/util-build'
 import { resolveComponent } from '@pubstudio/frontend/util-builtin'
 import { triggerEventBehaviors } from '@pubstudio/frontend/util-runtime'
 import { ISetComponentEventData } from '@pubstudio/shared/type-command-data'

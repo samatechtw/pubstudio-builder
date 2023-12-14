@@ -1,17 +1,17 @@
 import {
+  setBuildSubmenu,
+  setStyleToolbarMenu,
   useBuild,
   useCopyPaste,
   useDuplicateComponent,
   usePaddingMarginEdit,
 } from '@pubstudio/frontend/feature-build'
-import {
-  clearComponentTabState,
-  setBuildSubmenu,
-  setStyleToolbarMenu,
-} from '@pubstudio/frontend/feature-editor'
 import { activeBreakpoint } from '@pubstudio/frontend/feature-site-source'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
-import { resolvedComponentStyle } from '@pubstudio/frontend/util-build'
+import {
+  clearComponentTabState,
+  resolvedComponentStyle,
+} from '@pubstudio/frontend/util-build'
 import { resolveComponent } from '@pubstudio/frontend/util-builtin'
 import { isDynamicComponent } from '@pubstudio/frontend/util-ids'
 import { Keys } from '@pubstudio/frontend/util-key-listener'
@@ -199,7 +199,6 @@ export const useBuildEvent = () => {
       editor.value?.componentTab.editEvent !== undefined ||
       editor.value?.componentTab.editInput !== undefined ||
       editor.value?.componentTab.editInputValue !== undefined ||
-      (editor.value?.editStyles.size ?? 0) > 0 ||
       editor.value?.componentTab.editInfo !== undefined
     ) {
       clearComponentTabState(editor.value)

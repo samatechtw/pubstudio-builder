@@ -108,11 +108,12 @@
 import { useI18n } from 'petite-vue-i18n'
 import { Checkbox, InfoBubble, Minus, Plus } from '@pubstudio/frontend/ui-widgets'
 import { IThemeVariable } from '@pubstudio/shared/type-site'
-import { selectColor, unselectColor } from '@pubstudio/frontend/feature-editor'
 import {
   IThemeVariableEditState,
   useThemeMenuVariables,
   useBuild,
+  selectColor,
+  unselectColor,
 } from '@pubstudio/frontend/feature-build'
 
 const { t } = useI18n()
