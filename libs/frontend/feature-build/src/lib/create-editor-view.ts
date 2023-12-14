@@ -7,6 +7,7 @@ import {
 import { EditorView } from 'prosemirror-view'
 import { ref, Ref } from 'vue'
 import { useBuild } from './use-build'
+import { whitespacePasteFixPlugin } from './whitespace-paste-fix-plugin'
 
 // Use to detect updates in the ProseMirror component edit view
 export const editViewTxCount = ref(0)
@@ -19,8 +20,10 @@ export function createComponentEditorView(
   if (!container) {
     return undefined
   }
+  const plugins = [...(options.plugins ?? []), whitespacePasteFixPlugin(schemaText)]
   const state = prosemirrorSetup({
     ...options,
+    plugins,
     schema: schemaText,
   })
 
