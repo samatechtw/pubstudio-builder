@@ -23,6 +23,9 @@ export const useGetSite = (): IUseGetSite => {
       if (id === 'identity') {
         const { getLocalSite } = useLocalSiteApi(rootApi)
         const site = await getLocalSite(store.user.identity.value.id)
+        if (!site) {
+          return undefined
+        }
         mergedSite = {
           ...site,
           id: 'identity',
