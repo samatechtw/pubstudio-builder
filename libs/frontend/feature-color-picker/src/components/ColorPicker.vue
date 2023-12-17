@@ -43,11 +43,6 @@
       </div>
       <Box name="HEX" :color="modelHex" @inputColor="inputHex" />
       <Box name="RGBA" :color="modelRgba" @inputColor="inputRgba" />
-      <Colors
-        :color="rgbaString"
-        :colors-default="colorsDefault"
-        @selectColor="selectColor"
-      />
       <div class="select-wrap">
         <ColorPickerButton class="color-select" @click="emitResult">
           {{ t('style.toolbar.select_color') }}
@@ -107,7 +102,6 @@ import Alpha from './Alpha.vue'
 import Preview from './Preview.vue'
 import Gradient from './Gradient.vue'
 import Box from './Box.vue'
-import Colors from './Colors.vue'
 import ColorPickerButton from './ColorPickerButton.vue'
 import { setColorValue, rgb2hex, colorCodeToRgbaString } from '../lib/color-picker-util'
 import { IPickerColor } from '../lib/i-picker-color'
@@ -256,7 +250,7 @@ const clearColor = () => {
 
 const selectSaturation = (color: IRgba) => {
   const { r, g, b, h, s, v } = setColorValue(color)
-  Object.assign(c, { r, g, b, h, s, v })
+  Object.assign(c, { r, g, b, h, s, v, themeVar: undefined })
   setText()
   updateSelectedGradientColor(rgbaString.value)
 }
@@ -264,16 +258,16 @@ const selectSaturation = (color: IRgba) => {
 const selectHue = async (color: any) => {
   const { r, g, b, h } = setColorValue(color)
   // Retain previous saturation
-  Object.assign(c, { r, g, b, h })
+  Object.assign(c, { r, g, b, h, themeVar: undefined })
   setText()
-  await nextTick()
-  saturation.value.renderColor()
-  saturation.value.renderSlide()
   updateSelectedGradientColor(rgbaString.value)
+  await rerender()
+  saturation.value.recalculateSaturation()
 }
 
 const selectAlpha = (a: any) => {
   c.a = a
+  c.themeVar = undefined
   setText()
   updateSelectedGradientColor(rgbaString.value)
 }
@@ -281,7 +275,7 @@ const selectAlpha = (a: any) => {
 const inputHex = async (color: string) => {
   const normalized = normalizeHex(color)
   const { r, g, b, a, h, s, v } = setColorValue(normalized ?? color)
-  Object.assign(c, { r, g, b, a, h, s, v })
+  Object.assign(c, { r, g, b, a, h, s, v, themeVar: undefined })
   modelHex.value = color
   modelRgba.value = rgbaStringShort.value
   updateSelectedGradientColor(rgbaString.value)
@@ -297,7 +291,7 @@ const rerender = async () => {
 
 const inputRgba = async (color: string) => {
   const { r, g, b, a, h, s, v } = setColorValue(color)
-  Object.assign(c, { r, g, b, a, h, s, v })
+  Object.assign(c, { r, g, b, a, h, s, v, themeVar: undefined })
   modelHex.value = hexString.value
   modelRgba.value = color
   updateSelectedGradientColor(rgbaString.value)
@@ -339,7 +333,7 @@ const emitResult = () => {
   }
 }
 
-onMounted(() => {
+onMounted(async () => {
   let initialColor = gradientColors.value[0]?.rgba || color.value
   if (forceNonGradient.value) {
     initialColor = color.value
@@ -350,7 +344,7 @@ onMounted(() => {
     c.themeVar = initialColor.match(/\$\{(.*?)\}/)?.[1] || undefined
   }
   setText()
-  rerender()
+  await rerender()
 })
 </script>
 
@@ -378,9 +372,6 @@ onMounted(() => {
         color: #666;
         background: #eceef0;
       }
-    }
-    .colors.history {
-      border-top: 1px solid #eee;
     }
     .theme-color-cell {
       border-color: #313233;
@@ -437,22 +428,27 @@ onMounted(() => {
   }
   .theme-colors {
     margin-top: 12px;
-    .theme-color-grid {
-      @mixin flex-row;
-      flex-wrap: wrap;
-      margin: -8px 0 0 -8px;
-      .theme-color-cell {
-        width: 17px;
-        height: 17px;
-        margin: 8px 0 0 8px;
-        border: 1px solid $grey-700;
-        cursor: pointer;
-      }
-    }
-    .theme-color-empty {
-      @mixin title 13px;
-      color: $grey-500;
+  }
+  .theme-color-grid {
+    @mixin flex-row;
+    flex-wrap: wrap;
+    margin: -8px 0 0 -8px;
+  }
+  .theme-color-cell {
+    width: 17px;
+    height: 17px;
+    margin: 8px 0 0 8px;
+    box-shadow: 0 1px 4px 1px rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    &:hover {
+      transform: scale(1.1);
     }
   }
+}
+.theme-color-empty {
+  @mixin title 13px;
+  color: $grey-500;
 }
 </style>

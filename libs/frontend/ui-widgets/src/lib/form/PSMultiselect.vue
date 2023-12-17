@@ -337,6 +337,11 @@ defineExpose({ multiselectRef, toggleDropdown })
   background: var(--ms-bg);
   cursor: pointer;
   border: var(--ms-border-width, 1px) solid var(--ms-border-color, #d1d5db);
+
+  .ms-item.no-options {
+    @mixin text 12px;
+    padding: 6px 8px 4px;
+  }
 }
 .disabled {
   opacity: 0.6;

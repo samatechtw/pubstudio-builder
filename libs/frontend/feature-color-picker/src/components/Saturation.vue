@@ -24,6 +24,9 @@ const props = withDefaults(
   },
 )
 const { color, hsv, size } = toRefs(props)
+// Remember previous x/y selection to recalculate color
+let prevX: number | undefined
+let prevY: number | undefined
 
 const emit = defineEmits<{
   (e: 'selectSaturation', saturation: IRgba): void
@@ -55,40 +58,67 @@ const renderSlide = () => {
   }
 }
 
-const selectSaturation = (e: Event) => {
+// TODO - there must be a better way to do this in `ColorPicker.vue`
+// This fixes a bug when the hue is selected and the saturation selection is unchanged,
+// but the color is reset to max saturation
+const recalculateSaturation = () => {
+  if (prevX && prevY) {
+    const ctx = (canvasSaturation.value as HTMLCanvasElement).getContext(
+      '2d',
+    ) as CanvasRenderingContext2D
+    calculateSaturation(ctx, prevX, prevY)
+  }
+}
+
+const handleMousemove = (
+  e: MouseEvent,
+  ctx: CanvasRenderingContext2D,
+  boundingLeft: number,
+  boundingTop: number,
+) => {
+  let x = e.clientX - boundingLeft
+  let y = e.clientY - boundingTop
+  calculateSaturation(ctx, x, y)
+}
+
+const calculateSaturation = (ctx: CanvasRenderingContext2D, x: number, y: number) => {
+  if (x < 0) {
+    x = 0
+  }
+  if (y < 0) {
+    y = 0
+  }
+  if (x > size.value) {
+    x = size.value
+  }
+  if (y > size.value) {
+    y = size.value
+  }
+  // Do not modify the dom by monitoring data changes, otherwise when the color is #ffffff, the slide will go to the lower left corner
+  slideSaturationStyle.value = {
+    left: x - 5 + 'px',
+    top: y - 5 + 'px',
+  }
+  // If you use the maximum value, the selected pixel will be empty, and the empty default is black
+  const imgData = ctx.getImageData(
+    Math.min(x, size.value - 1),
+    Math.min(y, size.value - 1),
+    1,
+    1,
+  )
+  const [r, g, b] = imgData.data
+  emit('selectSaturation', { r, g, b })
+  prevX = x
+  prevY = y
+}
+
+const selectSaturation = (e: MouseEvent) => {
   const { top: saturationTop, left: saturationLeft } = root.value.getBoundingClientRect()
   const ctx = (e.target as HTMLCanvasElement).getContext('2d') as CanvasRenderingContext2D
-  const mousemove = (e: any) => {
-    let x = e.clientX - saturationLeft
-    let y = e.clientY - saturationTop
-    if (x < 0) {
-      x = 0
-    }
-    if (y < 0) {
-      y = 0
-    }
-    if (x > size.value) {
-      x = size.value
-    }
-    if (y > size.value) {
-      y = size.value
-    }
-    // Do not modify the dom by monitoring data changes, otherwise when the color is #ffffff, the slide will go to the lower left corner
-    slideSaturationStyle.value = {
-      left: x - 5 + 'px',
-      top: y - 5 + 'px',
-    }
-    // If you use the maximum value, the selected pixel will be empty, and the empty default is black
-    const imgData = ctx.getImageData(
-      Math.min(x, size.value - 1),
-      Math.min(y, size.value - 1),
-      1,
-      1,
-    )
-    const [r, g, b] = imgData.data
-    emit('selectSaturation', { r, g, b })
+  const mousemove = (moveEvent: MouseEvent) => {
+    handleMousemove(moveEvent, ctx, saturationLeft, saturationTop)
   }
-  mousemove(e)
+  handleMousemove(e, ctx, saturationLeft, saturationTop)
   const mouseup = () => {
     document.removeEventListener('mousemove', mousemove)
     document.removeEventListener('mouseup', mouseup)
@@ -97,7 +127,7 @@ const selectSaturation = (e: Event) => {
   document.addEventListener('mouseup', mouseup)
 }
 
-defineExpose({ renderColor, renderSlide })
+defineExpose({ renderColor, renderSlide, recalculateSaturation })
 
 onMounted(() => {
   renderColor()

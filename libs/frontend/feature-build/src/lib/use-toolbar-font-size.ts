@@ -2,10 +2,14 @@ import { Css } from '@pubstudio/shared/type-site'
 import { Ref, ref, watch } from 'vue'
 import { useBuild } from './use-build'
 import { useToolbar } from './use-toolbar'
+import {
+  IUseToolbarResumeTextFocus,
+  useToolbarResumeTextFocus,
+} from './use-toolbar-resume-text-focus'
 
 export interface IUseToolbarFontSize {
-  fontSizePsInputRef: Ref
   fontSize: Ref<IFontSize>
+  fontSizeTextFocus: IUseToolbarResumeTextFocus
   setFontSize: () => void
   setFontUnit: (unit: string | undefined) => void
 }
@@ -19,8 +23,8 @@ export const useToolbarFontSize = (): IUseToolbarFontSize => {
   const { editor } = useBuild()
   const { getResolvedOrSelectedStyle, setStyle, refocusSelection, selectionStyles } =
     useToolbar()
+  const fontSizeTextFocus = useToolbarResumeTextFocus({ editor })
 
-  const psInputRef = ref()
   const fontSize = ref<IFontSize>({ size: '', unit: 'px' })
 
   const updateFontSize = () => {
@@ -38,12 +42,15 @@ export const useToolbarFontSize = (): IUseToolbarFontSize => {
   }
 
   const setFontSize = () => {
-    refocusSelection()
+    if (fontSizeTextFocus.textWasFocused.value) {
+      refocusSelection()
+    } else {
+      fontSizeTextFocus.toolbarItemRef.value?.inputRef?.blur()
+    }
     try {
       const size = parseInt(fontSize.value.size)
       if (size > 1 && size < 1000) {
         setStyle(Css.FontSize, `${size}${fontSize.value.unit}`)
-        psInputRef.value?.inputRef?.blur()
       }
     } catch (e) {
       console.log('Font size error:', e)
@@ -66,8 +73,8 @@ export const useToolbarFontSize = (): IUseToolbarFontSize => {
   )
 
   return {
-    fontSizePsInputRef: psInputRef,
     fontSize,
+    fontSizeTextFocus,
     setFontSize,
     setFontUnit,
   }

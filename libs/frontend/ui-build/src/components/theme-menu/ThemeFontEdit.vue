@@ -30,6 +30,11 @@
         :placeholder="t('theme.fallback')"
       />
     </div>
+    <!-- TODO -- add code to download the font so it's available for preview
+    <div class="preview" :style="{ 'font-family': quotedFont }">
+      {{ t('theme.font_preview') }}
+    </div>
+    -->
     <ErrorMessage :error="fontError" />
     <div class="theme-font-actions">
       <PSButton
@@ -64,6 +69,8 @@ const { t } = useI18n()
 const { editingFont, fontError, clearEditingState, saveFont } = useThemeMenuFonts()
 
 const isNativeFont = computed(() => editingFont.source === ThemeFontSource.Native)
+
+const quotedFont = computed(() => `"${editingFont.name}"`)
 
 const updateSource = (source: ThemeFontSource) => {
   editingFont.source = source

@@ -64,6 +64,7 @@ const removeFont = (font: IThemeFont) => {
     width: 100%;
     .fonts-title {
       @mixin flex-row;
+      @mixin title 15px;
       align-items: center;
       .label {
         font-weight: bold;
@@ -105,7 +106,7 @@ const removeFont = (font: IThemeFont) => {
     }
   }
   .theme-fonts-empty {
-    @mixin text-medium 16px;
+    @mixin title-medium 15px;
     padding-top: 16px;
     color: $grey-500;
   }

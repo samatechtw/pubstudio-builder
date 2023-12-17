@@ -96,8 +96,7 @@ const setBackgroundColor = (pickerColor: IToolbarPickerColor | undefined) => {
   const { selectedComponent } = editor.value ?? {}
 
   const editView = editor.value?.editView
-  refocusSelection()
-  if (editView && pickerColor?.prosemirrorWasFocused) {
+  if (editView && pickerColor?.textWasFocused) {
     refocusSelection()
     setProseMirrorStyle(editView, Css.BackgroundColor, colorToCssValue(pickerColor))
   } else if (selectedComponent) {

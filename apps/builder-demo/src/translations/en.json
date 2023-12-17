@@ -264,6 +264,7 @@
     "fallback_to": "Fallback: {fallback}",
     "native": "Native Font",
     "google": "Google Font",
+    "font_preview": "The Quick Brown Fox Jumps Over The Lazy Dog",
     "meta": "Meta",
     "favicon": "Favicon",
     "remove_favicon": "Remove Favicon",
