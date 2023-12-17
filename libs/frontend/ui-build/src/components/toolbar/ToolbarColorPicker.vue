@@ -1,10 +1,10 @@
 <template>
   <div class="color-picker-wrap">
     <ToolbarItem
-      ref="itemRef"
+      ref="toolbarItemRef"
       :tooltip="tooltip"
       @click="emit('click', $event)"
-      @mousedown="mousedown"
+      @mousedown="toolbarButtonMouseDown"
     >
       <slot />
     </ToolbarItem>
@@ -24,13 +24,13 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, toRefs } from 'vue'
+import { toRefs } from 'vue'
 import { ColorPicker, IPickerColor } from '@pubstudio/frontend/feature-color-picker'
 import { IThemeVariable } from '@pubstudio/shared/type-site'
 import { IThemedGradient } from '@pubstudio/frontend/util-gradient'
 import { resolveThemeVariables } from '@pubstudio/frontend/util-builtin'
 import { ToolbarItem } from '@pubstudio/frontend/ui-widgets'
-import { useBuild } from '@pubstudio/frontend/feature-build'
+import { useBuild, useToolbarResumeTextFocus } from '@pubstudio/frontend/feature-build'
 import { IToolbarPickerColor, IToolbarThemedGradient } from './i-toolbar-color-picker'
 
 const { site, editor } = useBuild()
@@ -62,32 +62,17 @@ const emit = defineEmits<{
   (e: 'applyGradient', gradient: IToolbarThemedGradient | undefined): void
 }>()
 
-const itemRef = ref()
-const prosemirrorWasFocused = ref(false)
-
-const mouseup = (e: MouseEvent) => {
-  document.removeEventListener('mouseup', mouseup)
-  const clicked = itemRef.value.itemRef.contains(e.target)
-  if (!clicked) {
-    prosemirrorWasFocused.value = false
-  }
-}
-
-const mousedown = () => {
-  prosemirrorWasFocused.value = !!editor.value?.editView?.hasFocus()
-  document.addEventListener('mouseup', mouseup)
-}
+const { textWasFocused, toolbarItemRef, toolbarButtonMouseDown } =
+  useToolbarResumeTextFocus({ editor })
 
 const selectColor = (color: IPickerColor | undefined) => {
-  const emitColor = color
-    ? { ...color, prosemirrorWasFocused: prosemirrorWasFocused.value }
-    : undefined
+  const emitColor = color ? { ...color, textWasFocused: textWasFocused.value } : undefined
   emit('selectColor', emitColor)
 }
 
 const applyGradient = (gradient: IThemedGradient | undefined) => {
   const emitGradient = gradient
-    ? { ...gradient, prosemirrorWasFocused: prosemirrorWasFocused.value }
+    ? { ...gradient, textWasFocused: textWasFocused.value }
     : undefined
   emit('applyGradient', emitGradient)
 }

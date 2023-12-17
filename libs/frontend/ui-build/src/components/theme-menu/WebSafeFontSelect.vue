@@ -37,7 +37,7 @@ defineExpose({ multiselectRef })
 
 <style lang="postcss" scoped>
 .web-safe-font-select {
-  max-width: 160px;
+  max-width: 180px;
   margin-right: 0;
 }
 </style>

@@ -34,12 +34,13 @@
       <FontFamily @mousedown.prevent />
       <FontWeight :fontFamily="fontFamily" @mousedown.prevent />
       <PSInput
-        ref="fontSizePsInputRef"
+        ref="fontSizeRef"
         v-model="fontSize.size"
         type="number"
         :maxLength="3"
         class="font-size"
         @keyup.enter.stop="setFontSize"
+        @mousedown="fontSizeTextFocus.toolbarButtonMouseDown"
       >
         <PSMultiselect
           :value="fontSize.unit"
@@ -64,7 +65,7 @@ import {
 } from '@pubstudio/frontend/ui-widgets'
 import { PSInput } from '@pubstudio/frontend/ui-widgets'
 import { useControlledClickaway } from '@pubstudio/frontend/util-clickaway'
-import { IPickerColor, colorToCssValue } from '@pubstudio/frontend/feature-color-picker'
+import { colorToCssValue } from '@pubstudio/frontend/feature-color-picker'
 import { Css, StyleToolbarMenu } from '@pubstudio/shared/type-site'
 import {
   IThemedGradient,
@@ -98,7 +99,8 @@ const {
 } = useToolbar()
 const { editor, pushGroupCommands } = useBuild()
 const { selectedThemeColors } = useThemeColors()
-const { fontSizePsInputRef, fontSize, setFontSize, setFontUnit } = useToolbarFontSize()
+const { fontSize, setFontSize, setFontUnit, fontSizeTextFocus } = useToolbarFontSize()
+const { toolbarItemRef: fontSizeRef } = fontSizeTextFocus
 
 defineProps<{
   show: boolean
@@ -116,7 +118,7 @@ const setFontColor = (pickerColor: IToolbarPickerColor | undefined) => {
   const { selectedComponent } = editor.value ?? {}
 
   const editView = editor.value?.editView
-  if (editView && pickerColor?.prosemirrorWasFocused) {
+  if (editView && pickerColor?.textWasFocused) {
     refocusSelection()
     setProseMirrorStyle(editView, Css.Color, colorToCssValue(pickerColor))
   } else if (selectedComponent) {
