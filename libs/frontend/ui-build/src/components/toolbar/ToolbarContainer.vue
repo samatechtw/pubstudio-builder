@@ -30,7 +30,6 @@
         :gradient="getRawStyle(Css.Background)"
         :showPicker="showBackgroundPicker"
         :selectedThemeColors="selectedThemeColors"
-        :isGradient="isProsemirrorEditing"
         class="toolbar-menu"
         @selectColor="setBackgroundColor($event)"
         @applyGradient="setGradientBackground($event)"
@@ -60,7 +59,7 @@ import {
   ToolbarItemDropdown,
   IToolbarDropdownItem,
 } from '@pubstudio/frontend/ui-widgets'
-import { IPickerColor, colorToCssValue } from '@pubstudio/frontend/feature-color-picker'
+import { colorToCssValue } from '@pubstudio/frontend/feature-color-picker'
 import {
   GradientTypeValues,
   IThemedGradient,
@@ -76,12 +75,12 @@ import {
   setStyleToolbarMenu,
 } from '@pubstudio/frontend/feature-build'
 import ToolbarColorPicker from './ToolbarColorPicker.vue'
+import { IToolbarPickerColor } from './i-toolbar-color-picker'
 
 const { t } = useI18n()
 
 const {
   selectionStyles,
-  isProsemirrorEditing,
   getRawStyle,
   getRawOrSelectedStyle,
   getStyleValue,
@@ -93,12 +92,13 @@ const {
 const { editor, pushGroupCommands } = useBuild()
 const { selectedThemeColors } = useThemeColors()
 
-const setBackgroundColor = (pickerColor: IPickerColor | undefined) => {
+const setBackgroundColor = (pickerColor: IToolbarPickerColor | undefined) => {
   const { selectedComponent } = editor.value ?? {}
 
   const editView = editor.value?.editView
   refocusSelection()
-  if (editView?.hasFocus()) {
+  if (editView && pickerColor?.prosemirrorWasFocused) {
+    refocusSelection()
     setProseMirrorStyle(editView, Css.BackgroundColor, colorToCssValue(pickerColor))
   } else if (selectedComponent) {
     const cmdList: (ICommand | undefined)[] = []

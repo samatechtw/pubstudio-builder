@@ -82,6 +82,7 @@ import {
   setStyleToolbarMenu,
 } from '@pubstudio/frontend/feature-build'
 import ToolbarColorPicker from './ToolbarColorPicker.vue'
+import { IToolbarPickerColor } from './i-toolbar-color-picker'
 
 const { t } = useI18n()
 const {
@@ -111,12 +112,12 @@ const { activate, deactivate } = useControlledClickaway(
 
 const fontUnits = ['px', 'em', 'rem', '%']
 
-const setFontColor = (pickerColor: IPickerColor | undefined) => {
+const setFontColor = (pickerColor: IToolbarPickerColor | undefined) => {
   const { selectedComponent } = editor.value ?? {}
 
   const editView = editor.value?.editView
-  refocusSelection()
-  if (editView?.hasFocus()) {
+  if (editView && pickerColor?.prosemirrorWasFocused) {
+    refocusSelection()
     setProseMirrorStyle(editView, Css.Color, colorToCssValue(pickerColor))
   } else if (selectedComponent) {
     const cmdList: (ICommand | undefined)[] = []
