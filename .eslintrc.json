@@ -110,7 +110,12 @@
               },
               {
                 "sourceTag": "type:ui",
-                "onlyDependOnLibsWithTags": ["type:ui", "type:util", "type:type"]
+                "onlyDependOnLibsWithTags": [
+                  "type:feature",
+                  "type:ui",
+                  "type:util",
+                  "type:type"
+                ]
               },
               {
                 "sourceTag": "type:data-access",

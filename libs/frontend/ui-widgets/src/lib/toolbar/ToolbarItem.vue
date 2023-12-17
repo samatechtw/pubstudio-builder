@@ -67,6 +67,8 @@ const {
   tooltipStyle,
   show,
 } = useTooltipDelay(tooltipOptions.value)
+
+defineExpose({ itemRef })
 </script>
 
 <style lang="postcss" scoped>

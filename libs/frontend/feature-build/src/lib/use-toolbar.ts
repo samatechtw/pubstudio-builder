@@ -112,8 +112,8 @@ export const useToolbar = (): IUseToolbar => {
   }
 
   const getRawOrSelectedStyle = (property: Css): string | undefined => {
-    const view = editor.value?.editView
-    if (view) {
+    const selColor = selectionStyles[property as keyof typeof selectionStyles]
+    if (isProsemirrorEditing.value && selColor !== undefined) {
       return selectionStyles[property as keyof typeof selectionStyles]
     } else {
       return getRawStyle(property)
