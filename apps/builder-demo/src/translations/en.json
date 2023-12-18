@@ -165,6 +165,8 @@
     "image": "Image",
     "svg": "SVG",
     "link": "Link",
+    "no_link": "No link",
+    "open_in_new_tab": "Open in new tab",
     "site_error": "Site Error",
     "site_error_text_1": "Oops! It seems that an error occurred while loading your site. The specific error message is shown below:",
     "site_error_text_2": "You can refresh the page later, or take the following actions:",
