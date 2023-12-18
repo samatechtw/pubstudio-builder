@@ -18,7 +18,8 @@ export const rawStyleRecordToString = (
     const fields = Object.entries(rawStyle)
       .map(([prop, value]) => {
         const computedValue = computeCssValue(prop as Css, value, context)
-        return `${prop}:${computedValue};`
+        const supportedValue = CSS.supports(prop, computedValue) ? computedValue : ''
+        return `${prop}:${supportedValue};`
       })
       .join('')
     return `${result}${selector}{${fields}}`

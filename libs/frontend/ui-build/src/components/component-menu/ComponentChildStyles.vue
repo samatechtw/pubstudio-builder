@@ -202,17 +202,19 @@ const childStyles = computed<IInheritedStyleEntry[]>(() => {
       descSortedBreakpoints.value,
       activeBreakpoint.value,
     )
-    return Object.entries(flattenedStyles).map(
-      ([css, source]) =>
-        ({
-          pseudoClass: currentPseudoClass.value,
-          property: css as Css,
-          value: source.value,
-          sourceType: source.sourceType,
-          sourceId: source.sourceId,
-          sourceBreakpointId: source.sourceBreakpointId,
-        }) as IInheritedStyleEntry,
-    )
+    return Object.entries(flattenedStyles)
+      .sort((a, b) => a[0].localeCompare(b[0]))
+      .map(
+        ([css, source]) =>
+          ({
+            pseudoClass: currentPseudoClass.value,
+            property: css as Css,
+            value: source.value,
+            sourceType: source.sourceType,
+            sourceId: source.sourceId,
+            sourceBreakpointId: source.sourceBreakpointId,
+          }) as IInheritedStyleEntry,
+      )
   } else {
     return []
   }

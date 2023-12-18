@@ -23,7 +23,7 @@
         autocomplete="off"
         @update:modelValue="updateSearch"
         @keydown.enter.stop="searchEnter"
-        @keydown.enter.tab="searchEnter"
+        @keydown.tab.stop="searchEnter"
         @click.stop="toggleDropdown"
       />
       <div v-else-if="forceLabel ?? label" class="label-text">
