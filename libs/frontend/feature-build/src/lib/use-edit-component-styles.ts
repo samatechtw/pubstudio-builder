@@ -56,17 +56,19 @@ export const useEditComponentStyles = (
   const { site, currentPseudoClass, selectedComponentFlattenedStyles } = useBuild()
 
   const styleEntries = computed(() =>
-    Object.entries(selectedComponentFlattenedStyles.value).map(
-      ([css, source]) =>
-        ({
-          pseudoClass: currentPseudoClass.value,
-          property: css as Css,
-          value: source.value,
-          sourceType: source.sourceType,
-          sourceId: source.sourceId,
-          sourceBreakpointId: source.sourceBreakpointId,
-        }) as IInheritedStyleEntry,
-    ),
+    Object.entries(selectedComponentFlattenedStyles.value)
+      .sort((a, b) => a[0].localeCompare(b[0]))
+      .map(
+        ([css, source]) =>
+          ({
+            pseudoClass: currentPseudoClass.value,
+            property: css as Css,
+            value: source.value,
+            sourceType: source.sourceType,
+            sourceId: source.sourceId,
+            sourceBreakpointId: source.sourceBreakpointId,
+          }) as IInheritedStyleEntry,
+      ),
   )
 
   const editStyle = (prop: Css) => {
