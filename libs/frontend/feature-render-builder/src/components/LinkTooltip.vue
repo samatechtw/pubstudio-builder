@@ -21,7 +21,17 @@
     <div v-else class="empty">
       {{ t('build.no_link') }}
     </div>
-    <Check v-if="editing" class="link-save" color="#009879" @click="updateLink" />
+    <div v-if="editing" class="editing-wrap">
+      <Checkbox
+        class="open-in-new-tab-checkbox"
+        :item="{
+          label: t('build.open_in_new_tab'),
+          checked: openInNewTab,
+        }"
+        @checked="openInNewTab = $event"
+      />
+      <Check class="link-save" color="#009879" @click="updateLink" />
+    </div>
     <div v-else class="icon-wrap">
       <IconTooltip :tip="t('edit')">
         <Edit class="edit-link" @click="edit" />
@@ -36,6 +46,7 @@ import { computed, nextTick, ref, toRefs, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import {
   Check,
+  Checkbox,
   IconTooltip,
   CopyText,
   Edit,
@@ -43,9 +54,17 @@ import {
 } from '@pubstudio/frontend/ui-widgets'
 import { useBuild, getLinkDatalistOptions } from '@pubstudio/frontend/feature-build'
 import { useTooltip } from '@pubstudio/frontend/util-tooltip'
+import { resolveComponent } from '@pubstudio/frontend/util-builtin'
+import { ComponentArgPrimitive } from '@pubstudio/shared/type-site'
 
 const { t } = useI18n()
-const { site, changePage, setSelectedIsInput } = useBuild()
+const {
+  site,
+  changePage,
+  setSelectedIsInput,
+  addOrUpdateComponentInput,
+  removeComponentInput,
+} = useBuild()
 
 const props = defineProps<{
   link: string
@@ -56,12 +75,19 @@ const { link, componentId } = toRefs(props)
 const linkInput = ref()
 const editing = ref(false)
 const editedLink = ref('')
+const openInNewTab = ref(false)
 
 const linkDatalist = computed(() => getLinkDatalistOptions(site.value, componentId.value))
 
 const internalLink = computed(() => {
   return link.value?.startsWith('/') && link.value in site.value.pages
 })
+
+const component = computed(() => resolveComponent(site.value.context, componentId.value))
+
+const componentTargetInput = computed(
+  () => component.value?.inputs?.target?.is as string | undefined,
+)
 
 const gotoPage = () => {
   changePage(link.value)
@@ -70,22 +96,43 @@ const gotoPage = () => {
 const edit = async () => {
   editing.value = true
   editedLink.value = link.value
+  openInNewTab.value = componentTargetInput.value === '_blank'
   await nextTick()
   linkInput.value?.inputRef?.focus()
+  await updatePosition()
 }
 
-const updateLink = () => {
+const updateLink = async () => {
   setSelectedIsInput('href', editedLink.value)
   editing.value = false
   editedLink.value = ''
+
+  if (openInNewTab.value) {
+    addOrUpdateComponentInput('target', {
+      type: ComponentArgPrimitive.String,
+      name: 'target',
+      attr: true,
+      is: '_blank',
+    })
+  } else if (componentTargetInput.value === '_blank') {
+    removeComponentInput('target')
+  }
+
+  await updatePosition()
 }
 
-const { itemRef, tooltipRef, tooltipStyle, tooltipMouseEnter, tooltipMouseLeave } =
-  useTooltip({
-    placement: 'top-start',
-    shift: true,
-    flip: true,
-  })
+const {
+  itemRef,
+  tooltipRef,
+  tooltipStyle,
+  updatePosition,
+  tooltipMouseEnter,
+  tooltipMouseLeave,
+} = useTooltip({
+  placement: 'top-start',
+  shift: true,
+  flip: true,
+})
 
 onMounted(() => {
   itemRef.value = document.getElementById(componentId.value)
@@ -143,6 +190,17 @@ onUnmounted(() => {
     width: 100%;
   }
 }
+
+.editing-wrap {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  .open-in-new-tab-checkbox {
+    margin: 0 8px 0 4px;
+    color: $color-text;
+    flex-shrink: 0;
+  }
+}
 .icon-wrap {
   margin-left: auto;
   display: flex;
@@ -151,6 +209,7 @@ onUnmounted(() => {
 .edit-link {
   @mixin size 22px;
   cursor: pointer;
+  flex-shrink: 0;
 }
 .copy-wrap {
   display: flex;

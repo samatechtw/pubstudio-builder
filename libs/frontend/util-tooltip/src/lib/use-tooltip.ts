@@ -26,7 +26,10 @@ export interface IUseTooltip {
   tooltipRef: Ref<HTMLElement | null>
   arrowRef: Ref<HTMLElement | null> | undefined
   arrowStyle: Ref<CSSProperties | undefined>
+  // The native update function from floating-ui
   update: () => void
+  // Customized update function
+  updatePosition: () => Promise<void>
   tooltipMouseEnter: () => void
   tooltipMouseLeave: () => void
 }
@@ -156,6 +159,7 @@ export const useTooltip = (options?: IUseTooltipOptions): IUseTooltip => {
     arrowRef,
     arrowStyle,
     update,
+    updatePosition,
     tooltipMouseEnter,
     tooltipMouseLeave,
   }
