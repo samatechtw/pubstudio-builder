@@ -1,15 +1,14 @@
-import {
-  pushCommandObject,
-  replaceLastCommand,
-  undoCommand,
-} from '@pubstudio/frontend/feature-command'
 import { activeBreakpoint } from '@pubstudio/frontend/feature-site-source'
 import {
+  componentStylesCancelEdit,
   editCommands,
   editStyles,
+  pushCommandObject,
+  replaceLastCommand,
   setStyleType,
   StyleType,
-} from '@pubstudio/frontend/util-build'
+  undoCommand,
+} from '@pubstudio/frontend/util-command'
 import { CommandType, ICommand } from '@pubstudio/shared/type-command'
 import {
   ICommandGroupData,
@@ -72,7 +71,7 @@ export const useEditComponentStyles = (
   )
 
   const editStyle = (prop: Css) => {
-    setStyleType(styleType)
+    setStyleType(site.value, styleType)
     editStyles.value.add(prop)
   }
 
@@ -83,8 +82,9 @@ export const useEditComponentStyles = (
 
   // Finishes the editing session if no styles are active
   const checkEditStylesComplete = () => {
+    editCommands.value = undefined
     if (editStyles.value.size === 0) {
-      editCommands.value = undefined
+      componentStylesCancelEdit(site.value)
     }
   }
 
@@ -163,14 +163,14 @@ export const useEditComponentStyles = (
     }
     const cmd: ICommand = { type: CommandType.Group, data: editCommands.value }
     if (firstEdit) {
-      pushCommandObject(cmd)
+      pushCommandObject(site.value, cmd)
     } else {
-      replaceLastCommand(cmd)
+      replaceLastCommand(site.value, cmd)
     }
   }
 
   const addComponentStyle = () => {
-    setStyleType(styleType)
+    setStyleType(site.value, styleType)
     const property = '' as Css
     editStyle(property)
     setStyle(undefined, { pseudoClass: currentPseudoClass.value, property, value: '' })

@@ -23,7 +23,7 @@ import {
   useBuild,
   usePageMenu,
 } from '@pubstudio/frontend/feature-build'
-import { setActivePage } from '@pubstudio/frontend/util-build'
+import { setActivePage } from '@pubstudio/frontend/util-command'
 import { Plus } from '@pubstudio/frontend/ui-widgets'
 import BuildMenuText from './BuildMenuText.vue'
 import { EditorMode } from '@pubstudio/shared/type-site'

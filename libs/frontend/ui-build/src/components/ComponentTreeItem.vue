@@ -77,8 +77,8 @@ import {
 import {
   collapseComponentTreeItem,
   expandComponentTreeItem,
-} from '@pubstudio/frontend/util-build'
-import { setSelectedComponent } from '@pubstudio/frontend/util-build'
+  setSelectedComponent,
+} from '@pubstudio/frontend/util-command'
 import { Eye, Hide } from '@pubstudio/frontend/ui-widgets'
 import { runtimeContext } from '@pubstudio/frontend/util-runtime'
 import ComponentTreeItemRename from './ComponentTreeItemRename.vue'

@@ -1,6 +1,6 @@
-import { getLastCommand } from '@pubstudio/frontend/feature-command'
 import { activeBreakpoint } from '@pubstudio/frontend/feature-site-source'
-import { resolvedComponentStyle } from '@pubstudio/frontend/util-build'
+import { getLastCommand } from '@pubstudio/frontend/util-command'
+import { resolvedComponentStyle } from '@pubstudio/frontend/util-component'
 import { CommandType, ICommand } from '@pubstudio/shared/type-command'
 import { ISetComponentCustomStyleData } from '@pubstudio/shared/type-command-data'
 import { Css, IComponent, ISite, IStyleEntry } from '@pubstudio/shared/type-site'
@@ -8,6 +8,7 @@ import { Css, IComponent, ISite, IStyleEntry } from '@pubstudio/shared/type-site
 export type IRemoveStyleEntry = Omit<IStyleEntry, 'value'>
 
 export const setCustomStyleCommand = (
+  site: ISite,
   component: IComponent,
   oldStyle: IStyleEntry | undefined,
   newStyle: IStyleEntry,
@@ -21,7 +22,7 @@ export const setCustomStyleCommand = (
   }
   if (replace) {
     // Keep the original "old" data in a chain of commands
-    const lastCommand = getLastCommand()
+    const lastCommand = getLastCommand(site)
     const oldStyle = (lastCommand?.data as ISetComponentCustomStyleData | undefined)
       ?.oldStyle
     return {
@@ -44,7 +45,7 @@ export const setComponentCustomStyleCommand = (
 ): ICommand | undefined => {
   const selected = site.editor?.selectedComponent
   if (selected) {
-    return setCustomStyleCommand(selected, oldStyle, newStyle, replace)
+    return setCustomStyleCommand(site, selected, oldStyle, newStyle, replace)
   }
   return undefined
 }

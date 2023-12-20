@@ -21,7 +21,7 @@
 import { toRefs } from 'vue'
 import { useBuild } from '@pubstudio/frontend/feature-build'
 import { useDragDrop } from '@pubstudio/frontend/feature-render-builder'
-import { makeAddBuiltinComponentData } from '@pubstudio/frontend/util-command'
+import { makeAddBuiltinComponentData } from '@pubstudio/frontend/util-command-data'
 import { IComponent } from '@pubstudio/shared/type-site'
 
 const props = defineProps<{

@@ -46,7 +46,7 @@ import { useBuild } from '@pubstudio/frontend/feature-build'
 import { Modal, PSButton } from '@pubstudio/frontend/ui-widgets'
 import { saveSite, defaultExportedFileName } from '@pubstudio/frontend/util-site-store'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
-import { clearAll, clearPartial } from '@pubstudio/frontend/feature-command'
+import { clearAll, clearPartial } from '@pubstudio/frontend/util-command'
 import { IApiError } from '@pubstudio/shared/type-api'
 
 const { t } = useI18n()
@@ -66,7 +66,7 @@ const error = computed(() => {
 watch(error, (newError: IApiError | undefined) => {
   if (newError) {
     if (isHistory.value) {
-      clearPartial(0.3)
+      clearPartial(site.value, 0.3)
     } else {
       show.value = true
     }
@@ -86,7 +86,7 @@ const exportSite = () => {
 }
 
 const clearHistory = () => {
-  clearAll()
+  clearAll(site.value)
   cancel()
 }
 

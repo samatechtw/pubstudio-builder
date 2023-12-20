@@ -22,8 +22,8 @@
         type="search"
         autocomplete="off"
         @update:modelValue="updateSearch"
-        @keydown.enter.stop="searchEnter"
-        @keydown.tab.stop="searchEnter"
+        @keyup.enter.stop.prevent="searchEnter"
+        @keydown="handleKeydown"
         @click.stop="toggleDropdown"
       />
       <div v-else-if="forceLabel ?? label" class="label-text">
@@ -43,6 +43,7 @@
           v-for="(l, index) in labels"
           :key="(l ?? index).toString()"
           class="ms-item"
+          :class="{ highlight: searchActive && index === searchIndex }"
           @click="select(index)"
         >
           <slot v-if="customLabel" :label="l" :index="index"></slot>
@@ -145,6 +146,7 @@ const emit = defineEmits<{
   (e: 'selectEmpty'): void
   (e: 'open'): void
   (e: 'close'): void
+  (e: 'keydown', event: KeyboardEvent): void
 }>()
 
 defineSlots<{
@@ -194,6 +196,7 @@ const {
 const search = ref('')
 const searchActive = ref(false)
 const searchRef = ref()
+const searchIndex = ref(0)
 
 const multiselectRef = ref()
 
@@ -279,11 +282,30 @@ const label = computed(() => {
 
 const updateSearch = (value: string) => {
   search.value = value
+  searchIndex.value = Math.min(searchIndex.value, filteredOptions.value.length)
+}
+
+const handleKeydown = (e: KeyboardEvent) => {
+  const optionsLen = filteredOptions.value.length
+  if (e.key === Keys.Tab) {
+    e.stopPropagation()
+    e.preventDefault()
+    searchEnter()
+  } else if (e.key === Keys.Escape) {
+    e.stopPropagation()
+    e.preventDefault()
+    closeMenu()
+  } else if (e.key === Keys.ArrowUp) {
+    searchIndex.value = (searchIndex.value + optionsLen - 1) % optionsLen
+  } else if (e.key === Keys.ArrowDown) {
+    searchIndex.value = (searchIndex.value + optionsLen + 1) % optionsLen
+  }
+  emit('keydown', e)
 }
 
 const searchEnter = () => {
   if (filteredOptions.value[0]) {
-    select(0)
+    select(searchIndex.value)
     closeMenu()
     setMenuOpened(false)
   } else if (allowAny.value) {
@@ -301,6 +323,7 @@ const toggleDropdown = async () => {
   cancelHoverTimer()
   if (searchable.value && opened.value) {
     searchActive.value = true
+    searchIndex.value = 0
     await nextTick()
     searchRef.value?.inputRef.focus()
   } else {
@@ -340,8 +363,11 @@ defineExpose({ multiselectRef, toggleDropdown })
 
   .ms-item.no-options {
     @mixin text 12px;
-    padding: 6px 8px 4px;
+    padding: 6px 8px;
   }
+}
+.highlight {
+  background-color: $blue-100;
 }
 .disabled {
   opacity: 0.6;

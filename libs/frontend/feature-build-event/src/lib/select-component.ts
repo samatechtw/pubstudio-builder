@@ -1,5 +1,5 @@
 import { getComponentTreeItemId } from '@pubstudio/frontend/feature-build'
-import { setSelectedComponent } from '@pubstudio/frontend/util-build'
+import { setSelectedComponent } from '@pubstudio/frontend/util-command'
 import { IComponent, ISite } from '@pubstudio/shared/type-site'
 
 export const selectComponent = (site: ISite, component: IComponent) => {

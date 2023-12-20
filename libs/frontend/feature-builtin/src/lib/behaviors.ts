@@ -1,4 +1,3 @@
-import { mergeLastCommandHelper } from '@pubstudio/frontend/feature-command'
 import {
   builtinStyles,
   defaultNavMenuItemInputs,
@@ -6,12 +5,13 @@ import {
   resolveComponent,
   resolveStyle,
 } from '@pubstudio/frontend/util-builtin'
+import { mergeLastCommand } from '@pubstudio/frontend/util-command'
 import {
   makeAddBuiltinComponentData,
   makeEditComponentData,
   makeRemoveComponentData,
   makeSetInputData,
-} from '@pubstudio/frontend/util-command'
+} from '@pubstudio/frontend/util-command-data'
 import {
   homeLinkBehaviorId,
   navItemBehaviorId,
@@ -182,7 +182,7 @@ const syncNavMenu = (site: ISite, cmp: IComponent) => {
       }
     }
   }
-  mergeLastCommandHelper(site, commands)
+  mergeLastCommand(site, commands)
 }
 
 export const navItemBehavior: IBehavior = {
