@@ -1,5 +1,8 @@
-import { redoCommand, undoLastCommand } from '@pubstudio/frontend/feature-command'
-import { componentStylesCancelEdit } from '@pubstudio/frontend/util-build'
+import {
+  componentStylesCancelEdit,
+  redoCommand,
+  undoLastCommand,
+} from '@pubstudio/frontend/util-command'
 import { CommandType } from '@pubstudio/shared/type-command'
 import { computed, ComputedRef } from 'vue'
 import { useBuild } from './use-build'
@@ -23,8 +26,8 @@ export const useHistory = (): IUseHistory => {
     if (uiAlert) {
       commandAlert.value = CommandType.Undo
     }
-    undoLastCommand()
-    componentStylesCancelEdit()
+    undoLastCommand(site.value)
+    componentStylesCancelEdit(site.value)
   }
 
   const redo = (uiAlert = false) => {
@@ -34,7 +37,7 @@ export const useHistory = (): IUseHistory => {
     if (uiAlert) {
       commandAlert.value = CommandType.Redo
     }
-    redoCommand()
+    redoCommand(site.value)
   }
 
   return {

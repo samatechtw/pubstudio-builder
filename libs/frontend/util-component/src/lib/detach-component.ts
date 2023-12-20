@@ -1,6 +1,7 @@
 import {
   IBreakpointStyles,
   IComponent,
+  IComponentStyleOverrides,
   IPseudoStyle,
   IResolvedComponentProps,
 } from '@pubstudio/shared/type-site'
@@ -67,4 +68,29 @@ export const detachComponent = (
   component.events = events
   component.editorEvents = editorEvents
   return component
+}
+
+export const detachOverrides = (
+  component: IComponent,
+  source: IComponent | undefined,
+): IComponentStyleOverrides | undefined => {
+  const sourceOverrides = source?.style.overrides
+  if (!sourceOverrides || !component.children || !source.children) {
+    return sourceOverrides ?? component.style.overrides
+  }
+  const overrides: IComponentStyleOverrides = {}
+  for (const [key, override] of Object.entries(sourceOverrides)) {
+    // Get index of child the original override applied to
+    const childIndex = source.children.findIndex((cmp) => cmp.id === key)
+
+    const overrideCopy = JSON.parse(JSON.stringify(override))
+    if (childIndex === -1) {
+      // Override does not correspond to a child, copy it directly
+      overrides[key] = structuredClone(overrideCopy)
+    } else {
+      // Copy the override to the new component, using the new child ID as key
+      overrides[component.children[childIndex].id] = structuredClone(overrideCopy)
+    }
+  }
+  return overrides
 }

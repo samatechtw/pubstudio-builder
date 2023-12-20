@@ -1,5 +1,5 @@
 import { store, WebStore } from '@pubstudio/frontend/data-access-web-store'
-import { restoreSiteHelper } from '@pubstudio/frontend/feature-site-store'
+import { restoreSiteHelper } from '@pubstudio/frontend/util-command'
 import { serializeEditor, storeSite } from '@pubstudio/frontend/util-site-store'
 import {
   IEditorContext,

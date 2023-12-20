@@ -2,11 +2,8 @@ import { useLocalSiteApi, usePlatformSiteApi } from '@pubstudio/frontend/data-ac
 import { ApiInjectionKey } from '@pubstudio/frontend/data-access-injection'
 import { useSiteApi } from '@pubstudio/frontend/data-access-site-api'
 import { store } from '@pubstudio/frontend/data-access-web-store'
-import {
-  restoreSiteError,
-  restoreSiteHelper,
-} from '@pubstudio/frontend/feature-site-store'
 import { parseApiErrorKey, PSApi, toApiError } from '@pubstudio/frontend/util-api'
+import { restoreSiteError, restoreSiteHelper } from '@pubstudio/frontend/util-command'
 import { serializeEditor, storeSite } from '@pubstudio/frontend/util-site-store'
 import { IApiError } from '@pubstudio/shared/type-api'
 import {

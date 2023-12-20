@@ -85,11 +85,14 @@ export interface IComponentEventBehavior {
 // Map of event names to events
 export type IComponentEvents = Record<string, IComponentEvent>
 
+// Map of override IDs to styles
+export type IComponentStyleOverrides = Record<string, IBreakpointStyles>
+
 export interface IComponentStyle {
   custom: IBreakpointStyles
   mixins?: string[]
   // Custom style selectors scoped to this component
-  overrides?: Record<string, IBreakpointStyles>
+  overrides?: IComponentStyleOverrides
 }
 
 export interface IComponent {

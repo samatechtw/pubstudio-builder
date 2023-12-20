@@ -22,20 +22,20 @@
         v-for="(forward, index) in forwardHistory"
         :key="`f${index}`"
         :command="forward"
-        @click="redoN(forwardHistory.length - index)"
+        @click="redoN(site, forwardHistory.length - index)"
       />
       <HistoryRow
         v-for="(back, index) in backHistory"
         :key="`b${index}`"
         :command="back"
         :isCurrent="index === 0"
-        @click="undoN(index)"
+        @click="undoN(site, index)"
       />
       <HistoryRow
         v-if="!noCommands"
         :command="{ type: 'initial' as CommandType, data: {} }"
         :isCurrent="backHistory.length === 0"
-        @click="undoN(backHistory.length)"
+        @click="undoN(site, backHistory.length)"
       />
     </div>
     <ConfirmModal
@@ -51,7 +51,7 @@
 <script lang="ts" setup>
 import { computed, ref } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
-import { undoN, redoN, clearAll } from '@pubstudio/frontend/feature-command'
+import { undoN, redoN, clearAll } from '@pubstudio/frontend/util-command'
 import { CommandType } from '@pubstudio/shared/type-command'
 import { ConfirmModal, PSButton } from '@pubstudio/frontend/ui-widgets'
 import { useBuild } from '@pubstudio/frontend/feature-build'
@@ -75,7 +75,7 @@ const noCommands = computed(
 
 const clearHistory = () => {
   showClearModal.value = false
-  clearAll()
+  clearAll(site.value)
 }
 </script>
 

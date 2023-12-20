@@ -12,7 +12,7 @@ import {
   descSortedBreakpoints,
 } from '@pubstudio/frontend/feature-site-source'
 import { Edit } from '@pubstudio/frontend/ui-widgets'
-import { setSelectedComponent } from '@pubstudio/frontend/util-build'
+import { setSelectedComponent } from '@pubstudio/frontend/util-command'
 import { findStyles } from '@pubstudio/frontend/util-component'
 import { RenderMode } from '@pubstudio/frontend/util-render'
 import { resetRuntimeContext, runtimeContext } from '@pubstudio/frontend/util-runtime'

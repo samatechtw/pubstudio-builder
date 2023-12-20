@@ -125,9 +125,6 @@
       "@pubstudio/frontend/feature-build-event": [
         "libs/frontend/feature-build-event/src/index.ts"
       ],
-      "@pubstudio/frontend/feature-command": [
-        "libs/frontend/feature-command/src/index.ts"
-      ],
       "@pubstudio/frontend/feature-preview": [
         "libs/frontend/feature-preview/src/index.ts"
       ],
@@ -153,8 +150,10 @@
       "@pubstudio/web/type-builtins": ["libs/web/type-builtins/src/index.ts"],
       "@pubstudio/frontend/ui-build": ["libs/frontend/ui-build/src/index.ts"],
       "@pubstudio/frontend/ui-theme": ["libs/frontend/ui-theme/src"],
-      "@pubstudio/frontend/util-build": ["libs/frontend/util-build/src/index.ts"],
       "@pubstudio/frontend/util-command": ["libs/frontend/util-command/src/index.ts"],
+      "@pubstudio/frontend/util-command-data": [
+        "libs/frontend/util-command-data/src/index.ts"
+      ],
       "@pubstudio/frontend/util-component": ["libs/frontend/util-component/src/index.ts"],
       "@pubstudio/frontend/util-edit-text": ["libs/frontend/util-edit-text/src/index.ts"],
       "@pubstudio/frontend/util-ids": ["libs/frontend/util-ids/src/index.ts"],

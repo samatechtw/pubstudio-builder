@@ -13,6 +13,7 @@
         :modelValue="style.value"
         class="value-multiselect"
         :options="valueOptions"
+        @keyup="checkEscape"
         @update:modelValue="updateValue"
       />
       <PSInput
@@ -58,6 +59,7 @@ import { StyleProperty, StyleValue } from '@pubstudio/frontend/ui-widgets'
 import { Check, Edit, InfoBubble, Minus, PSInput } from '@pubstudio/frontend/ui-widgets'
 import { Css, CssPseudoClass, cssValues, IStyleEntry } from '@pubstudio/shared/type-site'
 import { useBuild, validateCssValue } from '@pubstudio/frontend/feature-build'
+import { Keys } from '@pubstudio/frontend/util-key-listener'
 
 const { t } = useI18n()
 const { site } = useBuild()
@@ -151,6 +153,12 @@ const valueErrorMessage = computed(() => {
 
 const updateValue = (value: string) => {
   emit('setValue', value)
+}
+
+const checkEscape = (e: KeyboardEvent) => {
+  if (e.key === Keys.Escape) {
+    saveStyle()
+  }
 }
 
 const saveStyle = () => {

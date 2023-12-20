@@ -1,6 +1,6 @@
-import { redoCommand, undoLastCommand } from '@pubstudio/frontend/feature-command'
 import { initializeSiteStore } from '@pubstudio/frontend/feature-site-store-init'
 import { h1 } from '@pubstudio/frontend/util-builtin'
+import { redoCommand, undoLastCommand } from '@pubstudio/frontend/util-command'
 import { stringifySite } from '@pubstudio/frontend/util-site-store'
 import { IUseBuild, useBuild } from './use-build'
 
@@ -24,9 +24,9 @@ describe('Use Build', () => {
     const siteStr = stringifySite(build.site.value)
 
     // Undo and redo
-    undoLastCommand()
+    undoLastCommand(build.site.value)
     expect(build.site.value.context.nextId).toEqual(1)
-    redoCommand()
+    redoCommand(build.site.value)
 
     expect(build.site.value.context.nextId).toEqual(2)
     expect(siteStr).toEqual(stringifySite(build.site.value))

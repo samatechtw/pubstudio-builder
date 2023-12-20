@@ -1,7 +1,7 @@
 import { setBuildSubmenu, useBuild } from '@pubstudio/frontend/feature-build'
 import { activeBreakpoint } from '@pubstudio/frontend/feature-site-source'
-import { resolvedComponentStyle } from '@pubstudio/frontend/util-build'
 import { resolveComponent } from '@pubstudio/frontend/util-builtin'
+import { resolvedComponentStyle } from '@pubstudio/frontend/util-component'
 import { isDynamicComponent } from '@pubstudio/frontend/util-ids'
 import { IAddComponentData } from '@pubstudio/shared/type-command-data'
 import {
