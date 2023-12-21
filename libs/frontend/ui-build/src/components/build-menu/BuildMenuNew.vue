@@ -62,6 +62,11 @@
         :text="t('build.input')"
         :builtinComponentId="input.id"
       />
+      <NewComponent
+        class="new-textarea"
+        :text="t('build.textarea')"
+        :builtinComponentId="textarea.id"
+      />
     </div>
   </div>
 </template>
@@ -87,6 +92,7 @@ import {
   header,
   footer,
   input,
+  textarea,
   svg,
 } from '@pubstudio/frontend/util-builtin'
 import NewComponent from './NewComponent.vue'

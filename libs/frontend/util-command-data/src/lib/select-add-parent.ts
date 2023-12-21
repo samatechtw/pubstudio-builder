@@ -11,7 +11,13 @@ export const selectAddParent = (
     return { parentId: fallbackId as string }
   }
   const { tag, content } = selectedComponent
-  if (content || tag === Tag.Img || tag === Tag.Input || tag === Tag.Span) {
+  if (
+    content ||
+    tag === Tag.Img ||
+    tag === Tag.Input ||
+    tag === Tag.Textarea ||
+    tag === Tag.Span
+  ) {
     const parent = selectedComponent.parent
     const index = parent?.children?.findIndex((c) => c.id === selectedComponent.id)
     const parentId = parent?.id ?? fallbackId

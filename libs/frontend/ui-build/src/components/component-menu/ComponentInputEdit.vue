@@ -43,6 +43,7 @@
       <PSButton
         class="save-button"
         :text="t('save')"
+        size="small"
         :secondary="true"
         @click.stop="save"
       />
@@ -50,12 +51,14 @@
         v-if="editInput"
         class="delete-button"
         :text="t('delete')"
+        size="small"
         :secondary="true"
         @click.stop="emit('remove', editInput?.name as string)"
       />
       <PSButton
         class="cancel-button"
         :text="t('cancel')"
+        size="small"
         :secondary="true"
         @click.stop="emit('cancel')"
       />
@@ -129,7 +132,14 @@ const save = () => {
 .input-actions {
   @mixin menu-actions;
   > button {
-    width: 31%;
+    margin: 0 3px;
+    min-width: calc(33.3% - 6px);
+    &:first-child {
+      margin: 0 6px 0 0;
+    }
+    &:last-child {
+      margin: 0 0 0 6px;
+    }
   }
 }
 .input-attr {
