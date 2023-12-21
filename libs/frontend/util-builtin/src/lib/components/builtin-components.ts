@@ -12,6 +12,7 @@ import { ol, ul } from './builtin-list'
 import { navMenu, navMenuItem } from './builtin-nav-menu'
 import { svg } from './builtin-svg'
 import { text } from './builtin-text'
+import { textarea } from './builtin-textarea'
 
 export const builtinComponents: Record<string, ISerializedComponent> = {
   [containerHorizontal.id]: containerHorizontal,
@@ -36,6 +37,7 @@ export const builtinComponents: Record<string, ISerializedComponent> = {
   [navMenuItem.id]: navMenuItem,
   [footer.id]: footer,
   [input.id]: input,
+  [textarea.id]: textarea,
   [ul.id]: ul,
   [ol.id]: ol,
 }

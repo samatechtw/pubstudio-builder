@@ -79,6 +79,12 @@ export const computeBuilderStyleProps = (
       e.preventDefault()
     }
   }
+  if (component.tag === Tag.Input || component.tag === Tag.Textarea) {
+    builderProps['onMousedown'] = (e: MouseEvent) => {
+      e.preventDefault()
+    }
+    builderStyle['cursor'] = 'default'
+  }
   if (selected) {
     if (component.tag === Tag.A) {
       extraChildren = [
@@ -203,7 +209,6 @@ export const computePropsContent = (
 ): IPropsBuildContent => {
   // TODO -- handle inputs
   const data = computeAttrsInputsMixins(site.context, component, { renderMode })
-  // TODO -- should we inherit events?
   const events = computeEvents(site, component)
 
   const { editor } = site

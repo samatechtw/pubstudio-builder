@@ -20,6 +20,7 @@ import { listStyle } from './components/builtin-list'
 import { navMenuItemStyle, navMenuStyle } from './components/builtin-nav-menu'
 import { svgStyle } from './components/builtin-svg'
 import { textStyle } from './components/builtin-text'
+import { textareaStyle } from './components/builtin-textarea'
 import { parseId } from './resolve-util'
 
 export const builtinStyles: Record<string, IStyle> = {
@@ -41,6 +42,7 @@ export const builtinStyles: Record<string, IStyle> = {
   [headerStyle.id]: headerStyle,
   [footerStyle.id]: footerStyle,
   [inputStyle.id]: inputStyle,
+  [textareaStyle.id]: textareaStyle,
   [listStyle.id]: listStyle,
 }
 

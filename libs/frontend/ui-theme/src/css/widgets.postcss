@@ -96,14 +96,17 @@
   display: flex;
   justify-content: space-between;
   margin-top: 16px;
-  > button {
-    width: 48%;
-  }
   .save-button {
     background-color: $color-button-bg;
+    &:hover {
+      background-color: rgba($color-button-bg, 0.7);
+    }
   }
   .delete-button {
     background-color: $color-red;
+    &:hover {
+      background-color: rgba($color-red, 0.7);
+    }
   }
 }
 

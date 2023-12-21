@@ -65,3 +65,6 @@ export const headerId = componentId(defaultContext.namespace, 'header')
 export const headerLogoId = componentId(defaultContext.namespace, 'headerLogo')
 export const headerLogoLinkId = componentId(defaultContext.namespace, 'headerLogoLink')
 export const headerNavMenuId = componentId(defaultContext.namespace, 'headerNavMenu')
+
+export const textareaStyleId = nextStyleId(defaultContext)
+export const textareaId = componentId(defaultContext.namespace, 'textarea')
