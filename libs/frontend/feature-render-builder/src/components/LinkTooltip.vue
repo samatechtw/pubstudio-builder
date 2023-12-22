@@ -42,7 +42,16 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, nextTick, ref, toRefs, onMounted, onUnmounted } from 'vue'
+import {
+  computed,
+  nextTick,
+  ref,
+  toRefs,
+  onMounted,
+  onUnmounted,
+  toRaw,
+  watch,
+} from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import {
   Check,
@@ -56,6 +65,10 @@ import { useBuild, getLinkDatalistOptions } from '@pubstudio/frontend/feature-bu
 import { useTooltip } from '@pubstudio/frontend/util-tooltip'
 import { resolveComponent } from '@pubstudio/frontend/util-builtin'
 import { ComponentArgPrimitive } from '@pubstudio/shared/type-site'
+import { LinkTooltipMode } from '../lib/enum-link-tooltip-mode'
+import { createLinkNode, schemaText } from '@pubstudio/frontend/util-edit-text'
+import { EditorView } from 'prosemirror-view'
+import { TextSelection } from 'prosemirror-state'
 
 const { t } = useI18n()
 const {
@@ -66,16 +79,27 @@ const {
   removeComponentInput,
 } = useBuild()
 
-const props = defineProps<{
-  link: string
-  componentId: string
-}>()
-const { link, componentId } = toRefs(props)
+const props = withDefaults(
+  defineProps<{
+    link: string
+    componentId: string
+    defaultOpenInNewTab?: boolean
+    mode: LinkTooltipMode
+    editView?: EditorView
+    anchor?: Element
+  }>(),
+  {
+    editView: undefined,
+    defaultOpenInNewTab: false,
+    anchor: undefined,
+  },
+)
+const { link, componentId, defaultOpenInNewTab, mode, editView, anchor } = toRefs(props)
 
 const linkInput = ref()
 const editing = ref(false)
 const editedLink = ref('')
-const openInNewTab = ref(false)
+const openInNewTab = ref(defaultOpenInNewTab.value)
 
 const linkDatalist = computed(() => getLinkDatalistOptions(site.value, componentId.value))
 
@@ -96,16 +120,31 @@ const gotoPage = () => {
 const edit = async () => {
   editing.value = true
   editedLink.value = link.value
-  openInNewTab.value = componentTargetInput.value === '_blank'
+  if (mode.value === LinkTooltipMode.Component) {
+    // Overwrite openInNewTab with the latest component input because inputs can be changed
+    // from the component menu when LinkTooltip is already mounted.
+    openInNewTab.value = componentTargetInput.value === '_blank'
+  }
   await nextTick()
   linkInput.value?.inputRef?.focus()
   await updatePosition()
 }
 
 const updateLink = async () => {
-  setSelectedIsInput('href', editedLink.value)
   editing.value = false
+
+  if (mode.value === LinkTooltipMode.Component) {
+    updateComponentInputs()
+  } else if (mode.value === LinkTooltipMode.ProseMirror) {
+    updateProseMirrorLink()
+  }
+
   editedLink.value = ''
+  await updatePosition()
+}
+
+const updateComponentInputs = () => {
+  setSelectedIsInput('href', editedLink.value)
 
   if (openInNewTab.value) {
     addOrUpdateComponentInput('target', {
@@ -117,8 +156,30 @@ const updateLink = async () => {
   } else if (componentTargetInput.value === '_blank') {
     removeComponentInput('target')
   }
+}
 
-  await updatePosition()
+const updateProseMirrorLink = () => {
+  // toRaw is necessary because ProseMirror doesn't behave well when proxied
+  // eslint-disable-next-line max-len
+  // https://discuss.prosemirror.net/t/getting-rangeerror-applying-a-mismatched-transaction-even-with-trivial-code/4948/6
+  const { state } = toRaw(editView.value) ?? {}
+  if (state) {
+    const { $cursor } = state.selection as TextSelection
+    if ($cursor) {
+      const cursorPos = $cursor.pos
+      state.doc.nodesBetween(cursorPos, cursorPos, (node, startPos) => {
+        // `nodesBetween` will gives us both root node and link node.
+        // Check `childCount` to make sure it is the link node that gets replaced.
+        if (node.childCount === 0) {
+          const endPos = startPos + node.nodeSize
+          const target = openInNewTab.value ? '_blank' : undefined
+          // TODO: is it necessary & possible to keep other marks? (color, font-weight, font-family, etc)
+          const newLinkNode = createLinkNode(schemaText, editedLink.value, target)
+          editView.value?.dispatch(state.tr.replaceWith(startPos, endPos, newLinkNode))
+        }
+      })
+    }
+  }
 }
 
 const {
@@ -134,9 +195,16 @@ const {
   flip: true,
 })
 
+const getAnchor = () => anchor.value ?? document.getElementById(componentId.value)
+
 onMounted(() => {
-  itemRef.value = document.getElementById(componentId.value)
+  itemRef.value = getAnchor()
   tooltipMouseEnter()
+})
+
+watch(anchor, () => {
+  itemRef.value = getAnchor()
+  updatePosition()
 })
 
 onUnmounted(() => {

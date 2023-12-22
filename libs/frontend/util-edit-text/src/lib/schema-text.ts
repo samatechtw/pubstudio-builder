@@ -167,19 +167,24 @@ const marks = {
     attrs: {
       href: {},
       title: { default: null },
+      target: { default: null },
     },
     inclusive: false,
     parseDOM: [
       {
         tag: 'a[href]',
         getAttrs(dom: HTMLElement) {
-          return { href: dom.getAttribute('href'), title: dom.getAttribute('title') }
+          return {
+            href: dom.getAttribute('href'),
+            title: dom.getAttribute('title'),
+            target: dom.getAttribute('target'),
+          }
         },
       },
     ],
     toDOM(node) {
-      const { href, title } = node.attrs
-      return ['a', { href, title }, 0]
+      const { href, title, target } = node.attrs
+      return ['a', { href, title, target }, 0]
     },
   } as MarkSpec,
 

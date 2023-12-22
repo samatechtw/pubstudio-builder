@@ -48,6 +48,9 @@ const findClickedComponentTreeItemId = (
   if (componentTreeItem) {
     return componentTreeItem.id
   } else {
+    // Convert tag name to lowercase because the casing is different in HTML & XML/XHTML.
+    const tagName = target?.tagName?.toLowerCase()
+
     // When the eye button in a component tree item is clicked, the editor will scroll to
     // the corresponding component, so the "press enter to rename" feature should also
     // work. We use `element.closest` to find the corresponding tree item when click event
@@ -58,13 +61,16 @@ const findClickedComponentTreeItemId = (
     // lose the renaming state (click on the rename input should not be considered as clicking outside).
     // So we have to add dataset on the rename input to store tree item id for retrieving later as well.
     let element: HTMLElement | undefined | null
-    if (target?.tagName === 'svg' || target?.tagName === 'input') {
+    if (tagName === 'svg' || tagName === 'input') {
       element = target
-    } else if (target?.tagName === 'path') {
-      element = target.parentElement
+    } else if (tagName === 'path') {
+      element = (target as HTMLElement).parentElement
     }
     return element?.dataset.treeItemId
   }
+}
+const isProseMirrorLink = (target: HTMLElement | undefined): boolean => {
+  return !!target?.closest('a') && !!target?.closest('.pm-p')
 }
 const isBuildMenu = (target: HTMLElement | undefined): boolean => {
   return !!target?.closest('.build-menu')
@@ -166,6 +172,10 @@ export const useBuildEvent = () => {
     if (isRenderer(target)) {
       if (!mouseDownOnTextEditableComponent) {
         clickRenderer(target)
+      }
+      if (isProseMirrorLink(target)) {
+        // Prevent links in prosemirror editor from being opened upon click.
+        event.preventDefault()
       }
     } else if (isStyleToolbar(target)) {
       clickStyleToolbar(target)

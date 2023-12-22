@@ -76,19 +76,19 @@ watch(editViewTxCount, (newCount, oldCount) => {
       ? 'italic'
       : undefined
 
-    const colorMark = firstMarkInSelection(state, schema.marks.color)
+    const [colorMark] = firstMarkInSelection(state, schema.marks.color)
     selectionStyles[Css.Color] = colorMark?.attrs.color
 
-    const bgMark = firstMarkInSelection(state, schema.marks.bg)
+    const [bgMark] = firstMarkInSelection(state, schema.marks.bg)
     selectionStyles[Css.BackgroundColor] = bgMark?.attrs[Css.BackgroundColor]
 
-    const weightMark = firstMarkInSelection(state, schema.marks.strong)
+    const [weightMark] = firstMarkInSelection(state, schema.marks.strong)
     selectionStyles[Css.FontWeight] = weightMark?.attrs[Css.FontWeight]
 
-    const fontMark = firstMarkInSelection(state, schema.marks.font)
+    const [fontMark] = firstMarkInSelection(state, schema.marks.font)
     selectionStyles[Css.FontFamily] = fontMark?.attrs[Css.FontFamily]
 
-    const sizeMark = firstMarkInSelection(state, schema.marks.size)
+    const [sizeMark] = firstMarkInSelection(state, schema.marks.size)
     selectionStyles[Css.FontSize] = sizeMark?.attrs[Css.FontSize]
   }
 })
