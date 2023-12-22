@@ -1,5 +1,6 @@
 import {
   createComponentEditorView,
+  editViewTxCount,
   getProseMirrorContainerId,
   useBuild,
   useToolbar,
@@ -32,7 +33,10 @@ import {
   toRaw,
   toRefs,
   watch,
+  Teleport,
 } from 'vue'
+import LinkTooltip from './LinkTooltip.vue'
+import { LinkTooltipMode } from '../lib/enum-link-tooltip-mode'
 
 export const ProseMirrorEditor = defineComponent({
   name: 'ProseMirrorEditor',
@@ -57,7 +61,7 @@ export const ProseMirrorEditor = defineComponent({
 
     const markStrong = (state: EditorState, dispatch?: (tr: Transaction) => void) => {
       const fallbackStyle = getStyleValue(Css.FontWeight)
-      const mark = firstMarkInSelection(state, schemaText.marks.strong)
+      const [mark] = firstMarkInSelection(state, schemaText.marks.strong)
       const newWeight = mark?.attrs[Css.FontWeight] === '700' ? '400' : '700'
       const cmd = setOrRemoveStyleMark(
         schemaText.marks.strong,
@@ -201,12 +205,51 @@ export const ProseMirrorEditor = defineComponent({
       },
     )
 
+    const cursorLinkAttrs = ref()
+    let linkElement: Element | undefined = undefined
+
+    watch(editViewTxCount, () => {
+      const { editView } = editor.value
+      if (editView) {
+        const [linkMark, element] = firstMarkInSelection(
+          editView.state,
+          schemaText.marks.link,
+          editView,
+        )
+        cursorLinkAttrs.value = linkMark?.attrs
+        linkElement = element
+      }
+    })
+
     return () => {
-      return h('div', {
-        id: containerId.value,
-        ref: container,
-        class: 'prose-mirror-editor-container',
-      })
+      return h(
+        'div',
+        {
+          id: containerId.value,
+          ref: container,
+          class: 'prose-mirror-editor-container',
+        },
+        cursorLinkAttrs.value
+          ? h(
+              // Use teleport to prevent LinkTooltip from constantly changing position
+              // due to the relative/absolute layout in the builder.
+              Teleport,
+              {
+                to: 'body',
+              },
+              [
+                h(LinkTooltip, {
+                  link: cursorLinkAttrs.value.href ?? '',
+                  componentId: component.value.id,
+                  defaultOpenInNewTab: cursorLinkAttrs.value.target === '_blank',
+                  mode: LinkTooltipMode.ProseMirror,
+                  editView: editor.value.editView,
+                  anchor: linkElement,
+                }),
+              ],
+            )
+          : undefined,
+      )
     }
   },
 })

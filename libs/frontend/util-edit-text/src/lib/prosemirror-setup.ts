@@ -12,14 +12,27 @@ export interface IProsemirrorSetupOptions {
   schema: Schema
   mapKeys?: { [key: string]: Command }
   plugins?: EditorStateConfig['plugins']
+  overwriteBaseKeys?: string[]
 }
 
 export function prosemirrorSetup(options: IProsemirrorSetupOptions): EditorState {
-  const { content: contentOption, mapKeys, plugins: pluginsOption, schema } = options
+  const {
+    content: contentOption,
+    schema,
+    mapKeys,
+    plugins: pluginsOption,
+    overwriteBaseKeys,
+  } = options
+
+  const baseKeyBinding = { ...baseKeymap }
+  overwriteBaseKeys?.forEach((key) => {
+    delete baseKeyBinding[key]
+  })
+
   const plugins = [
     buildInputRules(schema),
     keymap(buildKeymap(schema, mapKeys)),
-    keymap(baseKeymap),
+    keymap(baseKeyBinding),
     gapCursor(),
     history(),
     new Plugin({

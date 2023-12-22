@@ -3,11 +3,13 @@ import {
   IProsemirrorSetupOptions,
   prosemirrorSetup,
   schemaText,
+  parseLinksDuringPaste,
+  textToLinkKeymap,
 } from '@pubstudio/frontend/util-edit-text'
 import { EditorView } from 'prosemirror-view'
+import { keymap } from 'prosemirror-keymap'
 import { ref, Ref } from 'vue'
 import { useBuild } from './use-build'
-import { whitespacePasteFixPlugin } from './whitespace-paste-fix-plugin'
 
 // Use to detect updates in the ProseMirror component edit view
 export const editViewTxCount = ref(0)
@@ -20,11 +22,17 @@ export function createComponentEditorView(
   if (!container) {
     return undefined
   }
-  const plugins = [...(options.plugins ?? []), whitespacePasteFixPlugin(schemaText)]
+  const plugins = [
+    ...(options.plugins ?? []),
+    keymap(textToLinkKeymap(schemaText)),
+    parseLinksDuringPaste(schemaText),
+  ]
   const state = prosemirrorSetup({
     ...options,
     plugins,
     schema: schemaText,
+    // Overwrite Enter key so that `textToLinkKeymap` could work properly.
+    overwriteBaseKeys: ['Enter'],
   })
 
   const view = new EditorView(container, {

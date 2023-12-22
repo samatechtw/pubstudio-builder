@@ -1,10 +1,12 @@
-import { schemaCode } from '@pubstudio/frontend/util-edit-text'
+import {
+  schemaCode,
+  preserveWhiteSpacesDuringPaste,
+} from '@pubstudio/frontend/util-edit-text'
 import { Keys } from '@pubstudio/frontend/util-key-listener'
 import hljs from 'highlight.js/lib/core'
 import { keymap } from 'prosemirror-keymap'
 import { Plugin } from 'prosemirror-state'
 import { highlightPlugin } from './prosemirror-highlighthjs-plugin'
-import { whitespacePasteFixPlugin } from './whitespace-paste-fix-plugin'
 
 // Manually insert a new line instead of using the default behavior to avoid creating
 // a new block of <p> as a sibling of <pre>.
@@ -36,6 +38,6 @@ export const codeEditorPlugins: Plugin[] = [
     },
   }),
   highlightPlugin(hljs),
-  whitespacePasteFixPlugin(schemaCode),
+  preserveWhiteSpacesDuringPaste(schemaCode),
   interceptNewLineEventPlugin,
 ]

@@ -30,6 +30,7 @@ import { ListAdd } from '../components/ListAdd'
 import { ProseMirrorEditor } from '../components/ProseMirrorEditor'
 import { IDndState } from './dnd/builder-dnd'
 import { BuilderDndComponent } from './dnd/builder-dnd-component'
+import { LinkTooltipMode } from './enum-link-tooltip-mode'
 
 // Style and props for a component rendered in the builder
 export interface IBuilderStyleProps {
@@ -89,8 +90,9 @@ export const computeBuilderStyleProps = (
     if (component.tag === Tag.A) {
       extraChildren = [
         h(LinkTooltip, {
-          link: data.attrs.href,
+          link: data.attrs.href ?? '',
           componentId: component.id,
+          mode: LinkTooltipMode.Component,
         }),
       ]
       data.mixins.push('__link')

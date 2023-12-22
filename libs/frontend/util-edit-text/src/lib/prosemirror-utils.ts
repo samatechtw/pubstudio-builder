@@ -1,6 +1,7 @@
-import { Attrs, Mark, MarkType } from 'prosemirror-model'
+import { Attrs, Mark, MarkType, ResolvedPos } from 'prosemirror-model'
 import { Command, EditorState, SelectionRange, TextSelection } from 'prosemirror-state'
 import { EditorView } from 'prosemirror-view'
+import { Schema } from 'prosemirror-model'
 
 const posWithoutSpaces = (range: SelectionRange) => {
   const { $from, $to } = range
@@ -38,17 +39,45 @@ export const isMarkInSelection = (view: EditorView, mark: MarkType): boolean => 
   }
 }
 
+const findElementFromCursor = (
+  view: EditorView | undefined,
+  $cursor: ResolvedPos,
+): Element | undefined => {
+  const pos = $cursor.pos - $cursor.textOffset
+  const nodeOrElement = view?.nodeDOM(pos) ?? null
+
+  let element: Element | Node | null = nodeOrElement
+  while (element && !(element instanceof Element)) {
+    element = element.parentElement
+  }
+
+  return element ?? undefined
+}
+
 export const firstMarkInSelection = (
   state: EditorState | undefined,
   mark: MarkType,
-): Mark | undefined => {
+  view?: EditorView,
+): [Mark | undefined, Element | undefined] => {
   const selection = state?.selection as TextSelection
   if (!state || !selection || (selection.empty && !selection.$cursor)) {
-    return undefined
+    return [undefined, undefined]
   }
   const { $cursor, ranges } = selection
   if ($cursor) {
-    return mark.isInSet(state.storedMarks || $cursor.marks())
+    const marks = $cursor.marks()
+    const markInSet = mark.isInSet(state.storedMarks || marks)
+    if (markInSet) {
+      return [markInSet, findElementFromCursor(view, $cursor)]
+    } else {
+      // FIXME: this is a workaround for link mark not being found in `mark.isInSet`.
+      const firstMark = marks[0]
+      if (firstMark?.type.name === mark.name) {
+        return [firstMark, findElementFromCursor(view, $cursor)]
+      } else {
+        return [undefined, undefined]
+      }
+    }
   } else {
     let found: Mark | undefined = undefined
     ranges.some((r) => {
@@ -56,9 +85,9 @@ export const firstMarkInSelection = (
         if (found) return false
         found = mark.isInSet(node.marks)
       })
-      return !!found
+      return [!!found, undefined]
     })
-    return found
+    return [found, undefined]
   }
 }
 
@@ -141,4 +170,13 @@ export const replaceMark = (markType: MarkType, attrs: Attrs | null = null): Com
     }
     return true
   }
+}
+
+export const createLinkNode = (schema: Schema, href: string, target?: string) => {
+  const attrs = {
+    title: href,
+    href: href,
+    target: target ?? null,
+  }
+  return schema.text(href, [schema.mark('link', attrs), schema.mark('u')])
 }
