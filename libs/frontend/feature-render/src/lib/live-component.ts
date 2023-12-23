@@ -1,15 +1,7 @@
 import { RenderMode } from '@pubstudio/frontend/util-render'
-import { RouterLink as CustomRouterLink } from '@pubstudio/frontend/util-router'
+import { RouterLink } from '@pubstudio/frontend/util-router'
 import { IComponent, ISite, Tag } from '@pubstudio/shared/type-site'
-import {
-  Component,
-  defineComponent,
-  h,
-  onMounted,
-  onUnmounted,
-  PropType,
-  toRefs,
-} from 'vue'
+import { defineComponent, h, onMounted, onUnmounted, PropType, toRefs } from 'vue'
 import { registerCustomEvents, removeListeners } from './custom-event-handlers'
 import { IContent } from './i-props-content'
 import { computePropsContent } from './render'
@@ -77,7 +69,7 @@ export const LiveComponent = () => {
         if (tag === Tag.A) {
           const path = props.href ?? ''
           return h(
-            CustomRouterLink as Component,
+            RouterLink,
             {
               ...renderProps,
               to: { path },
