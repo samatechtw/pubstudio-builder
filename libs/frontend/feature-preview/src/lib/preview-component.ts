@@ -60,7 +60,7 @@ export const PreviewComponent = () => {
         }
 
         if (tag === Tag.A) {
-          // TODO: merge back with `live-comopnent.ts` once the custom router is used for `web`
+          // TODO: merge back with `live-component.ts` once the custom router is used for `web`
           const hrefProp = (props.href ?? '') as string
 
           if (/^(https?:\/\/|www\.)/.test(hrefProp)) {

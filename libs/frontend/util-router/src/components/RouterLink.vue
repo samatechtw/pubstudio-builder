@@ -4,7 +4,7 @@
     :class="{ 'router-link-active': isActive, 'router-link-exact-active': isExactActive }"
     :href="href"
     :target="target"
-    @click.prevent="navigate"
+    @click="navigate"
   >
     <slot />
   </a>
@@ -67,11 +67,15 @@ const isExactActive = computed(() => {
   return lastMatch?.name === targetRoute.value?.name
 })
 
-const navigate = () => {
-  if (replace.value) {
-    router.replace(to.value)
-  } else {
-    router.push(to.value)
+const navigate = (e: Event) => {
+  const isExternal = /^(https?:\/\/|www\.)/.test(to.value.path ?? '')
+  if (!isExternal) {
+    e.preventDefault()
+    if (replace.value) {
+      router.replace(to.value)
+    } else {
+      router.push(to.value)
+    }
   }
 }
 </script>
