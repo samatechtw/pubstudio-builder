@@ -10,10 +10,12 @@ import {
   IComponent,
   IInheritedStyleEntry,
   IRawStylesWithSource,
+  IRawStyleWithSource,
   IStyle,
   IStyleEntry,
   StyleSourceType,
 } from '@pubstudio/shared/type-site'
+import { useI18n } from 'petite-vue-i18n'
 import { computed, ComputedRef, Ref, ref, toRaw } from 'vue'
 import { useBuild } from './use-build'
 
@@ -54,6 +56,7 @@ export const resetStyleMenu = () => {
 }
 
 export const useReusableStyleMenu = (): IUseStyleMenuFeature => {
+  const { t } = useI18n()
   const { site, editor, currentPseudoClass, addStyle, convertComponentStyle, editStyle } =
     useBuild()
 
@@ -143,9 +146,20 @@ export const useReusableStyleMenu = (): IUseStyleMenuFeature => {
           sourceType: source.sourceType,
           sourceId: source.sourceId,
           sourceBreakpointId: source.sourceBreakpointId,
+          inheritedFrom: getInheritedFrom(source),
         }) as IInheritedStyleEntry,
     )
   })
+
+  const getInheritedFrom = (entry: IRawStyleWithSource): string | undefined => {
+    if (entry.sourceBreakpointId !== activeBreakpoint.value.id) {
+      return t('style.inherited_breakpoint', {
+        breakpoint: site.value.context.breakpoints[entry.sourceBreakpointId]?.name,
+      })
+    } else {
+      return undefined
+    }
+  }
 
   const newEditingStyleProp = () => {
     const rawStyle = getActiveRawStyle()

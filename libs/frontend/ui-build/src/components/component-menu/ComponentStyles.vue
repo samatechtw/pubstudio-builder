@@ -20,8 +20,8 @@
         :key="entry.property"
         :style="entry"
         :editing="editing(entry.property)"
+        :omitEditProperties="nonInheritedProperties"
         :error="!resolveThemeVariables(site.context, entry.value)"
-        :inheritedFrom="getInheritedFrom(entry)"
         class="menu-row"
         @setProperty="setProperty(entry, $event)"
         @setValue="setValue(entry, $event)"
@@ -65,7 +65,7 @@ const {
   setValue,
   saveStyle,
   removeStyle,
-  getInheritedFrom,
+  nonInheritedProperties,
   editStyles,
 } = useEditComponentStyles({ styleType: StyleType.ComponentCustom })
 

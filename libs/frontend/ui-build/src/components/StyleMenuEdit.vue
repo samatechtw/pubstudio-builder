@@ -18,7 +18,6 @@
       :key="`${entry.sourceBreakpointId}-${entry.property}`"
       :style="entry"
       :editing="!entry.property || editing(entry.property)"
-      :inheritedFrom="getInheritedFrom(entry)"
       :focusProp="!entry.property"
       class="menu-row"
       @edit="editStyle"
@@ -50,8 +49,7 @@
 import { computed, onUnmounted, ref } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { ErrorMessage, PSButton } from '@pubstudio/frontend/ui-widgets'
-import { Css, IInheritedStyleEntry, IStyleEntry } from '@pubstudio/shared/type-site'
-import { activeBreakpoint } from '@pubstudio/frontend/feature-site-source'
+import { Css, IStyleEntry } from '@pubstudio/shared/type-site'
 import {
   useBuild,
   validateCssValue,
@@ -112,16 +110,6 @@ const removeStyle = (property: Css) => {
 }
 
 const menuSubTitle = computed(() => `(${currentPseudoClass.value})`)
-
-const getInheritedFrom = (entry: IInheritedStyleEntry): string | undefined => {
-  if (entry.sourceBreakpointId !== activeBreakpoint.value.id) {
-    return t('style.inherited_breakpoint', {
-      breakpoint: site.value.context.breakpoints[entry.sourceBreakpointId]?.name,
-    })
-  } else {
-    return undefined
-  }
-}
 
 const validateAndSave = () => {
   const allValuesValid = editingStyleEntries.value.every((style) =>

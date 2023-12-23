@@ -5,6 +5,7 @@
         :modelValue="style.property"
         class="property-multiselect"
         :openInitial="!style.property"
+        :omitEditProperties="omitEditProperties"
         @update:modelValue="updateProperty"
       />
       <StyleValue
@@ -37,46 +38,47 @@
     <div class="label">
       {{ propertyText }}
     </div>
-    <div class="value-preview" :class="{ error, ['value-inherited']: inheritedFrom }">
+    <div
+      class="value-preview"
+      :class="{ error, ['value-inherited']: style.inheritedFrom }"
+    >
       {{ style?.value }}
     </div>
     <Edit class="edit-icon" @click="edit" />
-    <Minus v-if="!inheritedFrom" class="item-delete" @click.stop="removeStyle" />
-    <InfoBubble v-if="inheritedFrom" class="inherited-from" :message="inheritedFrom" />
+    <Minus v-if="!style.inheritedFrom" class="item-delete" @click.stop="removeStyle" />
+    <InfoBubble
+      v-if="style.inheritedFrom"
+      class="inherited-from"
+      :message="style.inheritedFrom"
+    />
   </div>
 </template>
-
-<script lang="ts">
-interface IStyleProp extends Omit<IStyleEntry, 'pseudoClass'> {
-  pseudoClass?: CssPseudoClass
-}
-</script>
 
 <script lang="ts" setup>
 import { computed, nextTick, onMounted, ref, toRefs } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { StyleProperty, StyleValue } from '@pubstudio/frontend/ui-widgets'
 import { Check, Edit, InfoBubble, Minus, PSInput } from '@pubstudio/frontend/ui-widgets'
-import { Css, CssPseudoClass, cssValues, IStyleEntry } from '@pubstudio/shared/type-site'
+import {
+  Css,
+  CssPseudoClass,
+  cssValues,
+  IInheritedStyleEntry,
+} from '@pubstudio/shared/type-site'
 import { useBuild, validateCssValue } from '@pubstudio/frontend/feature-build'
 import { Keys } from '@pubstudio/frontend/util-key-listener'
 
 const { t } = useI18n()
 const { site } = useBuild()
 
-const props = withDefaults(
-  defineProps<{
-    editing?: boolean
-    style: IStyleProp
-    error?: boolean
-    inheritedFrom?: string
-    focusProp?: boolean
-  }>(),
-  {
-    inheritedFrom: undefined,
-  },
-)
-const { editing, style, inheritedFrom } = toRefs(props)
+const props = defineProps<{
+  editing?: boolean
+  omitEditProperties: string[]
+  style: IInheritedStyleEntry
+  error?: boolean
+  focusProp?: boolean
+}>()
+const { editing, style } = toRefs(props)
 
 const emit = defineEmits<{
   (e: 'edit', propName: string): void

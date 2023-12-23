@@ -61,7 +61,6 @@
         :key="`${entry.pseudoClass}-${entry.property}-${entry.value}`"
         :style="entry"
         :editing="editing(entry.property)"
-        :inheritedFrom="getInheritedFrom(entry)"
         :error="!resolveThemeVariables(site.context, entry.value)"
         class="menu-row"
         @edit="setEditStyle"
@@ -81,9 +80,9 @@ import {
   Css,
   IComponent,
   IInheritedStyleEntry,
+  IRawStyleWithSource,
   IStyleEntry,
 } from '@pubstudio/shared/type-site'
-import EditMenuTitle from '../EditMenuTitle.vue'
 import { useBuild, setComponentMenuCollapses } from '@pubstudio/frontend/feature-build'
 import { resolveThemeVariables } from '@pubstudio/frontend/util-builtin'
 import {
@@ -95,8 +94,9 @@ import {
   activeBreakpoint,
   descSortedBreakpoints,
 } from '@pubstudio/frontend/feature-site-source'
-import ChildStyleRow from './ChildStyleRow.vue'
 import { runtimeContext } from '@pubstudio/frontend/util-runtime'
+import ChildStyleRow from './ChildStyleRow.vue'
+import EditMenuTitle from '../EditMenuTitle.vue'
 
 const { t } = useI18n()
 const {
@@ -213,6 +213,7 @@ const childStyles = computed<IInheritedStyleEntry[]>(() => {
             sourceType: source.sourceType,
             sourceId: source.sourceId,
             sourceBreakpointId: source.sourceBreakpointId,
+            inheritedFrom: getInheritedFrom(source),
           }) as IInheritedStyleEntry,
       )
   } else {
@@ -220,7 +221,7 @@ const childStyles = computed<IInheritedStyleEntry[]>(() => {
   }
 })
 
-const getInheritedFrom = (entry: IInheritedStyleEntry) => {
+const getInheritedFrom = (entry: IRawStyleWithSource) => {
   if (entry.sourceBreakpointId !== activeBreakpoint.value.id) {
     return t('style.inherited_breakpoint', {
       breakpoint: site.value.context.breakpoints[entry.sourceBreakpointId]?.name,
