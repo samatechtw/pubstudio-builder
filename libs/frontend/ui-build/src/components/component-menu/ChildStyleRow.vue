@@ -37,27 +37,34 @@
     <div class="label">
       {{ propertyText }}
     </div>
-    <div class="value-preview" :class="{ error, ['value-inherited']: inheritedFrom }">
+    <div
+      class="value-preview"
+      :class="{ error, ['value-inherited']: style?.inheritedFrom }"
+    >
       {{ style?.value }}
     </div>
     <Edit class="edit-icon" @click="edit" />
-    <Minus v-if="!inheritedFrom" class="item-delete" @click.stop="removeStyle" />
-    <InfoBubble v-if="inheritedFrom" class="inherited-from" :message="inheritedFrom" />
+    <Minus v-if="!style?.inheritedFrom" class="item-delete" @click.stop="removeStyle" />
+    <InfoBubble
+      v-if="style?.inheritedFrom"
+      class="inherited-from"
+      :message="style?.inheritedFrom"
+    />
   </div>
 </template>
-
-<script lang="ts">
-interface IStyleProp extends Omit<IStyleEntry, 'pseudoClass'> {
-  pseudoClass?: CssPseudoClass
-}
-</script>
 
 <script lang="ts" setup>
 import { computed, nextTick, ref, toRefs } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { StyleProperty, StyleValue } from '@pubstudio/frontend/ui-widgets'
 import { Check, Edit, InfoBubble, Minus, PSInput } from '@pubstudio/frontend/ui-widgets'
-import { Css, CssPseudoClass, cssValues, IStyleEntry } from '@pubstudio/shared/type-site'
+import {
+  Css,
+  CssPseudoClass,
+  cssValues,
+  IInheritedStyleEntry,
+  IStyleEntry,
+} from '@pubstudio/shared/type-site'
 import { useBuild, validateCssValue } from '@pubstudio/frontend/feature-build'
 
 const { t } = useI18n()
@@ -66,17 +73,15 @@ const { site } = useBuild()
 const props = withDefaults(
   defineProps<{
     editing?: boolean
-    style?: IStyleProp
+    style?: IInheritedStyleEntry
     error?: boolean
-    inheritedFrom?: string
     focusProp?: boolean
   }>(),
   {
     style: undefined,
-    inheritedFrom: undefined,
   },
 )
-const { focusProp, editing, style, inheritedFrom } = toRefs(props)
+const { focusProp, editing, style } = toRefs(props)
 
 const emit = defineEmits<{
   (e: 'edit', propName: string): void
@@ -102,7 +107,7 @@ const escapePressed = (event: KeyboardEvent) => {
 function propStyleOrNewStyle(): IStyleEntry {
   if (style?.value) {
     // Use destructing assignment to prevent Ref from being passed by reference
-    return { pseudoClass: CssPseudoClass.Default, ...style.value }
+    return { ...style.value, pseudoClass: CssPseudoClass.Default }
   }
   return {
     pseudoClass: CssPseudoClass.Default,

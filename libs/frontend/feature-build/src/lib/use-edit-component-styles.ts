@@ -17,6 +17,7 @@ import {
 import {
   Css,
   IInheritedStyleEntry,
+  IRawStyleWithSource,
   IStyleEntry,
   StyleSourceType,
 } from '@pubstudio/shared/type-site'
@@ -35,6 +36,7 @@ export interface IUseEditComponenStylesOptions {
 
 export interface IUseEditComponentStyles {
   styleEntries: ComputedRef<IInheritedStyleEntry[]>
+  nonInheritedProperties: ComputedRef<string[]>
   editCommands: Ref<ICommandGroupData | undefined>
   editStyles: Ref<Set<string>>
   editStyle: (prop: Css) => void
@@ -66,8 +68,15 @@ export const useEditComponentStyles = (
             sourceType: source.sourceType,
             sourceId: source.sourceId,
             sourceBreakpointId: source.sourceBreakpointId,
+            inheritedFrom: getInheritedFrom(source),
           }) as IInheritedStyleEntry,
       ),
+  )
+
+  const nonInheritedProperties = computed(() =>
+    styleEntries.value
+      .filter((style) => !style.inheritedFrom)
+      .map((style) => style.property),
   )
 
   const editStyle = (prop: Css) => {
@@ -139,8 +148,8 @@ export const useEditComponentStyles = (
       // Makes sure the parent has `relative` or `absolute` style.
       // Otherwise the component might jump to an unexpected location
       commands = setPositionAbsoluteCommands(site.value, oldStyle, { ...newStyle })
-    } else if (removeCmd && newStyle && oldStyle?.property !== newStyle?.property) {
-      // Undo the previous command to clean up the old property
+    } else if (removeCmd && newStyle) {
+      // Undo the previous command to clean up the old property/value
       undoCommand(site.value, removeCmd)
       // The property changed, and we're replacing a command in the current group
       const c = setComponentCustomStyleCommand(site.value, originalStyle, { ...newStyle })
@@ -187,7 +196,7 @@ export const useEditComponentStyles = (
     checkEditStylesComplete()
   }
 
-  const getInheritedFrom = (entry: IInheritedStyleEntry): string | undefined => {
+  const getInheritedFrom = (entry: IRawStyleWithSource): string | undefined => {
     if (entry.sourceType === StyleSourceType.Custom) {
       if (entry.sourceBreakpointId !== activeBreakpoint.value.id) {
         return t('style.inherited_breakpoint', {
@@ -212,6 +221,7 @@ export const useEditComponentStyles = (
 
   return {
     styleEntries,
+    nonInheritedProperties,
     editCommands,
     editStyles,
     editStyle,

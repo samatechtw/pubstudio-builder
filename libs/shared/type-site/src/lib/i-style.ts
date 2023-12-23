@@ -11,6 +11,7 @@ export interface IInheritedStyleEntry extends IStyleEntry {
   sourceType: StyleSourceType
   sourceId: string
   sourceBreakpointId: string
+  inheritedFrom: string | undefined
 }
 
 export interface IStyleOverrideEntry extends IStyleEntry {

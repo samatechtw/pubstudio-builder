@@ -22,6 +22,7 @@ const { t } = useI18n()
 const props = defineProps<{
   modelValue: string
   options: string[]
+  omitEditProperties: string[]
 }>()
 
 const { modelValue } = toRefs(props)
