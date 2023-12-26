@@ -8,7 +8,7 @@ export interface AddStyle extends ICommand<IAddStyleMixinData> {
   type: CommandType.AddStyleMixin
 }
 
-export const applyAddStyleMixin = (site: ISite, data: IAddStyleMixinData) => {
+export const applyAddStyleMixin = (site: ISite, data: IAddStyleMixinData): string => {
   const context = site.context
   const { id: builtinId, name, breakpoints } = data
   const styleId = builtinId ?? nextStyleId(context)
@@ -18,6 +18,7 @@ export const applyAddStyleMixin = (site: ISite, data: IAddStyleMixinData) => {
     breakpoints,
   }
   context.styles[styleId] = newStyle
+  return styleId
 }
 
 export const undoAddStyleMixin = (site: ISite, data: IAddStyleMixinData) => {

@@ -1,8 +1,14 @@
 import { activeBreakpoint } from '@pubstudio/frontend/feature-site-source'
+import { resolveStyle } from '@pubstudio/frontend/util-builtin'
 import { getLastCommand } from '@pubstudio/frontend/util-command'
 import { resolvedComponentStyle } from '@pubstudio/frontend/util-component'
 import { CommandType, ICommand } from '@pubstudio/shared/type-command'
-import { ISetComponentCustomStyleData } from '@pubstudio/shared/type-command-data'
+import {
+  IEditStyleMixinData,
+  ISetComponentCustomStyleData,
+  ISetComponentOverrideStyleData,
+  ISetMixinEntryData,
+} from '@pubstudio/shared/type-command-data'
 import { Css, IComponent, ISite, IStyleEntry } from '@pubstudio/shared/type-site'
 
 export type IRemoveStyleEntry = Omit<IStyleEntry, 'value'>
@@ -137,4 +143,80 @@ export const setPositionAbsoluteCommands = (
       },
     ]
   }
+}
+export const setOverrideStyleCommand = (
+  site: ISite,
+  selector: string,
+  oldStyle: IStyleEntry | undefined,
+  newStyle: IStyleEntry,
+): ICommand | undefined => {
+  const selected = site.editor?.selectedComponent
+  if (!selected) {
+    return undefined
+  }
+  const data: ISetComponentOverrideStyleData = {
+    componentId: selected.id,
+    selector,
+    breakpointId: activeBreakpoint.value.id,
+    oldStyle,
+    newStyle,
+  }
+  return { type: CommandType.SetComponentOverrideStyle, data }
+}
+
+export const removeComponentOverrideStyleEntryCommand = (
+  site: ISite,
+  selector: string,
+  style: IRemoveStyleEntry,
+): ICommand | undefined => {
+  const selected = site.editor?.selectedComponent
+  const oldValue =
+    selected?.style.overrides?.[selector][activeBreakpoint.value.id][style.pseudoClass]?.[
+      style.property
+    ]
+  if (!oldValue) {
+    return
+  }
+  const data: ISetComponentOverrideStyleData = {
+    componentId: selected.id,
+    breakpointId: activeBreakpoint.value.id,
+    selector: selector,
+    oldStyle: {
+      ...style,
+      value: oldValue,
+    },
+  }
+  return { type: CommandType.SetComponentOverrideStyle, data }
+}
+
+export const editMixinEntryCommand = (
+  mixinId: string,
+  oldStyle: IStyleEntry | undefined,
+  newStyle: IStyleEntry | undefined,
+): ICommand => {
+  const data: ISetMixinEntryData = {
+    mixinId,
+    breakpointId: activeBreakpoint.value.id,
+    oldStyle,
+    newStyle,
+  }
+  return { type: CommandType.SetMixinEntry, data }
+}
+
+export const editStyleNameCommand = (
+  site: ISite,
+  mixinId: string,
+  newName: string,
+): ICommand | undefined => {
+  const oldStyle = resolveStyle(site.context, mixinId)
+  if (!oldStyle) {
+    return
+  }
+
+  const data: IEditStyleMixinData = {
+    id: mixinId,
+    oldName: oldStyle.name,
+    newName,
+  }
+  return { type: CommandType.EditStyleMixin, data }
 }

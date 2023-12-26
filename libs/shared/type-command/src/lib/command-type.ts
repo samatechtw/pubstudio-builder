@@ -24,6 +24,7 @@ export enum CommandType {
   AddStyleMixin = 'addS',
   EditStyleMixin = 'editS',
   RemoveStyleMixin = 'rmS',
+  SetMixinEntry = 'setME',
   AddThemeVariable = 'addTV',
   EditThemeVariable = 'editTV',
   RemoveThemeVariable = 'rmTV',

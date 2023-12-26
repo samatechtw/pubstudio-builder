@@ -3,7 +3,7 @@
     <EditMenuTitle
       :title="t('style.styles')"
       :collapsed="collapsed"
-      :showAdd="!editing('')"
+      :showAdd="!isEditing('')"
       @add="addStyle"
       @toggleCollapse="toggleCollapse"
     >
@@ -17,9 +17,9 @@
     <div class="style-rows" :class="{ collapsed }">
       <StyleRow
         v-for="entry in styleEntries"
-        :key="entry.property"
+        :key="`s-${entry.property}`"
         :style="entry"
-        :editing="editing(entry.property)"
+        :editing="isEditing(entry.property)"
         :omitEditProperties="nonInheritedProperties"
         :error="!resolveThemeVariables(site.context, entry.value)"
         class="menu-row"
@@ -50,7 +50,6 @@ import {
   setStyleToolbarMenu,
   setComponentMenuCollapses,
 } from '@pubstudio/frontend/feature-build'
-import { StyleType } from '@pubstudio/frontend/util-command'
 import StyleRow from '../StyleRow.vue'
 import EditMenuTitle from '../EditMenuTitle.vue'
 
@@ -60,14 +59,15 @@ const { newStyle } = useReusableStyleMenu()
 const {
   styleEntries,
   editStyle,
-  addComponentStyle,
+  createStyle,
   setProperty,
   setValue,
   saveStyle,
   removeStyle,
+  isEditing,
   nonInheritedProperties,
   editStyles,
-} = useEditComponentStyles({ styleType: StyleType.ComponentCustom })
+} = useEditComponentStyles()
 
 const toMixinRef = ref()
 
@@ -87,7 +87,7 @@ const menuSubTitle = computed(() => `(${currentPseudoClass.value})`)
 
 const addStyle = () => {
   setComponentMenuCollapses(editor.value, ComponentMenuCollapsible.Styles, false)
-  addComponentStyle()
+  createStyle()
 }
 
 const styleRowHeight = computed(() => {
@@ -108,10 +108,6 @@ const clickSubTitle = () => {
       ? undefined
       : StyleToolbarMenu.PseudoClass
   setStyleToolbarMenu(editor.value, newVal)
-}
-
-const editing = (propName: string) => {
-  return editStyles.value?.has(propName)
 }
 
 const convertToMixin = () => {

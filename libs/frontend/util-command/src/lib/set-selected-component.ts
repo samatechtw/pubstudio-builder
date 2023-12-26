@@ -7,7 +7,7 @@ import {
 } from '@pubstudio/shared/type-site'
 import { nextTick } from 'vue'
 import { expandComponentTreeItem } from './component-tree-item-util'
-import { componentStylesCancelEdit } from './edit-component-styles-data'
+import { editStylesCancelEdit } from './edit-styles-data'
 import { setActivePage } from './set-active-page'
 
 export const clearComponentTabState = (editor: IEditorContext | undefined) => {
@@ -95,7 +95,7 @@ export const setSelectedComponent = (
     }
     // Save editor state to local storage if anything changed
     if (editor.mode !== prevMode || component !== prevComponent) {
-      componentStylesCancelEdit(site)
+      editStylesCancelEdit(site)
       clearComponentTabState(editor)
     }
   }

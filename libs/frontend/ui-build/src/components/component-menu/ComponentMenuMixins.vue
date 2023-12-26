@@ -88,10 +88,7 @@ const setMixin = (oldMixinId: string | undefined, newMixinId: string) => {
 }
 
 const edit = (mixinId: string) => {
-  const style = resolveStyle(site.value.context, mixinId)
-  if (style) {
-    setEditingStyle(style)
-  }
+  setEditingStyle(mixinId)
 }
 
 const flattenMixin = (mixinId: string) => {
