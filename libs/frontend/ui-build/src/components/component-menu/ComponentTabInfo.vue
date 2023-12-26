@@ -1,6 +1,6 @@
 <template>
   <div class="tab-info">
-    <MenuRowEdit
+    <MenuRowSimple
       :label="t('name')"
       :value="component.name"
       :editable="true"
@@ -10,7 +10,7 @@
       @update="setName"
     />
     <MenuRow :label="t('id')" :value="component.id" :copyValue="true" class="id" />
-    <MenuRowEdit
+    <MenuRowSimple
       :label="t('content')"
       :value="component.content"
       :editable="true"
@@ -46,7 +46,7 @@ import {
   useBuild,
 } from '@pubstudio/frontend/feature-build'
 import MenuRow from '../MenuRow.vue'
-import MenuRowEdit from '../MenuRowEdit.vue'
+import MenuRowSimple from '../MenuRowSimple.vue'
 import ComponentTag from './ComponentTag.vue'
 import ComponentRole from './ComponentRole.vue'
 import SvgEditModal from './SvgEditModal.vue'

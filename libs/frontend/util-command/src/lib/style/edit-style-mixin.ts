@@ -8,19 +8,17 @@ export interface EditStyleMixin extends ICommand<IEditStyleMixinData> {
 }
 
 export const applyEditStyleMixin = (site: ISite, data: IEditStyleMixinData) => {
-  const { oldStyle, newStyle } = data
-  const style = resolveStyle(site.context, oldStyle.id)
+  const { id, newName } = data
+  const style = resolveStyle(site.context, id)
   if (style) {
-    style.name = newStyle.name
-    style.breakpoints = newStyle.breakpoints
+    style.name = newName
   }
 }
 
 export const undoEditStyleMixin = (site: ISite, data: IEditStyleMixinData) => {
-  const { oldStyle, newStyle } = data
-  const style = resolveStyle(site.context, newStyle.id)
+  const { id, oldName } = data
+  const style = resolveStyle(site.context, id)
   if (style) {
-    style.name = oldStyle.name
-    style.breakpoints = oldStyle.breakpoints
+    style.name = oldName
   }
 }

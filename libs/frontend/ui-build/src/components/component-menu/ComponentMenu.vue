@@ -1,6 +1,6 @@
 <template>
   <div class="component-menu">
-    <StyleMenuEdit v-if="editingStyle" class="style-edit" />
+    <StyleMenuEdit v-if="isEditingMixin" class="style-edit" />
     <ComponentInputEdit
       v-else-if="isEditingInput"
       :editInput="editedInput"
@@ -87,7 +87,7 @@ import StyleMenuEdit from '../StyleMenuEdit.vue'
 
 const { t } = useI18n()
 const { editor, replacePageRoot } = useBuild()
-const { editing: editingStyle } = useReusableStyleMenu()
+const { isEditingMixin } = useReusableStyleMenu()
 const { addHUD } = useHUD()
 
 const props = defineProps<{

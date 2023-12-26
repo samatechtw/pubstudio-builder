@@ -19,7 +19,10 @@ export const editStyles = ref(new Set<string>())
 export const editCommands = ref<ICommandGroupData | undefined>()
 export const currentStyleType = ref<StyleType>()
 
-export const componentStylesCancelEdit = (site: ISite) => {
+// Extra info for editing reusable styles
+export const editingStyleId = ref<string | undefined>()
+
+export const editStylesCancelEdit = (site: ISite) => {
   // Clear any blank commands (no property or value set)
   if (editCommands.value) {
     const cmdCount = editCommands.value.commands.length
@@ -43,12 +46,13 @@ export const componentStylesCancelEdit = (site: ISite) => {
   }
   editStyles.value.clear()
   editCommands.value = undefined
+  editingStyleId.value = undefined
 }
 
 export const setStyleType = (site: ISite, styleType: StyleType | undefined) => {
   // Only one type of style can be edited
   if (currentStyleType.value !== styleType) {
-    componentStylesCancelEdit(site)
+    editStylesCancelEdit(site)
     currentStyleType.value = styleType
   }
 }

@@ -1,13 +1,14 @@
 import { IEditStyleMixinData } from '@pubstudio/shared/type-command-data'
-import { IStyle } from '@pubstudio/shared/type-site'
 
 export const mockEditStyleMixinData = (
-  oldStyle: IStyle,
-  newStyle: IStyle,
+  id: string,
+  oldName: string,
+  newName: string,
 ): IEditStyleMixinData => {
   const data: IEditStyleMixinData = {
-    oldStyle,
-    newStyle,
+    id,
+    oldName,
+    newName,
   }
   return data
 }

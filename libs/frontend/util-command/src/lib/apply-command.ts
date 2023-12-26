@@ -29,6 +29,7 @@ import { applySetPageHead } from './page/set-page-head'
 import { applyAddStyleMixin } from './style/add-style-mixin'
 import { applyEditStyleMixin } from './style/edit-style-mixin'
 import { applyRemoveStyleMixin } from './style/remove-style-mixin'
+import { applySetMixinEntry } from './style/set-mixin-entry'
 import { applyAddThemeFont } from './theme-font/add-theme-font'
 import { applyEditThemeFont } from './theme-font/edit-theme-font'
 import { applyRemoveThemeFont } from './theme-font/remove-theme-font'
@@ -62,6 +63,7 @@ export const applyCommand = (site: ISite, command: ICommand): ICommand => {
     [CommandType.AddStyleMixin]: applyAddStyleMixin,
     [CommandType.EditStyleMixin]: applyEditStyleMixin,
     [CommandType.RemoveStyleMixin]: applyRemoveStyleMixin,
+    [CommandType.SetMixinEntry]: applySetMixinEntry,
     [CommandType.AddThemeVariable]: applyAddThemeVariable,
     [CommandType.EditThemeVariable]: applyEditThemeVariable,
     [CommandType.RemoveThemeVariable]: applyRemoveThemeVariable,

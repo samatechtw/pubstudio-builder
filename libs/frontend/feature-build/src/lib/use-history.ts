@@ -1,5 +1,5 @@
 import {
-  componentStylesCancelEdit,
+  editStylesCancelEdit,
   redoCommand,
   undoLastCommand,
 } from '@pubstudio/frontend/util-command'
@@ -27,7 +27,7 @@ export const useHistory = (): IUseHistory => {
       commandAlert.value = CommandType.Undo
     }
     undoLastCommand(site.value)
-    componentStylesCancelEdit(site.value)
+    editStylesCancelEdit(site.value)
   }
 
   const redo = (uiAlert = false) => {

@@ -10,6 +10,7 @@ import {
 } from '@pubstudio/frontend/util-builtin'
 import {
   createSite,
+  editStylesCancelEdit,
   getLastCommand,
   pushCommand,
   pushCommandObject,
@@ -46,7 +47,6 @@ import {
   IEditComponentData,
   IEditComponentFields,
   IEditPageData,
-  IEditStyleMixinData,
   IEditThemeFontData,
   IEditThemeVariableData,
   IMergeComponentStyleData,
@@ -66,7 +66,6 @@ import {
   ISetComponentCustomStyleData,
   ISetComponentEventData,
   ISetComponentInputData,
-  ISetComponentOverrideStyleData,
   ISetDefaultsHeadData,
   ISetHomePageData,
   ISetPageHeadData,
@@ -77,6 +76,7 @@ import {
   IBehavior,
   IBehaviorArg,
   IBreakpoint,
+  IBreakpointStyles,
   IComponent,
   IComponentEvent,
   IComponentInput,
@@ -98,12 +98,14 @@ import {
 } from '@pubstudio/shared/type-site'
 import { computed, ComputedRef, Ref, ref, toRaw } from 'vue'
 import {
+  editStyleNameCommand,
   IRemoveStyleEntry,
   removeComponentCustomStyleCommand,
+  removeComponentOverrideStyleEntryCommand,
   setCustomStyleCommand,
+  setOverrideStyleCommand,
   setPositionAbsoluteCommands,
 } from './build-command-helpers'
-import { resetStyleMenu } from './use-reusable-style-menu'
 import { resetThemeMenuVariables } from './use-theme-menu-variables'
 
 export type IOldNewStyleEntry = {
@@ -183,10 +185,14 @@ export interface IUseBuild {
     oldArg: IBehaviorArg | undefined,
     newArg: IBehaviorArg | undefined,
   ) => void
-  addStyle: (style: IStyle) => void
+  addStyle: (name: string, breakpoints: IBreakpointStyles) => void
   flattenComponentMixin: (componentId: string, mixinId: string) => void
-  convertComponentStyle: (componentId: string, style: IStyle) => void
-  editStyle: (style: IStyle) => void
+  convertComponentStyle: (
+    componentId: string,
+    name: string,
+    breakpoints: IBreakpointStyles,
+  ) => string | undefined
+  editStyle: (id: string, newName: string) => void
   deleteStyle: (style: IStyle) => void
   setTranslations: (props: ISetTranslationsProps) => void
   setActiveI18n: (activeI18n: string) => void
@@ -270,8 +276,8 @@ export const useBuild = (): IUseBuild => {
   }
 
   const resetSite = () => {
+    editStylesCancelEdit(site.value)
     replaceSite(createSite(site.value.name ?? 'test'))
-    resetStyleMenu()
     resetThemeMenuVariables()
   }
 
@@ -549,16 +555,9 @@ export const useBuild = (): IUseBuild => {
     oldStyle: IStyleEntry | undefined,
     newStyle: IStyleEntry,
   ) => {
-    const selected = site.value.editor?.selectedComponent
-    if (selected) {
-      const data: ISetComponentOverrideStyleData = {
-        componentId: selected.id,
-        selector,
-        breakpointId: activeBreakpoint.value.id,
-        oldStyle,
-        newStyle,
-      }
-      pushCommand(site.value, CommandType.SetComponentOverrideStyle, data)
+    const command = setOverrideStyleCommand(site.value, selector, oldStyle, newStyle)
+    if (command) {
+      pushCommandObject(site.value, command)
     }
   }
 
@@ -566,24 +565,10 @@ export const useBuild = (): IUseBuild => {
     selector: string,
     style: IRemoveStyleEntry,
   ) => {
-    const selected = site.value.editor?.selectedComponent
-    const oldValue =
-      selected?.style.overrides?.[selector][activeBreakpoint.value.id][
-        style.pseudoClass
-      ]?.[style.property]
-    if (!oldValue) {
-      return
+    const command = removeComponentOverrideStyleEntryCommand(site.value, selector, style)
+    if (command) {
+      pushCommandObject(site.value, command)
     }
-    const data: ISetComponentOverrideStyleData = {
-      componentId: selected.id,
-      breakpointId: activeBreakpoint.value.id,
-      selector: selector,
-      oldStyle: {
-        ...style,
-        value: oldValue,
-      },
-    }
-    pushCommand(site.value, CommandType.SetComponentOverrideStyle, data)
   }
 
   const removeComponentOverrideStyle = (selector: string) => {
@@ -760,10 +745,10 @@ export const useBuild = (): IUseBuild => {
     }
   }
 
-  const addStyle = (style: IStyle) => {
+  const addStyle = (name: string, breakpoints: IBreakpointStyles) => {
     const data: IAddStyleMixinData = {
-      name: style.name,
-      breakpoints: style.breakpoints,
+      name: name,
+      breakpoints: breakpoints,
     }
     pushCommand(site.value, CommandType.AddStyleMixin, data)
   }
@@ -825,20 +810,25 @@ export const useBuild = (): IUseBuild => {
     }
   }
 
-  const convertComponentStyle = (componentId: string, style: IStyle) => {
+  const convertComponentStyle = (
+    componentId: string,
+    name: string,
+    breakpoints: IBreakpointStyles,
+  ): string | undefined => {
     const component = resolveComponent(site.value.context, componentId)
     if (component) {
       // Create the new mixin
       const styleData: IAddStyleMixinData = {
-        name: style.name,
-        breakpoints: style.breakpoints,
+        name,
+        breakpoints,
       }
       // Add the new mixin to the component
       const { nextId, namespace } = site.value.context
+      const mixinId = styleId(namespace, nextId.toString())
       const addToComponent: IAddComponentMixinData = {
         componentId,
         // Precalculate the expected mixin ID
-        mixinId: styleId(namespace, nextId.toString()),
+        mixinId,
       }
       const commands: ICommand[] = [
         { type: CommandType.AddStyleMixin, data: styleData },
@@ -849,7 +839,7 @@ export const useBuild = (): IUseBuild => {
         for (const [pClass, pseudo] of Object.entries(bp)) {
           const pseudoClass = pClass as CssPseudoClass
           for (const [prop, val] of Object.entries(pseudo)) {
-            const pseudos = style.breakpoints[bpId]?.[pseudoClass]
+            const pseudos = breakpoints[bpId]?.[pseudoClass]
             if (pseudos?.[prop as Css] !== undefined) {
               const styleData: ISetComponentCustomStyleData = {
                 componentId,
@@ -873,24 +863,15 @@ export const useBuild = (): IUseBuild => {
         commands,
       }
       pushCommand(site.value, CommandType.Group, data)
+      return mixinId
     }
   }
 
-  const editStyle = (style: IStyle) => {
-    const oldStyle = structuredClone(toRaw(resolveStyle(site.value.context, style.id)))
-    if (!oldStyle) {
-      return
+  const editStyle = (id: string, newName: string) => {
+    const command = editStyleNameCommand(site.value, id, newName)
+    if (command) {
+      pushCommandObject(site.value, command)
     }
-
-    const newStyle = structuredClone(oldStyle)
-    newStyle.name = style.name
-    newStyle.breakpoints = style.breakpoints
-
-    const data: IEditStyleMixinData = {
-      oldStyle,
-      newStyle,
-    }
-    pushCommand(site.value, CommandType.EditStyleMixin, data)
   }
 
   const deleteStyle = (style: IStyle) => {

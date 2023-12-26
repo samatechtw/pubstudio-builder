@@ -3,8 +3,8 @@
     <EditMenuTitle
       :title="t('style.child')"
       :collapsed="collapsed"
-      :showAdd="selector !== undefined && !isMissingSelector(selector)"
-      @add="onAddClick"
+      :showAdd="selector !== undefined && !isMissingSelector(selector) && !isEditing('')"
+      @add="addStyle"
       @toggleCollapse="toggleCollapse"
     >
       <InfoBubble :message="t('style.child_info')" placement="top" class="info" />
@@ -48,77 +48,63 @@
       />
     </EditMenuTitle>
     <div class="style-rows" :class="{ collapsed }">
-      <ChildStyleRow
-        v-if="showNewStyle"
-        :editing="true"
-        class="new-style menu-row"
-        :focusProp="true"
-        @save="addStyle"
-        @remove="setEditStyle(undefined)"
-      />
-      <ChildStyleRow
-        v-for="entry in childStyles"
-        :key="`${entry.pseudoClass}-${entry.property}-${entry.value}`"
+      <StyleRow
+        v-for="entry in styleEntries"
+        :key="`cs-${entry.property}`"
         :style="entry"
-        :editing="editing(entry.property)"
+        :editing="isEditing(entry.property)"
+        :omitEditProperties="nonInheritedProperties"
         :error="!resolveThemeVariables(site.context, entry.value)"
         class="menu-row"
-        @edit="setEditStyle"
-        @save="updateStyle(entry, $event)"
-        @remove="removeEntry(entry)"
+        @setProperty="setProperty(entry, $event)"
+        @setValue="setValue(entry, $event)"
+        @edit="editStyle(entry.property)"
+        @save="saveStyle(entry.property)"
+        @remove="removeStyle(entry)"
       />
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { computed, ref, toRefs, watch } from 'vue'
+import { computed, toRefs } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { InfoBubble, PSMultiselect, Minus } from '@pubstudio/frontend/ui-widgets'
+import { ComponentMenuCollapsible, Css, IComponent } from '@pubstudio/shared/type-site'
 import {
-  ComponentMenuCollapsible,
-  Css,
-  IComponent,
-  IInheritedStyleEntry,
-  IRawStyleWithSource,
-  IStyleEntry,
-} from '@pubstudio/shared/type-site'
-import { useBuild, setComponentMenuCollapses } from '@pubstudio/frontend/feature-build'
+  useBuild,
+  setComponentMenuCollapses,
+  useEditComponentChildStyles,
+} from '@pubstudio/frontend/feature-build'
 import { resolveThemeVariables } from '@pubstudio/frontend/util-builtin'
-import {
-  computeComponentOverrideStyle,
-  computeComponentFlattenedStyles,
-  omitSourceBreakpointId,
-} from '@pubstudio/frontend/util-component'
-import {
-  activeBreakpoint,
-  descSortedBreakpoints,
-} from '@pubstudio/frontend/feature-site-source'
 import { runtimeContext } from '@pubstudio/frontend/util-runtime'
-import ChildStyleRow from './ChildStyleRow.vue'
 import EditMenuTitle from '../EditMenuTitle.vue'
-
-const { t } = useI18n()
-const {
-  site,
-  editor,
-  currentPseudoClass,
-  setOverrideStyle,
-  removeComponentOverrideStyleEntry,
-  removeComponentOverrideStyle,
-} = useBuild()
+import StyleRow from '../StyleRow.vue'
 
 const props = defineProps<{
   component: IComponent
 }>()
 const { component } = toRefs(props)
 
-const getDefaultSelector = (): string | undefined => {
-  return Object.keys(component.value.style.overrides ?? {})[0]
-}
-
-const selector = ref(getDefaultSelector())
-const editStyleProp = ref<string | undefined>()
+const { t } = useI18n()
+const { site, editor, removeComponentOverrideStyle } = useBuild()
+const {
+  styleEntries,
+  selector,
+  selectors,
+  flattenedChildStyles,
+  hasMissingSelector,
+  isMissingSelector,
+  editStyle,
+  createStyle,
+  setProperty,
+  setValue,
+  saveStyle,
+  removeStyle,
+  isEditing,
+  nonInheritedProperties,
+  editStyles,
+} = useEditComponentChildStyles({ component })
 
 const collapsed = computed(
   () => !!editor.value?.componentMenuCollapses?.[ComponentMenuCollapsible.ChildStyles],
@@ -132,47 +118,11 @@ const toggleCollapse = () => {
   )
 }
 
-const onAddClick = () => {
-  setComponentMenuCollapses(editor.value, ComponentMenuCollapsible.ChildStyles, false)
-  setEditStyle('')
-}
-
-const childrenIdSet = computed(
-  () => new Set(component.value.children?.map((child) => child.id)),
-)
-
-const overriddenChildrenIdSet = computed(
-  () => new Set(Object.keys(component.value.style.overrides ?? {})),
-)
-
-const selectors = computed(() => {
-  const allIds = [...childrenIdSet.value, ...overriddenChildrenIdSet.value]
-  const uniqueIds = new Set(allIds)
-  return Array.from(uniqueIds)
-})
-
-const hasMissingSelector = computed(() => {
-  const overriddenChildrenIds = Array.from(overriddenChildrenIdSet.value)
-  return overriddenChildrenIds.some((id) => !childrenIdSet.value.has(id))
-})
-
 const currentSelectorMissing = computed(
   () =>
     !!selector.value &&
     !component.value.children?.some((child) => child.id === selector.value),
 )
-
-const showNewStyle = computed(() => {
-  return editStyleProp.value === ''
-})
-
-const editing = (propName: string) => {
-  return editStyleProp.value === propName
-}
-
-const isMissingSelector = (childId: string) => {
-  return !childrenIdSet.value.has(childId)
-}
 
 const labelEnter = (id: string) => {
   runtimeContext.hoveredComponentIdInComponentTree.value = id
@@ -183,53 +133,16 @@ const labelLeave = () => {
 }
 
 const styleRowHeight = computed(() => {
-  const entries = 37 * childStyles.value.length
-  const editing = !!editStyleProp.value
-  const newStyle = showNewStyle.value || editing ? 51 : 0
-  return entries + newStyle
-})
-
-const childStyles = computed<IInheritedStyleEntry[]>(() => {
-  const { selectedComponent } = site.value.editor ?? {}
-  if (selectedComponent && selector.value) {
-    const breakpointStyles = computeComponentOverrideStyle(
-      selectedComponent,
-      selector.value,
-    )
-    const flattenedStyles = computeComponentFlattenedStyles(
-      editor.value,
-      breakpointStyles,
-      descSortedBreakpoints.value,
-      activeBreakpoint.value,
-    )
-    return Object.entries(flattenedStyles)
-      .sort((a, b) => a[0].localeCompare(b[0]))
-      .map(
-        ([css, source]) =>
-          ({
-            pseudoClass: currentPseudoClass.value,
-            property: css as Css,
-            value: source.value,
-            sourceType: source.sourceType,
-            sourceId: source.sourceId,
-            sourceBreakpointId: source.sourceBreakpointId,
-            inheritedFrom: getInheritedFrom(source),
-          }) as IInheritedStyleEntry,
-      )
-  } else {
-    return []
+  const getEditingHeight = (prop: string): number => {
+    const val = flattenedChildStyles.value[prop as Css]?.value ?? ''
+    const wrap = prop.length > 16 || val.length > 12
+    return wrap ? 91 : 51
   }
+  const editing = Array.from(editStyles.value ?? [])
+  const editHeight = editing.map(getEditingHeight).reduce((prev, cur) => prev + cur, 0)
+  const viewing = styleEntries.value.length - editing.length
+  return editHeight + viewing * 37
 })
-
-const getInheritedFrom = (entry: IRawStyleWithSource) => {
-  if (entry.sourceBreakpointId !== activeBreakpoint.value.id) {
-    return t('style.inherited_breakpoint', {
-      breakpoint: site.value.context.breakpoints[entry.sourceBreakpointId]?.name,
-    })
-  } else {
-    return undefined
-  }
-}
 
 const setSelector = (sel: string | undefined) => {
   selector.value = sel
@@ -238,38 +151,9 @@ const setSelector = (sel: string | undefined) => {
   }
 }
 
-const setEditStyle = (prop: string | undefined) => {
-  editStyleProp.value = prop
-  if (collapsed.value && prop !== undefined) {
-    collapsed.value = false
-  }
-}
-
-const updateStyle = (oldStyle: IInheritedStyleEntry, newStyle: IStyleEntry) => {
-  if (selector.value) {
-    const oldStyleEntry: IStyleEntry | undefined =
-      oldStyle.sourceBreakpointId === activeBreakpoint.value.id
-        ? omitSourceBreakpointId(oldStyle)
-        : undefined
-
-    setOverrideStyle(selector.value, oldStyleEntry, newStyle)
-    setEditStyle(undefined)
-  }
-}
-
-const addStyle = (newStyle: IStyleEntry) => {
-  if (selector.value) {
-    newStyle.pseudoClass = currentPseudoClass.value
-    setOverrideStyle(selector.value, undefined, newStyle)
-    setEditStyle(undefined)
-  }
-}
-
-const removeEntry = (style: IStyleEntry) => {
-  if (selector.value) {
-    removeComponentOverrideStyleEntry(selector.value, style)
-    setEditStyle(undefined)
-  }
+const addStyle = () => {
+  setComponentMenuCollapses(editor.value, ComponentMenuCollapsible.ChildStyles, false)
+  createStyle()
 }
 
 const removeSelector = () => {
@@ -278,14 +162,6 @@ const removeSelector = () => {
     selector.value = undefined
   }
 }
-
-watch(selectors, (newSelectors) => {
-  // Ensure that the current selector doesn't retain a deleted/non-existent value after selecting
-  // another component, or after redoing an override style removal for a specific selector.
-  if (!selector.value || (selector.value && !newSelectors.includes(selector.value))) {
-    selector.value = getDefaultSelector()
-  }
-})
 </script>
 
 <style lang="postcss" scoped>
