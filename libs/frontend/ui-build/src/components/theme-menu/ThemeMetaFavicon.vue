@@ -53,6 +53,7 @@
 </template>
 
 <script lang="ts" setup>
+import { ref, toRefs } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { CreateAssetModal } from '@pubstudio/frontend/feature-site-assets'
 import { useSites } from '@pubstudio/frontend/feature-sites'
@@ -65,9 +66,9 @@ import {
   PSSpinner,
   Plus,
 } from '@pubstudio/frontend/ui-widgets'
-import { ref, toRefs } from 'vue'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { IUploadFileResult } from '@pubstudio/frontend/feature-site-assets'
+import { urlFromAsset } from '@pubstudio/frontend/util-asset'
 
 const { t } = useI18n()
 const { listSites, sites, loading: loadingSites } = useSites()
@@ -97,7 +98,7 @@ const updateFavicon = (newFavicon: string | undefined) => {
 
 const uploadComplete = (asset: IUploadFileResult) => {
   uploadingFavicon.value = false
-  updateFavicon(asset.signed_url)
+  updateFavicon(urlFromAsset(asset))
 }
 
 const setUploadingFavicon = async () => {
