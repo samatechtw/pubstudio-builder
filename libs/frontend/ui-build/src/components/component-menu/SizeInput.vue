@@ -89,7 +89,7 @@ const parsedSize = ref<ISize>(parseSize())
 const update = () => {
   const { unit, value } = parsedSize.value
   if (unit === '-') {
-    emit('update', undefined)
+    emit('update', '')
     return
   }
   if (!unit) {
@@ -143,6 +143,9 @@ const componentSize = (): string => {
 const selectUnit = (unit: SizeUnit) => {
   const prevUnit = parsedSize.value.unit
   if (prevUnit !== unit) {
+    if (unit === 'auto' || unit === '-') {
+      parsedSize.value.value = ''
+    }
     if (unit === 'px') {
       parsedSize.value.value = componentSize()
     }
