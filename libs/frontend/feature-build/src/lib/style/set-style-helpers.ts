@@ -41,6 +41,6 @@ export const pushOrReplaceStyleCommand = (
   if (firstEdit) {
     pushCommandObject(site, cmd)
   } else {
-    replaceLastCommand(site, cmd)
+    replaceLastCommand(site, cmd, true)
   }
 }
