@@ -37,7 +37,7 @@
           :class="{ gradient: isGradient }"
           @click="addGradientColor(rgbaString, c.themeVar)"
         >
-          <Plus color="white" class="plus" />
+          <Plus color="white" plusColor="#6a5cf5" class="plus" />
           {{ t('style.toolbar.add_gradient') }}
         </ColorPickerButton>
       </div>

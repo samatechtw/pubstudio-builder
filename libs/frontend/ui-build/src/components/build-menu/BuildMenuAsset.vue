@@ -18,7 +18,7 @@
         @click="emit('showCreate')"
       >
         <div class="button-content">
-          <Plus color="white" class="button-plus" />
+          <Plus color="white" plusColor="#6a5cf5" class="button-plus" />
           {{ t('add') }}
         </div>
       </PSButton>
