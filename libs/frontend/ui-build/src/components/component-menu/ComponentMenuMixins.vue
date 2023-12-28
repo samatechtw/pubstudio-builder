@@ -32,9 +32,10 @@ import { useI18n } from 'petite-vue-i18n'
 import { IStyle } from '@pubstudio/shared/type-site'
 import { resolveStyle } from '@pubstudio/frontend/util-builtin'
 import { builtinStyles } from '@pubstudio/frontend/util-builtin'
-import { useReusableStyleMenu, useBuild } from '@pubstudio/frontend/feature-build'
+import { useBuild } from '@pubstudio/frontend/feature-build'
 import EditMenuTitle from '../EditMenuTitle.vue'
 import MixinSelect from './MixinSelect.vue'
+import { setEditingMixin } from '@pubstudio/frontend/util-command'
 
 const props = defineProps<{
   mixinIds: string[]
@@ -50,7 +51,6 @@ const {
   removeComponentMixin,
   flattenComponentMixin,
 } = useBuild()
-const { setEditingStyle } = useReusableStyleMenu()
 
 const showNewMixin = ref(false)
 
@@ -88,7 +88,7 @@ const setMixin = (oldMixinId: string | undefined, newMixinId: string) => {
 }
 
 const edit = (mixinId: string) => {
-  setEditingStyle(mixinId)
+  setEditingMixin(site.value, mixinId)
 }
 
 const flattenMixin = (mixinId: string) => {

@@ -382,6 +382,7 @@
       "addS": "Add Style Mixin",
       "editS": "Edit Style Mixin",
       "rmS": "Remove Style Mixin",
+      "setME": "Set Mixin Entry",
       "addTV": "Add Theme Variable",
       "editTV": "Edit Theme Variable",
       "rmTV": "Remove Theme Variable",

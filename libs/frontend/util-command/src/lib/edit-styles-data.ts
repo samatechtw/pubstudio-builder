@@ -56,3 +56,9 @@ export const setStyleType = (site: ISite, styleType: StyleType | undefined) => {
     currentStyleType.value = styleType
   }
 }
+
+export const setEditingMixin = (site: ISite, styleId: string) => {
+  setStyleType(site, StyleType.Mixin)
+  console.log('SETEDITINGMIXIN', styleId)
+  editingStyleId.value = styleId
+}
