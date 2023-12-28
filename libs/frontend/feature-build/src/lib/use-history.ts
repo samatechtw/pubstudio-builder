@@ -1,5 +1,6 @@
 import {
   editStylesCancelEdit,
+  getLastCommand,
   redoCommand,
   undoLastCommand,
 } from '@pubstudio/frontend/util-command'
@@ -26,8 +27,14 @@ export const useHistory = (): IUseHistory => {
     if (uiAlert) {
       commandAlert.value = CommandType.Undo
     }
+    const lastCommand = getLastCommand(site.value)
     undoLastCommand(site.value)
-    editStylesCancelEdit(site.value)
+    if (
+      lastCommand &&
+      ![CommandType.EditStyleMixin, CommandType.SetMixinEntry].includes(lastCommand.type)
+    ) {
+      editStylesCancelEdit(site.value)
+    }
   }
 
   const redo = (uiAlert = false) => {
@@ -38,6 +45,7 @@ export const useHistory = (): IUseHistory => {
       commandAlert.value = CommandType.Redo
     }
     redoCommand(site.value)
+    editStylesCancelEdit(site.value)
   }
 
   return {

@@ -3,7 +3,7 @@
     <EditMenuTitle :title="t('style.reusable')" @add="newStyle" />
     <div v-if="styles.length" class="styles">
       <div v-for="style in styles" :key="style.id" class="style-entry edit-item">
-        <div class="style-name" @click="setEditingStyle(style.id)">
+        <div class="style-name" @click="setEditingMixin(site, style.id)">
           {{ style.name }}
         </div>
         <Minus class="item-delete" @click="deleteStyle(style)" />
@@ -21,10 +21,11 @@ import { useI18n } from 'petite-vue-i18n'
 import { Minus } from '@pubstudio/frontend/ui-widgets'
 import { useBuild, useReusableStyleMenu } from '@pubstudio/frontend/feature-build'
 import EditMenuTitle from './EditMenuTitle.vue'
+import { setEditingMixin } from '@pubstudio/frontend/util-command'
 
 const { t } = useI18n()
 
-const { newStyle, setEditingStyle } = useReusableStyleMenu()
+const { newStyle } = useReusableStyleMenu()
 const { deleteStyle, site } = useBuild()
 
 const styles = computed(() => {

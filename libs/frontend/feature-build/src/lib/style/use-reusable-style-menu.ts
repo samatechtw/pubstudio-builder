@@ -8,7 +8,7 @@ import {
   editingStyleId,
   editStyles,
   editStylesCancelEdit,
-  setStyleType,
+  setEditingMixin,
   StyleType,
   undoCommand,
 } from '@pubstudio/frontend/util-command'
@@ -42,7 +42,6 @@ export interface IUseStyleMenuFeature extends IUseEditStyles {
   styleError: Ref<string | undefined>
   editingName: Ref<string>
   newStyle: (source?: IComponent) => void
-  setEditingStyle: (styleId: string) => void
   saveMixinName: () => void
 }
 
@@ -73,13 +72,13 @@ watch(editingStyle, (style) => {
 
 export const useReusableStyleMenu = (): IUseStyleMenuFeature => {
   const { t } = useI18n()
-  const { editor, currentPseudoClass, addStyle, convertComponentStyle } = useBuild()
+  const { site, editor, currentPseudoClass, addStyle, convertComponentStyle } = useBuild()
 
   const newStyle = (source?: IComponent) => {
-    setStyleType(site.value, StyleType.Mixin)
+    let mixinId: string | undefined
     if (source) {
       const name = `${source.name}_Style`
-      editingStyleId.value = convertComponentStyle(
+      mixinId = convertComponentStyle(
         source.id,
         name,
         JSON.parse(JSON.stringify(source.style.custom)),
@@ -92,13 +91,11 @@ export const useReusableStyleMenu = (): IUseStyleMenuFeature => {
       const name = `Style_${id}`
       const breakpoints: IBreakpointStyles = { default: {} }
       addStyle(name, breakpoints)
-      editingStyleId.value = id
+      mixinId = id
     }
-  }
-
-  const setEditingStyle = (styleId: string) => {
-    setStyleType(site.value, StyleType.Mixin)
-    editingStyleId.value = styleId
+    if (mixinId) {
+      setEditingMixin(site.value, mixinId)
+    }
   }
 
   const styleEntries = computed(() => {
@@ -261,7 +258,6 @@ export const useReusableStyleMenu = (): IUseStyleMenuFeature => {
     saveStyle,
     removeStyle,
     newStyle,
-    setEditingStyle,
     saveMixinName,
   }
 }
