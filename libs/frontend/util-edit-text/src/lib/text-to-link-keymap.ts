@@ -1,7 +1,13 @@
-import { baseKeymap } from 'prosemirror-commands'
 import { Node, Schema, ResolvedPos } from 'prosemirror-model'
 import { Command, EditorState, TextSelection, Transaction } from 'prosemirror-state'
 import { createLinkNode } from './prosemirror-utils'
+import {
+  baseKeymap,
+  chainCommands,
+  createParagraphNear,
+  liftEmptyBlock,
+  splitBlock,
+} from './base-keymap'
 
 export const urlRegex = () =>
   /(https?:\/\/(www\.)?)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\\+.~#?&/=]*)/g
@@ -48,7 +54,11 @@ const textToLinkOnEnter = (schema: Schema): Command => {
         }
         return true
       } else {
-        return baseKeymap.Enter?.(state, dispatch, view)
+        return chainCommands(createParagraphNear, liftEmptyBlock, splitBlock)(
+          state,
+          dispatch,
+          view,
+        )
       }
     }
     return false
