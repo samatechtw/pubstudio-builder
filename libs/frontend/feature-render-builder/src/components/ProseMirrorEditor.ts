@@ -30,13 +30,13 @@ import {
   onMounted,
   PropType,
   ref,
+  Teleport,
   toRaw,
   toRefs,
   watch,
-  Teleport,
 } from 'vue'
-import LinkTooltip from './LinkTooltip.vue'
 import { LinkTooltipMode } from '../lib/enum-link-tooltip-mode'
+import LinkTooltip from './LinkTooltip.vue'
 
 export const ProseMirrorEditor = defineComponent({
   name: 'ProseMirrorEditor',
@@ -209,6 +209,8 @@ export const ProseMirrorEditor = defineComponent({
     let linkElement: Element | undefined = undefined
 
     watch(editViewTxCount, () => {
+      // TODO -- it might be better to track selectionSet in dispatchTransaction, so we only need to
+      // check for links when the user selects text
       const { editView } = editor.value
       if (editView) {
         const [linkMark, element] = firstMarkInSelection(
@@ -230,24 +232,14 @@ export const ProseMirrorEditor = defineComponent({
           class: 'prose-mirror-editor-container',
         },
         cursorLinkAttrs.value
-          ? h(
-              // Use teleport to prevent LinkTooltip from constantly changing position
-              // due to the relative/absolute layout in the builder.
-              Teleport,
-              {
-                to: 'body',
-              },
-              [
-                h(LinkTooltip, {
-                  link: cursorLinkAttrs.value.href ?? '',
-                  componentId: component.value.id,
-                  defaultOpenInNewTab: cursorLinkAttrs.value.target === '_blank',
-                  mode: LinkTooltipMode.ProseMirror,
-                  editView: editor.value.editView,
-                  anchor: linkElement,
-                }),
-              ],
-            )
+          ? h(LinkTooltip, {
+              link: cursorLinkAttrs.value.href ?? '',
+              componentId: component.value.id,
+              defaultOpenInNewTab: cursorLinkAttrs.value.target === '_blank',
+              mode: LinkTooltipMode.ProseMirror,
+              editView: editor.value.editView,
+              anchor: linkElement,
+            })
           : undefined,
       )
     }

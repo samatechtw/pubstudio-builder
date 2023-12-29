@@ -1,44 +1,46 @@
 <template>
-  <div ref="tooltipRef" class="link-tooltip" :style="tooltipStyle" @mousedown.stop>
-    <PSInput
-      v-if="editing"
-      ref="linkInput"
-      v-model="editedLink"
-      class="link-input"
-      :datalistId="componentId"
-      :datalist="linkDatalist"
-      :draggable="true"
-      @dragstart.stop.prevent
-      @keyup.enter="updateLink"
-      @keyup.esc="$event.srcElement.blur()"
-    />
-    <div v-else-if="internalLink" class="link-view" @click="gotoPage">
-      {{ link }}
-    </div>
-    <a v-else-if="link" :href="link" target="_blank" class="link-view" @click.stop>
-      {{ link }}
-    </a>
-    <div v-else class="empty">
-      {{ t('build.no_link') }}
-    </div>
-    <div v-if="editing" class="editing-wrap">
-      <Checkbox
-        class="open-in-new-tab-checkbox"
-        :item="{
-          label: t('build.open_in_new_tab'),
-          checked: openInNewTab,
-        }"
-        @checked="openInNewTab = $event"
+  <Teleport to="body">
+    <div ref="tooltipRef" class="link-tooltip" :style="tooltipStyle" @mousedown.stop>
+      <PSInput
+        v-if="editing"
+        ref="linkInput"
+        v-model="editedLink"
+        class="link-input"
+        :datalistId="componentId"
+        :datalist="linkDatalist"
+        :draggable="true"
+        @dragstart.stop.prevent
+        @keyup.enter="updateLink"
+        @keyup.esc="$event.srcElement.blur()"
       />
-      <Check class="link-save" color="#009879" @click="updateLink" />
+      <div v-else-if="internalLink" class="link-view" @click="gotoPage">
+        {{ link }}
+      </div>
+      <a v-else-if="link" :href="link" target="_blank" class="link-view" @click.stop>
+        {{ link }}
+      </a>
+      <div v-else class="empty">
+        {{ t('build.no_link') }}
+      </div>
+      <div v-if="editing" class="editing-wrap">
+        <Checkbox
+          class="open-in-new-tab-checkbox"
+          :item="{
+            label: t('build.open_in_new_tab'),
+            checked: openInNewTab,
+          }"
+          @checked="openInNewTab = $event"
+        />
+        <Check class="link-save" color="#009879" @click="updateLink" />
+      </div>
+      <div v-else class="icon-wrap">
+        <IconTooltip :tip="t('edit')">
+          <Edit class="edit-link" @click="edit" />
+        </IconTooltip>
+        <CopyText :text="link" class="copy-text" />
+      </div>
     </div>
-    <div v-else class="icon-wrap">
-      <IconTooltip :tip="t('edit')">
-        <Edit class="edit-link" @click="edit" />
-      </IconTooltip>
-      <CopyText :text="link" class="copy-text" />
-    </div>
-  </div>
+  </Teleport>
 </template>
 
 <script lang="ts" setup>
@@ -53,6 +55,8 @@ import {
   watch,
 } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
+import { EditorView } from 'prosemirror-view'
+import { TextSelection } from 'prosemirror-state'
 import {
   Check,
   Checkbox,
@@ -65,10 +69,9 @@ import { useBuild, getLinkDatalistOptions } from '@pubstudio/frontend/feature-bu
 import { useTooltip } from '@pubstudio/frontend/util-tooltip'
 import { resolveComponent } from '@pubstudio/frontend/util-builtin'
 import { ComponentArgPrimitive } from '@pubstudio/shared/type-site'
-import { LinkTooltipMode } from '../lib/enum-link-tooltip-mode'
 import { createLinkNode, schemaText } from '@pubstudio/frontend/util-edit-text'
-import { EditorView } from 'prosemirror-view'
-import { TextSelection } from 'prosemirror-state'
+import { LinkTooltipMode } from '../lib/enum-link-tooltip-mode'
+import { Node, ResolvedPos } from 'prosemirror-model'
 
 const { t } = useI18n()
 const {
@@ -158,6 +161,44 @@ const updateComponentInputs = () => {
   }
 }
 
+// Gets the link absolute start and end by traversing nodes around `cursor` to see if they
+// have the same link mark
+const getLinkPosition = (pos: ResolvedPos): number[] => {
+  const linkMark = schemaText.marks.link
+  const parent = pos.parent
+  const idx = pos.index()
+  const selNode = parent.child(idx)
+  const href = linkMark.isInSet(selNode?.marks ?? [])?.attrs?.href
+  let start = pos.pos - pos.textOffset
+  let end = start + parent.child(idx).nodeSize
+  if (!href) {
+    return [start, end]
+  }
+  // Check nodes after the cursor to get the link's end pos
+  let nodeOffset = 1
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
+    const node = parent.child(idx + nodeOffset)
+    if (nodeOffset >= parent.childCount || !linkMark.isInSet(node?.marks ?? [])) {
+      break
+    }
+    nodeOffset += 1
+    end = end + node?.nodeSize ?? 0
+  }
+  // Check nodes before the cursor to get the link's start pos
+  nodeOffset = 1
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
+    const node = parent.child(pos.index() - nodeOffset)
+    if (nodeOffset < 0 || !linkMark.isInSet(node?.marks ?? [])) {
+      break
+    }
+    nodeOffset += 1
+    start = start - node?.nodeSize ?? 0
+  }
+  return [start, end]
+}
+
 const updateProseMirrorLink = () => {
   // toRaw is necessary because ProseMirror doesn't behave well when proxied
   // eslint-disable-next-line max-len
@@ -166,18 +207,13 @@ const updateProseMirrorLink = () => {
   if (state) {
     const { $cursor } = state.selection as TextSelection
     if ($cursor) {
-      const cursorPos = $cursor.pos
-      state.doc.nodesBetween(cursorPos, cursorPos, (node, startPos) => {
-        // `nodesBetween` will gives us both root node and link node.
-        // Check `childCount` to make sure it is the link node that gets replaced.
-        if (node.childCount === 0) {
-          const endPos = startPos + node.nodeSize
-          const target = openInNewTab.value ? '_blank' : undefined
-          // TODO: is it necessary & possible to keep other marks? (color, font-weight, font-family, etc)
-          const newLinkNode = createLinkNode(schemaText, editedLink.value, target)
-          editView.value?.dispatch(state.tr.replaceWith(startPos, endPos, newLinkNode))
-        }
-      })
+      const [start, end] = getLinkPosition($cursor)
+      const target = openInNewTab.value ? '_blank' : undefined
+      // TODO: is it possible to keep other marks? (color, font-weight, font-family, etc)
+      // We could check each node and retain it instead of replacing, if the part of the text
+      // it contains is unchanged
+      const newLinkNode = createLinkNode(schemaText, editedLink.value, target)
+      editView.value?.dispatch(state.tr.replaceWith(start, end, newLinkNode))
     }
   }
 }
