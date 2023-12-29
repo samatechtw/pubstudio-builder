@@ -1,37 +1,37 @@
 /* eslint-disable prefer-const */
+import {
+  Attrs,
+  ContentMatch,
+  Fragment,
+  MarkType,
+  Node,
+  NodeType,
+  ResolvedPos,
+  Slice,
+} from 'prosemirror-model'
+import {
+  AllSelection,
+  Command,
+  EditorState,
+  NodeSelection,
+  Selection,
+  SelectionRange,
+  TextSelection,
+  Transaction,
+} from 'prosemirror-state'
 /**
  * This file is copied from "https://github.com/ProseMirror/prosemirror-commands/blob/master/src/commands.ts"
  */
 import {
-  joinPoint,
   canJoin,
-  findWrapping,
-  liftTarget,
   canSplit,
-  ReplaceStep,
+  findWrapping,
+  joinPoint,
+  liftTarget,
   ReplaceAroundStep,
+  ReplaceStep,
   replaceStep,
 } from 'prosemirror-transform'
-import {
-  Slice,
-  Fragment,
-  Node,
-  NodeType,
-  Attrs,
-  MarkType,
-  ResolvedPos,
-  ContentMatch,
-} from 'prosemirror-model'
-import {
-  Selection,
-  EditorState,
-  Transaction,
-  TextSelection,
-  NodeSelection,
-  SelectionRange,
-  AllSelection,
-  Command,
-} from 'prosemirror-state'
 import { EditorView } from 'prosemirror-view'
 
 /// Delete the selection, if there is one.
@@ -979,15 +979,10 @@ export const macBaseKeymap: { [key: string]: Command } = {
   'Ctrl-a': selectTextblockStart,
   'Ctrl-e': selectTextblockEnd,
 }
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 for (let key in pcBaseKeymap) (macBaseKeymap as any)[key] = pcBaseKeymap[key]
 
-const mac =
-  typeof navigator != 'undefined'
-    ? /Mac|iP(hone|[oa]d)/.test(navigator.platform)
-    : // @ts-ignore
-      typeof os != 'undefined' && os.platform
-      ? os.platform() == 'darwin'
-      : false
+const mac = /Mac|iP(hone|[oa]d)/.test(navigator?.platform ?? '')
 
 /// Depending on the detected platform, this will hold
 /// [`pcBasekeymap`](#commands.pcBaseKeymap) or

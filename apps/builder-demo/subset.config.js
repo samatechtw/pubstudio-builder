@@ -21,7 +21,6 @@ export default {
       '@vitejs/plugin-vue',
       'nx-vue3-vite',
       'postcss',
-      'prosemirror-commands',
       'prosemirror-gapcursor',
       'prosemirror-history',
       'prosemirror-inputrules',

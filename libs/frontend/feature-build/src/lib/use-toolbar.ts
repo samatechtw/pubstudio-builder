@@ -7,6 +7,7 @@ import {
   replaceMark,
   schemaText as schema,
   setOrRemoveStyleMark,
+  toggleMark,
 } from '@pubstudio/frontend/util-edit-text'
 import { CommandType, ICommand } from '@pubstudio/shared/type-command'
 import { ISetComponentCustomStyleData } from '@pubstudio/shared/type-command-data'
@@ -16,7 +17,6 @@ import {
   IStyleEntry,
   StyleSourceType,
 } from '@pubstudio/shared/type-site'
-import { toggleMark } from 'prosemirror-commands'
 import { Command, TextSelection } from 'prosemirror-state'
 import { EditorView } from 'prosemirror-view'
 import { computed, ComputedRef, reactive, toRaw, UnwrapNestedRefs, watch } from 'vue'

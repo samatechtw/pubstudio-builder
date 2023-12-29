@@ -1,13 +1,13 @@
 import {
   editorStateToHtml,
   IProsemirrorSetupOptions,
+  parseLinksDuringPaste,
   prosemirrorSetup,
   schemaText,
-  parseLinksDuringPaste,
   textToLinkKeymap,
 } from '@pubstudio/frontend/util-edit-text'
-import { EditorView } from 'prosemirror-view'
 import { keymap } from 'prosemirror-keymap'
+import { EditorView } from 'prosemirror-view'
 import { ref, Ref } from 'vue'
 import { useBuild } from './use-build'
 
@@ -31,7 +31,7 @@ export function createComponentEditorView(
     ...options,
     plugins,
     schema: schemaText,
-    // Overwrite Enter key so that `textToLinkKeymap` could work properly.
+    // Overwrite Enter key so that `textToLinkKeymap` works properly.
     overwriteBaseKeys: ['Enter'],
   })
 

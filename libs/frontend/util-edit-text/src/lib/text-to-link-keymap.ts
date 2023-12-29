@@ -1,6 +1,5 @@
-import { Node, Schema, ResolvedPos } from 'prosemirror-model'
+import { Node, ResolvedPos, Schema } from 'prosemirror-model'
 import { Command, EditorState, TextSelection, Transaction } from 'prosemirror-state'
-import { createLinkNode } from './prosemirror-utils'
 import {
   baseKeymap,
   chainCommands,
@@ -8,6 +7,7 @@ import {
   liftEmptyBlock,
   splitBlock,
 } from './base-keymap'
+import { createLinkNode } from './prosemirror-utils'
 
 export const urlRegex = () =>
   /(https?:\/\/(www\.)?)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\\+.~#?&/=]*)/g
@@ -49,7 +49,7 @@ const textToLinkOnEnter = (schema: Schema): Command => {
         const newState = state.apply(transaction)
         if (view) {
           view.updateState(newState)
-          // Pass the updated state to base command so that transaction could work properly.
+          // Pass the updated state to base command so that transactions work properly.
           baseKeymap.Enter?.(newState, dispatch, view)
         }
         return true
@@ -91,7 +91,7 @@ const convertTextToLinkWhenNecessary = (
       }
 
       const href = match[0]
-      nodes.push(createLinkNode(schema, href))
+      nodes.push(createLinkNode(schema, href, '_blank'))
 
       const endPos = state.selection.head
       const startPos = endPos - nodeBefore.nodeSize

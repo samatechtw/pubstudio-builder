@@ -67,7 +67,7 @@ const itemClick = (item: IToolbarDropdownItem) => {
 
 .toolbar-item-dropdown {
   position: relative;
-  z-index: 900;
+  z-index: 2000;
 }
 .item-wrap {
   background-color: $color-toolbar-bg;
@@ -77,7 +77,7 @@ const itemClick = (item: IToolbarDropdownItem) => {
   position: absolute;
   height: 0;
   transition: height 0.2s;
-  z-index: 900;
+  z-index: 2000;
   overflow: hidden;
   &.opened {
     height: v-bind(items.length * 36 + 'px');

@@ -1,13 +1,3 @@
-import {
-  chainCommands,
-  exitCode,
-  joinDown,
-  joinUp,
-  lift,
-  setBlockType,
-  toggleMark,
-  wrapIn,
-} from 'prosemirror-commands'
 import { redo, undo } from 'prosemirror-history'
 import { undoInputRule } from 'prosemirror-inputrules'
 import { Schema } from 'prosemirror-model'
@@ -18,6 +8,16 @@ import {
   wrapInList,
 } from 'prosemirror-schema-list'
 import { Command } from 'prosemirror-state'
+import {
+  chainCommands,
+  exitCode,
+  joinDown,
+  joinUp,
+  lift,
+  setBlockType,
+  toggleMark,
+  wrapIn,
+} from './base-keymap'
 
 const mac =
   typeof navigator != 'undefined' ? /Mac|iP(hone|[oa]d)/.test(navigator.platform) : false

@@ -75,7 +75,7 @@ const textNodesFromTextWithUrl = (
 
     // Append link node
     const href = match[0]
-    nodes.push(createLinkNode(schema, href))
+    nodes.push(createLinkNode(schema, href, '_blank'))
     cursor = cursor + href.length
   })
 

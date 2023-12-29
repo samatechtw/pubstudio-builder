@@ -88,18 +88,29 @@ export const computeBuilderStyleProps = (
   }
   if (selected) {
     if (component.tag === Tag.A) {
-      extraChildren = [
-        h(LinkTooltip, {
-          link: data.attrs.href ?? '',
-          componentId: component.id,
-          mode: LinkTooltipMode.Component,
-        }),
-      ]
-      data.mixins.push('__link')
-      data.attrs.href = 'javascript:'
-      getPosition()
-      if (position !== 'absolute' && position !== 'relative') {
-        builderClass.push('force-relative')
+      const display =
+        findStyles(
+          [Css.Display],
+          site,
+          component,
+          descSortedBreakpoints.value,
+          activeBreakpoint.value,
+        ).display ?? null
+      // Don't show the tooltip if the link isn't in the DOM
+      if (display !== 'none') {
+        extraChildren = [
+          h(LinkTooltip, {
+            link: data.attrs.href ?? '',
+            componentId: component.id,
+            mode: LinkTooltipMode.Component,
+          }),
+        ]
+        data.mixins.push('__link')
+        data.attrs.href = 'javascript:'
+        getPosition()
+        if (position !== 'absolute' && position !== 'relative') {
+          builderClass.push('force-relative')
+        }
       }
     }
     if (component.tag === Tag.Ul || component.tag === Tag.Ol) {
