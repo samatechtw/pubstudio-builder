@@ -63,10 +63,12 @@ export const PreviewComponent = () => {
           // TODO: merge back with `live-component.ts` once the custom router is used for `web`
           const hrefProp = (props.href ?? '') as string
 
-          if (/^(https?:\/\/|www\.)/.test(hrefProp)) {
+          const { url, isExternal } = hrefToUrl(hrefProp, '/preview')
+          if (isExternal) {
             // Absolute path, use the `href` in renderProps as is (don't forward query string and hash).
             // We are unable to use router-link here because router-link treats any given link as a
             // relative path to the current site.
+            renderProps.href = url
             return h('a', renderProps, children)
           } else {
             // Relative path, forward query string and hash.
@@ -80,12 +82,11 @@ export const PreviewComponent = () => {
             // from the `href` prop and merge them with editor hash and query. User-provided hash&query
             // will take precedence over editor hash&query.
 
-            const linkURL = hrefToUrl(hrefProp, '/preview')
             const {
               pathname: previewPathName,
               search: userSearch,
               hash: userHash,
-            } = linkURL
+            } = new URL(url)
             const { search: editorSearch, hash: editorHash } = window.location
 
             const mergedSearchParams = mergeSearch(editorSearch, userSearch)

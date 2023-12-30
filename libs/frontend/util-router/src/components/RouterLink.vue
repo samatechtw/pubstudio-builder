@@ -2,10 +2,11 @@
   <a
     class="router-link"
     :class="{ 'router-link-active': isActive, 'router-link-exact-active': isExactActive }"
-    :href="href"
+    :href="link.url"
     :target="target"
     @click="navigate"
   >
+    {{ JSON.stringify(link) }}
     <slot />
   </a>
 </template>
@@ -16,6 +17,7 @@ import { IRoute, IResolvedRoute } from '../lib/i-route'
 import { INavigateOptions } from '../lib/i-router'
 import { MatchedRoutesSymbol } from '../lib/router-injection-keys'
 import { useRouter } from '../lib/use-router'
+import { normalizeUrl } from '../lib/href-to-url'
 
 const props = withDefaults(
   defineProps<{
@@ -46,11 +48,13 @@ const targetRoute = computed<IRoute<unknown> | undefined>(() => {
   }
 })
 
-const href = computed(() => {
+const link = computed(() => {
   if ('name' in to.value) {
-    return router.computeResolvedPath(targetRoute.value as IRoute<unknown>, to.value)
+    const url = router.computeResolvedPath(targetRoute.value as IRoute<unknown>, to.value)
+    return { url, isExternal: false }
   } else {
-    return to.value.path
+    const { url, isExternal } = normalizeUrl(to.value.path ?? '')
+    return { url, isExternal }
   }
 })
 
@@ -68,8 +72,7 @@ const isExactActive = computed(() => {
 })
 
 const navigate = (e: Event) => {
-  const isExternal = /^(https?:\/\/|www\.)/.test(to.value.path ?? '')
-  if (!isExternal) {
+  if (!link.value.isExternal) {
     e.preventDefault()
     if (replace.value) {
       router.replace(to.value)

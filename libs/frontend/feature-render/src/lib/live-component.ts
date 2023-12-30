@@ -65,17 +65,15 @@ export const LiveComponent = () => {
         } else {
           children = content
         }
-
         if (tag === Tag.A) {
           const path = props.href ?? ''
-          return h(
-            RouterLink,
-            {
-              ...renderProps,
-              to: { path },
-            },
-            () => children,
-          )
+          const linkProps = {
+            ...renderProps,
+            href: undefined,
+            to: { path },
+          }
+          delete linkProps['href']
+          return h(RouterLink, linkProps, () => children)
         }
 
         return h(tag as string, renderProps, children)
