@@ -94,7 +94,7 @@ jobs:
       - name: Install rust
         uses: dtolnay/rust-toolchain@master
         with:
-          toolchain: '1.72'
+          toolchain: '1.75'
       - name: Use Cross
         if: matrix.target == 'aarch64-unknown-linux-gnu'
         run: |

@@ -30,7 +30,7 @@ pub fn make_site_pages(namespace: &str) -> String {
 }
 
 pub fn make_namespace(name: &str) -> String {
-    name.to_lowercase().replace(" ", "-")
+    name.to_lowercase().replace(" ", "_")
 }
 
 pub fn stringified_json(str: &str) -> String {

@@ -1,3 +1,4 @@
+use crate::type_util::REGEX_SITE_NAME;
 use serde::{Deserialize, Serialize};
 use serde_json;
 use validator::Validate;
@@ -5,7 +6,7 @@ use validator::Validate;
 #[derive(Serialize, Deserialize, Validate, Clone, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct UpdateSiteDto {
-    #[validate(length(min = 1, max = 50))]
+    #[validate(regex = "REGEX_SITE_NAME")]
     pub name: Option<String>,
     pub version: Option<String>,
     pub context: Option<serde_json::Value>,

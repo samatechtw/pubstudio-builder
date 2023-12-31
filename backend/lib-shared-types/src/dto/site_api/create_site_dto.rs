@@ -1,4 +1,7 @@
-use crate::{shared::site::SiteType, type_util::REGEX_UUID};
+use crate::{
+    shared::site::SiteType,
+    type_util::{REGEX_SITE_NAME, REGEX_UUID},
+};
 use serde::{Deserialize, Serialize};
 use serde_json;
 use validator::Validate;
@@ -10,7 +13,7 @@ pub struct CreateSiteDto {
     pub id: String,
     #[validate(regex = "REGEX_UUID")]
     pub owner_id: String,
-    #[validate(length(min = 1, max = 50))]
+    #[validate(regex = "REGEX_SITE_NAME")]
     pub name: String,
     pub version: String,
     pub context: serde_json::Value,
