@@ -185,11 +185,11 @@ const handleInput = (e: Event) => {
   .bubble {
     right: 8px;
   }
-  .error-icon {
+  :deep(.info-bubble-wrap) {
     @mixin size 18px;
     &:hover {
-      :deep(svg g) {
-        stroke: $color-light1;
+      svg g {
+        fill: rgba($color-red, 0.7);
       }
     }
   }

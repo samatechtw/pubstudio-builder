@@ -53,6 +53,7 @@ export interface ISitesFeature {
   deleteSite: (id: string) => Promise<void>
   siteNameToSubdomain: (siteName: string) => string
   validateSubdomain: (subdomain: string) => string | undefined
+  validateSiteName: (name: string) => string | undefined
 }
 
 export const useSites = (): ISitesFeature => {
@@ -146,6 +147,13 @@ export const useSites = (): ISitesFeature => {
     }
   }
 
+  const validateSiteName = (name: string): string | undefined => {
+    if (!/^[a-zA-Z0-9 ]{2,50}$/.test(name)) {
+      return i18n.t('errors.site_name')
+    }
+    return undefined
+  }
+
   return {
     api,
     loading,
@@ -160,5 +168,6 @@ export const useSites = (): ISitesFeature => {
     deleteSite,
     siteNameToSubdomain,
     validateSubdomain,
+    validateSiteName,
   }
 }

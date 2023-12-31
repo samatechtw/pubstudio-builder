@@ -83,7 +83,7 @@ jobs:
           fetch-depth: 0
       - run: |
           rustup set auto-self-update disable
-          rustup toolchain install 1.72.0 --profile minimal
+          rustup toolchain install 1.75.0 --profile minimal
       - name: Cache build
         uses: Swatinem/rust-cache@v2
         with:

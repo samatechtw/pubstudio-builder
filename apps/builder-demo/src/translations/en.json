@@ -410,6 +410,7 @@
   "errors": {
     "site_restore_fail": "Unable to restore the site. If this error persists, please contact support at support{'@'}samatech.tw",
     "site_format": "Site format version mismatch. The site imported correctly, but something might be broken. If so, contact support.",
+    "site_name": "Only letters, numbers, and spaces allowed.",
     "site_subdomain_empty": "Subdomain cannot be empty.",
     "site_subdomain_format": "Subdomain can only contain lowercase characters, numbers, and dashes.",
     "site_subdomain_reserved": "Subdomain conflicts with reserved subdomains.",

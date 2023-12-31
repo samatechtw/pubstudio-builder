@@ -145,7 +145,9 @@ export const deserializeSite = (serializedSite: string): ISite | undefined => {
   }
 }
 
-export const storedToSerializedSite = (stored: IStoredSite): ISerializedSite | undefined => {
+export const storedToSerializedSite = (
+  stored: IStoredSite,
+): ISerializedSite | undefined => {
   const { name, version, defaults, context, pages, editor, history } = stored
   if (!(name && version && defaults && context && pages)) {
     return undefined

@@ -134,7 +134,7 @@ const hideBubble = () => {
   flex-shrink: 0;
   &:hover {
     :deep(svg g) {
-      fill: $blue-100;
+      fill: $blue-300;
     }
   }
 }
