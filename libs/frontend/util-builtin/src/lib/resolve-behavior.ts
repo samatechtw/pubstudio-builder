@@ -5,7 +5,6 @@ import {
   IResolvedBehavior,
   ISiteContext,
 } from '@pubstudio/shared/type-site'
-import { parseId } from './resolve-util'
 
 export const builtinBehaviors: Record<string, IBehavior> = {
   // Populated by '@pubstudio/frontend/feature-builtin' to avoid circular dependencies
@@ -44,11 +43,10 @@ export const resolveBehavior = (
   context: ISiteContext,
   behaviorId: string,
 ): IBehavior | undefined => {
-  const { namespace } = parseId(behaviorId)
   let behavior: IBehavior | undefined
-  if (namespace === context.namespace) {
+  if (behaviorId.startsWith(context.namespace)) {
     behavior = context.behaviors[behaviorId]
-  } else if (namespace === defaultContext.namespace) {
+  } else if (behaviorId.startsWith(defaultContext.namespace)) {
     // Builtins are native code and don't need to be eval'd
     return builtinBehaviors[behaviorId]
   } else {

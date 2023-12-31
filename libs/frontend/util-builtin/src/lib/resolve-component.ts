@@ -1,7 +1,6 @@
 import { defaultContext } from '@pubstudio/frontend/util-ids'
 import { IComponent, ISiteContext } from '@pubstudio/shared/type-site'
 import { builtinComponents } from './components/builtin-components'
-import { parseId } from './resolve-util'
 
 export const resolveComponent = (
   context: ISiteContext,
@@ -10,11 +9,10 @@ export const resolveComponent = (
   if (!componentId) {
     return undefined
   }
-  const { namespace } = parseId(componentId)
 
-  if (namespace === context.namespace) {
+  if (componentId.startsWith(context.namespace)) {
     return context.components[componentId]
-  } else if (namespace === defaultContext.namespace) {
+  } else if (componentId.startsWith(defaultContext.namespace)) {
     return builtinComponents[componentId]
   } else {
     // TODO -- resolve external namespaces

@@ -1,20 +1,11 @@
+import { breakpointSortFn } from '@pubstudio/frontend/util-render'
 import { IBreakpointStyles, IPseudoStyle } from '@pubstudio/shared/type-site'
 import { computed } from 'vue'
 import { site } from './site-source'
 
 // Sorts breakpoints from small to large
 export const sortedBreakpoints = computed(() =>
-  Object.values(site.value.context.breakpoints).sort((a, b) => {
-    if (a.maxWidth === undefined && b.maxWidth === undefined) {
-      return 0
-    } else if (a.maxWidth === undefined) {
-      return 1
-    } else if (b.maxWidth === undefined) {
-      return -1
-    } else {
-      return a.maxWidth - b.maxWidth
-    }
-  }),
+  Object.values(site.value.context.breakpoints).sort(breakpointSortFn),
 )
 
 export const descSortedBreakpoints = computed(() =>

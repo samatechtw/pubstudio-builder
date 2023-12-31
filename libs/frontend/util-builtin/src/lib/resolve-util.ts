@@ -12,7 +12,6 @@ export const parseId = (id: string): IParsedId => {
   return { id: idArr[1] }
 }
 
-export const isGlobal = (id: string): boolean => {
-  const { namespace } = parseId(id)
-  return namespace === defaultContext.namespace
+export const isGlobal = (id: string | undefined): boolean => {
+  return (id ?? '').startsWith(defaultContext.namespace)
 }

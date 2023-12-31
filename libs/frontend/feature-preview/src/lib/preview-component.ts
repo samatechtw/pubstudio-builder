@@ -4,10 +4,10 @@ import {
   registerCustomEvents,
   removeListeners,
 } from '@pubstudio/frontend/feature-render'
+import { hrefToUrl } from '@pubstudio/frontend/util-router'
 import { IComponent, ISite, Tag } from '@pubstudio/shared/type-site'
 import { defineComponent, h, onMounted, onUnmounted, PropType, toRefs } from 'vue'
 import { RouterLink } from 'vue-router'
-import { hrefToUrl } from './href-to-url'
 import { mergeSearch } from './merge-search'
 import { computePropsContent } from './render-preview'
 

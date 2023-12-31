@@ -145,7 +145,7 @@ export const deserializeSite = (serializedSite: string): ISite | undefined => {
   }
 }
 
-export const unstoreSite = (stored: IStoredSite): ISite | undefined => {
+export const storedToSerializedSite = (stored: IStoredSite): ISerializedSite | undefined => {
   const { name, version, defaults, context, pages, editor, history } = stored
   if (!(name && version && defaults && context && pages)) {
     return undefined
@@ -165,5 +165,10 @@ export const unstoreSite = (stored: IStoredSite): ISite | undefined => {
         },
     updated_at: stored.updated_at || undefined,
   }
-  return deserializedHelper(serialized)
+  return serialized
+}
+
+export const unstoreSite = (stored: IStoredSite): ISite | undefined => {
+  const serialized = storedToSerializedSite(stored)
+  return serialized ? deserializedHelper(serialized) : undefined
 }
