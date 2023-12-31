@@ -21,7 +21,6 @@ import { navMenuItemStyle, navMenuStyle } from './components/builtin-nav-menu'
 import { svgStyle } from './components/builtin-svg'
 import { textStyle } from './components/builtin-text'
 import { textareaStyle } from './components/builtin-textarea'
-import { parseId } from './resolve-util'
 
 export const builtinStyles: Record<string, IStyle> = {
   [horizontalStyle.id]: horizontalStyle,
@@ -50,9 +49,11 @@ export const resolveStyle = (
   context: ISiteContext,
   styleId: string,
 ): IStyle | undefined => {
-  const { namespace } = parseId(styleId)
   let style: IStyle | undefined
-  if (namespace === context.namespace || namespace === defaultContext.namespace) {
+  if (
+    styleId.startsWith(context.namespace) ||
+    styleId.startsWith(defaultContext.namespace)
+  ) {
     style = context.styles[styleId]
   } else {
     // TODO -- resolve external namespaces

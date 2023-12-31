@@ -6,7 +6,6 @@
     :target="target"
     @click="navigate"
   >
-    {{ JSON.stringify(link) }}
     <slot />
   </a>
 </template>
