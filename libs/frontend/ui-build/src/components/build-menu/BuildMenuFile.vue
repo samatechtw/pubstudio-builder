@@ -27,9 +27,10 @@
       <Trash color="#b7436a" />
     </BuildMenuIconText>
     <ExportModal
+      :site="site"
       :show="showExport"
       :defaultFileName="defaultFileName"
-      @confirmExport="exportSite"
+      @confirmExport="showExport = false"
       @cancel="showExport = false"
     />
     <AlertModal
@@ -72,7 +73,6 @@ import {
 import { serializeSite } from '@pubstudio/frontend/util-site-store'
 import {
   defaultExportedFileName,
-  saveSite,
   validateSite,
 } from '@pubstudio/frontend/util-site-store'
 import { loadFile } from '@pubstudio/frontend/util-doc'
@@ -99,11 +99,6 @@ const showConfirmReset = ref(false)
 const importing = ref(false)
 
 const defaultFileName = computed(() => defaultExportedFileName(site.value.name))
-
-const exportSite = (fileName: string) => {
-  saveSite(site.value, fileName)
-  showExport.value = false
-}
 
 const confirmImport = async () => {
   importing.value = true
