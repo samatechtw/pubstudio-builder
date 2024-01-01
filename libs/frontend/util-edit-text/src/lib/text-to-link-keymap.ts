@@ -71,14 +71,14 @@ const convertTextToLinkWhenNecessary = (
   $cursor: ResolvedPos,
 ): Transaction | undefined => {
   const nodeBefore = $cursor.nodeBefore
-  const nodeBeforeIsLink = nodeBefore?.marks.some(
-    (mark) => mark.type.name === schema.mark('link')?.type.name,
-  )
+  const linkMark = schema.mark('link')?.type.name
+  const nodeBeforeIsLink = nodeBefore?.marks.some((mark) => mark.type.name === linkMark)
 
   if (!nodeBeforeIsLink && nodeBefore?.isText && nodeBefore.text) {
     // Convert text to link
     const match = urlRegex().exec(nodeBefore.text)
-    if (match) {
+    // Only convert when the link is the last text entered
+    if (match && nodeBefore.text.endsWith(match[0])) {
       const nodes: Node[] = []
 
       if (match.index > 0) {
