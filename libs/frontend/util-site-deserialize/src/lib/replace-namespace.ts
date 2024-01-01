@@ -1,12 +1,14 @@
-import { ISite } from '@pubstudio/shared/type-site'
+import { ISerializedComponent, ISite } from '@pubstudio/shared/type-site'
+
+const replaceId = (id: string, oldNamespace: string, namespace: string): string => {
+  return id.replace(oldNamespace, namespace)
+}
 
 // Replace all references to the site namespace
 export const replaceNamespace = (site: ISite, namespace: string): ISite => {
   const { context, editor } = site
   const oldNamespace = context.namespace
-  const updateId = (id: string): string => {
-    return id.replace(oldNamespace, namespace)
-  }
+  const updateId = (id: string): string => replaceId(id, oldNamespace, namespace)
 
   context.namespace = namespace
   // Update styles
@@ -68,4 +70,20 @@ export const replaceNamespace = (site: ISite, namespace: string): ISite => {
     editor.selectedComponent = undefined
   }
   return site
+}
+
+// Replaces a component's namespace, including children
+// TODO -- figure out how to handle styles and events/behaviors
+export const replaceComponentNamespace = (
+  component: ISerializedComponent,
+  oldNamespace: string,
+  namespace: string,
+) => {
+  const newId = replaceId(component.id, oldNamespace, namespace)
+  component.id = newId
+  if (component.children) {
+    for (const child of component.children) {
+      replaceComponentNamespace(child, oldNamespace, namespace)
+    }
+  }
 }

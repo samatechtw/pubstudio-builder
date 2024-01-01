@@ -187,7 +187,6 @@
     "confirm_import": "Confirm Import",
     "confirm_import_text": "This will overwrite the current active site!",
     "import_error": "Import Failed",
-    "copied": "Copied",
     "select_color_info": "Checked theme colors will show in the color picker (maximum 16 colors).",
     "page": "Page",
     "pages": "Pages",
