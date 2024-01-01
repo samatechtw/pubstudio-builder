@@ -18,11 +18,8 @@
 <script lang="ts" setup>
 import { onMounted } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
-import {
-  setCssPseudoClass,
-  setStyleToolbarMenu,
-  useBuild,
-} from '@pubstudio/frontend/feature-build'
+import { useBuild } from '@pubstudio/frontend/feature-build'
+import { setStyleToolbarMenu, setCssPseudoClass } from '@pubstudio/frontend/util-command'
 import { PSMultiselect } from '@pubstudio/frontend/ui-widgets'
 import {
   CssPseudoClass,

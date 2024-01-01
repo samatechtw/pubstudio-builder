@@ -62,12 +62,8 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
-import {
-  setDebugBounding,
-  setShowComponentTree,
-  useBuild,
-  useHistory,
-} from '@pubstudio/frontend/feature-build'
+import { useBuild, useHistory } from '@pubstudio/frontend/feature-build'
+import { setDebugBounding, setShowComponentTree } from '@pubstudio/frontend/util-command'
 import {
   Redo,
   ToolbarItem,

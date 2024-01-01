@@ -28,13 +28,15 @@ export const useHistory = (): IUseHistory => {
       commandAlert.value = CommandType.Undo
     }
     const lastCommand = getLastCommand(site.value)
-    undoLastCommand(site.value)
+    // Clear style edit data
     if (
       lastCommand &&
       ![CommandType.EditStyleMixin, CommandType.SetMixinEntry].includes(lastCommand.type)
     ) {
       editStylesCancelEdit(site.value)
     }
+
+    undoLastCommand(site.value)
   }
 
   const redo = (uiAlert = false) => {

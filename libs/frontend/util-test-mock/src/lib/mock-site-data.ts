@@ -32,7 +32,20 @@ export const mockSerializedSite: ISerializedSite = {
   context: {
     namespace: 'test',
     nextId: 2,
-    styles: {},
+    styles: {
+      'global-s-0': {
+        id: 'global-s-0',
+        name: 'ContainerVerticalStyle',
+        breakpoints: {
+          'breakpoint-1': {
+            default: {
+              display: 'flex',
+              'flex-direction': 'column',
+            },
+          },
+        },
+      },
+    },
     behaviors: {},
     theme: {
       variables: {

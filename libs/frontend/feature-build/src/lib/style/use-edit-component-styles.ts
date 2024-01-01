@@ -1,6 +1,6 @@
 import { activeBreakpoint } from '@pubstudio/frontend/feature-site-source'
-import { editCommands, StyleType, undoCommand } from '@pubstudio/frontend/util-command'
-import { ICommand } from '@pubstudio/shared/type-command'
+import { editCommands, undoCommand } from '@pubstudio/frontend/util-command'
+import { ICommand, StyleType } from '@pubstudio/shared/type-command'
 import {
   Css,
   IInheritedStyleEntry,

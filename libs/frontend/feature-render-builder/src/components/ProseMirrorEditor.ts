@@ -1,7 +1,6 @@
 import {
   createComponentEditorView,
   editViewTxCount,
-  getProseMirrorContainerId,
   useBuild,
   useToolbar,
 } from '@pubstudio/frontend/feature-build'
@@ -11,6 +10,7 @@ import {
 } from '@pubstudio/frontend/feature-site-source'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { resolveThemeVariables } from '@pubstudio/frontend/util-builtin'
+import { getProseMirrorContainerId } from '@pubstudio/frontend/util-command'
 import { findStyles } from '@pubstudio/frontend/util-component'
 import {
   firstMarkInSelection,
@@ -30,7 +30,6 @@ import {
   onMounted,
   PropType,
   ref,
-  Teleport,
   toRaw,
   toRefs,
   watch,

@@ -47,9 +47,11 @@ import {
   useBuild,
   useReusableStyleMenu,
   useEditComponentStyles,
+} from '@pubstudio/frontend/feature-build'
+import {
   setStyleToolbarMenu,
   setComponentMenuCollapses,
-} from '@pubstudio/frontend/feature-build'
+} from '@pubstudio/frontend/util-command'
 import StyleRow from '../StyleRow.vue'
 import EditMenuTitle from '../EditMenuTitle.vue'
 

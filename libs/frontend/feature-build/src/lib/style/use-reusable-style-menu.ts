@@ -5,16 +5,16 @@ import {
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import {
   editCommands,
-  editingStyleId,
+  editingMixinData,
   editStyles,
   editStylesCancelEdit,
   setEditingMixin,
-  StyleType,
   undoCommand,
 } from '@pubstudio/frontend/util-command'
 import { computeComponentFlattenedStyles } from '@pubstudio/frontend/util-component'
 import { styleId } from '@pubstudio/frontend/util-ids'
-import { ICommand } from '@pubstudio/shared/type-command'
+import { ICommand, StyleType } from '@pubstudio/shared/type-command'
+import { ICloseMixinMenuData } from '@pubstudio/shared/type-command-data'
 import {
   Css,
   CssPseudoClass,
@@ -37,7 +37,7 @@ import { IUseEditStyles, useEditStyles } from './use-edit-styles'
 
 export interface IUseStyleMenuFeature extends IUseEditStyles {
   isEditingMixin: ComputedRef<boolean>
-  editingStyleId: Ref<string | undefined>
+  editingMixinData: Ref<ICloseMixinMenuData | undefined>
   editingStyle: ComputedRef<IStyle | undefined>
   styleError: Ref<string | undefined>
   editingName: Ref<string>
@@ -56,8 +56,8 @@ const styleError = ref<string | undefined>()
 export const editingName = ref('')
 
 const editingStyle = computed<IStyle | undefined>(() => {
-  if (editingStyleId.value) {
-    return site.value.context.styles[editingStyleId.value]
+  if (editingMixinData.value) {
+    return site.value.context.styles[editingMixinData.value.id]
   }
   return undefined
 })
@@ -94,7 +94,7 @@ export const useReusableStyleMenu = (): IUseStyleMenuFeature => {
       mixinId = id
     }
     if (mixinId) {
-      setEditingMixin(site.value, mixinId)
+      setEditingMixin(site.value, mixinId, source?.id)
     }
   }
 
@@ -168,7 +168,7 @@ export const useReusableStyleMenu = (): IUseStyleMenuFeature => {
   }
 
   const saveMixinName = () => {
-    const styleId = editingStyleId.value
+    const styleId = editingMixinData.value?.id
     if (!styleId || !validateStyle()) {
       return
     }
@@ -185,14 +185,14 @@ export const useReusableStyleMenu = (): IUseStyleMenuFeature => {
   }
 
   const isEditingMixin = computed(() => {
-    return !!editingStyleId.value
+    return !!editingMixinData.value
   })
 
   const setStyle = (
     oldStyle: IStyleEntry | undefined,
     newStyle: IStyleEntry | undefined,
   ) => {
-    if (!editingStyleId.value) {
+    if (!editingMixinData.value) {
       return
     }
     const firstEdit = !editCommands.value
@@ -207,20 +207,22 @@ export const useReusableStyleMenu = (): IUseStyleMenuFeature => {
       // Undo the previous command to clean up the old property/value
       undoCommand(site.value, removeCmd)
       // The property changed, and we're replacing a command in the current group
-      const c = editMixinEntryCommand(editingStyleId.value, originalStyle, {
+      const c = editMixinEntryCommand(editingMixinData.value.id, originalStyle, {
         ...newStyle,
       })
       if (c) {
         commands = [c]
       }
     } else if (newStyle) {
-      const c = editMixinEntryCommand(editingStyleId.value, oldStyle, { ...newStyle })
+      const c = editMixinEntryCommand(editingMixinData.value.id, oldStyle, {
+        ...newStyle,
+      })
       if (c) {
         commands = [c]
       }
     } else if (oldStyle) {
       const c = editMixinEntryCommand(
-        editingStyleId.value,
+        editingMixinData.value.id,
         originalStyle ?? oldStyle,
         undefined,
       )
@@ -250,7 +252,7 @@ export const useReusableStyleMenu = (): IUseStyleMenuFeature => {
   })
   return {
     ...editStylesUsable,
-    editingStyleId,
+    editingMixinData,
     editingStyle,
     isEditingMixin,
     styleError,

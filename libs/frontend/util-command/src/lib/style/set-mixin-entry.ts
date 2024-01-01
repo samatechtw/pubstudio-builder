@@ -2,7 +2,6 @@ import { resolveStyle } from '@pubstudio/frontend/util-builtin'
 import { CommandType, ICommand } from '@pubstudio/shared/type-command'
 import { ISetMixinEntryData } from '@pubstudio/shared/type-command-data'
 import { ISite, IStyle, IStyleEntry } from '@pubstudio/shared/type-site'
-import { editingStyleId } from '../edit-styles-data'
 
 export interface SetMixinEntry extends ICommand<ISetMixinEntryData> {
   type: CommandType.SetMixinEntry
@@ -49,5 +48,4 @@ export const undoSetMixinEntry = (site: ISite, data: ISetMixinEntryData) => {
   const { mixinId, oldStyle, newStyle } = data
   const mixin = resolveStyle(site.context, mixinId)
   setMixinEntry(mixin, data.breakpointId, newStyle, oldStyle)
-  editingStyleId.value = mixinId
 }

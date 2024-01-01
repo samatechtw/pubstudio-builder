@@ -104,7 +104,8 @@ import {
 import { Plus } from '@pubstudio/frontend/ui-widgets'
 import EditMenuTitle from '../EditMenuTitle.vue'
 import EventBehaviorRow from './EventBehaviorRow.vue'
-import { useBuild, setEditBehavior } from '@pubstudio/frontend/feature-build'
+import { useBuild } from '@pubstudio/frontend/feature-build'
+import { setEditBehavior } from '@pubstudio/frontend/util-command'
 import { IUpdateComponentArgPayload } from '../component-arg/i-update-component-arg-payload'
 import BehaviorModal from './BehaviorModal.vue'
 

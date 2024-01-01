@@ -383,6 +383,7 @@
       "editS": "Edit Style Mixin",
       "rmS": "Remove Style Mixin",
       "setME": "Set Mixin Entry",
+      "cMM": "Close Mixin Menu",
       "addTV": "Add Theme Variable",
       "editTV": "Edit Theme Variable",
       "rmTV": "Remove Theme Variable",

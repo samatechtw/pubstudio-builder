@@ -39,8 +39,8 @@ import {
   validateComponentArg,
   convertComponentArg,
   getLinkDatalistOptions,
-  setComponentEditInputValue,
 } from '@pubstudio/frontend/feature-build'
+import { setComponentEditInputValue } from '@pubstudio/frontend/util-command'
 
 const { t } = useI18n()
 

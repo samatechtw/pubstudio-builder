@@ -25,8 +25,10 @@ describe('Add Style Mixin', () => {
   })
 
   it('should add style mixin to site', () => {
-    // Assert there's no style mixin in site context
-    expect(Object.keys(site.context.styles)).toHaveLength(0)
+    // Assert there's one default mixin in site context
+    const defaultMixinIds = Object.keys(site.context.styles)
+    expect(defaultMixinIds).toHaveLength(1)
+    const defaultMixinId = defaultMixinIds[0]
 
     // Add style mixin
     const data = mockAddStyleMixinData(styleName, pseudoStyle)
@@ -34,11 +36,12 @@ describe('Add Style Mixin', () => {
 
     // Assert style mixin is added to site context
     const styleIds = Object.keys(site.context.styles)
-    expect(styleIds).toHaveLength(1)
+    expect(styleIds).toHaveLength(2)
+    const newMixinId = styleIds.find((id) => id !== defaultMixinId) ?? ''
+    expect(newMixinId).toBeTruthy()
 
-    const styleId = styleIds[0]
-    expect(site.context.styles[styleId]).toEqual({
-      id: styleId,
+    expect(site.context.styles[newMixinId]).toEqual({
+      id: newMixinId,
       name: styleName,
       breakpoints: {
         [DEFAULT_BREAKPOINT_ID]: pseudoStyle,
@@ -47,12 +50,12 @@ describe('Add Style Mixin', () => {
   })
 
   it('should undo add style mixin', () => {
-    // Add style and  mixinundo
+    // Add style and mixin undo
     const data = mockAddStyleMixinData(styleName, pseudoStyle)
     applyAddStyleMixin(site, data)
     undoAddStyleMixin(site, data)
 
-    // Assert there's no style mixin in site context
-    expect(Object.keys(site.context.styles)).toHaveLength(0)
+    // Assert there's one mixin in site context
+    expect(Object.keys(site.context.styles)).toHaveLength(1)
   })
 })

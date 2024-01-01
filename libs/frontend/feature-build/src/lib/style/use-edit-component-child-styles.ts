@@ -2,12 +2,12 @@ import {
   activeBreakpoint,
   descSortedBreakpoints,
 } from '@pubstudio/frontend/feature-site-source'
-import { editCommands, StyleType, undoCommand } from '@pubstudio/frontend/util-command'
+import { editCommands, undoCommand } from '@pubstudio/frontend/util-command'
 import {
   computeComponentFlattenedStyles,
   computeComponentOverrideStyle,
 } from '@pubstudio/frontend/util-component'
-import { ICommand } from '@pubstudio/shared/type-command'
+import { ICommand, StyleType } from '@pubstudio/shared/type-command'
 import {
   Css,
   IComponent,
@@ -107,12 +107,6 @@ export const useEditComponentChildStyles = (
   const isMissingSelector = (childId: string) => {
     return !childrenIdSet.value.has(childId)
   }
-
-  const omitSourceBreakpointId = (entry: IInheritedStyleEntry): IStyleEntry => ({
-    pseudoClass: entry.pseudoClass,
-    property: entry.property,
-    value: entry.value,
-  })
 
   const setStyle = (
     oldStyle: IStyleEntry | undefined,
