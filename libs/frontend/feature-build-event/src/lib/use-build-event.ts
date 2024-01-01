@@ -1,6 +1,4 @@
 import {
-  setBuildSubmenu,
-  setStyleToolbarMenu,
   useBuild,
   useCopyPaste,
   useDuplicateComponent,
@@ -9,7 +7,11 @@ import {
 import { activeBreakpoint } from '@pubstudio/frontend/feature-site-source'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { resolveComponent } from '@pubstudio/frontend/util-builtin'
-import { clearComponentTabState } from '@pubstudio/frontend/util-command'
+import {
+  clearComponentTabState,
+  setBuildSubmenu,
+  setStyleToolbarMenu,
+} from '@pubstudio/frontend/util-command'
 import { resolvedComponentStyle } from '@pubstudio/frontend/util-component'
 import { isDynamicComponent } from '@pubstudio/frontend/util-ids'
 import { Keys } from '@pubstudio/frontend/util-key-listener'

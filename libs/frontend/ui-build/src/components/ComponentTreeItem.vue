@@ -69,14 +69,12 @@ import { computed, toRefs } from 'vue'
 import { Caret } from '@pubstudio/frontend/ui-widgets'
 import { IComponent } from '@pubstudio/shared/type-site'
 import { useDragDrop, findNonDynamic } from '@pubstudio/frontend/feature-render-builder'
-import {
-  getComponentTreeItemId,
-  toggleComponentHidden,
-  useBuild,
-} from '@pubstudio/frontend/feature-build'
+import { useBuild } from '@pubstudio/frontend/feature-build'
 import {
   collapseComponentTreeItem,
   expandComponentTreeItem,
+  toggleComponentHidden,
+  getComponentTreeItemId,
   setSelectedComponent,
 } from '@pubstudio/frontend/util-command'
 import { Eye, Hide } from '@pubstudio/frontend/ui-widgets'

@@ -91,7 +91,8 @@ import {
   PageMenu,
   StyleToolbar,
 } from '@pubstudio/frontend/ui-build'
-import { useBuild, useHistory, toggleEditorMenu } from '@pubstudio/frontend/feature-build'
+import { useBuild, useHistory } from '@pubstudio/frontend/feature-build'
+import { toggleEditorMenu } from '@pubstudio/frontend/util-command'
 import { useDragDropData } from '@pubstudio/frontend/feature-render-builder'
 import { useBuildEvent, hotkeysDisabled } from '@pubstudio/frontend/feature-build-event'
 import { Keys, useKeyListener } from '@pubstudio/frontend/util-key-listener'

@@ -27,7 +27,8 @@ describe('Edit Style Mixin', () => {
     }
     applyAddStyleMixin(site, mockAddStyleMixinData(undefined, oldPseudoStyle))
     const styles = Object.values(site.context.styles)
-    expect(styles).toHaveLength(1)
+    // One mixin in initial site, one new mixin
+    expect(styles).toHaveLength(2)
     mixinId = styles[0].id
     oldName = styles[0].name
 

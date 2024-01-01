@@ -71,11 +71,8 @@ import { computed, toRefs } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { InfoBubble, PSMultiselect, Minus } from '@pubstudio/frontend/ui-widgets'
 import { ComponentMenuCollapsible, Css, IComponent } from '@pubstudio/shared/type-site'
-import {
-  useBuild,
-  setComponentMenuCollapses,
-  useEditComponentChildStyles,
-} from '@pubstudio/frontend/feature-build'
+import { useBuild, useEditComponentChildStyles } from '@pubstudio/frontend/feature-build'
+import { setComponentMenuCollapses } from '@pubstudio/frontend/util-command'
 import { resolveThemeVariables } from '@pubstudio/frontend/util-builtin'
 import { runtimeContext } from '@pubstudio/frontend/util-runtime'
 import EditMenuTitle from '../EditMenuTitle.vue'

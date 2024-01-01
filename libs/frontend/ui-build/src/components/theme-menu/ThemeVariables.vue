@@ -112,9 +112,8 @@ import {
   IThemeVariableEditState,
   useThemeMenuVariables,
   useBuild,
-  selectColor,
-  unselectColor,
 } from '@pubstudio/frontend/feature-build'
+import { selectColor, unselectColor } from '@pubstudio/frontend/util-command'
 
 const { t } = useI18n()
 

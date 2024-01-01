@@ -24,7 +24,8 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
-import { setEditBehavior, useBuild } from '@pubstudio/frontend/feature-build'
+import { useBuild } from '@pubstudio/frontend/feature-build'
+import { setEditBehavior } from '@pubstudio/frontend/util-command'
 import { Edit, Plus } from '@pubstudio/frontend/ui-widgets'
 import BehaviorModal from '../component-menu/BehaviorModal.vue'
 

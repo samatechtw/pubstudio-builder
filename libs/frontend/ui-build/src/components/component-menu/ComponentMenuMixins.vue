@@ -88,7 +88,7 @@ const setMixin = (oldMixinId: string | undefined, newMixinId: string) => {
 }
 
 const edit = (mixinId: string) => {
-  setEditingMixin(site.value, mixinId)
+  setEditingMixin(site.value, mixinId, editor.value?.selectedComponent?.id)
 }
 
 const flattenMixin = (mixinId: string) => {

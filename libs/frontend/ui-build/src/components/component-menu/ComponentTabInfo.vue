@@ -39,12 +39,12 @@
 import { computed, toRefs } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { AriaRole, ComponentTabState, IComponent, Tag } from '@pubstudio/shared/type-site'
+import { useBuild } from '@pubstudio/frontend/feature-build'
 import {
   setComponentTabState,
   setComponentTabEditInfo,
   setEditSvg,
-  useBuild,
-} from '@pubstudio/frontend/feature-build'
+} from '@pubstudio/frontend/util-command'
 import MenuRow from '../MenuRow.vue'
 import MenuRowSimple from '../MenuRowSimple.vue'
 import ComponentTag from './ComponentTag.vue'

@@ -1,17 +1,13 @@
-import { CommandType, ICommand } from '@pubstudio/shared/type-command'
+import { CommandType, ICommand, StyleType } from '@pubstudio/shared/type-command'
 import {
+  ICloseMixinMenuData,
   ICommandGroupData,
   ISetComponentCustomStyleData,
 } from '@pubstudio/shared/type-command-data'
 import { ISite } from '@pubstudio/shared/type-site'
 import { ref } from 'vue'
-import { pushCommandObject, undoLastCommand } from './command'
-
-export enum StyleType {
-  ComponentCustom = 'componentCustom',
-  ComponentChild = 'componentChild',
-  Mixin = 'mixin',
-}
+import { getLastCommand, pushCommandObject, undoLastCommand } from './command'
+import { replaceLastCommand } from './replace-last-command'
 
 // Names of editing style properties
 export const editStyles = ref(new Set<string>())
@@ -19,10 +15,10 @@ export const editStyles = ref(new Set<string>())
 export const editCommands = ref<ICommandGroupData | undefined>()
 export const currentStyleType = ref<StyleType>()
 
-// Extra info for editing reusable styles
-export const editingStyleId = ref<string | undefined>()
+// Extra info for editing reusable styles/mixins
+export const editingMixinData = ref<ICloseMixinMenuData | undefined>()
 
-export const editStylesCancelEdit = (site: ISite) => {
+const clearBlankCommands = (site: ISite) => {
   // Clear any blank commands (no property or value set)
   if (editCommands.value) {
     const cmdCount = editCommands.value.commands.length
@@ -44,9 +40,36 @@ export const editStylesCancelEdit = (site: ISite) => {
       }
     }
   }
+}
+
+const cancelEdit = () => {
   editStyles.value.clear()
   editCommands.value = undefined
-  editingStyleId.value = undefined
+  editingMixinData.value = undefined
+}
+
+export const editStylesCancelEdit = (site: ISite) => {
+  clearBlankCommands(site)
+  if (currentStyleType.value === StyleType.Mixin && editingMixinData.value) {
+    const closeCommand: ICommand<ICloseMixinMenuData> = {
+      type: CommandType.CloseMixinMenu,
+      data: editingMixinData.value,
+    }
+
+    if (getLastCommand(site)?.type === CommandType.CloseMixinMenu) {
+      replaceLastCommand(site, closeCommand)
+    } else {
+      pushCommandObject(site, closeCommand)
+    }
+  }
+  cancelEdit()
+}
+
+// Used by close-mixin-menu command to avoid recursively calling editStylesCancelEdit
+export const closeMixinMenu = (site: ISite) => {
+  clearBlankCommands(site)
+  cancelEdit()
+  currentStyleType.value = undefined
 }
 
 export const setStyleType = (site: ISite, styleType: StyleType | undefined) => {
@@ -57,8 +80,14 @@ export const setStyleType = (site: ISite, styleType: StyleType | undefined) => {
   }
 }
 
-export const setEditingMixin = (site: ISite, styleId: string) => {
+export const setEditingMixin = (
+  site: ISite,
+  mixinId: string,
+  originComponentId: string | undefined,
+) => {
   setStyleType(site, StyleType.Mixin)
-  console.log('SETEDITINGMIXIN', styleId)
-  editingStyleId.value = styleId
+  editingMixinData.value = {
+    id: mixinId,
+    componentId: originComponentId,
+  }
 }

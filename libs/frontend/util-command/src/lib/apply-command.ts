@@ -27,6 +27,7 @@ import { applyRemovePage } from './page/remove-page'
 import { applySetHomePage } from './page/set-home-page'
 import { applySetPageHead } from './page/set-page-head'
 import { applyAddStyleMixin } from './style/add-style-mixin'
+import { applyCloseMixinMenu } from './style/close-mixin-menu'
 import { applyEditStyleMixin } from './style/edit-style-mixin'
 import { applyRemoveStyleMixin } from './style/remove-style-mixin'
 import { applySetMixinEntry } from './style/set-mixin-entry'
@@ -55,6 +56,7 @@ export const applyCommand = (site: ISite, command: ICommand): ICommand => {
     [CommandType.AddComponentMixin]: applyAddComponentMixin,
     [CommandType.RemoveComponentMixin]: applyRemoveComponentMixin,
     [CommandType.ReplaceComponentMixin]: applyReplaceComponentMixin,
+    [CommandType.CloseMixinMenu]: applyCloseMixinMenu,
     [CommandType.SetComponentInput]: applySetComponentInput,
     [CommandType.SetComponentEvent]: applySetComponentEvent,
     [CommandType.SetBehavior]: applySetBehavior,

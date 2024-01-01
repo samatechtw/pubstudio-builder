@@ -34,13 +34,12 @@ import {
   StyleToolbarMenu,
   ThemeTab,
 } from '@pubstudio/shared/type-site'
+import { useBuild, useToolbar } from '@pubstudio/frontend/feature-build'
 import {
-  useBuild,
-  useToolbar,
   setStyleToolbarMenu,
   setThemeTab,
   toggleEditorMenu,
-} from '@pubstudio/frontend/feature-build'
+} from '@pubstudio/frontend/util-command'
 
 const { t } = useI18n()
 const { site, editor } = useBuild()

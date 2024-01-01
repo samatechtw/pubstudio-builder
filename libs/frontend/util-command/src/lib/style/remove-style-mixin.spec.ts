@@ -39,7 +39,7 @@ describe('Remove Style Mixin', () => {
         },
       },
     })
-    totalStylesCount = 2
+    totalStylesCount = 3
     const styles = Object.values(site.context.styles)
     expect(styles).toHaveLength(totalStylesCount)
     styleToBeRemoved = structuredClone(styles[0])

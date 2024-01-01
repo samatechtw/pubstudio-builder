@@ -27,6 +27,7 @@ import { undoRemovePage } from './page/remove-page'
 import { undoSetHomePage } from './page/set-home-page'
 import { undoSetPageHead } from './page/set-page-head'
 import { undoAddStyleMixin } from './style/add-style-mixin'
+import { undoCloseMixinMenu } from './style/close-mixin-menu'
 import { undoEditStyleMixin } from './style/edit-style-mixin'
 import { undoRemoveStyleMixin } from './style/remove-style-mixin'
 import { undoSetMixinEntry } from './style/set-mixin-entry'
@@ -62,6 +63,7 @@ export const undoCommand = (site: ISite, command: ICommand) => {
     [CommandType.AddStyleMixin]: undoAddStyleMixin,
     [CommandType.EditStyleMixin]: undoEditStyleMixin,
     [CommandType.RemoveStyleMixin]: undoRemoveStyleMixin,
+    [CommandType.CloseMixinMenu]: undoCloseMixinMenu,
     [CommandType.SetMixinEntry]: undoSetMixinEntry,
     [CommandType.SetTranslations]: undoSetTranslations,
     [CommandType.AddThemeVariable]: undoAddThemeVariable,

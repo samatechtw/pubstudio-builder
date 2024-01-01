@@ -1,4 +1,3 @@
-import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { runtimeContext } from '@pubstudio/frontend/util-runtime'
 import {
   BuildSubmenu,
@@ -14,13 +13,11 @@ import {
   ThemeTab,
 } from '@pubstudio/shared/type-site'
 
-const { siteStore } = useSiteSource()
-
-export const setEditorMode = (editor: IEditorContext, mode: EditorMode) => {
+const setEditorMode = (editor: IEditorContext, mode: EditorMode) => {
   const prevMode = editor.mode
   editor.mode = mode
   if (mode !== prevMode) {
-    siteStore.value.saveEditor(editor)
+    editor.store?.saveEditor(editor)
   }
 }
 
@@ -53,7 +50,7 @@ export const setBuildSubmenu = (
     const prevSubmenu = editor.buildSubmenu
     editor.buildSubmenu = submenu
     if (submenu !== prevSubmenu) {
-      siteStore.value.saveEditor(editor)
+      editor.store?.saveEditor(editor)
     }
   }
 }
@@ -66,7 +63,7 @@ export const setStyleToolbarMenu = (
     const prevMenu = editor.styleMenu
     editor.styleMenu = menu
     if (menu !== prevMenu) {
-      siteStore.value.saveEditor(editor)
+      editor.store?.saveEditor(editor)
     }
   }
 }
@@ -81,7 +78,7 @@ export const setComponentTabState = (
   if (changed) {
     editor.componentTab.state = state
     if (save) {
-      siteStore.value.saveEditor(editor)
+      editor.store?.saveEditor(editor)
     }
   }
   return changed
@@ -96,7 +93,7 @@ export const setComponentTabEditInfo = (
     setComponentTabState(editor, state, false)
     if (value !== editor.componentTab.editInfo) {
       editor.componentTab.editInfo = value
-      siteStore.value.saveEditor(editor)
+      editor.store?.saveEditor(editor)
     }
   }
 }
@@ -110,7 +107,7 @@ export const setComponentEditEvent = (
     const changed = setComponentTabState(editor, state, false)
     if (changed) {
       editor.componentTab.editEvent = eventName
-      siteStore.value.saveEditor(editor)
+      editor.store?.saveEditor(editor)
     }
   }
 }
@@ -124,7 +121,7 @@ export const setComponentEditInput = (
     const changed = setComponentTabState(editor, state, false)
     if (changed) {
       editor.componentTab.editInput = inputName
-      siteStore.value.saveEditor(editor)
+      editor.store?.saveEditor(editor)
     }
   }
 }
@@ -135,7 +132,7 @@ export const setComponentEditInputValue = (
 ) => {
   if (editor) {
     editor.componentTab.editInputValue = inputName
-    siteStore.value.saveEditor(editor)
+    editor.store?.saveEditor(editor)
   }
 }
 
@@ -145,7 +142,7 @@ export const setEditBehavior = (
 ) => {
   if (editor && behavior !== editor.editBehavior) {
     editor.editBehavior = behavior
-    siteStore.value.saveEditor(editor)
+    editor.store?.saveEditor(editor)
   }
 }
 
@@ -155,28 +152,28 @@ export const setEditSvg = (
 ) => {
   if (editor && svg !== editor.editSvg) {
     editor.editSvg = svg
-    siteStore.value.saveEditor(editor)
+    editor.store?.saveEditor(editor)
   }
 }
 
 export const showTranslations = (editor: IEditorContext | undefined, show: boolean) => {
   if (editor && show !== editor.translations) {
     editor.translations = show
-    siteStore.value.saveEditor(editor)
+    editor.store?.saveEditor(editor)
   }
 }
 
 export const setThemeTab = (editor: IEditorContext | undefined, tab: ThemeTab) => {
   if (editor && tab !== editor.themeTab) {
     editor.themeTab = tab
-    siteStore.value.saveEditor(editor)
+    editor.store?.saveEditor(editor)
   }
 }
 
 export const setDebugBounding = (editor: IEditorContext | undefined, enable: boolean) => {
   if (editor) {
     editor.debugBounding = enable
-    siteStore.value.saveEditor(editor)
+    editor.store?.saveEditor(editor)
   }
 }
 
@@ -203,7 +200,7 @@ export const setShowComponentTree = (
     const prevValue = editor.showComponentTree
     if (prevValue !== showComponentTree) {
       editor.showComponentTree = showComponentTree
-      siteStore.value.saveEditor(editor)
+      editor.store?.saveEditor(editor)
     }
   }
 }
@@ -219,7 +216,7 @@ export const setBuilderWidth = (editor: IEditorContext | undefined, width: numbe
     } else {
       editor.builderScale = 1
     }
-    siteStore.value.saveEditor(editor)
+    editor.store?.saveEditor(editor)
   }
 }
 
@@ -230,7 +227,7 @@ export const setBuilderScale = (editor: IEditorContext | undefined, scale: numbe
     editor.builderWidth = Math.round(
       runtimeContext.buildContentWindowSize.value.width / scale,
     )
-    siteStore.value.saveEditor(editor)
+    editor.store?.saveEditor(editor)
   }
 }
 
@@ -245,7 +242,7 @@ export const selectColor = (
       )
     }
     editor.selectedThemeColors.add(themeVariableId)
-    siteStore.value.saveEditor(editor)
+    editor.store?.saveEditor(editor)
   }
 }
 
@@ -258,7 +255,7 @@ export const unselectColor = (
       throw new Error(`Theme variable ${themeVariableId} is not in selectedThemeColors`)
     }
     editor.selectedThemeColors.delete(themeVariableId)
-    siteStore.value.saveEditor(editor)
+    editor.store?.saveEditor(editor)
   }
 }
 
@@ -268,14 +265,14 @@ export const setCssPseudoClass = (
 ) => {
   if (editor) {
     editor.cssPseudoClass = pseudoClass
-    siteStore.value.saveEditor(editor)
+    editor.store?.saveEditor(editor)
   }
 }
 
 export const setTemplatesShown = (editor: IEditorContext | undefined, shown: boolean) => {
   if (editor) {
     editor.templatesShown = shown
-    siteStore.value.saveEditor(editor)
+    editor.store?.saveEditor(editor)
   }
 }
 
@@ -289,6 +286,6 @@ export const setComponentMenuCollapses = (
 ) => {
   if (editor) {
     editor.componentMenuCollapses[collapsible] = collapsed
-    siteStore.value.saveEditor(editor)
+    editor.store?.saveEditor(editor)
   }
 }

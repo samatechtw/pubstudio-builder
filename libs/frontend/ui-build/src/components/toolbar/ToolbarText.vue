@@ -80,8 +80,8 @@ import {
   useToolbar,
   useThemeColors,
   useToolbarFontSize,
-  setStyleToolbarMenu,
 } from '@pubstudio/frontend/feature-build'
+import { setStyleToolbarMenu } from '@pubstudio/frontend/util-command'
 import ToolbarColorPicker from './ToolbarColorPicker.vue'
 import { IToolbarPickerColor } from './i-toolbar-color-picker'
 

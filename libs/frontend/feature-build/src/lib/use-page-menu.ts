@@ -1,8 +1,8 @@
 import { IMultiselectOptions } from '@pubstudio/frontend/type-ui-widgets'
+import { toggleEditorMenu } from '@pubstudio/frontend/util-command'
 import { EditorMode, IPage, IPageMetadata } from '@pubstudio/shared/type-site'
 import { useI18n } from 'petite-vue-i18n'
 import { computed, ComputedRef, reactive, Ref, ref, UnwrapNestedRefs } from 'vue'
-import { toggleEditorMenu } from './editor-helpers'
 import { useBuild } from './use-build'
 
 export interface IUsePageMenuFeature {
