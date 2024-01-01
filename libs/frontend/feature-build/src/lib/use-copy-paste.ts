@@ -1,3 +1,4 @@
+import { replaceComponentNamespace } from '@pubstudio/frontend/util-site-deserialize'
 import { serializeComponent } from '@pubstudio/frontend/util-site-store'
 import { useToast } from '@pubstudio/frontend/util-ui-alert'
 import { ISerializedComponent } from '@pubstudio/shared/type-site'
@@ -6,7 +7,7 @@ import { useBuild } from './use-build'
 // Export functions for testing
 export interface IUseCopyPaste {
   pressCopy(evt: KeyboardEvent): void
-  pressPaste(evt: KeyboardEvent): void
+  pressPaste(evt: KeyboardEvent): Promise<void>
   pasteStyle(copiedComponent: ISerializedComponent): void
   pasteComponent(copiedComponent: ISerializedComponent): void
 }
@@ -23,11 +24,24 @@ export const useCopyPaste = (): IUseCopyPaste => {
   const pressCopy = (evt: KeyboardEvent) => {
     evt.stopImmediatePropagation()
     const component = editor.value?.selectedComponent
-    if (site.value.editor && component) {
-      site.value.editor.copiedComponent = serializeComponent(component)
+    if (site.value.editor && component && (evt.ctrlKey || evt.metaKey)) {
+      const serialized = serializeComponent(component)
+      site.value.editor.copiedComponent = serialized
       // TODO -- find a good way to handle translations without requiring library consumers
       // to use `vue-i18n`
       addHUD({ text: 'Copied' })
+
+      // Firefox doesn't support clipboard.write ^_^
+      if (typeof ClipboardItem && navigator.clipboard.write) {
+        navigator.clipboard.write([
+          new ClipboardItem({
+            'web text/pubstudio': new Blob([JSON.stringify(serialized)], {
+              type: 'web text/pubstudio',
+            }),
+            'text/plain': new Blob([serialized.content ?? ''], { type: 'text/plain' }),
+          }),
+        ])
+      }
     }
   }
 
@@ -44,16 +58,49 @@ export const useCopyPaste = (): IUseCopyPaste => {
     if (copiedComponent.id === selectedComponent.id) {
       const parent = selectedComponent.parent
       if (parent) {
-        executePasteComponent(copiedComponent.id, parent)
+        executePasteComponent(copiedComponent, parent)
       }
     } else {
-      executePasteComponent(copiedComponent.id, selectedComponent)
+      executePasteComponent(copiedComponent, selectedComponent)
     }
     addHUD({ text: 'Component Pasted' })
   }
 
-  const pressPaste = (evt: KeyboardEvent) => {
+  // Attempt to paste a component from the clipboard. Return true if successful
+  const pasteClipboardComponent = async (): Promise<boolean> => {
+    try {
+      // Iterate over all clipboard items.
+      const clipboardItems = await navigator.clipboard.read()
+      for (const clipboardItem of clipboardItems) {
+        for (const type of clipboardItem.types) {
+          // Discard any types that are not pubstudio's custom format
+          if (type !== 'web text/pubstudio') {
+            continue
+          }
+          const blob = await clipboardItem.getType(type)
+          const serialized = JSON.parse(await blob.text()) as ISerializedComponent
+          const namespace = site.value.context.namespace
+          const sourceNamespace = parseNamespace(serialized.id)
+          if (sourceNamespace) {
+            replaceComponentNamespace(serialized, sourceNamespace, namespace)
+          }
+          pasteComponent(serialized)
+          console.log(namespace, sourceNamespace)
+          console.log('CLIP', serialized)
+          return true
+        }
+      }
+    } catch (err) {
+      console.error('Failed to paste from clipboard', err)
+    }
+    return false
+  }
+
+  const pressPaste = async (evt: KeyboardEvent) => {
     evt.stopImmediatePropagation()
+    if (await pasteClipboardComponent()) {
+      return
+    }
     const { selectedComponent } = editor.value ?? {}
     const { copiedComponent } = site.value.editor ?? {}
     if (selectedComponent && copiedComponent) {

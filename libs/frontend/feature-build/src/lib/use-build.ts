@@ -119,7 +119,7 @@ export interface IUseBuild {
   replaceSite: (newSite: ISite) => Promise<void>
   addComponent: (data?: Partial<IAddComponentData>) => void
   duplicateComponent: () => void
-  pasteComponent: (copiedComponentId: string, parent: IComponent) => void
+  pasteComponent: (component: ISerializedComponent, parent: IComponent) => void
   replacePageRoot: (copiedComponentId: string, pageRoute: string) => void
   editSelectedComponent: (fields: IEditComponentFields) => void
   editComponent: (component: IComponent, fields: IEditComponentFields) => void
@@ -358,16 +358,15 @@ export const useBuild = (): IUseBuild => {
     pushCommand(site.value, CommandType.AddComponent, data)
   }
 
-  const pasteComponent = (copiedComponentId: string, parent: IComponent) => {
-    const copiedComponent = resolveComponent(site.value.context, copiedComponentId)
-    if (!copiedComponent) return
+  const pasteComponent = (component: ISerializedComponent, parent: IComponent) => {
+    const copiedComponent = resolveComponent(site.value.context, component.id)
 
     const data: IAddComponentData = {
-      tag: copiedComponent.tag,
-      content: copiedComponent.content,
-      sourceId: copiedComponent.id,
-      customComponentId: copiedComponent.customSourceId,
-      name: copiedComponent.name,
+      tag: component.tag,
+      content: component.content,
+      sourceId: copiedComponent?.id,
+      customComponentId: component.customSourceId,
+      name: component.name,
       ...selectAddParent(parent, activePage.value?.root.id),
     }
     pushCommand(site.value, CommandType.AddComponent, data)
