@@ -43,9 +43,10 @@
       @cancel="showClear = false"
     />
     <ExportModal
+      :site="site"
       :show="showExport"
       :defaultFileName="defaultFileName"
-      @confirmExport="exportSite"
+      @confirmExport="showExport = false"
       @cancel="showExport = false"
     />
   </Modal>
@@ -61,7 +62,7 @@ import {
   Modal,
   PSButton,
 } from '@pubstudio/frontend/ui-widgets'
-import { saveSite, defaultExportedFileName } from '@pubstudio/frontend/util-site-store'
+import { defaultExportedFileName } from '@pubstudio/frontend/util-site-store'
 
 const { t } = useI18n()
 
@@ -93,11 +94,6 @@ const contactSupport = () => {
 }
 
 const defaultFileName = computed(() => defaultExportedFileName(site.value.name))
-
-const exportSite = (fileName: string) => {
-  saveSite(site.value, fileName)
-  showExport.value = false
-}
 </script>
 
 <style lang="postcss" scoped>
