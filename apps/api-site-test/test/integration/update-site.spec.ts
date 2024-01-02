@@ -1,4 +1,5 @@
 import {
+  IGetSiteApiResponse,
   IUpdateSiteApiRequest,
   IUpdateSiteApiResponse,
 } from '@pubstudio/shared/type-api-site-sites'
@@ -66,6 +67,32 @@ describe('Update Site', () => {
     expect(JSON.parse(body.pages)).toEqual(payload.pages)
   })
 
+  it('updates site when update_key match the saved updated_at', async () => {
+    const prevResponse = await api
+      .get(`${testEndpoint}/${siteId}`)
+      .set('Authorization', adminAuth)
+      .expect(200)
+
+    const prevBody: IGetSiteApiResponse = prevResponse.body
+
+    payload.update_key = prevBody.updated_at.toString()
+
+    const response = await api
+      .patch(`${testEndpoint}/${siteId}`)
+      .set('Authorization', adminAuth)
+      .send(payload)
+      .expect(200)
+    const body: IUpdateSiteApiResponse = response.body
+
+    expect(body.name).toEqual(payload.name)
+    expect(body.version).toEqual(payload.version)
+    expect(JSON.parse(body.context)).toEqual(payload.context)
+    expect(JSON.parse(body.defaults)).toEqual(payload.defaults)
+    expect(JSON.parse(body.editor)).toEqual(payload.editor)
+    expect(JSON.parse(body.history)).toEqual(payload.history)
+    expect(JSON.parse(body.pages)).toEqual(payload.pages)
+  })
+
   describe('when request is not valid', () => {
     it('when user is other owner', () => {
       const ownerAuth = ownerAuthHeader('0c069253-e45d-487c-b7c0-cbe467c33a10')
@@ -101,6 +128,20 @@ describe('Update Site', () => {
         message: 'Unauthorized',
         status: 401,
       })
+    })
+
+    it('when update_key does not match the saved updated_at', () => {
+      payload.update_key = '2023-11-07T08:25:58.131123Z'
+      return api
+        .patch(`${testEndpoint}/${siteId}`)
+        .set('Authorization', adminAuth)
+        .send(payload)
+        .expect(400, {
+          code: 'None',
+          message:
+            'Error occurred during the database query: no rows returned by a query that expected to return at least one row',
+          status: 400,
+        })
     })
   })
 

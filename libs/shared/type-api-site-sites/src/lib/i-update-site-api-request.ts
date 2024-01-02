@@ -6,4 +6,5 @@ export interface IUpdateSiteApiRequest {
   editor?: string
   history?: string
   pages?: string
+  update_key?: string
 }

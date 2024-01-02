@@ -187,12 +187,16 @@ impl SiteRepoTrait for SiteRepo {
         }
 
         // Update the latest version of the site
-        query.push(
-            " WHERE id = (
-                    SELECT MAX(id)
-                    FROM site_versions
-                )",
-        );
+        if let Some(update_key) = req.update_key {
+            // Append the condition to check the updated_at
+            query.push(format!(
+                " WHERE id = (SELECT MAX(id) FROM site_versions) AND updated_at = DATETIME('{}')",
+                update_key
+            ));
+        } else {
+            query.push(" WHERE id = (SELECT MAX(id) FROM site_versions)");
+        }
+
         query.push(formatcp!(" RETURNING {}", SITE_COLUMNS));
 
         Ok(query
