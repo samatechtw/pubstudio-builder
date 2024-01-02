@@ -16,4 +16,5 @@ pub struct UpdateSiteDto {
     pub pages: Option<serde_json::Value>,
     pub published: Option<bool>,
     pub disabled: Option<bool>,
+    pub update_key: Option<String>,
 }
