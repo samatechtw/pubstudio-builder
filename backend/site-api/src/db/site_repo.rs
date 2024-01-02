@@ -1,6 +1,9 @@
 use axum::async_trait;
 use const_format::formatcp;
-use lib_shared_site_api::db::{db_error::DbError, util::append_comma};
+use lib_shared_site_api::db::{
+    db_error::{map_sqlx_err, DbError},
+    util::append_comma,
+};
 use lib_shared_types::{
     dto::{
         query_dto::ListQuery,
@@ -186,15 +189,13 @@ impl SiteRepoTrait for SiteRepo {
             return Err(DbError::NoUpdate);
         }
 
+        query.push(" WHERE id = (SELECT MAX(id) FROM site_versions)");
         // Update the latest version of the site
         if let Some(update_key) = req.update_key {
             // Append the condition to check the updated_at
-            query.push(format!(
-                " WHERE id = (SELECT MAX(id) FROM site_versions) AND updated_at = DATETIME('{}')",
-                update_key
-            ));
-        } else {
-            query.push(" WHERE id = (SELECT MAX(id) FROM site_versions)");
+            query.push(" AND updated_at = DATETIME(");
+            query.push_bind(update_key);
+            query.push(")");
         }
 
         query.push(formatcp!(" RETURNING {}", SITE_COLUMNS));
@@ -204,7 +205,7 @@ impl SiteRepoTrait for SiteRepo {
             .try_map(map_to_site_entity)
             .fetch_one(&pool)
             .await
-            .map_err(|e| DbError::Query(e.to_string()))?)
+            .map_err(map_sqlx_err)?)
     }
 
     async fn create_db(&self, id: &str) -> Result<SqlitePool, DbError> {

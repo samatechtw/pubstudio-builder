@@ -21,6 +21,7 @@ pub enum ApiErrorCode {
     SiteVerificationFail,
     NoAvailableSiteServer,
     NoUpdates,
+    UpdateStale,
     SiteHasAssets,
     InvalidCollectionId,
     TemplateNameExists,

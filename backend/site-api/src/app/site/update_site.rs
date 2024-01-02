@@ -55,7 +55,7 @@ pub async fn update_site(
     if let Some(value) = &dto.pages {
         validator.validate_pages(value)?;
     }
-
+    let has_update_key = dto.update_key.is_some();
     let site = context
         .site_repo
         .update_site(&id, dto)
@@ -64,6 +64,15 @@ pub async fn update_site(
             DbError::NoUpdate => ApiError::bad_request()
                 .code(ApiErrorCode::NoUpdates)
                 .message("No updates were made for the request.".to_string()),
+            DbError::EntityNotFound() => {
+                if has_update_key {
+                    ApiError::bad_request()
+                        .code(ApiErrorCode::UpdateStale)
+                        .message("update_key did not match")
+                } else {
+                    ApiError::not_found()
+                }
+            }
             DbError::Query(e) => ApiError::bad_request()
                 .message("Error occurred during the database query: ".to_string() + &e),
             _ => ApiError::internal_error().message(e),

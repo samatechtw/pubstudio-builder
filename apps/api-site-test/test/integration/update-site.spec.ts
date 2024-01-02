@@ -67,7 +67,7 @@ describe('Update Site', () => {
     expect(JSON.parse(body.pages)).toEqual(payload.pages)
   })
 
-  it('updates site when update_key match the saved updated_at', async () => {
+  it('updates site when update_key matches the saved updated_at', async () => {
     const prevResponse = await api
       .get(`${testEndpoint}/${siteId}`)
       .set('Authorization', adminAuth)
@@ -137,9 +137,8 @@ describe('Update Site', () => {
         .set('Authorization', adminAuth)
         .send(payload)
         .expect(400, {
-          code: 'None',
-          message:
-            'Error occurred during the database query: no rows returned by a query that expected to return at least one row',
+          code: 'UpdateStale',
+          message: 'update_key did not match',
           status: 400,
         })
     })
