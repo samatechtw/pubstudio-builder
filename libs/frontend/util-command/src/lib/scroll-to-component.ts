@@ -1,5 +1,6 @@
 import { IComponent, IPage, ISite } from '@pubstudio/shared/type-site'
 import { nextTick } from 'vue'
+import { getComponentTreeItemId } from './editor-helpers'
 import { setActivePage } from './set-active-page'
 
 // Switch to the corresponding page and scroll to the given component.
@@ -42,6 +43,12 @@ export const scrollToComponent = (site: ISite, component: IComponent) => {
       }
     })
   }
+}
+
+export const scrollToComponentTreeItem = (component: IComponent) => {
+  const treeItemId = getComponentTreeItemId(component)
+  const treeItemElement = document.getElementById(treeItemId)
+  treeItemElement?.scrollIntoView()
 }
 
 const findComponentPage = (site: ISite, component: IComponent): IPage | undefined => {

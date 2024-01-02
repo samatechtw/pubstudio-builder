@@ -1,5 +1,5 @@
 import {
-  getComponentTreeItemId,
+  scrollToComponentTreeItem,
   setSelectedComponent,
 } from '@pubstudio/frontend/util-command'
 import { IComponent, ISite } from '@pubstudio/shared/type-site'
@@ -9,9 +9,7 @@ export const selectComponent = (site: ISite, component: IComponent) => {
 
   // Scroll to the corresponding tree item if component tree is visible
   if (site.editor?.showComponentTree) {
-    const treeItemId = getComponentTreeItemId(component)
-    const treeItemElement = document.getElementById(treeItemId)
-    treeItemElement?.scrollIntoView()
+    scrollToComponentTreeItem(component)
   }
 }
 
