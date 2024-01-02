@@ -86,7 +86,7 @@ import ComponentEventEdit from './ComponentEventEdit.vue'
 import StyleMenuEdit from '../StyleMenuEdit.vue'
 
 const { t } = useI18n()
-const { editor, replacePageRoot } = useBuild()
+const { site, editor, replacePageRoot } = useBuild()
 const { isEditingMixin } = useReusableStyleMenu()
 const { addHUD } = useHUD()
 
