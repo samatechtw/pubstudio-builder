@@ -8,6 +8,11 @@ export interface ISiteRestore {
   error: string | undefined
 }
 
+export interface ISiteSaveOptions {
+  immediate?: boolean
+  ignoreUpdateKey?: boolean
+}
+
 export enum SiteSaveState {
   SavingEditor = 'savingEditor',
   Saving = 'saving',
@@ -20,7 +25,7 @@ export interface ISiteStore {
   siteId: Ref<string>
   saveError: Ref<IApiError | undefined>
   initialize(): Promise<void>
-  save(site: ISite, immediate?: boolean): Promise<void>
+  save(site: ISite, options?: ISiteSaveOptions): Promise<void>
   saveEditor(editor: IEditorContext): Promise<void>
   restore(updateKey?: string): Promise<ISiteRestore | undefined>
 }

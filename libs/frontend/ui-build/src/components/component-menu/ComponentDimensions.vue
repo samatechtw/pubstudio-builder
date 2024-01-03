@@ -142,7 +142,7 @@ const updateStyle = (property: Css, value: string | undefined) => {
     setStyle(property, value)
   } else {
     // Remove style
-    // We don't have to check if the property is presented in the component style
+    // We don't have to check if the property is in the component style
     // because it's already covered in `removeComponentCustomStyle`.
     removeComponentCustomStyle({
       pseudoClass: currentPseudoClass.value,

@@ -16,6 +16,7 @@ import {
   IEditorContext,
   ISite,
   ISiteRestore,
+  ISiteSaveOptions,
   ISiteStore,
   IStoredSiteDirty,
   SiteSaveState,
@@ -30,6 +31,7 @@ export interface IUseApiStoreProps {
 interface IUpdateApiOptions {
   keepalive?: boolean
   clearTimer?: boolean
+  ignoreUpdateKey?: boolean
 }
 
 export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
@@ -58,6 +60,8 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
   })
 
   const dirty = ref<IStoredSiteDirty>(dirtyDefault())
+  // Used to ensure site data from another tab/browser isn't overwritten
+  const updateKey = ref<string | undefined>()
 
   const saveState = computed(() => {
     if (dirty.value.editor) {
@@ -100,6 +104,9 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
     const site = store.site.getSite.value
     try {
       const payload: IUpdateSiteApiRequest = {}
+      if (updateKey.value && !options.ignoreUpdateKey) {
+        payload.update_key = updateKey.value
+      }
       let hasUpdates = false
       for (const key in dirty.value) {
         const k = key as keyof IStoredSiteDirty
@@ -110,7 +117,8 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
         }
       }
       if (hasUpdates) {
-        await updateFn(siteId.value, payload, keepalive)
+        const result = await updateFn(siteId.value, payload, keepalive)
+        updateKey.value = result.updated_at.toString()
       }
       dirty.value = dirtyDefault()
       if (clearTimer) {
@@ -140,7 +148,7 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
 
   // Save the Site to localstorage, and start the API update timer
   // The API timer is reset if currently active
-  const save = async (site: ISite, immediate?: boolean): Promise<void> => {
+  const save = async (site: ISite, options?: ISiteSaveOptions): Promise<void> => {
     const storedSite = storeSite(site)
     store.site.setSite(storedSite)
     let changed = false
@@ -152,10 +160,11 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
       }
     }
     if (changed) {
-      if (immediate) {
+      if (options?.immediate) {
         await updateApi({
           keepalive: true,
           clearTimer: false,
+          ignoreUpdateKey: options?.ignoreUpdateKey,
         })
       } else {
         startSaveTimer(3000)
@@ -177,15 +186,16 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
     }
   }
 
-  const restore = async (updateKey?: string): Promise<ISiteRestore | undefined> => {
+  const restore = async (checkUpdateKey?: string): Promise<ISiteRestore | undefined> => {
     try {
-      const siteData = await getFn(siteId.value, { update_key: updateKey })
+      const siteData = await getFn(siteId.value, { update_key: checkUpdateKey })
       if (!siteData) {
         return undefined
       }
+      updateKey.value = siteData?.updated_at.toString()
       const data = {
         ...siteData,
-        updated_at: siteData?.updated_at.toString(),
+        updated_at: updateKey.value,
       }
       return restoreSiteHelper(data)
     } catch (e) {
