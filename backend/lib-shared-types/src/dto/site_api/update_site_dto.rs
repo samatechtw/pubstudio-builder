@@ -1,4 +1,5 @@
 use crate::type_util::REGEX_SITE_NAME;
+use crate::type_util::REGEX_DATE;
 use serde::{Deserialize, Serialize};
 use serde_json;
 use validator::Validate;
@@ -16,5 +17,6 @@ pub struct UpdateSiteDto {
     pub pages: Option<serde_json::Value>,
     pub published: Option<bool>,
     pub disabled: Option<bool>,
+    #[validate(regex = "REGEX_DATE")]
     pub update_key: Option<String>,
 }
