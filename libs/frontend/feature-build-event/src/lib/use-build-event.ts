@@ -77,8 +77,8 @@ const isProseMirrorLink = (target: HTMLElement | undefined): boolean => {
 const isBuildMenu = (target: HTMLElement | undefined): boolean => {
   return !!target?.closest('.build-menu')
 }
-const isRightMenu = (target: HTMLElement | undefined): boolean => {
-  return !!target?.closest('.right-menu')
+const isBuildRightMenu = (target: HTMLElement | undefined): boolean => {
+  return !!target?.closest('.build-right-menu')
 }
 const isStyleToolbar = (target: HTMLElement | undefined): boolean => {
   return !!target?.closest('.style-toolbar')
@@ -155,6 +155,7 @@ export const useBuildEvent = () => {
   }
   const clickRightMenu = (_target: HTMLElement | undefined) => {
     setBuildSubmenu(editor.value, undefined)
+    runtimeContext.rightMenuFocused.value = true
   }
   const clickComponentTree = (componentTreeItemId: string) => {
     setBuildSubmenu(editor.value, undefined)
@@ -171,6 +172,8 @@ export const useBuildEvent = () => {
       runtimeContext.resetComponentTreeItemRenameData()
     }
 
+    runtimeContext.rightMenuFocused.value = false
+
     if (isRenderer(target)) {
       if (!mouseDownOnTextEditableComponent) {
         clickRenderer(target)
@@ -183,7 +186,7 @@ export const useBuildEvent = () => {
       clickStyleToolbar(target)
     } else if (isBuildMenu(target)) {
       clickBuildMenu(target)
-    } else if (isRightMenu(target)) {
+    } else if (isBuildRightMenu(target)) {
       clickRightMenu(target)
     } else if (clickedComponentTreeItemId) {
       clickComponentTree(clickedComponentTreeItemId)
@@ -235,6 +238,7 @@ export const useBuildEvent = () => {
       }
       // Remove focus, some browsers will select the next DOM element on Tab keydown
       ;(document.activeElement as HTMLElement)?.blur()
+      runtimeContext.rightMenuFocused.value = false
     }
   }
 

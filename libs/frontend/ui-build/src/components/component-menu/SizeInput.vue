@@ -6,6 +6,7 @@
       :class="{ invalid }"
       :value="parsedSize.value"
       type="text"
+      :tabindex="tabIndex"
       :name="`input${uid}`"
       @input="handleInput"
       @focusout="update"
@@ -36,11 +37,12 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, watch, ref, toRefs } from 'vue'
+import { onMounted, watch, ref, toRefs, computed } from 'vue'
 import { uidSingleton } from '@pubstudio/frontend/util-doc'
 import { useDropdown } from '@pubstudio/frontend/util-dropdown'
 import { Css } from '@pubstudio/shared/type-site'
 import { useToolbar, useBuild } from '@pubstudio/frontend/feature-build'
+import { runtimeContext } from '@pubstudio/frontend/util-runtime'
 
 const uid = uidSingleton.next()
 const { editor } = useBuild()
@@ -58,6 +60,13 @@ const { cssProp } = toRefs(props)
 const emit = defineEmits<{
   (e: 'update', size: string | undefined): void
 }>()
+
+// Set tabindex to -1 when right menu is not focused to make size input not tab-focusable when
+// right menu is not focused. In the builder, we can select the next component by pressing Tab
+// continuously. However, if the next component is currently not in the viewport, after the
+// scrollToComponent operation, the subsequent Tab press will focus on the first size input
+// instead of selecting the next component.
+const tabIndex = computed(() => (runtimeContext.rightMenuFocused.value ? 1 : -1))
 
 type SizeUnit = 'px' | '%' | 'em' | 'rem' | 'vw' | 'vh' | 'auto' | '-'
 

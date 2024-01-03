@@ -229,6 +229,9 @@ export const BuilderDndComponent = defineComponent({
         // TODO -- is this necessary?
         key: renderKey.value,
         ref: dnd.elementRef,
+        // Make builder dnd component not tab-focusable to avoid jumping between
+        // activeElement and component when on Tab press.
+        tabindex: '-1',
       } as Record<string, unknown>
 
       const tag = component.value.tag

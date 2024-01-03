@@ -37,7 +37,12 @@ export function prosemirrorSetup(options: IProsemirrorSetupOptions): EditorState
     history(),
     new Plugin({
       props: {
-        attributes: { class: 'pm-style' },
+        attributes: {
+          // Make ProseMirror editor not tab-focusable so that pressing Tab in the builder
+          // could select the next component correctly.
+          tabindex: '-1',
+          class: 'pm-style',
+        },
       },
     }),
     ...(pluginsOption ?? []),
