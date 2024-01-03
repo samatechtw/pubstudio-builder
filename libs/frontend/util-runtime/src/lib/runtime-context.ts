@@ -12,6 +12,7 @@ export interface IRuntimeContext {
   buildDndState: Ref<IBuildDndState | undefined>
   componentTreeItemRenameData: Ref<IComponentTreeItemRenameData>
   resetComponentTreeItemRenameData: () => void
+  rightMenuFocused: Ref<boolean>
 }
 
 export interface ISize {
@@ -52,6 +53,7 @@ export const runtimeContext: IRuntimeContext = {
   resetComponentTreeItemRenameData: () => {
     runtimeContext.componentTreeItemRenameData.value = defaultComponentTreItemRenameData()
   },
+  rightMenuFocused: ref(false),
 }
 
 export const resetRuntimeContext = () => {
@@ -61,4 +63,5 @@ export const resetRuntimeContext = () => {
   runtimeContext.hoveredComponentIdInComponentTree.value = undefined
   runtimeContext.buildDndState.value = undefined
   runtimeContext.componentTreeItemRenameData.value = defaultComponentTreItemRenameData()
+  runtimeContext.rightMenuFocused.value = false
 }

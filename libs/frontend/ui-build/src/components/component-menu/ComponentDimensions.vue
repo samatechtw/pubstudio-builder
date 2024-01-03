@@ -14,7 +14,7 @@
         <SizeInput
           :cssProp="Css.Width"
           class="size"
-          @update="setStyle(Css.Width, $event)"
+          @update="updateStyle(Css.Width, $event)"
         />
         <div class="size-label">
           {{ t('build.min') }}
@@ -22,7 +22,7 @@
         <SizeInput
           :cssProp="Css.MinWidth"
           class="size"
-          @update="setStyle(Css.MinWidth, $event)"
+          @update="updateStyle(Css.MinWidth, $event)"
         />
         <div class="size-label">
           {{ t('build.max') }}
@@ -30,7 +30,7 @@
         <SizeInput
           :cssProp="Css.MaxWidth"
           class="size"
-          @update="setStyle(Css.MaxWidth, $event)"
+          @update="updateStyle(Css.MaxWidth, $event)"
         />
       </div>
       <div class="divider" />
@@ -41,7 +41,7 @@
         <SizeInput
           :cssProp="Css.Height"
           class="size"
-          @update="setStyle(Css.Height, $event)"
+          @update="updateStyle(Css.Height, $event)"
         />
         <div class="size-label">
           {{ t('build.min') }}
@@ -49,7 +49,7 @@
         <SizeInput
           :cssProp="Css.MinHeight"
           class="size"
-          @update="setStyle(Css.MinHeight, $event)"
+          @update="updateStyle(Css.MinHeight, $event)"
         />
         <div class="size-label">
           {{ t('build.max') }}
@@ -57,7 +57,7 @@
         <SizeInput
           :cssProp="Css.MaxHeight"
           class="size"
-          @update="setStyle(Css.MaxHeight, $event)"
+          @update="updateStyle(Css.MaxHeight, $event)"
         />
       </div>
       <div class="divider" />
@@ -119,7 +119,7 @@ import PaddingMarginEdit from './PaddingMarginEdit.vue'
 import EditMenuTitle from '../EditMenuTitle.vue'
 
 const { t } = useI18n()
-const { editor } = useBuild()
+const { editor, currentPseudoClass, removeComponentCustomStyle } = useBuild()
 const { getStyleValue, setStyle } = useToolbar()
 const { editValueData } = usePaddingMarginEdit()
 
@@ -133,6 +133,22 @@ const toggleCollapse = () => {
     ComponentMenuCollapsible.Dimensions,
     !collapsed.value,
   )
+}
+
+const updateStyle = (property: Css, value: string | undefined) => {
+  const startsWithNumber = /^\d/.test(value ?? '')
+  if (startsWithNumber) {
+    // Update style
+    setStyle(property, value)
+  } else {
+    // Remove style
+    // We don't have to check if the property is presented in the component style
+    // because it's already covered in `removeComponentCustomStyle`.
+    removeComponentCustomStyle({
+      pseudoClass: currentPseudoClass.value,
+      property,
+    })
+  }
 }
 
 const sectionHeight = computed(() => {
