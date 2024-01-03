@@ -192,7 +192,7 @@ impl SiteRepoTrait for SiteRepo {
         query.push(" WHERE id = (SELECT MAX(id) FROM site_versions)");
         // Update the latest version of the site
         if let Some(update_key) = req.update_key {
-            // Append the condition to check the updated_at
+            // Append the condition to check updated_at
             query.push(" AND updated_at = DATETIME(");
             query.push_bind(update_key);
             query.push(")");

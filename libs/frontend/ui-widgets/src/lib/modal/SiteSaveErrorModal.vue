@@ -9,9 +9,9 @@
       {{ t('build.save_error') }}
     </div>
     <div class="modal-text">
-      {{ isHistory ? t('build.save_history') : t('build.save_error_text') }}
+      {{ errorText }}
     </div>
-    <div class="site-error-detail">
+    <div v-if="!isStale" class="site-error-detail">
       {{ error?.message }}
     </div>
     <div class="modal-text">
@@ -29,12 +29,19 @@
         class="export-button"
         @click="exportSite"
       />
+      <PSButton :text="t('build.refresh')" class="refresh-button" @click="refreshPage" />
+      <PSButton
+        v-if="isStale"
+        :text="t('build.overwrite')"
+        :secondary="true"
+        class="overwrite-button"
+        @click="overwriteData"
+      />
       <PSButton
         :text="t('build.site_error_contact')"
         class="contact-button"
         @click="contactSupport"
       />
-      <PSButton :text="t('build.refresh')" class="refresh-button" @click="refreshPage" />
     </div>
   </Modal>
 </template>
@@ -47,7 +54,7 @@ import { Modal, PSButton } from '@pubstudio/frontend/ui-widgets'
 import { saveSite, defaultExportedFileName } from '@pubstudio/frontend/util-site-store'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { clearAll, clearPartial } from '@pubstudio/frontend/util-command'
-import { IApiError } from '@pubstudio/shared/type-api'
+import { IApiError, ApiErrorCode } from '@pubstudio/shared/type-api'
 
 const { t } = useI18n()
 
@@ -57,6 +64,10 @@ const show = ref(false)
 
 const isHistory = computed(() => {
   return siteStore.value.saveError?.message?.startsWith('History')
+})
+
+const isStale = computed(() => {
+  return siteStore.value.saveError?.code === ApiErrorCode.UpdateStale
 })
 
 const error = computed(() => {
@@ -75,6 +86,16 @@ watch(error, (newError: IApiError | undefined) => {
   }
 })
 
+const errorText = computed(() => {
+  if (isHistory.value) {
+    return t('build.save_history')
+  } else if (isStale.value) {
+    return t('build.stale')
+  } else {
+    return t('build.save_error_text')
+  }
+})
+
 const contactSupport = () => {
   const subject = `Site Errror for Site: ${site.value.name}`
   const url = `mailto:support@pubstud.io?subject=${subject}&body=${siteStore.value.saveError}`
@@ -83,6 +104,11 @@ const contactSupport = () => {
 
 const exportSite = () => {
   saveSite(site.value, defaultExportedFileName(site.value.name))
+}
+
+const overwriteData = () => {
+  siteStore.value.save(site.value, { immediate: true, ignoreUpdateKey: true })
+  cancel()
 }
 
 const clearHistory = () => {
@@ -128,6 +154,9 @@ const cancel = () => {
       margin-bottom: 16px;
     }
     .refresh-button {
+      margin-top: 16px;
+    }
+    .overwrite-button {
       margin-top: 16px;
     }
   }

@@ -3,9 +3,9 @@ import { history } from 'prosemirror-history'
 import { keymap } from 'prosemirror-keymap'
 import { DOMParser as ProseDOMParser, DOMSerializer, Schema } from 'prosemirror-model'
 import { Command, EditorState, EditorStateConfig, Plugin } from 'prosemirror-state'
+import { baseKeymap } from './base-keymap'
 import { buildInputRules } from './input-rules'
 import { buildKeymap } from './keymap'
-import { baseKeymap } from './base-keymap'
 
 export interface IProsemirrorSetupOptions {
   content: string
@@ -38,8 +38,8 @@ export function prosemirrorSetup(options: IProsemirrorSetupOptions): EditorState
     new Plugin({
       props: {
         attributes: {
-          // Make ProseMirror editor not tab-focusable so that pressing Tab in the builder
-          // could select the next component correctly.
+          // Make ProseMirror editor not tab-focusable so pressing Tab in the builder
+          // selects the next component correctly.
           tabindex: '-1',
           class: 'pm-style',
         },

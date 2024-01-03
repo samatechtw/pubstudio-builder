@@ -41,7 +41,7 @@
         />
       </div>
     </div>
-    <ErrorMessage :error="saveError ? t(saveError) : undefined" />
+    <ErrorMessage :error="templateError ? t(templateError) : undefined" />
     <div class="modal-buttons">
       <PSButton
         class="save-button"
@@ -81,7 +81,7 @@ const { t } = useI18n()
 const {
   templates,
   saving,
-  saveError,
+  templateError,
   listLoading,
   listTemplates,
   createTemplate,
@@ -136,7 +136,7 @@ const save = async () => {
     data.collection_id = GLOBAL_TEMPLATE_COLLECTION_ID
     await createTemplate(data)
   }
-  if (!saveError.value) {
+  if (!templateError.value) {
     emit('cancel')
   }
 }
