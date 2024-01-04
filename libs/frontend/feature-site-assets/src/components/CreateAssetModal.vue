@@ -214,7 +214,7 @@ const uploadAsset = async () => {
     }
     return
   }
-  if (!siteId.value) {
+  if (!assetToUpdate.value && !siteId.value) {
     error.value = t('errors.site_missing')
     return
   }

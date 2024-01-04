@@ -104,10 +104,11 @@ export const useSiteAssets = (): ISiteAssetsFeature => {
     if (!assets.value) {
       return
     }
-    for (let i = 0; i < assets.value.length; i += 1) {
-      if (assets.value[i].id === newAsset.id) {
-        assets.value[i] = newAsset
-      }
+    const assetIndex = assets.value.findIndex((asset) => asset.id === newAsset.id)
+    if (assetIndex === -1) {
+      assets.value.unshift(newAsset)
+    } else {
+      assets.value[assetIndex] = newAsset
     }
   }
 

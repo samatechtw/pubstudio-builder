@@ -1,9 +1,10 @@
 <template>
   <div class="component-menu-mixins">
     <div class="wrap">
-      <EditMenuTitle :title="t('style.reusable')" @add="showNewMixin = true" />
+      <EditMenuTitle :title="t('style.reusable')" @add="addMixin" />
       <div v-if="showNewMixin" class="mixin new-mixin">
         <MixinSelect
+          ref="newMixinRef"
           :mixin="undefined"
           :mixinOptions="mixinOptions"
           :isNew="true"
@@ -27,7 +28,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref, toRefs } from 'vue'
+import { computed, ref, toRefs, nextTick } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { IStyle } from '@pubstudio/shared/type-site'
 import { resolveStyle } from '@pubstudio/frontend/util-builtin'
@@ -53,6 +54,7 @@ const {
 } = useBuild()
 
 const showNewMixin = ref(false)
+const newMixinRef = ref()
 
 const mixinOptions = computed(() => {
   const values = Object.values(site.value.context.styles)
@@ -77,6 +79,11 @@ const mixins = computed(() => {
   }
   return mixins
 })
+
+const addMixin = async () => {
+  showNewMixin.value = true
+  setTimeout(() => newMixinRef.value?.multiselectRef?.toggleDropdown(), 1)
+}
 
 const setMixin = (oldMixinId: string | undefined, newMixinId: string) => {
   if (oldMixinId) {
