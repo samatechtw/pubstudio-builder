@@ -1,6 +1,7 @@
 <template>
   <div class="menu-row">
     <PSMultiselect
+      ref="multiselectRef"
       :value="mixin?.id"
       class="edit-item"
       :placeholder="t('style.select')"
@@ -54,11 +55,14 @@ const emit = defineEmits<{
 }>()
 
 const flattenRef = ref()
+const multiselectRef = ref()
 
 const flatten = () => {
   flattenRef.value?.cancelHoverTimer()
   emit('flatten')
 }
+
+defineExpose({ multiselectRef })
 </script>
 
 <style lang="postcss" scoped>
