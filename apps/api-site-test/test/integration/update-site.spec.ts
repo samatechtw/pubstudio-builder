@@ -157,6 +157,19 @@ describe('Update Site', () => {
       })
   })
 
+  it('when update_key is invalid', () => {
+    payload.update_key = '2023-11-07T08:25:58.131'
+    return api
+      .patch(`${testEndpoint}/${siteId}`)
+      .set('Authorization', adminAuth)
+      .send(payload)
+      .expect(400, {
+        code: 'InvalidFormData',
+        message: 'Failed to validate request',
+        status: 400,
+      })
+  })
+
   it.each(['a', 'a'.repeat(30), 'test_site', 'test-site', 'test.site', '#abc'])(
     'when site name is invalid',
     () => {

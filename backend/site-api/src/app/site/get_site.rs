@@ -6,13 +6,14 @@ use axum::{
 };
 use axum_macros::debug_handler;
 use chrono::DateTime;
-use lib_shared_site_api::error::api_error::ApiError;
+use lib_shared_site_api::error::{api_error::ApiError, helpers::check_bad_form};
 use lib_shared_types::{
     dto::site_api::get_site_dto::{to_api_response, GetSiteQuery},
     entity::site_api::site_metadata_entity::SiteMetadataEntity,
     error::api_error::ApiErrorCode,
     shared::user::{RequestUser, UserType},
 };
+use validator::Validate;
 
 use crate::{api_context::ApiContext, middleware::auth::verify_site_owner};
 
@@ -50,6 +51,7 @@ async fn get_site_result(
     user: RequestUser,
     context: ApiContext,
 ) -> Result<Response, ApiError> {
+    check_bad_form(query.validate())?;
     verify_site_owner(&context, &user, &site_id).await?;
 
     let site_metadata = context

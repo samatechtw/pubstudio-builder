@@ -117,6 +117,18 @@ describe('Get Site', () => {
       expect(response.body).toEqual({})
     })
 
+    it('returns 400 when update_key is invalid', async () => {
+      await api
+        .get(`${testEndpoint}/${siteId}`)
+        .query({ update_key: '2023-11-07T08:25:58.131123' })
+        .set('Authorization', adminAuth)
+        .expect(400, {
+          code: 'InvalidFormData',
+          message: 'Failed to validate request',
+          status: 400,
+        })
+    })
+
     it('returns 401 when owner token has expired', async () => {
       await api
         .get(`${testEndpoint}/${siteId}`)

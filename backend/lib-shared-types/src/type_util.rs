@@ -6,7 +6,7 @@ lazy_static! {
         Regex::new(r"^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$")
             .unwrap();
     pub static ref REGEX_DATE: Regex =
-        Regex::new(r#"^"?\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[.]\d+?Z"?$"#).unwrap();
+        Regex::new(r#"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?Z$"#).unwrap();
     pub static ref REGEX_BOOL: Regex = Regex::new(r#"^(__true__)|(__false__)$"#).unwrap();
     pub static ref REGEX_NUMBER: Regex = Regex::new(r#"^-?\d+$"#).unwrap();
     pub static ref REGEX_FLOAT: Regex = Regex::new(r#"^-?\d+?\.^-?\d*$"#).unwrap();
