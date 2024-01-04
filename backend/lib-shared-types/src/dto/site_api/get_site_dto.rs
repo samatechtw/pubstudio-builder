@@ -1,4 +1,6 @@
 use serde::{Deserialize, Serialize};
+use validator::Validate;
+use crate::type_util::REGEX_DATE;
 
 use crate::{entity::site_api::site_entity::SiteEntity, shared::js_date::JsDate};
 
@@ -18,8 +20,9 @@ pub struct GetSiteDto {
     pub disabled: Option<bool>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Validate)]
 pub struct GetSiteQuery {
+    #[validate(regex = "REGEX_DATE")]
     pub update_key: Option<String>,
 }
 
