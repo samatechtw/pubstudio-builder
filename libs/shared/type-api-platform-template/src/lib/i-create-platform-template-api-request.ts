@@ -12,6 +12,7 @@ export interface ICreatePlatformTemplateRequest {
   preview_content_size: number
   preview_content_type: AssetContentType
   public: boolean
+  sort_priority: number
   name: string
   version: string
   context: ISerializedSiteContext
