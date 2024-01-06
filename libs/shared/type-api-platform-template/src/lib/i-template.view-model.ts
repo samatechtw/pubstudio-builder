@@ -3,6 +3,7 @@ export interface ITemplateViewModel {
   preview_url: string
   collection_id: string
   description: string
+  sort_priority?: number
   categories: string[]
   public: boolean
   name: string
