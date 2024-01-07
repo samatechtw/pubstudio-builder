@@ -17,7 +17,10 @@
     @open="setStyleToolbarMenu(editor, StyleToolbarMenu.FontFamily)"
     @close="setStyleToolbarMenu(editor, undefined)"
   >
-    <div :style="{ 'font-family': label === addFontText ? undefined : font(label) }">
+    <div
+      :class="{ 'add-font': label === addFontText }"
+      :style="{ 'font-family': label === addFontText ? undefined : font(label) }"
+    >
       {{ label }}
     </div>
   </PSMultiselect>
@@ -101,6 +104,9 @@ onMounted(() => {
   :deep(.multiselect-single-label) {
     padding: 0 0 0 6px;
   }
+}
+.add-font {
+  color: $grey-700;
 }
 .inherited {
   :deep(.label-text) {

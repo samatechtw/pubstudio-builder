@@ -52,7 +52,7 @@ const { toasts, removeToast } = useToast()
     box-shadow: 0 16px 40px rgba(#000, 0.15);
     border-radius: 4px;
     margin-top: 16px;
-    z-index: 1000;
+    z-index: $z-index-toast;
     background-color: white;
     &.error {
       .toast-left {
