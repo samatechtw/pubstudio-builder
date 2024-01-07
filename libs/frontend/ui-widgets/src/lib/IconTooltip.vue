@@ -63,7 +63,7 @@ const mouseEnter = () => {
   @mixin flex-center;
   padding: 6px 8px;
   position: absolute;
-  z-index: 1000;
+  z-index: $z-index-tooltip;
   a {
     @mixin truncate;
     max-width: calc(100% - 30px);

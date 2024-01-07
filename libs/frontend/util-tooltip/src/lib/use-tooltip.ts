@@ -111,7 +111,7 @@ export const useTooltip = (options?: IUseTooltipOptions): IUseTooltip => {
     top: `${y.value ?? 0}px`,
     left: `${x.value ?? 0}px`,
     width: 'max-content',
-    'z-index': 1001,
+    'z-index': 7000,
   })
 
   const updatePosition = async () => {

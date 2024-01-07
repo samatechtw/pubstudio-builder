@@ -38,7 +38,7 @@ const { huds } = useHUD()
     color: white;
     background-color: rgba(0, 0, 0, 0.25);
     backdrop-filter: blur(12px);
-    z-index: 1000;
+    z-index: $z-index-toast;
   }
 }
 

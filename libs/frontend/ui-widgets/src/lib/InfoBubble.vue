@@ -142,7 +142,7 @@ const hideBubble = () => {
   @mixin tooltip;
   position: absolute;
   max-width: 200px;
-  z-index: 1000;
+  z-index: $z-index-tooltip;
   :deep(a) {
     color: $purple-500;
     font-weight: 500;
