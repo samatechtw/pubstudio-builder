@@ -4,35 +4,38 @@ import {
   useDuplicateComponent,
   usePaddingMarginEdit,
 } from '@pubstudio/frontend/feature-build'
-import {
-  clearComponentTabState,
-  getComponentTreeItemId,
-  setBuildSubmenu,
-  setSelectedComponent,
-  setStyleToolbarMenu,
-} from '@pubstudio/frontend/feature-editor'
 import { activeBreakpoint } from '@pubstudio/frontend/feature-site-source'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
-import { resolvedComponentStyle } from '@pubstudio/frontend/util-build'
 import { resolveComponent } from '@pubstudio/frontend/util-builtin'
+import {
+  clearComponentTabState,
+  setBuildSubmenu,
+  setStyleToolbarMenu,
+} from '@pubstudio/frontend/util-command'
+import { resolvedComponentStyle } from '@pubstudio/frontend/util-component'
 import { isDynamicComponent } from '@pubstudio/frontend/util-ids'
 import { Keys } from '@pubstudio/frontend/util-key-listener'
+import { runtimeContext } from '@pubstudio/frontend/util-runtime'
 import {
   BuildSubmenu,
   Css,
   CssPseudoClass,
   CssUnit,
-  IComponent,
   IStyleEntry,
-  StyleToolbarMenu,
 } from '@pubstudio/shared/type-site'
 import { onMounted, onUnmounted } from 'vue'
+import {
+  selectComponent,
+  selectNextComponent,
+  selectPreviousComponent,
+} from './select-component'
 import { hotkeysDisabled } from './util-build-event'
 import {
   calcNextHeight,
   calcNextWidth,
   getHeightPxPerPercent,
   getWidthPxPerPercent,
+  isLengthValue,
 } from './util-resize'
 
 const clickEventType = document.ontouchstart !== null ? 'click' : 'touchend'
@@ -40,14 +43,42 @@ const clickEventType = document.ontouchstart !== null ? 'click' : 'touchend'
 const isRenderer = (target: HTMLElement | undefined): boolean => {
   return !!target?.closest('.build-content')
 }
-const isComponentTree = (target: HTMLElement | undefined): boolean => {
-  return !!target?.closest('.component-tree')
+const findClickedComponentTreeItemId = (
+  target: HTMLElement | undefined,
+): string | undefined => {
+  const componentTreeItem = target?.closest('.component-tree-item')
+  if (componentTreeItem) {
+    return componentTreeItem.id
+  } else {
+    // Convert tag name to lowercase because the casing is different in HTML & XML/XHTML.
+    const tagName = target?.tagName?.toLowerCase()
+
+    // When the eye button in a component tree item is clicked, the editor will scroll to
+    // the corresponding component, so the "press enter to rename" feature should also
+    // work. We use `element.closest` to find the corresponding tree item when click event
+    // happens, but `element.closest` does not work on <svg> and <path> (their parentElements
+    // will always be null). Thus, we have to add dataset on the eye buttons (<svg>) to store
+    // tree item id for retrieving later.
+    // Also, when a component is being renamed in the tree, clicking the rename input should not
+    // lose the renaming state (click on the rename input should not be considered as clicking outside).
+    // So we have to add dataset on the rename input to store tree item id for retrieving later as well.
+    let element: HTMLElement | undefined | null
+    if (tagName === 'svg' || tagName === 'input') {
+      element = target
+    } else if (tagName === 'path') {
+      element = (target as HTMLElement).parentElement
+    }
+    return element?.dataset.treeItemId
+  }
+}
+const isProseMirrorLink = (target: HTMLElement | undefined): boolean => {
+  return !!target?.closest('a') && !!target?.closest('.pm-p')
 }
 const isBuildMenu = (target: HTMLElement | undefined): boolean => {
   return !!target?.closest('.build-menu')
 }
-const isRightMenu = (target: HTMLElement | undefined): boolean => {
-  return !!target?.closest('.right-menu')
+const isBuildRightMenu = (target: HTMLElement | undefined): boolean => {
+  return !!target?.closest('.build-right-menu')
 }
 const isStyleToolbar = (target: HTMLElement | undefined): boolean => {
   return !!target?.closest('.style-toolbar')
@@ -71,24 +102,11 @@ export const useBuildEvent = () => {
   const { siteStore } = useSiteSource()
   const { pressCopy, pressPaste } = useCopyPaste()
   const { pressDuplicate } = useDuplicateComponent()
-  const { drag, stopDrag } = usePaddingMarginEdit()
-  const ed = editor.value
-  const context = site.value.context
+  const { dragging: paddingMarginDragData, drag, stopDrag } = usePaddingMarginEdit()
   let buildWindow: HTMLElement | null = null
 
-  const selectComponent = (component: IComponent) => {
-    setSelectedComponent(site.value.editor, component)
-
-    // Scroll to the corresponding tree item if component tree is visible
-    if (editor.value?.showComponentTree) {
-      const treeItemId = getComponentTreeItemId(component)
-      const treeItemElement = document.getElementById(treeItemId)
-      treeItemElement?.scrollIntoView()
-    }
-  }
-
   const clickRenderer = (target: HTMLElement | undefined) => {
-    setBuildSubmenu(ed, undefined)
+    setBuildSubmenu(editor.value, undefined)
     if (site.value.editor?.resizeData) {
       site.value.editor.resizeData = undefined
       siteStore.value.save(site.value)
@@ -96,16 +114,16 @@ export const useBuildEvent = () => {
       const componentId =
         target?.id || target?.closest('.component-content-container')?.parentElement?.id
       if (componentId) {
-        const component = context.components[componentId]
+        const component = site.value.context.components[componentId]
         if (component) {
-          selectComponent(component)
+          selectComponent(site.value, component)
         } else if (target.parentElement && isDynamicComponent(target.id)) {
           // TODO -- this is fragile, it's probably better to add dynamic components to the
           // Site's `context.components`
           const index = parseInt(target.id.split('_').pop() ?? '')
-          const parent = context.components[target.parentElement.id]
+          const parent = site.value.context.components[target.parentElement.id]
           if (parent.children?.[index]) {
-            selectComponent(parent.children[index])
+            selectComponent(site.value, parent.children[index])
           }
         }
       }
@@ -115,62 +133,112 @@ export const useBuildEvent = () => {
     if (
       // Close the active Build Submenu if any other part of the menu was clicked
       !(
-        (ed?.buildSubmenu === BuildSubmenu.New && target?.closest('#build-new')) ||
-        (ed?.buildSubmenu === BuildSubmenu.Page && target?.closest('#build-page')) ||
-        (ed?.buildSubmenu === BuildSubmenu.File && target?.closest('#build-file')) ||
-        (ed?.buildSubmenu === BuildSubmenu.Behavior &&
+        (editor.value?.buildSubmenu === BuildSubmenu.New &&
+          target?.closest('#build-new')) ||
+        (editor.value?.buildSubmenu === BuildSubmenu.Page &&
+          target?.closest('#build-page')) ||
+        (editor.value?.buildSubmenu === BuildSubmenu.File &&
+          target?.closest('#build-file')) ||
+        (editor.value?.buildSubmenu === BuildSubmenu.Behavior &&
           target?.closest('#build-behaviors')) ||
-        (ed?.buildSubmenu === BuildSubmenu.Asset && target?.closest('#build-asset')) ||
-        (ed?.buildSubmenu === BuildSubmenu.History && target?.closest('#build-history'))
+        (editor.value?.buildSubmenu === BuildSubmenu.Asset &&
+          target?.closest('#build-asset')) ||
+        (editor.value?.buildSubmenu === BuildSubmenu.History &&
+          target?.closest('#build-history'))
       )
     ) {
-      setBuildSubmenu(ed, undefined)
+      setBuildSubmenu(editor.value, undefined)
     }
   }
   const clickStyleToolbar = (_target: HTMLElement | undefined) => {
-    setBuildSubmenu(ed, undefined)
+    setBuildSubmenu(editor.value, undefined)
   }
   const clickRightMenu = (_target: HTMLElement | undefined) => {
-    setBuildSubmenu(ed, undefined)
+    setBuildSubmenu(editor.value, undefined)
+    runtimeContext.rightMenuFocused.value = true
   }
-  const clickComponentTree = (_target: HTMLElement | undefined) => {
-    setBuildSubmenu(ed, undefined)
+  const clickComponentTree = (componentTreeItemId: string) => {
+    setBuildSubmenu(editor.value, undefined)
+    runtimeContext.componentTreeItemRenameData.value.treeItemId = componentTreeItemId
   }
   const handleClick = (event: Event) => {
     const target = event.target as HTMLElement | undefined
+    const clickedComponentTreeItemId = findClickedComponentTreeItemId(target)
+
+    if (
+      clickedComponentTreeItemId !==
+      runtimeContext.componentTreeItemRenameData.value.treeItemId
+    ) {
+      runtimeContext.resetComponentTreeItemRenameData()
+    }
+
+    runtimeContext.rightMenuFocused.value = false
+
     if (isRenderer(target)) {
       if (!mouseDownOnTextEditableComponent) {
         clickRenderer(target)
+      }
+      if (isProseMirrorLink(target)) {
+        // Prevent links in prosemirror editor from being opened upon click.
+        event.preventDefault()
       }
     } else if (isStyleToolbar(target)) {
       clickStyleToolbar(target)
     } else if (isBuildMenu(target)) {
       clickBuildMenu(target)
-    } else if (isRightMenu(target)) {
+    } else if (isBuildRightMenu(target)) {
       clickRightMenu(target)
-    } else if (isComponentTree(target)) {
-      clickComponentTree(target)
+    } else if (clickedComponentTreeItemId) {
+      clickComponentTree(clickedComponentTreeItemId)
     }
+
     mouseDownOnTextEditableComponent = false
   }
 
   const pressEscape = () => {
-    if (ed?.editBehavior) {
-      // Handled directly in `BehaviorModal.vue`'s modal widget
-    } else if (ed?.styleMenu) {
-      setStyleToolbarMenu(ed, undefined)
-    } else if (ed?.buildSubmenu) {
-      setBuildSubmenu(ed, undefined)
+    if (editor.value?.editBehavior || editor.value?.translations) {
+      // Handled directly in `BehaviorModal.vue` or `TranslationsModal.vue`
+      // This is also checked in `hotkeysDisabled`
+    } else if (runtimeContext.componentTreeItemRenameData.value.renaming) {
+      // This is for the case where rename input is still visible in the tree, but
+      // the input has lost focus. i.e. clicking on the hide/show button of the
+      // same component in the tree during rename.
+      runtimeContext.componentTreeItemRenameData.value.renaming = false
+    } else if (editor.value?.styleMenu) {
+      setStyleToolbarMenu(editor.value, undefined)
+    } else if (editor.value?.buildSubmenu) {
+      setBuildSubmenu(editor.value, undefined)
     } else if (
-      ed?.componentTab.editEvent !== undefined ||
-      ed?.componentTab.editInput !== undefined ||
-      ed?.componentTab.editInputValue !== undefined ||
-      ed?.componentTab.editStyle !== undefined ||
-      ed?.componentTab.editInfo !== undefined
+      editor.value?.componentTab.editEvent !== undefined ||
+      editor.value?.componentTab.editInput !== undefined ||
+      editor.value?.componentTab.editInputValue !== undefined ||
+      editor.value?.componentTab.editInfo !== undefined
     ) {
-      clearComponentTabState(ed)
+      clearComponentTabState(editor.value)
     } else {
       selectComponentParent()
+    }
+  }
+
+  const pressEnter = () => {
+    const { treeItemId, renaming } = runtimeContext.componentTreeItemRenameData.value
+    if (treeItemId && !renaming) {
+      runtimeContext.componentTreeItemRenameData.value.renaming = true
+    }
+  }
+
+  const pressTab = async (e: KeyboardEvent) => {
+    const { selectedComponent } = editor.value ?? {}
+
+    if (selectedComponent) {
+      if (e.shiftKey) {
+        selectPreviousComponent(site.value, selectedComponent)
+      } else {
+        selectNextComponent(site.value, selectedComponent, true)
+      }
+      // Remove focus, some browsers will select the next DOM element on Tab keydown
+      ;(document.activeElement as HTMLElement)?.blur()
+      runtimeContext.rightMenuFocused.value = false
     }
   }
 
@@ -186,6 +254,10 @@ export const useBuildEvent = () => {
   const handleKeyup = (event: KeyboardEvent) => {
     if (event.key === Keys.Escape) {
       pressHotkey(event, pressEscape)
+    } else if (event.key === Keys.Enter) {
+      pressHotkey(event, pressEnter)
+    } else if (event.key === Keys.Tab) {
+      pressHotkey(event, pressTab)
     }
   }
 
@@ -206,17 +278,18 @@ export const useBuildEvent = () => {
 
   const handleMousemove = (e: MouseEvent) => {
     const editor = site.value.editor
-    if (editor?.styleMenu === StyleToolbarMenu.Size) {
+    if (paddingMarginDragData.value) {
       drag(e)
       return
     }
     const target = e.target as HTMLElement
     const component =
-      resolveComponent(context, target?.id) ??
+      resolveComponent(site.value.context, target?.id) ??
       // This is for elements that use an additional wrapper for hover edges, such as img.
       // Kebab case "component-id" will be converted to camel case "componentId".
       // See https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/dataset#name_conversion
-      resolveComponent(context, target?.dataset.componentId)
+      resolveComponent(site.value.context, target?.dataset.componentId) ??
+      editor?.resizeData?.component
     if (editor) {
       const data = editor.resizeData
       if (component && data) {
@@ -299,7 +372,7 @@ export const useBuildEvent = () => {
 
     // If the cursor is dragged while ProseMirror is active, mouseup/click outside the
     // component shouldn't de-select the current component. Convenient for selecting editable text
-    const mousedownComponent = resolveComponent(context, target.id)
+    const mousedownComponent = resolveComponent(site.value.context, target.id)
     mouseDownOnTextEditableComponent =
       !!target.closest('.ProseMirror') ||
       (mousedownComponent !== undefined &&
@@ -311,7 +384,7 @@ export const useBuildEvent = () => {
       // This is for elements that use an additional wrapper for hover edges, such as img.
       resizeCmp = resizeCmp.children[0] as HTMLElement
     }
-    const component = resolveComponent(context, resizeCmp?.id)
+    const component = resolveComponent(site.value.context, resizeCmp?.id)
     const side = target.classList[target.classList.length - 1]
     if (
       parent &&
@@ -321,14 +394,14 @@ export const useBuildEvent = () => {
       ['bottom', 'right', 'bottom-right'].includes(side)
     ) {
       const initialHeightProp = resolvedComponentStyle(
-        context,
+        site.value.context,
         component,
         CssPseudoClass.Default,
         Css.Height,
         activeBreakpoint.value.id,
       )
       const initialWidthProp = resolvedComponentStyle(
-        context,
+        site.value.context,
         component,
         CssPseudoClass.Default,
         Css.Width,
@@ -338,7 +411,12 @@ export const useBuildEvent = () => {
       const resizeCmpRect = resizeCmp.getBoundingClientRect()
       const parentRect = (resizeCmp.parentElement as HTMLElement).getBoundingClientRect()
 
-      const startHeight = initialHeightProp || `${resizeCmpRect.height}px`
+      let startHeight = initialHeightProp || `${resizeCmpRect.height}px`
+      if (!isLengthValue(startHeight)) {
+        // Use the current height (px) of the resized component as the initial height
+        startHeight = `${resizeCmpRect.height}px`
+      }
+
       let startWidth = initialWidthProp
       if (!startWidth) {
         const resizeCmpIsAbsolute =
@@ -350,6 +428,9 @@ export const useBuildEvent = () => {
         } else {
           startWidth = '100%'
         }
+      } else if (!isLengthValue(startWidth)) {
+        // Use the current width (px) of the resized component as the initial width
+        startWidth = `${resizeCmpRect.width}px`
       }
 
       const heightUnit = startHeight.replace(/[-\d.]/g, '') as CssUnit
@@ -388,7 +469,7 @@ export const useBuildEvent = () => {
       editor.resizeData = undefined
       siteStore.value.save(site.value)
     }
-    if (editor?.styleMenu === StyleToolbarMenu.Size) {
+    if (paddingMarginDragData.value) {
       stopDrag(e)
       return
     }

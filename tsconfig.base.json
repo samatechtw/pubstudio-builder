@@ -52,6 +52,7 @@
       "@pubstudio/frontend/util-config": ["libs/frontend/util-config/src/index.ts"],
       "@pubstudio/frontend/util-doc": ["libs/frontend/util-doc/src/index.ts"],
       "@pubstudio/frontend/util-dropdown": ["libs/frontend/util-dropdown/src/index.ts"],
+      "@pubstudio/frontend/util-i18n": ["libs/frontend/util-i18n/src/index.ts"],
       "@pubstudio/frontend/util-fields": ["libs/frontend/util-fields/src/index.ts"],
       "@pubstudio/frontend/util-gradient": ["libs/frontend/util-gradient/src/index.ts"],
       "@pubstudio/frontend/util-identicon": ["libs/frontend/util-identicon/src/index.ts"],
@@ -70,6 +71,7 @@
       "@pubstudio/frontend/util-vite-config": [
         "libs/frontend/util-vite-config/src/index.ts"
       ],
+      "@pubstudio/shared/type-api": ["libs/shared/type-api/src/index.ts"],
       "@pubstudio/shared/type-api-local-site": [
         "libs/shared/type-api-local-site/src/index.ts"
       ],
@@ -96,7 +98,6 @@
         "libs/shared/type-command-data/src/index.ts"
       ],
       "@pubstudio/shared/type-site": ["libs/shared/type-site/src/index.ts"],
-      "@pubstudio/shared/type-site-store": ["libs/shared/type-site-store/src/index.ts"],
       "@pubstudio/shared/type-sort": ["libs/shared/type-sort/src/index.ts"],
       "@pubstudio/shared/type-utils": ["libs/shared/type-utils/src/index.ts"],
       "@pubstudio/shared/util-core": ["libs/shared/util-core/src/index.ts"],
@@ -118,18 +119,20 @@
         "libs/frontend/feature-breakpoint/src/index.ts"
       ],
       "@pubstudio/frontend/feature-build": ["libs/frontend/feature-build/src/index.ts"],
+      "@pubstudio/frontend/feature-render-builder": [
+        "libs/frontend/feature-render-builder/src/index.ts"
+      ],
       "@pubstudio/frontend/feature-build-event": [
         "libs/frontend/feature-build-event/src/index.ts"
       ],
-      "@pubstudio/frontend/feature-command": [
-        "libs/frontend/feature-command/src/index.ts"
-      ],
-      "@pubstudio/frontend/feature-editor": ["libs/frontend/feature-editor/src/index.ts"],
       "@pubstudio/frontend/feature-preview": [
         "libs/frontend/feature-preview/src/index.ts"
       ],
       "@pubstudio/frontend/feature-site-assets": [
         "libs/frontend/feature-site-assets/src/index.ts"
+      ],
+      "@pubstudio/frontend/feature-site-translations": [
+        "libs/frontend/feature-site-translations/src/index.ts"
       ],
       "@pubstudio/web/feature-site-resources": [
         "libs/web/feature-site-resources/src/index.ts"
@@ -140,11 +143,17 @@
       "@pubstudio/frontend/feature-site-store": [
         "libs/frontend/feature-site-store/src/index.ts"
       ],
+      "@pubstudio/frontend/feature-site-store-init": [
+        "libs/frontend/feature-site-store-init/src/index.ts"
+      ],
       "@pubstudio/frontend/feature-sites": ["libs/frontend/feature-sites/src/index.ts"],
       "@pubstudio/web/type-builtins": ["libs/web/type-builtins/src/index.ts"],
+      "@pubstudio/frontend/ui-build": ["libs/frontend/ui-build/src/index.ts"],
       "@pubstudio/frontend/ui-theme": ["libs/frontend/ui-theme/src"],
-      "@pubstudio/frontend/util-build": ["libs/frontend/util-build/src/index.ts"],
       "@pubstudio/frontend/util-command": ["libs/frontend/util-command/src/index.ts"],
+      "@pubstudio/frontend/util-command-data": [
+        "libs/frontend/util-command-data/src/index.ts"
+      ],
       "@pubstudio/frontend/util-component": ["libs/frontend/util-component/src/index.ts"],
       "@pubstudio/frontend/util-edit-text": ["libs/frontend/util-edit-text/src/index.ts"],
       "@pubstudio/frontend/util-ids": ["libs/frontend/util-ids/src/index.ts"],

@@ -2,9 +2,9 @@
   <a
     class="router-link"
     :class="{ 'router-link-active': isActive, 'router-link-exact-active': isExactActive }"
-    :href="href"
+    :href="link.url"
     :target="target"
-    @click.prevent="navigate"
+    @click="navigate"
   >
     <slot />
   </a>
@@ -16,6 +16,7 @@ import { IRoute, IResolvedRoute } from '../lib/i-route'
 import { INavigateOptions } from '../lib/i-router'
 import { MatchedRoutesSymbol } from '../lib/router-injection-keys'
 import { useRouter } from '../lib/use-router'
+import { normalizeUrl } from '../lib/href-to-url'
 
 const props = withDefaults(
   defineProps<{
@@ -46,11 +47,13 @@ const targetRoute = computed<IRoute<unknown> | undefined>(() => {
   }
 })
 
-const href = computed(() => {
+const link = computed(() => {
   if ('name' in to.value) {
-    return router.computeResolvedPath(targetRoute.value as IRoute<unknown>, to.value)
+    const url = router.computeResolvedPath(targetRoute.value as IRoute<unknown>, to.value)
+    return { url, isExternal: false }
   } else {
-    return to.value.path
+    const { url, isExternal } = normalizeUrl(to.value.path ?? '')
+    return { url, isExternal }
   }
 })
 
@@ -67,11 +70,14 @@ const isExactActive = computed(() => {
   return lastMatch?.name === targetRoute.value?.name
 })
 
-const navigate = () => {
-  if (replace.value) {
-    router.replace(to.value)
-  } else {
-    router.push(to.value)
+const navigate = (e: Event) => {
+  if (!link.value.isExternal) {
+    e.preventDefault()
+    if (replace.value) {
+      router.replace(to.value)
+    } else {
+      router.push(to.value)
+    }
   }
 }
 </script>

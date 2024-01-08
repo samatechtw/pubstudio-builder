@@ -1,15 +1,7 @@
 import { RenderMode } from '@pubstudio/frontend/util-render'
-import { RouterLink as CustomRouterLink } from '@pubstudio/frontend/util-router'
+import { RouterLink } from '@pubstudio/frontend/util-router'
 import { IComponent, ISite, Tag } from '@pubstudio/shared/type-site'
-import {
-  Component,
-  defineComponent,
-  h,
-  onMounted,
-  onUnmounted,
-  PropType,
-  toRefs,
-} from 'vue'
+import { defineComponent, h, onMounted, onUnmounted, PropType, toRefs } from 'vue'
 import { registerCustomEvents, removeListeners } from './custom-event-handlers'
 import { IContent } from './i-props-content'
 import { computePropsContent } from './render'
@@ -58,29 +50,33 @@ export const LiveComponent = () => {
 
         let renderProps = props
         let children: IContent
+        let tag = component.value.tag
 
         if (typeof content === 'string') {
           // `innerHTML` should not exist in `props` when content (children) is a
           // non-string value because Vue will use whatever value it contains to
           // render components when using `h()`.
           renderProps = { ...props, innerHTML: content }
+
+          // Vue render function requires a tag, and we don't want two layers of <svg>
+          if (tag === Tag.Svg && content.includes('<svg')) {
+            tag = Tag.Div
+          }
         } else {
           children = content
         }
-
-        if (component.value.tag === Tag.A) {
+        if (tag === Tag.A) {
           const path = props.href ?? ''
-          return h(
-            CustomRouterLink as Component,
-            {
-              ...renderProps,
-              to: { path },
-            },
-            children,
-          )
+          const linkProps = {
+            ...renderProps,
+            href: undefined,
+            to: { path },
+          }
+          delete linkProps['href']
+          return h(RouterLink, linkProps, () => children)
         }
 
-        return h(component.value.tag as string, renderProps, children)
+        return h(tag as string, renderProps, children)
       }
     },
   })

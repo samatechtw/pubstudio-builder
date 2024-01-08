@@ -8,8 +8,8 @@ import {
   ISerializedSite,
   ISite,
   ISiteContext,
+  IStoredSite,
 } from '@pubstudio/shared/type-site'
-import { IStoredSite } from '@pubstudio/shared/type-site-store'
 
 interface IDeserializePagesResult {
   pages: Record<string, IPage>
@@ -21,7 +21,7 @@ export const deserializeEditor = (
   serializedEditor: ISerializedEditorContext | undefined | null,
 ): IEditorContext | undefined => {
   const selectedId = serializedEditor?.selectedComponentId
-  return serializedEditor
+  const editor = serializedEditor
     ? {
         selectedComponent: selectedId ? context.components[selectedId] : undefined,
         active: serializedEditor.active,
@@ -30,18 +30,25 @@ export const deserializeEditor = (
         buildSubmenu: serializedEditor.buildSubmenu,
         styleMenu: serializedEditor.styleMenu,
         editBehavior: serializedEditor.editBehavior,
+        translations: serializedEditor.translations,
         themeTab: serializedEditor.themeTab,
         componentTab: serializedEditor.componentTab ?? {},
         mode: serializedEditor.mode,
         showComponentTree: serializedEditor.showComponentTree,
         componentTreeExpandedItems: serializedEditor.componentTreeExpandedItems,
+        // Added 231125
+        componentsHidden: serializedEditor.componentsHidden ?? {},
         selectedThemeColors: new Set(serializedEditor.selectedThemeColors),
         builderWidth: serializedEditor.builderWidth,
         builderScale: serializedEditor.builderScale,
         cssPseudoClass: serializedEditor.cssPseudoClass,
         templatesShown: serializedEditor.templatesShown,
+        // Added 231201
+        componentMenuCollapses: serializedEditor.componentMenuCollapses ?? {},
       }
     : undefined
+
+  return editor
 }
 
 const deserializeComponent = (ser: ISerializedComponent): IComponent => {
@@ -110,6 +117,9 @@ export const deserializedHelper = (serialized: ISerializedSite): ISite => {
     styles: context.styles,
     theme: context.theme,
     breakpoints: context.breakpoints,
+    // Added 231105
+    i18n: context.i18n ?? {},
+    activeI18n: context.activeI18n,
   }
   const site: ISite = {
     context: siteContext,
@@ -119,6 +129,7 @@ export const deserializedHelper = (serialized: ISerializedSite): ISite => {
     pages,
     editor: deserializeEditor(siteContext, editor),
     history: { back: history.back, forward: history.forward },
+    updated_at: serialized.updated_at,
   }
   return site
 }
@@ -134,7 +145,9 @@ export const deserializeSite = (serializedSite: string): ISite | undefined => {
   }
 }
 
-export const unstoreSite = (stored: IStoredSite): ISite | undefined => {
+export const storedToSerializedSite = (
+  stored: IStoredSite,
+): ISerializedSite | undefined => {
   const { name, version, defaults, context, pages, editor, history } = stored
   if (!(name && version && defaults && context && pages)) {
     return undefined
@@ -152,6 +165,12 @@ export const unstoreSite = (stored: IStoredSite): ISite | undefined => {
           back: [],
           forward: [],
         },
+    updated_at: stored.updated_at || undefined,
   }
-  return deserializedHelper(serialized)
+  return serialized
+}
+
+export const unstoreSite = (stored: IStoredSite): ISite | undefined => {
+  const serialized = storedToSerializedSite(stored)
+  return serialized ? deserializedHelper(serialized) : undefined
 }

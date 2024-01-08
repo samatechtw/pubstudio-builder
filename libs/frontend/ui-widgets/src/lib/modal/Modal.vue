@@ -12,7 +12,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, onUnmounted, toRefs, watch } from 'vue'
+import { onMounted, onUnmounted, ref, toRefs, watch } from 'vue'
 import ModalClose from './ModalClose.vue'
 
 const props = withDefaults(
@@ -33,6 +33,8 @@ const emit = defineEmits<{
   (e: 'cancel'): void
 }>()
 
+const listenersActive = ref(false)
+
 function clickOutside(e: Event) {
   if (
     e.target &&
@@ -50,50 +52,35 @@ function escape(e: KeyboardEvent) {
   }
 }
 
-watch(
-  () => show,
-  (show) => {
-    if (show?.value) {
-      document.addEventListener('keydown', escape)
-      document.body.classList.add('noscroll')
-    } else {
-      document.removeEventListener('keydown', escape)
-      document.body.classList.remove('noscroll')
-    }
-  },
-)
-
-onMounted(() => {
-  if (show?.value) {
+const modalSetup = (show: boolean) => {
+  if (show === listenersActive.value) {
+    return
+  }
+  if (show) {
     document.addEventListener('keydown', escape)
     document.body.classList.add('noscroll')
+  } else {
+    document.removeEventListener('keydown', escape)
+    document.body.classList.remove('noscroll')
   }
+  listenersActive.value = show
+}
+
+watch(show, modalSetup)
+
+onMounted(() => {
+  modalSetup(show.value)
 })
 
 onUnmounted(() => {
-  document.removeEventListener('keydown', escape)
-  document.body.classList.remove('noscroll')
+  modalSetup(false)
 })
 </script>
 
-<style lang="postcss">
+<style lang="postcss" scoped>
 @import '@theme/css/mixins.postcss';
 @import '@theme/css/colors.postcss';
 
-.modal-title {
-  @mixin title 32px;
-  color: $color-title;
-}
-.modal-text {
-  @mixin text-medium 16px;
-  line-height: 140%;
-  color: $color-text;
-  margin-top: 16px;
-}
-.modal-buttons {
-  @mixin flex-row;
-  margin-top: 24px;
-}
 .modal-outer {
   background-color: rgba(0, 0, 0, 0.6);
   @mixin overlay;
@@ -101,7 +88,7 @@ onUnmounted(() => {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1001;
+  z-index: $z-index-modal;
 }
 .modal-inner {
   position: relative;
@@ -109,6 +96,20 @@ onUnmounted(() => {
   background-color: white;
   width: 440px;
   border-radius: 4px;
+}
+:slotted(.modal-title) {
+  @mixin title 32px;
+  color: $color-title;
+}
+:slotted(.modal-text) {
+  @mixin text-medium 16px;
+  line-height: 140%;
+  color: $color-text;
+  margin-top: 16px;
+}
+:slotted(.modal-buttons) {
+  @mixin flex-row;
+  margin-top: 24px;
 }
 
 .modal-enter-active,

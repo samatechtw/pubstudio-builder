@@ -1,5 +1,5 @@
-import { useHUD } from '@pubstudio/frontend/ui-widgets'
 import { serializeComponent } from '@pubstudio/frontend/util-site-store'
+import { useHUD } from '@pubstudio/frontend/util-ui-alert'
 import { ISerializedComponent } from '@pubstudio/shared/type-site'
 import { useBuild } from './use-build'
 
@@ -23,12 +23,7 @@ export const useCopyPaste = (): IUseCopyPaste => {
   const pressCopy = (evt: KeyboardEvent) => {
     evt.stopImmediatePropagation()
     const component = editor.value?.selectedComponent
-    if (
-      site.value.editor &&
-      // Make sure selected component is not page root before copying
-      component?.parent &&
-      (evt.ctrlKey || evt.metaKey)
-    ) {
+    if (site.value.editor && component && (evt.ctrlKey || evt.metaKey)) {
       site.value.editor.copiedComponent = serializeComponent(component)
       // TODO -- find a good way to handle translations without requiring library consumers
       // to use `vue-i18n`
@@ -47,20 +42,16 @@ export const useCopyPaste = (): IUseCopyPaste => {
     const { selectedComponent } = site.value.editor ?? {}
     if (!selectedComponent) return
 
-    if (selectedComponent.content) {
-      addHUD({ text: "Can't paste into a component with text content" })
-    } else {
-      // If the copied component is still selected, paste to its parent
-      if (copiedComponent.id === selectedComponent.id) {
-        const parentId = selectedComponent.parent?.id
-        if (parentId) {
-          executePasteComponent(copiedComponent.id, parentId)
-        }
-      } else {
-        executePasteComponent(copiedComponent.id, selectedComponent.id)
+    // If the copied component is still selected, paste to its parent
+    if (copiedComponent.id === selectedComponent.id) {
+      const parent = selectedComponent.parent
+      if (parent) {
+        executePasteComponent(copiedComponent.id, parent)
       }
-      addHUD({ text: 'Component Pasted' })
+    } else {
+      executePasteComponent(copiedComponent.id, selectedComponent)
     }
+    addHUD({ text: 'Component Pasted' })
   }
 
   const pressPaste = (evt: KeyboardEvent) => {
@@ -74,7 +65,15 @@ export const useCopyPaste = (): IUseCopyPaste => {
           pasteStyle(copiedComponent)
         }
       } else {
-        pasteComponent(copiedComponent)
+        if (!copiedComponent.parentId) {
+          // Root component should not be pasted through paste hotkey.
+          addHUD({
+            text: 'Root component can only be used to replace another root component',
+            duration: 2000,
+          })
+        } else {
+          pasteComponent(copiedComponent)
+        }
       }
     }
   }

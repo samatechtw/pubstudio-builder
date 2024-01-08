@@ -71,7 +71,7 @@ describe('Get Current Site', () => {
 
       return api
         .get(testEndpoint)
-        .set('Host', 'shop.abc.com')
+        .set('Host', 'www.myblog.org')
         .set('Authorization', adminAuth)
         .expect(509, {
           code: 'None',

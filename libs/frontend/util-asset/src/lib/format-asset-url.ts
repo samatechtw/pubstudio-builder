@@ -10,5 +10,5 @@ export const urlFromAsset = (asset: ISiteAssetViewModel): string => {
   }[asset.content_type]
   ext = ext ? `.${ext}` : ''
 
-  return `${S3_SITE_ASSETS_URL}/${asset.site_id || 'identity'}/${asset.id}${ext}`
+  return `${S3_SITE_ASSETS_URL}/${asset.site_id || asset.local_site_id}/${asset.id}${ext}`
 }

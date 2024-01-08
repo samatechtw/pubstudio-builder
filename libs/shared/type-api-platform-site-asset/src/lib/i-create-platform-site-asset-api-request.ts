@@ -6,4 +6,5 @@ export interface ICreatePlatformSiteAssetRequest {
   content_type: AssetContentType
   site_id?: string
   local_site_id?: string
+  template_id?: string
 }

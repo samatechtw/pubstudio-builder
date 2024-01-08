@@ -40,6 +40,9 @@ export interface IUseDropdownOptions {
   // Override actions/events that cause the menu to close
   disableClose?: ComputedRef<boolean> | Ref<boolean>
   middlewares?: Middleware[]
+  // Control autoUpdate options
+  layoutShift?: boolean
+  elementResize?: boolean
   // An external function that controls whether the menu is open
   openControl?: () => boolean
   // Open change callback
@@ -63,7 +66,7 @@ export const useDropdown = (options: IUseDropdownOptions): IUseDropdown => {
   const opened = ref(openedInit ?? false)
 
   if (openControl) {
-    watch(openControl, (isOpen: boolean) => {
+    watch(openControl, async (isOpen: boolean) => {
       opened.value = isOpen
     })
   }
@@ -109,6 +112,9 @@ export const useDropdown = (options: IUseDropdownOptions): IUseDropdown => {
   useControlledClickaway(clickawayIgnoreSelector, closeMenu)
 
   const setMenuOpened = (value: boolean) => {
+    if (opened.value === value) {
+      return
+    }
     opened.value = value
     if (value) {
       updateMenuPosition()
@@ -126,8 +132,13 @@ export const useDropdown = (options: IUseDropdownOptions): IUseDropdown => {
     }
   }
 
-  onMounted(() => {
-    autoUpdateCleanup = autoUpdate(toggleRef.value, menuRef.value, updateMenuPosition)
+  onMounted(async () => {
+    autoUpdateCleanup = autoUpdate(toggleRef.value, menuRef.value, updateMenuPosition, {
+      ancestorScroll: false,
+      ancestorResize: false,
+      elementResize: options.elementResize ?? false,
+      layoutShift: options.layoutShift ?? true,
+    })
     window.addEventListener('resize', updateMenuPositionOnResize)
   })
 

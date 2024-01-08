@@ -1,8 +1,11 @@
 import { site } from '@pubstudio/frontend/feature-site-source'
-import { ISite } from '@pubstudio/shared/type-site'
-import { ISiteRestore, ISiteStore } from '@pubstudio/shared/type-site-store'
-import { Ref, ref } from 'vue'
-import { useSiteStore } from './use-site-store'
+import {
+  ISite,
+  ISiteRestore,
+  ISiteStore,
+  SiteSaveState,
+} from '@pubstudio/shared/type-site'
+import { computed, ComputedRef, Ref, ref } from 'vue'
 
 // This file is here, instead of frontend/feature-site-source, to decouple the `site`
 // instance from the dependencies required by this lib.
@@ -12,7 +15,14 @@ export interface IUseSiteSource {
   siteError: Ref<string | undefined>
   apiSiteId: Ref<string | undefined>
   siteStore: Ref<ISiteStore>
-  initializeSite: (siteId: string | undefined) => Promise<void>
+  isSaving: ComputedRef<boolean>
+  initializeSite: (options: IInitializeSiteOptions) => Promise<void>
+  checkOutdated: () => Promise<void>
+}
+
+export interface IInitializeSiteOptions {
+  store: ISiteStore
+  siteId: string | undefined
 }
 
 const siteStore = ref() as Ref<ISiteStore>
@@ -20,15 +30,53 @@ let restoredSite: ISiteRestore
 const siteError = ref<string>()
 const apiSiteId = ref<string>()
 
+const isSaving = computed(() => {
+  // TODO -- figure out how to avoid nested ComputedRef in `siteStore` Ref
+  const saveState = siteStore.value.saveState as unknown as SiteSaveState
+  return saveState === SiteSaveState.Saving || saveState === SiteSaveState.SavingEditor
+})
+
 export const useSiteSource = (): IUseSiteSource => {
-  const initializeSite = async (siteId: string | undefined) => {
-    siteStore.value = useSiteStore({ siteId })
-    await siteStore.value.initialize()
-    restoredSite = await siteStore.value.restore()
-    site.value = restoredSite.site
-    apiSiteId.value = siteId
-    siteError.value = restoredSite.error
+  const setRestoredSite = (restored: ISiteRestore | undefined) => {
+    if (restored) {
+      restoredSite = restored
+      site.value = restoredSite.site
+      if (site.value.editor) {
+        site.value.editor.store = siteStore.value
+      }
+      siteError.value = restoredSite.error
+    }
   }
 
-  return { initializeSite, apiSiteId, siteStore, site, siteError }
+  const initializeSite = async (options: IInitializeSiteOptions) => {
+    const { siteId, store } = options
+    apiSiteId.value = siteId
+    siteStore.value = {
+      ...store,
+    }
+
+    await siteStore.value.initialize()
+    const restored = await siteStore.value.restore()
+    setRestoredSite(restored)
+  }
+
+  const checkOutdated = async () => {
+    const restored = await siteStore.value.restore(site.value.updated_at)
+    setRestoredSite(restored)
+    if (restored) {
+      console.log('Site updated:', site.value.updated_at)
+    } else {
+      console.log('No site updates')
+    }
+  }
+
+  return {
+    initializeSite,
+    checkOutdated,
+    apiSiteId,
+    siteStore,
+    isSaving,
+    site,
+    siteError,
+  }
 }

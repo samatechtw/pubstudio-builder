@@ -20,5 +20,5 @@
       }
     }
   },
-  "tags": ["scope:frontend", "type:feature"]
+  "tags": ["scope:frontend", "type:util"]
 }

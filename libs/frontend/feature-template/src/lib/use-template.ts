@@ -14,7 +14,7 @@ import { inject, Ref, ref } from 'vue'
 export interface ITemplateFeature {
   api: IApiTemplate
   saving: Ref<boolean>
-  saveError: Ref<string>
+  templateError: Ref<string>
   listLoading: Ref<boolean>
   templates: Ref<IListPlatformTemplatesResponse | undefined>
   getTemplate: (id: string) => Promise<IGetPlatformTemplateResponse | undefined>
@@ -27,17 +27,17 @@ export const useTemplate = (): ITemplateFeature => {
   const rootApi = inject(ApiInjectionKey) as PSApi
   const api = useTemplateApi(rootApi)
   const saving = ref(false)
-  const saveError = ref()
+  const templateError = ref()
   const listLoading = ref(false)
   const templates = ref<IListPlatformTemplatesResponse>()
 
   const createTemplate = async (data: ICreatePlatformTemplateRequest): Promise<void> => {
     saving.value = true
-    saveError.value = undefined
+    templateError.value = undefined
     try {
       await api.createTemplate(data)
     } catch (e) {
-      saveError.value = parseApiErrorKey(toApiError(e))
+      templateError.value = parseApiErrorKey(toApiError(e))
     } finally {
       saving.value = false
     }
@@ -48,11 +48,11 @@ export const useTemplate = (): ITemplateFeature => {
     data: IUpdatePlatformTemplateRequest,
   ): Promise<void> => {
     saving.value = true
-    saveError.value = undefined
+    templateError.value = undefined
     try {
       await api.updateTemplate(id, data)
     } catch (e) {
-      saveError.value = parseApiErrorKey(toApiError(e))
+      templateError.value = parseApiErrorKey(toApiError(e))
     } finally {
       saving.value = false
     }
@@ -89,7 +89,7 @@ export const useTemplate = (): ITemplateFeature => {
   return {
     api,
     saving,
-    saveError,
+    templateError,
     listLoading,
     templates,
     createTemplate,

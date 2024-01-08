@@ -22,9 +22,10 @@
         {{ t('assets.no_assets') }}
       </div>
       <AssetCard
-        v-for="asset in assets"
+        v-for="(asset, index) in assets"
         :key="asset.id"
         :asset="asset"
+        :style="{ 'z-index': (assets?.length ?? 0) + 10 - index }"
         @update="updateAssetList"
         @delete="deletedAssetId = asset.id"
         @preview="previewAssetUrl = $event"
@@ -54,7 +55,7 @@
 
 <script lang="ts" setup>
 import { ref, onMounted, computed } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useI18n } from 'petite-vue-i18n'
 import { InfoBubble, PSSpinner, UsageProgress } from '@pubstudio/frontend/ui-widgets'
 import { useSites } from '@pubstudio/frontend/feature-sites'
 import { IListPlatformSiteAssetsRequest } from '@pubstudio/shared/type-api-platform-site-asset'
@@ -110,9 +111,7 @@ const removeDeletedAsset = () => {
 }
 
 const uploadComplete = (asset: IUploadFileResult) => {
-  if (updateAsset.value) {
-    updateAssetList({ ...asset, version: updateAsset.value.version + 1 })
-  }
+  updateAssetList({ ...asset, version: (updateAsset.value?.version ?? 0) + 1 })
   updateAsset.value = undefined
   showCreateModal.value = false
 }

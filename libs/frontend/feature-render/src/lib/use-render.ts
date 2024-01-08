@@ -11,8 +11,12 @@ import {
 import { Css, IPage, ISite } from '@pubstudio/shared/type-site'
 import { Link, Meta, Script, useHead } from '@unhead/vue'
 import { Component, computed, ComputedRef, defineComponent, h, Ref } from 'vue'
-import { getBuildPageStyle, getLivePageStyle } from './get-page-style'
-import { getBuildReusableStyle, getLiveReusableStyle } from './get-reusable-style'
+import {
+  getBuildPageStyle,
+  getLivePageStyle,
+  getRootBackgroundStyle,
+} from './get-page-style'
+import { getReusableStyle } from './get-reusable-style'
 import { renderPage } from './render'
 
 export interface IUseRender {
@@ -20,7 +24,6 @@ export interface IUseRender {
   ComponentStyle: ReturnType<typeof defineComponent>
   GoogleFontLink: ReturnType<typeof defineComponent>
   PageContent: ReturnType<typeof defineComponent>
-  rootComponentHeight: ComputedRef<string>
   rootComponentMinHeight: ComputedRef<string>
 }
 
@@ -35,19 +38,10 @@ export interface IUseRenderOptions {
 export const useRender = (options: IUseRenderOptions): IUseRender => {
   const { site, activePage, notFoundComponent, renderMode, unhead } = options
 
-  const buildReusableStyle = computed(() => {
+  const reusableStyle = computed(() => {
     let styleContent = ''
     if (site.value) {
-      const reusableStyle = getBuildReusableStyle(site.value)
-      styleContent = rawStyleRecordToString(reusableStyle, site.value.context)
-    }
-    return h('style', styleContent)
-  })
-
-  const liveReusableStyle = computed(() => {
-    let styleContent = ''
-    if (site.value) {
-      const reusableStyle = getLiveReusableStyle(site.value.context)
+      const reusableStyle = getReusableStyle(site.value.context)
       styleContent = queryStyleToString(site.value.context, reusableStyle)
     }
     return h('style', styleContent)
@@ -55,11 +49,7 @@ export const useRender = (options: IUseRenderOptions): IUseRender => {
 
   const ReusableStyle = defineComponent({
     render() {
-      if (renderMode === RenderMode.Build) {
-        return buildReusableStyle.value
-      } else {
-        return liveReusableStyle.value
-      }
+      return reusableStyle.value
     },
   })
 
@@ -75,8 +65,11 @@ export const useRender = (options: IUseRenderOptions): IUseRender => {
   const livePageComponentStyle = computed(() => {
     let styleContent = ''
     if (activePage.value && site.value) {
+      const htmlStyle = getRootBackgroundStyle(site.value.context, activePage.value)
       const pageStyle = getLivePageStyle(site.value.context, activePage.value)
-      styleContent = queryStyleToString(site.value.context, pageStyle)
+      styleContent =
+        queryStyleToString(site.value.context, htmlStyle) +
+        queryStyleToString(site.value.context, pageStyle)
     }
     return h('style', styleContent)
   })
@@ -152,16 +145,19 @@ export const useRender = (options: IUseRenderOptions): IUseRender => {
         ...(site.value?.defaults.head.link ?? []),
         ...(activePage.value?.head.link ?? []),
       ].map((l) => (l.rel === 'icon' ? { ...l, key: 'favicon' } : l))
+
+      const activePageTitle = activePage.value?.head.title || activePageName
+
       return {
-        title: activePageName,
+        title: activePageTitle,
         meta: [
           {
             name: 'og:title',
-            content: activePageName,
+            content: activePageTitle,
           },
           {
             name: 'twitter:title',
-            content: activePageName,
+            content: activePageTitle,
           },
           ...((site.value?.defaults.head.meta ?? []) as Meta[]),
           ...((activePage.value?.head.meta ?? []) as Meta[]),
@@ -189,30 +185,6 @@ export const useRender = (options: IUseRenderOptions): IUseRender => {
     )
   })
 
-  const rootComponentHeight = computed(() => {
-    const { height } = rootComponentStyle.value ?? {}
-    if (!height || height === '100%') {
-      // This is to overwrite the `height: 100%` defined in the style of root component in build and
-      // preview mode. We don't need this in release mode.
-      // Most of the time, when the height of root component is set to 100%, it means the user wants
-      // the content of the site to cover the whole page in vertical axis.
-
-      // In the builder, `height: 100%` on root component means it'll have the same height as its' parent,
-      // which is build-content-window. If we set `background-color: red` on root component, and the content
-      // height inside root component is greater than the height of build-content-window, the overflow part
-      // will thus NOT have a red background.
-
-      // To solve this problem, we can overwrite the `height: 100%` of root component with `height: auto`.
-      // That allows root component to have as much height as it wants. In addition, we have to add
-      // `min-height: 100%` to root component to make sure it'll at least have the same height as
-      // build-content-window when the content height inside root component is too short when `height: 100%`
-      // is set on root component.
-      return 'auto'
-    } else {
-      return height
-    }
-  })
-
   const rootComponentMinHeight = computed(() => {
     const { height } = rootComponentStyle.value ?? {}
     if (!height || height === '100%') {
@@ -227,7 +199,6 @@ export const useRender = (options: IUseRenderOptions): IUseRender => {
     ComponentStyle,
     GoogleFontLink,
     PageContent,
-    rootComponentHeight,
     rootComponentMinHeight,
   }
 }

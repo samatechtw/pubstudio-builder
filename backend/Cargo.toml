@@ -1,0 +1,11 @@
+[workspace]
+
+members = [
+    "site-api",
+    "lib-shared-site-api",
+    "lib-shared-types",
+]
+
+[profile.dev]
+opt-level = "z"
+strip = true

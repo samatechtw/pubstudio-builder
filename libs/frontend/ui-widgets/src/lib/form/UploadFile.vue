@@ -57,7 +57,7 @@
 
 <script lang="ts" setup>
 import { ref } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useI18n } from 'petite-vue-i18n'
 import PSAsset from '../PSAsset.vue'
 import Spinner from '../Spinner.vue'
 

@@ -2,7 +2,8 @@ import { IJsonObject } from '@sampullman/fetch-api'
 import { ApiResponse } from './api-response'
 import { transformResponseData } from './api-transforms'
 
-export const defaultResponseInterceptors = [
+// Convert errors to exceptions and extract JSON
+export const plainResponseInterceptors = [
   async (res: Response): Promise<ApiResponse> => {
     if (!res) {
       throw new Error('NETWORK_FAILURE')
@@ -31,8 +32,16 @@ export const defaultResponseInterceptors = [
     if (status === 400 || status === 404) {
       throw data
     }
-    const apiRes = res as ApiResponse
+    const apiRes = res as unknown as ApiResponse
     apiRes.data = data
+    return apiRes
+  },
+]
+
+// Transforms API date strings to Date
+export const defaultResponseInterceptors = [
+  async (res: Response): Promise<ApiResponse> => {
+    const apiRes = await plainResponseInterceptors[0](res)
     transformResponseData(apiRes.data)
     return apiRes
   },

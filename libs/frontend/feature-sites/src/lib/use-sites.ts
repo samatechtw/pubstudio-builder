@@ -21,8 +21,8 @@ import {
   ISiteViewModel,
   IUpdatePlatformSiteRequest,
 } from '@pubstudio/shared/type-api-platform-site'
+import { useI18n } from 'petite-vue-i18n'
 import { inject, Ref, ref } from 'vue'
-import { useI18n } from 'vue-i18n'
 
 const subdomainFormatRegex = new RegExp(/^[a-z]([a-z\d-]+)?$/g)
 
@@ -53,6 +53,7 @@ export interface ISitesFeature {
   deleteSite: (id: string) => Promise<void>
   siteNameToSubdomain: (siteName: string) => string
   validateSubdomain: (subdomain: string) => string | undefined
+  validateSiteName: (name: string) => string | undefined
 }
 
 export const useSites = (): ISitesFeature => {
@@ -146,6 +147,13 @@ export const useSites = (): ISitesFeature => {
     }
   }
 
+  const validateSiteName = (name: string): string | undefined => {
+    if (!/^[a-zA-Z0-9 ]{2,50}$/.test(name)) {
+      return i18n.t('errors.site_name')
+    }
+    return undefined
+  }
+
   return {
     api,
     loading,
@@ -160,5 +168,6 @@ export const useSites = (): ISitesFeature => {
     deleteSite,
     siteNameToSubdomain,
     validateSubdomain,
+    validateSiteName,
   }
 }

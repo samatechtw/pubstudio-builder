@@ -5,16 +5,22 @@
     class="toolbar-item"
     :class="{ active, alert }"
     :disabled="disabled"
-    @mouseenter="tooltipMouseEnter"
+    @mouseenter="tooltipMouseEnter()"
     @mouseleave="tooltipMouseLeave"
     @click="click"
   >
     <slot />
-    <Teleport to="body">
-      <div v-if="tooltip && show" ref="tooltipRef" class="tooltip" :style="tooltipStyle">
+    <div
+      v-if="(tooltip || customTooltip) && show"
+      ref="tooltipRef"
+      class="tooltip"
+      :style="tooltipStyle"
+    >
+      <slot v-if="customTooltip" name="tooltip" />
+      <template v-else>
         {{ tooltip }}
-      </div>
-    </Teleport>
+      </template>
+    </div>
   </button>
 </template>
 
@@ -31,6 +37,7 @@ const props = withDefaults(
     active?: boolean
     disabled?: boolean
     alert?: boolean
+    customTooltip?: boolean
     tooltipOptions?: IUseTooltipDelayOptions
   }>(),
   {
@@ -60,6 +67,8 @@ const {
   tooltipStyle,
   show,
 } = useTooltipDelay(tooltipOptions.value)
+
+defineExpose({ itemRef })
 </script>
 
 <style lang="postcss" scoped>
@@ -67,6 +76,8 @@ const {
 
 .toolbar-item {
   @mixin size $style-toolbar-height;
+  @mixin flex-center;
+  position: relative;
   outline: none;
   cursor: pointer;
   padding: 6px;

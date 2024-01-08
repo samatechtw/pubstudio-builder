@@ -1,47 +1,37 @@
-import { GradientType, IGradientColor } from '@pubstudio/frontend/util-gradient'
+import {
+  GradientType,
+  IGradientColor,
+  IThemedGradient,
+} from '@pubstudio/frontend/util-gradient'
 
-export const computeLinearGradient = (
+export const computeGradient = (
   gradientType: GradientType,
   gradientDegree: number,
   gradientColors: IGradientColor[],
-): string => {
+): IThemedGradient => {
   const degree = gradientType === GradientType.Linear ? `${gradientDegree}deg,` : ''
+  const sorted = [...gradientColors].sort((a, b) => a.stop - b.stop)
 
-  const colors = [...gradientColors]
-    .sort((a, b) => a.stop - b.stop)
+  const colors = sorted
     .map((gradientColor) => {
       const { rgba, stop } = gradientColor
       return `${rgba} ${stop}%`
     })
     .join(',')
+  const hasThemeVar = sorted.some((c) => !!c.themeVar)
+  let themed: string | undefined = undefined
+  if (hasThemeVar) {
+    themed = sorted
+      .map((gradientColor) => {
+        const { themeVar, rgba, stop } = gradientColor
+        const v = themeVar ? `$\{${themeVar}}` : undefined
+        return `${v ?? rgba} ${stop}%`
+      })
+      .join(',')
+  }
 
-  return `${gradientType}(${degree}${colors})`
-}
-
-export const computeRadialGradient = (
-  gradientType: GradientType,
-  gradientColors: IGradientColor[],
-): string => {
-  const colors = [...gradientColors]
-    .sort((a, b) => a.stop - b.stop)
-    .map((gradientColor) => {
-      const { rgba, stop } = gradientColor
-      return `${rgba} ${stop}%`
-    })
-    .join(',')
-  return `${gradientType}(${colors})`
-}
-
-export const computeConicGradient = (
-  gradientType: GradientType,
-  gradientColors: IGradientColor[],
-): string => {
-  const colors = [...gradientColors]
-    .sort((a, b) => a.stop - b.stop)
-    .map((gradientColor) => {
-      const { rgba, stop } = gradientColor
-      return `${rgba} ${stop}%`
-    })
-    .join(',')
-  return `${gradientType}(${colors})`
+  return {
+    raw: `${gradientType}(${degree}${colors})`,
+    themed: themed ? `${gradientType}(${degree}${themed})` : undefined,
+  }
 }

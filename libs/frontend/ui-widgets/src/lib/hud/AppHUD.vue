@@ -11,7 +11,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useHUD } from './use-hud'
+import { useHUD } from '@pubstudio/frontend/util-ui-alert'
 
 const { huds } = useHUD()
 </script>
@@ -38,7 +38,7 @@ const { huds } = useHUD()
     color: white;
     background-color: rgba(0, 0, 0, 0.25);
     backdrop-filter: blur(12px);
-    z-index: 1000;
+    z-index: $z-index-toast;
   }
 }
 

@@ -1,5 +1,8 @@
 import { minidenticon } from '@pubstudio/frontend/util-identicon'
-import { ILocalSiteRelationViewModel } from '@pubstudio/shared/type-api-platform-user'
+import {
+  ILocalSiteRelationViewModel,
+  UserType,
+} from '@pubstudio/shared/type-api-platform-user'
 import { LocalStoragePlugin, useModule } from '@samatech/vue-store'
 
 type IdentitySiteState = ILocalSiteRelationViewModel
@@ -33,6 +36,12 @@ const userInit = (): UserState => ({
   identity: DEFAULT_IDENTITY,
 })
 
+export const userGetters = (state: UserState) => ({
+  isAdmin: () => {
+    return state.userType === UserType.Admin
+  },
+})
+
 const userMutations = (user: UserState) => ({
   resetUser: () => {
     Object.assign(user, userInit())
@@ -55,13 +64,14 @@ const userMutations = (user: UserState) => ({
 
 export const userModule = useModule<
   UserState,
-  Record<string, never>,
+  ReturnType<typeof userGetters>,
   ReturnType<typeof userMutations>
 >({
   name: 'user',
   version: 1,
   stateInit: userInit,
   mutations: userMutations,
+  getters: userGetters,
   plugins: [LocalStoragePlugin],
 })
 

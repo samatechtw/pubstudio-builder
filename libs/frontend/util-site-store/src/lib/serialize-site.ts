@@ -9,8 +9,8 @@ import {
   ISerializedSiteContext,
   ISite,
   ISiteContext,
+  IStoredSite,
 } from '@pubstudio/shared/type-site'
-import { IStoredSite } from '@pubstudio/shared/type-site-store'
 
 export const serializeComponent = (component: IComponent): ISerializedComponent => {
   return {
@@ -48,16 +48,19 @@ export const serializeEditor = (
         buildSubmenu: editor.buildSubmenu,
         styleMenu: editor.styleMenu,
         editBehavior: editor.editBehavior,
+        translations: editor.translations,
         themeTab: editor.themeTab,
         componentTab: editor.componentTab,
         mode: editor.mode,
         showComponentTree: editor.showComponentTree,
         componentTreeExpandedItems: editor.componentTreeExpandedItems,
+        componentsHidden: editor.componentsHidden,
         selectedThemeColors: Array.from(editor.selectedThemeColors),
         builderWidth: editor.builderWidth,
         builderScale: editor.builderScale,
         cssPseudoClass: editor.cssPseudoClass,
         templatesShown: editor.templatesShown,
+        componentMenuCollapses: editor.componentMenuCollapses,
       }
     : undefined
 }
@@ -70,6 +73,8 @@ export const serializeSiteContext = (context: ISiteContext): ISerializedSiteCont
     behaviors: context.behaviors,
     theme: context.theme,
     breakpoints: context.breakpoints,
+    i18n: context.i18n,
+    activeI18n: context.activeI18n,
   }
 }
 
@@ -101,6 +106,7 @@ export const storeSite = (site: ISite): IStoredSite => {
     pages: JSON.stringify(serialized.pages),
     editor: JSON.stringify(serialized.editor),
     history: JSON.stringify(serialized.history),
+    updated_at: serialized.updated_at,
   }
 }
 

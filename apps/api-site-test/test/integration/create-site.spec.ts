@@ -20,11 +20,11 @@ describe('Create Site', () => {
     api = supertest(testConfig.get('apiUrl'))
     adminAuth = adminAuthHeader()
     resetService = new SiteApiResetService('http://127.0.0.1:3100', adminAuth, SITE_SEEDS)
-    await resetService.reset()
   })
 
-  beforeEach(() => {
+  beforeEach(async () => {
     payload = mockCreateSitePayload()
+    await resetService.reset()
   })
 
   it('returns 201 status code and message when requester is admin', async () => {
@@ -99,5 +99,21 @@ describe('Create Site', () => {
           status: 400,
         })
     })
+
+    it.each(['a', 'a'.repeat(30), 'test_site', 'test-site', 'test.site', '#abc'])(
+      'when site name is invalid',
+      () => {
+        payload.name = 'a'.repeat(51)
+        return api
+          .post(testEndpoint)
+          .set('Authorization', adminAuth)
+          .send(payload)
+          .expect(400, {
+            code: 'InvalidFormData',
+            message: 'Failed to validate request',
+            status: 400,
+          })
+      },
+    )
   })
 })

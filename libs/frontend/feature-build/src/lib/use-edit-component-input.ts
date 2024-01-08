@@ -1,8 +1,12 @@
-import { setComponentEditInput } from '@pubstudio/frontend/feature-editor'
+import { setComponentEditInput } from '@pubstudio/frontend/util-command'
 import { ComponentTabState, IComponentInput } from '@pubstudio/shared/type-site'
 import { computed, ComputedRef } from 'vue'
-import { IInputUpdate } from '../components/component-menu/ComponentInputs.vue'
 import { useBuild } from './use-build'
+
+export interface IInputUpdate {
+  property: string
+  newValue: unknown
+}
 
 export interface IUseEditComponentInputFeature {
   editedInput: ComputedRef<IComponentInput | undefined>

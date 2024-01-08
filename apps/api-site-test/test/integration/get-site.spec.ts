@@ -82,6 +82,53 @@ describe('Get Site', () => {
       expect(body.pages).toBeDefined()
     })
 
+    it('returns site data if current update_key does not match the saved updated_at', async () => {
+      const response = await api
+        .get(`${testEndpoint}/${siteId}`)
+        .query({ update_key: '2023-11-07T08:25:58.131123Z' })
+        .set('Authorization', adminAuth)
+        .expect(200)
+      const body: IGetSiteApiResponse = response.body
+
+      expect(body.id).toEqual(1)
+      expect(body.name).toEqual('Test Site 2')
+      expect(body.published).toEqual(false)
+      expect(body.version).toEqual('0.1')
+      expect(body.context).toBeDefined()
+      expect(body.defaults).toBeDefined()
+      expect(body.editor).toBeDefined()
+      expect(body.history).toBeDefined()
+      expect(body.pages).toBeDefined()
+    })
+
+    it('returns empty site if current update_key match the saved updated_at', async () => {
+      const prevResponse = await api
+        .get(`${testEndpoint}/${siteId}`)
+        .set('Authorization', ownerAuth)
+        .expect(200)
+      const prevBody: IGetSiteApiResponse = prevResponse.body
+
+      const response = await api
+        .get(`${testEndpoint}/${siteId}`)
+        .query({ update_key: prevBody.updated_at.toString() })
+        .set('Authorization', adminAuth)
+        .expect(204)
+
+      expect(response.body).toEqual({})
+    })
+
+    it('returns 400 when update_key is invalid', async () => {
+      await api
+        .get(`${testEndpoint}/${siteId}`)
+        .query({ update_key: '2023-11-07T08:25:58.131123' })
+        .set('Authorization', adminAuth)
+        .expect(400, {
+          code: 'InvalidFormData',
+          message: 'Failed to validate request',
+          status: 400,
+        })
+    })
+
     it('returns 401 when owner token has expired', async () => {
       await api
         .get(`${testEndpoint}/${siteId}`)

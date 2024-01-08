@@ -87,8 +87,8 @@ The following is a minimal Site representation in serialized JSON form, with com
     "editor": {
       // Current selected component
       "selectedComponentId": "test-c-0",
-      // Current page name
-      "active": "home",
+      // Current page route
+      "active": "/home",
       // Builder debug bounding box display
       "debugBounding": false,
       // Active context menu

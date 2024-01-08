@@ -1,6 +1,16 @@
-import { arrow, offset, Placement, shift, Strategy, useFloating } from '@floating-ui/vue'
-import { computed } from '@vue/reactivity'
-import { ComputedRef, CSSProperties, ref, Ref } from 'vue'
+import {
+  arrow,
+  autoUpdate,
+  computePosition,
+  flip,
+  Middleware,
+  offset,
+  Placement,
+  shift,
+  Strategy,
+  useFloating,
+} from '@floating-ui/vue'
+import { CSSProperties, nextTick, ref, Ref } from 'vue'
 
 export interface ITooltipStyle extends CSSProperties {
   position: Strategy
@@ -11,12 +21,15 @@ export interface ITooltipStyle extends CSSProperties {
 
 export interface IUseTooltip {
   show: Ref<boolean>
-  tooltipStyle: ComputedRef<ITooltipStyle>
+  tooltipStyle: Ref<ITooltipStyle>
   itemRef: Ref<Element | null>
   tooltipRef: Ref<HTMLElement | null>
   arrowRef: Ref<HTMLElement | null> | undefined
-  arrowStyle: ComputedRef<CSSProperties> | undefined
+  arrowStyle: Ref<CSSProperties | undefined>
+  // The native update function from floating-ui
   update: () => void
+  // Customized update function
+  updatePosition: () => Promise<void>
   tooltipMouseEnter: () => void
   tooltipMouseLeave: () => void
 }
@@ -26,13 +39,15 @@ export interface IUseTooltipOptions {
   arrow?: boolean
   offset?: number
   shift?: boolean
+  flip?: boolean
 }
 
 export const useTooltip = (options?: IUseTooltipOptions): IUseTooltip => {
   const placement = options?.placement ?? 'bottom'
   let arrowRef: Ref<HTMLElement | null> | undefined = undefined
-  let arrowStyle: ComputedRef<CSSProperties> | undefined = undefined
-  const middleware = []
+  const arrowStyle = ref<CSSProperties | undefined>()
+  let autoUpdateCleanup: (() => void) | undefined = undefined
+  const middleware: Middleware[] = []
 
   if (options?.offset) {
     middleware.push(offset(options?.offset))
@@ -40,26 +55,41 @@ export const useTooltip = (options?: IUseTooltipOptions): IUseTooltip => {
   if (options?.shift) {
     middleware.push(shift())
   }
+  if (options?.flip) {
+    middleware.push(flip())
+  }
   if (options?.arrow) {
     arrowRef = ref(null)
     middleware.push(arrow({ element: arrowRef }))
   }
 
-  const itemRef = ref(null)
+  const itemRef = ref<Element | null>(null)
   const tooltipRef = ref(null)
   const show = ref(false)
   const tooltip = useFloating(itemRef, tooltipRef, {
     placement,
     middleware,
   })
-  const side = placement.split('-')[0]
-  const { x, y, strategy, update, middlewareData } = tooltip
+  const { x, y, strategy, update } = tooltip
 
   if (options?.arrow) {
-    const arrowX = computed(() => middlewareData.value.arrow?.x ?? null)
-    const arrowY = computed(() => middlewareData.value.arrow?.y ?? null)
+    arrowStyle.value = {
+      left: '0px',
+      right: '0px',
+    }
+  }
 
-    arrowStyle = computed(() => {
+  interface IArrow {
+    x?: number
+    y?: number
+  }
+
+  const computeArrow = (arrow: IArrow, placement: string) => {
+    if (arrowStyle.value) {
+      const side = placement.split('-')[0]
+
+      const x = arrow.x ?? null
+      const y = arrow.y ?? null
       const staticSide =
         {
           top: 'bottom',
@@ -67,29 +97,58 @@ export const useTooltip = (options?: IUseTooltipOptions): IUseTooltip => {
           bottom: 'top',
           left: 'right',
         }[side] ?? placement
-      const offset = options?.offset ?? 2
-      return {
-        left: arrowX.value != null ? `${arrowX.value}px` : '',
-        top: arrowY.value != null ? `${arrowY.value}px` : '',
+      const offset = options?.offset ?? 10
+      arrowStyle.value = {
+        left: x === null ? '' : `${x}px`,
+        top: y === null ? '' : `${y}px`,
         [staticSide]: `-${offset - 2}px`,
       }
-    })
+    }
   }
 
-  const tooltipStyle = computed(() => ({
+  const tooltipStyle = ref<ITooltipStyle>({
     position: strategy.value,
     top: `${y.value ?? 0}px`,
     left: `${x.value ?? 0}px`,
     width: 'max-content',
-    'z-index': 1001,
-  }))
+    'z-index': 7000,
+  })
 
-  const tooltipMouseEnter = () => {
+  const updatePosition = async () => {
+    if (itemRef.value && tooltipRef.value) {
+      const {
+        x,
+        y,
+        middlewareData,
+        placement: updatedPlacement,
+      } = await computePosition(itemRef.value, tooltipRef.value, {
+        placement,
+        middleware,
+      })
+      tooltipStyle.value.position = strategy.value
+      tooltipStyle.value.top = `${y ?? 0}px`
+      tooltipStyle.value.left = `${x ?? 0}px`
+      if (middlewareData.arrow) {
+        computeArrow(middlewareData.arrow, updatedPlacement)
+      }
+    }
+  }
+
+  const tooltipMouseEnter = async () => {
     show.value = true
+    await nextTick()
+    if (itemRef.value && tooltipRef.value) {
+      autoUpdateCleanup = autoUpdate(itemRef.value, tooltipRef.value, updatePosition, {
+        ancestorScroll: false,
+        ancestorResize: false,
+        elementResize: false,
+      })
+    }
   }
 
   const tooltipMouseLeave = () => {
     show.value = false
+    autoUpdateCleanup?.()
   }
 
   return {
@@ -100,6 +159,7 @@ export const useTooltip = (options?: IUseTooltipOptions): IUseTooltip => {
     arrowRef,
     arrowStyle,
     update,
+    updatePosition,
     tooltipMouseEnter,
     tooltipMouseLeave,
   }

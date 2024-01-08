@@ -6,6 +6,7 @@
     "module": "commonjs",
     "target": "esnext",
     "lib": ["esnext"],
+    "esModuleInterop": true,
     "types": ["node"],
     "importHelpers": false
   },

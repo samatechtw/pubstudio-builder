@@ -8,8 +8,11 @@ import { header, headerLogo, headerLogoLink, headerNavMenu } from './builtin-hea
 import { image } from './builtin-image'
 import { input } from './builtin-input'
 import { link } from './builtin-link'
+import { ol, ul } from './builtin-list'
 import { navMenu, navMenuItem } from './builtin-nav-menu'
+import { svg } from './builtin-svg'
 import { text } from './builtin-text'
+import { textarea } from './builtin-textarea'
 
 export const builtinComponents: Record<string, ISerializedComponent> = {
   [containerHorizontal.id]: containerHorizontal,
@@ -22,6 +25,7 @@ export const builtinComponents: Record<string, ISerializedComponent> = {
   [h5.id]: h5,
   [h6.id]: h6,
   [image.id]: image,
+  [svg.id]: svg,
   [link.id]: link,
   [button.id]: button,
   [navMenu.id]: navMenu,
@@ -33,4 +37,7 @@ export const builtinComponents: Record<string, ISerializedComponent> = {
   [navMenuItem.id]: navMenuItem,
   [footer.id]: footer,
   [input.id]: input,
+  [textarea.id]: textarea,
+  [ul.id]: ul,
+  [ol.id]: ol,
 }

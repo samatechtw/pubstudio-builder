@@ -1,5 +1,6 @@
-import { applyAddComponent } from '@pubstudio/frontend/feature-command'
+import { initializeSiteStore } from '@pubstudio/frontend/feature-site-store-init'
 import { resolveComponent } from '@pubstudio/frontend/util-builtin'
+import { applyAddComponent } from '@pubstudio/frontend/util-command'
 import { DEFAULT_BREAKPOINT_ID } from '@pubstudio/frontend/util-ids'
 import {
   mockAddComponentData,
@@ -9,7 +10,7 @@ import { ISerializedComponent, ISite } from '@pubstudio/shared/type-site'
 import { IUseBuild, useBuild } from './use-build'
 import { IUseCopyPaste, useCopyPaste } from './use-copy-paste'
 
-jest.mock('vue-i18n', () => ({ useI18n: () => ({ t: jest.fn() }) }))
+jest.mock('petite-vue-i18n', () => ({ useI18n: () => ({ t: jest.fn() }) }))
 jest.mock('@pubstudio/frontend/ui-widgets', () => ({
   useHUD: () => ({ addHUD: jest.fn() }),
 }))
@@ -22,7 +23,7 @@ describe('use-build composable', () => {
 
   beforeEach(async () => {
     build = useBuild()
-    await build.initializeBuilder(undefined)
+    await initializeSiteStore({ siteId: undefined })
     site = build.site.value
     copyPaste = useCopyPaste()
 

@@ -24,6 +24,8 @@
       :list="normalizedDatalistId"
       @input="handleInput"
       @focusout="emit('focusout', modelValue)"
+      @keyup="emit('keyup', $event)"
+      @keydown="emit('keydown', $event)"
       @keyup.enter="emit('handle-enter')"
     />
     <datalist v-if="datalist" :id="normalizedDatalistId">
@@ -117,14 +119,17 @@ const props = withDefaults(
 const emit = defineEmits<{
   (e: 'update:modelValue', value: string): void
   (e: 'focusout', value: string | number | undefined): void
+  (e: 'keyup', event: KeyboardEvent): void
+  (e: 'keydown', event: KeyboardEvent): void
   (e: 'handle-enter'): void
 }>()
 
 const { type, name, placeholder, maxLength, modelValue, required, datalistId } =
   toRefs(props)
 
-const inputRef = ref(null)
+const inputRef = ref<HTMLInputElement>()
 
+// TODO: consider adding an interface for the exposed value?
 defineExpose({ inputRef })
 
 const requiredStar = ` *`
@@ -157,7 +162,7 @@ const handleInput = (e: Event) => {
     const limitedValue = value.slice(0, maxLength.value)
     emit('update:modelValue', limitedValue)
     if (inputRef.value) {
-      ;(inputRef.value as HTMLInputElement).value = limitedValue
+      inputRef.value.value = limitedValue
     }
   } else {
     emit('update:modelValue', value)
@@ -180,11 +185,11 @@ const handleInput = (e: Event) => {
   .bubble {
     right: 8px;
   }
-  .error-icon {
+  :deep(.info-bubble-wrap) {
     @mixin size 18px;
     &:hover {
-      :deep(svg g) {
-        stroke: $color-light1;
+      svg g {
+        fill: rgba($color-red, 0.7);
       }
     }
   }
@@ -216,6 +221,7 @@ const handleInput = (e: Event) => {
 }
 .ps-input {
   @mixin text-medium 13px;
+  @mixin input;
   box-sizing: border-box;
   color: $color-title;
   width: 100%;

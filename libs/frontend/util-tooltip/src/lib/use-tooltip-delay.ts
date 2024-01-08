@@ -23,6 +23,7 @@ export const useTooltipDelay = (options?: IUseTooltipDelayOptions): IUseTooltipD
     shift: true,
     placement: options?.placement,
     offset: options?.offset,
+    arrow: options?.arrow,
   })
   let mouseover = false
   let hoverTimer: ReturnType<typeof setTimeout> | undefined
@@ -32,13 +33,13 @@ export const useTooltipDelay = (options?: IUseTooltipDelayOptions): IUseTooltipD
     cancelGlobalShowTimer()
     // If the user hovers over another tooltip within the delay time, immediately show
     if (globalShow.value) {
-      tooltip.show.value = true
+      tooltip.tooltipMouseEnter()
     } else {
       hoverTimer = setTimeout(() => {
         if (mouseover) {
           tooltip.update()
-          tooltip.show.value = true
           globalShow.value = true
+          tooltip.tooltipMouseEnter()
         }
       }, hoverDelay)
     }
@@ -60,13 +61,15 @@ export const useTooltipDelay = (options?: IUseTooltipDelayOptions): IUseTooltipD
 
   const tooltipMouseLeave = () => {
     cancelHoverTimer()
-    if (!globalShowTimer) {
+    if (globalShowDuration === 0) {
+      globalShow.value = false
+    } else if (!globalShowTimer) {
       globalShowTimer = setTimeout(() => {
         globalShow.value = false
       }, globalShowDuration)
     }
     mouseover = false
-    tooltip.show.value = false
+    tooltip.tooltipMouseLeave()
   }
 
   onUnmounted(() => {

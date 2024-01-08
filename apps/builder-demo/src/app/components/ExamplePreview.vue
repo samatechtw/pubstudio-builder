@@ -8,7 +8,7 @@
 </template>
 
 <script lang="ts" setup>
-import { SitePreview } from '@pubstudio/frontend/feature-build'
+import { SitePreview } from '@pubstudio/frontend/ui-build'
 
 const emit = defineEmits<{
   (e: 'close'): void

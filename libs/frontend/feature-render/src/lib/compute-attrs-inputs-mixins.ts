@@ -49,15 +49,8 @@ export const computeAttrsInputsMixins = (
     attrs.role = c.role
   }
 
-  if (component.tag === Tag.A && attrs.href) {
-    if (renderMode === RenderMode.Preview) {
-      const href = attrs.href.toString()
-      if (!href.startsWith('http')) {
-        attrs.href = `/preview${attrs.href}`
-      }
-    } else if (renderMode === RenderMode.Release) {
-      attrs.href = attrs.href?.toString()
-    }
+  if (component.tag === Tag.A && attrs.href && renderMode === RenderMode.Release) {
+    attrs.href = attrs.href?.toString()
   }
 
   return { attrs, inputs, mixins }

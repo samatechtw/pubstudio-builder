@@ -1,5 +1,5 @@
 import {
-  IGetSiteDomainsApiResponse,
+  IGetSiteApiResponse,
   IUpdateSiteApiRequest,
   IUpdateSiteApiResponse,
 } from '@pubstudio/shared/type-api-site-sites'
@@ -47,15 +47,6 @@ describe('Update Site', () => {
     expect(JSON.parse(body.editor)).toEqual(payload.editor)
     expect(JSON.parse(body.history)).toEqual(payload.history)
     expect(JSON.parse(body.pages)).toEqual(payload.pages)
-
-    // Verify domains are updated
-    const getResponse = await api
-      .get(`/api/sites/${siteId}/domains`)
-      .set('Authorization', adminAuth)
-      .expect(200)
-    const getBody: IGetSiteDomainsApiResponse = getResponse.body
-
-    expect(getBody.domains).toEqual(payload.domains)
   })
 
   it('updates site and verifies result when requester is owner', async () => {
@@ -63,6 +54,32 @@ describe('Update Site', () => {
     const response = await api
       .patch(`${testEndpoint}/${siteId}`)
       .set('Authorization', ownerAuth)
+      .send(payload)
+      .expect(200)
+    const body: IUpdateSiteApiResponse = response.body
+
+    expect(body.name).toEqual(payload.name)
+    expect(body.version).toEqual(payload.version)
+    expect(JSON.parse(body.context)).toEqual(payload.context)
+    expect(JSON.parse(body.defaults)).toEqual(payload.defaults)
+    expect(JSON.parse(body.editor)).toEqual(payload.editor)
+    expect(JSON.parse(body.history)).toEqual(payload.history)
+    expect(JSON.parse(body.pages)).toEqual(payload.pages)
+  })
+
+  it('updates site when update_key matches the saved updated_at', async () => {
+    const prevResponse = await api
+      .get(`${testEndpoint}/${siteId}`)
+      .set('Authorization', adminAuth)
+      .expect(200)
+
+    const prevBody: IGetSiteApiResponse = prevResponse.body
+
+    payload.update_key = prevBody.updated_at.toString()
+
+    const response = await api
+      .patch(`${testEndpoint}/${siteId}`)
+      .set('Authorization', adminAuth)
       .send(payload)
       .expect(200)
     const body: IUpdateSiteApiResponse = response.body
@@ -113,40 +130,15 @@ describe('Update Site', () => {
       })
     })
 
-    it('returns 400 when domains is invalid', () => {
-      payload.domains = [
-        // length > 10
-        'a1',
-        'a2',
-        'a3',
-        'a4',
-        'a5',
-        'a6',
-        'a7',
-        'a8',
-        'a9',
-        'a10',
-        'a11',
-      ]
-      api
+    it('when update_key does not match the saved updated_at', () => {
+      payload.update_key = '2023-11-07T08:25:58.131123Z'
+      return api
         .patch(`${testEndpoint}/${siteId}`)
         .set('Authorization', adminAuth)
         .send(payload)
         .expect(400, {
-          code: 'InvalidFormData',
-          message: 'Failed to validate request',
-          status: 400,
-        })
-
-      payload.domains = ['1w1']
-      api
-        .patch(`${testEndpoint}/${siteId}`)
-        .set('Authorization', adminAuth)
-        .send(payload)
-        .expect(400, {
-          code: 'InvalidFormData',
-          message:
-            'Custom domains can only contain lowercase characters, numbers, and dashes',
+          code: 'UpdateStale',
+          message: 'update_key did not match',
           status: 400,
         })
     })
@@ -164,4 +156,33 @@ describe('Update Site', () => {
         status: 400,
       })
   })
+
+  it('when update_key is invalid', () => {
+    payload.update_key = '2023-11-07T08:25:58.131'
+    return api
+      .patch(`${testEndpoint}/${siteId}`)
+      .set('Authorization', adminAuth)
+      .send(payload)
+      .expect(400, {
+        code: 'InvalidFormData',
+        message: 'Failed to validate request',
+        status: 400,
+      })
+  })
+
+  it.each(['a', 'a'.repeat(30), 'test_site', 'test-site', 'test.site', '#abc'])(
+    'when site name is invalid',
+    () => {
+      payload.name = 'a'.repeat(51)
+      return api
+        .patch(`${testEndpoint}/${siteId}`)
+        .set('Authorization', adminAuth)
+        .send(payload)
+        .expect(400, {
+          code: 'InvalidFormData',
+          message: 'Failed to validate request',
+          status: 400,
+        })
+    },
+  )
 })

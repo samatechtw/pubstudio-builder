@@ -12,7 +12,7 @@ export const mockSerializedSite: ISerializedSite = {
   version: '0.1',
   editor: {
     selectedComponentId: 'test-c-0',
-    active: 'home',
+    active: '/home',
     editorEvents: {},
     debugBounding: false,
     mode: EditorMode.SelectedComponent,
@@ -21,6 +21,8 @@ export const mockSerializedSite: ISerializedSite = {
       'test-c-0': true,
       'test-c-1': false,
     },
+    componentMenuCollapses: {},
+    componentsHidden: {},
     componentTab: {},
     selectedThemeColors: [],
     builderWidth: 1080,
@@ -30,7 +32,20 @@ export const mockSerializedSite: ISerializedSite = {
   context: {
     namespace: 'test',
     nextId: 2,
-    styles: {},
+    styles: {
+      'global-s-0': {
+        id: 'global-s-0',
+        name: 'ContainerVerticalStyle',
+        breakpoints: {
+          'breakpoint-1': {
+            default: {
+              display: 'flex',
+              'flex-direction': 'column',
+            },
+          },
+        },
+      },
+    },
     behaviors: {},
     theme: {
       variables: {
@@ -67,6 +82,7 @@ export const mockSerializedSite: ISerializedSite = {
         name: 'Mobile',
       },
     },
+    i18n: { en: { hello: 'My First Blog' } },
   },
   history: {
     back: [

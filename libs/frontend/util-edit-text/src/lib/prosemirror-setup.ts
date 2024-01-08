@@ -1,49 +1,80 @@
-import { IComponent } from '@pubstudio/shared/type-site'
-import { baseKeymap } from 'prosemirror-commands'
 import { gapCursor } from 'prosemirror-gapcursor'
 import { history } from 'prosemirror-history'
 import { keymap } from 'prosemirror-keymap'
-import { DOMParser as ProseDOMParser, DOMSerializer } from 'prosemirror-model'
-import { EditorState, Plugin } from 'prosemirror-state'
+import { DOMParser as ProseDOMParser, DOMSerializer, Schema } from 'prosemirror-model'
+import { Command, EditorState, EditorStateConfig, Plugin } from 'prosemirror-state'
+import { baseKeymap } from './base-keymap'
 import { buildInputRules } from './input-rules'
 import { buildKeymap } from './keymap'
-import { schema } from './schema-basic'
-
-export { buildKeymap, buildInputRules }
 
 export interface IProsemirrorSetupOptions {
-  component: IComponent
-  /// Can be used to the key bindings created.
-  mapKeys?: { [key: string]: string | false }
+  content: string
+  schema: Schema
+  mapKeys?: { [key: string]: Command }
+  plugins?: EditorStateConfig['plugins']
+  overwriteBaseKeys?: string[]
 }
 
 export function prosemirrorSetup(options: IProsemirrorSetupOptions): EditorState {
-  const { component, mapKeys } = options
+  const {
+    content: contentOption,
+    schema,
+    mapKeys,
+    plugins: pluginsOption,
+    overwriteBaseKeys,
+  } = options
+
+  const baseKeyBinding = { ...baseKeymap }
+  overwriteBaseKeys?.forEach((key) => {
+    delete baseKeyBinding[key]
+  })
+
   const plugins = [
     buildInputRules(schema),
     keymap(buildKeymap(schema, mapKeys)),
-    keymap(baseKeymap),
+    keymap(baseKeyBinding),
     gapCursor(),
     history(),
     new Plugin({
       props: {
-        attributes: { class: 'pm-style' },
+        attributes: {
+          // Make ProseMirror editor not tab-focusable so pressing Tab in the builder
+          // selects the next component correctly.
+          tabindex: '-1',
+          class: 'pm-style',
+        },
       },
     }),
+    ...(pluginsOption ?? []),
   ]
-  const content = new DOMParser().parseFromString(component.content ?? '', 'text/html')
+  const content = new DOMParser().parseFromString(contentOption, 'text/html')
   return EditorState.create({
     doc: ProseDOMParser.fromSchema(schema).parse(content),
     plugins,
   })
 }
 
-export function editorStateToHtml(state: EditorState): string {
+export function editorStateToHtml(
+  schema: Schema,
+  state: EditorState,
+): string | undefined {
   const fragment = DOMSerializer.fromSchema(schema).serializeFragment(state.doc.content)
   const div = document.createElement('div')
   div.id = '__pm-serialize__'
   div.appendChild(fragment)
   const html = div.innerHTML
+  const textContent = div.textContent
   div.parentNode?.removeChild(div)
-  return html
+  if (textContent) {
+    return html
+  } else {
+    // Returns undefined so that components like horizontal&vertical container can include other components
+    // as children again when the text content is cleared.
+    return undefined
+  }
+}
+
+export function editorStateTextContent(schema: Schema, state: EditorState): string {
+  const fragment = DOMSerializer.fromSchema(schema).serializeFragment(state.doc.content)
+  return fragment.textContent ?? ''
 }

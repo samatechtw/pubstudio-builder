@@ -1,15 +1,23 @@
 <template>
-  <Transition name="image-show">
-    <img
-      v-show="imageLoaded"
-      :src="image"
-      :class="imageClass"
-      @load="imageLoaded = true"
-    />
-  </Transition>
-  <Transition name="image-show">
-    <img v-show="!imageLoaded" :src="placeholder" :class="placeholderClass" />
-  </Transition>
+  <div class="img-wrap">
+    <Transition name="image-show">
+      <img
+        v-show="imageLoaded"
+        :src="image"
+        :class="imageClass"
+        @load="imageLoaded = true"
+        @click="imageLoaded = !imageLoaded"
+      />
+    </Transition>
+    <Transition name="image-show">
+      <img
+        v-show="!imageLoaded"
+        :src="placeholder"
+        :class="placeholderClass"
+        @click="imageLoaded = !imageLoaded"
+      />
+    </Transition>
+  </div>
 </template>
 
 <script lang="ts" setup>

@@ -8,7 +8,7 @@ Editing procedure:
 
 - User clicks a component eligible for text editing. Ineligible components include those with children, images, videos, and line breaks.
   - Detected in `setSelectedComponent` in `editor-helpers.ts`
-- A ProseMirror editor is created with `createEditorView` and stored in the EditorContext
+- A ProseMirror editor is created with `createComponentEditorView` and stored in the EditorContext
   - Note - the EditorView is not serialized, but should be recreated when a site is loaded with an eligible `selectedComponent`
 - The renderer displays `innerHTML` for the selected component based on the current state of the EditorView, serialized with `editorStateToHtml`
 - All clicks and key presses are now handled/controlled by the ProseMirror EditorView
@@ -21,7 +21,7 @@ Editing procedure:
 - `@pubstudio/web/feature-edit-text` - includes a high level function for creating a new ProseMirror `EditView` for a PubStudio component. It hooks into ProseMirror's `dispatchTransaction` to save the latest state in PubStudio history.
 - `@pubstudio/frontend/util-edit-text` - interface to the ProseMirror libraries.
   - `input-rules.ts` - Supports some markdown-like behavior. For example, entering a dash and adding a space will start an unordered list.
-  - `schema-basic.ts` - Originally copied from [prosemirror-schema-basic](https://github.com/ProseMirror/prosemirror-schema-basic), contains our custom document schema.
+  - `schema-text.ts` - Originally copied from [prosemirror-schema-basic](https://github.com/ProseMirror/prosemirror-schema-basic), contains our custom document schema.
   - `keymap.ts` - Defines keybindings supported while editing text.
 
 ## Future Improvements

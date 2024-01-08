@@ -11,6 +11,11 @@ export interface IInheritedStyleEntry extends IStyleEntry {
   sourceType: StyleSourceType
   sourceId: string
   sourceBreakpointId: string
+  inheritedFrom: string | undefined
+}
+
+export interface IStyleOverrideEntry extends IStyleEntry {
+  selector: string
 }
 
 export type IRawStyle = { [key in Css]?: string }
@@ -24,12 +29,6 @@ export type IStyle = {
   id: string
   name: string
   breakpoints: IBreakpointStyles
-}
-
-export type IActiveBreakpointStyle = {
-  id: string
-  name: string
-  pseudoStyle: IPseudoStyle
 }
 
 export type IRawStyleWithSource = {
@@ -47,6 +46,14 @@ export type IPseudoStyleWithSource = { [key in CssPseudoClass]?: IRawStylesWithS
 
 // Use breakpoint id as key, IPseudoStyle as value
 export type IBreakpointStylesWithSource = Record<string, IPseudoStyleWithSource>
+
+// Use selector as key, IPseudoStyleWithSource as value
+export type IOverrideStylesWithSource = Record<string, IPseudoStyleWithSource>
+// Use breakpoint as key, IOverrideStylesWithSource as value
+export type IBreakpointOverrideStylesWithSource = Record<
+  string,
+  IOverrideStylesWithSource
+>
 
 export enum StyleSourceType {
   Mixin = 'mixin',

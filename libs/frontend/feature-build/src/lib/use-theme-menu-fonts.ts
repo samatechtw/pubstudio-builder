@@ -1,6 +1,6 @@
 import { IThemeFont, ThemeFontSource } from '@pubstudio/shared/type-site'
+import { useI18n } from 'petite-vue-i18n'
 import { computed, ComputedRef, reactive, Ref, ref, UnwrapNestedRefs } from 'vue'
-import { useI18n } from 'vue-i18n'
 import { useBuild } from './use-build'
 
 export interface IUseThemeMenuFontFeature {
@@ -51,6 +51,7 @@ export const useThemeMenuFonts = (): IUseThemeMenuFontFeature => {
     Object.assign(editingFont, emptyFont())
     Object.assign(editingFontSource, emptyFont())
     editing.value = true
+    console.log('NEWF', editing.value)
   }
 
   const setEditingFont = (font: IThemeFont) => {

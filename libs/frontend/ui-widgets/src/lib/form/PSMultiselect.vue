@@ -1,5 +1,6 @@
 <template>
   <div
+    ref="multiselectRef"
     class="ps-multiselect"
     :class="{ disabled }"
     :data-toggle-id="dataToggleId"
@@ -8,7 +9,7 @@
     <div
       :ref="setToggleRef"
       class="label"
-      @mouseenter="tooltipMouseEnter"
+      @mouseenter="tooltipMouseEnter()"
       @mouseleave="tooltipMouseLeave"
     >
       <PSInput
@@ -21,11 +22,12 @@
         type="search"
         autocomplete="off"
         @update:modelValue="updateSearch"
-        @keydown.enter.stop="searchEnter"
+        @keyup.enter.stop.prevent="searchEnter"
+        @keydown="handleKeydown"
         @click.stop="toggleDropdown"
       />
-      <div v-else-if="label" class="label-text">
-        {{ label }}
+      <div v-else-if="forceLabel ?? label" class="label-text">
+        {{ forceLabel ?? label }}
       </div>
       <div v-else class="placeholder">
         {{ placeholder ?? '' }}
@@ -41,12 +43,17 @@
           v-for="(l, index) in labels"
           :key="(l ?? index).toString()"
           class="ms-item"
+          :class="{ highlight: searchActive && index === searchIndex }"
           @click="select(index)"
         >
-          {{ l }}
+          <slot v-if="customLabel" :label="l" :index="index"></slot>
+          <div v-else>
+            {{ l }}
+          </div>
         </div>
+        <slot v-if="customSlot" name="customSlot" />
         <div
-          v-if="!labels.length"
+          v-else-if="!labels.length"
           class="ms-item no-options"
           @click="emit('selectEmpty')"
         >
@@ -68,8 +75,8 @@
 </template>
 
 <script lang="ts" setup generic="T extends IMultiselectOption">
-import { ComponentPublicInstance, computed, nextTick, ref, toRefs } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { ComponentPublicInstance, computed, nextTick, onMounted, ref, toRefs } from 'vue'
+import { useI18n } from 'petite-vue-i18n'
 import { Placement } from '@floating-ui/vue'
 import { useDropdown, observePlacementChange } from '@pubstudio/frontend/util-dropdown'
 import { Keys, useKeyListener } from '@pubstudio/frontend/util-key-listener'
@@ -88,6 +95,9 @@ const props = withDefaults(
     searchable?: boolean
     disabled?: boolean
     options?: T[]
+    // Overrides the active label. Useful to avoid including the selected entry in the list
+    // TODO -- should we automatically filter out the selected value from options instead?
+    forceLabel?: string
     // TODO -- implement multiple selection via array
     value: string | undefined
     labelKey?: string
@@ -96,23 +106,31 @@ const props = withDefaults(
     toggleId?: string
     tooltip?: string
     emptyText?: string
+    // Adds a slot after options, instead of an option with `emptyText`
+    customSlot?: boolean
+    openInitial?: boolean
+    // If true, the label is replaced with a slot
+    customLabel?: boolean
+    // Allow any search input to be selected, even if it's not in the list
+    allowAny?: boolean
     openControl?: () => boolean
   }>(),
   {
     placeholder: undefined,
     openControl: undefined,
     toggleId: undefined,
+    forceLabel: undefined,
     labelKey: 'label',
     valueKey: 'value',
     caret: true,
     options: () => [] as T[],
-    searchable: false,
     tooltip: undefined,
     emptyText: undefined,
   },
 )
 const {
   labelKey,
+  openInitial,
   openControl,
   options,
   searchable,
@@ -120,6 +138,7 @@ const {
   toggleId,
   value,
   valueKey,
+  allowAny,
 } = toRefs(props)
 
 const emit = defineEmits<{
@@ -127,6 +146,12 @@ const emit = defineEmits<{
   (e: 'selectEmpty'): void
   (e: 'open'): void
   (e: 'close'): void
+  (e: 'keydown', event: KeyboardEvent): void
+}>()
+
+defineSlots<{
+  default(props: { label: string; index: number }): void
+  customSlot(): void
 }>()
 
 const dataToggleId = `toggle-${toggleId.value ?? uidSingleton.next()}`
@@ -171,6 +196,9 @@ const {
 const search = ref('')
 const searchActive = ref(false)
 const searchRef = ref()
+const searchIndex = ref(0)
+
+const multiselectRef = ref()
 
 const {
   itemRef: tooltipAnchorRef,
@@ -190,6 +218,7 @@ const setToggleRef = (element: Element | ComponentPublicInstance | null) => {
 }
 
 const closeMenu = () => {
+  // TODO -- should this call setMenuOpened(false) ?
   search.value = ''
   searchActive.value = false
   if (opened.value) {
@@ -253,12 +282,36 @@ const label = computed(() => {
 
 const updateSearch = (value: string) => {
   search.value = value
+  searchIndex.value = Math.min(searchIndex.value, filteredOptions.value.length)
+}
+
+const handleKeydown = (e: KeyboardEvent) => {
+  const optionsLen = filteredOptions.value.length
+  if (e.key === Keys.Tab) {
+    e.stopPropagation()
+    e.preventDefault()
+    searchEnter()
+  } else if (e.key === Keys.Escape) {
+    e.stopPropagation()
+    e.preventDefault()
+    closeMenu()
+  } else if (e.key === Keys.ArrowUp) {
+    searchIndex.value = (searchIndex.value + optionsLen - 1) % optionsLen
+  } else if (e.key === Keys.ArrowDown) {
+    searchIndex.value = (searchIndex.value + optionsLen + 1) % optionsLen
+  }
+  emit('keydown', e)
 }
 
 const searchEnter = () => {
   if (filteredOptions.value[0]) {
-    select(0)
+    select(searchIndex.value)
     closeMenu()
+    setMenuOpened(false)
+  } else if (allowAny.value) {
+    emit('select', search.value as T)
+    search.value = ''
+    setMenuOpened(false)
   }
 }
 
@@ -270,6 +323,7 @@ const toggleDropdown = async () => {
   cancelHoverTimer()
   if (searchable.value && opened.value) {
     searchActive.value = true
+    searchIndex.value = 0
     await nextTick()
     searchRef.value?.inputRef.focus()
   } else {
@@ -286,12 +340,18 @@ const clear = () => {
   setMenuOpened(false)
   emit('select', undefined)
 }
+
+onMounted(() => {
+  if (openInitial.value) {
+    toggleDropdown()
+  }
+})
+
+defineExpose({ multiselectRef, toggleDropdown })
 </script>
 
 <style lang="postcss" scoped>
 @import '@theme/css/mixins.postcss';
-
-$padding-x: 8px;
 
 .ps-multiselect {
   width: 140px;
@@ -300,17 +360,17 @@ $padding-x: 8px;
   background: var(--ms-bg);
   cursor: pointer;
   border: var(--ms-border-width, 1px) solid var(--ms-border-color, #d1d5db);
+
+  .ms-item.no-options {
+    @mixin text 12px;
+    padding: 6px 8px;
+  }
+}
+.highlight {
+  background-color: $blue-100;
 }
 .disabled {
   opacity: 0.6;
-}
-.label {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  padding: 4px $padding-x;
-  align-items: center;
-  justify-content: space-between;
 }
 .search {
   height: 100%;
@@ -370,17 +430,7 @@ $padding-x: 8px;
   transition: transform 0.2s ease-in-out;
   transform-origin: v-bind(dropdownTransformOrigin);
   border: var(--ms-border-width, 1px) solid var(--ms-border-color, #d1d5db);
-}
-.ms-item {
-  width: 100%;
-  padding: 7px $padding-x 5px;
-  background: var(--ms-dropdown-bg);
-  &:hover {
-    background: var(--ms-option-bg-pointed);
-  }
-  &:last-child {
-    padding-bottom: 8px;
-  }
+  background-color: white;
 }
 
 .multiselect-tooltip {

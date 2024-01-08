@@ -1,4 +1,4 @@
-import { IApiError } from './i-api-error'
+import { IApiError } from '@pubstudio/shared/type-api'
 
 export const toApiError = (e: unknown): IApiError | undefined => {
   const rsp = e as Record<string, unknown>

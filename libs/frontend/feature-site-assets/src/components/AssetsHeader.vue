@@ -7,17 +7,16 @@
       <div class="subtitle">
         <span>{{ t('assets.subtitle') }}</span>
 
-        <i18n-t
+        <I18nT
           v-if="!hasSites"
           keypath="assets.subtitle_no_sites"
-          scope="global"
           class="no-sites"
           tag="span"
         >
           <router-link :to="{ name: 'Sites' }">
             {{ t('sites.title') }}
           </router-link>
-        </i18n-t>
+        </I18nT>
       </div>
     </div>
     <PSButton
@@ -27,7 +26,7 @@
       @click="emit('upload')"
     >
       <div class="button-content">
-        <Plus color="white" class="button-plus" />
+        <Plus color="white" plusColor="#6a5cf5" class="button-plus" />
         {{ t('upload') }}
       </div>
     </PSButton>
@@ -35,7 +34,8 @@
 </template>
 
 <script lang="ts" setup>
-import { useI18n } from 'vue-i18n'
+import { useI18n } from 'petite-vue-i18n'
+import { I18nT } from '@pubstudio/frontend/util-i18n'
 import { PSButton, Plus } from '@pubstudio/frontend/ui-widgets'
 
 const { t } = useI18n()

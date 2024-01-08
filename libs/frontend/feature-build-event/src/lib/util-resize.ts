@@ -50,3 +50,12 @@ export const calcNextWidth = (e: MouseEvent, data: IResizeData): string => {
   }
   return `${normalize(value)}${data.widthUnit}`
 }
+
+/**
+ * Returns `true` for values like `100%`, `55px`, `2.5rem`, and returns false for values like `auto`,
+ * `inherit`, `initial`.
+ */
+export const isLengthValue = (value: string): boolean => {
+  const int = parseInt(value)
+  return Number.isFinite(int)
+}

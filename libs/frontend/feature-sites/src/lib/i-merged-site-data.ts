@@ -7,10 +7,14 @@ import {
 
 // Data representing either a Local or Platform site
 export interface IMergedSiteData
-  extends Omit<ISiteViewModel, 'owner_id' | 'created_at' | 'updated_at' | 'site_server'> {
+  extends Omit<
+    ISiteViewModel,
+    'owner_id' | 'created_at' | 'updated_at' | 'site_server' | 'disabled'
+  > {
   variant: SiteVariant
   created_at?: Date
   updated_at?: Date
   site_server?: ISiteServerRelationViewModel
   checkout?: ISiteCheckoutRelationViewModel
+  disabled?: boolean
 }

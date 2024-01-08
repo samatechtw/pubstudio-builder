@@ -1,28 +1,36 @@
-import { useCommand } from '@pubstudio/frontend/feature-command'
-import { setSelectedComponent } from '@pubstudio/frontend/feature-editor'
 import {
   activeBreakpoint,
   descSortedBreakpoints,
 } from '@pubstudio/frontend/feature-site-source'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
-import { createSite, resolvedComponentStyle } from '@pubstudio/frontend/util-build'
 import {
   builtinStyles,
   resolveComponent,
   resolveStyle,
 } from '@pubstudio/frontend/util-builtin'
 import {
+  createSite,
+  editStylesCancelEdit,
+  getLastCommand,
+  pushCommand,
+  pushCommandObject,
+  replaceLastCommand,
+  setSelectedComponent,
+} from '@pubstudio/frontend/util-command'
+import {
   makeAddBuiltinComponentData,
   makeEditComponentData,
   makeRemoveComponentData,
   makeSetInputData,
-} from '@pubstudio/frontend/util-command'
+  makeSetTranslationsData,
+  selectAddParent,
+} from '@pubstudio/frontend/util-command-data'
 import {
   computeComponentBreakpointStyles,
   computeComponentFlattenedStyles,
   flattenedComponentStyle,
 } from '@pubstudio/frontend/util-component'
-import { DEFAULT_BREAKPOINT_ID } from '@pubstudio/frontend/util-ids'
+import { DEFAULT_BREAKPOINT_ID, styleId } from '@pubstudio/frontend/util-ids'
 import { serializePage } from '@pubstudio/frontend/util-site-store'
 import { uiAlert } from '@pubstudio/frontend/util-ui-alert'
 import { CommandType, ICommand } from '@pubstudio/shared/type-command'
@@ -39,17 +47,19 @@ import {
   IEditComponentData,
   IEditComponentFields,
   IEditPageData,
-  IEditStyleMixinData,
   IEditThemeFontData,
   IEditThemeVariableData,
   IMergeComponentStyleData,
   IMoveComponentData,
+  INewTranslations,
   IRemoveComponentMixinData,
+  IRemoveComponentOverrideStyleData,
   IRemovePageData,
   IRemoveStyleMixinData,
   IRemoveThemeFontData,
   IRemoveThemeVariableData,
   IReplaceComponentMixinData,
+  IReplacePageRootData,
   ISetBehaviorArgData,
   ISetBehaviorData,
   ISetBreakpointData,
@@ -63,10 +73,10 @@ import {
 import {
   Css,
   CssPseudoClass,
-  IActiveBreakpointStyle,
   IBehavior,
   IBehaviorArg,
   IBreakpoint,
+  IBreakpointStyles,
   IComponent,
   IComponentEvent,
   IComponentInput,
@@ -74,7 +84,7 @@ import {
   IHeadObject,
   IHeadTag,
   IPage,
-  IPageHead,
+  IPageHeadTag,
   IPageMetadata,
   IRawStylesWithSource,
   ISerializedComponent,
@@ -87,18 +97,32 @@ import {
   WebSafeFont,
 } from '@pubstudio/shared/type-site'
 import { computed, ComputedRef, Ref, ref, toRaw } from 'vue'
-import { resetStyleMenu } from './use-reusable-style-menu'
+import {
+  editStyleNameCommand,
+  IRemoveStyleEntry,
+  removeComponentCustomStyleCommand,
+  removeComponentOverrideStyleEntryCommand,
+  setCustomStyleCommand,
+  setOverrideStyleCommand,
+  setPositionAbsoluteCommands,
+} from './build-command-helpers'
 import { resetThemeMenuVariables } from './use-theme-menu-variables'
-
-type IRemoveStyleEntry = Omit<IStyleEntry, 'value'>
 
 export type IOldNewStyleEntry = {
   oldStyle?: IStyleEntry
   newStyle?: IStyleEntry
 }
 
+export type ISetTranslationsProps = {
+  code: string
+  translations: INewTranslations
+  replace?: boolean
+  forceSave?: boolean
+}
+
 // The element id of build content window
 export const buildContentWindowId = 'build-content-window'
+export const buildContentWindowInnerId = 'build-content-window-inner'
 
 export interface IUseBuild {
   activePage: Ref<IPage | undefined>
@@ -108,16 +132,17 @@ export interface IUseBuild {
   currentPseudoClass: ComputedRef<CssPseudoClass>
   selectedComponentFlattenedStyles: ComputedRef<IRawStylesWithSource>
   commandAlert: Ref<CommandType | undefined>
-  initializeBuilder: (siteId: string | undefined) => Promise<void>
   clearSiteError: () => void
   resetSite: () => void
   replaceSite: (newSite: ISite) => void
   addComponent: (data?: Partial<IAddComponentData>) => void
   addComponentData: (data: IAddComponentData) => void
   duplicateComponent: () => void
-  pasteComponent: (copiedComponentId: string, parentId: string) => void
-  addBuiltinComponent: (id: string) => void
-  editComponent: (fields: IEditComponentFields) => void
+  pasteComponent: (copiedComponentId: string, parent: IComponent) => void
+  replacePageRoot: (copiedComponentId: string, pageRoute: string) => void
+  addBuiltinComponent: (id: string, parentId?: string) => void
+  editSelectedComponent: (fields: IEditComponentFields) => void
+  editComponent: (component: IComponent, fields: IEditComponentFields) => void
   setCustomStyle: (
     component: IComponent,
     oldStyle: IStyleEntry | undefined,
@@ -136,6 +161,13 @@ export interface IUseBuild {
   ) => void
   setPositionAbsolute: (oldStyle: IStyleEntry | undefined, newStyle: IStyleEntry) => void
   removeComponentCustomStyle: (style: IRemoveStyleEntry) => void
+  setOverrideStyle: (
+    selector: string,
+    oldStyle: IStyleEntry | undefined,
+    newStyle: IStyleEntry,
+  ) => void
+  removeComponentOverrideStyleEntry: (selector: string, style: IRemoveStyleEntry) => void
+  removeComponentOverrideStyle: (selector: string) => void
   mergeComponentStyle: (from: ISerializedComponent) => void
   addComponentMixin: (mixinId: string) => void
   removeComponentMixin: (mixinId: string) => void
@@ -153,16 +185,24 @@ export interface IUseBuild {
     oldArg: IBehaviorArg | undefined,
     newArg: IBehaviorArg | undefined,
   ) => void
-  addStyle: (style: IActiveBreakpointStyle) => void
-  editStyle: (style: IActiveBreakpointStyle) => void
+  addStyle: (name: string, breakpoints: IBreakpointStyles) => void
+  flattenComponentMixin: (componentId: string, mixinId: string) => void
+  convertComponentStyle: (
+    componentId: string,
+    name: string,
+    breakpoints: IBreakpointStyles,
+  ) => string | undefined
+  editStyle: (id: string, newName: string) => void
   deleteStyle: (style: IStyle) => void
+  setTranslations: (props: ISetTranslationsProps) => void
+  setActiveI18n: (activeI18n: string) => void
   addThemeVariable: (data: IAddThemeVariableData) => void
   editThemeVariable: (data: IEditThemeVariableData) => void
   deleteThemeVariable: (themeVariable: IRemoveThemeVariableData) => void
   addThemeFont: (source: ThemeFontSource, name: string, fallback?: WebSafeFont) => void
   editThemeFont: (oldFont: IThemeFont, newFold: IThemeFont) => void
   deleteThemeFont: (font: IThemeFont) => void
-  addPage: (page: IPageMetadata) => void
+  addPage: (page: IPageMetadata, copyFrom?: string) => void
   editPage: (oldPage: IPageMetadata, newPage: IPageMetadata) => void
   removePage: (route: string) => void
   changePage: (route: string) => void
@@ -175,9 +215,14 @@ export interface IUseBuild {
   setDefaultsHead: (tag: IHeadTag, index: number, value: IHeadObject) => void
   removeDefaultsHead: (tag: IHeadTag, index: number) => void
   setFavicon: (newFavicon: string | undefined) => void
-  addPageHead: (route: string, tag: IHeadTag, value: IHeadObject) => void
-  setPageHead: (route: string, tag: IHeadTag, index: number, value: IHeadObject) => void
-  removePageHead: (route: string, tag: IHeadTag, index: number) => void
+  addPageHead: (route: string, tag: IPageHeadTag, value: IHeadObject | string) => void
+  setPageHead: (
+    route: string,
+    tag: IPageHeadTag,
+    index: number,
+    value: IHeadObject | string,
+  ) => void
+  removePageHead: (route: string, tag: IPageHeadTag, index: number) => void
   setPageFavicon: (route: string, newFavicon: string | undefined) => void
   setBreakpoint: (newBreakpoints: Record<string, IBreakpoint>) => void
   pushGroupCommands: (data: ICommandGroupData) => void
@@ -187,12 +232,7 @@ export interface IUseBuild {
 const commandAlert = uiAlert<CommandType | undefined>(ref())
 
 export const useBuild = (): IUseBuild => {
-  const { initializeSite, site, siteError, siteStore } = useSiteSource()
-  const { pushCommand, replaceLastCommand, getLastCommand } = useCommand()
-
-  const initializeBuilder = async (siteId: string | undefined): Promise<void> => {
-    await initializeSite(siteId)
-  }
+  const { site, siteError, siteStore } = useSiteSource()
 
   const activePage = computed(() => {
     const route = site.value.editor?.active
@@ -236,8 +276,8 @@ export const useBuild = (): IUseBuild => {
   }
 
   const resetSite = () => {
-    replaceSite(createSite('test'))
-    resetStyleMenu()
+    editStylesCancelEdit(site.value)
+    replaceSite(createSite(site.value.name ?? 'test'))
     resetThemeMenuVariables()
   }
 
@@ -246,15 +286,12 @@ export const useBuild = (): IUseBuild => {
     siteStore.value.save(site.value)
   }
 
-  const selectComponentParent = () => {
-    const component = site.value.editor?.selectedComponent
-    if (component) {
-      setSelectedComponent(site.value.editor, component.parent)
-    }
-  }
-
   const addComponent = (data?: Partial<IAddComponentData>) => {
-    const parent = site.value.editor?.selectedComponent
+    let parent: IComponent | undefined
+    if (data?.parentId) {
+      parent = resolveComponent(site.value.context, data.parentId)
+    }
+    parent = parent ?? site.value.editor?.selectedComponent
     if (!activePage.value) {
       return
     }
@@ -262,7 +299,7 @@ export const useBuild = (): IUseBuild => {
       name: data?.name,
       tag: data?.tag ?? Tag.Div,
       content: data?.content ?? 'test',
-      parentId: parent?.id ?? activePage.value.root.id,
+      ...selectAddParent(parent, activePage.value?.root.id),
       sourceId: data?.sourceId,
       style: {
         mixins: data?.style?.mixins,
@@ -276,18 +313,22 @@ export const useBuild = (): IUseBuild => {
         },
       },
     }
-    pushCommand(CommandType.AddComponent, addData)
+    pushCommand(site.value, CommandType.AddComponent, addData)
   }
 
   const addComponentData = (data: IAddComponentData) => {
-    pushCommand(CommandType.AddComponent, data)
+    pushCommand(site.value, CommandType.AddComponent, data)
   }
 
-  const addBuiltinComponent = (id: string) => {
+  const addBuiltinComponent = (id: string, parentId?: string) => {
     if (!activePage.value) {
       return
     }
-    const parent = site.value.editor?.selectedComponent ?? activePage.value.root
+    let parent: IComponent | undefined
+    if (parentId) {
+      parent = resolveComponent(site.value.context, parentId)
+    }
+    parent = parent ?? site.value.editor?.selectedComponent ?? activePage.value.root
 
     const builtinComponent = resolveComponent(site.value.context, id)
     const addBuiltinComponentData = makeAddBuiltinComponentData(
@@ -325,17 +366,19 @@ export const useBuild = (): IUseBuild => {
       }
     })
 
-    pushCommand(CommandType.Group, { commands } as ICommandGroupData)
+    pushCommand(site.value, CommandType.Group, { commands } as ICommandGroupData)
   }
 
-  const editComponent = (fields: IEditComponentFields) => {
-    const component = site.value.editor?.selectedComponent
+  const editComponent = (
+    component: IComponent | undefined,
+    fields: IEditComponentFields,
+  ) => {
     const keys = Object.keys(fields)
     if (!activePage.value || !component || keys.length === 0) {
       return
     }
     const data = makeEditComponentData(component, fields)
-    const lastCommand = getLastCommand()
+    const lastCommand = getLastCommand(site.value)
     if (lastCommand?.type === CommandType.EditComponent) {
       const lastCommandData = lastCommand.data as IEditComponentData
       if (
@@ -349,11 +392,19 @@ export const useBuild = (): IUseBuild => {
           new: fields,
           old: lastCommandData.old,
         }
-        replaceLastCommand(CommandType.EditComponent, dataToReplace)
+        replaceLastCommand(site.value, {
+          type: CommandType.EditComponent,
+          data: dataToReplace,
+        })
         return
       }
     }
-    pushCommand(CommandType.EditComponent, data)
+    pushCommand(site.value, CommandType.EditComponent, data)
+  }
+
+  const editSelectedComponent = (fields: IEditComponentFields) => {
+    const component = site.value.editor?.selectedComponent
+    editComponent(component, fields)
   }
 
   const duplicateComponent = () => {
@@ -372,10 +423,10 @@ export const useBuild = (): IUseBuild => {
       // Place after selected component
       parentIndex: index === undefined ? undefined : index + 1,
     }
-    pushCommand(CommandType.AddComponent, data)
+    pushCommand(site.value, CommandType.AddComponent, data)
   }
 
-  const pasteComponent = (copiedComponentId: string, parentId: string) => {
+  const pasteComponent = (copiedComponentId: string, parent: IComponent) => {
     const copiedComponent = resolveComponent(site.value.context, copiedComponentId)
     if (!copiedComponent) return
 
@@ -383,67 +434,43 @@ export const useBuild = (): IUseBuild => {
       tag: copiedComponent.tag,
       content: copiedComponent.content,
       sourceId: copiedComponent.id,
-      parentId,
+      name: copiedComponent.name,
+      ...selectAddParent(parent, activePage.value?.root.id),
     }
-    pushCommand(CommandType.AddComponent, data)
+    pushCommand(site.value, CommandType.AddComponent, data)
+  }
+
+  const replacePageRoot = (copiedComponentId: string, pageRoute: string) => {
+    const copiedComponent = resolveComponent(site.value.context, copiedComponentId)
+    if (!copiedComponent) return
+
+    const page = site.value.pages[pageRoute]
+    if (!page) {
+      throw new Error(`Cannot find page with route ${pageRoute}`)
+    }
+
+    const data: IReplacePageRootData = {
+      pageRoute: page.route,
+      oldRoot: makeRemoveComponentData(site.value, page.root, true),
+      replacementComponent: {
+        name: copiedComponent.name,
+        tag: copiedComponent.tag,
+        content: copiedComponent.content,
+        sourceId: copiedComponent.id,
+        parentId: '',
+      },
+    }
+    pushCommand(site.value, CommandType.ReplacePageRoot, data)
   }
 
   const setPositionAbsolute = (
     oldStyle: IStyleEntry | undefined,
     newStyle: IStyleEntry,
   ) => {
-    const pseudoClass = newStyle.pseudoClass
-    const selected = site.value.editor?.selectedComponent
-    if (!selected) {
-      return
-    }
-    const parent = selected.parent
-    const parentPosition = resolvedComponentStyle(
-      site.value.context,
-      parent,
-      pseudoClass,
-      Css.Position,
-      activeBreakpoint.value.id,
-    )
-    // No action if parent already has relative position
-    if (!parent || parentPosition === 'relative' || parentPosition === 'absolute') {
-      setComponentCustomStyle(oldStyle, newStyle)
-    } else {
-      const oldValue =
-        parent.style.custom[activeBreakpoint.value.id][pseudoClass]?.[Css.Position]
-      const data: ICommandGroupData = {
-        commands: [
-          {
-            type: CommandType.SetComponentCustomStyle,
-            data: {
-              componentId: selected.id,
-              breakpointId: activeBreakpoint.value.id,
-              oldStyle,
-              newStyle,
-            },
-          },
-          {
-            type: CommandType.SetComponentCustomStyle,
-            data: {
-              componentId: parent.id,
-              breakpointId: activeBreakpoint.value.id,
-              oldStyle: oldValue
-                ? {
-                    pseudoClass,
-                    property: Css.Position,
-                    value: oldValue,
-                  }
-                : undefined,
-              newStyle: {
-                pseudoClass,
-                property: Css.Position,
-                value: 'relative',
-              },
-            },
-          },
-        ],
-      }
-      pushCommand(CommandType.Group, data)
+    const commands = setPositionAbsoluteCommands(site.value, oldStyle, newStyle)
+    if (commands.length) {
+      const data: ICommandGroupData = { commands }
+      pushCommand(site.value, CommandType.Group, { data })
     }
   }
 
@@ -453,23 +480,17 @@ export const useBuild = (): IUseBuild => {
     newStyle: IStyleEntry,
     replace = false,
   ) => {
-    const data: ISetComponentCustomStyleData = {
-      componentId: component.id,
-      breakpointId: activeBreakpoint.value.id,
+    const command = setCustomStyleCommand(
+      site.value,
+      component,
       oldStyle,
       newStyle,
-    }
+      replace,
+    )
     if (replace) {
-      // Keep the original "old" data in a chain of commands
-      const lastCommand = getLastCommand()
-      const oldStyle = (lastCommand?.data as ISetComponentCustomStyleData | undefined)
-        ?.oldStyle
-      replaceLastCommand(CommandType.SetComponentCustomStyle, {
-        ...data,
-        oldStyle: oldStyle ?? data.oldStyle,
-      })
+      replaceLastCommand(site.value, command)
     } else {
-      pushCommand(CommandType.SetComponentCustomStyle, data)
+      pushCommandObject(site.value, command)
     }
   }
 
@@ -493,9 +514,9 @@ export const useBuild = (): IUseBuild => {
       }),
     }
     if (replace) {
-      replaceLastCommand(CommandType.Group, data)
+      replaceLastCommand(site.value, { type: CommandType.Group, data })
     } else {
-      pushCommand(CommandType.Group, data)
+      pushCommand(site.value, CommandType.Group, data)
     }
   }
 
@@ -511,23 +532,10 @@ export const useBuild = (): IUseBuild => {
   }
 
   const removeComponentCustomStyle = (style: IRemoveStyleEntry) => {
-    const selected = site.value.editor?.selectedComponent
-    const oldValue =
-      selected?.style.custom[activeBreakpoint.value.id][style.pseudoClass]?.[
-        style.property
-      ]
-    if (!oldValue) {
-      return
+    const command = removeComponentCustomStyleCommand(site.value, style)
+    if (command) {
+      pushCommandObject(site.value, command)
     }
-    const data: ISetComponentCustomStyleData = {
-      componentId: selected.id,
-      breakpointId: activeBreakpoint.value.id,
-      oldStyle: {
-        ...style,
-        value: oldValue,
-      },
-    }
-    pushCommand(CommandType.SetComponentCustomStyle, data)
   }
 
   const mergeComponentStyle = (from: ISerializedComponent) => {
@@ -538,7 +546,41 @@ export const useBuild = (): IUseBuild => {
         oldStyle: structuredClone(toRaw(selected.style)),
         newStyle: flattenedComponentStyle(from),
       }
-      pushCommand(CommandType.MergeComponentStyle, data)
+      pushCommand(site.value, CommandType.MergeComponentStyle, data)
+    }
+  }
+
+  const setOverrideStyle = (
+    selector: string,
+    oldStyle: IStyleEntry | undefined,
+    newStyle: IStyleEntry,
+  ) => {
+    const command = setOverrideStyleCommand(site.value, selector, oldStyle, newStyle)
+    if (command) {
+      pushCommandObject(site.value, command)
+    }
+  }
+
+  const removeComponentOverrideStyleEntry = (
+    selector: string,
+    style: IRemoveStyleEntry,
+  ) => {
+    const command = removeComponentOverrideStyleEntryCommand(site.value, selector, style)
+    if (command) {
+      pushCommandObject(site.value, command)
+    }
+  }
+
+  const removeComponentOverrideStyle = (selector: string) => {
+    const selected = site.value.editor?.selectedComponent
+    if (selected) {
+      const styles = structuredClone(toRaw(selected.style.overrides?.[selector]) ?? {})
+      const data: IRemoveComponentOverrideStyleData = {
+        selector,
+        componentId: selected.id,
+        styles,
+      }
+      pushCommand(site.value, CommandType.RemoveComponentOverrideStyle, data)
     }
   }
 
@@ -563,7 +605,7 @@ export const useBuild = (): IUseBuild => {
       componentId: selected.id,
       mixinId,
     }
-    pushCommand(CommandType.RemoveComponentMixin, data)
+    pushCommand(site.value, CommandType.RemoveComponentMixin, data)
   }
 
   const replaceComponentMixin = (oldMixinId: string, newMixinId: string) => {
@@ -600,7 +642,7 @@ export const useBuild = (): IUseBuild => {
       oldEvent,
       newEvent,
     }
-    pushCommand(CommandType.SetComponentEvent, data)
+    pushCommand(site.value, CommandType.SetComponentEvent, data)
   }
 
   const updateComponentEvent = (oldEventName: string, newEvent: IComponentEvent) => {
@@ -615,7 +657,7 @@ export const useBuild = (): IUseBuild => {
       oldEvent,
       newEvent,
     }
-    pushCommand(CommandType.SetComponentEvent, data)
+    pushCommand(site.value, CommandType.SetComponentEvent, data)
   }
 
   const removeComponentEvent = (name: string) => {
@@ -629,7 +671,7 @@ export const useBuild = (): IUseBuild => {
       oldEvent,
       newEvent: undefined,
     }
-    pushCommand(CommandType.SetComponentEvent, data)
+    pushCommand(site.value, CommandType.SetComponentEvent, data)
   }
 
   const addOrUpdateComponentInput = (
@@ -639,7 +681,7 @@ export const useBuild = (): IUseBuild => {
     const selected = site.value.editor?.selectedComponent
     const data = makeSetInputData(selected, property, payload)
     if (data) {
-      pushCommand(CommandType.SetComponentInput, data)
+      pushCommand(site.value, CommandType.SetComponentInput, data)
     }
   }
 
@@ -654,7 +696,7 @@ export const useBuild = (): IUseBuild => {
       oldInput,
       newInput: undefined,
     }
-    pushCommand(CommandType.SetComponentInput, data)
+    pushCommand(site.value, CommandType.SetComponentInput, data)
   }
 
   const setBehavior = (behavior: IBehavior) => {
@@ -663,7 +705,7 @@ export const useBuild = (): IUseBuild => {
       oldBehavior,
       newBehavior: behavior,
     }
-    pushCommand(CommandType.SetBehavior, data)
+    pushCommand(site.value, CommandType.SetBehavior, data)
   }
 
   const removeBehavior = (id: string) => {
@@ -673,7 +715,7 @@ export const useBuild = (): IUseBuild => {
         oldBehavior,
         newBehavior: undefined,
       }
-      pushCommand(CommandType.SetBehavior, data)
+      pushCommand(site.value, CommandType.SetBehavior, data)
     }
   }
 
@@ -690,7 +732,7 @@ export const useBuild = (): IUseBuild => {
       oldArg,
       newArg,
     }
-    pushCommand(CommandType.SetBehaviorArg, data)
+    pushCommand(site.value, CommandType.SetBehaviorArg, data)
   }
 
   const setSelectedIsInput = (prop: string, newValue: unknown) => {
@@ -699,50 +741,172 @@ export const useBuild = (): IUseBuild => {
       is: newValue,
     })
     if (data) {
-      pushCommand(CommandType.SetComponentInput, data)
+      pushCommand(site.value, CommandType.SetComponentInput, data)
     }
   }
 
-  const addStyle = (style: IActiveBreakpointStyle) => {
+  const addStyle = (name: string, breakpoints: IBreakpointStyles) => {
     const data: IAddStyleMixinData = {
-      name: style.name,
-      breakpoints: { [activeBreakpoint.value.id]: style.pseudoStyle },
+      name: name,
+      breakpoints: breakpoints,
     }
-    pushCommand(CommandType.AddStyleMixin, data)
+    pushCommand(site.value, CommandType.AddStyleMixin, data)
   }
 
-  const editStyle = (style: IActiveBreakpointStyle) => {
-    const oldStyle = structuredClone(toRaw(resolveStyle(site.value.context, style.id)))
-    if (!oldStyle) {
-      return
+  const flattenComponentMixin = (componentId: string, mixinId: string) => {
+    const component = resolveComponent(site.value.context, componentId)
+    const mixin = site.value.context.styles[mixinId]
+    if (component && mixin) {
+      const removeMixinData: IRemoveComponentMixinData = {
+        componentId,
+        mixinId,
+      }
+      const removeMixin: ICommand = {
+        type: CommandType.RemoveComponentMixin,
+        data: removeMixinData,
+      }
+      // Build array of set-component-custom-style commands
+      const commands: ICommand[] = [removeMixin]
+      for (const [bpId, bp] of Object.entries(mixin.breakpoints)) {
+        for (const [pClass, pseudo] of Object.entries(bp)) {
+          const pseudoClass = pClass as CssPseudoClass
+          for (const [prop, val] of Object.entries(pseudo)) {
+            const css = prop as Css
+            const oldValue = component.style.custom[bpId]?.[pseudoClass]?.[css]
+            if (val === oldValue) {
+              // Skip if component already has the same style as the mixin
+              continue
+            }
+            const styleData: ISetComponentCustomStyleData = {
+              componentId,
+              breakpointId: bpId,
+              oldStyle:
+                oldValue === undefined
+                  ? undefined
+                  : {
+                      pseudoClass,
+                      property: css,
+                      value: oldValue,
+                    },
+              newStyle: {
+                pseudoClass,
+                property: css,
+                value: val,
+              },
+            }
+            commands.push({
+              type: CommandType.SetComponentCustomStyle,
+              data: styleData,
+            })
+          }
+        }
+      }
+      if (commands.length) {
+        const data: ICommandGroupData = {
+          commands,
+        }
+        pushCommand(site.value, CommandType.Group, data)
+      }
     }
+  }
 
-    const newStyle = structuredClone(oldStyle)
-    newStyle.name = style.name
-    newStyle.breakpoints[activeBreakpoint.value.id] = style.pseudoStyle
-
-    const data: IEditStyleMixinData = {
-      oldStyle,
-      newStyle,
+  const convertComponentStyle = (
+    componentId: string,
+    name: string,
+    breakpoints: IBreakpointStyles,
+  ): string | undefined => {
+    const component = resolveComponent(site.value.context, componentId)
+    if (component) {
+      // Create the new mixin
+      const styleData: IAddStyleMixinData = {
+        name,
+        breakpoints,
+      }
+      // Add the new mixin to the component
+      const { nextId, namespace } = site.value.context
+      const mixinId = styleId(namespace, nextId.toString())
+      const addToComponent: IAddComponentMixinData = {
+        componentId,
+        // Precalculate the expected mixin ID
+        mixinId,
+      }
+      const commands: ICommand[] = [
+        { type: CommandType.AddStyleMixin, data: styleData },
+        { type: CommandType.AddComponentMixin, data: addToComponent },
+      ]
+      // Delete the old component styles
+      for (const [bpId, bp] of Object.entries(component.style.custom)) {
+        for (const [pClass, pseudo] of Object.entries(bp)) {
+          const pseudoClass = pClass as CssPseudoClass
+          for (const [prop, val] of Object.entries(pseudo)) {
+            const pseudos = breakpoints[bpId]?.[pseudoClass]
+            if (pseudos?.[prop as Css] !== undefined) {
+              const styleData: ISetComponentCustomStyleData = {
+                componentId,
+                breakpointId: bpId,
+                oldStyle: {
+                  pseudoClass,
+                  property: prop as Css,
+                  value: val,
+                },
+                newStyle: undefined,
+              }
+              commands.push({
+                type: CommandType.SetComponentCustomStyle,
+                data: styleData,
+              })
+            }
+          }
+        }
+      }
+      const data: ICommandGroupData = {
+        commands,
+      }
+      pushCommand(site.value, CommandType.Group, data)
+      return mixinId
     }
-    pushCommand(CommandType.EditStyleMixin, data)
+  }
+
+  const editStyle = (id: string, newName: string) => {
+    const command = editStyleNameCommand(site.value, id, newName)
+    if (command) {
+      pushCommandObject(site.value, command)
+    }
   }
 
   const deleteStyle = (style: IStyle) => {
     const data: IRemoveStyleMixinData = style
-    pushCommand(CommandType.RemoveStyleMixin, data)
+    pushCommand(site.value, CommandType.RemoveStyleMixin, data)
+  }
+
+  const setTranslations = (props: ISetTranslationsProps) => {
+    const { code, translations, replace, forceSave } = props
+    const data = makeSetTranslationsData(site.value.context, code, translations)
+    if (replace) {
+      replaceLastCommand(
+        site.value,
+        { type: CommandType.SetTranslations, data },
+        forceSave ?? false,
+      )
+    } else {
+      pushCommand(site.value, CommandType.SetTranslations, data)
+    }
+  }
+
+  const setActiveI18n = (activeI18n: string) => {
+    site.value.context.activeI18n = activeI18n
   }
 
   const addThemeVariable = (data: IAddThemeVariableData) => {
-    pushCommand(CommandType.AddThemeVariable, data)
+    pushCommand(site.value, CommandType.AddThemeVariable, data)
   }
 
   const editThemeVariable = (data: IEditThemeVariableData) => {
-    pushCommand(CommandType.EditThemeVariable, data)
+    pushCommand(site.value, CommandType.EditThemeVariable, data)
   }
 
   const deleteThemeVariable = (data: IRemoveThemeVariableData) => {
-    pushCommand(CommandType.RemoveThemeVariable, data)
+    pushCommand(site.value, CommandType.RemoveThemeVariable, data)
   }
 
   const addThemeFont = (
@@ -755,7 +919,7 @@ export const useBuild = (): IUseBuild => {
       name,
       fallback,
     }
-    pushCommand(CommandType.AddThemeFont, data)
+    pushCommand(site.value, CommandType.AddThemeFont, data)
   }
 
   const editThemeFont = (oldFont: IThemeFont, newFont: IThemeFont) => {
@@ -763,7 +927,7 @@ export const useBuild = (): IUseBuild => {
       oldFont,
       newFont,
     }
-    pushCommand(CommandType.EditThemeFont, data)
+    pushCommand(site.value, CommandType.EditThemeFont, data)
   }
 
   const deleteThemeFont = (font: IThemeFont) => {
@@ -771,18 +935,30 @@ export const useBuild = (): IUseBuild => {
       source: font.source,
       name: font.name,
     }
-    pushCommand(CommandType.RemoveThemeFont, data)
+    pushCommand(site.value, CommandType.RemoveThemeFont, data)
   }
 
-  const addPage = (metadata: IPageMetadata) => {
+  const addPage = (metadata: IPageMetadata, copyFrom?: string) => {
     const { editor } = site.value
     if (editor) {
+      let root: IAddComponentData | undefined
+      if (copyFrom && site.value.pages[copyFrom]) {
+        const copyCmp = site.value.pages[copyFrom].root
+        root = {
+          parentId: '',
+          tag: copyCmp.tag,
+          content: copyCmp.content,
+          sourceId: copyCmp.id,
+          name: copyCmp.name,
+        }
+      }
       const data: IAddPageData = {
         metadata,
         activePageRoute: editor.active,
         selectedComponentId: editor.selectedComponent?.id,
+        root,
       }
-      pushCommand(CommandType.AddPage, data)
+      pushCommand(site.value, CommandType.AddPage, data)
     }
   }
 
@@ -791,7 +967,7 @@ export const useBuild = (): IUseBuild => {
       oldMetadata: oldPage,
       newMetadata: newPage,
     }
-    pushCommand(CommandType.EditPage, data)
+    pushCommand(site.value, CommandType.EditPage, data)
   }
 
   const removePage = (route: string) => {
@@ -804,7 +980,7 @@ export const useBuild = (): IUseBuild => {
           serializedPage: serializePage(removedPage),
           selectedComponentId: editor.selectedComponent?.id,
         }
-        pushCommand(CommandType.RemovePage, data)
+        pushCommand(site.value, CommandType.RemovePage, data)
       }
     }
   }
@@ -818,7 +994,7 @@ export const useBuild = (): IUseBuild => {
         to: route,
         selectedComponentId: editor.selectedComponent?.id,
       }
-      pushCommand(CommandType.ChangePage, data)
+      pushCommand(site.value, CommandType.ChangePage, data)
     }
   }
 
@@ -827,7 +1003,7 @@ export const useBuild = (): IUseBuild => {
       oldRoute: site.value.defaults.homePage,
       newRoute: route,
     }
-    pushCommand(CommandType.SetHomePage, data)
+    pushCommand(site.value, CommandType.SetHomePage, data)
   }
 
   const deleteSelected = () => {
@@ -838,16 +1014,23 @@ export const useBuild = (): IUseBuild => {
       return
     }
     const data = makeRemoveComponentData(site.value, selected)
-    pushCommand(CommandType.RemoveComponent, data)
-    setSelectedComponent(site.value.editor, parent)
+    pushCommand(site.value, CommandType.RemoveComponent, data)
+    setSelectedComponent(site.value, parent)
+  }
+
+  const selectComponentParent = () => {
+    const selected = site.value.editor?.selectedComponent
+    const parent = selected?.parent
+    setSelectedComponent(site.value, parent)
   }
 
   const moveComponent = (from: IComponentPosition, to: IComponentPosition) => {
     const data: IMoveComponentData = {
       from,
       to,
+      selectedComponentId: editor.value?.selectedComponent?.id,
     }
-    pushCommand(CommandType.MoveComponent, data)
+    pushCommand(site.value, CommandType.MoveComponent, data)
   }
 
   const moveAbsoluteComponent = (component: IComponent, left: string, top: string) => {
@@ -889,7 +1072,7 @@ export const useBuild = (): IUseBuild => {
         },
       ],
     }
-    pushCommand(CommandType.Group, data)
+    pushCommand(site.value, CommandType.Group, data)
   }
 
   const setFavicon = (newFavicon: string | undefined) => {
@@ -905,7 +1088,7 @@ export const useBuild = (): IUseBuild => {
         rel: 'icon',
       },
     }
-    pushCommand(CommandType.SetDefaultsHead, data)
+    pushCommand(site.value, CommandType.SetDefaultsHead, data)
   }
 
   const addDefaultsHead = (tag: IHeadTag, value: IHeadObject) => {
@@ -914,7 +1097,7 @@ export const useBuild = (): IUseBuild => {
       index: 0,
       newValue: value,
     }
-    pushCommand(CommandType.SetDefaultsHead, data)
+    pushCommand(site.value, CommandType.SetDefaultsHead, data)
   }
 
   const setDefaultsHead = (tag: IHeadTag, index: number, value: IHeadObject) => {
@@ -922,7 +1105,7 @@ export const useBuild = (): IUseBuild => {
     if (tag === 'base') {
       oldValue = site.value.defaults.head.base
     } else {
-      oldValue = site.value.defaults.head[tag as keyof IPageHead]?.[index] as IHeadObject
+      oldValue = site.value.defaults.head[tag]?.[index] as IHeadObject
     }
     const data: ISetDefaultsHeadData = {
       tag,
@@ -930,7 +1113,7 @@ export const useBuild = (): IUseBuild => {
       oldValue,
       newValue: value,
     }
-    pushCommand(CommandType.SetDefaultsHead, data)
+    pushCommand(site.value, CommandType.SetDefaultsHead, data)
   }
 
   const removeDefaultsHead = (tag: IHeadTag, index: number) => {
@@ -938,35 +1121,38 @@ export const useBuild = (): IUseBuild => {
     if (tag === 'base') {
       oldValue = site.value.defaults.head.base
     } else {
-      oldValue = site.value.defaults.head[tag as keyof IPageHead]?.[index] as IHeadObject
+      oldValue = site.value.defaults.head[tag]?.[index] as IHeadObject
     }
     const data: ISetDefaultsHeadData = {
       tag,
       index,
       oldValue,
     }
-    pushCommand(CommandType.SetDefaultsHead, data)
+    pushCommand(site.value, CommandType.SetDefaultsHead, data)
   }
 
-  const addPageHead = (route: string, tag: IHeadTag, value: IHeadObject) => {
+  const addPageHead = (route: string, tag: IPageHeadTag, value: IHeadObject | string) => {
     const data: ISetPageHeadData = {
       route,
       tag,
       index: 0,
       newValue: value,
     }
-    pushCommand(CommandType.SetPageHead, data)
+    pushCommand(site.value, CommandType.SetPageHead, data)
   }
 
   const setPageHead = (
     route: string,
-    tag: IHeadTag,
+    tag: IPageHeadTag,
     index: number,
-    value: IHeadObject,
+    value: IHeadObject | string,
   ) => {
-    const oldValue = site.value.pages[route]?.head[tag as keyof IPageHead]?.[
-      index
-    ] as IHeadObject
+    let oldValue: IHeadObject | string | undefined
+    if (tag === 'title') {
+      oldValue = site.value.pages[route]?.head.title
+    } else {
+      oldValue = site.value.pages[route]?.head[tag]?.[index]
+    }
 
     const data: ISetPageHeadData = {
       route,
@@ -975,13 +1161,16 @@ export const useBuild = (): IUseBuild => {
       oldValue,
       newValue: value,
     }
-    pushCommand(CommandType.SetPageHead, data)
+    pushCommand(site.value, CommandType.SetPageHead, data)
   }
 
-  const removePageHead = (route: string, tag: IHeadTag, index: number) => {
-    const oldValue = site.value.pages[route]?.head[tag as keyof IPageHead]?.[
-      index
-    ] as IHeadObject
+  const removePageHead = (route: string, tag: IPageHeadTag, index: number) => {
+    let oldValue: IHeadObject | string | undefined
+    if (tag === 'title') {
+      oldValue = site.value.pages[route]?.head.title
+    } else {
+      oldValue = site.value.pages[route]?.head[tag]?.[index]
+    }
 
     const data: ISetPageHeadData = {
       route,
@@ -989,7 +1178,7 @@ export const useBuild = (): IUseBuild => {
       index,
       oldValue,
     }
-    pushCommand(CommandType.SetPageHead, data)
+    pushCommand(site.value, CommandType.SetPageHead, data)
   }
 
   const setPageFavicon = (route: string, newFavicon: string | undefined) => {
@@ -1007,7 +1196,7 @@ export const useBuild = (): IUseBuild => {
           rel: 'icon',
         },
       }
-      pushCommand(CommandType.SetPageHead, data)
+      pushCommand(site.value, CommandType.SetPageHead, data)
     }
   }
 
@@ -1025,11 +1214,11 @@ export const useBuild = (): IUseBuild => {
       oldBreakpoints,
       newBreakpoints,
     }
-    pushCommand(CommandType.SetBreakpoint, data)
+    pushCommand(site.value, CommandType.SetBreakpoint, data)
   }
 
   const pushGroupCommands = (data: ICommandGroupData) => {
-    pushCommand(CommandType.Group, data)
+    pushCommand(site.value, CommandType.Group, data)
   }
 
   return {
@@ -1040,22 +1229,25 @@ export const useBuild = (): IUseBuild => {
     selectedComponentFlattenedStyles,
     activePage,
     commandAlert,
-    initializeBuilder,
     clearSiteError,
     resetSite,
     replaceSite,
-    selectComponentParent,
     addComponent,
     addComponentData,
     duplicateComponent,
     pasteComponent,
+    replacePageRoot,
     addBuiltinComponent,
     editComponent,
+    editSelectedComponent,
     setCustomStyle,
     setCustomStyles,
     setComponentCustomStyle,
     setPositionAbsolute,
     removeComponentCustomStyle,
+    setOverrideStyle,
+    removeComponentOverrideStyleEntry,
+    removeComponentOverrideStyle,
     mergeComponentStyle,
     addComponentMixin,
     removeComponentMixin,
@@ -1067,12 +1259,17 @@ export const useBuild = (): IUseBuild => {
     removeComponentInput,
     setSelectedIsInput,
     deleteSelected,
+    selectComponentParent,
     setBehavior,
     removeBehavior,
     setBehaviorArg,
     addStyle,
+    convertComponentStyle,
+    flattenComponentMixin,
     editStyle,
     deleteStyle,
+    setTranslations,
+    setActiveI18n,
     addThemeVariable,
     editThemeVariable,
     deleteThemeVariable,

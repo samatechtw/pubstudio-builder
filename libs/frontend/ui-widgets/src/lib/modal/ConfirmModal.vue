@@ -25,7 +25,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useI18n } from 'vue-i18n'
+import { useI18n } from 'petite-vue-i18n'
 import Modal from './Modal.vue'
 import PSButton from '../form/PSButton.vue'
 import { computed, toRefs } from 'vue'
@@ -62,19 +62,20 @@ const { cancelText } = toRefs(props)
 const computedCancelText = computed(() => cancelText.value ?? t('cancel'))
 </script>
 
-<style lang="postcss">
+<style lang="postcss" scoped>
 @import '@theme/css/mixins.postcss';
 
-.confirm-modal {
-  .modal-buttons {
-    @mixin flex-row;
-    .confirm-button {
-      margin-right: 8px;
-      min-width: 94px;
-    }
-    .cancel-button {
-      margin-left: 8px;
-    }
-  }
+.modal-buttons {
+  @mixin flex-row;
+}
+:slotted(.confirm-button) {
+  margin-right: 8px;
+  min-width: 94px;
+}
+:slotted(.cancel-button) {
+  margin-left: 8px;
+}
+.cancel-button {
+  margin-left: 8px;
 }
 </style>

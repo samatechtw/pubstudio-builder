@@ -19,7 +19,7 @@ export const textStyle: IStyle = {
 export const text: IComponent = {
   id: textId,
   name: 'Text',
-  tag: Tag.Paragraph,
+  tag: Tag.Div,
   content: 'text content',
   style: {
     custom: {},

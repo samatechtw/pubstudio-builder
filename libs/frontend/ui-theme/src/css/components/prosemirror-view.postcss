@@ -1,0 +1,107 @@
+/** This file is a copy of "node_modules/prosemirror-view/style/prosemirror.css" */
+
+.ProseMirror {
+  position: relative;
+  .sel {
+    background-color: Highlight;
+  }
+}
+
+.ProseMirror {
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  white-space: break-spaces;
+  -webkit-font-variant-ligatures: none;
+  font-variant-ligatures: none;
+  font-feature-settings: 'liga' 0; /* the above doesn't seem to work in Edge */
+}
+
+/* Style when ProseMirror editor is not active */
+.component-content-container > p + p:empty::before {
+  content: '\00a0';
+}
+
+.ProseMirror-focused {
+  padding: 0 6px;
+}
+
+/* Style when ProseMirror editor is active */
+.ProseMirror > p {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.ProseMirror pre {
+  white-space: pre-wrap;
+}
+.ProseMirror-trailingBreak {
+  display: none;
+}
+
+.code-wrap {
+  width: 100%;
+  max-height: 250px;
+  overflow: auto;
+  margin-top: 16px;
+  .ProseMirror-focused {
+    padding: 0;
+  }
+  .ProseMirror {
+    .hljs {
+      margin: 0;
+      min-height: 250px;
+      padding: 8px;
+    }
+  }
+  .ProseMirror-trailingBreak {
+    display: block;
+  }
+}
+
+.ProseMirror li {
+  position: relative;
+}
+
+.ProseMirror-hideselection *::selection {
+  background: transparent;
+}
+.ProseMirror-hideselection *::-moz-selection {
+  background: transparent;
+}
+.ProseMirror-hideselection {
+  caret-color: transparent;
+}
+
+/* See https://github.com/ProseMirror/prosemirror/issues/1421#issuecomment-1759320191 */
+.ProseMirror [draggable][contenteditable='false'] {
+  user-select: text;
+}
+
+.ProseMirror-selectednode {
+  outline: 2px solid #8cf;
+}
+
+/* Make sure li selections wrap around markers */
+
+li.ProseMirror-selectednode {
+  outline: none;
+}
+
+li.ProseMirror-selectednode:after {
+  content: '';
+  position: absolute;
+  left: -32px;
+  right: -2px;
+  top: -2px;
+  bottom: -2px;
+  border: 2px solid #8cf;
+  pointer-events: none;
+}
+
+/* Protect against generic img rules */
+
+img.ProseMirror-separator {
+  display: inline !important;
+  border: none !important;
+  margin: 0 !important;
+}

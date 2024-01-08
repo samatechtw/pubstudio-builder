@@ -1,4 +1,4 @@
-import { useHUD } from '@pubstudio/frontend/ui-widgets'
+import { useHUD } from '@pubstudio/frontend/util-ui-alert'
 import { useBuild } from './use-build'
 
 export interface IUseDuplicateComponet {

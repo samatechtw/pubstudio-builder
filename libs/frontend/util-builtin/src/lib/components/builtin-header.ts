@@ -3,7 +3,6 @@ import {
   headerId,
   headerLogoId,
   headerLogoLinkId,
-  headerNavMenuId,
   headerStyleId,
   homeLinkBehaviorId,
   horizontalStyleId,
@@ -12,7 +11,7 @@ import { ComponentEventType, IComponent, IStyle, Tag } from '@pubstudio/shared/t
 import { defaultImageInputs } from '../default-inputs'
 import { image } from './builtin-image'
 import { link } from './builtin-link'
-import { navMenu } from './builtin-nav-menu'
+import { makeNavMenu } from './builtin-nav-menu'
 
 export const headerStyle: IStyle = {
   id: headerStyleId,
@@ -56,14 +55,7 @@ export const headerLogoLink: IComponent = {
   children: [headerLogo],
 }
 
-export const headerNavMenu: IComponent = {
-  ...navMenu,
-  id: headerNavMenuId,
-  style: {
-    ...navMenu.style,
-    custom: { [DEFAULT_BREAKPOINT_ID]: { default: { margin: '0 0 0 24px' } } },
-  },
-}
+export const headerNavMenu = makeNavMenu()
 
 export const header: IComponent = {
   id: headerId,

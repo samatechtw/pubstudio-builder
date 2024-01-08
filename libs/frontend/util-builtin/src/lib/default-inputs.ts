@@ -36,6 +36,25 @@ export const defaultInputInputs = (placeholder?: string): IComponentInputs => {
   }
 }
 
+export const defaultTextareaInputs = (placeholder?: string): IComponentInputs => {
+  return {
+    placeholder: {
+      type: ComponentArgPrimitive.String,
+      name: 'placeholder',
+      attr: true,
+      default: '',
+      is: placeholder ?? '',
+    },
+    rows: {
+      type: ComponentArgPrimitive.String,
+      name: 'rows',
+      attr: true,
+      default: '4',
+      is: '',
+    },
+  }
+}
+
 export const defaultNavMenuItemInputs = (
   href?: string,
   name?: string,

@@ -26,7 +26,7 @@
 
 <script lang="ts" setup>
 import { ref, toRefs } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useI18n } from 'petite-vue-i18n'
 import { ErrorMessage, Modal, PSButton } from '@pubstudio/frontend/ui-widgets'
 import { parseApiError, toApiError } from '@pubstudio/frontend/util-api'
 import { useSiteAssets } from '../lib/use-site-assets'

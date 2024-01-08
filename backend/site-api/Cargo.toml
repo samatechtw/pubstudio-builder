@@ -1,0 +1,26 @@
+[package]
+name = "site-api"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+lib-shared-site-api = { path = "../lib-shared-site-api" }
+lib-shared-types = { path = "../lib-shared-types" }
+axum = "0.6.14"
+axum-macros = "0.3.7"
+clap = { version = "4.2.2", features = ["derive", "env"] }
+const_format = "0.2.31"
+serde = { version = "1.0.160", features = ["derive"] }
+serde_json = "1.0.96"
+sqlx = { version = "0.6.3", features = ["runtime-tokio-rustls", "any", "postgres", "sqlite", "migrate", "chrono"] }
+tokio = { version = "1.27.0", features = ["full"] }
+tower = { version = "0.4.13", features = ["timeout"] }
+tower-http = { version = "0.4.0", features = ["trace", "cors", "fs"] }
+tracing = "0.1.37"
+validator = { version = "0.16.0", features = ["derive"] }
+chrono = { version = "0.4.24", features = ["serde"] }
+uuid = { version = "1.3.3", features = ["serde", "v4"] }
+dotenvy = "0.15.7"
+tokio-cron = "0.1.2"

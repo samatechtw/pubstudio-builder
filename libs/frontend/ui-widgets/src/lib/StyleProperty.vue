@@ -4,28 +4,36 @@
     :value="newVal"
     class="style-property"
     :placeholder="t('property')"
-    :options="CssValues"
+    :options="options"
     :searchable="true"
     :caret="false"
     :clearable="false"
+    :openInitial="openInitial"
     @select="emit('update:modelValue', $event)"
     @click.stop
   />
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref, toRefs, watch } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { computed, onMounted, ref, toRefs, watch } from 'vue'
+import { useI18n } from 'petite-vue-i18n'
 import { PSMultiselect } from '@pubstudio/frontend/ui-widgets'
 import { Css, CssValues } from '@pubstudio/shared/type-site'
 
 const { t } = useI18n()
 
-const props = defineProps<{
-  modelValue: Css
-}>()
+const props = withDefaults(
+  defineProps<{
+    modelValue: Css | undefined
+    omitEditProperties?: string[]
+    openInitial?: boolean
+  }>(),
+  {
+    omitEditProperties: undefined,
+  },
+)
 
-const { modelValue } = toRefs(props)
+const { modelValue, omitEditProperties } = toRefs(props)
 
 watch(modelValue, (val) => {
   newVal.value = val
@@ -35,8 +43,15 @@ const emit = defineEmits<{
   (e: 'update:modelValue', value: Css): void
 }>()
 
-const newVal = ref(Css.Empty)
+const newVal = ref<Css | undefined>(Css.Empty)
 const multiselectRef = ref(null)
+
+const options = computed(() => {
+  if (!omitEditProperties.value?.length) {
+    return CssValues as string[]
+  }
+  return CssValues.filter((css) => !omitEditProperties.value?.includes(css))
+})
 
 defineExpose({ multiselectRef })
 

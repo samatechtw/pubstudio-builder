@@ -7,10 +7,21 @@
   align-items: center;
   width: 100%;
   border-bottom: 1px solid $grey-100;
-  padding: 10px 0;
+  padding: 8px 0;
+  .label {
+    flex-shrink: 0;
+    margin-right: 8px;
+  }
 }
 .menu-subtitle {
   @mixin title-semibold 15px;
+  position: relative;
+  user-select: none;
+}
+.sub-label {
+  @mixin title-thin 12px;
+  color: $grey-500;
+  margin-left: 4px;
 }
 .item-add {
   width: 22px;
@@ -21,8 +32,9 @@
 .copy-icon {
   height: 20px;
   width: auto;
-  margin-left: 4px;
+  margin-left: 6px;
   cursor: pointer;
+  flex-shrink: 0;
 }
 .edit-item {
   cursor: pointer;
@@ -30,6 +42,7 @@
   align-items: center;
 }
 .item {
+  @mixin text 15px;
   margin-left: 6px;
 }
 .item-delete {

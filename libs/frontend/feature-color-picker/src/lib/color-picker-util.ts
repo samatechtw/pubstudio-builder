@@ -1,4 +1,5 @@
-import { IRgba } from './i-rgba'
+import { IRgba } from '@pubstudio/frontend/util-gradient'
+import { IPickerColor } from './i-picker-color'
 
 export function setColorValue(color: string | IRgba) {
   let rgba: IRgba = { r: 0, g: 0, b: 0, a: 1 }
@@ -121,4 +122,19 @@ export const colorCodeToRgbaString = (color: string): string => {
 
   document.body.removeChild(span)
   return rgba
+}
+
+// Convert IPickerColor to a CSS string value or theme variable that can be rendered
+export const colorToCssValue = (
+  pickerColor: IPickerColor | undefined,
+): string | undefined => {
+  if (pickerColor === undefined) {
+    return undefined
+  }
+  if (pickerColor.themeVar) {
+    return `$\{${pickerColor.themeVar}}`
+  } else {
+    const c = pickerColor.rgba
+    return c ? `rgba(${c.r},${c.g},${c.b},${c.a})` : undefined
+  }
 }

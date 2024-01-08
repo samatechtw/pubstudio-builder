@@ -29,7 +29,7 @@
       "executor": "@nrwl/linter:eslint",
       "options": {
         "lintFilePatterns": ["apps/builder-demo/**/*.{js,ts,vue}"],
-        "eslintConfig": "apps/builder-demo/.eslintrc.js"
+        "eslintConfig": "apps/builder-demo/.eslintrc.cjs"
       }
     }
   },

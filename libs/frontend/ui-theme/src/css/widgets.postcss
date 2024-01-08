@@ -15,7 +15,7 @@
 }
 
 @define-mixin button-base {
-  @mixin title-medium 18px;
+  @mixin title-medium 16px;
   letter-spacing: 1.5px;
   display: inline-flex;
   align-items: center;
@@ -25,7 +25,7 @@
   cursor: pointer;
   box-sizing: border-box;
   text-align: center;
-  height: 44px;
+  height: 40px;
   border-radius: 8px;
   transition: background-color 0.15s ease;
 
@@ -86,7 +86,7 @@
   height: 100%;
   max-width: $select-menu-width;
   width: $select-menu-width;
-  padding: 16px;
+  padding-bottom: 16px;
   background-color: white;
   align-items: center;
   flex-shrink: 0;
@@ -96,14 +96,17 @@
   display: flex;
   justify-content: space-between;
   margin-top: 16px;
-  > button {
-    width: 48%;
-  }
   .save-button {
     background-color: $color-button-bg;
+    &:hover {
+      background-color: rgba($color-button-bg, 0.7);
+    }
   }
   .delete-button {
     background-color: $color-red;
+    &:hover {
+      background-color: rgba($color-red, 0.7);
+    }
   }
 }
 
@@ -126,4 +129,18 @@
   border: none;
   color: #fff;
   background: #2e333a;
+}
+
+@define-mixin input {
+  background-color: rgba(255, 255, 255, 0.3);
+  border-color: black;
+  border-width: 1px;
+  border-radius: 2px;
+  box-shadow: none;
+  &:focus {
+    outline: none;
+    background-color: rgba(255, 255, 255, 0.7);
+    border-color: $blue-500;
+    border-width: 1.5px;
+  }
 }

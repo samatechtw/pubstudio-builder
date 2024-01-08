@@ -1,5 +1,5 @@
 <template>
-  <Modal :show="show" cls="create-asset-modal" @cancel="emit('cancel')">
+  <Modal :show="show" cls="create-asset-modal" @cancel="cancel">
     <div class="modal-title">
       {{ assetToUpdate ? t('assets.replace') : t('assets.new') }}
     </div>
@@ -50,7 +50,7 @@
 
 <script lang="ts" setup>
 import { computed, onMounted, ref, toRefs, watch } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useI18n } from 'petite-vue-i18n'
 import {
   ErrorMessage,
   Modal,
@@ -73,6 +73,7 @@ import {
 import { ISiteViewModel } from '@pubstudio/shared/type-api-platform-site'
 import { useSites } from '@pubstudio/frontend/feature-sites'
 import { store } from '@pubstudio/frontend/data-access-web-store'
+import { DEFAULT_TEMPLATE_ID } from '@pubstudio/shared/type-api-platform-template'
 import { IUploadFileResult } from '../lib/upload-asset'
 import { useSiteAssets } from '../lib/use-site-assets'
 
@@ -138,7 +139,14 @@ let validatedFile: ValidatedFile | undefined = undefined
 
 const resolvedSites = computed<ISelectableSite[]>(() => {
   const resolved = (propSites.value || loadedSites.value) ?? []
-  return [store.user.identity.value, ...resolved]
+  const adminTemplate = []
+  if (store.user.isAdmin.value) {
+    adminTemplate.push({
+      id: DEFAULT_TEMPLATE_ID,
+      name: t('assets.template'),
+    })
+  }
+  return [...adminTemplate, store.user.identity.value, ...resolved]
 })
 
 const handleImageSelect = (validFile: ValidatedFile) => {
@@ -160,7 +168,8 @@ const updateAsset = async (file: File | null | undefined) => {
       const validFile = await validateMedia({ size: 10000000 }, file)
       handleImageSelect(validFile)
     } catch (e) {
-      error.value = t((e as IValidateMediaError).fileErrors[0])
+      const key = (e as IValidateMediaError).fileErrors[0]
+      error.value = t(`errors.${key}`)
     }
   }
 }
@@ -174,7 +183,7 @@ const uploadReplaceAsset = async (id: string, validatedFile: ValidatedFile) => {
   const result = await replaceAsset(id, payload, validatedFile.file)
   const success = await verifyAsset(result.id)
   if (success) {
-    emit('complete', result)
+    complete(result)
   } else {
     error.value = t('errors.asset_upload_failed')
   }
@@ -192,7 +201,7 @@ const uploadCreateAsset = async (validatedFile: ValidatedFile) => {
   const result = await createAsset(payload, validatedFile.file)
   const success = await verifyAsset(result.id)
   if (success) {
-    emit('complete', result)
+    complete(result)
   } else {
     error.value = t('errors.asset_upload_failed')
   }
@@ -205,7 +214,7 @@ const uploadAsset = async () => {
     }
     return
   }
-  if (!siteId.value) {
+  if (!assetToUpdate.value && !siteId.value) {
     error.value = t('errors.site_missing')
     return
   }
@@ -253,6 +262,23 @@ const initializeAssetUpdate = () => {
         : initialSiteId.value
     name.value = initialName.value ?? ''
   }
+}
+
+const cleanup = () => {
+  name.value = ''
+  error.value = undefined
+  validatedFile = undefined
+  assetBase64.value = ''
+}
+
+const cancel = () => {
+  cleanup()
+  emit('cancel')
+}
+
+const complete = (result: IUploadFileResult) => {
+  cleanup()
+  emit('complete', result)
 }
 
 watch(assetToUpdate, () => {

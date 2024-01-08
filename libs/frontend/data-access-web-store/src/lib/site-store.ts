@@ -1,5 +1,5 @@
 // Site builder state
-import { IStoredSite } from '@pubstudio/shared/type-site-store'
+import { IStoredSite } from '@pubstudio/shared/type-site'
 // Saves the current Site to local storage
 import { LocalStoragePlugin, useModule } from '@samatech/vue-store'
 

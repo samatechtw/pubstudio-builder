@@ -1,0 +1,10 @@
+CREATE TABLE IF NOT EXISTS site_usage (
+    id INTEGER PRIMARY KEY NOT NULL,
+    site_id TEXT NOT NULL,
+    request_count BIGINT NOT NULL,
+    request_error_count BIGINT NOT NULL,
+    total_bandwidth BIGINT NOT NULL,
+    start_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    end_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_site_id FOREIGN KEY (site_id) REFERENCES sites(id) ON DELETE CASCADE
+);

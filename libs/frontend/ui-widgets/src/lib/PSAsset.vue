@@ -82,7 +82,7 @@ onUnmounted(() => {
   padding: 4px;
   @mixin flex-center;
   position: relative;
-  background-color: rgba(0, 0, 0, 0.3);
+  background-color: $blue-600;
   &.isVideo {
     background-color: unset;
     align-items: flex-start;

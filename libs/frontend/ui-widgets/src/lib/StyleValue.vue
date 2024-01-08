@@ -14,7 +14,7 @@
 
 <script lang="ts" setup>
 import { ref, toRefs, watch } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useI18n } from 'petite-vue-i18n'
 import { PSMultiselect } from '@pubstudio/frontend/ui-widgets'
 
 const { t } = useI18n()
@@ -36,7 +36,11 @@ const emit = defineEmits<{
 
 const newVal = ref(modelValue.value)
 
-const multiselectRef = ref(null)
+const multiselectRef = ref()
 
-defineExpose({ multiselectRef })
+const toggleDropdown = () => {
+  multiselectRef.value?.toggleDropdown()
+}
+
+defineExpose({ multiselectRef, toggleDropdown })
 </script>

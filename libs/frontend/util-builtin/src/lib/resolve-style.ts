@@ -1,8 +1,4 @@
-import {
-  builtinFonts,
-  builtinThemeVariables,
-  globalContext,
-} from '@pubstudio/frontend/util-ids'
+import { builtinThemeVariables, defaultContext } from '@pubstudio/frontend/util-ids'
 import { ISiteContext, IStyle } from '@pubstudio/shared/type-site'
 import { buttonStyle } from './components/builtin-button'
 import { horizontalStyle } from './components/builtin-container-horizontal'
@@ -20,9 +16,11 @@ import { headerStyle } from './components/builtin-header'
 import { imageStyle } from './components/builtin-image'
 import { inputStyle } from './components/builtin-input'
 import { linkStyle } from './components/builtin-link'
+import { listStyle } from './components/builtin-list'
 import { navMenuItemStyle, navMenuStyle } from './components/builtin-nav-menu'
+import { svgStyle } from './components/builtin-svg'
 import { textStyle } from './components/builtin-text'
-import { parseId } from './resolve'
+import { textareaStyle } from './components/builtin-textarea'
 
 export const builtinStyles: Record<string, IStyle> = {
   [horizontalStyle.id]: horizontalStyle,
@@ -37,20 +35,25 @@ export const builtinStyles: Record<string, IStyle> = {
   [imageStyle.id]: imageStyle,
   [navMenuStyle.id]: navMenuStyle,
   [navMenuItemStyle.id]: navMenuItemStyle,
+  [svgStyle.id]: svgStyle,
   [linkStyle.id]: linkStyle,
   [buttonStyle.id]: buttonStyle,
   [headerStyle.id]: headerStyle,
   [footerStyle.id]: footerStyle,
   [inputStyle.id]: inputStyle,
+  [textareaStyle.id]: textareaStyle,
+  [listStyle.id]: listStyle,
 }
 
 export const resolveStyle = (
   context: ISiteContext,
   styleId: string,
 ): IStyle | undefined => {
-  const { namespace } = parseId(styleId)
   let style: IStyle | undefined
-  if (namespace === context.namespace || namespace === globalContext.namespace) {
+  if (
+    styleId.startsWith(context.namespace) ||
+    styleId.startsWith(defaultContext.namespace)
+  ) {
     style = context.styles[styleId]
   } else {
     // TODO -- resolve external namespaces
@@ -59,7 +62,7 @@ export const resolveStyle = (
 }
 
 // For example, ${color-text}
-export const themeVariableSyntaxRegex = new RegExp(/^\$\{(.*)\}$/)
+export const themeVariableSyntaxRegex = /\$\{(.*?)\}/g
 
 export const resolveThemeVariables = (
   context: ISiteContext,
@@ -71,10 +74,7 @@ export const resolveThemeVariables = (
         // Custom theme variable
         context.theme.variables[variableName] ??
         // Builtin theme variable
-        builtinThemeVariables[variableName as keyof typeof builtinThemeVariables] ??
-        // Builtin font
-        builtinFonts[variableName as keyof typeof builtinFonts]
-
+        builtinThemeVariables[variableName as keyof typeof builtinThemeVariables]
       if (value === undefined) {
         console.warn(`Variable not found: ${variableName}`)
       }

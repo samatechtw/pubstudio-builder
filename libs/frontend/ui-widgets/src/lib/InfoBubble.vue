@@ -25,7 +25,7 @@
         <path d="M12 12v4M12 8h0" />
       </g>
     </svg>
-    <teleport to="body">
+    <Teleport to="body">
       <div
         v-if="show"
         ref="tooltipRef"
@@ -35,21 +35,22 @@
         @mouseleave="hideBubble"
         @mouseenter="cancelBubbleDelay"
       >
-        <div v-if="useHtml" class="message-html" v-html="message" />
+        <slot v-if="useSlot"></slot>
+        <div v-else-if="useHtml" class="message-html" v-html="message" />
         <template v-else-if="message">
           {{ message }}
         </template>
         <slot v-else name="message" />
         <div v-if="showArrow" ref="arrowRef" :style="arrowStyle" class="arrow" />
       </div>
-    </teleport>
+    </Teleport>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { Placement } from '@floating-ui/vue'
 import { useTooltip } from '@pubstudio/frontend/util-tooltip'
-import { ref, toRefs } from 'vue'
+import { toRefs } from 'vue'
 
 const props = withDefaults(
   defineProps<{
@@ -61,6 +62,7 @@ const props = withDefaults(
     showArrow?: boolean
     placement?: Placement
     useHtml?: boolean
+    useSlot?: boolean
   }>(),
   {
     message: undefined,
@@ -73,18 +75,36 @@ const props = withDefaults(
 )
 const { hideDelay, showArrow, placement } = toRefs(props)
 
-const { itemRef, arrowStyle, tooltipRef, tooltipStyle } = useTooltip({
+const {
+  itemRef,
+  arrowStyle,
+  tooltipRef,
+  tooltipStyle,
+  show,
+  tooltipMouseEnter,
+  tooltipMouseLeave,
+} = useTooltip({
   placement: placement.value,
   arrow: showArrow.value,
   offset: 8,
   shift: true,
 })
-const show = ref(false)
 let hoverTimer: ReturnType<typeof setTimeout> | undefined
 
 const clickInfo = () => {
-  show.value = !show.value
+  setShow(!show.value)
   cancelBubbleDelay()
+}
+
+const setShow = (newShow: boolean) => {
+  if (newShow === show.value) {
+    return
+  }
+  if (newShow) {
+    tooltipMouseEnter()
+  } else {
+    tooltipMouseLeave()
+  }
 }
 
 const cancelBubbleDelay = () => {
@@ -97,9 +117,9 @@ const cancelBubbleDelay = () => {
 const hideBubble = () => {
   if (hideDelay.value) {
     cancelBubbleDelay()
-    hoverTimer = setTimeout(() => (show.value = false), hideDelay.value)
+    hoverTimer = setTimeout(() => setShow(false), hideDelay.value)
   } else {
-    show.value = false
+    setShow(false)
   }
 }
 </script>
@@ -110,9 +130,11 @@ const hideBubble = () => {
 .info-bubble-wrap {
   @mixin size 20px;
   cursor: pointer;
+  position: relative;
+  flex-shrink: 0;
   &:hover {
     :deep(svg g) {
-      fill: $color-light1;
+      fill: $blue-300;
     }
   }
 }
@@ -120,7 +142,11 @@ const hideBubble = () => {
   @mixin tooltip;
   position: absolute;
   max-width: 200px;
-  z-index: 1000;
+  z-index: $z-index-tooltip;
+  :deep(a) {
+    color: $purple-500;
+    font-weight: 500;
+  }
 }
 
 :deep(svg) {

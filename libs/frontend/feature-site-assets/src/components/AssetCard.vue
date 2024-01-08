@@ -43,9 +43,9 @@
 
 <script lang="ts" setup>
 import { computed, ref, toRefs } from 'vue'
-import { useDragDrop } from '@pubstudio/frontend/feature-build'
+import { useDragDrop } from '@pubstudio/frontend/feature-render-builder'
 import { useBuild } from '@pubstudio/frontend/feature-build'
-import { makeAddImageData } from '@pubstudio/frontend/util-command'
+import { makeAddImageData } from '@pubstudio/frontend/util-command-data'
 import {
   Check,
   CopyText,
@@ -85,7 +85,7 @@ const dndProps = computed(() => {
     return undefined
   }
   const dnd = useDragDrop({
-    context: site.value.context,
+    site: site.value,
     componentId: asset.value.id,
     getParentId: () => undefined,
     getComponentIndex: () => 0,
@@ -146,7 +146,6 @@ const updateName = async () => {
   filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.15))
     drop-shadow(4px 8px 24px rgba(16, 3, 70, 0.05));
   border-radius: 4px;
-  z-index: 10;
   &.small {
     .asset-info {
       padding: 0 4px 4px;
@@ -197,8 +196,10 @@ const updateName = async () => {
   justify-content: space-between;
   padding: 12px 0 8px;
 }
-.copy-text :deep(svg) {
-  @mixin size 16px;
+.copy-text {
+  :deep(svg) {
+    @mixin size 16px;
+  }
 }
 .asset-name {
   @mixin title-medium 16px;

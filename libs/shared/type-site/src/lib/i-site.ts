@@ -23,4 +23,5 @@ export interface ISite {
     forward: ICommand[]
   }
   pages: Record<string, IPage>
+  updated_at?: string
 }

@@ -8,6 +8,7 @@ import {
   ISiteContext,
   IThemeFont,
 } from '@pubstudio/shared/type-site'
+import { breakpointSortFn } from './sort-breakpoint-fn'
 import { IQueryStyle, IRawStyleRecord } from './util-render-types'
 
 export const rawStyleRecordToString = (
@@ -18,7 +19,8 @@ export const rawStyleRecordToString = (
     const fields = Object.entries(rawStyle)
       .map(([prop, value]) => {
         const computedValue = computeCssValue(prop as Css, value, context)
-        return `${prop}:${computedValue};`
+        const supportedValue = CSS.supports(prop, computedValue) ? computedValue : ''
+        return `${prop}:${supportedValue};`
       })
       .join('')
     return `${result}${selector}{${fields}}`
@@ -51,15 +53,25 @@ export const queryStyleToString = (
   queryStyle: IQueryStyle,
 ): string => {
   let styleContent = ''
-  Object.entries(context.breakpoints).forEach(([breakpointId, breakpoint]) => {
-    const rawStyle = rawStyleRecordToString(queryStyle[breakpointId], context)
-    if (breakpointId === DEFAULT_BREAKPOINT_ID) {
-      styleContent += rawStyle
-    } else {
-      const mediaQuery = getMediaQuery(breakpoint)
-      styleContent += `@media ${mediaQuery} {${rawStyle}}`
-    }
-  })
+  Object.entries(context.breakpoints)
+    .sort((bp1, bp2) => {
+      if (bp1[0] === DEFAULT_BREAKPOINT_ID) {
+        return 1
+      } else if (bp2[0] === DEFAULT_BREAKPOINT_ID) {
+        return -1
+      }
+      return breakpointSortFn(bp1[1], bp2[1])
+    })
+    .reverse()
+    .forEach(([breakpointId, breakpoint]) => {
+      const rawStyle = rawStyleRecordToString(queryStyle[breakpointId], context)
+      if (breakpointId === DEFAULT_BREAKPOINT_ID) {
+        styleContent += rawStyle
+      } else {
+        const mediaQuery = getMediaQuery(breakpoint)
+        styleContent += `@media ${mediaQuery} {${rawStyle}}`
+      }
+    })
   return styleContent
 }
 
