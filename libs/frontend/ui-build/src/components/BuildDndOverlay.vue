@@ -7,10 +7,11 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, nextTick, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { runtimeContext } from '@pubstudio/frontend/util-runtime'
 import { buildContentWindowInnerId, useBuild } from '@pubstudio/frontend/feature-build'
 import { activeBreakpoint } from '@pubstudio/frontend/feature-site-source'
+import { IComponent } from '@pubstudio/shared/type-site'
 
 const hoverOutlineThickness = 6
 const outlineColor = '#000'
@@ -109,6 +110,49 @@ const hoverOverlayStyle = computed(() => {
 // height of the component on page load & after selection.
 const selectionOverlayStyle = ref()
 
+const computeSelectionOverlay = async (selectedComponent: IComponent | undefined) => {
+  if (selectedComponent) {
+    // This `nextTick` is necessary for buildContentWindowInner and componentElement
+    await nextTick()
+
+    const buildContentWindowInner = document.getElementById(buildContentWindowInnerId)
+    const componentElement = document.getElementById(selectedComponent.id)
+
+    if (buildContentWindowInner && componentElement) {
+      const { top: buildContentWindowTop, left: buildContentWindowLeft } =
+        buildContentWindowInner.getBoundingClientRect()
+
+      const {
+        top: elementTop,
+        left: elementLeft,
+        width: elementWidth,
+        height: elementHeight,
+      } = componentElement.getBoundingClientRect()
+
+      const elementRelativeTop = elementTop - buildContentWindowTop
+      const elementRelativeLeft = elementLeft - buildContentWindowLeft
+
+      const { top, left, width, height } = normalizeDimensions(
+        elementRelativeTop,
+        elementRelativeLeft,
+        elementWidth,
+        elementHeight,
+        buildContentWindowInner,
+      )
+
+      selectionOverlayStyle.value = {
+        top: `${top}px`,
+        left: `${left}px`,
+        width: `${width}px`,
+        height: `${height}px`,
+        border: '1.5px solid #3768FF',
+      }
+    }
+  } else {
+    selectionOverlayStyle.value = undefined
+  }
+}
+
 watch(
   () => ({
     selectedComponent: editor.value?.selectedComponent,
@@ -116,50 +160,10 @@ watch(
     activeBreakpoint: activeBreakpoint.value,
   }),
   async ({ selectedComponent }) => {
-    if (selectedComponent) {
-      // This `nextTick` is necessary for buildContentWindowInner and componentElement
-      await nextTick()
-
-      const buildContentWindowInner = document.getElementById(buildContentWindowInnerId)
-      const componentElement = document.getElementById(selectedComponent.id)
-
-      if (buildContentWindowInner && componentElement) {
-        const { top: buildContentWindowTop, left: buildContentWindowLeft } =
-          buildContentWindowInner.getBoundingClientRect()
-
-        const {
-          top: elementTop,
-          left: elementLeft,
-          width: elementWidth,
-          height: elementHeight,
-        } = componentElement.getBoundingClientRect()
-
-        const elementRelativeTop = elementTop - buildContentWindowTop
-        const elementRelativeLeft = elementLeft - buildContentWindowLeft
-
-        const { top, left, width, height } = normalizeDimensions(
-          elementRelativeTop,
-          elementRelativeLeft,
-          elementWidth,
-          elementHeight,
-          buildContentWindowInner,
-        )
-
-        selectionOverlayStyle.value = {
-          top: `${top}px`,
-          left: `${left}px`,
-          width: `${width}px`,
-          height: `${height}px`,
-          border: '1.5px solid #3768FF',
-        }
-      }
-    } else {
-      selectionOverlayStyle.value = undefined
-    }
+    computeSelectionOverlay(selectedComponent)
   },
   {
     deep: true,
-    immediate: true,
   },
 )
 
@@ -220,6 +224,10 @@ const normalizeDimensions = (
     height,
   }
 }
+
+onMounted(() => {
+  setTimeout(() => computeSelectionOverlay(editor.value?.selectedComponent), 1)
+})
 </script>
 
 <style lang="postcss" scoped>
