@@ -63,6 +63,7 @@ export const useEditComponentChildStyles = (
         breakpointStyles,
         descSortedBreakpoints.value,
         activeBreakpoint.value,
+        true,
       )
     }
     return {}
@@ -164,6 +165,13 @@ export const useEditComponentChildStyles = (
     if (entry.sourceBreakpointId !== activeBreakpoint.value.id) {
       return t('style.inherited_breakpoint', {
         breakpoint: site.value.context.breakpoints[entry.sourceBreakpointId]?.name,
+      })
+    } else if (
+      entry.sourcePseudoClass !== undefined &&
+      entry.sourcePseudoClass !== currentPseudoClass.value
+    ) {
+      return t('style.inherited_pseudo_class', {
+        pseudoClass: entry.sourcePseudoClass,
       })
     } else {
       return undefined
