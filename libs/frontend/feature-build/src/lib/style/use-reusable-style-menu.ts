@@ -134,7 +134,7 @@ export const useReusableStyleMenu = (): IUseStyleMenuFeature => {
       breakpointStylesWithSource,
       descSortedBreakpoints.value,
       activeBreakpoint.value,
-      currentStyleType.value === StyleType.Mixin,
+      true,
     )
 
     return Object.entries(flattenedStyles)

@@ -84,6 +84,13 @@ export const useEditComponentStyles = (): IUseEditStyles => {
         return t('style.inherited_breakpoint', {
           breakpoint: site.value.context.breakpoints[entry.sourceBreakpointId]?.name,
         })
+      } else if (
+        entry.sourcePseudoClass !== undefined &&
+        entry.sourcePseudoClass !== currentPseudoClass.value
+      ) {
+        return t('style.inherited_pseudo_class', {
+          pseudoClass: entry.sourcePseudoClass,
+        })
       } else {
         return undefined
       }
