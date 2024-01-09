@@ -172,13 +172,8 @@ $border-offset: 0px;
       position: relative;
     }
     :deep(.hover) {
-      /* An absolute-positioned img is wrapped with div.hover-wrap on hover. We need to match the original
-        image insets to avoid display issues. */
       &.hover-wrap-absolute {
         position: absolute;
-        img {
-          inset: 0;
-        }
       }
       .hover-edge {
         position: absolute;

@@ -4,14 +4,9 @@ import {
   registerCustomEvents,
   removeListeners,
 } from '@pubstudio/frontend/feature-render'
-import {
-  activeBreakpoint,
-  descSortedBreakpoints,
-} from '@pubstudio/frontend/feature-site-source'
-import { findStyles } from '@pubstudio/frontend/util-component'
 import { RenderMode } from '@pubstudio/frontend/util-render'
 import { runtimeContext } from '@pubstudio/frontend/util-runtime'
-import { Css, IComponent, IRawStyle, ISite, Tag } from '@pubstudio/shared/type-site'
+import { IComponent, ISite, Tag } from '@pubstudio/shared/type-site'
 import { buildContentWindowInnerId } from '@pubstudio/frontend/feature-build'
 import {
   computed,
@@ -36,43 +31,50 @@ const renderImageHover = (
   site: ISite,
   component: IComponent,
   props: Record<string, unknown>,
-  componentClass: string[],
   content: IContent,
 ): VNode => {
   const imgElement = document.getElementById(component.id)
+  const buildContentWindowInner = document.getElementById(buildContentWindowInnerId)
 
-  let [width, height] = ['', '']
+  let position = '',
+    top = '',
+    right = '',
+    width = '',
+    height = '',
+    margin = ''
 
-  const { margin } = findStyles(
-    [Css.Margin],
-    site,
-    component,
-    descSortedBreakpoints.value,
-    activeBreakpoint.value,
-  )
+  if (imgElement) {
+    const imgComputedStyle = getComputedStyle(imgElement)
 
-  const { width: rectWidth = 0, height: rectHeight = 0 } =
-    imgElement?.getBoundingClientRect() ?? {}
+    position = imgComputedStyle.position
+    top = imgComputedStyle.top
+    right = imgComputedStyle.right
 
-  const { builderScale = 1 } = site.editor ?? {}
-  const unscaledWidth = rectWidth / builderScale
-  const unscaledHeight = rectHeight / builderScale
+    if (position === 'absolute' && buildContentWindowInner) {
+      // Manually compute the top & right for the absolute positioned
+      // <img> for top & right returned by `getComputedStyle` will be
+      // '0px' when the component is selected by clicking it in the
+      // builder/renderer if it's not selected before click.
+      if (top === '0px' || right === '0px') {
+        const { builderScale = 1 } = site.editor ?? {}
+        const innerRect = buildContentWindowInner.getBoundingClientRect()
+        const imgRect = imgElement.getBoundingClientRect()
 
-  width = `${unscaledWidth}px`
-  height = `${unscaledHeight}px`
+        top = (imgRect.top - innerRect.top) / builderScale + 'px'
+        right = (innerRect.right - imgRect.right) / builderScale + 'px'
+      }
+    }
+
+    width = imgComputedStyle.width
+    height = imgComputedStyle.height
+    margin = imgComputedStyle.margin
+    position = imgComputedStyle.position
+  }
 
   let hoverWrapClass = 'hover hover-wrap'
-  let imgStyles: IRawStyle | undefined
 
-  if (componentClass.includes('hover-absolute')) {
+  if (position === 'absolute') {
     hoverWrapClass += ' hover-wrap-absolute'
-    imgStyles = findStyles(
-      [Css.Top, Css.Right, Css.Bottom, Css.Left],
-      site,
-      component,
-      descSortedBreakpoints.value,
-      activeBreakpoint.value,
-    )
   }
 
   // Pass the margin of img to the wrapper element, and set the margin of the rendered img
@@ -84,6 +86,7 @@ const renderImageHover = (
   imgStyleProp.width = '100%'
   imgStyleProp.height = '100%'
   imgStyleProp.margin = '0'
+  imgStyleProp.inset = '0'
 
   const img = h(component.tag as string, {
     ...props,
@@ -103,10 +106,8 @@ const renderImageHover = (
         margin,
         flexShrink: '0',
         // absolute positioning for wrapper
-        top: imgStyles?.top,
-        right: imgStyles?.right,
-        bottom: imgStyles?.bottom,
-        left: imgStyles?.left,
+        top,
+        right,
       },
       class: hoverWrapClass,
     },
@@ -244,13 +245,7 @@ export const BuilderDndComponent = defineComponent({
         // Don't render hover wrap if the image is currently being resized
         site.value.editor?.resizeData?.component.id !== component.value.id
       ) {
-        return renderImageHover(
-          site.value,
-          component.value,
-          props,
-          componentClass,
-          propsContent.content,
-        )
+        return renderImageHover(site.value, component.value, props, propsContent.content)
       } else if (tag === Tag.Svg) {
         return h(Tag.Div, props, propsContent.content)
       } else {
