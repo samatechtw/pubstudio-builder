@@ -183,9 +183,7 @@ export const computeBuilderStyleProps = (
     builderStyle.opacity = '0'
   }
 
-  if (selected) {
-    builderStyle.border = '1.5px solid #3768FF'
-  } else if (editor?.debugBounding) {
+  if (editor?.debugBounding) {
     builderStyle.border = '1.5px dashed #999'
   }
   if (dndState) {
@@ -196,6 +194,11 @@ export const computeBuilderStyleProps = (
       builderStyle.opacity = '0.8'
     }
   }
+
+  // Set pointer-events to auto so that components are always clickable in the builder
+  // even if pointer-events: none; is set on the components.
+  builderStyle['pointer-events'] = 'auto'
+
   return { builderStyle, builderProps, builderClass, extraChildren }
 }
 
