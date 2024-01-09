@@ -263,6 +263,7 @@ export const useBuild = (): IUseBuild => {
         breakpointStyles,
         descSortedBreakpoints.value,
         activeBreakpoint.value,
+        true,
       )
       return flattenedStyles
     } else {
