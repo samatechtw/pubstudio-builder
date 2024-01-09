@@ -10,8 +10,7 @@ import {
   activeBreakpoint,
   descSortedBreakpoints,
 } from '@pubstudio/frontend/feature-site-source'
-import { Edit } from '@pubstudio/frontend/ui-widgets'
-import { setEditSvg, setSelectedComponent } from '@pubstudio/frontend/util-command'
+import { setSelectedComponent } from '@pubstudio/frontend/util-command'
 import { findStyles } from '@pubstudio/frontend/util-component'
 import { RenderMode } from '@pubstudio/frontend/util-render'
 import { resetRuntimeContext, runtimeContext } from '@pubstudio/frontend/util-runtime'
@@ -27,6 +26,7 @@ import { h, VNode } from 'vue'
 import LinkTooltip from '../components/LinkTooltip.vue'
 import { ListAdd } from '../components/ListAdd'
 import { ProseMirrorEditor } from '../components/ProseMirrorEditor'
+import SvgEdit from '../components/SvgEdit.vue'
 import { IDndState } from './dnd/builder-dnd'
 import { BuilderDndComponent } from './dnd/builder-dnd-component'
 import { LinkTooltipMode } from './enum-link-tooltip-mode'
@@ -119,16 +119,8 @@ export const computeBuilderStyleProps = (
         builderClass.push('force-relative')
       }
     } else if (component.tag === Tag.Svg) {
-      // Make sure wrapper is `position: relative;` so we can position the edit icon
-      builderClass.push('svg-sel')
       // Add an icon that shows SvgEditModal on click
-      extraChildren = [
-        h(Edit, {
-          color: 'white',
-          class: 'svg-edit',
-          onClick: () => setEditSvg(site.editor, { content: component.content ?? '' }),
-        }),
-      ]
+      extraChildren = [h(SvgEdit)]
     }
   }
 
