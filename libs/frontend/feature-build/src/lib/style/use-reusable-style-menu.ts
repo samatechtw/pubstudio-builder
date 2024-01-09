@@ -4,6 +4,7 @@ import {
 } from '@pubstudio/frontend/feature-site-source'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import {
+  currentStyleType,
   editCommands,
   editingMixinData,
   editStyles,
@@ -133,6 +134,7 @@ export const useReusableStyleMenu = (): IUseStyleMenuFeature => {
       breakpointStylesWithSource,
       descSortedBreakpoints.value,
       activeBreakpoint.value,
+      currentStyleType.value === StyleType.Mixin,
     )
 
     return Object.entries(flattenedStyles)
@@ -155,6 +157,13 @@ export const useReusableStyleMenu = (): IUseStyleMenuFeature => {
     if (entry.sourceBreakpointId !== activeBreakpoint.value.id) {
       return t('style.inherited_breakpoint', {
         breakpoint: site.value.context.breakpoints[entry.sourceBreakpointId]?.name,
+      })
+    } else if (
+      entry.sourcePseudoClass !== undefined &&
+      entry.sourcePseudoClass !== currentPseudoClass.value
+    ) {
+      return t('style.inherited_pseudo_class', {
+        pseudoClass: entry.sourcePseudoClass,
       })
     } else {
       return undefined

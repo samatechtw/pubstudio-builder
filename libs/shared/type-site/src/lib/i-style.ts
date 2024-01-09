@@ -35,6 +35,8 @@ export type IRawStyleWithSource = {
   sourceType: StyleSourceType
   sourceId: string
   sourceBreakpointId: string
+  // Only used in mixins
+  sourcePseudoClass?: CssPseudoClass
   value: string
 }
 
