@@ -193,6 +193,15 @@ const showBackgroundPicker = computed(() => {
   return editor.value?.styleMenu === StyleToolbarMenu.BackgroundColor
 })
 
+// Sets a style, or un-sets it if the current value matches the new one.
+const toggleStyle = (prop: Css, value: string) => {
+  if (getStyleValue(prop) === value) {
+    setStyle(prop, undefined)
+  } else {
+    setStyle(prop, value)
+  }
+}
+
 const togglePicker = (show: boolean) => {
   if (show) {
     setStyleToolbarMenu(editor.value, StyleToolbarMenu.BackgroundColor)
@@ -229,11 +238,19 @@ const isRow = computed(() => {
 
 const toggleDirection = (value: string) => {
   ensureFlex()
-  if (getStyleValue(Css.FlexDirection) === value) {
-    setStyle(Css.FlexDirection, undefined)
-  } else {
-    setStyle(Css.FlexDirection, value)
+  toggleStyle(Css.FlexDirection, value)
+}
+
+const isNonFlexTextComponent = () => {
+  if (getStyleValue(Css.Display) === 'flex') {
+    return false
   }
+  const { selectedComponent } = editor.value ?? {}
+  return !!selectedComponent?.content
+}
+
+const toggleTextAlign = (value: string) => {
+  toggleStyle(Css.TextAlign, value)
 }
 
 const alignHorizontalProp = computed(() => {
@@ -241,33 +258,54 @@ const alignHorizontalProp = computed(() => {
 })
 
 const isAlignLeft = computed(() => {
+  if (isNonFlexTextComponent()) {
+    return getStyleValue(Css.TextAlign) === 'left'
+  }
   return getStyleValue(alignHorizontalProp.value) === 'flex-start'
 })
 
 const toggleAlignLeft = () => {
-  ensureFlex()
-  const value = isAlignLeft.value ? undefined : 'flex-start'
-  setStyle(alignHorizontalProp.value, value)
+  if (isNonFlexTextComponent()) {
+    toggleTextAlign('left')
+  } else {
+    ensureFlex()
+    const value = isAlignLeft.value ? undefined : 'flex-start'
+    setStyle(alignHorizontalProp.value, value)
+  }
 }
 
 const isAlignCenter = computed(() => {
+  if (isNonFlexTextComponent()) {
+    return getStyleValue(Css.TextAlign) === 'center'
+  }
   return getStyleValue(alignHorizontalProp.value) === 'center'
 })
 
 const toggleAlignCenter = () => {
-  ensureFlex()
-  const value = isAlignCenter.value ? undefined : 'center'
-  setStyle(alignHorizontalProp.value, value)
+  if (isNonFlexTextComponent()) {
+    toggleTextAlign('center')
+  } else {
+    ensureFlex()
+    const value = isAlignCenter.value ? undefined : 'center'
+    setStyle(alignHorizontalProp.value, value)
+  }
 }
 
 const isAlignRight = computed(() => {
+  if (isNonFlexTextComponent()) {
+    return getStyleValue(Css.TextAlign) === 'right'
+  }
   return getStyleValue(alignHorizontalProp.value) === 'flex-end'
 })
 
 const toggleAlignRight = () => {
-  ensureFlex()
-  const value = isAlignRight.value ? undefined : 'flex-end'
-  setStyle(alignHorizontalProp.value, value)
+  if (isNonFlexTextComponent()) {
+    toggleTextAlign('right')
+  } else {
+    ensureFlex()
+    const value = isAlignRight.value ? undefined : 'flex-end'
+    setStyle(alignHorizontalProp.value, value)
+  }
 }
 
 const alignHorizontalItems: IToolbarDropdownItem[] = [
