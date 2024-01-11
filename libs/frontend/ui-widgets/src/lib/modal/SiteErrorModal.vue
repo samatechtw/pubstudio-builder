@@ -87,7 +87,7 @@ const showExport = ref(false)
 const { site, clearSiteError } = useBuild()
 
 const contactSupport = () => {
-  const subject = `Site Errror for Site: ${siteId.value}`
+  const subject = `Site Error for Site: ${siteId.value}`
   const url = `mailto:support@pubstud.io?subject=${subject}&body=${siteError.value}`
   window.open(url, '_blank')
 }

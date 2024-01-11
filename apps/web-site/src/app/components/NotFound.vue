@@ -22,6 +22,11 @@ const notFoundText = "Sorry, we can't find what you're looking for."
   padding-top: 120px;
   position: relative;
 }
+.not-found-title {
+  font-size: 24px;
+  font-weight: 600;
+  font-family: Helvetica, sans-serif;
+}
 .not-found-text {
   font-size: 16px;
   font-weight: 500;

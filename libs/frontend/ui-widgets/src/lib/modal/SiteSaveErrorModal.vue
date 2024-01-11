@@ -97,7 +97,7 @@ const errorText = computed(() => {
 })
 
 const contactSupport = () => {
-  const subject = `Site Errror for Site: ${site.value.name}`
+  const subject = `Site Error for Site: ${site.value.name}`
   const url = `mailto:support@pubstud.io?subject=${subject}&body=${siteStore.value.saveError}`
   window.open(url, '_blank')
 }

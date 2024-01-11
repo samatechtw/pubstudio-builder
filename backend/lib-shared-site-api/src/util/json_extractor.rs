@@ -1,5 +1,5 @@
 use axum::{
-    extract::rejection::JsonRejection::{self, JsonDataError},
+    extract::rejection::JsonRejection::{self, JsonDataError, JsonSyntaxError},
     http::StatusCode,
 };
 use axum_macros::FromRequest;
@@ -33,6 +33,15 @@ impl From<JsonRejection> for ApiError {
                 } else {
                     err_str
                 }
+            }
+            JsonSyntaxError(ref e) => {
+                println!(
+                    "JsonSyntaxError: {}, {}, {}",
+                    rejection.status(),
+                    rejection.to_string(),
+                    e.to_string(),
+                );
+                rejection.body_text()
             }
             _ => rejection.body_text(),
         };
