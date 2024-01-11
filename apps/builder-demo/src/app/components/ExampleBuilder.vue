@@ -144,7 +144,7 @@ const showCreateCancel = () => {
 
 const saveSiteBeforeLeave = () => {
   if (isSaving.value) {
-    siteStore.value.save(site.value, true)
+    siteStore.value.save(site.value, { immediate: true })
   }
 }
 */
@@ -182,7 +182,7 @@ const beforeWindowUnload = (e: BeforeUnloadEvent) => {
     // Note: Most modern browsers no longer allow custom messages
     return e.returnValue
   } else {
-    siteStore.value.save(site.value, true)
+    siteStore.value.save(site.value, { immediate: true })
   }
 }
 

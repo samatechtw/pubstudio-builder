@@ -3,7 +3,7 @@
     <transition name="modal">
       <div v-if="show" class="modal-outer" :class="cls" @mousedown="clickOutside">
         <div class="modal-inner">
-          <ModalClose :color="closeColor" @click="emit('cancel')" />
+          <ModalClose v-if="!disableClose" :color="closeColor" @click="emit('cancel')" />
           <slot />
         </div>
       </div>
@@ -20,15 +20,18 @@ const props = withDefaults(
     show?: boolean
     cls?: string
     closeColor?: string
+    disableClose?: boolean
     cancelByClickingOutside?: boolean
+    cancelWithEscape?: boolean
   }>(),
   {
     closeColor: 'black',
     cls: undefined,
     cancelByClickingOutside: true,
+    cancelWithEscape: true,
   },
 )
-const { show, cancelByClickingOutside } = toRefs(props)
+const { show, cancelByClickingOutside, cancelWithEscape } = toRefs(props)
 const emit = defineEmits<{
   (e: 'cancel'): void
 }>()
@@ -47,7 +50,7 @@ function clickOutside(e: Event) {
   }
 }
 function escape(e: KeyboardEvent) {
-  if (e.key === 'Escape') {
+  if (cancelWithEscape.value && e.key === 'Escape') {
     emit('cancel')
   }
 }
