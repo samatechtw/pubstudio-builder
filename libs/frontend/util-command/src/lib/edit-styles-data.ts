@@ -46,6 +46,7 @@ const cancelEdit = () => {
   editStyles.value.clear()
   editCommands.value = undefined
   editingMixinData.value = undefined
+  currentStyleType.value = undefined
 }
 
 export const editStylesCancelEdit = (site: ISite) => {
@@ -69,7 +70,6 @@ export const editStylesCancelEdit = (site: ISite) => {
 export const closeMixinMenu = (site: ISite) => {
   clearBlankCommands(site)
   cancelEdit()
-  currentStyleType.value = undefined
 }
 
 export const setStyleType = (site: ISite, styleType: StyleType | undefined) => {

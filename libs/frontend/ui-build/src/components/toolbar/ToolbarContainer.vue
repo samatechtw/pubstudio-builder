@@ -80,7 +80,8 @@ const {
   getRawStyle,
   getRawOrSelectedStyle,
   getStyleValue,
-  setStyle,
+  setStyleEnsureFlex,
+  toggleStyle,
   createSetComponentCustomStyleCommand,
   setProseMirrorStyle,
   refocusSelection,
@@ -193,15 +194,6 @@ const showBackgroundPicker = computed(() => {
   return editor.value?.styleMenu === StyleToolbarMenu.BackgroundColor
 })
 
-// Sets a style, or un-sets it if the current value matches the new one.
-const toggleStyle = (prop: Css, value: string) => {
-  if (getStyleValue(prop) === value) {
-    setStyle(prop, undefined)
-  } else {
-    setStyle(prop, value)
-  }
-}
-
 const togglePicker = (show: boolean) => {
   if (show) {
     setStyleToolbarMenu(editor.value, StyleToolbarMenu.BackgroundColor)
@@ -212,20 +204,13 @@ const togglePicker = (show: boolean) => {
   }
 }
 
-const ensureFlex = () => {
-  if (getStyleValue(Css.Display) !== 'flex') {
-    setStyle(Css.Display, 'flex')
-  }
-}
-
 const isWrap = computed(() => {
   return getStyleValue(Css.FlexWrap) === 'wrap'
 })
 
 const toggleWrap = () => {
-  ensureFlex()
   const value = isWrap.value ? undefined : 'wrap'
-  setStyle(Css.FlexWrap, value)
+  setStyleEnsureFlex(Css.FlexWrap, value)
 }
 
 const isColumn = computed(() => {
@@ -237,8 +222,9 @@ const isRow = computed(() => {
 })
 
 const toggleDirection = (value: string) => {
-  ensureFlex()
-  toggleStyle(Css.FlexDirection, value)
+  if (getStyleValue(Css.FlexDirection) !== value) {
+    setStyleEnsureFlex(Css.FlexDirection, value)
+  }
 }
 
 const isNonFlexTextComponent = () => {
@@ -268,9 +254,8 @@ const toggleAlignLeft = () => {
   if (isNonFlexTextComponent()) {
     toggleTextAlign('left')
   } else {
-    ensureFlex()
     const value = isAlignLeft.value ? undefined : 'flex-start'
-    setStyle(alignHorizontalProp.value, value)
+    setStyleEnsureFlex(alignHorizontalProp.value, value)
   }
 }
 
@@ -285,9 +270,8 @@ const toggleAlignCenter = () => {
   if (isNonFlexTextComponent()) {
     toggleTextAlign('center')
   } else {
-    ensureFlex()
     const value = isAlignCenter.value ? undefined : 'center'
-    setStyle(alignHorizontalProp.value, value)
+    setStyleEnsureFlex(alignHorizontalProp.value, value)
   }
 }
 
@@ -302,9 +286,8 @@ const toggleAlignRight = () => {
   if (isNonFlexTextComponent()) {
     toggleTextAlign('right')
   } else {
-    ensureFlex()
     const value = isAlignRight.value ? undefined : 'flex-end'
-    setStyle(alignHorizontalProp.value, value)
+    setStyleEnsureFlex(alignHorizontalProp.value, value)
   }
 }
 
@@ -338,9 +321,8 @@ const isAlignTop = computed(() => {
 })
 
 const toggleAlignTop = () => {
-  ensureFlex()
   const value = isAlignTop.value ? undefined : 'flex-start'
-  setStyle(alignVerticalProp.value, value)
+  setStyleEnsureFlex(alignVerticalProp.value, value)
 }
 
 const isAlignCenterVertical = computed(() => {
@@ -348,9 +330,8 @@ const isAlignCenterVertical = computed(() => {
 })
 
 const toggleAlignCenterVertical = () => {
-  ensureFlex()
   const value = isAlignCenterVertical.value ? undefined : 'center'
-  setStyle(alignVerticalProp.value, value)
+  setStyleEnsureFlex(alignVerticalProp.value, value)
 }
 
 const isAlignBottom = computed(() => {
@@ -358,9 +339,8 @@ const isAlignBottom = computed(() => {
 })
 
 const toggleAlignBottom = () => {
-  ensureFlex()
   const value = isAlignBottom.value ? undefined : 'flex-end'
-  setStyle(alignVerticalProp.value, value)
+  setStyleEnsureFlex(alignVerticalProp.value, value)
 }
 
 const alignVerticalItems: IToolbarDropdownItem[] = [

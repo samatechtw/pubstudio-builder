@@ -2,6 +2,11 @@ import { activeBreakpoint } from '@pubstudio/frontend/feature-site-source'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { resolveThemeVariables } from '@pubstudio/frontend/util-builtin'
 import {
+  getLastCommand,
+  pushOrReplaceCommand,
+  replaceLastCommand,
+} from '@pubstudio/frontend/util-command'
+import {
   firstMarkInSelection,
   isMarkInSelection,
   replaceMark,
@@ -10,7 +15,10 @@ import {
   toggleMark,
 } from '@pubstudio/frontend/util-edit-text'
 import { CommandType, ICommand } from '@pubstudio/shared/type-command'
-import { ISetComponentCustomStyleData } from '@pubstudio/shared/type-command-data'
+import {
+  ICommandGroupData,
+  ISetComponentCustomStyleData,
+} from '@pubstudio/shared/type-command-data'
 import {
   Css,
   IRawStyleWithSource,
@@ -20,6 +28,7 @@ import {
 import { Command, TextSelection } from 'prosemirror-state'
 import { EditorView } from 'prosemirror-view'
 import { computed, ComputedRef, reactive, toRaw, UnwrapNestedRefs, watch } from 'vue'
+import { setCustomStyleCommand } from './build-command-helpers'
 import { editViewTxCount } from './create-editor-view'
 import { useBuild } from './use-build'
 
@@ -32,6 +41,8 @@ export interface IUseToolbar {
   getStyleValue(property: Css): string | undefined
   getResolvedStyle(property: Css): IRawStyleWithSource | undefined
   setStyle(property: Css, value: string | undefined, replace?: boolean): void
+  toggleStyle(prop: Css, value: string): void
+  setStyleEnsureFlex: (prop: Css, value: string | undefined) => void
   setProseMirrorStyle(view: EditorView, property: Css, value: string | undefined): void
   createSetComponentCustomStyleCommand(
     property: Css,
@@ -99,7 +110,7 @@ export const useToolbar = (): IUseToolbar => {
     currentPseudoClass,
     selectedComponentFlattenedStyles,
     removeComponentCustomStyle,
-    setComponentCustomStyle,
+    getSelectedComponent,
   } = useBuild()
 
   const isProsemirrorEditing = computed(() => {
@@ -211,6 +222,31 @@ export const useToolbar = (): IUseToolbar => {
     }
   }
 
+  const setStyleCommand = (property: Css, value: string, replace?: boolean): ICommand => {
+    let currentStyle: IStyleEntry | undefined = undefined
+
+    const currentValue = getStyleValue(property)
+    if (currentValue) {
+      currentStyle = {
+        pseudoClass: currentPseudoClass.value,
+        property,
+        value: currentValue,
+      }
+    }
+
+    return setCustomStyleCommand(
+      site.value,
+      getSelectedComponent(),
+      currentStyle,
+      {
+        pseudoClass: currentPseudoClass.value,
+        property,
+        value,
+      },
+      replace,
+    )
+  }
+
   const setStyle = (property: Css, value: string | undefined, replace?: boolean) => {
     const editView = editor.value?.editView
     if (!editor.value?.editView?.state.selection?.empty) {
@@ -224,26 +260,34 @@ export const useToolbar = (): IUseToolbar => {
         pseudoClass: currentPseudoClass.value,
       })
     } else {
-      let currentStyle: IStyleEntry | undefined = undefined
+      const cmd = setStyleCommand(property, value, replace)
+      pushOrReplaceCommand(site.value, cmd, !!replace)
+    }
+  }
 
-      const currentValue = getStyleValue(property)
-      if (currentValue) {
-        currentStyle = {
-          pseudoClass: currentPseudoClass.value,
-          property,
-          value: currentValue,
+  // Sets a style, or un-sets it if the current value matches the new one.
+  const toggleStyle = (prop: Css, value: string) => {
+    if (getStyleValue(prop) === value) {
+      setStyle(prop, undefined)
+    } else {
+      setStyle(prop, value)
+    }
+  }
+
+  const setStyleEnsureFlex = (prop: Css, value: string | undefined) => {
+    setStyle(prop, value)
+    if (value !== undefined && getStyleValue(Css.Display) !== 'flex') {
+      const cmd = getLastCommand(site.value)
+      if (cmd) {
+        const flexCmd = setStyleCommand(Css.Display, 'flex')
+        const flexGroup: ICommand<ICommandGroupData> = {
+          type: CommandType.Group,
+          data: {
+            commands: [flexCmd, cmd],
+          },
         }
+        replaceLastCommand(site.value, flexGroup, true)
       }
-
-      setComponentCustomStyle(
-        currentStyle,
-        {
-          pseudoClass: currentPseudoClass.value,
-          property,
-          value,
-        },
-        replace,
-      )
     }
   }
 
@@ -251,12 +295,7 @@ export const useToolbar = (): IUseToolbar => {
     property: Css,
     newValue: string | undefined,
   ): ICommand<ISetComponentCustomStyleData> | undefined => {
-    const { selectedComponent } = editor.value ?? {}
-    if (!selectedComponent) {
-      throw new Error(
-        'Cannot create set component custom style command when no component is selected',
-      )
-    }
+    const selectedComponent = getSelectedComponent()
     const oldStyle = selectedComponentFlattenedStyles.value[property]
     // Style inherited from mixin should not be set as oldStyle,
     // otherwise undo will create a duplicate custom style that didn't exist before
@@ -305,6 +344,8 @@ export const useToolbar = (): IUseToolbar => {
     getStyleValue,
     getResolvedStyle,
     setStyle,
+    toggleStyle,
+    setStyleEnsureFlex,
     setProseMirrorStyle,
     createSetComponentCustomStyleCommand,
     refocusSelection,

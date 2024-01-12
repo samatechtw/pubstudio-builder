@@ -123,13 +123,6 @@ export const useEditComponentChildStyles = (
     const prop = oldStyle?.property ?? newStyle?.property
     const { removeCmd, originalStyle } = removeEditCommand(editCommands, prop)
 
-    /*
-    const oldStyleEntry: IStyleEntry | undefined =
-    oldStyle?.sourceBreakpointId === activeBreakpoint.value.id
-        ? omitSourceBreakpointId(oldStyle)
-        : undefined
-        */
-
     let commands: ICommand[] | undefined
     if (removeCmd && newStyle) {
       // Undo the previous command to clean up the old property/value
