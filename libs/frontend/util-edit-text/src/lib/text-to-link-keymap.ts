@@ -10,7 +10,7 @@ import {
 import { createLinkNode } from './prosemirror-utils'
 
 export const urlRegex = () =>
-  /(https?:\/\/(www\.)?)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\\+.~#?&/=]*)/g
+  /(https?:\/\/(www\.)?)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\.[a-zA-Z()]{1,6}\b([-a-zA-Z0-9()@:%_\\+.~#?&/=]*)/g
 
 export const textToLinkKeymap = (schema: Schema) => {
   const keys: Record<string, Command> = {}
