@@ -1,9 +1,4 @@
-import {
-  editStylesCancelEdit,
-  getLastCommand,
-  redoCommand,
-  undoLastCommand,
-} from '@pubstudio/frontend/util-command'
+import { redoCommand, undoLastCommand } from '@pubstudio/frontend/util-command'
 import { CommandType } from '@pubstudio/shared/type-command'
 import { computed, ComputedRef } from 'vue'
 import { useBuild } from './use-build'
@@ -27,15 +22,6 @@ export const useHistory = (): IUseHistory => {
     if (uiAlert) {
       commandAlert.value = CommandType.Undo
     }
-    const lastCommand = getLastCommand(site.value)
-    // Clear style edit data
-    if (
-      lastCommand &&
-      ![CommandType.EditStyleMixin, CommandType.SetMixinEntry].includes(lastCommand.type)
-    ) {
-      editStylesCancelEdit(site.value)
-    }
-
     undoLastCommand(site.value)
   }
 
@@ -47,7 +33,6 @@ export const useHistory = (): IUseHistory => {
       commandAlert.value = CommandType.Redo
     }
     redoCommand(site.value)
-    editStylesCancelEdit(site.value)
   }
 
   return {

@@ -4,7 +4,6 @@ import {
 } from '@pubstudio/frontend/feature-site-source'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import {
-  currentStyleType,
   editCommands,
   editingMixinData,
   editStyles,

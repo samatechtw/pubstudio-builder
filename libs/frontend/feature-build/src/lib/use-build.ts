@@ -14,6 +14,7 @@ import {
   getLastCommand,
   pushCommand,
   pushCommandObject,
+  pushOrReplaceCommand,
   replaceLastCommand,
   setSelectedComponent,
 } from '@pubstudio/frontend/util-command'
@@ -143,6 +144,7 @@ export interface IUseBuild {
   addBuiltinComponent: (id: string, parentId?: string) => void
   editSelectedComponent: (fields: IEditComponentFields) => void
   editComponent: (component: IComponent, fields: IEditComponentFields) => void
+  getSelectedComponent: () => IComponent
   setCustomStyle: (
     component: IComponent,
     oldStyle: IStyleEntry | undefined,
@@ -152,11 +154,6 @@ export interface IUseBuild {
   setCustomStyles: (
     component: IComponent,
     styles: IOldNewStyleEntry[],
-    replace?: boolean,
-  ) => void
-  setComponentCustomStyle: (
-    oldStyle: IStyleEntry | undefined,
-    newStyle: IStyleEntry,
     replace?: boolean,
   ) => void
   setPositionAbsolute: (oldStyle: IStyleEntry | undefined, newStyle: IStyleEntry) => void
@@ -475,6 +472,14 @@ export const useBuild = (): IUseBuild => {
     }
   }
 
+  const getSelectedComponent = (): IComponent => {
+    const { selectedComponent } = editor.value ?? {}
+    if (!selectedComponent) {
+      throw new Error('No component is selected')
+    }
+    return selectedComponent
+  }
+
   const setCustomStyle = (
     component: IComponent,
     oldStyle: IStyleEntry | undefined,
@@ -488,11 +493,7 @@ export const useBuild = (): IUseBuild => {
       newStyle,
       replace,
     )
-    if (replace) {
-      replaceLastCommand(site.value, command)
-    } else {
-      pushCommandObject(site.value, command)
-    }
+    pushOrReplaceCommand(site.value, command, replace)
   }
 
   const setCustomStyles = (
@@ -514,22 +515,8 @@ export const useBuild = (): IUseBuild => {
         }
       }),
     }
-    if (replace) {
-      replaceLastCommand(site.value, { type: CommandType.Group, data })
-    } else {
-      pushCommand(site.value, CommandType.Group, data)
-    }
-  }
-
-  const setComponentCustomStyle = (
-    oldStyle: IStyleEntry | undefined,
-    newStyle: IStyleEntry,
-    replace = false,
-  ) => {
-    const selected = site.value.editor?.selectedComponent
-    if (selected) {
-      setCustomStyle(selected, oldStyle, newStyle, replace)
-    }
+    const cmd = { type: CommandType.Group, data }
+    pushOrReplaceCommand(site.value, cmd, !!replace)
   }
 
   const removeComponentCustomStyle = (style: IRemoveStyleEntry) => {
@@ -1241,9 +1228,9 @@ export const useBuild = (): IUseBuild => {
     addBuiltinComponent,
     editComponent,
     editSelectedComponent,
+    getSelectedComponent,
     setCustomStyle,
     setCustomStyles,
-    setComponentCustomStyle,
     setPositionAbsolute,
     removeComponentCustomStyle,
     setOverrideStyle,

@@ -33,10 +33,17 @@ const { initializeSite, site } = useSiteSource()
 await initializeSite({ store: makeMockStore(), siteId: undefined })
 site.value = createSite('__namespace__')
 
-const { addBuiltinComponent, setComponentCustomStyle, editSelectedComponent } = useBuild()
+const {
+  addBuiltinComponent,
+  setCustomStyle,
+  getSelectedComponent,
+  editSelectedComponent,
+} = useBuild()
+const selectedComponent = getSelectedComponent()
 
 addBuiltinComponent(containerVertical.id)
-setComponentCustomStyle(
+setCustomStyle(
+  selectedComponent,
   {
     pseudoClass: CssPseudoClass.Default,
     property: Css.Width,
@@ -52,17 +59,17 @@ setComponentCustomStyle(
 )
 addBuiltinComponent(h1.id)
 editSelectedComponent({ content: 'My Site' })
-setComponentCustomStyle(undefined, {
+setCustomStyle(selectedComponent, undefined, {
   pseudoClass: CssPseudoClass.Default,
   property: Css.AlignContent,
   value: 'center',
 })
-setComponentCustomStyle(undefined, {
+setCustomStyle(selectedComponent, undefined, {
   pseudoClass: CssPseudoClass.Default,
   property: Css.TextAlign,
   value: 'center',
 })
-setComponentCustomStyle(undefined, {
+setCustomStyle(selectedComponent, undefined, {
   pseudoClass: CssPseudoClass.Default,
   property: Css.Margin,
   value: '40px 0 40px 0',

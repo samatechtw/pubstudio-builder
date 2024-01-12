@@ -92,7 +92,7 @@ const {
   getRawStyle,
   getRawOrSelectedStyle,
   getStyleValue,
-  setStyle,
+  toggleStyle,
   setProseMirrorStyle,
   createSetComponentCustomStyleCommand,
   refocusSelection,
@@ -235,11 +235,7 @@ const isUnderline = computed(() => {
 })
 
 const toggleTextDecoration = (value: string) => {
-  if (getStyleValue(Css.TextDecoration) === value) {
-    setStyle(Css.TextDecoration, undefined)
-  } else {
-    setStyle(Css.TextDecoration, value)
-  }
+  toggleStyle(Css.TextDecoration, value)
 }
 
 const isItalic = computed(() => {
@@ -247,11 +243,7 @@ const isItalic = computed(() => {
 })
 
 const toggleFontStyle = (value: string) => {
-  if (getStyleValue(Css.FontStyle) === value) {
-    setStyle(Css.FontStyle, undefined)
-  } else {
-    setStyle(Css.FontStyle, value)
-  }
+  toggleStyle(Css.FontStyle, value)
 }
 
 const iconColor = computed(() => {
