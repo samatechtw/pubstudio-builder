@@ -1,13 +1,18 @@
+import { buildContentWindowInnerId } from '@pubstudio/frontend/feature-build'
 import {
   computeEvents,
   IContent,
   registerCustomEvents,
   removeListeners,
 } from '@pubstudio/frontend/feature-render'
+import {
+  activeBreakpoint,
+  descSortedBreakpoints,
+} from '@pubstudio/frontend/feature-site-source'
+import { findStyles } from '@pubstudio/frontend/util-component'
 import { RenderMode } from '@pubstudio/frontend/util-render'
 import { runtimeContext } from '@pubstudio/frontend/util-runtime'
-import { IComponent, ISite, Tag } from '@pubstudio/shared/type-site'
-import { buildContentWindowInnerId } from '@pubstudio/frontend/feature-build'
+import { Css, IComponent, ISite, Tag } from '@pubstudio/shared/type-site'
 import {
   computed,
   defineComponent,
@@ -34,14 +39,22 @@ const renderImageHover = (
   content: IContent,
 ): VNode => {
   const imgElement = document.getElementById(component.id)
-  const buildContentWindowInner = document.getElementById(buildContentWindowInnerId)
 
   let position = '',
     top = '',
     right = '',
     width = '',
-    height = '',
-    margin = ''
+    height = ''
+  // TODO -- find a more efficient way to compute this. It can't be taken from `imgComputedStyle`
+  // because margin is set to 0 when the img is hovered, so the wrapper gets margin=0 if the img is clicked
+  const margin =
+    findStyles(
+      [Css.Margin],
+      site,
+      component,
+      descSortedBreakpoints.value,
+      activeBreakpoint.value,
+    ).margin ?? ''
 
   if (imgElement) {
     const imgComputedStyle = getComputedStyle(imgElement)
@@ -50,24 +63,8 @@ const renderImageHover = (
     top = imgComputedStyle.top
     right = imgComputedStyle.right
 
-    if (position === 'absolute' && buildContentWindowInner) {
-      // Manually compute the top & right for the absolute positioned
-      // <img> for top & right returned by `getComputedStyle` will be
-      // '0px' when the component is selected by clicking it in the
-      // builder/renderer if it's not selected before click.
-      if (top === '0px' || right === '0px') {
-        const { builderScale = 1 } = site.editor ?? {}
-        const innerRect = buildContentWindowInner.getBoundingClientRect()
-        const imgRect = imgElement.getBoundingClientRect()
-
-        top = (imgRect.top - innerRect.top) / builderScale + 'px'
-        right = (innerRect.right - imgRect.right) / builderScale + 'px'
-      }
-    }
-
     width = imgComputedStyle.width
     height = imgComputedStyle.height
-    margin = imgComputedStyle.margin
     position = imgComputedStyle.position
   }
 

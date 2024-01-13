@@ -24,11 +24,11 @@ const editSvg = () => {
 .svg-edit {
   @mixin flex-center;
   position: relative;
-  margin-top: -100%;
+  height: 0;
+  top: -32px;
+  right: -24px;
   .edit-icon {
     position: absolute;
-    top: -32px;
-    right: -24px;
     width: 26px;
     height: 26px;
   }

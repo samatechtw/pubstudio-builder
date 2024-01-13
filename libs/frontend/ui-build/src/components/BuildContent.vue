@@ -5,6 +5,7 @@
         :id="buildContentWindowInnerId"
         class="build-content-window-inner scrollbar-small"
         :style="innerStyle"
+        @click="selectRoot"
       >
         <ReusableStyle />
         <ComponentStyle />
@@ -34,7 +35,7 @@ import {
   buildContentWindowId,
   buildContentWindowInnerId,
 } from '@pubstudio/frontend/feature-build'
-import { setBuilderWidth } from '@pubstudio/frontend/util-command'
+import { setBuilderWidth, setSelectedComponent } from '@pubstudio/frontend/util-command'
 import { useRenderBuilder } from '@pubstudio/frontend/feature-render-builder'
 
 const { site, activePage, editor } = useBuild()
@@ -103,6 +104,14 @@ const resizeObserver = new ResizeObserver(
     }
   }, 200),
 )
+
+// If the root component doesn't extend to the whole editor width/height,
+// select it when the build window is clicked
+const selectRoot = (e: MouseEvent) => {
+  if ((e.target as HTMLElement)?.id === buildContentWindowInnerId) {
+    setSelectedComponent(site.value, activePage.value?.root)
+  }
+}
 
 onMounted(() => {
   if (contentWindowRef.value) {

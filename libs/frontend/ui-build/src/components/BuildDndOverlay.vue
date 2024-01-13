@@ -7,11 +7,12 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, nextTick, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { runtimeContext } from '@pubstudio/frontend/util-runtime'
 import { buildContentWindowInnerId, useBuild } from '@pubstudio/frontend/feature-build'
 import { activeBreakpoint } from '@pubstudio/frontend/feature-site-source'
 import { IComponent } from '@pubstudio/shared/type-site'
+import { sleep } from '@pubstudio/shared/util-core'
 
 const hoverOutlineThickness = 6
 const outlineColor = '#000'
@@ -105,18 +106,22 @@ const hoverOverlayStyle = computed(() => {
   return undefined
 })
 
-// Use `ref`+`watch` instead of `computed` because we have to use `nextTick`
-// to wait for the screen to (re)render before calculating the width and
-// height of the component on page load & after selection.
+// Use `ref`+`watch` instead of `computed` because we have to wait for the screen to (re)render
+// before calculating the width and height of the component on page load & after selection.
 const selectionOverlayStyle = ref()
 
 const computeSelectionOverlay = async (selectedComponent: IComponent | undefined) => {
   if (selectedComponent) {
-    // This `nextTick` is necessary for buildContentWindowInner and componentElement
-    await nextTick()
+    // This sleep is necessary for buildContentWindowInner and componentElement
+    await sleep(1)
 
     const buildContentWindowInner = document.getElementById(buildContentWindowInnerId)
-    const componentElement = document.getElementById(selectedComponent.id)
+    let componentElement = document.getElementById(selectedComponent.id)
+    // Container size might be different from the actual component
+    const containerChild = componentElement?.children?.[0]
+    if (containerChild?.className?.includes('component-content-container')) {
+      componentElement = containerChild.children?.[0] as HTMLElement
+    }
 
     if (buildContentWindowInner && componentElement) {
       const { top: buildContentWindowTop, left: buildContentWindowLeft } =
@@ -141,11 +146,11 @@ const computeSelectionOverlay = async (selectedComponent: IComponent | undefined
       )
 
       selectionOverlayStyle.value = {
-        top: `${top}px`,
-        left: `${left}px`,
+        top: `${top - 1}px`,
+        left: `${left - 1}px`,
         width: `${width}px`,
         height: `${height}px`,
-        border: '1.5px solid #3768FF',
+        border: '2px solid #3768FF',
       }
     }
   } else {
@@ -158,6 +163,8 @@ watch(
     selectedComponent: editor.value?.selectedComponent,
     // Re-compute selection overlay width & height when active breakpoint changes.
     activeBreakpoint: activeBreakpoint.value,
+    // Recompute on window resize
+    buildContentWindowSize: runtimeContext.buildContentWindowSize.value,
   }),
   async ({ selectedComponent }) => {
     computeSelectionOverlay(selectedComponent)
@@ -226,7 +233,7 @@ const normalizeDimensions = (
 }
 
 onMounted(() => {
-  setTimeout(() => computeSelectionOverlay(editor.value?.selectedComponent), 1)
+  computeSelectionOverlay(editor.value?.selectedComponent)
 })
 </script>
 
@@ -236,7 +243,7 @@ onMounted(() => {
 .build-dnd-overlay {
   position: absolute;
   pointer-events: none;
-  /* Ensure the overlay will be on top of absolute positioned components. */
+  /* Ensure overlay is on top of absolute positioned components. */
   z-index: 1;
 }
 </style>
