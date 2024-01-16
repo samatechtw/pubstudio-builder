@@ -18,8 +18,13 @@
       :items="items"
       :opened="opened"
       :style="menuStyle"
+      :extraHeight="extraHeight"
       @closeMenu="closeMenu"
-    />
+    >
+      <template #before>
+        <slot name="before"></slot>
+      </template>
+    </DropdownMenuItems>
   </div>
 </template>
 
@@ -38,12 +43,15 @@ const props = withDefaults(
     items?: IDropdownMenuItem[]
     clickawaySelector?: string
     hideWhenNoItems?: boolean
+    // Extra height used by slots is needed for the height animation to work correctly
+    extraHeight?: number
   }>(),
   {
     label: undefined,
     items: () => [],
     clickawaySelector: '.ps-menu',
     hideWhenNoItems: false,
+    extraHeight: 0,
   },
 )
 const { items, clickawaySelector, hideWhenNoItems } = toRefs(props)

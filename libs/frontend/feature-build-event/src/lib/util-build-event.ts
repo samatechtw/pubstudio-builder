@@ -6,6 +6,7 @@ export const hotkeysDisabled = (e: KeyboardEvent, editor: IEditorContext | undef
     e.target instanceof HTMLInputElement ||
     e.target instanceof HTMLTextAreaElement ||
     editor?.editBehavior ||
+    editor?.editSvg ||
     editor?.translations ||
     !!editingMixinData.value ||
     (e.target instanceof HTMLElement && e.target.classList.contains('ProseMirror'))

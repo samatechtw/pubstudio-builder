@@ -196,8 +196,12 @@ export const useBuildEvent = () => {
   }
 
   const pressEscape = () => {
-    if (editor.value?.editBehavior || editor.value?.translations) {
-      // Handled directly in `BehaviorModal.vue` or `TranslationsModal.vue`
+    if (
+      editor.value?.editBehavior ||
+      editor.value?.editSvg ||
+      editor.value?.translations
+    ) {
+      // Handled directly in SVG/Behavior/Translations modal
       // This is also checked in `hotkeysDisabled`
     } else if (runtimeContext.componentTreeItemRenameData.value.renaming) {
       // This is for the case where rename input is still visible in the tree, but

@@ -3,6 +3,7 @@
     cls="svg-modal"
     :show="!!editSvg"
     :cancelByClickingOutside="false"
+    escapeEvent="keyup"
     @cancel="clearSvg"
   >
     <div class="svg-content">
