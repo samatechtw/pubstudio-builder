@@ -1,6 +1,7 @@
 export * from './lib/components/builtin-button'
 export * from './lib/components/builtin-container-horizontal'
 export * from './lib/components/builtin-container-vertical'
+export * from './lib/components/builtin-divider'
 export * from './lib/components/builtin-header'
 export * from './lib/components/builtin-footer'
 export * from './lib/components/builtin-image'

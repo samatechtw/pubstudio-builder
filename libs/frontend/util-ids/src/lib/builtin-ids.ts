@@ -55,6 +55,13 @@ export const listItemStyleId = nextStyleId(defaultContext)
 export const ulId = componentId(defaultContext.namespace, 'ul')
 export const ollId = componentId(defaultContext.namespace, 'ol')
 export const liId = componentId(defaultContext.namespace, 'li')
+export const dividerVerticalStyleId = nextStyleId(defaultContext)
+export const dividerVerticalId = componentId(defaultContext.namespace, 'dividerVertical')
+export const dividerHorizontalStyleId = nextStyleId(defaultContext)
+export const dividerHorizontalId = componentId(
+  defaultContext.namespace,
+  'dividerHorizontal',
+)
 
 // Form
 export const inputStyleId = nextStyleId(defaultContext)
