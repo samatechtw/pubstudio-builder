@@ -23,15 +23,17 @@ const props = withDefaults(
     disableClose?: boolean
     cancelByClickingOutside?: boolean
     cancelWithEscape?: boolean
+    escapeEvent?: 'keyup' | 'keydown'
   }>(),
   {
     closeColor: 'black',
     cls: undefined,
     cancelByClickingOutside: true,
     cancelWithEscape: true,
+    escapeEvent: 'keydown',
   },
 )
-const { show, cancelByClickingOutside, cancelWithEscape } = toRefs(props)
+const { show, cancelByClickingOutside, escapeEvent, cancelWithEscape } = toRefs(props)
 const emit = defineEmits<{
   (e: 'cancel'): void
 }>()
@@ -60,10 +62,10 @@ const modalSetup = (show: boolean) => {
     return
   }
   if (show) {
-    document.addEventListener('keydown', escape)
+    document.addEventListener(escapeEvent.value, escape)
     document.body.classList.add('noscroll')
   } else {
-    document.removeEventListener('keydown', escape)
+    document.removeEventListener(escapeEvent.value, escape)
     document.body.classList.remove('noscroll')
   }
   listenersActive.value = show

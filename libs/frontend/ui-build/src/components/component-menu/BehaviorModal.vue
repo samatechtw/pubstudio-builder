@@ -3,6 +3,7 @@
     cls="bm"
     :show="!!behavior"
     :cancelByClickingOutside="false"
+    escapeEvent="keyup"
     @cancel="clearBehavior"
   >
     <div>

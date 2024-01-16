@@ -1,5 +1,6 @@
 <template>
   <div class="dropdown-menu-items" :class="{ opened }">
+    <slot name="before"></slot>
     <template v-for="(item, index) in items" :key="index">
       <component
         :is="itemTag(item)"
@@ -25,10 +26,17 @@ import Spinner from '../Spinner.vue'
 
 const { t } = useI18n()
 
-defineProps<{
-  opened: boolean
-  items: IDropdownMenuItem[]
-}>()
+withDefaults(
+  defineProps<{
+    opened: boolean
+    items: IDropdownMenuItem[]
+    // Extra height used by slots is needed for the height animation to work correctly
+    extraHeight?: number
+  }>(),
+  {
+    extraHeight: 0,
+  },
+)
 
 const emit = defineEmits<{
   (e: 'itemClick', item: IDropdownMenuItem): void
@@ -89,14 +97,14 @@ const computeItemLabel = (item: IDropdownMenuItem) => {
 .dropdown-menu-items {
   filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.25));
   position: absolute;
-  min-width: 184px;
+  min-width: 216px;
   height: 0;
   max-height: 192px;
   overflow: hidden;
   transition: height 0.2s;
   z-index: 1;
   &.opened {
-    height: v-bind(items.length * 48 + 'px');
+    height: v-bind(extraHeight + (items.length * 48) + 'px');
     overflow-y: auto;
   }
   .ps-dropdown-item {
