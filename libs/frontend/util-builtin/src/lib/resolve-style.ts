@@ -3,6 +3,10 @@ import { ISiteContext, IStyle } from '@pubstudio/shared/type-site'
 import { buttonStyle } from './components/builtin-button'
 import { horizontalStyle } from './components/builtin-container-horizontal'
 import { verticalStyle } from './components/builtin-container-vertical'
+import {
+  dividerHorizontalStyle,
+  dividerVerticalStyle,
+} from './components/builtin-divider'
 import { footerStyle } from './components/builtin-footer'
 import {
   h1Style,
@@ -43,6 +47,8 @@ export const builtinStyles: Record<string, IStyle> = {
   [inputStyle.id]: inputStyle,
   [textareaStyle.id]: textareaStyle,
   [listStyle.id]: listStyle,
+  [dividerHorizontalStyle.id]: dividerHorizontalStyle,
+  [dividerVerticalStyle.id]: dividerVerticalStyle,
 }
 
 export const resolveStyle = (

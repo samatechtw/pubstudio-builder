@@ -43,6 +43,11 @@
         :text="t('build.footer')"
         :builtinComponentId="footer.id"
       />
+      <NewComponent
+        class="new-divider-horizontal"
+        :text="t('build.divider_horizontal')"
+        :builtinComponentId="dividerHorizontal.id"
+      />
     </div>
     <div class="new-right">
       <NewComponent
@@ -66,6 +71,11 @@
         class="new-textarea"
         :text="t('build.textarea')"
         :builtinComponentId="textarea.id"
+      />
+      <NewComponent
+        class="new-divider-vertical"
+        :text="t('build.divider_vertical')"
+        :builtinComponentId="dividerVertical.id"
       />
     </div>
   </div>
@@ -94,6 +104,8 @@ import {
   input,
   textarea,
   svg,
+  dividerVertical,
+  dividerHorizontal,
 } from '@pubstudio/frontend/util-builtin'
 import NewComponent from './NewComponent.vue'
 

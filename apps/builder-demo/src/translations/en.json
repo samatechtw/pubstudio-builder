@@ -166,6 +166,8 @@
     "image": "Image",
     "svg": "SVG",
     "link": "Link",
+    "divider_horizontal": "Horizontal Divider",
+    "divider_vertical": "Vertical Divider",
     "no_link": "No link",
     "open_in_new_tab": "Open in new tab",
     "site_error": "Site Error",

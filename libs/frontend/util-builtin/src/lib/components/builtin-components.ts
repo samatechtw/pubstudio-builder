@@ -2,6 +2,7 @@ import { ISerializedComponent } from '@pubstudio/shared/type-site'
 import { button } from './builtin-button'
 import { containerHorizontal } from './builtin-container-horizontal'
 import { containerVertical } from './builtin-container-vertical'
+import { dividerHorizontal, dividerVertical } from './builtin-divider'
 import { footer } from './builtin-footer'
 import { h1, h2, h3, h4, h5, h6 } from './builtin-h'
 import { header, headerLogo, headerLogoLink, headerNavMenu } from './builtin-header'
@@ -40,4 +41,6 @@ export const builtinComponents: Record<string, ISerializedComponent> = {
   [textarea.id]: textarea,
   [ul.id]: ul,
   [ol.id]: ol,
+  [dividerVertical.id]: dividerVertical,
+  [dividerHorizontal.id]: dividerHorizontal,
 }

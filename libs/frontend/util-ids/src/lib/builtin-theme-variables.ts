@@ -16,7 +16,7 @@ export const builtinThemeVariables = {
   'color-active': '#2343B4',
   'color-secondary': '#1b3858',
   'color-disabled': '#868692',
-  'color-border': '#dddfe2',
+  'color-border': '#8b8b8b',
   'color-button-hover': '#b7c8dc',
   'font-title': 'Helvetica, sans-serif',
   'font-text': 'Georgia, sans-serif',
