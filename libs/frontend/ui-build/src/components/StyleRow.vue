@@ -22,6 +22,7 @@
         ref="valueInputRef"
         :modelValue="style.value"
         class="value-input"
+        :class="{ small: showAssetButton }"
         :placeholder="t('value')"
         :isError="!!valueErrorMessage"
         @update:modelValue="updateValue"
@@ -30,9 +31,21 @@
       />
     </div>
     <div class="item">
+      <Assets
+        v-if="showAssetButton"
+        class="edit-icon backgound-asset-icon"
+        @click="showSelectAssetModal = true"
+      />
       <Check class="item-save" color="#009879" @click.stop="saveStyle" />
       <Minus class="item-delete" @click.stop="removeStyle" />
     </div>
+    <SelectAssetModal
+      :show="showSelectAssetModal"
+      :initialSiteId="siteId"
+      :contentTypes="[AssetContentType.Jpeg, AssetContentType.Png, AssetContentType.Gif]"
+      @cancel="showSelectAssetModal = false"
+      @select="onBackgroundAssetSelected"
+    />
   </div>
   <div v-else class="style">
     <div class="label">
@@ -44,12 +57,24 @@
     >
       {{ style?.value }}
     </div>
+    <Assets
+      v-if="showAssetButton"
+      class="edit-icon backgound-asset-icon"
+      @click="showSelectAssetModal = true"
+    />
     <Edit class="edit-icon" @click="edit" />
     <Minus v-if="!style.inheritedFrom" class="item-delete" @click.stop="removeStyle" />
     <InfoBubble
       v-if="style.inheritedFrom"
       class="inherited-from"
       :message="style.inheritedFrom"
+    />
+    <SelectAssetModal
+      :show="showSelectAssetModal"
+      :initialSiteId="siteId"
+      :contentTypes="[AssetContentType.Jpeg, AssetContentType.Png, AssetContentType.Gif]"
+      @cancel="showSelectAssetModal = false"
+      @select="onBackgroundAssetSelected"
     />
   </div>
 </template>
@@ -58,7 +83,14 @@
 import { computed, nextTick, onMounted, ref, toRefs } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { StyleProperty, StyleValue } from '@pubstudio/frontend/ui-widgets'
-import { Check, Edit, InfoBubble, Minus, PSInput } from '@pubstudio/frontend/ui-widgets'
+import {
+  Assets,
+  Check,
+  Edit,
+  InfoBubble,
+  Minus,
+  PSInput,
+} from '@pubstudio/frontend/ui-widgets'
 import {
   Css,
   CssPseudoClass,
@@ -67,6 +99,13 @@ import {
 } from '@pubstudio/shared/type-site'
 import { useBuild, validateCssValue } from '@pubstudio/frontend/feature-build'
 import { Keys } from '@pubstudio/frontend/util-key-listener'
+import { SelectAssetModal } from '@pubstudio/frontend/feature-site-assets'
+import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
+import {
+  AssetContentType,
+  ISiteAssetViewModel,
+} from '@pubstudio/shared/type-api-platform-site-asset'
+import { urlFromAsset } from '@pubstudio/frontend/util-asset'
 
 const { t } = useI18n()
 const { site } = useBuild()
@@ -90,6 +129,7 @@ const emit = defineEmits<{
 
 const valueInputRef = ref()
 const valueSelectRef = ref()
+const showSelectAssetModal = ref(false)
 
 const valueOptions = computed(() => {
   const prop = style.value?.property
@@ -99,7 +139,13 @@ const valueOptions = computed(() => {
 // Wrap the property/value inputs when they overflow
 const editWrap = computed(() => {
   const s = style.value
-  return editing.value && (s.property.length > 16 || s.value.length > 12)
+  if (editing.value) {
+    if ([Css.Background, Css.BackgroundImage].includes(s.property)) {
+      return s.value.length > 10
+    }
+    return s.property.length > 16 || s.value.length > 12
+  }
+  return false
 })
 
 const propertyText = computed(() => {
@@ -109,6 +155,20 @@ const propertyText = computed(() => {
     return `${style.value.pseudoClass} ${style.value.property}`
   }
 })
+
+const showAssetButton = computed(
+  () =>
+    style.value.property === Css.Background ||
+    style.value.property === Css.BackgroundImage,
+)
+
+const { siteStore } = useSiteSource()
+
+const siteId = computed(
+  () =>
+    // `siteId` is unwrapped by ref, so it's actually a string instead of a Ref<string>.
+    siteStore.value.siteId as unknown as string,
+)
 
 const focusValue = async () => {
   await nextTick()
@@ -173,6 +233,42 @@ const removeStyle = () => {
   emit('remove')
 }
 
+const onBackgroundAssetSelected = (asset: ISiteAssetViewModel) => {
+  const assetUrl = urlFromAsset(asset)
+  if (style.value.property === Css.Background) {
+    const newValue = replaceBackground(assetUrl)
+    updateValue(newValue)
+    saveStyle()
+  } else if (style.value.property === Css.BackgroundImage) {
+    updateValue(`url("${assetUrl}")`)
+    saveStyle()
+  }
+  showSelectAssetModal.value = false
+}
+
+const replaceBackground = (assetUrl: string) => {
+  const cssValue = `url("${assetUrl}")`
+  const currentValue = style.value.value
+  if (CSS.supports('background', currentValue)) {
+    // Replace the background value and retain any non-url information.
+    // Find a more efficient & comprehensive way to extract attributes from CSS value.
+    const attributes = style.value.value
+      .split(/([^\s]+|"[^"]+"|'[^']+')/g)
+      .filter((value) => value.trim())
+    const valueIndex = attributes.findIndex(
+      (value) =>
+        // url(...), radial-gradient(crimson, skyblue), etc.
+        CSS.supports('background-image', value) ||
+        // red, green, etc.
+        CSS.supports('color', value),
+    )
+    attributes[valueIndex] = cssValue
+    return attributes.join(' ')
+  } else {
+    return cssValue
+  }
+}
+
 onMounted(() => {
   // Component is re-mounted on property change. Ideally we would avoid this,
   // but it's difficult because there is no consistent key in that case
@@ -196,6 +292,7 @@ onMounted(() => {
   }
   .label {
     margin-right: 0;
+    flex-shrink: 1;
   }
 }
 .label {
@@ -239,6 +336,10 @@ onMounted(() => {
   :deep(.ps-input) {
     height: 34px;
   }
+}
+.small {
+  max-width: 88px;
+  width: 88px;
 }
 .edit-wrap {
   flex-wrap: wrap;
