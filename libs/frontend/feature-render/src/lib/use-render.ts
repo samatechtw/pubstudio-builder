@@ -9,6 +9,7 @@ import {
   RenderMode,
 } from '@pubstudio/frontend/util-render'
 import { Css, IPage, ISite } from '@pubstudio/shared/type-site'
+import { renderGoogleFontsLink } from '@pubstudio/frontend/util-render'
 import { Link, Meta, Script, useHead } from '@unhead/vue'
 import { Component, computed, ComputedRef, defineComponent, h, Ref } from 'vue'
 import {
@@ -85,22 +86,10 @@ export const useRender = (options: IUseRenderOptions): IUseRender => {
   })
 
   const googleFonts = computed(() => {
-    const fonts = Object.values(site.value?.context.theme.fonts ?? {})
-    if (!fonts.length) {
-      return undefined
-    } else {
-      // See https://developers.google.com/fonts/docs/css2#multiple_families
-      const familyParams = fonts
-        .map((font) => {
-          const fontName = font.name.replace(' ', '+')
-          return `family=${fontName}`
-        })
-        .join('&')
-      return h('link', {
-        rel: 'stylesheet',
-        href: `https://fonts.googleapis.com/css2?${familyParams}`,
-      })
-    }
+    const fontNames = Object.values(site.value?.context.theme.fonts ?? {}).map(
+      (font) => font.name,
+    )
+    return renderGoogleFontsLink(fontNames)
   })
 
   const GoogleFontLink = defineComponent({

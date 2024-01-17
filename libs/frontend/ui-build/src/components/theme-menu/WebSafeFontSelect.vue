@@ -6,9 +6,16 @@
     :placeholder="t('theme.font_name')"
     :options="WebSafeFontValues"
     :clearable="false"
+    :customLabel="true"
     @select="emit('update:modelValue', $event)"
     @click.stop
-  />
+  >
+    <template #default="{ label }">
+      <div :style="{ 'font-family': quotedFont(label) }">
+        {{ label }}
+      </div>
+    </template>
+  </PSMultiselect>
 </template>
 
 <script lang="ts" setup>
@@ -31,6 +38,8 @@ const emit = defineEmits<{
 }>()
 
 const multiselectRef = ref(null)
+
+const quotedFont = (fontName: string) => `"${fontName}"`
 
 defineExpose({ multiselectRef })
 </script>
