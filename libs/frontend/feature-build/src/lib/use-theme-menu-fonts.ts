@@ -6,6 +6,8 @@ import { useBuild } from './use-build'
 export interface IUseThemeMenuFontFeature {
   editing: Ref<boolean>
   editingFont: UnwrapNestedRefs<IThemeFont>
+  // All Google Fonts selected at runtime.
+  selectedGoogleFonts: Ref<Set<string>>
   fontError: Ref<string | undefined>
   fonts: ComputedRef<IThemeFont[]>
   clearEditingState: () => void
@@ -22,6 +24,7 @@ const emptyFont = (): IThemeFont => ({
 
 const editing = ref(false)
 const editingFont = reactive<IThemeFont>(emptyFont())
+const selectedGoogleFonts = ref(new Set<string>())
 const editingFontSource = reactive<IThemeFont>(emptyFont())
 const fontError = ref<string | undefined>()
 
@@ -92,6 +95,7 @@ export const useThemeMenuFonts = (): IUseThemeMenuFontFeature => {
   return {
     editing,
     editingFont,
+    selectedGoogleFonts,
     fontError,
     fonts,
     clearEditingState,

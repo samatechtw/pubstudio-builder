@@ -8,16 +8,22 @@ import {
 import { NotFound } from '@pubstudio/frontend/ui-widgets'
 import { computed, defineComponent, h } from 'vue'
 import { renderPage } from './render-builder'
-import { IRawStyleRecord, rawStyleRecordToString } from '@pubstudio/frontend/util-render'
+import {
+  IRawStyleRecord,
+  rawStyleRecordToString,
+  renderGoogleFontsLink,
+} from '@pubstudio/frontend/util-render'
 import {
   activeBreakpoint,
   descSortedBreakpoints,
 } from '@pubstudio/frontend/feature-site-source'
 import { Css } from '@pubstudio/shared/type-site'
+import { useThemeMenuFonts } from '@pubstudio/frontend/feature-build'
 
 export const useRenderBuilder = (options: IUseRenderOptions): IUseRender => {
   const { site, activePage } = options
   const render = useRender(options)
+  const { selectedGoogleFonts } = useThemeMenuFonts()
 
   const reusableStyle = computed(() => {
     let styleContent = ''
@@ -66,9 +72,31 @@ export const useRenderBuilder = (options: IUseRenderOptions): IUseRender => {
     },
   })
 
+  const googleFonts = computed(() => {
+    const themeFontNames = Object.values(site.value?.context.theme.fonts ?? {}).map(
+      (font) => font.name,
+    )
+
+    const fontNames = [...themeFontNames]
+    for (const googleFontName of selectedGoogleFonts.value) {
+      if (!fontNames.includes(googleFontName)) {
+        fontNames.push(googleFontName)
+      }
+    }
+
+    return renderGoogleFontsLink(fontNames)
+  })
+
+  const GoogleFontLink = defineComponent({
+    render() {
+      return googleFonts.value
+    },
+  })
+
   return {
     ...render,
     ReusableStyle,
     PageContent,
+    GoogleFontLink,
   }
 }
