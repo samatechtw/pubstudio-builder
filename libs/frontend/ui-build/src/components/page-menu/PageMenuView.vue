@@ -8,13 +8,15 @@
       :editable="false"
     />
     <MenuRow :label="t('build.home_page')" :editable="false">
-      <span v-if="isHomePage">{{ t('yes') }}</span>
-      <PSButton
-        v-else
-        :text="t('build.set_home')"
-        size="small"
-        @click="showConfirmSetHomePage = true"
-      />
+      <template #item>
+        <span v-if="isHomePage">{{ t('yes') }}</span>
+        <PSButton
+          v-else
+          :text="t('build.set_home')"
+          size="small"
+          @click="showConfirmSetHomePage = true"
+        />
+      </template>
     </MenuRow>
     <div class="actions">
       <PSButton :text="t('build.edit_page')" size="small" @click="edit" />

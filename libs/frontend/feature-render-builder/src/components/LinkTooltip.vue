@@ -71,7 +71,7 @@ import { resolveComponent } from '@pubstudio/frontend/util-builtin'
 import { ComponentArgPrimitive } from '@pubstudio/shared/type-site'
 import { createLinkNode, schemaText } from '@pubstudio/frontend/util-edit-text'
 import { LinkTooltipMode } from '../lib/enum-link-tooltip-mode'
-import { Node, ResolvedPos } from 'prosemirror-model'
+import { ResolvedPos } from 'prosemirror-model'
 
 const { t } = useI18n()
 const {
