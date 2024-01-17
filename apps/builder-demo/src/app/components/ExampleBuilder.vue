@@ -124,7 +124,7 @@ watch(droppedFile, (newVal) => {
 /*
 const showCreateComplete = (asset: ICreatePlatformSiteAssetResponse) => {
   if (droppedFile.value && activePage.value) {
-    const addImageData = makeAddImageData(site.value, activePage.value.root, asset)
+    const addImageData = makeAddImageData(site.value, activePage.value.root, urlFromAsset(asset))
     if (addImageData) {
       addComponentData({
         ...addImageData,

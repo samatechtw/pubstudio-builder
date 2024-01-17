@@ -16,8 +16,10 @@
       <UsageProgress :current="usage" :max="usageAllowance" />
     </div>
     <AssetFilters :sites="sites" @updateFilter="updateFilter" />
-    <div class="asset-list">
-      <PSSpinner v-if="loadingAssets" class="assets-spinner" :scale="5" color="#2a17d6" />
+    <div v-if="loadingAssets" class="assets-spinner">
+      <PSSpinner :scale="5" color="#2a17d6" />
+    </div>
+    <div v-else class="asset-list">
       <div v-if="assets?.length === 0" class="assets-empty">
         {{ t('assets.no_assets') }}
       </div>
@@ -148,18 +150,20 @@ onMounted(async () => {
   }
 }
 .assets-spinner {
+  min-height: 200px;
   margin-top: 80px;
 }
 
 .asset-list {
   display: flex;
   flex-wrap: wrap;
+  min-height: 272px;
   margin-top: 8px;
   margin-left: -16px;
 }
 .assets-empty {
   @mixin title-medium 18px;
-  padding-top: 64px;
+  padding: 64px 0 0 16px;
   color: $grey-500;
 }
 .asset-card {

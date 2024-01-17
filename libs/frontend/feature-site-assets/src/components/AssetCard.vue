@@ -80,7 +80,7 @@ const dndProps = computed(() => {
   if (!small.value || !activePage.value) {
     return
   }
-  const addImageData = makeAddImageData(site.value, activePage.value.root, asset.value)
+  const addImageData = makeAddImageData(site.value, activePage.value.root, assetUrl.value)
   if (!addImageData) {
     return undefined
   }

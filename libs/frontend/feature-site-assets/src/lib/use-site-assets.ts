@@ -9,6 +9,7 @@ import {
   IUpdatePlatformSiteAssetRequest,
   IVerifyPlatformSiteAssetResponse,
 } from '@pubstudio/shared/type-api-platform-site-asset'
+import { sleep } from '@pubstudio/shared/util-core'
 import { inject, Ref, ref } from 'vue'
 import { IUploadFileResult, useAssets } from './upload-asset'
 
@@ -90,6 +91,7 @@ export const useSiteAssets = (): ISiteAssetsFeature => {
 
   const listAssets = async (params: IListPlatformSiteAssetsRequest): Promise<void> => {
     loading.value = true
+    await sleep(2000)
     try {
       const response = await api.listSiteAssets(params)
       usage.value = response.total_usage

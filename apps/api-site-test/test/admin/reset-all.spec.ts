@@ -3,6 +3,7 @@ import {
   ICreateSiteApiResponse,
 } from '@pubstudio/shared/type-api-site-sites'
 import supertest from 'supertest'
+import TestAgent from 'supertest/lib/agent'
 import { adminAuthHeader, ownerAuthHeader } from '../helpers/auth-helpers'
 import { mockCreateSitePayload } from '../mocks/mock-create-site-payload'
 import { SITE_SEEDS } from '../mocks/site-seeds'
@@ -10,7 +11,7 @@ import { testConfig } from '../test.config'
 
 describe('Admin reset all endpoint', () => {
   const testEndpoint = '/api/admin/actions/reset'
-  let api: supertest.SuperTest<supertest.Test>
+  let api: TestAgent
   let authHeader: string
   let payload: ICreateSiteApiRequest
 

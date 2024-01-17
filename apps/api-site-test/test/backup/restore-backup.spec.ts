@@ -1,13 +1,14 @@
 import { IGetSiteApiResponse } from '@pubstudio/shared/type-api-site-sites'
 import { SiteApiResetService } from '@pubstudio/shared/util-test-reset'
 import supertest from 'supertest'
+import TestAgent from 'supertest/lib/agent'
 import { adminAuthHeader, ownerAuthHeader } from '../helpers/auth-helpers'
 import { SITE_SEEDS } from '../mocks/site-seeds'
 import { testConfig } from '../test.config'
 
 describe('Restore Backup', () => {
   const testEndpoint = '/api/sites'
-  let api: supertest.SuperTest<supertest.Test>
+  let api: TestAgent
   let adminAuth: string
   let ownerAuth: string
   let resetService: SiteApiResetService
