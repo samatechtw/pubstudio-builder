@@ -12,6 +12,7 @@ node_modules/
 log
 *~
 *.sqlite3
+.nx/cache
 
 *.env
 .env.stage
