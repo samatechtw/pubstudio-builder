@@ -3,16 +3,17 @@
     <div class="label">
       {{ label }}
     </div>
-    <PSInput
-      v-if="editing || forceEdit"
-      ref="newValueRef"
-      v-model="newValue"
-      class="item"
-      :placeholder="placeholder"
-      @update:modelValue="immediateSetValue"
-      @keydown.enter="setValue"
-      @keyup.esc="$event.srcElement.blur()"
-    />
+    <slot v-if="editing || forceEdit" name="input">
+      <PSInput
+        ref="newValueRef"
+        v-model="newValue"
+        class="item"
+        :placeholder="placeholder"
+        @update:modelValue="immediateSetValue"
+        @keydown.enter="setValue"
+        @keyup.esc="$event.srcElement.blur()"
+      />
+    </slot>
     <div
       v-else
       class="item edit-item"
@@ -20,7 +21,7 @@
       @click="editValue"
     >
       {{ value || '' }}
-      <slot />
+      <slot name="item" />
       <Edit v-if="editable" class="edit-icon" />
       <Copy v-if="value && copyValue" class="copy-icon" @click="copy(value)" />
     </div>

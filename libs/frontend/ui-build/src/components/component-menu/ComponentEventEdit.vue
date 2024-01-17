@@ -38,7 +38,18 @@
           :forceEdit="true"
           :immediateUpdate="true"
           @update="setEventParam(param[0], $event)"
-        />
+        >
+          <template v-if="param[1].type === ComponentArgPrimitive.Boolean" #input>
+            <Checkbox
+              class="event-param-checkbox"
+              :item="{
+                label: '',
+                checked: ['true', true].includes(param[1].value),
+              }"
+              @checked="setEventParam(param[0], $event.toString())"
+            />
+          </template>
+        </MenuRow>
       </div>
     </div>
     <!-- Event Behaviors -->
@@ -95,17 +106,18 @@
 <script lang="ts">
 import { computed } from 'vue'
 import {
+  ComponentArgPrimitive,
   ComponentEventType,
   ComponentEventTypeValues,
   IBehavior,
   IComponentEvent,
   IComponentEventBehavior,
 } from '@pubstudio/shared/type-site'
-import { Plus } from '@pubstudio/frontend/ui-widgets'
-import EditMenuTitle from '../EditMenuTitle.vue'
-import EventBehaviorRow from './EventBehaviorRow.vue'
+import { Checkbox, Plus } from '@pubstudio/frontend/ui-widgets'
 import { useBuild } from '@pubstudio/frontend/feature-build'
 import { setEditBehavior } from '@pubstudio/frontend/util-command'
+import EditMenuTitle from '../EditMenuTitle.vue'
+import EventBehaviorRow from './EventBehaviorRow.vue'
 import { IUpdateComponentArgPayload } from '../component-arg/i-update-component-arg-payload'
 import BehaviorModal from './BehaviorModal.vue'
 
@@ -207,22 +219,23 @@ const updateEventName = (name: ComponentEventType | undefined) => {
     if (!newEvent.value.eventParams?.interval) {
       newEvent.value.eventParams = {
         interval: {
+          type: ComponentArgPrimitive.Number,
           value: '1000',
         },
       }
     }
   } else if (name === ComponentEventType.ScrollIntoView) {
-    if (newEvent.value.eventParams?.interval === undefined) {
-      newEvent.value.eventParams = {
-        margin: {
-          value: '0%',
-          infoKey: 'build.event_params_info.scroll_into_view.margin',
-        },
-        direction: {
-          value: 'down',
-          infoKey: 'build.event_params_info.scroll_into_view.direction',
-        },
-      }
+    newEvent.value.eventParams = {
+      margin: {
+        type: ComponentArgPrimitive.String,
+        value: '0%',
+        infoKey: 'build.event_params_info.scroll_into_view.margin',
+      },
+      direction: {
+        type: ComponentArgPrimitive.String,
+        value: 'down',
+        infoKey: 'build.event_params_info.scroll_into_view.direction',
+      },
     }
   } else {
     newEvent.value.eventParams = undefined
@@ -237,6 +250,7 @@ const setEventParam = (paramName: string, value: string | undefined) => {
   } else {
     newEvent.value.eventParams = {
       [paramName]: {
+        type: ComponentArgPrimitive.String,
         value: value ?? '',
       },
     }
@@ -338,6 +352,9 @@ const save = () => {
   }
   .event-params {
     margin-top: 16px;
+  }
+  .event-param-checkbox {
+    margin: 0;
   }
   .event-actions {
     @mixin menu-actions;

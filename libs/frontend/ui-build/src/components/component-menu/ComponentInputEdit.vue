@@ -17,7 +17,17 @@
       :immediateUpdate="true"
       :placeholder="t('value')"
       @update="newInput.type = $event as ComponentArgPrimitive"
-    />
+    >
+      <template #input>
+        <PSMultiselect
+          class="input-type-multiselect"
+          :value="newInput.type"
+          :placeholder="t('type')"
+          :options="Object.values(ComponentArgPrimitive)"
+          @select="newInput.type = $event as ComponentArgPrimitive"
+        />
+      </template>
+    </MenuRow>
     <MenuRow
       :label="t('default')"
       :value="newInput.default"
@@ -75,6 +85,7 @@ import {
   ErrorMessage,
   InfoBubble,
   PSButton,
+  PSMultiselect,
 } from '@pubstudio/frontend/ui-widgets'
 import MenuRow from '../MenuRow.vue'
 
@@ -128,6 +139,9 @@ const save = () => {
 
 .component-input-new {
   padding: 16px;
+}
+.input-type-multiselect {
+  width: 168px;
 }
 .input-actions {
   @mixin menu-actions;

@@ -4,7 +4,17 @@
       {{ property }}
     </div>
     <div v-if="editing" class="edit">
+      <Checkbox
+        v-if="argType === ComponentArgPrimitive.Boolean"
+        :item="{
+          label: '',
+          checked: ['true', true].includes(newValue),
+        }"
+        class="input-boolean"
+        @checked="newValue = $event.toString()"
+      />
       <PSInput
+        v-else
         ref="valueInputRef"
         v-model="newValue"
         :placeholder="t('value')"
@@ -30,10 +40,10 @@
 <script lang="ts" setup>
 import { computed, ref, toRefs } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
-import { Check, Edit, PSInput } from '@pubstudio/frontend/ui-widgets'
+import { Check, Checkbox, Edit, PSInput } from '@pubstudio/frontend/ui-widgets'
 import { IDatalistOption } from '@pubstudio/frontend/type-ui-widgets'
 import { Settings } from '@pubstudio/frontend/ui-widgets'
-import { ComponentArgType, Tag } from '@pubstudio/shared/type-site'
+import { ComponentArgType, ComponentArgPrimitive, Tag } from '@pubstudio/shared/type-site'
 import {
   useBuild,
   validateComponentArg,
@@ -110,10 +120,16 @@ const datalist = computed<IDatalistOption[] | undefined>(() => {
   @mixin text 14px;
 }
 
+.input-boolean {
+  margin: 0;
+}
+
 .value-preview {
   @mixin truncate;
   @mixin text 14px;
   flex-grow: 1;
+  text-align: end;
+  color: $grey-700;
 }
 
 .edit-icon {

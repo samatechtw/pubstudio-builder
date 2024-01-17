@@ -98,7 +98,9 @@ const inputArray = computed(() => {
     renderMode: RenderMode.Build,
     resolveTheme: false,
   })
-  return Object.entries(inputs)
+  return Object.entries(inputs).sort((entryA, entryB) =>
+    entryA[0].localeCompare(entryB[0]),
+  )
 })
 
 const setInput = (property: string, newValue: unknown) => {

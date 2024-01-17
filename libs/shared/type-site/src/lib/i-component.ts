@@ -64,6 +64,7 @@ export type IComponentState = string | number | boolean | Array<unknown> | objec
 export type IEventParams = Record<string, IEventParamEntry>
 
 export type IEventParamEntry = {
+  type: ComponentArgType
   value: string
   // An info bubble will show next to the param if `infoKey` is truthy
   infoKey?: string
