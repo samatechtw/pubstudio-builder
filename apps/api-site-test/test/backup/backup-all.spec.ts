@@ -1,13 +1,14 @@
 import { IBackupAllApiResponse } from '@pubstudio/shared/type-api-site-backup'
 import { SiteApiResetService } from '@pubstudio/shared/util-test-reset'
 import supertest from 'supertest'
+import TestAgent from 'supertest/lib/agent'
 import { adminAuthHeader, ownerAuthHeader } from '../helpers/auth-helpers'
 import { SITE_SEEDS } from '../mocks/site-seeds'
 import { testConfig } from '../test.config'
 
 describe('Backup All', () => {
   const testEndpoint = '/api/admin/actions/backup_all'
-  let api: supertest.SuperTest<supertest.Test>
+  let api: TestAgent
   let adminAuth: string
   let resetService: SiteApiResetService
 

@@ -3,9 +3,10 @@ import {
   IGetSiteApiResponse,
   IGetSiteUsageApiResponse,
 } from '@pubstudio/shared/type-api-site-sites'
-import { SiteApiResetService } from '@pubstudio/shared/util-test-reset'
 import { commonRegex } from '@pubstudio/shared/util-parse'
+import { SiteApiResetService } from '@pubstudio/shared/util-test-reset'
 import supertest from 'supertest'
+import TestAgent from 'supertest/lib/agent'
 import { adminAuthHeader, ownerAuthHeader } from '../helpers/auth-helpers'
 import { mockCreateSitePayload } from '../mocks/mock-create-site-payload'
 import { SITE_SEEDS } from '../mocks/site-seeds'
@@ -14,7 +15,7 @@ import { testConfig } from '../test.config'
 
 describe('Get Site Usage', () => {
   const testEndpoint = (siteId: string) => `/api/sites/${siteId}/usage`
-  let api: supertest.SuperTest<supertest.Test>
+  let api: TestAgent
   let resetService: SiteApiResetService
   let adminAuth: string
   let siteId: string

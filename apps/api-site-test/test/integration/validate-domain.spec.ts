@@ -1,12 +1,13 @@
 import { SiteApiResetService } from '@pubstudio/shared/util-test-reset'
 import supertest from 'supertest'
+import TestAgent from 'supertest/lib/agent'
 import { adminAuthHeader } from '../helpers/auth-helpers'
 import { SITE_SEEDS } from '../mocks/site-seeds'
 import { testConfig } from '../test.config'
 
 describe('Validate Site Domain', () => {
   const testEndpoint = '/api/sites/validate_domain'
-  let api: supertest.SuperTest<supertest.Test>
+  let api: TestAgent
   let resetService: SiteApiResetService
 
   beforeAll(() => {

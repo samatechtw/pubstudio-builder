@@ -1,8 +1,9 @@
 import supertest from 'supertest'
+import TestAgent from 'supertest/lib/agent'
 import { testConfig } from '../test.config'
 
 describe('Health check endpoint', () => {
-  let api: supertest.SuperTest<supertest.Test>
+  let api: TestAgent
 
   beforeAll(() => {
     api = supertest(testConfig.get('apiUrl'))

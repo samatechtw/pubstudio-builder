@@ -1,6 +1,7 @@
 import { IGetSiteApiResponse } from '@pubstudio/shared/type-api-site-sites'
 import { SiteApiResetService } from '@pubstudio/shared/util-test-reset'
 import supertest from 'supertest'
+import TestAgent from 'supertest/lib/agent'
 import {
   adminAuthHeader,
   expiredAdminToken,
@@ -13,7 +14,7 @@ import { testConfig } from '../test.config'
 
 describe('Get Site', () => {
   const testEndpoint = '/api/sites'
-  let api: supertest.SuperTest<supertest.Test>
+  let api: TestAgent
   let resetService: SiteApiResetService
   let adminAuth: string
   let ownerAuth: string
