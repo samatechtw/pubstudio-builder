@@ -37,7 +37,7 @@ runs:
     - name: Install dependencies
       shell: bash
       run: |
-        npm install -g semantic-release@18
+        npm install -g semantic-release@23
         npm install -g @semantic-release/changelog
     - name: Preview semantic-release
       shell: bash

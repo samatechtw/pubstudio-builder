@@ -276,7 +276,7 @@ jobs:
           node-version: 'lts/*'
       - name: Install dependencies
         run: |
-          npm install -g semantic-release@18
+          npm install -g semantic-release@23
           npm install -g @semantic-release/changelog
           npm install -g conventional-changelog-conventionalcommits
       - name: Release
