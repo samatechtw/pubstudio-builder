@@ -1,10 +1,10 @@
 <template>
-  <div class="style-menu-edit" @keydown.esc.stop.prevent="saveMixinName">
+  <div class="style-menu-edit" @keydown.esc.stop.prevent="saveMixinStyles">
     <MenuRowEdit
       :label="t('name')"
-      :modelValue="editingName"
+      :modelValue="editingStyle?.name"
       class="name"
-      @update:modelValue="editingName = $event || ''"
+      @update:modelValue="setMixinName($event || '')"
     />
     <EditMenuTitle
       :title="t('style.styles')"
@@ -33,7 +33,7 @@
         :secondary="true"
         size="small"
         background="#451dd6"
-        @click.stop="saveMixinName"
+        @click.stop="saveMixinStyles"
       />
     </div>
   </div>
@@ -47,20 +47,21 @@ import { useBuild, useReusableStyleMenu } from '@pubstudio/frontend/feature-buil
 import { editStylesCancelEdit } from '@pubstudio/frontend/util-command'
 import EditMenuTitle from './EditMenuTitle.vue'
 import MenuRowEdit from './MenuRowEdit.vue'
-import { StyleRow } from '..'
+import StyleRow from './StyleRow.vue'
 
 const { t } = useI18n()
 
 const {
-  editingName,
   styleEntries,
   styleError,
+  editingStyle,
   isEditing,
   createStyle,
   editStyle,
   saveStyle,
   nonInheritedProperties,
-  saveMixinName,
+  setMixinName,
+  saveMixinStyles,
   removeStyle,
   setProperty,
   setValue,

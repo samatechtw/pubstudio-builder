@@ -32,7 +32,11 @@ import { useI18n } from 'petite-vue-i18n'
 import { computed, ComputedRef, Ref, ref, watch } from 'vue'
 import { editMixinEntryCommand, editStyleNameCommand } from '../build-command-helpers'
 import { useBuild } from '../use-build'
-import { pushOrReplaceStyleCommand, removeEditCommand } from './set-style-helpers'
+import {
+  pushOrReplaceStyleCommand,
+  removeEditCommand,
+  removeMixinNameCommand,
+} from './set-style-helpers'
 import { IUseEditStyles, useEditStyles } from './use-edit-styles'
 
 export interface IUseStyleMenuFeature extends IUseEditStyles {
@@ -40,9 +44,9 @@ export interface IUseStyleMenuFeature extends IUseEditStyles {
   editingMixinData: Ref<ICloseMixinMenuData | undefined>
   editingStyle: ComputedRef<IStyle | undefined>
   styleError: Ref<string | undefined>
-  editingName: Ref<string>
   newStyle: (source?: IComponent) => void
-  saveMixinName: () => void
+  setMixinName: (name: string) => void
+  saveMixinStyles: () => void
 }
 
 export interface IEditingStyle extends Omit<IStyle, 'id'> {
@@ -53,21 +57,12 @@ export interface IEditingStyle extends Omit<IStyle, 'id'> {
 const { site } = useSiteSource()
 
 const styleError = ref<string | undefined>()
-export const editingName = ref('')
 
 const editingStyle = computed<IStyle | undefined>(() => {
   if (editingMixinData.value) {
     return site.value.context.styles[editingMixinData.value.id]
   }
   return undefined
-})
-
-watch(editingStyle, (style) => {
-  if (style) {
-    editingName.value = style.name
-  } else {
-    editingName.value = ''
-  }
 })
 
 export const useReusableStyleMenu = (): IUseStyleMenuFeature => {
@@ -177,19 +172,29 @@ export const useReusableStyleMenu = (): IUseStyleMenuFeature => {
     return !styleError.value
   }
 
-  const saveMixinName = () => {
+  const setMixinName = (name: string) => {
+    if (!editingMixinData.value) {
+      return
+    }
+    const firstEdit = !editCommands.value
+    editCommands.value = editCommands.value ?? { commands: [] }
+    // Remove edit mixin name command, if it exists
+    const removeCmd = removeMixinNameCommand(editCommands)
+
+    const command = editStyleNameCommand(
+      editingMixinData.value.id,
+      removeCmd?.data.oldName ?? editingStyle.value?.name ?? '',
+      name,
+    )
+    if (command) {
+      pushOrReplaceStyleCommand(site.value, editCommands, [command], firstEdit)
+    }
+  }
+
+  const saveMixinStyles = () => {
     const styleId = editingMixinData.value?.id
     if (!styleId || !validateStyle()) {
       return
-    }
-    // Add the edit name command to the edit commands, if the name changed
-    if (editingName.value !== editingStyle.value?.name) {
-      const command = editStyleNameCommand(site.value, styleId, editingName.value)
-      if (command) {
-        const firstEdit = !editCommands.value
-        editCommands.value = editCommands.value ?? { commands: [] }
-        pushOrReplaceStyleCommand(site.value, editCommands, [command], firstEdit)
-      }
     }
     editStylesCancelEdit(site.value)
   }
@@ -266,10 +271,10 @@ export const useReusableStyleMenu = (): IUseStyleMenuFeature => {
     editingStyle,
     isEditingMixin,
     styleError,
-    editingName,
     saveStyle,
     removeStyle,
     newStyle,
-    saveMixinName,
+    setMixinName,
+    saveMixinStyles,
   }
 }
