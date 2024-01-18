@@ -99,7 +99,6 @@ import {
 } from '@pubstudio/shared/type-site'
 import { computed, ComputedRef, Ref, ref, toRaw } from 'vue'
 import {
-  editStyleNameCommand,
   IRemoveStyleEntry,
   removeComponentCustomStyleCommand,
   removeComponentOverrideStyleEntryCommand,
@@ -189,7 +188,6 @@ export interface IUseBuild {
     name: string,
     breakpoints: IBreakpointStyles,
   ) => string | undefined
-  editStyle: (id: string, newName: string) => void
   deleteStyle: (style: IStyle) => void
   setTranslations: (props: ISetTranslationsProps) => void
   setActiveI18n: (activeI18n: string) => void
@@ -855,13 +853,6 @@ export const useBuild = (): IUseBuild => {
     }
   }
 
-  const editStyle = (id: string, newName: string) => {
-    const command = editStyleNameCommand(site.value, id, newName)
-    if (command) {
-      pushCommandObject(site.value, command)
-    }
-  }
-
   const deleteStyle = (style: IStyle) => {
     const data: IRemoveStyleMixinData = style
     pushCommand(site.value, CommandType.RemoveStyleMixin, data)
@@ -1254,7 +1245,6 @@ export const useBuild = (): IUseBuild => {
     addStyle,
     convertComponentStyle,
     flattenComponentMixin,
-    editStyle,
     deleteStyle,
     setTranslations,
     setActiveI18n,

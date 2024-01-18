@@ -204,18 +204,13 @@ export const editMixinEntryCommand = (
 }
 
 export const editStyleNameCommand = (
-  site: ISite,
   mixinId: string,
+  oldName: string,
   newName: string,
 ): ICommand | undefined => {
-  const oldStyle = resolveStyle(site.context, mixinId)
-  if (!oldStyle) {
-    return
-  }
-
   const data: IEditStyleMixinData = {
     id: mixinId,
-    oldName: oldStyle.name,
+    oldName,
     newName,
   }
   return { type: CommandType.EditStyleMixin, data }
