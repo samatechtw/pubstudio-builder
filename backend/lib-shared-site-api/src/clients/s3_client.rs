@@ -64,18 +64,25 @@ impl S3Client {
         let expires_in = Duration::from_secs(600);
         let url = delete_object.sign(expires_in);
 
-        let response = reqwest::Client::new().delete(url).send().await;
+        match reqwest::Client::new().delete(url).send().await {
+            Ok(res) => {
+                if res.status().is_success() {
+                    Ok(())
+                } else {
+                    let error_message = match res.text().await {
+                        Ok(text) => {
+                            format!("Delete asset fail: {}, Response: {}", object_key, text)
+                        }
+                        Err(_) => format!("Delete asset fail: {}", object_key),
+                    };
 
-        if let Ok(res) = response {
-            if res.status().is_success() {
-                Ok(())
-            } else {
-                Err(ApiError::internal_error()
-                    .message(format!("Delete asset fail: '{}'", object_key)))
+                    Err(ApiError::internal_error().message(error_message))
+                }
             }
-        } else {
-            Err(ApiError::internal_error()
-                .message(format!("Failed to send DELETE request: {}", object_key)))
+            Err(err) => Err(ApiError::internal_error().message(format!(
+                "Failed to send DELETE request: {}, {}",
+                object_key, err
+            ))),
         }
     }
 
@@ -119,12 +126,10 @@ impl S3Client {
         let expires_in = Duration::from_secs(600);
         let url = head_object.sign(expires_in);
 
-        let response = reqwest::Client::new().head(url).send().await;
-
-        if let Ok(res) = response {
-            Ok(res.status().is_success())
-        } else {
-            Err(ApiError::internal_error().message("Failed to send HEAD request"))
+        match reqwest::Client::new().head(url).send().await {
+            Ok(res) => Ok(res.status().is_success()),
+            Err(err) => Err(ApiError::internal_error()
+                .message("Failed to send HEAD request".to_string() + &err.to_string())),
         }
     }
 
@@ -144,17 +149,23 @@ impl S3Client {
         let expires_in = Duration::from_secs(600);
         let url = upload_object.sign(expires_in);
 
-        let response = reqwest::Client::new().put(url).send().await;
-        if let Ok(res) = response {
-            if res.status().is_success() {
-                Ok(())
-            } else {
-                Err(ApiError::internal_error()
-                    .message(format!("Failed to upload backup: {}", object_key)))
+        match reqwest::Client::new().put(url).send().await {
+            Ok(res) => {
+                if res.status().is_success() {
+                    Ok(())
+                } else {
+                    let error_message = match res.text().await {
+                        Ok(text) => format!(
+                            "Failed to upload backup: {}, Response: {}",
+                            object_key, text
+                        ),
+                        Err(_) => format!("Failed to upload backup: {}", object_key),
+                    };
+                    Err(ApiError::internal_error().message(error_message))
+                }
             }
-        } else {
-            Err(ApiError::internal_error()
-                .message("Failed to send upload_backup request".to_string()))
+            Err(err) => Err(ApiError::internal_error()
+                .message("Failed to send upload_backup request".to_string() + &err.to_string())),
         }
     }
 
@@ -166,18 +177,23 @@ impl S3Client {
         let expires_in = Duration::from_secs(600);
         let url = delete_object.sign(expires_in);
 
-        let response = reqwest::Client::new().delete(url).send().await;
-
-        if let Ok(res) = response {
-            if res.status().is_success() {
-                Ok(())
-            } else {
-                Err(ApiError::internal_error()
-                    .message(format!("Failed to delete backup '{}'", object_key)))
+        match reqwest::Client::new().delete(url).send().await {
+            Ok(res) => {
+                if res.status().is_success() {
+                    Ok(())
+                } else {
+                    let error_message = match res.text().await {
+                        Ok(text) => format!(
+                            "Failed to delete backup: {}, Response: {}",
+                            object_key, text
+                        ),
+                        Err(_) => format!("Failed to delete backup: {}", object_key),
+                    };
+                    Err(ApiError::internal_error().message(error_message))
+                }
             }
-        } else {
-            Err(ApiError::internal_error()
-                .message("Failed to send backup DELETE request".to_string()))
+            Err(err) => Err(ApiError::internal_error()
+                .message("Failed to send backup DELETE request".to_string() + &err.to_string())),
         }
     }
 
@@ -189,21 +205,27 @@ impl S3Client {
         let expires_in = Duration::from_secs(600);
         let url = get_object.sign(expires_in);
 
-        let response = reqwest::Client::new().get(url).send().await;
+        match reqwest::Client::new().get(url).send().await {
+            Ok(res) => {
+                if res.status().is_success() {
+                    let bytes = res
+                        .bytes()
+                        .await
+                        .map_err(|e| ApiError::internal_error().message(e))?;
+                    Ok(bytes.to_vec())
+                } else {
+                    let error_message = match res.text().await {
+                        Ok(text) => {
+                            format!("Failed to get backup: {}, Response: {}", object_key, text)
+                        }
+                        Err(_) => format!("Failed to get backup: {}", object_key),
+                    };
 
-        if let Ok(res) = response {
-            if res.status().is_success() {
-                let bytes = res
-                    .bytes()
-                    .await
-                    .map_err(|e| ApiError::internal_error().message(e))?;
-                Ok(bytes.to_vec())
-            } else {
-                Err(ApiError::internal_error()
-                    .message(format!("Failed to get backup '{}'", object_key)))
+                    Err(ApiError::internal_error().message(error_message))
+                }
             }
-        } else {
-            Err(ApiError::internal_error().message("Failed to send backup GET request"))
+            Err(err) => Err(ApiError::internal_error()
+                .message("Failed to send backup GET request".to_string() + &err.to_string())),
         }
     }
 }
