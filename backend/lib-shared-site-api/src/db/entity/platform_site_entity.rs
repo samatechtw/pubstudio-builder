@@ -34,6 +34,7 @@ pub struct PlatformSiteEntity {
     pub custom_domains: Vec<String>,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
+    pub content_updated_at: DateTime<Utc>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -50,6 +51,7 @@ pub struct GetPlatformSiteEntity {
     pub custom_domains: Vec<String>,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
+    pub content_updated_at: DateTime<Utc>,
     // Relations
     pub checkout: Option<SiteCheckoutRelationEntity>,
     pub site_server: Option<SiteServerRelationEntity>,

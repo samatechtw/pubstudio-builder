@@ -13,6 +13,7 @@ pub struct SiteEntity {
     pub pages: String,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
+    pub content_updated_at: DateTime<Utc>,
     pub published: bool,
 }
 

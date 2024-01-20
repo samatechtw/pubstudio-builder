@@ -68,7 +68,7 @@ describe('Update Site', () => {
     expect(JSON.parse(body.pages)).toEqual(payload.pages)
   })
 
-  it('updates site when update_key matches the saved updated_at', async () => {
+  it('updates site when update_key matches the saved content_updated_at', async () => {
     const prevResponse = await api
       .get(`${testEndpoint}/${siteId}`)
       .set('Authorization', adminAuth)
@@ -76,7 +76,7 @@ describe('Update Site', () => {
 
     const prevBody: IGetSiteApiResponse = prevResponse.body
 
-    payload.update_key = prevBody.updated_at.toString()
+    payload.update_key = prevBody.content_updated_at.toString()
 
     const response = await api
       .patch(`${testEndpoint}/${siteId}`)
@@ -131,7 +131,7 @@ describe('Update Site', () => {
       })
     })
 
-    it('when update_key does not match the saved updated_at', () => {
+    it('when update_key does not match the saved content_updated_at', () => {
       payload.update_key = '2023-11-07T08:25:58.131123Z'
       return api
         .patch(`${testEndpoint}/${siteId}`)

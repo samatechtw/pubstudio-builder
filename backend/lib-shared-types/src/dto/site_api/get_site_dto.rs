@@ -1,6 +1,6 @@
+use crate::type_util::REGEX_DATE;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
-use crate::type_util::REGEX_DATE;
 
 use crate::{entity::site_api::site_entity::SiteEntity, shared::js_date::JsDate};
 
@@ -16,6 +16,7 @@ pub struct GetSiteDto {
     pub pages: String,
     pub created_at: Option<JsDate>,
     pub updated_at: Option<JsDate>,
+    pub content_updated_at: Option<JsDate>,
     pub published: Option<bool>,
     pub disabled: Option<bool>,
 }
@@ -43,6 +44,9 @@ pub fn to_api_response(site_entity: SiteEntity, with_editor: bool, disabled: boo
             updated_at: Some(JsDate {
                 timestamp: site_entity.updated_at,
             }),
+            content_updated_at: Some(JsDate {
+                timestamp: site_entity.content_updated_at,
+            }),
             published: Some(site_entity.published),
             disabled: Some(disabled),
         }
@@ -58,6 +62,7 @@ pub fn to_api_response(site_entity: SiteEntity, with_editor: bool, disabled: boo
             pages: site_entity.pages,
             created_at: None,
             updated_at: None,
+            content_updated_at: None,
             published: None,
             disabled: None,
         }
