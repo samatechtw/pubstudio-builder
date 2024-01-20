@@ -183,7 +183,7 @@ const handleInput = (e: Event) => {
     position: absolute;
   }
   .bubble {
-    right: 8px;
+    right: 12px;
   }
   :deep(.info-bubble-wrap) {
     @mixin size 18px;
@@ -326,7 +326,7 @@ textarea.ps-input {
 :deep(.icon-button-wrap) {
   position: absolute;
   top: 11px;
-  right: 20px;
+  right: 12px;
 }
 
 .bo {

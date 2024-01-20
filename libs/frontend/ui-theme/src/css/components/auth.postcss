@@ -3,10 +3,10 @@
 @define-mixin auth-page {
   .auth-wrap {
     @mixin flex-col;
-    padding: 72px 24px 80px;
+    padding: 88px 24px 80px;
     align-items: center;
-    max-width: 400px;
-    width: 400px;
+    max-width: 440px;
+    width: 440px;
     min-height: 600px;
     margin: 0 auto;
     color: black;
@@ -22,10 +22,15 @@
     @mixin title 40px;
     text-align: center;
   }
+  .auth-form {
+    margin: 0 auto;
+    max-width: 320px;
+    width: 320px;
+  }
   .auth-subtitle {
-    @mixin title-medium 18px;
+    @mixin title-medium 17px;
     text-align: center;
-    max-width: 300px;
+    max-width: 380px;
     margin-top: 16px;
   }
   .email-input {
