@@ -103,7 +103,7 @@ async fn get_site_result(
                     ApiError::internal_error().message(format!("Date parsing error: {}", e))
                 })
                 .and_then(|date_time| {
-                    if site.updated_at == date_time {
+                    if site.content_updated_at == date_time {
                         Ok(StatusCode::NO_CONTENT.into_response())
                     } else {
                         Ok(Json(to_api_response(

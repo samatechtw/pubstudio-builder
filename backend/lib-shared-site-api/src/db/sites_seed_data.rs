@@ -54,6 +54,7 @@ pub fn sites_seed_data() -> Vec<PlatformSiteEntity> {
             custom_domains: Vec::new(),
             created_at: Utc::now(),
             updated_at: Utc::now(),
+            content_updated_at: Utc::now(),
         },
         PlatformSiteEntity {
             id: Uuid::from_str("6d2c8359-6094-402c-bcbb-37202fd7c336").unwrap(),
@@ -69,6 +70,7 @@ pub fn sites_seed_data() -> Vec<PlatformSiteEntity> {
             custom_domains: vec!["www.myblog.org".into(), "user1-site3.localhost".into()],
             created_at: Utc::now() + Duration::days(1),
             updated_at: Utc::now(),
+            content_updated_at: Utc::now(),
         },
         PlatformSiteEntity {
             id: Uuid::from_str("870aafc9-36e9-476a-b38c-c1aaaad9d9fe").unwrap(),
@@ -84,6 +86,7 @@ pub fn sites_seed_data() -> Vec<PlatformSiteEntity> {
             custom_domains: Vec::new(),
             created_at: Utc::now() + Duration::days(2),
             updated_at: Utc::now(),
+            content_updated_at: Utc::now(),
         },
         PlatformSiteEntity {
             id: Uuid::from_str("d58080e9-dea0-434b-abda-c314b2001b23").unwrap(),
@@ -99,6 +102,7 @@ pub fn sites_seed_data() -> Vec<PlatformSiteEntity> {
             custom_domains: Vec::new(),
             created_at: Utc::now() - Duration::days(59),
             updated_at: Utc::now() - Duration::days(59),
+            content_updated_at: Utc::now() - Duration::days(59),
         },
         PlatformSiteEntity {
             id: Uuid::from_str("8b088c7f-1605-40ea-96e9-430b4c2863fd").unwrap(),
@@ -114,6 +118,7 @@ pub fn sites_seed_data() -> Vec<PlatformSiteEntity> {
             custom_domains: Vec::new(),
             created_at: Utc::now() - Duration::days(60),
             updated_at: Utc::now() - Duration::days(60),
+            content_updated_at: Utc::now() - Duration::days(60),
         },
         PlatformSiteEntity {
             id: Uuid::from_str("4c5f525b-60a3-4908-80dd-3d44bfa3d577").unwrap(),
@@ -129,6 +134,7 @@ pub fn sites_seed_data() -> Vec<PlatformSiteEntity> {
             custom_domains: Vec::new(),
             created_at: Utc::now() - Duration::days(61),
             updated_at: Utc::now() - Duration::days(61),
+            content_updated_at: Utc::now() - Duration::days(61),
         },
         PlatformSiteEntity {
             id: Uuid::from_str("ad01f2e0-0f4b-4c86-a8af-800d5cc4f812").unwrap(),
@@ -144,6 +150,7 @@ pub fn sites_seed_data() -> Vec<PlatformSiteEntity> {
             custom_domains: Vec::new(),
             created_at: Utc::now() - Duration::days(60),
             updated_at: Utc::now() - Duration::days(60),
+            content_updated_at: Utc::now() - Duration::days(60),
         },
     ]
 }

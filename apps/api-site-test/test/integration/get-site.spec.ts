@@ -83,7 +83,7 @@ describe('Get Site', () => {
       expect(body.pages).toBeDefined()
     })
 
-    it('returns site data if current update_key does not match the saved updated_at', async () => {
+    it('returns site data if current update_key does not match the saved content_updated_at', async () => {
       const response = await api
         .get(`${testEndpoint}/${siteId}`)
         .query({ update_key: '2023-11-07T08:25:58.131123Z' })
@@ -102,7 +102,7 @@ describe('Get Site', () => {
       expect(body.pages).toBeDefined()
     })
 
-    it('returns empty site if current update_key match the saved updated_at', async () => {
+    it('returns empty site if current update_key match the saved content_updated_at', async () => {
       const prevResponse = await api
         .get(`${testEndpoint}/${siteId}`)
         .set('Authorization', ownerAuth)
@@ -111,7 +111,7 @@ describe('Get Site', () => {
 
       const response = await api
         .get(`${testEndpoint}/${siteId}`)
-        .query({ update_key: prevBody.updated_at.toString() })
+        .query({ update_key: prevBody.content_updated_at.toString() })
         .set('Authorization', adminAuth)
         .expect(204)
 

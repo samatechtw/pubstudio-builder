@@ -118,7 +118,7 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
       }
       if (hasUpdates) {
         const result = await updateFn(siteId.value, payload, keepalive)
-        updateKey.value = result.updated_at.toString()
+        updateKey.value = result.content_updated_at.toString()
       }
       dirty.value = dirtyDefault()
       if (clearTimer) {
@@ -192,10 +192,11 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
       if (!siteData) {
         return undefined
       }
-      updateKey.value = siteData?.updated_at.toString()
+      updateKey.value = siteData?.content_updated_at.toString()
       const data = {
         ...siteData,
-        updated_at: updateKey.value,
+        updated_at: siteData.updated_at.toString(),
+        content_updated_at: updateKey.value,
       }
       return restoreSiteHelper(data)
     } catch (e) {

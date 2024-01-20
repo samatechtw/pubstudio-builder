@@ -3,6 +3,7 @@ use axum::{
     http::StatusCode,
     Extension, Json,
 };
+use chrono::{DateTime, Utc};
 use lib_shared_site_api::{
     db::db_error::DbError,
     error::{api_error::ApiError, helpers::check_bad_form},
@@ -12,7 +13,7 @@ use lib_shared_site_api::{
 use lib_shared_types::{
     dto::site_api::{
         site_viewmodel::{to_api_response, SiteViewModel},
-        update_site_dto::UpdateSiteDto,
+        update_site_dto::{UpdateSiteDto, UpdateSiteDtoWithContentUpdatedAt},
     },
     error::api_error::ApiErrorCode,
     shared::user::{RequestUser, UserType},
@@ -56,9 +57,38 @@ pub async fn update_site(
         validator.validate_pages(value)?;
     }
     let has_update_key = dto.update_key.is_some();
+
     let site = context
         .site_repo
-        .update_site(&id, dto)
+        .get_site_latest_version(&id)
+        .await
+        .map_err(|e| ApiError::not_found().message(e))?;
+
+    // Update `content_updated_at` if any of `defaults`, `context`, or `pages` changes.
+    let mut content_updated_at: Option<DateTime<Utc>> = None;
+
+    let new_defaults = dto.defaults.clone();
+    let new_context = dto.context.clone();
+    let new_pages = dto.pages.clone();
+
+    if let (Some(defaults), Some(context), Some(pages)) = (new_defaults, new_context, new_pages) {
+        if site.defaults != defaults.to_string()
+            || site.context != context.to_string()
+            || site.pages != pages
+        {
+            content_updated_at = Some(Utc::now());
+        }
+    }
+
+    let site = context
+        .site_repo
+        .update_site(
+            &id,
+            UpdateSiteDtoWithContentUpdatedAt {
+                dto,
+                content_updated_at,
+            },
+        )
         .await
         .map_err(|e| match e {
             DbError::NoUpdate => ApiError::bad_request()

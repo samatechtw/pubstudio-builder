@@ -13,6 +13,7 @@ pub struct SiteViewModel {
     pub history: String,
     pub pages: String,
     pub created_at: JsDate,
+    pub content_updated_at: JsDate,
     pub updated_at: JsDate,
     pub published: bool,
 }
@@ -29,6 +30,9 @@ pub fn to_api_response(site_entity: SiteEntity) -> SiteViewModel {
         pages: site_entity.pages,
         created_at: JsDate {
             timestamp: site_entity.created_at,
+        },
+        content_updated_at: JsDate {
+            timestamp: site_entity.content_updated_at,
         },
         updated_at: JsDate {
             timestamp: site_entity.updated_at,

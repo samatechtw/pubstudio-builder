@@ -9,7 +9,7 @@ use lib_shared_types::{
         query_dto::ListQuery,
         site_api::{
             create_site_dto::CreateSiteDto, publish_site_dto::PublishSiteDto,
-            update_site_dto::UpdateSiteDto,
+            update_site_dto::UpdateSiteDtoWithContentUpdatedAt,
         },
     },
     entity::site_api::site_entity::SiteEntity,
@@ -31,7 +31,7 @@ pub type SiteDbPools = RwLock<HashMap<String, SqlitePool>>;
 
 pub type DynSiteRepo = Arc<dyn SiteRepoTrait + Send + Sync>;
 
-const SITE_COLUMNS: &str = r#"id, name, version, context, defaults, editor, history, pages, created_at, updated_at, published"#;
+const SITE_COLUMNS: &str = r#"id, name, version, context, defaults, editor, history, pages, created_at, updated_at, content_updated_at, published"#;
 
 #[async_trait]
 pub trait SiteRepoTrait {
@@ -47,7 +47,11 @@ pub trait SiteRepoTrait {
         id: &str,
         query: ListQuery,
     ) -> Result<Vec<SiteEntity>, DbError>;
-    async fn update_site(&self, id: &str, req: UpdateSiteDto) -> Result<SiteEntity, DbError>;
+    async fn update_site(
+        &self,
+        id: &str,
+        req: UpdateSiteDtoWithContentUpdatedAt,
+    ) -> Result<SiteEntity, DbError>;
     async fn publish_site(&self, id: &str, req: PublishSiteDto) -> Result<SiteEntity, DbError>;
     async fn export_backup(&self, id: &str) -> Result<(), DbError>;
     async fn import_backup(&self, id: &str, backup_data: Vec<u8>) -> Result<(), DbError>;
@@ -169,21 +173,31 @@ impl SiteRepoTrait for SiteRepo {
         }
     }
 
-    async fn update_site(&self, id: &str, req: UpdateSiteDto) -> Result<SiteEntity, DbError> {
+    async fn update_site(
+        &self,
+        id: &str,
+        req: UpdateSiteDtoWithContentUpdatedAt,
+    ) -> Result<SiteEntity, DbError> {
         let pool = self.get_db_pool(id).await?;
 
         let query = QueryBuilder::new("UPDATE site_versions SET");
         let update_count = 0;
 
-        let (query, update_count) = append_comma(query, "name", req.name, update_count);
-        let (query, update_count) = append_comma(query, "version", req.version, update_count);
-        let (query, update_count) = append_comma(query, "context", req.context, update_count);
-        let (query, update_count) = append_comma(query, "defaults", req.defaults, update_count);
-        let (query, update_count) = append_comma(query, "editor", req.editor, update_count);
-        let (query, update_count) = append_comma(query, "history", req.history, update_count);
-        let (query, update_count) = append_comma(query, "pages", req.pages, update_count);
-        let (mut query, update_count) =
-            append_comma(query, "published", req.published, update_count);
+        let (query, update_count) = append_comma(query, "name", req.dto.name, update_count);
+        let (query, update_count) = append_comma(query, "version", req.dto.version, update_count);
+        let (query, update_count) = append_comma(query, "context", req.dto.context, update_count);
+        let (query, update_count) = append_comma(query, "defaults", req.dto.defaults, update_count);
+        let (query, update_count) = append_comma(query, "editor", req.dto.editor, update_count);
+        let (query, update_count) = append_comma(query, "history", req.dto.history, update_count);
+        let (query, update_count) = append_comma(query, "pages", req.dto.pages, update_count);
+        let (query, update_count) =
+            append_comma(query, "published", req.dto.published, update_count);
+        let (mut query, update_count) = append_comma(
+            query,
+            "content_updated_at",
+            req.content_updated_at,
+            update_count,
+        );
 
         if update_count == 0 {
             return Err(DbError::NoUpdate);
@@ -191,9 +205,9 @@ impl SiteRepoTrait for SiteRepo {
 
         query.push(" WHERE id = (SELECT MAX(id) FROM site_versions)");
         // Update the latest version of the site
-        if let Some(update_key) = req.update_key {
-            // Append the condition to check updated_at
-            query.push(" AND updated_at = DATETIME(");
+        if let Some(update_key) = req.dto.update_key {
+            // Append the condition to check content_updated_at
+            query.push(" AND content_updated_at = DATETIME(");
             query.push_bind(update_key);
             query.push(")");
         }
@@ -392,6 +406,7 @@ fn map_to_site_entity(row: SqliteRow) -> Result<SiteEntity, Error> {
         pages: row.try_get("pages")?,
         created_at: row.try_get("created_at")?,
         updated_at: row.try_get("updated_at")?,
+        content_updated_at: row.try_get("content_updated_at")?,
         published: row.try_get("published")?,
     })
 }
