@@ -57,6 +57,9 @@ const emit = defineEmits<{
   justify-content: space-between;
   align-items: center;
 }
+.title-wrap {
+  margin-right: 16px;
+}
 .content-title {
   color: black;
 }

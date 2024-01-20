@@ -169,4 +169,20 @@ onMounted(() => {
   margin-left: 8px;
   width: 120px;
 }
+@media (max-width: 640px) {
+  .asset-filters {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .asset-search {
+    width: 100%;
+    margin-bottom: 12px;
+    :deep(.ps-input) {
+      width: 100%;
+    }
+  }
+  .asset-sort {
+    margin: 0 8px;
+  }
+}
 </style>
