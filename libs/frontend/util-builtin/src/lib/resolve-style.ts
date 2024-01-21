@@ -17,7 +17,7 @@ import {
   h6Style,
 } from './components/builtin-h'
 import { headerStyle } from './components/builtin-header'
-import { imageStyle } from './components/builtin-image'
+import { captionedImageStyle, imageStyle } from './components/builtin-image'
 import { inputStyle } from './components/builtin-input'
 import { linkStyle } from './components/builtin-link'
 import { listStyle } from './components/builtin-list'
@@ -37,6 +37,7 @@ export const builtinStyles: Record<string, IStyle> = {
   [h5Style.id]: h5Style,
   [h6Style.id]: h6Style,
   [imageStyle.id]: imageStyle,
+  [captionedImageStyle.id]: captionedImageStyle,
   [navMenuStyle.id]: navMenuStyle,
   [navMenuItemStyle.id]: navMenuItemStyle,
   [svgStyle.id]: svgStyle,

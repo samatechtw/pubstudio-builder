@@ -336,10 +336,22 @@ export const useBuild = (): IUseBuild => {
     if (!addBuiltinComponentData) {
       return
     }
+    // Iterate component/children and get mixins
+    const stack = [builtinComponent]
+    let mixins: string[] = []
+    while (stack.length > 0) {
+      const cmp = stack.pop()
+      if (cmp?.style.mixins) {
+        mixins = [...mixins, ...cmp.style.mixins]
+      }
+      if (cmp?.children) {
+        stack.push(...cmp.children)
+      }
+    }
     pushCommandAndAddMissingMixins(
       CommandType.AddComponent,
       addBuiltinComponentData,
-      builtinComponent?.style.mixins,
+      mixins,
     )
   }
 

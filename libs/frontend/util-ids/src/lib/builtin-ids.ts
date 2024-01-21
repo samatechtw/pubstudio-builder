@@ -1,7 +1,7 @@
 // Pre-define builtin IDs to avoid circular reference
 
 import { defaultContext } from './default-context'
-import { behaviorId, componentId, nextStyleId } from './make-ids'
+import { behaviorId, componentId, nextStyleId, styleId } from './make-ids'
 
 // Public behaviors
 export const noBehaviorId = behaviorId(defaultContext.namespace, 'none')
@@ -62,6 +62,8 @@ export const dividerHorizontalId = componentId(
   defaultContext.namespace,
   'dividerHorizontal',
 )
+export const captionedImageStyleId = styleId(defaultContext.namespace, 'captionedImage')
+export const captionedImageId = componentId(defaultContext.namespace, 'captionedImage')
 
 // Form
 export const inputStyleId = nextStyleId(defaultContext)

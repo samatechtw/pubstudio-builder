@@ -1,5 +1,4 @@
 import { activeBreakpoint } from '@pubstudio/frontend/feature-site-source'
-import { resolveStyle } from '@pubstudio/frontend/util-builtin'
 import { getLastCommand } from '@pubstudio/frontend/util-command'
 import { resolvedComponentStyle } from '@pubstudio/frontend/util-component'
 import { CommandType, ICommand } from '@pubstudio/shared/type-command'

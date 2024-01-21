@@ -29,7 +29,7 @@ import {
   StyleSourceType,
 } from '@pubstudio/shared/type-site'
 import { useI18n } from 'petite-vue-i18n'
-import { computed, ComputedRef, Ref, ref, watch } from 'vue'
+import { computed, ComputedRef, Ref, ref } from 'vue'
 import { editMixinEntryCommand, editStyleNameCommand } from '../build-command-helpers'
 import { useBuild } from '../use-build'
 import {

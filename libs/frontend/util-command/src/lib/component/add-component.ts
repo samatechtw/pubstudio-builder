@@ -57,6 +57,8 @@ export const addComponentHelper = (site: ISite, data: IAddComponentData): ICompo
           content: child.content,
           parentId: id,
           sourceId: child.id,
+          inputs: child.inputs,
+          style: child.style,
         })
       }
     }

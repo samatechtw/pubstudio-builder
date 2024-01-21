@@ -16,6 +16,11 @@
         :text="t('build.image')"
         :builtinComponentId="image.id"
       />
+      <NewComponent
+        class="new-captioned-image"
+        :text="t('build.captioned_image')"
+        :builtinComponentId="captionedImage.id"
+      />
       <NewComponent class="new-svg" :text="t('build.svg')" :builtinComponentId="svg.id" />
       <NewComponent
         class="new-link"
@@ -94,6 +99,7 @@ import {
   h5,
   h6,
   image,
+  captionedImage,
   ol,
   ul,
   link,

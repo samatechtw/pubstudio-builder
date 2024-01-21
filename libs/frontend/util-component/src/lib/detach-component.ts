@@ -28,10 +28,10 @@ export const resolveComponentProps = (
 ): IResolvedComponentProps => {
   const customStyles: IBreakpointStyles = structuredClone(component.style.custom)
 
-  let mixins = component.style.mixins ?? []
-  let inputs = component.inputs
-  let events = component.events
-  let editorEvents = component.editorEvents
+  let mixins = [...(component.style.mixins ?? [])]
+  let inputs = structuredClone(component.inputs)
+  let events = structuredClone(component.events)
+  let editorEvents = structuredClone(component.editorEvents)
 
   if (source !== undefined) {
     // Collect mixins

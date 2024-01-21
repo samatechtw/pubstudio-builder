@@ -6,7 +6,7 @@ import {
   mockAddComponentData,
   mockSerializedComponent,
 } from '@pubstudio/frontend/util-test-mock'
-import { ISerializedComponent, ISite } from '@pubstudio/shared/type-site'
+import { IComponent, ISerializedComponent, ISite } from '@pubstudio/shared/type-site'
 import { IUseBuild, useBuild } from './use-build'
 import { IUseCopyPaste, useCopyPaste } from './use-copy-paste'
 
@@ -51,11 +51,12 @@ describe('use-build composable', () => {
       mixins: ['p'],
     }
     // Add a childComponent that inherits `component`
-    childComponent = mockSerializedComponent(site, {
+    const child = mockSerializedComponent(site, {
       style: childStyle,
       parentId: 'test-c-0',
     })
-    applyAddComponent(site, mockAddComponentData(childComponent, component.id))
+    applyAddComponent(site, mockAddComponentData(child, component.id))
+    childComponent = resolveComponent(site.context, child.id) as IComponent
   })
 
   it('should copy paste component', () => {
@@ -74,6 +75,7 @@ describe('use-build composable', () => {
 
     // Include inherited style from copied component's parent
     const resultCmp = resolveComponent(site.context, targetComponent.id)
+
     expect(resultCmp?.style.custom).toEqual({
       [DEFAULT_BREAKPOINT_ID]: {
         default: {
