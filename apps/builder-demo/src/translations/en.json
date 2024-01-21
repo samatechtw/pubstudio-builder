@@ -164,6 +164,7 @@
     "ul": "Bullet List",
     "ol": "Number List",
     "image": "Image",
+    "captioned_image": "Captioned Image",
     "svg": "SVG",
     "link": "Link",
     "divider_horizontal": "Horizontal Divider",
