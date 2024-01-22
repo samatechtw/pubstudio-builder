@@ -45,6 +45,7 @@ describe('List Site Versions', () => {
         const response = await api
           .get(`${testEndpoint}/${siteId}/versions?from=2&to=3`)
           .set('Authorization', ownerAuth)
+          .expect(200)
 
         const body: IGetSiteApiResponse[] = response.body
 

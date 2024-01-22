@@ -1,4 +1,5 @@
 use axum::async_trait;
+use chrono::Utc;
 use const_format::formatcp;
 use lib_shared_site_api::db::{
     db_error::{map_sqlx_err, DbError},
@@ -12,7 +13,7 @@ use lib_shared_types::{
             update_site_dto::UpdateSiteDtoWithContentUpdatedAt,
         },
     },
-    entity::site_api::site_entity::SiteEntity,
+    entity::site_api::{site_entity::SiteEntity, site_metadata_entity::SiteMetadataEntity},
 };
 use sqlx::{
     migrate::MigrateDatabase,
@@ -40,6 +41,8 @@ pub trait SiteRepoTrait {
     async fn get_db_pool(&self, id: &str) -> Result<SqlitePool, DbError>;
     async fn delete_site(&self, id: &str) -> Result<(), DbError>;
     async fn create_site(&self, req: CreateSiteDto) -> Result<SiteEntity, DbError>;
+    async fn migrate_db(&self, pool: &SqlitePool, id: &str) -> Result<(), DbError>;
+    async fn migrate_all(&self, sites: Vec<SiteMetadataEntity>) -> Result<(), DbError>;
     async fn get_site_latest_version(&self, id: &str) -> Result<SiteEntity, DbError>;
     async fn get_site_by_version(&self, id: &str, version_id: &str) -> Result<SiteEntity, DbError>;
     async fn list_site_versions(
@@ -109,8 +112,8 @@ impl SiteRepoTrait for SiteRepo {
         // Insert site info into sites table
         let site_response = sqlx::query(formatcp!(
             r#"
-            INSERT INTO site_versions(name, version, context, defaults, editor, history, pages, published)
-            VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)
+            INSERT INTO site_versions(name, version, context, defaults, editor, history, pages, published, content_updated_at)
+            VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)
             RETURNING {}
         "#,
             SITE_COLUMNS
@@ -123,6 +126,7 @@ impl SiteRepoTrait for SiteRepo {
         .bind(req.history)
         .bind(req.pages)
         .bind(req.published)
+        .bind(Utc::now())
         .try_map(map_to_site_entity)
         .fetch_one(&pool)
         .await
@@ -207,7 +211,7 @@ impl SiteRepoTrait for SiteRepo {
         // Update the latest version of the site
         if let Some(update_key) = req.dto.update_key {
             // Append the condition to check content_updated_at
-            query.push(" AND content_updated_at = DATETIME(");
+            query.push(" AND updated_at = DATETIME(");
             query.push_bind(update_key);
             query.push(")");
         }
@@ -233,17 +237,32 @@ impl SiteRepoTrait for SiteRepo {
         // Connect to the database
         let pool = SqlitePoolOptions::new().connect(&site_db_url).await?;
 
-        // Migrate the database
-        sqlx::migrate!("db/sites/migrations")
-            .run(&pool)
-            .await
-            .map_err(|e| DbError::Migrate(e.to_string()))?;
-
         // Insert the connection pool into the map.
         let mut db_pools = self.site_db_pools.write().await;
         db_pools.insert(id.to_string(), pool.clone());
 
+        self.migrate_db(&pool, id).await?;
+
         Ok(pool)
+    }
+
+    async fn migrate_db(&self, pool: &SqlitePool, id: &str) -> Result<(), DbError> {
+        // Migrate the database
+        sqlx::migrate!("db/sites/migrations")
+            .run(pool)
+            .await
+            .map_err(|e| DbError::Migrate(e.to_string()))?;
+        Ok(())
+    }
+
+    async fn migrate_all(&self, sites: Vec<SiteMetadataEntity>) -> Result<(), DbError> {
+        for site in sites {
+            let pool = self.get_db_pool(&site.id).await?;
+            if let Err(e) = self.migrate_db(&pool, &site.id).await {
+                println!("Failed to migrate site: {}", e.to_string());
+            }
+        }
+        Ok(())
     }
 
     async fn delete_site(&self, id: &str) -> Result<(), DbError> {
@@ -305,8 +324,8 @@ impl SiteRepoTrait for SiteRepo {
         // if the latest site version is published, create a new version and copy data from the latest version
         sqlx::query(
             r#"
-            INSERT INTO site_versions (name, version, context, defaults, editor, history, pages, published)
-            SELECT name, version, context, defaults, editor, history, pages, false
+            INSERT INTO site_versions (name, version, context, defaults, editor, history, pages, published, content_updated_at)
+            SELECT name, version, context, defaults, editor, history, pages, false, content_updated_at
             FROM site_versions
             WHERE id = (
                 SELECT MAX(id)
@@ -394,7 +413,8 @@ impl SiteRepoTrait for SiteRepo {
         let pool = SqlitePoolOptions::new().connect(&site_db_url).await?;
         db_pools.insert(id.to_string(), pool.clone());
 
-        Ok(())
+        // Run migrations in case a new one was added since the snapshot was saved
+        Ok(self.migrate_db(&pool, id).await?)
     }
 }
 

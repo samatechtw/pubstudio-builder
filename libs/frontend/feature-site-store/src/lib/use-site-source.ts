@@ -61,10 +61,10 @@ export const useSiteSource = (): IUseSiteSource => {
   }
 
   const checkOutdated = async () => {
-    const restored = await siteStore.value.restore(site.value.updated_at)
+    const restored = await siteStore.value.restore(site.value.content_updated_at)
     setRestoredSite(restored)
     if (restored) {
-      console.log('Site updated:', site.value.updated_at)
+      console.log('Site updated:', site.value.content_updated_at)
     } else {
       console.log('No site updates')
     }

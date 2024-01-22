@@ -76,7 +76,7 @@ describe('Update Site', () => {
 
     const prevBody: IGetSiteApiResponse = prevResponse.body
 
-    payload.update_key = prevBody.content_updated_at.toString()
+    payload.update_key = prevBody.updated_at.toString()
 
     const response = await api
       .patch(`${testEndpoint}/${siteId}`)

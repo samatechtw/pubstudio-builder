@@ -66,6 +66,7 @@ export const useSiteApi = (params: IUseSiteApiParams): IApiSite => {
       published: serialized.published,
       disabled: serialized.disabled,
       updated_at: serialized.updated_at,
+      content_updated_at: serialized.content_updated_at,
     }
   }
 
@@ -100,6 +101,7 @@ export const useSiteApi = (params: IUseSiteApiParams): IApiSite => {
       disabled: serialized.disabled,
       published: serialized.published,
       updated_at: serialized.updated_at,
+      content_updated_at: serialized.content_updated_at,
     }
   }
 
