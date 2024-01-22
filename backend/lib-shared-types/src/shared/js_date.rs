@@ -8,12 +8,16 @@ pub struct JsDate {
     pub timestamp: DateTime<Utc>,
 }
 
+pub fn format_js_date(date: DateTime<Utc>) -> String {
+    date.format("%Y-%m-%dT%H:%M:%S%.6fZ").to_string()
+}
+
 impl Serialize for JsDate {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: Serializer,
     {
-        let serialized_date = self.timestamp.format("%Y-%m-%dT%H:%M:%S%.6fZ").to_string();
+        let serialized_date = format_js_date(self.timestamp);
         serializer.serialize_str(&serialized_date)
     }
 }

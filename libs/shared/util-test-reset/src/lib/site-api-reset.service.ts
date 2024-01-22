@@ -18,9 +18,7 @@ export class SiteApiResetService {
       url: '/api/admin/actions/reset',
       timeout: 10000,
       data: { seeds: this.seeds },
-      headers: {
-        Authorization: this.adminAuth,
-      },
+      headers: { Authorization: this.adminAuth },
     })
   }
 }

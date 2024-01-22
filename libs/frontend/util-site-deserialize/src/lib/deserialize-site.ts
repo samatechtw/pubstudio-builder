@@ -130,6 +130,7 @@ export const deserializedHelper = (serialized: ISerializedSite): ISite => {
     editor: deserializeEditor(siteContext, editor),
     history: { back: history.back, forward: history.forward },
     updated_at: serialized.updated_at,
+    content_updated_at: serialized.content_updated_at,
   }
   return site
 }
@@ -166,6 +167,7 @@ export const storedToSerializedSite = (
           forward: [],
         },
     updated_at: stored.updated_at || undefined,
+    content_updated_at: stored.content_updated_at || undefined,
   }
   return serialized
 }

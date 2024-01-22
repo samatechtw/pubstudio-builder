@@ -11,7 +11,10 @@ use lib_shared_types::{
     dto::site_api::get_site_dto::{to_api_response, GetSiteQuery},
     entity::site_api::site_metadata_entity::SiteMetadataEntity,
     error::api_error::ApiErrorCode,
-    shared::user::{RequestUser, UserType},
+    shared::{
+        js_date::format_js_date,
+        user::{RequestUser, UserType},
+    },
 };
 use validator::Validate;
 
@@ -98,22 +101,17 @@ async fn get_site_result(
             .await;
 
         if let Some(update_key) = query.update_key {
-            return DateTime::parse_from_rfc3339(update_key.as_str())
-                .map_err(|e| {
-                    ApiError::internal_error().message(format!("Date parsing error: {}", e))
-                })
-                .and_then(|date_time| {
-                    if site.content_updated_at == date_time {
-                        Ok(StatusCode::NO_CONTENT.into_response())
-                    } else {
-                        Ok(Json(to_api_response(
-                            site,
-                            admin_or_owner,
-                            site_metadata.disabled,
-                        ))
-                        .into_response())
-                    }
-                });
+            let content_updated = format_js_date(site.content_updated_at);
+            return if content_updated == update_key {
+                Ok(StatusCode::NO_CONTENT.into_response())
+            } else {
+                Ok(Json(to_api_response(
+                    site,
+                    admin_or_owner,
+                    site_metadata.disabled,
+                ))
+                .into_response())
+            };
         } else {
             return Ok(Json(to_api_response(
                 site,

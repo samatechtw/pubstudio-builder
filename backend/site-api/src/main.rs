@@ -51,12 +51,6 @@ async fn main() {
     }
     let metadata_db_pool = SqlitePool::connect(metadata_db_url).await.unwrap();
 
-    // Run metadata migrations
-    sqlx::migrate!("./db/metadata/migrations")
-        .run(&metadata_db_pool)
-        .await
-        .unwrap();
-
     // Set up ApiContext
     let metadata_repo = Arc::new(SitesMetadataRepo {
         metadata_db_pool: metadata_db_pool.clone(),
@@ -64,7 +58,9 @@ async fn main() {
     let backup_repo = Arc::new(BackupRepo {
         metadata_db_pool: metadata_db_pool.clone(),
     }) as DynBackupRepo;
-    let usage_repo = Arc::new(UsageRepo { metadata_db_pool }) as DynUsageRepo;
+    let usage_repo = Arc::new(UsageRepo {
+        metadata_db_pool: metadata_db_pool.clone(),
+    }) as DynUsageRepo;
 
     let site_db_pools = RwLock::new(HashMap::default());
     let site_repo = Arc::new(SiteRepo {
@@ -107,6 +103,16 @@ async fn main() {
         ]);
 
     setup_cron_jobs(&context);
+
+    // Run metadata migrations
+    sqlx::migrate!("./db/metadata/migrations")
+        .run(&metadata_db_pool)
+        .await
+        .unwrap();
+    // Run site migrations
+    let sites = context.metadata_repo.list_sites().await.unwrap();
+    context.site_repo.migrate_all(sites).await.unwrap();
+    println!("Finished migrations!");
 
     // Run server
     let bound = &api_url.parse().unwrap();
