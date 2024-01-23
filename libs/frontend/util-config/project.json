@@ -1,5 +1,5 @@
 {
-  "name": "util-config",
+  "name": "util-config-builder",
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/frontend/util-config/src",
   "projectType": "library",

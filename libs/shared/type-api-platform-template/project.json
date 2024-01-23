@@ -1,5 +1,5 @@
 {
-  "name": "type-api-platform-template",
+  "name": "type-api-platform-template-builder",
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/shared/type-api-platform-template/src",
   "projectType": "library",

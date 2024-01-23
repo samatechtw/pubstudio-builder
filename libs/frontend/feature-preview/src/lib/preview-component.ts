@@ -31,11 +31,11 @@ export const PreviewComponent = () => {
     setup(props: ILiveComponentProps) {
       const { site, component } = toRefs(props)
       const { custom } = computeEvents(site.value, component.value)
-      registerCustomEvents(component.value, custom, null, true)
+      registerCustomEvents(component.value, custom, null, false)
 
       onMounted(() => {
         const { custom } = computeEvents(site.value, component.value)
-        registerCustomEvents(component.value, custom, null, false)
+        registerCustomEvents(component.value, custom, null, true)
       })
       onUnmounted(() => {
         removeListeners(component.value)
