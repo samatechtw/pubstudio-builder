@@ -86,7 +86,7 @@ describe('Get Site', () => {
     it('returns site data if current update_key does not match the saved content_updated_at', async () => {
       const response = await api
         .get(`${testEndpoint}/${siteId}`)
-        .query({ update_key: '2023-11-07T08:25:58.131123Z' })
+        .query({ update_key: 123456789 })
         .set('Authorization', adminAuth)
         .expect(200)
       const body: IGetSiteApiResponse = response.body
@@ -111,7 +111,7 @@ describe('Get Site', () => {
 
       const response = await api
         .get(`${testEndpoint}/${siteId}`)
-        .query({ update_key: prevBody.content_updated_at.toString() })
+        .query({ update_key: prevBody.content_updated_at })
         .set('Authorization', adminAuth)
         .expect(204)
 
@@ -123,11 +123,7 @@ describe('Get Site', () => {
         .get(`${testEndpoint}/${siteId}`)
         .query({ update_key: '2023-11-07T08:25:58.131123' })
         .set('Authorization', adminAuth)
-        .expect(400, {
-          code: 'InvalidFormData',
-          message: 'Failed to validate request',
-          status: 400,
-        })
+        .expect(400)
     })
 
     it('returns 401 when owner token has expired', async () => {

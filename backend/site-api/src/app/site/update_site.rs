@@ -3,7 +3,7 @@ use axum::{
     http::StatusCode,
     Extension, Json,
 };
-use chrono::{DateTime, Utc};
+use chrono::Utc;
 use lib_shared_site_api::{
     db::db_error::DbError,
     error::{api_error::ApiError, helpers::check_bad_form},
@@ -58,26 +58,11 @@ pub async fn update_site(
     }
     let has_update_key = dto.update_key.is_some();
 
-    let site = context
-        .site_repo
-        .get_site_latest_version(&id)
-        .await
-        .map_err(|e| ApiError::not_found().message(e))?;
-
     // Update `content_updated_at` if any of `defaults`, `context`, or `pages` changes.
-    let mut content_updated_at: Option<DateTime<Utc>> = None;
+    let mut content_updated_at: Option<i64> = None;
 
-    let new_defaults = dto.defaults.clone();
-    let new_context = dto.context.clone();
-    let new_pages = dto.pages.clone();
-
-    if let (Some(defaults), Some(context), Some(pages)) = (new_defaults, new_context, new_pages) {
-        if site.defaults != defaults.to_string()
-            || site.context != context.to_string()
-            || site.pages != pages
-        {
-            content_updated_at = Some(Utc::now());
-        }
+    if dto.defaults.is_some() || dto.context.is_some() || dto.pages.is_some() {
+        content_updated_at = Some(Utc::now().timestamp_millis());
     }
 
     let site = context

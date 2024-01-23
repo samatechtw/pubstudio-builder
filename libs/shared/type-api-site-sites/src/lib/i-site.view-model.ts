@@ -10,5 +10,5 @@ export interface ISiteViewModel {
   published: boolean
   disabled?: boolean
   updated_at: Date
-  content_updated_at: Date
+  content_updated_at: number
 }

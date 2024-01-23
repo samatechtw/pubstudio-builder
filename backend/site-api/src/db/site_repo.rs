@@ -41,7 +41,7 @@ pub trait SiteRepoTrait {
     async fn get_db_pool(&self, id: &str) -> Result<SqlitePool, DbError>;
     async fn delete_site(&self, id: &str) -> Result<(), DbError>;
     async fn create_site(&self, req: CreateSiteDto) -> Result<SiteEntity, DbError>;
-    async fn migrate_db(&self, pool: &SqlitePool, id: &str) -> Result<(), DbError>;
+    async fn migrate_db(&self, pool: &SqlitePool) -> Result<(), DbError>;
     async fn migrate_all(&self, sites: Vec<SiteMetadataEntity>) -> Result<(), DbError>;
     async fn get_site_latest_version(&self, id: &str) -> Result<SiteEntity, DbError>;
     async fn get_site_by_version(&self, id: &str, version_id: &str) -> Result<SiteEntity, DbError>;
@@ -126,7 +126,7 @@ impl SiteRepoTrait for SiteRepo {
         .bind(req.history)
         .bind(req.pages)
         .bind(req.published)
-        .bind(Utc::now())
+        .bind(Utc::now().timestamp_millis())
         .try_map(map_to_site_entity)
         .fetch_one(&pool)
         .await
@@ -241,12 +241,12 @@ impl SiteRepoTrait for SiteRepo {
         let mut db_pools = self.site_db_pools.write().await;
         db_pools.insert(id.to_string(), pool.clone());
 
-        self.migrate_db(&pool, id).await?;
+        self.migrate_db(&pool).await?;
 
         Ok(pool)
     }
 
-    async fn migrate_db(&self, pool: &SqlitePool, id: &str) -> Result<(), DbError> {
+    async fn migrate_db(&self, pool: &SqlitePool) -> Result<(), DbError> {
         // Migrate the database
         sqlx::migrate!("db/sites/migrations")
             .run(pool)
@@ -258,7 +258,7 @@ impl SiteRepoTrait for SiteRepo {
     async fn migrate_all(&self, sites: Vec<SiteMetadataEntity>) -> Result<(), DbError> {
         for site in sites {
             let pool = self.get_db_pool(&site.id).await?;
-            if let Err(e) = self.migrate_db(&pool, &site.id).await {
+            if let Err(e) = self.migrate_db(&pool).await {
                 println!("Failed to migrate site: {}", e.to_string());
             }
         }
@@ -410,7 +410,7 @@ impl SiteRepoTrait for SiteRepo {
         db_pools.insert(id.to_string(), pool.clone());
 
         // Run migrations in case a new one was added since the snapshot was saved
-        Ok(self.migrate_db(&pool, id).await?)
+        Ok(self.migrate_db(&pool).await?)
     }
 }
 

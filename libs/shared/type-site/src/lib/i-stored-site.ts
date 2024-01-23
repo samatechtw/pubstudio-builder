@@ -7,7 +7,7 @@ export interface IStoredSite {
   editor?: string | null
   history?: string | null
   updated_at?: string | null
-  content_updated_at?: string | null
+  content_updated_at?: number | null
 }
 
 export type IStoredSiteDirty = {

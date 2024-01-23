@@ -118,7 +118,7 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
       }
       if (hasUpdates) {
         const result = await updateFn(siteId.value, payload, keepalive)
-        updateKey.value = result.content_updated_at.toString()
+        updateKey.value = result.updated_at.toString()
       }
       dirty.value = dirtyDefault()
       if (clearTimer) {
@@ -150,17 +150,21 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
   // The API timer is reset if currently active
   const save = async (site: ISite, options?: ISiteSaveOptions): Promise<void> => {
     const storedSite = storeSite(site)
-    store.site.setSite(storedSite)
     let changed = false
     for (const key in site) {
       const k = key as keyof IStoredSiteDirty
-      dirty.value[k] = site[k] !== store.site[k]?.value
+      dirty.value[k] = dirty.value[k] || storedSite[k] !== store.site[k]?.value
       if (dirty.value[k]) {
         changed = true
       }
     }
+    store.site.setSite(storedSite)
     if (changed) {
       if (options?.immediate) {
+        if (saveTimer) {
+          clearTimeout(saveTimer)
+          saveTimer = undefined
+        }
         await updateApi({
           keepalive: true,
           clearTimer: false,
@@ -186,17 +190,17 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
     }
   }
 
-  const restore = async (checkUpdateKey?: string): Promise<ISiteRestore | undefined> => {
+  const restore = async (checkUpdateKey?: number): Promise<ISiteRestore | undefined> => {
     try {
       const siteData = await getFn(siteId.value, { update_key: checkUpdateKey })
       if (!siteData) {
         return undefined
       }
-      updateKey.value = siteData?.content_updated_at.toString()
+      updateKey.value = siteData?.updated_at.toString()
       const data = {
         ...siteData,
-        updated_at: siteData.updated_at.toString(),
-        content_updated_at: updateKey.value,
+        updated_at: updateKey.value,
+        content_updated_at: siteData?.content_updated_at,
       }
       return restoreSiteHelper(data)
     } catch (e) {

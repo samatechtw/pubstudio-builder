@@ -71,6 +71,7 @@ export const useLocalSiteApi = (_api: PSApi): IApiLocalSite => {
       subdomain: serialized.subdomain,
       disabled: serialized.disabled,
       updated_at: serialized.updated_at,
+      content_updated_at: serialized.content_updated_at,
     }
   }
 
