@@ -169,7 +169,7 @@ body {
   }
 }
 
-.pm-p:after {
+.pm-p::after {
   content: '\200b';
 }
 

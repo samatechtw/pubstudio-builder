@@ -88,5 +88,8 @@ html {
       flex-shrink: 0;
     }
   }
+  .pm-p::after {
+    content: '\200b';
+  }
 }
 </style>

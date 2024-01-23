@@ -1,5 +1,5 @@
 {
-  "name": "util-vite-config",
+  "name": "util-vite-config-builder",
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/frontend/util-vite-config/src",
   "projectType": "library",

@@ -1,5 +1,5 @@
 {
-  "name": "type-api-local-site",
+  "name": "type-api-local-site-builder",
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/shared/type-api-local-site/src",
   "projectType": "library",

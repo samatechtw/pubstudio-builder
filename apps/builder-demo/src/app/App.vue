@@ -44,12 +44,14 @@ onMounted(async () => {
   }
 }
 
-.pm-p {
-  &:after {
-    content: '\200b';
-  }
-  &.pm-p-placeholder {
-    cursor: text;
+.component-content-container {
+  .pm-p {
+    &::after {
+      content: '\200b';
+    }
+    &.pm-p-placeholder {
+      cursor: text;
+    }
   }
 }
 

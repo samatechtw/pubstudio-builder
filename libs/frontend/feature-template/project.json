@@ -1,5 +1,5 @@
 {
-  "name": "frontend-feature-template",
+  "name": "frontend-feature-template-builder",
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/frontend/feature-template/src",
   "projectType": "library",
