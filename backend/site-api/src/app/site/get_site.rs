@@ -5,16 +5,12 @@ use axum::{
     Extension, Json,
 };
 use axum_macros::debug_handler;
-use chrono::DateTime;
 use lib_shared_site_api::error::{api_error::ApiError, helpers::check_bad_form};
 use lib_shared_types::{
     dto::site_api::get_site_dto::{to_api_response, GetSiteQuery},
     entity::site_api::site_metadata_entity::SiteMetadataEntity,
     error::api_error::ApiErrorCode,
-    shared::{
-        js_date::format_js_date,
-        user::{RequestUser, UserType},
-    },
+    shared::user::{RequestUser, UserType},
 };
 use validator::Validate;
 
@@ -101,7 +97,7 @@ async fn get_site_result(
             .await;
 
         if let Some(update_key) = query.update_key {
-            let content_updated = format_js_date(site.content_updated_at);
+            let content_updated = site.content_updated_at;
             return if content_updated == update_key {
                 Ok(StatusCode::NO_CONTENT.into_response())
             } else {

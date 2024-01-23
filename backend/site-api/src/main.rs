@@ -112,7 +112,6 @@ async fn main() {
     // Run site migrations
     let sites = context.metadata_repo.list_sites().await.unwrap();
     context.site_repo.migrate_all(sites).await.unwrap();
-    println!("Finished migrations!");
 
     // Run server
     let bound = &api_url.parse().unwrap();

@@ -1,6 +1,5 @@
 ALTER TABLE
   site_versions
 ADD COLUMN
-  content_updated_at TIMESTAMP;
+  content_updated_at INTEGER DEFAULT 0;
 
-UPDATE site_versions SET content_updated_at = CURRENT_TIMESTAMP;

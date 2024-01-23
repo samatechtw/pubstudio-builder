@@ -1,3 +1,3 @@
 export interface IGetSiteApiRequest {
-  update_key?: string
+  update_key?: number
 }
