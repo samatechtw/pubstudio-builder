@@ -49,7 +49,7 @@ pub trait SiteRepoTrait {
     ) -> Result<Vec<SiteEntity>, DbError>;
     async fn update_site(&self, id: &str, req: UpdateSiteDto) -> Result<SiteEntity, DbError>;
     async fn publish_site(&self, id: &str, req: PublishSiteDto) -> Result<SiteEntity, DbError>;
-    async fn export_backup(&self, id: &str) -> Result<(), DbError>;
+    async fn export_backup(&self, id: &str) -> Result<u64, DbError>;
     async fn import_backup(&self, id: &str, backup_data: Vec<u8>) -> Result<(), DbError>;
 }
 
@@ -335,7 +335,7 @@ impl SiteRepoTrait for SiteRepo {
         Ok(result)
     }
 
-    async fn export_backup(&self, id: &str) -> Result<(), DbError> {
+    async fn export_backup(&self, id: &str) -> Result<u64, DbError> {
         let pool = self.get_db_pool(id).await?;
 
         let backup_file = format!("db/sites/backups/backup_{}.db", id);
@@ -345,11 +345,15 @@ impl SiteRepoTrait for SiteRepo {
         }
 
         let _ = sqlx::query("VACUUM INTO ?1")
-            .bind(backup_file)
+            .bind(&backup_file)
             .fetch_all(&pool)
             .await?;
 
-        Ok(())
+        let file_size = fs::metadata(backup_file)
+            .map(|metadata| metadata.len())
+            .map_err(|e| DbError::FileError(e.to_string()))?;
+
+        Ok(file_size)
     }
 
     async fn import_backup(&self, id: &str, backup_data: Vec<u8>) -> Result<(), DbError> {
