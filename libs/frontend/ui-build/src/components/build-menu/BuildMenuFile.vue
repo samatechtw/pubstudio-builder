@@ -75,7 +75,10 @@ import {
   validateSite,
 } from '@pubstudio/frontend/util-site-store'
 import { loadFile } from '@pubstudio/frontend/util-doc'
-import { deserializeSite } from '@pubstudio/frontend/util-site-deserialize'
+import {
+  deserializeSite,
+  replaceNamespace,
+} from '@pubstudio/frontend/util-site-deserialize'
 import { ISerializedSite } from '@pubstudio/shared/type-site'
 import { useBuild } from '@pubstudio/frontend/feature-build'
 import BuildMenuIconText from './BuildMenuIconText.vue'
@@ -101,7 +104,8 @@ const exportSite = (fileName: string) => {
 }
 
 const confirmImport = () => {
-  replaceSite(pendingSiteImport.value)
+  const namespace = site.value.context.namespace
+  replaceSite(replaceNamespace(pendingSiteImport.value, namespace))
   pendingSiteImport.value = undefined
 }
 
