@@ -1,6 +1,11 @@
 <template>
   <Teleport to="body">
-    <div ref="tooltipRef" class="link-tooltip" :style="tooltipStyle" @mousedown.stop>
+    <div
+      ref="tooltipRef"
+      class="link-tooltip"
+      :style="{ ...tooltipStyle, 'z-index': 4000 }"
+      @mousedown.stop
+    >
       <PSInput
         v-if="editing"
         ref="linkInput"

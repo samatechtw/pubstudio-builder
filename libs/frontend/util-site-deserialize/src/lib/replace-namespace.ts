@@ -7,6 +7,13 @@ export const replaceNamespace = (site: ISite, namespace: string): ISite => {
   const updateId = (id: string): string => {
     return id.replace(oldNamespace, namespace)
   }
+  const idRegex = new RegExp(`${oldNamespace}-[a-z]{1,2}-[a-zA-Z0-9]+`)
+  const hasId = (text: unknown | undefined) => {
+    if (!text || typeof text !== 'string') {
+      return false
+    }
+    return idRegex.test(text)
+  }
 
   context.namespace = namespace
   // Update styles
@@ -24,6 +31,16 @@ export const replaceNamespace = (site: ISite, namespace: string): ISite => {
     context.components[newId] = component
     if (component.style.mixins) {
       component.style.mixins = component.style.mixins.map(updateId)
+    }
+    if (component.inputs) {
+      for (const input of Object.values(component.inputs)) {
+        if (hasId(input.default)) {
+          input.default = updateId(input.default)
+        }
+        if (hasId(input.is)) {
+          input.is = updateId(input.is as string)
+        }
+      }
     }
     // Update event behavior inputs
     if (component.events) {
