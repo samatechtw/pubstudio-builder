@@ -9,8 +9,6 @@ export const svgStyle: IStyle = {
       default: {
         width: '32px',
         height: '32px',
-        fill: '${color-text}',
-        stroke: '${color-text}',
       },
     },
   },

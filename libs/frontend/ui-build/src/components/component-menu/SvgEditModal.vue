@@ -14,6 +14,9 @@
         <div class="modal-text">
           {{ t('build.svg_info') }}
         </div>
+        <div v-if="showSizeHint" class="svg-size">
+          {{ t('build.svg_size') }}
+        </div>
       </div>
       <div class="preview-wrap">
         <div class="preview">
@@ -77,6 +80,10 @@ watch(editSvg, (svg: IEditSvg | undefined) => {
   if (svg) {
     newSvg.value = { ...svg }
   }
+})
+
+const showSizeHint = computed(() => {
+  return /(width)|(height)/.test(newSvg.value.content)
 })
 
 const startStateTimer = () => {
@@ -208,6 +215,11 @@ onUnmounted(() => {
     max-width: 90%;
     max-height: 90vh;
     overflow-y: auto;
+  }
+  .svg-size {
+    @mixin text 14px;
+    color: $grey-700;
+    margin-top: 6px;
   }
 }
 </style>

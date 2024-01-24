@@ -68,6 +68,13 @@ export const computeBuilderStyleProps = (
       ).position ?? null
     return position
   }
+  // Force builder container to be relative position
+  const forceRelative = () => {
+    const pos = getPosition()
+    if (pos !== 'absolute' && pos !== 'relative') {
+      builderClass.push('force-relative')
+    }
+  }
 
   const selected = editor?.selectedComponent?.id === component.id
 
@@ -106,21 +113,16 @@ export const computeBuilderStyleProps = (
         ]
         data.mixins.push('__link')
         data.attrs.href = 'javascript:'
-        getPosition()
-        if (position !== 'absolute' && position !== 'relative') {
-          builderClass.push('force-relative')
-        }
+        forceRelative()
       }
     }
     if (component.tag === Tag.Ul || component.tag === Tag.Ol) {
       extraChildren = [h(ListAdd, { componentId: component.id })]
-      getPosition()
-      if (position !== 'absolute' && position !== 'relative') {
-        builderClass.push('force-relative')
-      }
+      forceRelative()
     } else if (component.tag === Tag.Svg) {
       // Add an icon that shows SvgEditModal on click
       extraChildren = [h(SvgEdit)]
+      forceRelative()
     }
   }
 
