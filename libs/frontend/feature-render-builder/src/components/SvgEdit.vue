@@ -1,6 +1,6 @@
 <template>
   <div class="svg-edit">
-    <Edit color="white" class="edit-icon" @click="editSvg" />
+    <Edit color="black" class="edit-icon" @click="editSvg" />
   </div>
 </template>
 
@@ -23,14 +23,13 @@ const editSvg = () => {
 
 .svg-edit {
   @mixin flex-center;
-  position: relative;
-  height: 0;
-  top: -32px;
-  right: -24px;
+  position: absolute;
+  top: -28px;
+  right: -28px;
   .edit-icon {
-    position: absolute;
     width: 26px;
     height: 26px;
+    filter: drop-shadow(0px 0px 1.5px rgb(255 255 255 / 0.9));
   }
 }
 </style>
