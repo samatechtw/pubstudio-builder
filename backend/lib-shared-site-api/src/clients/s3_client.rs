@@ -1,5 +1,6 @@
 use crate::reqwest::Url;
 use crate::{error::api_error::ApiError, reqwest};
+use reqwest::header;
 use rusty_s3::{Bucket, Credentials, S3Action, UrlStyle};
 use std::time::Duration;
 
@@ -45,7 +46,7 @@ impl S3Client {
         filename: &str,
         expires: u64,
         content_type: &str,
-        size: i64,
+        size: String,
     ) -> Result<Url, ApiError> {
         // Sign a request
         let presigned_url_duration = Duration::from_secs(expires);
@@ -53,7 +54,7 @@ impl S3Client {
 
         let query = action.query_mut();
         query.insert("Content-Type", content_type);
-        query.insert("Content-Length", size.to_string());
+        query.insert("Content-Length", size);
 
         Ok(action.sign(presigned_url_duration))
     }
@@ -98,7 +99,7 @@ impl S3Client {
             filename,
             expires,
             content_type,
-            size,
+            size.to_string(),
         )
     }
 
@@ -114,7 +115,7 @@ impl S3Client {
             filename,
             expires,
             content_type,
-            size,
+            size.to_string(),
         )
     }
 
@@ -124,20 +125,12 @@ impl S3Client {
         expires: u64,
         size: u64,
     ) -> Result<Url, ApiError> {
-        // Try to convert size to i64
-        let size_i64: i64 = match size.try_into() {
-            Ok(value) => value,
-            Err(_) => {
-                return Err(ApiError::internal_error().message("Size is too large to fit into i64"));
-            }
-        };
-
         self.presign_put(
             &self.backup_bucket,
             filename,
             expires,
             "application/octet-stream",
-            size_i64,
+            size.to_string(),
         )
     }
 
@@ -168,7 +161,12 @@ impl S3Client {
     pub async fn upload_backup(&self, object_key: &str, content_size: u64) -> Result<(), ApiError> {
         let url = self.presign_put_site_backup(&object_key, 600, content_size)?;
 
-        match reqwest::Client::new().put(url).send().await {
+        match reqwest::Client::new()
+            .put(url)
+            .header(header::CONTENT_LENGTH, content_size)
+            .send()
+            .await
+        {
             Ok(res) => {
                 if res.status().is_success() {
                     Ok(())
