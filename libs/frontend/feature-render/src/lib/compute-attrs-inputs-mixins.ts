@@ -26,7 +26,7 @@ export const computeAttrsInputsMixins = (
   const mixins: string[] = []
   const resolveInput = (value: unknown): unknown => {
     if (resolveTheme && typeof value === 'string') {
-      return resolveThemeVariables(context, value) ?? value
+      return resolveThemeVariables(context, value, false) ?? value
     } else {
       return value
     }
