@@ -57,15 +57,16 @@ export interface ISitesFeature {
   validateNamespace: (namespace: string) => string | undefined
 }
 
+const loading = ref(false)
+const sites = ref<ISiteViewModel[]>()
+
 export const useSites = (): ISitesFeature => {
   const i18n = useI18n()
   const rootApi = inject(ApiInjectionKey) as PSApi
   const api = usePlatformSiteApi(rootApi)
   const localSiteApi = useLocalSiteApi(rootApi)
-  const loading = ref(false)
   const error = ref()
   const errorKey = ref<string | undefined>()
-  const sites = ref<ISiteViewModel[]>()
   const store = inject(StoreInjectionKey) as IFrontendStore
   const usageAllowance = ref()
 
