@@ -121,7 +121,7 @@ export const computeBuilderStyleProps = (
       forceRelative()
     } else if (component.tag === Tag.Svg) {
       // Add an icon that shows SvgEditModal on click
-      extraChildren = [h(SvgEdit)]
+      extraChildren = [h(SvgEdit, { componentId: component.id })]
       forceRelative()
     }
   }

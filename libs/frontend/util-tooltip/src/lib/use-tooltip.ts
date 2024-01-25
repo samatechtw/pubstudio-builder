@@ -38,6 +38,7 @@ export interface IUseTooltipOptions {
   placement?: Placement
   arrow?: boolean
   offset?: number
+  offsetCross?: number
   shift?: boolean
   flip?: boolean
 }
@@ -49,8 +50,10 @@ export const useTooltip = (options?: IUseTooltipOptions): IUseTooltip => {
   let autoUpdateCleanup: (() => void) | undefined = undefined
   const middleware: Middleware[] = []
 
-  if (options?.offset) {
-    middleware.push(offset(options?.offset))
+  if (options?.offset || options?.offsetCross) {
+    middleware.push(
+      offset({ mainAxis: options.offset ?? 0, crossAxis: options.offsetCross ?? 0 }),
+    )
   }
   if (options?.shift) {
     middleware.push(shift())
