@@ -11,6 +11,7 @@ export interface ISiteRestore {
 export interface ISiteSaveOptions {
   immediate?: boolean
   ignoreUpdateKey?: boolean
+  forceUpdate?: boolean
 }
 
 export enum SiteSaveState {

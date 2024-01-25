@@ -29,10 +29,15 @@
         class="export-button"
         @click="exportSite"
       />
-      <PSButton :text="t('build.refresh')" class="refresh-button" @click="refreshPage" />
       <PSButton
-        v-if="isStale"
-        :text="t('build.overwrite')"
+        v-if="!isValidateError"
+        :text="t('build.refresh')"
+        class="refresh-button"
+        @click="refreshPage"
+      />
+      <PSButton
+        v-if="isStale || isValidateError"
+        :text="t(isStale ? 'build.overwrite' : 'try')"
         :secondary="true"
         class="overwrite-button"
         @click="overwriteData"
@@ -70,6 +75,10 @@ const isStale = computed(() => {
   return siteStore.value.saveError?.code === ApiErrorCode.UpdateStale
 })
 
+const isValidateError = computed(() => {
+  return siteStore.value.saveError?.code === ApiErrorCode.InvalidFormData
+})
+
 const error = computed(() => {
   return siteStore.value.saveError
 })
@@ -91,6 +100,8 @@ const errorText = computed(() => {
     return t('build.save_history')
   } else if (isStale.value) {
     return t('build.stale')
+  } else if (isValidateError.value) {
+    return t('build.save_server_error')
   } else {
     return t('build.save_error_text')
   }

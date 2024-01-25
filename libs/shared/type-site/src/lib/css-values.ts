@@ -15,7 +15,7 @@ export const cssValues = new Map<Css, string[]>([
   [Css.FlexDirection, ['column', 'column-reverse', 'row', 'row-reverse']],
   [Css.FlexWrap, ['nowrap', 'wrap', 'wrap-reverse']],
   [Css.FontStyle, ['italic', 'normal']],
-  [Css.FontWeight, ['400', '700']],
+  [Css.FontWeight, ['100', '300', '400', '500', '600', '700']],
   [
     Css.JustifyContent,
     ['center', 'flex-end', 'flex-start', 'space-around', 'space-between', 'stretch'],

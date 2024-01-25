@@ -54,7 +54,6 @@ export const useThemeMenuFonts = (): IUseThemeMenuFontFeature => {
     Object.assign(editingFont, emptyFont())
     Object.assign(editingFontSource, emptyFont())
     editing.value = true
-    console.log('NEWF', editing.value)
   }
 
   const setEditingFont = (font: IThemeFont) => {
