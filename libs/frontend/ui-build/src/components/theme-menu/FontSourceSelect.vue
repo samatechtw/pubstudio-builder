@@ -1,7 +1,7 @@
 <template>
   <PSMultiselect
     ref="multiselectRef"
-    :value="newVal"
+    :value="modelValue"
     class="font-source-select"
     :placeholder="t('source')"
     :options="options"
@@ -12,7 +12,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref, toRefs } from 'vue'
+import { computed, ref } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { PSMultiselect } from '@pubstudio/frontend/ui-widgets'
 import { IMultiselectObj } from '@pubstudio/frontend/type-ui-widgets'
@@ -20,17 +20,14 @@ import { ThemeFontSource, ThemeFontSourceValues } from '@pubstudio/shared/type-s
 
 const { t } = useI18n()
 
-const props = defineProps<{
+defineProps<{
   modelValue: ThemeFontSource | undefined
 }>()
-
-const { modelValue } = toRefs(props)
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: ThemeFontSource): void
 }>()
 
-const newVal = ref(modelValue.value)
 const multiselectRef = ref(null)
 
 const options = computed(() =>

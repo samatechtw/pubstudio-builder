@@ -45,7 +45,7 @@ const options = computed(() => {
     // 100 to 900
     availableWeights = Array.from({ length: 9 }).map((_, i) => (i + 1) * 100)
   } else {
-    availableWeights = [300, 400, 500, 700]
+    availableWeights = [300, 400, 500, 600, 700]
   }
 
   return availableWeights.map((weight) => ({
@@ -74,6 +74,9 @@ onMounted(() => {
   }
   :deep(.multiselect-single-label) {
     padding: 0 0 0 6px;
+  }
+  :deep(.ms-item) {
+    padding: 6px 6px 5px;
   }
 }
 </style>

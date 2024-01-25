@@ -75,6 +75,7 @@ const removeFont = (font: IThemeFont) => {
       margin-top: 4px;
     }
     .font-entry {
+      font-size: 15px;
       width: 100%;
       padding: 12px 0;
       justify-content: space-between;
