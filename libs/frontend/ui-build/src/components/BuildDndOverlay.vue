@@ -10,7 +10,6 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import { runtimeContext } from '@pubstudio/frontend/util-runtime'
 import { buildContentWindowInnerId, useBuild } from '@pubstudio/frontend/feature-build'
-import { activeBreakpoint } from '@pubstudio/frontend/feature-site-source'
 import { IComponent } from '@pubstudio/shared/type-site'
 import { sleep } from '@pubstudio/shared/util-core'
 
@@ -18,7 +17,7 @@ const hoverOutlineThickness = 6
 const outlineColor = '#000'
 const selfOutlineColor = '#F82389'
 
-const { editor } = useBuild()
+const { site, editor } = useBuild()
 
 const hoverOverlayStyle = computed(() => {
   const buildDndState = runtimeContext.buildDndState.value
@@ -159,14 +158,9 @@ const computeSelectionOverlay = async (selectedComponent: IComponent | undefined
 }
 
 watch(
-  () => ({
-    selectedComponent: editor.value?.selectedComponent,
-    // Re-compute selection overlay width & height when active breakpoint changes.
-    activeBreakpoint: activeBreakpoint.value,
-    // Recompute on window resize
-    buildContentWindowSize: runtimeContext.buildContentWindowSize.value,
-  }),
-  async ({ selectedComponent }) => {
+  site,
+  async (newSite) => {
+    const selectedComponent = newSite.editor?.selectedComponent
     computeSelectionOverlay(selectedComponent)
   },
   {
