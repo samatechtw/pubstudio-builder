@@ -20,6 +20,7 @@ import {
   IComponent,
   IPage,
   IRawStyle,
+  IRawStylesWithSource,
   ISite,
   ISiteContext,
 } from '@pubstudio/shared/type-site'
@@ -41,6 +42,8 @@ export const iteratePage = (page: IPage, fn: ComponentIterFn) => {
 export const getBuildPageStyle = (site: ISite, page: IPage): IRawStyleRecord => {
   const pageStyle: IRawStyleRecord = {}
 
+  const currentPseudoClass = site.editor?.cssPseudoClass ?? CssPseudoClass.Default
+
   const appendStyle = (component: IComponent) => {
     const breakpointStyles = computeComponentBreakpointStyles(site.context, component, {
       // Ignore mixins because they're already handled by Reusable Styles in renderer.
@@ -51,9 +54,34 @@ export const getBuildPageStyle = (site: ISite, page: IPage): IRawStyleRecord => 
       breakpointStyles,
       descSortedBreakpoints.value,
       activeBreakpoint.value,
+      true,
     )
-    const resolvedStyle = rawStyleToResolvedStyleWithSource(site.context, flattenedStyles)
+
+    const nonPlaceholderStyles: IRawStylesWithSource = {}
+    const placeholderStyles: IRawStylesWithSource = {}
+
+    Object.entries(flattenedStyles).forEach(([css, style]) => {
+      if (style.sourcePseudoClass === CssPseudoClass.Placeholder) {
+        placeholderStyles[css as Css] = style
+      } else {
+        nonPlaceholderStyles[css as Css] = style
+      }
+    })
+
+    const resolvedStyle = rawStyleToResolvedStyleWithSource(
+      site.context,
+      nonPlaceholderStyles,
+    )
     pageStyle[`#${component.id}`] = resolvedStyle
+
+    if (currentPseudoClass === CssPseudoClass.Placeholder) {
+      const resolvedPlaceholderStyle = rawStyleToResolvedStyleWithSource(
+        site.context,
+        placeholderStyles,
+      )
+      pageStyle[`#${component.id}${CssPseudoClass.Placeholder}`] =
+        resolvedPlaceholderStyle
+    }
 
     if (component.style.overrides) {
       Object.keys(component.style.overrides).forEach((selector) => {
