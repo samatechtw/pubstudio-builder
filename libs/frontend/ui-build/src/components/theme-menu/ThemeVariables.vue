@@ -176,7 +176,8 @@ const removeThemeVariable = (themeVariable: IThemeVariable) => {
 }
 
 .variable-entry {
-  padding: 12px 0;
+  @mixin text 15px;
+  padding: 8px 0;
   justify-content: space-between;
   border-bottom: 1px solid $grey-100;
   cursor: default;
