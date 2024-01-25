@@ -56,7 +56,7 @@ pub trait SiteRepoTrait {
         req: UpdateSiteDtoWithContentUpdatedAt,
     ) -> Result<SiteEntity, DbError>;
     async fn publish_site(&self, id: &str, req: PublishSiteDto) -> Result<SiteEntity, DbError>;
-    async fn export_backup(&self, id: &str) -> Result<u64, DbError>;
+    async fn export_backup(&self, id: &str) -> Result<Vec<u8>, DbError>;
     async fn import_backup(&self, id: &str, backup_data: Vec<u8>) -> Result<(), DbError>;
 }
 
@@ -368,7 +368,7 @@ impl SiteRepoTrait for SiteRepo {
         Ok(result)
     }
 
-    async fn export_backup(&self, id: &str) -> Result<u64, DbError> {
+    async fn export_backup(&self, id: &str) -> Result<Vec<u8>, DbError> {
         let pool = self.get_db_pool(id).await?;
 
         let backup_file = format!("db/sites/backups/backup_{}.db", id);
@@ -382,11 +382,9 @@ impl SiteRepoTrait for SiteRepo {
             .fetch_all(&pool)
             .await?;
 
-        let file_size = fs::metadata(backup_file)
-            .map(|metadata| metadata.len())
-            .map_err(|e| DbError::FileError(e.to_string()))?;
+        let file_content = fs::read(backup_file).map_err(|e| DbError::FileError(e.to_string()))?;
 
-        Ok(file_size)
+        Ok(file_content)
     }
 
     async fn import_backup(&self, id: &str, backup_data: Vec<u8>) -> Result<(), DbError> {

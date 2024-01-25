@@ -1,6 +1,5 @@
 use crate::reqwest::Url;
 use crate::{error::api_error::ApiError, reqwest};
-use reqwest::header;
 use rusty_s3::{Bucket, Credentials, S3Action, UrlStyle};
 use std::time::Duration;
 
@@ -119,21 +118,6 @@ impl S3Client {
         )
     }
 
-    pub fn presign_put_site_backup(
-        &self,
-        filename: &str,
-        expires: u64,
-        size: u64,
-    ) -> Result<Url, ApiError> {
-        self.presign_put(
-            &self.backup_bucket,
-            filename,
-            expires,
-            "application/octet-stream",
-            size.to_string(),
-        )
-    }
-
     pub async fn verify_site_asset(&self, object_key: &str) -> Result<bool, ApiError> {
         let head_object = self
             .site_asset_bucket
@@ -158,15 +142,14 @@ impl S3Client {
             .await
     }
 
-    pub async fn upload_backup(&self, object_key: &str, content_size: u64) -> Result<(), ApiError> {
-        let url = self.presign_put_site_backup(&object_key, 600, content_size)?;
+    pub async fn upload_backup(&self, object_key: &str, body: Vec<u8>) -> Result<(), ApiError> {
+        let upload_object = self
+            .backup_bucket
+            .put_object(Some(&self.credentials), &object_key);
+        let expires_in = Duration::from_secs(600);
+        let url = upload_object.sign(expires_in);
 
-        match reqwest::Client::new()
-            .put(url)
-            .header(header::CONTENT_LENGTH, content_size)
-            .send()
-            .await
-        {
+        match reqwest::Client::new().put(url).body(body).send().await {
             Ok(res) => {
                 if res.status().is_success() {
                     Ok(())
