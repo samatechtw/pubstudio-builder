@@ -74,9 +74,10 @@ export const themeVariableSyntaxRegex = /\$\{(.*?)\}/g
 export const resolveThemeVariables = (
   context: ISiteContext,
   text: string,
+  trim = true,
 ): string | undefined => {
   try {
-    return text.replace(themeVariableSyntaxRegex, (_, variableName: string) => {
+    const resolved = text.replace(themeVariableSyntaxRegex, (_, variableName: string) => {
       const value =
         // Custom theme variable
         context.theme.variables[variableName] ??
@@ -86,8 +87,14 @@ export const resolveThemeVariables = (
         console.warn(`Variable not found: ${variableName}`)
       }
 
-      return value?.trim()
+      return value
     })
+
+    if (trim) {
+      return resolved.trim()
+    } else {
+      return resolved
+    }
   } catch (_e) {
     return undefined
   }
