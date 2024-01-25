@@ -30,7 +30,6 @@ export interface IUseApiStoreProps {
 
 interface IUpdateApiOptions {
   keepalive?: boolean
-  clearTimer?: boolean
   ignoreUpdateKey?: boolean
 }
 
@@ -99,7 +98,7 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
 
   // Post the updated Site fields to the API
   const updateApi = async (options: IUpdateApiOptions) => {
-    const { keepalive, clearTimer } = options
+    const { keepalive } = options
     saveError.value = undefined
     const site = store.site.getSite.value
     try {
@@ -121,11 +120,6 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
         updateKey.value = result.updated_at.toString()
       }
       dirty.value = dirtyDefault()
-      if (clearTimer) {
-        // `clearTimeout` is not called here because we want to avoid canceling any queued updates
-        // when the previous update has completed.
-        saveTimer = undefined
-      }
     } catch (e) {
       saveError.value = toApiError(e)
       console.log('Save site API call fail:', e)
@@ -140,9 +134,8 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
       clearTimeout(saveTimer)
     }
     saveTimer = setTimeout(() => {
-      updateApi({
-        clearTimer: true,
-      })
+      updateApi({})
+      saveTimer = undefined
     }, timeout)
   }
 
@@ -153,7 +146,8 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
     let changed = false
     for (const key in site) {
       const k = key as keyof IStoredSiteDirty
-      dirty.value[k] = dirty.value[k] || storedSite[k] !== store.site[k]?.value
+      dirty.value[k] =
+        options?.forceUpdate || dirty.value[k] || storedSite[k] !== store.site[k]?.value
       if (dirty.value[k]) {
         changed = true
       }
@@ -167,7 +161,6 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
         }
         await updateApi({
           keepalive: true,
-          clearTimer: false,
           ignoreUpdateKey: options?.ignoreUpdateKey,
         })
       } else {
