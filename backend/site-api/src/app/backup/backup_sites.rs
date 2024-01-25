@@ -32,10 +32,11 @@ impl BackupSitesResult {
 async fn upload_backup(
     env: ExecEnv,
     s3_client: &S3Client,
-    site: &SiteMetadataEntity,
-    content_size: u64,
+    site_data: &(SiteMetadataEntity, Vec<u8>),
 ) -> Option<BackupEntityProps> {
     let created_at = Utc::now();
+    let site = &site_data.0;
+    let upload_file_content = site_data.1.clone();
     let key = format!("{}/{}.db", site.id, created_at.format("%Y-%m-%d %H:%M:%S"));
     let site_id = match Uuid::parse_str(&site.id) {
         Ok(site_id) => site_id,
@@ -55,7 +56,7 @@ async fn upload_backup(
             created_at,
         });
     }
-    match s3_client.upload_backup(&key, content_size).await {
+    match s3_client.upload_backup(&key, upload_file_content).await {
         Ok(_) => match Uuid::parse_str(&site.id) {
             Ok(site_id) => {
                 return Some(BackupEntityProps {
@@ -96,11 +97,11 @@ pub async fn backup_sites(
     let sites_count = sites.len();
 
     // Vacuum sites to local file
-    let mut vacuumed_sites: Vec<(SiteMetadataEntity, u64)> = Vec::new();
+    let mut vacuumed_sites: Vec<(SiteMetadataEntity, Vec<u8>)> = Vec::new();
     for site in sites {
         match context.site_repo.export_backup(&site.id).await {
-            Ok(file_size) => {
-                let tuple = (site.clone(), file_size);
+            Ok(file_content) => {
+                let tuple = (site, file_content);
                 vacuumed_sites.push(tuple);
             }
             Err(e) => error!("Failed to vacuum site: {}, {}", site.id, e.to_string()),
@@ -110,8 +111,7 @@ pub async fn backup_sites(
     // Upload backups
     let mut entity_props: Vec<BackupEntityProps> = Vec::new();
     for site in &vacuumed_sites {
-        if let Some(props) =
-            upload_backup(context.config.exec_env, &context.s3_client, &site.0, site.1).await
+        if let Some(props) = upload_backup(context.config.exec_env, &context.s3_client, site).await
         {
             entity_props.push(props);
         }
