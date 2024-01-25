@@ -86,7 +86,7 @@ export const resolveThemeVariables = (
         console.warn(`Variable not found: ${variableName}`)
       }
 
-      return value
+      return value?.trim()
     })
   } catch (_e) {
     return undefined
