@@ -71,7 +71,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, inject, onMounted, ref, toRefs, watch } from 'vue'
+import { computed, inject, ref, toRefs, watch } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import {
   Check,
@@ -122,7 +122,7 @@ const emit = defineEmits<{
 const rootApi = inject(ApiInjectionKey) as PSApi
 const api = useSiteAssetApi(rootApi)
 
-const { sites, listSites } = useSites()
+const { sites } = useSites()
 
 const defaultFilter = (): IListPlatformSiteAssetsRequest => {
   let siteId = initialSiteId.value
@@ -196,10 +196,6 @@ const listAssets = async () => {
   }
   loading.value = false
 }
-
-onMounted(async () => {
-  await listSites({})
-})
 
 watch(show, async (modalShown) => {
   if (modalShown) {
