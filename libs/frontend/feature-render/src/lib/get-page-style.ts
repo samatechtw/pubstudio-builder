@@ -4,10 +4,9 @@ import {
 } from '@pubstudio/frontend/feature-site-source'
 import {
   computeComponentBreakpointStyles,
-  computeComponentFlattenedStyles,
-  computeComponentOverrideStyle,
   computeComponentOverrideStyles,
 } from '@pubstudio/frontend/util-component'
+import { DEFAULT_BREAKPOINT_ID } from '@pubstudio/frontend/util-ids'
 import {
   createQueryStyle,
   IQueryStyle,
@@ -20,10 +19,10 @@ import {
   IComponent,
   IPage,
   IRawStyle,
-  IRawStylesWithSource,
   ISite,
   ISiteContext,
 } from '@pubstudio/shared/type-site'
+import { pseudoClassToCssClass } from './pseudo-class-to-css-class'
 
 type ComponentIterFn = (component: IComponent) => void
 
@@ -42,62 +41,53 @@ export const iteratePage = (page: IPage, fn: ComponentIterFn) => {
 export const getBuildPageStyle = (site: ISite, page: IPage): IRawStyleRecord => {
   const pageStyle: IRawStyleRecord = {}
 
-  const currentPseudoClass = site.editor?.cssPseudoClass ?? CssPseudoClass.Default
-
   const appendStyle = (component: IComponent) => {
-    const breakpointStyles = computeComponentBreakpointStyles(site.context, component, {
-      // Ignore mixins because they're already handled by Reusable Styles in renderer.
-      computeMixins: false,
-    })
-    const flattenedStyles = computeComponentFlattenedStyles(
-      site.editor,
-      breakpointStyles,
-      descSortedBreakpoints.value,
-      activeBreakpoint.value,
-      true,
-    )
+    // Compute accumulated breakpoint ids
+    const accumulatedBreakpointIds = new Set<string>([DEFAULT_BREAKPOINT_ID])
 
-    const nonPlaceholderStyles: IRawStylesWithSource = {}
-    const placeholderStyles: IRawStylesWithSource = {}
+    for (const breakpoint of descSortedBreakpoints.value) {
+      if (breakpoint.id === activeBreakpoint.value.id) {
+        break
+      }
+      accumulatedBreakpointIds.add(breakpoint.id)
+    }
 
-    Object.entries(flattenedStyles).forEach(([css, style]) => {
-      if (style.sourcePseudoClass === CssPseudoClass.Placeholder) {
-        placeholderStyles[css as Css] = style
-      } else {
-        nonPlaceholderStyles[css as Css] = style
+    const currentPseudoClass = site.editor?.cssPseudoClass ?? CssPseudoClass.Default
+
+    // Compute styles in default pseudo class
+    accumulatedBreakpointIds.forEach((breakpointId) => {
+      const bpStyle = component.style.custom[breakpointId]
+      const rawStyle = bpStyle?.[CssPseudoClass.Default] ?? {}
+      pageStyle[`.${component.id}`] = { ...rawStyle }
+
+      // Compute styles in the current pseudo class
+      if (currentPseudoClass !== CssPseudoClass.Default) {
+        const rawStyle = bpStyle?.[currentPseudoClass] ?? {}
+        const pseudoClassName = pseudoClassToCssClass(currentPseudoClass)
+        pageStyle[`.${component.id}.${pseudoClassName}`] = { ...rawStyle }
       }
     })
 
-    const resolvedStyle = rawStyleToResolvedStyleWithSource(
-      site.context,
-      nonPlaceholderStyles,
-    )
-    pageStyle[`#${component.id}`] = resolvedStyle
-
-    if (currentPseudoClass === CssPseudoClass.Placeholder) {
-      const resolvedPlaceholderStyle = rawStyleToResolvedStyleWithSource(
-        site.context,
-        placeholderStyles,
-      )
-      pageStyle[`#${component.id}${CssPseudoClass.Placeholder}`] =
-        resolvedPlaceholderStyle
-    }
-
     if (component.style.overrides) {
-      Object.keys(component.style.overrides).forEach((selector) => {
-        const childStyles = computeComponentOverrideStyle(component, selector)
-        const childFlattened = computeComponentFlattenedStyles(
-          site.editor,
-          childStyles,
-          descSortedBreakpoints.value,
-          activeBreakpoint.value,
-        )
-        const childResolved = rawStyleToResolvedStyleWithSource(
-          site.context,
-          childFlattened,
-        )
-        pageStyle[`#${component.id} #${selector}`] = childResolved
-      })
+      Object.entries(component.style.overrides).forEach(
+        ([selector, breakpointStyles]) => {
+          // Compute styles in default pseudo class
+          accumulatedBreakpointIds.forEach((breakpointId) => {
+            const bpStyle = breakpointStyles[breakpointId]
+            const rawStyle = bpStyle?.[CssPseudoClass.Default] ?? {}
+            pageStyle[`.${component.id} .${selector}`] = { ...rawStyle }
+
+            // Compute styles in the current pseudo class
+            if (currentPseudoClass !== CssPseudoClass.Default) {
+              const rawStyle = bpStyle?.[currentPseudoClass] ?? {}
+              const pseudoClassName = pseudoClassToCssClass(currentPseudoClass)
+              pageStyle[`.${component.id} .${selector}.${pseudoClassName}`] = {
+                ...rawStyle,
+              }
+            }
+          })
+        },
+      )
     }
   }
   iteratePage(page, appendStyle)
@@ -148,7 +138,7 @@ export const getLivePageStyle = (context: ISiteContext, page: IPage): IQueryStyl
         Object.entries(pseudoStyle).forEach(([pseudoClass, rawStyle]) => {
           const pseudoValue = pseudoClass === CssPseudoClass.Default ? '' : pseudoClass
           const resolvedStyle = rawStyleToResolvedStyleWithSource(context, rawStyle)
-          queryStyle[breakpointId][`#${component.id}${pseudoValue}`] = resolvedStyle
+          queryStyle[breakpointId][`.${component.id}${pseudoValue}`] = resolvedStyle
         })
       }
       if (overrideStyles && overrideStyles[breakpointId]) {
@@ -158,7 +148,7 @@ export const getLivePageStyle = (context: ISiteContext, page: IPage): IQueryStyl
               const pseudoValue =
                 pseudoClass === CssPseudoClass.Default ? '' : pseudoClass
               const resolvedStyle = rawStyleToResolvedStyleWithSource(context, rawStyle)
-              queryStyle[breakpointId][`#${component.id}${pseudoValue} #${selector}`] =
+              queryStyle[breakpointId][`.${component.id}${pseudoValue} .${selector}`] =
                 resolvedStyle
             })
           },
