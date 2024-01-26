@@ -9,6 +9,7 @@ import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { resolveComponent } from '@pubstudio/frontend/util-builtin'
 import {
   clearComponentTabState,
+  editingCommandCount,
   setBuildSubmenu,
   setStyleToolbarMenu,
 } from '@pubstudio/frontend/util-command'
@@ -16,6 +17,7 @@ import { resolvedComponentStyle } from '@pubstudio/frontend/util-component'
 import { isDynamicComponent } from '@pubstudio/frontend/util-ids'
 import { Keys } from '@pubstudio/frontend/util-key-listener'
 import { runtimeContext } from '@pubstudio/frontend/util-runtime'
+import { useHUD } from '@pubstudio/frontend/util-ui-alert'
 import {
   BuildSubmenu,
   Css,
@@ -232,8 +234,12 @@ export const useBuildEvent = () => {
   }
 
   const pressTab = async (e: KeyboardEvent) => {
+    // TODO -- alert the user that editing styles are active, or find a way to disable tab
+    // when a style property is selected, without disabling tab in other situations
+    if (editingCommandCount() > 0) {
+      return
+    }
     const { selectedComponent } = editor.value ?? {}
-
     if (selectedComponent) {
       if (e.shiftKey) {
         selectPreviousComponent(site.value, selectedComponent)
