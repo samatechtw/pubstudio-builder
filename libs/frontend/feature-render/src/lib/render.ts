@@ -33,7 +33,7 @@ export const computePropsContent = (
   const props = {
     ...data.attrs,
     ...events.native,
-    class: data.mixins,
+    class: data.mixins.concat(component.id),
     id: component.id,
   }
 

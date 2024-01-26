@@ -1,7 +1,14 @@
 import { resolveThemeVariables } from '@pubstudio/frontend/util-builtin'
 import { RenderMode } from '@pubstudio/frontend/util-render'
-import { IComponent, ISiteContext, Tag } from '@pubstudio/shared/type-site'
+import {
+  CssPseudoClass,
+  IComponent,
+  IEditorContext,
+  ISiteContext,
+  Tag,
+} from '@pubstudio/shared/type-site'
 import { IAttrsInputsMixins } from './i-attrs-inputs-mixins'
+import { pseudoClassToCssClass } from './pseudo-class-to-css-class'
 
 export interface IComputeAttrsInputsMixinsOptions {
   renderMode: RenderMode
@@ -9,6 +16,7 @@ export interface IComputeAttrsInputsMixinsOptions {
    * @default true
    */
   resolveTheme?: boolean
+  editor?: IEditorContext
 }
 
 // Compute component attributes/props, inputs, and mixins
@@ -18,12 +26,20 @@ export const computeAttrsInputsMixins = (
   component: IComponent,
   options: IComputeAttrsInputsMixinsOptions,
 ): IAttrsInputsMixins => {
-  const { renderMode, resolveTheme = true } = options
+  const { renderMode, resolveTheme = true, editor } = options
 
   const c: IComponent = component
   const inputs: Record<string, unknown> = {}
   const attrs: Record<string, unknown> = {}
   const mixins: string[] = []
+
+  if (editor) {
+    const { cssPseudoClass } = editor
+    if (cssPseudoClass !== CssPseudoClass.Default) {
+      mixins.push(pseudoClassToCssClass(cssPseudoClass))
+    }
+  }
+
   const resolveInput = (value: unknown): unknown => {
     if (resolveTheme && typeof value === 'string') {
       return resolveThemeVariables(context, value, false) ?? value

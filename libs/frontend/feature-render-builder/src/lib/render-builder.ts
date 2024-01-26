@@ -217,7 +217,10 @@ export const computePropsContent = (
   dndState?: IDndState,
 ): IPropsBuildContent => {
   // TODO -- handle inputs
-  const data = computeAttrsInputsMixins(site.context, component, { renderMode })
+  const data = computeAttrsInputsMixins(site.context, component, {
+    renderMode,
+    editor: site.editor,
+  })
   const events = computeEvents(site, component)
 
   const { editor } = site
@@ -273,7 +276,7 @@ export const computePropsContent = (
     ...data.attrs,
     ...builderStyleProps?.builderProps,
     ...events.native,
-    class: data.mixins.concat(builderStyleProps?.builderClass ?? []),
+    class: data.mixins.concat(component.id, builderStyleProps?.builderClass ?? []),
     style: builderStyleProps?.builderStyle,
     id: component.id,
   }

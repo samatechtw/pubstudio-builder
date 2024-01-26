@@ -4,11 +4,13 @@ import {
 } from '@pubstudio/frontend/feature-site-source'
 import { findStyles } from '@pubstudio/frontend/util-component'
 import {
+  createQueryStyle,
   queryStyleToString,
   rawStyleRecordToString,
+  rawStyleToResolvedStyle,
   RenderMode,
 } from '@pubstudio/frontend/util-render'
-import { Css, IPage, ISite } from '@pubstudio/shared/type-site'
+import { Css, CssPseudoClass, IPage, ISite } from '@pubstudio/shared/type-site'
 import { renderGoogleFontsLink } from '@pubstudio/frontend/util-render'
 import { Link, Meta, Script, useHead } from '@unhead/vue'
 import { Component, computed, ComputedRef, defineComponent, h, Ref } from 'vue'
@@ -17,7 +19,6 @@ import {
   getLivePageStyle,
   getRootBackgroundStyle,
 } from './get-page-style'
-import { getReusableStyle } from './get-reusable-style'
 import { renderPage } from './render'
 
 export interface IUseRender {
@@ -42,8 +43,22 @@ export const useRender = (options: IUseRenderOptions): IUseRender => {
   const reusableStyle = computed(() => {
     let styleContent = ''
     if (site.value) {
-      const reusableStyle = getReusableStyle(site.value.context)
-      styleContent = queryStyleToString(site.value.context, reusableStyle)
+      const queryStyle = createQueryStyle(site.value.context)
+
+      Object.entries(site.value.context.styles).forEach(([mixinId, style]) => {
+        Object.entries(style.breakpoints).forEach(([breakpointId, pseudoStyle]) => {
+          Object.entries(pseudoStyle).forEach(([pseudoClass, rawStyle]) => {
+            const pseudoValue = pseudoClass === CssPseudoClass.Default ? '' : pseudoClass
+            const resolvedStyle = rawStyleToResolvedStyle(
+              (site.value as ISite).context,
+              rawStyle,
+            )
+            queryStyle[breakpointId][`.${mixinId}${pseudoValue}`] = resolvedStyle
+          })
+        })
+      })
+
+      styleContent = queryStyleToString(site.value.context, queryStyle)
     }
     return h('style', styleContent)
   })
