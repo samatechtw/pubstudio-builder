@@ -42,6 +42,7 @@
       :show="!!pendingSiteImport"
       :title="t('build.confirm_import')"
       :text="t('build.confirm_import_text')"
+      :loading="importing"
       @confirm="confirmImport"
       @cancel="pendingSiteImport = undefined"
     />
@@ -95,6 +96,7 @@ const storedTemplate = ref<ISerializedSite>()
 const pendingSiteImport = ref()
 const parseError = ref()
 const showConfirmReset = ref(false)
+const importing = ref(false)
 
 const defaultFileName = computed(() => defaultExportedFileName(site.value.name))
 
@@ -103,10 +105,12 @@ const exportSite = (fileName: string) => {
   showExport.value = false
 }
 
-const confirmImport = () => {
+const confirmImport = async () => {
+  importing.value = true
   const namespace = site.value.context.namespace
-  replaceSite(replaceNamespace(pendingSiteImport.value, namespace))
+  await replaceSite(replaceNamespace(pendingSiteImport.value, namespace))
   pendingSiteImport.value = undefined
+  importing.value = false
 }
 
 const importSite = async (file: File) => {

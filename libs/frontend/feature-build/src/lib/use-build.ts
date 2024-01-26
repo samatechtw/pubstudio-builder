@@ -134,7 +134,7 @@ export interface IUseBuild {
   commandAlert: Ref<CommandType | undefined>
   clearSiteError: () => void
   resetSite: () => void
-  replaceSite: (newSite: ISite) => void
+  replaceSite: (newSite: ISite) => Promise<void>
   addComponent: (data?: Partial<IAddComponentData>) => void
   addComponentData: (data: IAddComponentData) => void
   duplicateComponent: () => void
@@ -281,7 +281,7 @@ export const useBuild = (): IUseBuild => {
     site.value = newSite
     // Basic name sanitization
     site.value.name = site.value.name.replace(/[-_]/g, ' ')
-    siteStore.value.save(site.value, {
+    return siteStore.value.save(site.value, {
       immediate: true,
       forceUpdate: true,
       ignoreUpdateKey: true,
