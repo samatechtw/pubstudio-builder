@@ -1,11 +1,21 @@
 import {
   IBreakpointStyles,
   IComponent,
+  IComponentEvents,
+  IComponentInputs,
   IComponentStyleOverrides,
+  IEditorEvents,
   IPseudoStyle,
   IResolvedComponentProps,
 } from '@pubstudio/shared/type-site'
 import { mergeRecord2 } from './helpers'
+
+const clone = <T>(object: T | undefined): T => {
+  if (!object) {
+    return object as T
+  }
+  return JSON.parse(JSON.stringify(object))
+}
 
 // Copies inherited custom style object and merges it into a component custom style
 export const generateCustomStyle = (
@@ -26,12 +36,12 @@ export const resolveComponentProps = (
   component: IComponent,
   source: IComponent,
 ): IResolvedComponentProps => {
-  const customStyles: IBreakpointStyles = structuredClone(component.style.custom)
+  const customStyles: IBreakpointStyles = clone(component.style.custom)
 
   let mixins = [...(component.style.mixins ?? [])]
-  let inputs = structuredClone(component.inputs)
-  let events = structuredClone(component.events)
-  let editorEvents = structuredClone(component.editorEvents)
+  let inputs = clone(component.inputs)
+  let events = clone(component.events)
+  let editorEvents = clone(component.editorEvents)
 
   if (source !== undefined) {
     // Collect mixins
@@ -46,11 +56,11 @@ export const resolveComponentProps = (
       )
     }
     // Merge inputs
-    inputs = mergeRecord2(source.inputs, inputs)
+    inputs = mergeRecord2(source.inputs, inputs) as IComponentInputs
     // Merge outputs
-    events = mergeRecord2(source.events, events)
+    events = mergeRecord2(source.events, events) as IComponentEvents
     // Merge editor events
-    editorEvents = mergeRecord2(source.editorEvents, editorEvents)
+    editorEvents = mergeRecord2(source.editorEvents, editorEvents) as IEditorEvents
   }
   // De-duplicate mixins
   mixins = Array.from(new Set(mixins))
@@ -86,10 +96,10 @@ export const detachOverrides = (
     const overrideCopy = JSON.parse(JSON.stringify(override))
     if (childIndex === -1) {
       // Override does not correspond to a child, copy it directly
-      overrides[key] = structuredClone(overrideCopy)
+      overrides[key] = clone(overrideCopy)
     } else {
       // Copy the override to the new component, using the new child ID as key
-      overrides[component.children[childIndex].id] = structuredClone(overrideCopy)
+      overrides[component.children[childIndex].id] = clone(overrideCopy)
     }
   }
   return overrides
