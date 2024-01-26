@@ -18,16 +18,20 @@ export const currentStyleType = ref<StyleType>()
 // Extra info for editing reusable styles/mixins
 export const editingMixinData = ref<ICloseMixinMenuData | undefined>()
 
+export const editingCommandCount = () => {
+  return editCommands.value?.commands.length ?? 0
+}
+
 const clearBlankCommands = (site: ISite) => {
   // Clear any blank commands (no property or value set)
   if (editCommands.value) {
-    const cmdCount = editCommands.value.commands.length
+    const cmdCount = editingCommandCount()
     if (cmdCount !== 0) {
       editCommands.value.commands = editCommands.value.commands.filter((cmd) => {
         const newStyle = (cmd.data as ISetComponentCustomStyleData).newStyle
         return !(newStyle && newStyle.property === '' && newStyle.value === '')
       })
-      if (cmdCount !== editCommands.value.commands.length) {
+      if (cmdCount !== editingCommandCount()) {
         const cmd: ICommand = { type: CommandType.Group, data: editCommands.value }
         // Remember the current selected component, in case this was called from setSelectedComponent
         // In that case, the component selected by the user should remain selected
