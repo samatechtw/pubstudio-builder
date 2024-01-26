@@ -54,6 +54,7 @@ export interface ISitesFeature {
   siteNameToSubdomain: (siteName: string) => string
   validateSubdomain: (subdomain: string) => string | undefined
   validateSiteName: (name: string) => string | undefined
+  validateNamespace: (namespace: string) => string | undefined
 }
 
 export const useSites = (): ISitesFeature => {
@@ -154,6 +155,13 @@ export const useSites = (): ISitesFeature => {
     return undefined
   }
 
+  const validateNamespace = (name: string): string | undefined => {
+    if (!/^[a-zA-Z0-9_]{2,50}$/.test(name)) {
+      return i18n.t('errors.namespace')
+    }
+    return undefined
+  }
+
   return {
     api,
     loading,
@@ -169,5 +177,6 @@ export const useSites = (): ISitesFeature => {
     siteNameToSubdomain,
     validateSubdomain,
     validateSiteName,
+    validateNamespace,
   }
 }

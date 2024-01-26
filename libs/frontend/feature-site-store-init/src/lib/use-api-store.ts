@@ -160,7 +160,11 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
           saveTimer = undefined
         }
         await updateApi({
-          keepalive: true,
+          // TODO -- figure out the exact limitations. Chrome seems to fail when keepalive=true and the
+          // request is > 64kB, but only when importing a site?
+          // Either check the request size and set keepalive accordingly, or keep it false.
+          // See https://fetch.spec.whatwg.org/#http-network-or-cache-fetch
+          keepalive: false,
           ignoreUpdateKey: options?.ignoreUpdateKey,
         })
       } else {
