@@ -38,6 +38,8 @@ pub enum ApiErrorCode {
     AlreadyConfirmed,
     ConfirmExpired,
     ReAuthFailed,
+    SubdomainReserved,
+    SubdomainTaken,
     None,
 }
 
