@@ -14,6 +14,7 @@ import {
   PSApi,
   toApiError,
 } from '@pubstudio/frontend/util-api'
+import { siteNameValid } from '@pubstudio/frontend/util-validate'
 import { IUpdateLocalSiteApiRequest } from '@pubstudio/shared/type-api-local-site'
 import {
   ICreatePlatformSiteRequest,
@@ -150,7 +151,7 @@ export const useSites = (): ISitesFeature => {
   }
 
   const validateSiteName = (name: string): string | undefined => {
-    if (!/^[a-zA-Z0-9 ]{2,50}$/.test(name)) {
+    if (!siteNameValid(name)) {
       return i18n.t('errors.site_name')
     }
     return undefined

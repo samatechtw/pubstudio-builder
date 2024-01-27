@@ -37,12 +37,12 @@ pub fn validate_subdomain(subdomain: &str, is_admin: bool) -> Result<(), ApiErro
     ];
     if reserved_subdomains.iter().any(|&r| subdomain.contains(r)) {
         return Err(ApiError::bad_request()
-            .code(ApiErrorCode::InvalidFormData)
+            .code(ApiErrorCode::SubdomainReserved)
             .message("Subdomain conflicts with reserved subdomains"));
     }
     if !is_admin && subdomain == "blog" {
         return Err(ApiError::bad_request()
-            .code(ApiErrorCode::InvalidFormData)
+            .code(ApiErrorCode::SubdomainReserved)
             .message("Only admin allowed to create the blog subdomain"));
     }
 
@@ -51,7 +51,7 @@ pub fn validate_subdomain(subdomain: &str, is_admin: bool) -> Result<(), ApiErro
         if let Some(n) = subdomain.chars().nth(1) {
             if n.is_ascii_digit() {
                 return Err(ApiError::bad_request()
-                    .code(ApiErrorCode::InvalidFormData)
+                    .code(ApiErrorCode::SubdomainReserved)
                     .message("Subdomain conflicts with reserved subdomains"));
             }
         }

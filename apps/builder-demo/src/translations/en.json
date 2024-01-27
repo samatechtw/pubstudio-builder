@@ -468,6 +468,7 @@
     "site_servers_full": "Sorry, we are currently over capacity. Please try again later.",
     "AssetUsageExceeded": "Storage limit exceeded, you can upgrade your site for more storage, or review and delete old assets in the {0}",
     "SiteHasAssets": "Cannot delete site with assets. Ensure all site assets have been deleted from the {0} first.",
+    "SubdomainTaken": "Subdomain is already in use.",
     "None": "Unknown error",
     "InvalidFormData": "Invalid input, please double check your submission.",
     "FILE_TYPE": "Unsupported file type"
