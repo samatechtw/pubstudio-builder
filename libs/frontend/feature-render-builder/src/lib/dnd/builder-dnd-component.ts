@@ -203,24 +203,6 @@ export const BuilderDndComponent = defineComponent({
         }
       }
 
-      if (
-        dndState.value?.hoverSelf ||
-        dndState.value?.hoverTop ||
-        dndState.value?.hoverRight ||
-        dndState.value?.hoverBottom ||
-        dndState.value?.hoverLeft
-      ) {
-        runtimeContext.buildDndState.value = {
-          hoverSelf: dndState.value.hoverSelf,
-          hoverTop: dndState.value.hoverTop,
-          hoverRight: dndState.value.hoverRight,
-          hoverBottom: dndState.value.hoverBottom,
-          hoverLeft: dndState.value.hoverLeft,
-          hoverCmpId: component.value.id,
-          hoverCmpParentIsRow: dndState.value.parentIsRow,
-        }
-      }
-
       const props = {
         ...propsContent.props,
         ...dndProps,

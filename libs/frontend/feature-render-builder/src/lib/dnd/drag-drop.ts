@@ -17,7 +17,7 @@ export interface IDropResult {
 export interface IOnDragOptions {
   e: DragEvent
   site: ISite
-  dragSrc: IDraggedComponent
+  dragSrc: IDraggedComponent | undefined
   hoverCmpIndex: number
   hoverCmp: IComponent
   elementRef: HTMLElement | undefined
@@ -35,13 +35,13 @@ export const onDrag = (options: IOnDragOptions): IDropProps => {
   const dropProps = defaultDropProps()
 
   if (elementRef) {
-    const dragCmpParentId = dragSrc.parentId
-    const dragComponentIndex = dragSrc.index
+    const dragCmpParentId = dragSrc?.parentId
+    const dragComponentIndex = dragSrc?.index ?? 0
 
     const hoverOnRoot = !hoverCmp.id.startsWith('global') && !hoverCmp.parent
     const haveSameParent = dragCmpParentId === hoverCmp.parent?.id
 
-    const addNewComponentToRoot = hoverOnRoot && !!dragSrc.addData
+    const addNewComponentToRoot = hoverOnRoot && !!dragSrc?.addData
 
     if (
       !haveSameParent ||
