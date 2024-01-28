@@ -152,12 +152,14 @@ onMounted(async () => {
 .assets-spinner {
   min-height: 200px;
   margin-top: 80px;
+  :deep(.ps-spinner) {
+    min-height: 100px;
+  }
 }
 
 .asset-list {
   display: flex;
   flex-wrap: wrap;
-  min-height: 272px;
   margin-top: 8px;
   margin-left: -16px;
 }
