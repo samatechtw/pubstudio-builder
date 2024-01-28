@@ -52,7 +52,6 @@ export interface IUseDragDropProps {
 
 const COMPONENT_TYPE = 'text/component-id'
 const FILES_TYPE = 'Files'
-const VALID_TYPES = ['image/jpg', 'image/jpeg', 'image/png']
 
 export const dragSource = ref<IDraggedComponent>()
 const droppedFile = ref<IDroppedFile>()
