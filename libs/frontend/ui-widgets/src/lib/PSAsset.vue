@@ -11,7 +11,11 @@
     </video>
     -->
     <img v-if="asImg && url" :src="url" class="ps-asset-image" />
-    <div v-if="url" :style="{ backgroundImage: `url(${url})` }" class="ps-asset-image" />
+    <div
+      v-else-if="url"
+      :style="{ backgroundImage: `url(${url})` }"
+      class="ps-asset-image"
+    />
     <img v-else :src="EditPhoto" class="ps-asset-default" />
   </div>
 </template>
@@ -92,6 +96,8 @@ onUnmounted(() => {
     height: 100%;
     background-size: cover;
     background-position: center;
+    object-fit: contain;
+    object-position: center;
   }
   .ps-asset-video {
     width: 100%;
