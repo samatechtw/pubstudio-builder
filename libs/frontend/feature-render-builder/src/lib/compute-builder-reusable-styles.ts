@@ -14,10 +14,10 @@ export const computeBuilderReusableStyles = (site: ISite): IRawStyleRecord => {
   const accumulatedBreakpointIds = new Set<string>([DEFAULT_BREAKPOINT_ID])
 
   for (const breakpoint of descSortedBreakpoints.value) {
+    accumulatedBreakpointIds.add(breakpoint.id)
     if (breakpoint.id === activeBreakpoint.value.id) {
       break
     }
-    accumulatedBreakpointIds.add(breakpoint.id)
   }
 
   // Compute styles in the current pseudo class
@@ -28,13 +28,18 @@ export const computeBuilderReusableStyles = (site: ISite): IRawStyleRecord => {
     accumulatedBreakpointIds.forEach((breakpointId) => {
       const bpStyle = style.breakpoints[breakpointId]
       const rawStyle = bpStyle?.[CssPseudoClass.Default] ?? {}
-      result[`.${styleId}`] = { ...rawStyle }
+      const cls = `.${styleId}`
+      const currentStyle = result[cls] ?? {}
+      result[cls] = { ...currentStyle, ...rawStyle }
 
       // Compute styles in the current pseudo class
       if (currentPseudoClass !== CssPseudoClass.Default) {
         const rawStyle = bpStyle?.[currentPseudoClass] ?? {}
         const pseudoClassName = pseudoClassToCssClass(currentPseudoClass)
-        result[`.${styleId}.${pseudoClassName}`] = { ...rawStyle }
+
+        const cls = `.${styleId}.${pseudoClassName}`
+        const currentStyle = result[cls] ?? {}
+        result[cls] = { ...currentStyle, ...rawStyle }
       }
     })
   })

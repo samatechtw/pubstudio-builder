@@ -46,10 +46,10 @@ export const getBuildPageStyle = (site: ISite, page: IPage): IRawStyleRecord => 
     const accumulatedBreakpointIds = new Set<string>([DEFAULT_BREAKPOINT_ID])
 
     for (const breakpoint of descSortedBreakpoints.value) {
+      accumulatedBreakpointIds.add(breakpoint.id)
       if (breakpoint.id === activeBreakpoint.value.id) {
         break
       }
-      accumulatedBreakpointIds.add(breakpoint.id)
     }
 
     const currentPseudoClass = site.editor?.cssPseudoClass ?? CssPseudoClass.Default
@@ -58,13 +58,17 @@ export const getBuildPageStyle = (site: ISite, page: IPage): IRawStyleRecord => 
     accumulatedBreakpointIds.forEach((breakpointId) => {
       const bpStyle = component.style.custom[breakpointId]
       const rawStyle = bpStyle?.[CssPseudoClass.Default] ?? {}
-      pageStyle[`.${component.id}`] = { ...rawStyle }
+      const cls = `.${component.id}`
+      const style = pageStyle[cls] ?? {}
+      pageStyle[cls] = { ...style, ...rawStyle }
 
-      // Compute styles in the current pseudo class
+      // Compute styles in the default and current pseudo class
       if (currentPseudoClass !== CssPseudoClass.Default) {
         const rawStyle = bpStyle?.[currentPseudoClass] ?? {}
         const pseudoClassName = pseudoClassToCssClass(currentPseudoClass)
-        pageStyle[`.${component.id}.${pseudoClassName}`] = { ...rawStyle }
+        const cls = `.${component.id}.${pseudoClassName}`
+        const style = pageStyle[cls] ?? {}
+        pageStyle[cls] = { ...style, ...rawStyle }
       }
     })
 
