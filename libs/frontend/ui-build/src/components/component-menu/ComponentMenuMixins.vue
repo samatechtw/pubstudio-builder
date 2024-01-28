@@ -28,7 +28,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref, toRefs, nextTick } from 'vue'
+import { computed, ref, toRefs } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { IStyle } from '@pubstudio/shared/type-site'
 import { resolveStyle } from '@pubstudio/frontend/util-builtin'

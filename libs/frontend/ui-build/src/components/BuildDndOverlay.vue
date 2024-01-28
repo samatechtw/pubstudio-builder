@@ -237,7 +237,7 @@ onMounted(() => {
 .build-dnd-overlay {
   position: absolute;
   pointer-events: none;
-  /* Ensure overlay is on top of absolute positioned components. */
-  z-index: 1;
+  /* Ensure overlay is above absolute positioned components and below other builder UI. */
+  z-index: $z-index-selection;
 }
 </style>

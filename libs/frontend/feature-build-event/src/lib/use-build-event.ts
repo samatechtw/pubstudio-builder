@@ -17,7 +17,6 @@ import { resolvedComponentStyle } from '@pubstudio/frontend/util-component'
 import { isDynamicComponent } from '@pubstudio/frontend/util-ids'
 import { Keys } from '@pubstudio/frontend/util-key-listener'
 import { runtimeContext } from '@pubstudio/frontend/util-runtime'
-import { useHUD } from '@pubstudio/frontend/util-ui-alert'
 import {
   BuildSubmenu,
   Css,
