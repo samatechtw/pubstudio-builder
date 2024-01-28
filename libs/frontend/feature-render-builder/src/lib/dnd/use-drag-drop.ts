@@ -4,6 +4,7 @@ import { resolveComponent } from '@pubstudio/frontend/util-builtin'
 import { setBuildSubmenu } from '@pubstudio/frontend/util-command'
 import { resolvedComponentStyle } from '@pubstudio/frontend/util-component'
 import { isDynamicComponent } from '@pubstudio/frontend/util-ids'
+import { runtimeContext } from '@pubstudio/frontend/util-runtime'
 import { IAddComponentData } from '@pubstudio/shared/type-command-data'
 import {
   BuildSubmenu,
@@ -50,6 +51,8 @@ export interface IUseDragDropProps {
 }
 
 const COMPONENT_TYPE = 'text/component-id'
+const FILES_TYPE = 'Files'
+const VALID_TYPES = ['image/jpg', 'image/jpeg', 'image/png']
 
 export const dragSource = ref<IDraggedComponent>()
 const droppedFile = ref<IDroppedFile>()
@@ -118,8 +121,14 @@ export const useDragDrop = (props: IUseDragDropProps): IUseDragDrop => {
       : undefined
   })
 
-  const isAncestorOf = (ancestor: IComponent, component: IComponent): boolean => {
+  const isAncestorOf = (
+    ancestor: IComponent | undefined,
+    component: IComponent,
+  ): boolean => {
     let c: IComponent | undefined = component
+    if (!ancestor) {
+      return false
+    }
     while (c) {
       if (c.id === ancestor.id) {
         return true
@@ -129,7 +138,7 @@ export const useDragDrop = (props: IUseDragDropProps): IUseDragDrop => {
     return false
   }
 
-  const canDrop = (): boolean => {
+  const canDrop = (srcIsFile?: boolean): boolean => {
     if (dragSource.value?.addData) {
       return true
     }
@@ -138,8 +147,8 @@ export const useDragDrop = (props: IUseDragDropProps): IUseDragDrop => {
     const draggedComponent = resolveComponent(site.context, dragSource.value?.componentId)
     if (
       !hoveredComponent ||
-      !draggedComponent ||
-      hoveredComponent.id === draggedComponent.id
+      (!draggedComponent && !srcIsFile) ||
+      hoveredComponent.id === draggedComponent?.id
     ) {
       return false
     }
@@ -207,13 +216,37 @@ export const useDragDrop = (props: IUseDragDropProps): IUseDragDrop => {
     }
   }
 
+  const updateRuntimeContext = (hoverCmpId: string | undefined) => {
+    const drop = dropProps.value
+    if (
+      hoverCmpId &&
+      (drop.hoverSelf ||
+        drop.hoverTop ||
+        drop.hoverRight ||
+        drop.hoverBottom ||
+        drop.hoverLeft)
+    ) {
+      runtimeContext.buildDndState.value = {
+        hoverSelf: drop.hoverSelf,
+        hoverTop: drop.hoverTop,
+        hoverRight: drop.hoverRight,
+        hoverBottom: drop.hoverBottom,
+        hoverLeft: drop.hoverLeft,
+        hoverCmpId,
+        hoverCmpParentIsRow: drop.parentIsRow,
+      }
+    }
+  }
+
   const dragover = (e: DragEvent) => {
     e.stopPropagation()
     e.preventDefault()
     const component = resolveComponent(site.context, componentId)
     if (component && e.dataTransfer && dragSource.value?.componentId !== componentId) {
-      const isComponent = e.dataTransfer.types.includes(COMPONENT_TYPE)
-      if (isComponent && dragSource.value && canDrop()) {
+      const isFile = e.dataTransfer.types.includes(FILES_TYPE)
+      const srcValid = e.dataTransfer.types.includes(COMPONENT_TYPE) || isFile
+
+      if (srcValid && canDrop(isFile)) {
         e.preventDefault()
         dropProps.value = onDrag({
           e,
@@ -224,6 +257,7 @@ export const useDragDrop = (props: IUseDragDropProps): IUseDragDrop => {
           elementRef: elementRef.value,
           verticalOnly,
         })
+        updateRuntimeContext(component.id)
       }
     }
   }
