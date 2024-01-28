@@ -1,27 +1,14 @@
 import { pseudoClassToCssClass } from '@pubstudio/frontend/feature-render'
-import {
-  activeBreakpoint,
-  descSortedBreakpoints,
-} from '@pubstudio/frontend/feature-site-source'
-import { DEFAULT_BREAKPOINT_ID } from '@pubstudio/frontend/util-ids'
+import { getActiveBreakpointIds } from '@pubstudio/frontend/feature-site-source'
 import { IRawStyleRecord } from '@pubstudio/frontend/util-render'
 import { CssPseudoClass, ISite } from '@pubstudio/shared/type-site'
 
 export const computeBuilderReusableStyles = (site: ISite): IRawStyleRecord => {
   const result: IRawStyleRecord = {}
 
-  // Compute target breakpoint ids
-  const accumulatedBreakpointIds = new Set<string>([DEFAULT_BREAKPOINT_ID])
-
-  for (const breakpoint of descSortedBreakpoints.value) {
-    accumulatedBreakpointIds.add(breakpoint.id)
-    if (breakpoint.id === activeBreakpoint.value.id) {
-      break
-    }
-  }
-
   // Compute styles in the current pseudo class
   const currentPseudoClass = site.editor?.cssPseudoClass ?? CssPseudoClass.Default
+  const accumulatedBreakpointIds = getActiveBreakpointIds()
 
   // Compute styles in default pseudo class
   Object.entries(site.context.styles).forEach(([styleId, style]) => {

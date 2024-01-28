@@ -1,3 +1,4 @@
+import { DEFAULT_BREAKPOINT_ID } from '@pubstudio/frontend/util-ids'
 import { breakpointSortFn } from '@pubstudio/frontend/util-render'
 import { IBreakpointStyles, IPseudoStyle } from '@pubstudio/shared/type-site'
 import { computed } from 'vue'
@@ -41,3 +42,18 @@ export const activeBreakpoint = computed(() => {
 
 export const getActiveBreakpointStyle = (styles: IBreakpointStyles): IPseudoStyle =>
   styles[activeBreakpoint.value.id] ?? {}
+
+// Get an array of the breakpoint IDs that are currently applied
+export const getActiveBreakpointIds = (): string[] => {
+  // Compute target breakpoint ids
+  const accumulatedBreakpointIds = [DEFAULT_BREAKPOINT_ID]
+  for (const breakpoint of descSortedBreakpoints.value) {
+    if (breakpoint.id !== DEFAULT_BREAKPOINT_ID) {
+      accumulatedBreakpointIds.push(breakpoint.id)
+    }
+    if (breakpoint.id === activeBreakpoint.value.id) {
+      break
+    }
+  }
+  return accumulatedBreakpointIds
+}

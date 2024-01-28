@@ -1,12 +1,8 @@
-import {
-  activeBreakpoint,
-  descSortedBreakpoints,
-} from '@pubstudio/frontend/feature-site-source'
+import { getActiveBreakpointIds } from '@pubstudio/frontend/feature-site-source'
 import {
   computeComponentBreakpointStyles,
   computeComponentOverrideStyles,
 } from '@pubstudio/frontend/util-component'
-import { DEFAULT_BREAKPOINT_ID } from '@pubstudio/frontend/util-ids'
 import {
   createQueryStyle,
   IQueryStyle,
@@ -40,18 +36,9 @@ export const iteratePage = (page: IPage, fn: ComponentIterFn) => {
 
 export const getBuildPageStyle = (site: ISite, page: IPage): IRawStyleRecord => {
   const pageStyle: IRawStyleRecord = {}
+  const accumulatedBreakpointIds = getActiveBreakpointIds()
 
   const appendStyle = (component: IComponent) => {
-    // Compute accumulated breakpoint ids
-    const accumulatedBreakpointIds = new Set<string>([DEFAULT_BREAKPOINT_ID])
-
-    for (const breakpoint of descSortedBreakpoints.value) {
-      accumulatedBreakpointIds.add(breakpoint.id)
-      if (breakpoint.id === activeBreakpoint.value.id) {
-        break
-      }
-    }
-
     const currentPseudoClass = site.editor?.cssPseudoClass ?? CssPseudoClass.Default
 
     // Compute styles in default pseudo class
