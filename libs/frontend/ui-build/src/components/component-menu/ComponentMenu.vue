@@ -19,6 +19,7 @@
     <template v-else>
       <ComponentTabInfo :component="component" />
       <ComponentDimensions />
+      <ComponentFlex />
       <ComponentTabStyle :component="component" />
       <ComponentInputs
         :component="component"
@@ -84,6 +85,7 @@ import ComponentInputs from './ComponentInputs.vue'
 import ComponentEvents from './ComponentEvents.vue'
 import ComponentEventEdit from './ComponentEventEdit.vue'
 import StyleMenuEdit from '../StyleMenuEdit.vue'
+import ComponentFlex from './ComponentFlex.vue'
 
 const { t } = useI18n()
 const { editor, replacePageRoot } = useBuild()

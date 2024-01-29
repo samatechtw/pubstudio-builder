@@ -1,11 +1,11 @@
 <template>
   <div class="component-tab-style">
     <ComponentStyles />
+    <ComponentMenuMixins :mixinIds="component.style.mixins ?? []" />
     <ComponentChildStyles
       v-if="hasOverrideStyles || !!component.children?.length"
       :component="component"
     />
-    <ComponentMenuMixins :mixinIds="component.style.mixins ?? []" />
   </div>
 </template>
 
