@@ -6,16 +6,10 @@
         :src="image"
         :class="imageClass"
         @load="imageLoaded = true"
-        @click="imageLoaded = !imageLoaded"
       />
     </Transition>
     <Transition name="image-show">
-      <img
-        v-show="!imageLoaded"
-        :src="placeholder"
-        :class="placeholderClass"
-        @click="imageLoaded = !imageLoaded"
-      />
+      <img v-show="!imageLoaded" :src="placeholder" :class="placeholderClass" />
     </Transition>
   </div>
 </template>

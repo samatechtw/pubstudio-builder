@@ -15,10 +15,27 @@ pub struct SiteDataValidator {
 impl SiteDataValidator {
     pub fn new(site_type: SiteType) -> Self {
         // TODO: Determine max_length based on site_type
-        Self {
-            max_context_length: 100 * KB,
-            max_history_length: 100 * KB,
-            max_pages_length: 1 * MB,
+        match site_type {
+            SiteType::Free => Self {
+                max_context_length: 100 * KB,
+                max_history_length: 100 * KB,
+                max_pages_length: 500 * KB,
+            },
+            SiteType::Paid1 => Self {
+                max_context_length: 200 * KB,
+                max_history_length: 200 * KB,
+                max_pages_length: 1 * MB,
+            },
+            SiteType::Paid2 => Self {
+                max_context_length: 500 * KB,
+                max_history_length: 500 * KB,
+                max_pages_length: 10 * MB,
+            },
+            SiteType::Paid3 => Self {
+                max_context_length: 1 * MB,
+                max_history_length: 1 * MB,
+                max_pages_length: 50 * MB,
+            },
         }
     }
 

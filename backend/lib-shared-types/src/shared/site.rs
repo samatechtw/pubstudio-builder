@@ -100,23 +100,23 @@ impl SiteType {
             SiteType::Free => 0,
             SiteType::Paid1 => {
                 if *payment_period == SitePaymentPeriod::Monthly {
-                    60
+                    90
                 } else {
-                    600
+                    900
                 }
             }
             SiteType::Paid2 => {
                 if *payment_period == SitePaymentPeriod::Monthly {
-                    150
+                    180
                 } else {
-                    1500
+                    1800
                 }
             }
             SiteType::Paid3 => {
                 if *payment_period == SitePaymentPeriod::Monthly {
-                    300
+                    450
                 } else {
-                    3000
+                    4500
                 }
             }
         }

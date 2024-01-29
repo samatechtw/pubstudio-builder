@@ -47,6 +47,13 @@
       <BoundingBox />
     </ToolbarItem>
     <ToolbarItem
+      :tooltip="t('style.toolbar.bounding')"
+      class="bounding"
+      @click="showBugReportModal = true"
+    >
+      <Bug />
+    </ToolbarItem>
+    <ToolbarItem
       v-if="!hideSettings && apiSiteId && apiSiteId !== 'scratch'"
       :tooltip="t('sites.settings')"
       @click="emit('showSiteSettings')"
@@ -56,15 +63,18 @@
     <ToolbarItem :tooltip="t(`style.toolbar.save.${siteStore.saveState}`)">
       <div class="save-state" :class="siteStore.saveState" />
     </ToolbarItem>
+    <BugReportModal :show="showBugReportModal" @cancel="showBugReportModal = false" />
   </div>
 </template>
 
 <script lang="ts" setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { useBuild, useHistory } from '@pubstudio/frontend/feature-build'
 import { setDebugBounding, setShowComponentTree } from '@pubstudio/frontend/util-command'
 import {
+  BoundingBox,
+  Bug,
   Redo,
   ToolbarItem,
   Undo,
@@ -72,7 +82,6 @@ import {
   Settings,
 } from '@pubstudio/frontend/ui-widgets'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
-import { BoundingBox } from '@pubstudio/frontend/ui-widgets'
 import { CommandType } from '@pubstudio/shared/type-command'
 import ToolbarText from './ToolbarText.vue'
 import ToolbarContainer from './ToolbarContainer.vue'
@@ -80,6 +89,7 @@ import ToolbarPage from './ToolbarPage.vue'
 import ToolbarPseudoClass from './ToolbarPseudoClass.vue'
 import ToolbarBuilderWidth from './ToolbarBuilderWidth.vue'
 import ToolbarBreakpoint from './ToolbarBreakpoint.vue'
+import BugReportModal from './BugReportModal.vue'
 
 defineProps<{
   hideSettings?: boolean
@@ -94,6 +104,7 @@ const { commandAlert, editor } = useBuild()
 const { siteStore, isSaving } = useSiteSource()
 const { canUndo, canRedo, undo, redo } = useHistory()
 const { apiSiteId } = useSiteSource()
+const showBugReportModal = ref(false)
 
 const showTextStyle = computed(() => {
   return !!editor.value?.selectedComponent?.content

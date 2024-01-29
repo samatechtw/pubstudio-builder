@@ -1,27 +1,6 @@
 <template>
   <Transition name="fade">
     <div v-if="show" class="toolbar-container">
-      <ToolbarItem
-        :active="isWrap"
-        :tooltip="t('style.toolbar.flex_wrap')"
-        @click="toggleWrap"
-      >
-        <FlexWrap />
-      </ToolbarItem>
-      <ToolbarItem
-        :active="isColumn"
-        :tooltip="t('style.toolbar.flex_vertical')"
-        @click="toggleDirection('column')"
-      >
-        <FlexColumn />
-      </ToolbarItem>
-      <ToolbarItem
-        :active="isRow"
-        :tooltip="t('style.toolbar.flex_horizontal')"
-        @click="toggleDirection('row')"
-      >
-        <FlexRow />
-      </ToolbarItem>
       <ToolbarItemDropdown :items="alignHorizontalItems" />
       <ToolbarItemDropdown :items="alignVerticalItems" />
       <ToolbarColorPicker
@@ -52,10 +31,6 @@ import {
   AlignRight,
   AlignTop,
   BackgroundColor,
-  FlexRow,
-  FlexColumn,
-  FlexWrap,
-  ToolbarItem,
   ToolbarItemDropdown,
   IToolbarDropdownItem,
 } from '@pubstudio/frontend/ui-widgets'
@@ -108,8 +83,8 @@ const setBackgroundColor = (pickerColor: IToolbarPickerColor | undefined) => {
     )
     cmdList.push(setBackgroundColorCommand)
 
-    const gradientBackgroundApplied = GradientTypeValues.some(
-      (gradientType) => background?.startsWith(gradientType),
+    const gradientBackgroundApplied = GradientTypeValues.some((gradientType) =>
+      background?.startsWith(gradientType),
     )
 
     if (gradientBackgroundApplied) {
@@ -204,28 +179,9 @@ const togglePicker = (show: boolean) => {
   }
 }
 
-const isWrap = computed(() => {
-  return getStyleValue(Css.FlexWrap) === 'wrap'
-})
-
-const toggleWrap = () => {
-  const value = isWrap.value ? undefined : 'wrap'
-  setStyleEnsureFlex(Css.FlexWrap, value)
-}
-
 const isColumn = computed(() => {
   return getStyleValue(Css.FlexDirection) === 'column'
 })
-
-const isRow = computed(() => {
-  return getStyleValue(Css.FlexDirection) === 'row'
-})
-
-const toggleDirection = (value: string) => {
-  if (getStyleValue(Css.FlexDirection) !== value) {
-    setStyleEnsureFlex(Css.FlexDirection, value)
-  }
-}
 
 const isNonFlexTextComponent = () => {
   if (getStyleValue(Css.Display) === 'flex') {
