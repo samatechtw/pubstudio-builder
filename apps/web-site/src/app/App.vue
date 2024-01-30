@@ -93,7 +93,12 @@ const getUserSite = async () => {
     const userSite = await getSite(url)
     return userSite
   } catch (err) {
-    error.value = "Sorry, we're having problems loading this site."
+    const e = (err ?? {}) as Record<string, string>
+    if ('code' in e && e.code === 'SiteUnpublished') {
+      error.value = 'This site is not published.'
+    } else {
+      error.value = "Sorry, we're having problems loading this site."
+    }
     loading.value = false
   }
 }

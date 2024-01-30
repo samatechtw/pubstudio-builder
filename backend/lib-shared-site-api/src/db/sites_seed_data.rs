@@ -81,7 +81,7 @@ pub fn sites_seed_data() -> Vec<PlatformSiteEntity> {
             disabled: false,
             subdomain_record_id: "user1-site3-record-id".into(),
             subdomain: "user1-site3-subdomain".into(),
-            custom_domains: Vec::new(),
+            custom_domains: vec!["test3.com".into()],
             created_at: Utc::now() + Duration::days(2),
             updated_at: Utc::now(),
         },
