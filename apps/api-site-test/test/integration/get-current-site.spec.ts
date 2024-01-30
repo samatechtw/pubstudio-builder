@@ -2,7 +2,7 @@ import { IGetSiteApiResponse } from '@pubstudio/shared/type-api-site-sites'
 import { SiteApiResetService } from '@pubstudio/shared/util-test-reset'
 import supertest from 'supertest'
 import TestAgent from 'supertest/lib/agent'
-import { adminAuthHeader } from '../helpers/auth-helpers'
+import { adminAuthHeader, ownerAuthHeader } from '../helpers/auth-helpers'
 import { SITE_SEEDS } from '../mocks/site-seeds'
 import { mockUpdateSitePayload } from '../mocks/update-create-site-payload'
 import { testConfig } from '../test.config'
@@ -24,7 +24,7 @@ describe('Get Current Site', () => {
   })
 
   describe('Request with Valid Hostname', () => {
-    it('returns current site for subdomain', async () => {
+    it('returns current when requester is admin site for subdomain', async () => {
       const execEnv = testConfig.get('execEnv')
       const response = await api
         .get(testEndpoint)
@@ -33,7 +33,6 @@ describe('Get Current Site', () => {
         .expect(200)
 
       const body: IGetSiteApiResponse = response.body
-
       expect(body.name).toEqual('Test Site 1')
       expect(body.version).toEqual('0.1')
       expect(body.context).toBeDefined()
@@ -41,20 +40,67 @@ describe('Get Current Site', () => {
       expect(body.pages).toBeDefined()
     })
 
-    it('returns current site for custom domain', async () => {
+    it('returns current site when requester is admin for custom domain', async () => {
       const response = await api
         .get(testEndpoint)
-        .set('Host', `www.myblog.org`)
+        .set('Host', 'www.myblog.org')
         .set('Authorization', adminAuth)
         .expect(200)
 
       const body: IGetSiteApiResponse = response.body
-
       expect(body.name).toEqual('Test Site 2')
       expect(body.version).toEqual('0.1')
       expect(body.context).toBeDefined()
       expect(body.defaults).toBeDefined()
       expect(body.pages).toBeDefined()
+    })
+
+    it('returns current site when requester is owner for custom domain', async () => {
+      const ownerAuth = ownerAuthHeader('903b3c28-deaa-45dc-a43f-511fe965d34e')
+      const response = await api
+        .get(testEndpoint)
+        .set('Host', 'www.myblog.org')
+        .set('Authorization', ownerAuth)
+        .expect(200)
+
+      const body: IGetSiteApiResponse = response.body
+      expect(body.name).toEqual('Test Site 2')
+      expect(body.version).toEqual('0.1')
+      expect(body.context).toBeDefined()
+      expect(body.defaults).toBeDefined()
+      expect(body.pages).toBeDefined()
+    })
+
+    it('returns current site when requester is anonymous', async () => {
+      const response = await api.get(testEndpoint).set('Host', 'test3.com').expect(200)
+
+      const body: IGetSiteApiResponse = response.body
+      expect(body.name).toEqual('Test Site 3')
+      expect(body.version).toEqual('0.1')
+      expect(body.context).toBeDefined()
+      expect(body.defaults).toBeDefined()
+      expect(body.pages).toBeDefined()
+    })
+
+    it('returns error when requester is other owner and site is unpublished', () => {
+      const ownerAuth = ownerAuthHeader('0c069253-e45d-487c-b7c0-cbe467c33a10')
+      return api
+        .get(testEndpoint)
+        .set('Host', 'www.myblog.org')
+        .set('Authorization', ownerAuth)
+        .expect(400, {
+          code: 'SiteUnpublished',
+          message: 'Failed to validate request',
+          status: 400,
+        })
+    })
+
+    it('returns error when requester is anonymous and site is unpublished', () => {
+      return api.get(testEndpoint).set('Host', 'www.myblog.org').expect(400, {
+        code: 'SiteUnpublished',
+        message: 'Failed to validate request',
+        status: 400,
+      })
     })
 
     it('returns 509 when bandwidth usage exceeds allowance', async () => {

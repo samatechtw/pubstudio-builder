@@ -1,13 +1,17 @@
 use axum::{
     extract::{Host, State},
-    Json,
+    Extension, Json,
 };
 use lib_shared_site_api::error::api_error::ApiError;
-use lib_shared_types::{entity::site_api::site_entity::SiteEntity, type_util::REGEX_PORT};
+use lib_shared_types::{
+    entity::site_api::site_entity::SiteEntity, shared::user::RequestUser, type_util::REGEX_PORT,
+};
 use lib_shared_types::{error::api_error::ApiErrorCode, type_util::is_port};
 use serde::Serialize;
 
 use crate::api_context::ApiContext;
+
+use super::util::is_admin_or_site_owner;
 
 #[derive(Serialize)]
 pub struct GetCurrentSiteResponse {
@@ -31,6 +35,7 @@ fn to_api_response(site: SiteEntity) -> Json<GetCurrentSiteResponse> {
 pub async fn get_current_site(
     State(context): State<ApiContext>,
     Host(hostname): Host,
+    Extension(user): Extension<RequestUser>,
 ) -> Result<Json<GetCurrentSiteResponse>, ApiError> {
     let domain_without_port = if is_port(&hostname) {
         let domain = REGEX_PORT.replace(&hostname, "");
@@ -61,6 +66,10 @@ pub async fn get_current_site(
         .get_site_latest_version(&site_id)
         .await
         .map_err(|e| ApiError::not_found().message(e))?;
+
+    if !site.published && !is_admin_or_site_owner(&site_metadata, &user) {
+        return Err(ApiError::bad_request().code(ApiErrorCode::SiteUnpublished));
+    }
 
     let site_size = site.calculate_site_size();
 

@@ -8,7 +8,6 @@ use axum_macros::debug_handler;
 use lib_shared_site_api::error::{api_error::ApiError, helpers::check_bad_form};
 use lib_shared_types::{
     dto::site_api::get_site_dto::{to_api_response, GetSiteQuery},
-    entity::site_api::site_metadata_entity::SiteMetadataEntity,
     error::api_error::ApiErrorCode,
     shared::user::{RequestUser, UserType},
 };
@@ -16,20 +15,7 @@ use validator::Validate;
 
 use crate::{api_context::ApiContext, middleware::auth::verify_site_owner};
 
-fn is_admin_or_site_owner(metadata: &SiteMetadataEntity, user: &RequestUser) -> bool {
-    match user.user_type {
-        UserType::Admin => true,
-        UserType::Anonymous => false,
-        UserType::Cron => false,
-        UserType::Owner => {
-            if let Some(user_id) = user.user_id {
-                user_id.to_string() == metadata.owner_id
-            } else {
-                false
-            }
-        }
-    }
-}
+use super::util::is_admin_or_site_owner;
 
 #[debug_handler]
 pub async fn get_site(

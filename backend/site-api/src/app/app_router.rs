@@ -72,7 +72,12 @@ fn api_router(context: &ApiContext) -> Router<ApiContext> {
         )
         .route(
             "/sites/current",
-            get(site::get_current_site::get_current_site),
+            get(
+                site::get_current_site::get_current_site.layer(from_fn_with_state(
+                    context.clone(),
+                    auth_admin_owner_anonymous,
+                )),
+            ),
         )
         .route(
             "/sites/:site_id/versions/:version_id",
