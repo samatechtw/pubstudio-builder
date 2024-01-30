@@ -86,9 +86,10 @@ import ComponentEvents from './ComponentEvents.vue'
 import ComponentEventEdit from './ComponentEventEdit.vue'
 import StyleMenuEdit from '../StyleMenuEdit.vue'
 import ComponentFlex from './ComponentFlex.vue'
+import { clearPartial } from '@pubstudio/frontend/util-command'
 
 const { t } = useI18n()
-const { editor, replacePageRoot } = useBuild()
+const { site, editor, replacePageRoot } = useBuild()
 const { isEditingMixin } = useReusableStyleMenu()
 const { addHUD } = useHUD()
 

@@ -84,13 +84,13 @@ export const clearAll = (site: ISite) => {
   site.editor?.store?.save(site)
 }
 
-// Clear a percentage of undo/redo history
+// Clear a percentage of undo history
 // `percent` is a decimal number between 0 and 1
 export const clearPartial = (site: ISite, percent: number) => {
   const back = site.history.back
   const clearCount = Math.floor(back.length * percent)
   if (clearCount < back.length) {
-    site.history.back = back.slice(0, -1 * clearCount)
+    site.history.back = back.slice(clearCount, back.length)
     console.log(`Cleared ${clearCount} items from history`)
     site.editor?.store?.save(site)
   }
