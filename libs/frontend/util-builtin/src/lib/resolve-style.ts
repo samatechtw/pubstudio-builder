@@ -20,7 +20,7 @@ import { headerStyle } from './components/builtin-header'
 import { captionedImageStyle, imageStyle } from './components/builtin-image'
 import { inputStyle } from './components/builtin-input'
 import { linkStyle } from './components/builtin-link'
-import { listStyle } from './components/builtin-list'
+import { listItemStyle, listStyle } from './components/builtin-list'
 import { navMenuItemStyle, navMenuStyle } from './components/builtin-nav-menu'
 import { svgStyle } from './components/builtin-svg'
 import { textStyle } from './components/builtin-text'
@@ -48,6 +48,7 @@ export const builtinStyles: Record<string, IStyle> = {
   [inputStyle.id]: inputStyle,
   [textareaStyle.id]: textareaStyle,
   [listStyle.id]: listStyle,
+  [listItemStyle.id]: listItemStyle,
   [dividerHorizontalStyle.id]: dividerHorizontalStyle,
   [dividerVerticalStyle.id]: dividerVerticalStyle,
 }
