@@ -102,16 +102,20 @@ export const useSiteAssets = (): ISiteAssetsFeature => {
     loading.value = false
   }
 
-  const updateAssetList = (newAsset: ISiteAssetListItem) => {
-    if (!assets.value) {
-      return
+  const updateAssetList = (newAsset: ISiteAssetListItem): void => {
+    let usageDiff = 0
+    if (assets.value) {
+      const assetIndex = assets.value.findIndex((asset) => asset.id === newAsset.id)
+      if (assetIndex === -1) {
+        assets.value.unshift(newAsset)
+        usageDiff = newAsset.size
+      } else {
+        const prevSize = assets.value[assetIndex]?.size ?? 0
+        assets.value[assetIndex] = newAsset
+        usageDiff = newAsset.size - prevSize
+      }
     }
-    const assetIndex = assets.value.findIndex((asset) => asset.id === newAsset.id)
-    if (assetIndex === -1) {
-      assets.value.unshift(newAsset)
-    } else {
-      assets.value[assetIndex] = newAsset
-    }
+    usage.value = (usage.value ?? 0) + usageDiff
   }
 
   const deleteAsset = async (id: string): Promise<void> => {

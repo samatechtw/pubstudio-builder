@@ -24,10 +24,6 @@
       </PSButton>
     </div>
     <div class="asset-list">
-      <PSSpinner v-if="loadingAssets" class="assets-spinner" :scale="2" color="#2a17d6" />
-      <div v-if="assets?.length === 0" class="assets-empty">
-        {{ t('assets.no_assets') }}
-      </div>
       <AssetCard
         v-for="(asset, index) in assets"
         :key="asset.id"
@@ -37,6 +33,10 @@
         :style="{ 'z-index': (assets?.length ?? 1) - index }"
         @update="updateAssetList"
       />
+      <PSSpinner v-if="loadingAssets" class="assets-spinner" :scale="2" color="#2a17d6" />
+      <div v-else-if="assets?.length === 0" class="assets-empty">
+        {{ t('assets.no_assets') }}
+      </div>
     </div>
   </div>
 </template>
@@ -151,6 +151,13 @@ const dropUploadImage = (e: Event) => {
   margin-right: 6px;
 }
 .assets-empty {
-  padding: 12px 0 4px 12px;
+  @mixin title-medium 15px;
+  color: $grey-500;
+  padding: 16px 4px 4px 16px;
+}
+.assets-spinner {
+  display: flex;
+  align-items: center;
+  min-height: 80px;
 }
 </style>

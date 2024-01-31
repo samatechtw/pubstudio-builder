@@ -6,25 +6,9 @@
       </div>
       <div class="subtitle">
         <span>{{ t('assets.subtitle') }}</span>
-
-        <I18nT
-          v-if="!hasSites"
-          keypath="assets.subtitle_no_sites"
-          class="no-sites"
-          tag="span"
-        >
-          <router-link :to="{ name: 'Sites' }">
-            {{ t('sites.title') }}
-          </router-link>
-        </I18nT>
       </div>
     </div>
-    <PSButton
-      v-if="hasSites"
-      class="create-button"
-      :animate="loadingSites"
-      @click="emit('upload')"
-    >
+    <PSButton class="create-button" :animate="loadingSites" @click="emit('upload')">
       <div class="button-content">
         <Plus color="white" plusColor="#6a5cf5" class="button-plus" />
         {{ t('upload') }}
@@ -35,13 +19,11 @@
 
 <script lang="ts" setup>
 import { useI18n } from 'petite-vue-i18n'
-import { I18nT } from '@pubstudio/frontend/util-i18n'
 import { PSButton, Plus } from '@pubstudio/frontend/ui-widgets'
 
 const { t } = useI18n()
 
 defineProps<{
-  hasSites?: boolean
   loadingSites?: boolean
 }>()
 const emit = defineEmits<{
