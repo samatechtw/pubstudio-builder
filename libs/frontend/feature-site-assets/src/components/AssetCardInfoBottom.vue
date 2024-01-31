@@ -132,4 +132,7 @@ const deleteAsset = () => {
   background-color: white;
   border-radius: 50%;
 }
+.delete-action {
+  color: $color-error;
+}
 </style>

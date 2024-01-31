@@ -1,10 +1,6 @@
 <template>
   <div class="assets">
-    <AssetsHeader
-      :hasSites="hasSites"
-      :loadingSites="loadingSites"
-      @upload="showCreate"
-    />
+    <AssetsHeader :loadingSites="loadingSites" @upload="showCreate" />
     <div
       v-if="usage !== undefined && usageAllowance !== undefined"
       class="asset-usage-wrap"
@@ -56,7 +52,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { InfoBubble, PSSpinner, UsageProgress } from '@pubstudio/frontend/ui-widgets'
 import { useSites } from '@pubstudio/frontend/feature-sites'
@@ -85,10 +81,6 @@ const deletedAssetId = ref<string>()
 const previewAssetUrl = ref<string>()
 const updateAsset = ref<ISiteAssetListItem | undefined>()
 
-const hasSites = computed(() => {
-  return sites.value && sites.value.length !== 0
-})
-
 const showCreate = () => {
   updateAsset.value = undefined
   showCreateModal.value = true
@@ -113,7 +105,10 @@ const removeDeletedAsset = () => {
 }
 
 const uploadComplete = (asset: IUploadFileResult) => {
-  updateAssetList({ ...asset, version: (updateAsset.value?.version ?? 0) + 1 })
+  updateAssetList({
+    ...asset,
+    version: (updateAsset.value?.version ?? 0) + 1,
+  })
   updateAsset.value = undefined
   showCreateModal.value = false
 }

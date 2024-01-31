@@ -2,6 +2,12 @@
   <Modal :show="show" cls="select-asset-modal" @cancel="cancel">
     <div class="modal-title">
       {{ t('build.select_asset') }}
+      <PSButton
+        class="create-button"
+        size="medium"
+        :text="t('create')"
+        @click="showCreateModal = true"
+      />
     </div>
     <div class="asset-filter-row">
       <PSMultiselect
@@ -67,6 +73,14 @@
         </div>
       </div>
     </div>
+    <CreateAssetModal
+      :show="showCreateModal"
+      :sites="sites"
+      :initialSiteId="filter.site_id || initialSiteId"
+      :loadSites="true"
+      @complete="createComplete"
+      @cancel="showCreateModal = false"
+    />
   </Modal>
 </template>
 
@@ -89,6 +103,7 @@ import {
   SiteAssetState,
   IListPlatformSiteAssetsRequest,
   ISiteAssetViewModel,
+  ICreatePlatformSiteAssetResponse,
 } from '@pubstudio/shared/type-api-platform-site-asset'
 import { debounce } from '@pubstudio/shared/util-debounce'
 import { ApiInjectionKey } from '@pubstudio/frontend/data-access-injection'
@@ -96,6 +111,7 @@ import { PSApi } from '@pubstudio/frontend/util-api'
 import { useSiteAssetApi } from '@pubstudio/frontend/data-access-api'
 import { ILocalSiteRelationViewModel } from '@pubstudio/shared/type-api-platform-user'
 import { urlFromAsset } from '@pubstudio/frontend/util-asset'
+import CreateAssetModal from './CreateAssetModal.vue'
 
 type ILocalOrApiSite = ILocalSiteRelationViewModel | ISiteViewModel
 
@@ -144,6 +160,7 @@ const loading = ref(false)
 const siteAssets = ref<ISiteAssetViewModel[]>()
 const filter = ref<IListPlatformSiteAssetsRequest>(defaultFilter())
 const selectedAsset = ref<ISiteAssetViewModel>()
+const showCreateModal = ref(false)
 
 const resolvedSites = computed<ILocalOrApiSite[]>(() => [
   store.user.identity.value,
@@ -197,6 +214,11 @@ const listAssets = async () => {
   loading.value = false
 }
 
+const createComplete = (asset: ICreatePlatformSiteAssetResponse) => {
+  showCreateModal.value = false
+  emit('select', asset)
+}
+
 watch(show, async (modalShown) => {
   if (modalShown) {
     await listAssets()
@@ -217,7 +239,7 @@ watch(show, async (modalShown) => {
     overflow-y: scroll;
   }
   .modal-title {
-    margin-bottom: 16px;
+    margin: 12px 0 16px;
   }
   .asset-filter-row {
     display: flex;
@@ -233,6 +255,9 @@ watch(show, async (modalShown) => {
   .asset-name-input {
     flex-grow: 1;
     margin-left: 12px;
+  }
+  .create-button {
+    margin-left: auto;
   }
   .select-button {
     margin-left: auto;
