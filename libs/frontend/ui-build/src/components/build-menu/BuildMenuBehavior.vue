@@ -81,6 +81,9 @@ const behaviors = computed(() => {
   }
   > div:not(:first-child) {
     margin-top: 4px;
+    &.no-behaviors {
+      margin-top: 16px;
+    }
   }
   .no-behaviors {
     @mixin title-medium 15px;

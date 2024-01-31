@@ -7,7 +7,10 @@ export const replaceNamespace = (site: ISite, namespace: string): ISite => {
   const updateId = (id: string): string => {
     return id.replace(oldNamespace, namespace)
   }
-  const idRegex = new RegExp(`${oldNamespace}-[a-z]{1,2}-[a-zA-Z0-9]+`)
+  const idRegex = new RegExp(`${oldNamespace}(-[a-z]{1,2}-[a-zA-Z0-9]+)`, 'g')
+  const updateAll = (str: string): string => {
+    return str.replaceAll(idRegex, `${namespace}$1`)
+  }
   const hasId = (text: unknown | undefined) => {
     if (!text || typeof text !== 'string') {
       return false
@@ -64,6 +67,17 @@ export const replaceNamespace = (site: ISite, namespace: string): ISite => {
     behavior.id = newId
     delete context.behaviors[behaviorId]
     context.behaviors[newId] = behavior
+
+    if (behavior.code) {
+      behavior.code = updateAll(behavior.code)
+    }
+    if (behavior.args) {
+      for (const [name, arg] of Object.entries(behavior.args)) {
+        if (hasId(arg.default)) {
+          behavior.args[name].default = updateId(arg.default as string)
+        }
+      }
+    }
   }
   // Update editor fields
   if (editor) {
