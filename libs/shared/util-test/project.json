@@ -1,24 +1,24 @@
 {
-  "name": "frontend-util-test",
+  "name": "shared-util-test",
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/frontend/util-test/src",
+  "sourceRoot": "libs/shared/util-test/src",
   "projectType": "library",
   "targets": {
     "lint": {
       "executor": "@nx/eslint:lint",
       "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": ["libs/frontend/util-test/**/*.ts"]
+        "lintFilePatterns": ["libs/shared/util-test/**/*.ts"]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/libs/frontend/util-test"],
+      "outputs": ["{workspaceRoot}/coverage/libs/shared/util-test"],
       "options": {
-        "jestConfig": "libs/frontend/util-test/jest.config.ts",
+        "jestConfig": "libs/shared/util-test/jest.config.ts",
         "passWithNoTests": true
       }
     }
   },
-  "tags": ["scope:frontend", "type:util"]
+  "tags": ["scope:shared", "type:util"]
 }

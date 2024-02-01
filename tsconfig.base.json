@@ -105,6 +105,7 @@
       "@pubstudio/shared/util-fetch-api": ["libs/shared/util-fetch-api/src/index.ts"],
       "@pubstudio/shared/util-format": ["libs/shared/util-format/src/index.ts"],
       "@pubstudio/shared/util-parse": ["libs/shared/util-parse/src/index.ts"],
+      "@pubstudio/shared/util-test": ["libs/shared/util-test/src/index.ts"],
       "@pubstudio/shared/util-test-reset": ["libs/shared/util-test-reset/src/index.ts"],
       "@pubstudio/frontend/data-access-api": [
         "libs/frontend/data-access-api/src/index.ts"
