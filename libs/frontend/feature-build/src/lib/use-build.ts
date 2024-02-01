@@ -227,7 +227,7 @@ export interface IUseBuild {
 const commandAlert = uiAlert<CommandType | undefined>(ref())
 
 export const useBuild = (): IUseBuild => {
-  const { site, siteError, siteStore } = useSiteSource()
+  const { site, siteError, siteStore, replaceSite: replaceSiteSource } = useSiteSource()
 
   const activePage = computed(() => {
     const route = site.value.editor?.active
@@ -278,7 +278,7 @@ export const useBuild = (): IUseBuild => {
   }
 
   const replaceSite = (newSite: ISite) => {
-    site.value = newSite
+    replaceSiteSource(newSite)
     // Basic name sanitization
     site.value.name = site.value.name.replace(/[-_]/g, ' ')
     return siteStore.value.save(site.value, {

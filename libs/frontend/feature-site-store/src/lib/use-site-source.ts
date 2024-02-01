@@ -18,6 +18,7 @@ export interface IUseSiteSource {
   isSaving: ComputedRef<boolean>
   initializeSite: (options: IInitializeSiteOptions) => Promise<void>
   checkOutdated: () => Promise<void>
+  replaceSite: (newSite: ISite) => void
 }
 
 export interface IInitializeSiteOptions {
@@ -40,11 +41,15 @@ export const useSiteSource = (): IUseSiteSource => {
   const setRestoredSite = (restored: ISiteRestore | undefined) => {
     if (restored) {
       restoredSite = restored
-      site.value = restoredSite.site
-      if (site.value.editor) {
-        site.value.editor.store = siteStore.value
-      }
+      replaceSite(restoredSite.site)
       siteError.value = restoredSite.error
+    }
+  }
+
+  const replaceSite = (newSite: ISite) => {
+    site.value = newSite
+    if (site.value.editor) {
+      site.value.editor.store = siteStore.value
     }
   }
 
@@ -73,6 +78,7 @@ export const useSiteSource = (): IUseSiteSource => {
   return {
     initializeSite,
     checkOutdated,
+    replaceSite,
     apiSiteId,
     siteStore,
     isSaving,

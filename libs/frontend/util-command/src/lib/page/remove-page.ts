@@ -20,8 +20,8 @@ export const applyRemovePage = (site: ISite, data: IRemovePageData) => {
   delete site.pages[pageRoute]
 
   // Serialize and deserialize site to clean up everything
-  const { site: sourceSite } = useSiteSource()
-  sourceSite.value = unstoreSite(storeSite(site)) as ISite
+  const { replaceSite } = useSiteSource()
+  replaceSite(unstoreSite(storeSite(site)) as ISite)
 
   // Trigger page change event
   triggerEditorEvent(site, EditorEventName.OnPageChange)
