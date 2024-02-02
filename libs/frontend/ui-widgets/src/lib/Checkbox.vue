@@ -4,6 +4,7 @@
       type="checkbox"
       :value="item.label"
       :checked="item.checked"
+      :modelValue="item.checked"
       :disabled="disabled"
     />
     <span class="checkmark" :class="internalCheckedClass" />

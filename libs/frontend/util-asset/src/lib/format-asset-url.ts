@@ -7,6 +7,7 @@ export const urlFromAsset = (asset: ISiteAssetViewModel): string => {
     'image/png': 'png',
     'image/gif': 'gif',
     'video/mp4': 'mp4',
+    'application/pdf': 'pdf',
   }[asset.content_type]
   ext = ext ? `.${ext}` : ''
 

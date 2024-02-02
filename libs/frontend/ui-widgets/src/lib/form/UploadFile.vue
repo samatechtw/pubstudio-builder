@@ -19,14 +19,16 @@
             :class="{ 'has-file': !!preview }"
           >
             <div class="file-upload-left">
+              <img src="@frontend-assets/icon/upload.svg" class="file-upload-image" />
               <PSAsset
                 v-if="preview"
                 :asset="preview"
                 :canPlayVideo="false"
                 class="file-upload-background"
               />
-              <slot v-else name="preview" />
-              <img src="@frontend-assets/icon/upload.svg" class="file-upload-image" />
+              <div v-else class="file-upload-background">
+                <slot name="preview" />
+              </div>
             </div>
             <div class="file-upload-right">
               <div class="file-upload-title">
@@ -146,6 +148,7 @@ $outline: $border-widget;
     width: 100%;
   }
   .file-upload-background {
+    @mixin flex-center;
     position: absolute;
     top: 0;
     width: 100%;
