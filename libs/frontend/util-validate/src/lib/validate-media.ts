@@ -1,4 +1,7 @@
-import { AssetContentType } from '@pubstudio/shared/type-api-platform-site-asset'
+import {
+  AssetContentType,
+  MEDIA_CONTENT_TYPES,
+} from '@pubstudio/shared/type-api-platform-site-asset'
 
 export interface MediaRequirements {
   minWidth?: number
@@ -6,7 +9,7 @@ export interface MediaRequirements {
   maxWidth?: number
   maxHeight?: number
   ext?: string[]
-  type?: AssetContentType
+  types?: AssetContentType[]
   size?: number
 }
 
@@ -28,7 +31,7 @@ export async function validateMedia(
   const URL = window.URL || window.webkitURL
   let img: HTMLImageElement | null = null
   let video: HTMLVideoElement | null = null
-  const validTypes = requirements.type ?? Object.values(AssetContentType)
+  const validTypes = requirements.types ?? MEDIA_CONTENT_TYPES
   const type = file.type as AssetContentType
 
   const { ext, size } = requirements
@@ -92,6 +95,8 @@ export async function validateMedia(
           reject({ fileErrors: ['errors.default'] })
         }
       })
+    } else if (fileType.includes('pdf')) {
+      return result
     }
   } catch (error) {
     errors.push('FILE_TYPE')

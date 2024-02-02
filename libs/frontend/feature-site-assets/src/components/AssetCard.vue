@@ -1,7 +1,15 @@
 <template>
   <div :id="asset.id" class="asset-card" :class="{ small }" v-bind="dndProps">
     <div class="asset-image">
-      <PSAsset :asset="assetUrl" :canPlayVideo="false" :contentHash="asset.version" />
+      <div v-if="asset.content_type === AssetContentType.Pdf" class="pdf-preview">
+        <img :src="PdfPreview" />
+      </div>
+      <PSAsset
+        v-else
+        :asset="assetUrl"
+        :canPlayVideo="false"
+        :contentHash="asset.version"
+      />
     </div>
     <div class="asset-info">
       <div v-if="showEdit" class="asset-name-edit">
@@ -45,7 +53,7 @@
 import { computed, ref, toRefs } from 'vue'
 import { useDragDrop } from '@pubstudio/frontend/feature-render-builder'
 import { useBuild } from '@pubstudio/frontend/feature-build'
-import { makeAddImageData } from '@pubstudio/frontend/util-command-data'
+import { makeAddImageData, makeAddLinkData } from '@pubstudio/frontend/util-command-data'
 import {
   Check,
   CopyText,
@@ -57,8 +65,11 @@ import {
 } from '@pubstudio/frontend/ui-widgets'
 import { urlFromAsset } from '@pubstudio/frontend/util-asset'
 import { Keys, useKeyListener } from '@pubstudio/frontend/util-key-listener'
+import { AssetContentType } from '@pubstudio/shared/type-api-platform-site-asset'
+import PdfPreview from '@frontend-assets/icon/pdf.png'
 import AssetCardInfoBottom from './AssetCardInfoBottom.vue'
 import { ISiteAssetListItem, useSiteAssets } from '../lib/use-site-assets'
+import { IAddComponentData } from '@pubstudio/shared/type-command-data'
 
 const { updateAsset, loading } = useSiteAssets()
 const { activePage, site } = useBuild()
@@ -80,8 +91,17 @@ const dndProps = computed(() => {
   if (!small.value || !activePage.value) {
     return
   }
-  const addImageData = makeAddImageData(site.value, activePage.value.root, assetUrl.value)
-  if (!addImageData) {
+  let addData: IAddComponentData | undefined
+  if (asset.value.content_type === AssetContentType.Pdf) {
+    addData = makeAddLinkData(site.value, activePage.value.root, {
+      src: assetUrl.value,
+      openInNewTab: true,
+      text: asset.value.name,
+    })
+  } else {
+    addData = makeAddImageData(site.value, activePage.value.root, assetUrl.value)
+  }
+  if (!addData) {
     return undefined
   }
   const dnd = useDragDrop({
@@ -90,7 +110,7 @@ const dndProps = computed(() => {
     getParentId: () => undefined,
     getComponentIndex: () => 0,
     isParent: false,
-    addData: addImageData,
+    addData,
   })
   return {
     draggable: true,
@@ -206,5 +226,12 @@ const updateName = async () => {
   @mixin truncate;
   cursor: pointer;
   color: $color-text;
+}
+.pdf-preview {
+  @mixin flex-center;
+  height: 100px;
+  img {
+    width: 40%;
+  }
 }
 </style>

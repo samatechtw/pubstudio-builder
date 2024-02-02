@@ -43,7 +43,11 @@
         :preview="assetBase64"
         accept="image/*"
         @fileSelect="updateAsset"
-      />
+      >
+        <template v-if="validatedFile?.type === AssetContentType.Pdf" #preview>
+          <img :src="PdfPreview" class="pdf-preview" />
+        </template>
+      </UploadFile>
     </div>
   </Modal>
 </template>
@@ -60,6 +64,8 @@ import {
   UploadFile,
 } from '@pubstudio/frontend/ui-widgets'
 import {
+  ALL_CONTENT_TYPES,
+  AssetContentType,
   ICreatePlatformSiteAssetRequest,
   IReplacePlatformSiteAssetRequest,
   ISiteAssetViewModel,
@@ -74,6 +80,7 @@ import { ISiteViewModel } from '@pubstudio/shared/type-api-platform-site'
 import { useSites } from '@pubstudio/frontend/feature-sites'
 import { store } from '@pubstudio/frontend/data-access-web-store'
 import { DEFAULT_TEMPLATE_ID } from '@pubstudio/shared/type-api-platform-template'
+import PdfPreview from '@frontend-assets/icon/pdf.png'
 import { IUploadFileResult } from '../lib/upload-asset'
 import { useSiteAssets } from '../lib/use-site-assets'
 
@@ -135,7 +142,7 @@ const errorInterpolationKey = computed(() => {
 })
 const assetBase64 = ref('')
 const loading = ref(false)
-let validatedFile: ValidatedFile | undefined = undefined
+const validatedFile = ref<ValidatedFile | undefined>()
 
 const resolvedSites = computed<ISelectableSite[]>(() => {
   const resolved = (propSites.value || loadedSites.value) ?? []
@@ -149,15 +156,19 @@ const resolvedSites = computed<ISelectableSite[]>(() => {
   return [...adminTemplate, store.user.identity.value, ...resolved]
 })
 
-const handleImageSelect = (validFile: ValidatedFile) => {
-  const reader = new FileReader()
-  reader.readAsDataURL(validFile.file)
-  reader.onload = () => {
-    assetBase64.value = reader.result?.toString() ?? ''
-    validatedFile = validFile
-    if (!name.value) {
-      name.value = validFile.file.name
+const handleAssetSelect = (validFile: ValidatedFile) => {
+  if (validFile.file.type === AssetContentType.Pdf) {
+    // Handle PDF preview in UploadFile slot
+  } else {
+    const reader = new FileReader()
+    reader.readAsDataURL(validFile.file)
+    reader.onload = () => {
+      assetBase64.value = reader.result?.toString() ?? ''
     }
+  }
+  validatedFile.value = validFile
+  if (!name.value) {
+    name.value = validFile.file.name
   }
 }
 
@@ -165,8 +176,11 @@ const updateAsset = async (file: File | null | undefined) => {
   if (file) {
     error.value = undefined
     try {
-      const validFile = await validateMedia({ size: 10000000 }, file)
-      handleImageSelect(validFile)
+      const validFile = await validateMedia(
+        { size: 10000000, types: ALL_CONTENT_TYPES },
+        file,
+      )
+      handleAssetSelect(validFile)
     } catch (e) {
       const key = (e as IValidateMediaError).fileErrors[0]
       error.value = t(`errors.${key}`)
@@ -208,7 +222,7 @@ const uploadCreateAsset = async (validatedFile: ValidatedFile) => {
 }
 
 const uploadAsset = async () => {
-  if (!validatedFile) {
+  if (!validatedFile.value) {
     if (!error.value) {
       error.value = t('errors.invalid_file')
     }
@@ -221,9 +235,9 @@ const uploadAsset = async () => {
   loading.value = true
   try {
     if (assetToUpdate.value) {
-      await uploadReplaceAsset(assetToUpdate.value.id, validatedFile)
+      await uploadReplaceAsset(assetToUpdate.value.id, validatedFile.value)
     } else {
-      await uploadCreateAsset(validatedFile)
+      await uploadCreateAsset(validatedFile.value)
     }
   } catch (e) {
     error.value = parseApiError(i18n, toApiError(e))
@@ -267,7 +281,7 @@ const initializeAssetUpdate = () => {
 const cleanup = () => {
   name.value = ''
   error.value = undefined
-  validatedFile = undefined
+  validatedFile.value = undefined
   assetBase64.value = ''
 }
 
@@ -307,6 +321,7 @@ onMounted(() => {
 
   .modal-text {
     margin: 16px 0 16px;
+    font-weight: 400;
   }
 
   .asset-name-wrap {
@@ -328,6 +343,9 @@ onMounted(() => {
   }
   .upload-wrap {
     margin-top: 16px;
+  }
+  img.pdf-preview {
+    width: 40%;
   }
 }
 </style>
