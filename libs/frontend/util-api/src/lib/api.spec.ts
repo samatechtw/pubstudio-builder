@@ -25,7 +25,9 @@ describe('web API', () => {
   })
 
   it('should transform Dates to UTC timestamps', async () => {
-    const data = { date1: new Date() }
+    const initialData = { date1: new Date() }
+    // Request transformer overwrites our data
+    const data = { ...initialData }
 
     const api = new PSApi({
       baseUrl,
@@ -39,7 +41,7 @@ describe('web API', () => {
 
         expect(typeof reqData?.date1).toEqual('string')
         expect(reqData?.date1).toEqual(data.date1)
-        expect(reqData?.date1).toEqual(date2str(data.date1, 'UTC'))
+        expect(reqData?.date1).toEqual(date2str(initialData.date1, true))
         throw new Error('Test interceptor complete')
       },
     )

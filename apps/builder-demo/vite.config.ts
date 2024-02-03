@@ -27,7 +27,7 @@ export default defineConfig({
   server: appConfigServer,
   publicDir: resolve('./src/public'),
   optimizeDeps: {
-    include: ['date-fns', 'date-fns-tz'],
+    include: ['date-fns'],
   },
   plugins: [Vue(), splitVendorChunkPlugin()],
 })

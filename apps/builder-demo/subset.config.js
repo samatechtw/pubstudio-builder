@@ -12,9 +12,7 @@ export default {
       'petite-vue-i18n',
       'vue-router',
       'date-fns',
-      'date-fns-tz',
       'jwt-decode',
-      '@vuepic/vue-datepicker',
       // devDependencies
       '@samatech/image-api-types',
       '@samatech/postcss-basics',
