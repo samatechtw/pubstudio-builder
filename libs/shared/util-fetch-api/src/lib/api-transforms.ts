@@ -3,7 +3,7 @@ import { commonRegex, date2str } from '@pubstudio/shared/util-parse'
 const dateRegex = new RegExp(commonRegex.date)
 
 export const transformApiDate = (date: Date): string => {
-  return date2str(date, 'UTC')
+  return date2str(date, true)
 }
 
 // Convert request payload types to JSON

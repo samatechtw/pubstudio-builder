@@ -1,6 +1,6 @@
 import { saveFile } from '@pubstudio/frontend/util-doc'
 import { ISite } from '@pubstudio/shared/type-site'
-import { format } from 'date-fns'
+import { format } from 'date-fns/format'
 import { stringifySite } from './serialize-site'
 
 export const saveSite = (site: ISite | undefined, fileName: string) => {
