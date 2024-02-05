@@ -39,9 +39,10 @@
 
 <script lang="ts" setup>
 import { onMounted, ref, toRefs } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'petite-vue-i18n'
 import { ExportOptions } from '@pubstudio/frontend/type-ui-widgets'
+import { getPreviewLink } from '@pubstudio/frontend/util-site'
 import { saveSite } from '@pubstudio/frontend/util-site-store'
 import { ISite } from '@pubstudio/shared/type-site'
 import Modal from './Modal.vue'
@@ -49,6 +50,7 @@ import PSInput from '../form/PSInput.vue'
 import PSButton from '../form/PSButton.vue'
 
 const { t } = useI18n()
+const route = useRoute()
 const router = useRouter()
 
 const props = defineProps<{
@@ -86,7 +88,9 @@ const exportSite = () => {
   if (exportType.value === ExportOptions.PubStudio) {
     saveSite(site.value, fileName.value)
   } else if (exportType.value === ExportOptions.Pdf) {
-    const routeData = router.resolve({ name: 'routeName', query: { data: 'someData' } })
+    const siteId = route.params.siteId ? route.params.siteId.toString() : ''
+    const link = getPreviewLink(site.value, siteId, { action: 'print' })
+    const routeData = router.resolve(link)
     window.open(routeData.href, '_blank')
   }
 }

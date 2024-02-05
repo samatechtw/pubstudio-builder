@@ -52,6 +52,7 @@ export { default as ScaleOut } from './lib/svg/ScaleOut.vue'
 export { default as Style } from './lib/svg/Style.vue'
 export { default as Theme } from './lib/svg/Theme.vue'
 export { default as Pages } from './lib/svg/Pages.vue'
+export { default as Print } from './lib/svg/Print.vue'
 export { default as Text } from './lib/svg/Text.vue'
 
 // toolbar

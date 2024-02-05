@@ -1,12 +1,24 @@
 <template>
   <div class="preview-banner" @click="goBack">
-    {{ t('build.preview_banner') }}
+    <div class="preview-content">
+      <div class="go-back">
+        {{ t('build.preview_banner') }}
+      </div>
+      <div class="print-wrap" @click.stop="emit('print')">
+        <Print class="print" />
+      </div>
+    </div>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { useI18n } from 'petite-vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
+import { Print } from '@pubstudio/frontend/ui-widgets'
+
+const emit = defineEmits<{
+  (e: 'print'): void
+}>()
 
 const { t } = useI18n()
 
@@ -38,5 +50,23 @@ const goBack = () => {
   height: 28px;
   cursor: pointer;
   background-color: #eee489;
+}
+.preview-content {
+  @mixin flex-center;
+  max-width: 1020px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+.go-back {
+  margin-left: auto;
+}
+.print-wrap {
+  @mixin flex-center;
+  padding: 0 8px;
+  height: 100%;
+  margin-left: auto;
+}
+.print {
+  height: 24px;
 }
 </style>

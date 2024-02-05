@@ -418,10 +418,10 @@
   "file": {
     "export": "Export",
     "export_title": "Export Site",
-    "export_text": "Save a copy of your site as a text (JSON) file. You can import it again any time!",
+    "export_text": "Save a copy of your site as a JSON or PDF file. JSON files can be imported again later.",
     "export_types": {
-      "pdf": "PDF",
-      "pubstudio": "PubStudio (JSON)"
+      "pubstudio": "PubStudio (JSON)",
+      "pdf": "PDF"
     }
   },
   "upload_file": {

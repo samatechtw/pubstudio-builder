@@ -60,6 +60,7 @@ export enum Css {
   OutlineStyle = 'outline-style',
   Overflow = 'overflow',
   Padding = 'padding',
+  PageBreakAfter = 'page-break-after',
   PointerEvents = 'pointer-events',
   Position = 'position',
   Right = 'right',
