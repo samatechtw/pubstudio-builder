@@ -25,8 +25,6 @@ let checkInterval: ReturnType<typeof setInterval> | undefined
 // TODO -- API isn't working?
 await initializeSiteStore({ siteId })
 
-console.log('ACTION', route.params.action)
-
 const notFoundPage = computed(() => {
   return Object.values(site.value?.pages ?? {}).find(
     (page) => page.route === '/not-found',
