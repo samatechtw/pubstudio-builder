@@ -53,12 +53,7 @@ const props = withDefaults(
 
 const { cancelText } = toRefs(props)
 
-// Use `computed` here because `t` is not available in `defineProps`.
-// Full error message:
-// [@vue/compiler-sfc] `defineProps()` in <script setup> cannot reference
-// locally declared variables because it will be hoisted outside of the
-// setup() function. If your component options require initialization in
-// the module scope, use a separate normal <script> to export the options instead.
+// Use `computed` for default because `t` is not available in `defineProps`.
 const computedCancelText = computed(() => cancelText.value ?? t('cancel'))
 </script>
 
