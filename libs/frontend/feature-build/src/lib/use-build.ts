@@ -70,6 +70,9 @@ import {
   ISetDefaultsHeadData,
   ISetHomePageData,
   ISetPageHeadData,
+  IUpdateUiData,
+  IUpdateUiParams,
+  UiAction,
 } from '@pubstudio/shared/type-command-data'
 import {
   Css,
@@ -221,6 +224,10 @@ export interface IUseBuild {
   setPageFavicon: (route: string, newFavicon: string | undefined) => void
   setBreakpoint: (newBreakpoints: Record<string, IBreakpoint>) => void
   pushGroupCommands: (data: ICommandGroupData) => void
+  updateUi: <Action extends UiAction>(
+    action: Action,
+    params: IUpdateUiParams[Action],
+  ) => void
 }
 
 // Briefly indicates active command
@@ -1218,6 +1225,17 @@ export const useBuild = (): IUseBuild => {
     pushCommand(site.value, CommandType.Group, data)
   }
 
+  const updateUi = <Action extends UiAction>(
+    action: Action,
+    params: IUpdateUiParams[Action],
+  ) => {
+    const data: IUpdateUiData<Action> = {
+      action,
+      params,
+    }
+    pushCommand(site.value, CommandType.UpdateUi, data)
+  }
+
   return {
     site,
     siteError,
@@ -1289,5 +1307,6 @@ export const useBuild = (): IUseBuild => {
     setPageFavicon,
     setBreakpoint,
     pushGroupCommands,
+    updateUi,
   }
 }

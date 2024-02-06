@@ -7,6 +7,7 @@ import {
   EditorMode,
   IComponent,
   IEditBehavior,
+  IEditingMixinData,
   IEditorContext,
   IEditSvg,
   StyleToolbarMenu,
@@ -286,6 +287,16 @@ export const setComponentMenuCollapses = (
 ) => {
   if (editor) {
     editor.componentMenuCollapses[collapsible] = collapsed
+    editor.store?.saveEditor(editor)
+  }
+}
+
+export const setEditingMixinData = (
+  editor: IEditorContext | undefined,
+  editingMixinData: IEditingMixinData | undefined,
+) => {
+  if (editor) {
+    editor.editingMixinData = editingMixinData
     editor.store?.saveEditor(editor)
   }
 }

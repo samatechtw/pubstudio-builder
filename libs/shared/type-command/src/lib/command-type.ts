@@ -25,7 +25,6 @@ export enum CommandType {
   EditStyleMixin = 'editS',
   RemoveStyleMixin = 'rmS',
   SetMixinEntry = 'setME',
-  CloseMixinMenu = 'cMM',
   AddThemeVariable = 'addTV',
   EditThemeVariable = 'editTV',
   RemoveThemeVariable = 'rmTV',
@@ -43,4 +42,5 @@ export enum CommandType {
   SetPageHead = 'setPH',
   SetBreakpoint = 'setBP',
   SetTranslations = 'setT',
+  UpdateUi = 'uUi',
 }

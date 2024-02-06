@@ -2,6 +2,7 @@ import {
   useBuild,
   useCopyPaste,
   useDuplicateComponent,
+  useMixinMenuUi,
   usePaddingMarginEdit,
 } from '@pubstudio/frontend/feature-build'
 import { activeBreakpoint } from '@pubstudio/frontend/feature-site-source'
@@ -104,6 +105,8 @@ export const useBuildEvent = () => {
   const { pressCopy, pressPaste } = useCopyPaste()
   const { pressDuplicate } = useDuplicateComponent()
   const { dragging: paddingMarginDragData, drag, stopDrag } = usePaddingMarginEdit()
+  const { closeMixinMenu } = useMixinMenuUi()
+
   let buildWindow: HTMLElement | null = null
 
   const clickRenderer = (target: HTMLElement | undefined) => {
@@ -220,6 +223,8 @@ export const useBuildEvent = () => {
       editor.value?.componentTab.editInfo !== undefined
     ) {
       clearComponentTabState(editor.value)
+    } else if (editor.value?.editingMixinData) {
+      closeMixinMenu()
     } else {
       selectComponentParent()
     }

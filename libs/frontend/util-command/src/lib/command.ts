@@ -1,4 +1,9 @@
 import { CommandType, ICommand } from '@pubstudio/shared/type-command'
+import {
+  ICommandGroupData,
+  IUpdateUiData,
+  UiAction,
+} from '@pubstudio/shared/type-command-data'
 import { ISite } from '@pubstudio/shared/type-site'
 import { applyCommand } from './apply-command'
 import { getLastCommandHelper } from './command-helpers'
@@ -8,12 +13,54 @@ import { undoCommand } from './undo-command'
 // Helper for pushing a command to separate siteStore.save
 const pushCommandHelper = (site: ISite, command: ICommand, clearRedo = true) => {
   const cmd = optimizeCommandGroup(command)
+  const { editingMixinData } = site.editor ?? {}
+
+  // Push a command to close mixin menu for user when necessary
+  if (editingMixinData && shouldCloseMixinMenuForUser(cmd)) {
+    const closeMixinMenuCommand: ICommand<IUpdateUiData<UiAction.CloseMixinMenu>> = {
+      type: CommandType.UpdateUi,
+      data: {
+        action: UiAction.CloseMixinMenu,
+        params: {
+          mixinId: editingMixinData?.mixinId as string,
+          originComponentId: editingMixinData?.originComponentId,
+        },
+      },
+    }
+    applyCommand(site, closeMixinMenuCommand)
+    site.history.back.push(closeMixinMenuCommand)
+  }
+
   if (cmd) {
     applyCommand(site, cmd)
     site.history.back.push(cmd)
     if (clearRedo) {
       site.history.forward = []
     }
+  }
+}
+
+const commandsInGroup = (command: ICommand, commandTypes: CommandType[]): boolean => {
+  if (command.type === CommandType.Group) {
+    const groupCommands = command.data as ICommandGroupData
+    return groupCommands.commands.some((cmd) => commandTypes.includes(cmd.type))
+  }
+  return false
+}
+
+const shouldCloseMixinMenuForUser = (newCmd: ICommand | undefined): boolean => {
+  const mixinCommands = [CommandType.SetMixinEntry, CommandType.EditStyleMixin]
+  if (
+    !newCmd ||
+    mixinCommands.includes(newCmd.type) ||
+    commandsInGroup(newCmd, mixinCommands)
+  ) {
+    return false
+  } else if (newCmd.type !== CommandType.UpdateUi) {
+    return true
+  } else {
+    const updateUiData = newCmd.data as IUpdateUiData
+    return updateUiData.action !== UiAction.CloseMixinMenu
   }
 }
 

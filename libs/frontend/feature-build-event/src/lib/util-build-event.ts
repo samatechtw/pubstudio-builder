@@ -1,4 +1,3 @@
-import { editingMixinData } from '@pubstudio/frontend/util-command'
 import { IEditorContext } from '@pubstudio/shared/type-site'
 
 export const hotkeysDisabled = (e: KeyboardEvent, editor: IEditorContext | undefined) => {
@@ -8,7 +7,6 @@ export const hotkeysDisabled = (e: KeyboardEvent, editor: IEditorContext | undef
     editor?.editBehavior ||
     editor?.editSvg ||
     editor?.translations ||
-    !!editingMixinData.value ||
     (e.target instanceof HTMLElement && e.target.classList.contains('ProseMirror'))
   )
 }

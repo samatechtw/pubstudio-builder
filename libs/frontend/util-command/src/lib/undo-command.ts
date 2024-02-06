@@ -27,7 +27,6 @@ import { undoRemovePage } from './page/remove-page'
 import { undoSetHomePage } from './page/set-home-page'
 import { undoSetPageHead } from './page/set-page-head'
 import { undoAddStyleMixin } from './style/add-style-mixin'
-import { undoCloseMixinMenu } from './style/close-mixin-menu'
 import { undoEditStyleMixin } from './style/edit-style-mixin'
 import { undoRemoveStyleMixin } from './style/remove-style-mixin'
 import { undoSetMixinEntry } from './style/set-mixin-entry'
@@ -38,6 +37,7 @@ import { undoAddThemeVariable } from './theme-variable/add-theme-variable'
 import { undoEditThemeVariable } from './theme-variable/edit-theme-variable'
 import { undoRemoveThemeVariable } from './theme-variable/remove-theme-variable'
 import { undoSetTranslations } from './translations/set-translations'
+import { undoUpdateUi } from './update-ui/update-ui'
 
 // Undo the most recent command and shift it to the redo stack
 export const undoCommand = (site: ISite, command: ICommand) => {
@@ -63,7 +63,6 @@ export const undoCommand = (site: ISite, command: ICommand) => {
     [CommandType.AddStyleMixin]: undoAddStyleMixin,
     [CommandType.EditStyleMixin]: undoEditStyleMixin,
     [CommandType.RemoveStyleMixin]: undoRemoveStyleMixin,
-    [CommandType.CloseMixinMenu]: undoCloseMixinMenu,
     [CommandType.SetMixinEntry]: undoSetMixinEntry,
     [CommandType.SetTranslations]: undoSetTranslations,
     [CommandType.AddThemeVariable]: undoAddThemeVariable,
@@ -81,6 +80,7 @@ export const undoCommand = (site: ISite, command: ICommand) => {
     [CommandType.MoveComponent]: undoMoveComponent,
     [CommandType.SetDefaultsHead]: undoSetDefaultsHead,
     [CommandType.SetBreakpoint]: undoSetBreakpoint,
+    [CommandType.UpdateUi]: undoUpdateUi,
   }[command.type]
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   applyFunction(site, command.data as any)

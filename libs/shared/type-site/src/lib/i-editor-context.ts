@@ -90,6 +90,12 @@ export interface IResizeData {
   heightPxPerPercent: number
 }
 
+export interface IEditingMixinData {
+  mixinId: string
+  // The ID of the component the mixin menu was opened from
+  originComponentId?: string
+}
+
 export interface IEditorContext {
   // Reference to store used to save/restore the site, populated on initialization
   store?: ISiteStore
@@ -142,6 +148,8 @@ export interface IEditorContext {
   componentsHidden: Record<string, boolean>
   // Ids of theme variables (colors) to show in color picker
   selectedThemeColors: Set<string>
+  // Id of the mixin being edited
+  editingMixinData?: IEditingMixinData
   // Set to actual builder window size on page load
   builderWidth: number
   // Defaults to 1

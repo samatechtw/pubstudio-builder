@@ -19,7 +19,7 @@
         :mixinOptions="mixinOptions"
         class="mixin"
         @set="setMixin($event.oldMixinId, $event.newMixinId)"
-        @edit="edit"
+        @edit="openMixinMenu"
         @remove="removeMixin($event)"
         @flatten="flattenMixin(mixin.id)"
       />
@@ -33,10 +33,9 @@ import { useI18n } from 'petite-vue-i18n'
 import { IStyle } from '@pubstudio/shared/type-site'
 import { resolveStyle } from '@pubstudio/frontend/util-builtin'
 import { builtinStyles } from '@pubstudio/frontend/util-builtin'
-import { useBuild } from '@pubstudio/frontend/feature-build'
+import { useBuild, useMixinMenuUi } from '@pubstudio/frontend/feature-build'
 import EditMenuTitle from '../EditMenuTitle.vue'
 import MixinSelect from './MixinSelect.vue'
-import { setEditingMixin } from '@pubstudio/frontend/util-command'
 
 const props = defineProps<{
   mixinIds: string[]
@@ -52,6 +51,7 @@ const {
   removeComponentMixin,
   flattenComponentMixin,
 } = useBuild()
+const { openMixinMenu } = useMixinMenuUi()
 
 const showNewMixin = ref(false)
 const newMixinRef = ref()
@@ -92,10 +92,6 @@ const setMixin = (oldMixinId: string | undefined, newMixinId: string) => {
     showNewMixin.value = false
     addComponentMixin(newMixinId)
   }
-}
-
-const edit = (mixinId: string) => {
-  setEditingMixin(site.value, mixinId, editor.value?.selectedComponent?.id)
 }
 
 const flattenMixin = (mixinId: string) => {

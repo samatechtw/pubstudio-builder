@@ -2,7 +2,7 @@
   <div class="history-row-wrap" :class="{ current: isCurrent }">
     <div class="history-row" @click="handleClick">
       <div>
-        {{ t(`history.command.${command.type}`) }}
+        {{ t(`history.command.${commandType}`) }}
       </div>
       <div v-if="isCurrent" class="check-wrap">
         <Check class="check-icon" />
@@ -19,7 +19,7 @@ import { computed, toRefs } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { Check } from '@pubstudio/frontend/ui-widgets'
 import { CommandType, ICommand } from '@pubstudio/shared/type-command'
-import { ICommandGroupData } from '@pubstudio/shared/type-command-data'
+import { ICommandGroupData, IUpdateUiData } from '@pubstudio/shared/type-command-data'
 
 const { t } = useI18n()
 
@@ -32,6 +32,15 @@ const { isCurrent, command } = toRefs(props)
 const emit = defineEmits<{
   (e: 'click'): void
 }>()
+
+const commandType = computed(() => {
+  const type = command.value.type
+  if (type !== CommandType.UpdateUi) {
+    return type
+  }
+  const data = command.value.data as IUpdateUiData
+  return `${type}.${data.action}`
+})
 
 const groupCommands = computed(() => {
   if (command.value?.type === CommandType.Group) {

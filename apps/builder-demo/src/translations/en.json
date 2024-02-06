@@ -412,7 +412,11 @@
       "shP": "Set Home Page",
       "mvC": "Move Component",
       "setDH": "Set Head",
-      "setBP": "Set Breakpoint"
+      "setBP": "Set Breakpoint",
+      "uUi": {
+        "oMM": "Open Mixin Menu",
+        "cMM": "Close Mixin Menu"
+      }
     }
   },
   "file": {
