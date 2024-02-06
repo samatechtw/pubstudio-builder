@@ -56,6 +56,7 @@ export const serializeEditor = (
         componentTreeExpandedItems: editor.componentTreeExpandedItems,
         componentsHidden: editor.componentsHidden,
         selectedThemeColors: Array.from(editor.selectedThemeColors),
+        editingMixinData: editor.editingMixinData,
         builderWidth: editor.builderWidth,
         builderScale: editor.builderScale,
         cssPseudoClass: editor.cssPseudoClass,

@@ -224,7 +224,7 @@ jobs:
   build-docker-builder-demo-prod:
     needs: [pre_job, repo-metadata]
     if: ${{ needs.pre_job.outputs.should_skip != 'true' }}
-    name: Builder Demo Staging Image
+    name: Builder Demo Production Image
     runs-on: ubuntu-22.04
     env:
       APP_NAME: builder-demo
@@ -242,7 +242,7 @@ jobs:
           registry: ghcr.io
           username: ${{github.actor}}
           password: ${{secrets.GITHUB_TOKEN}}
-      - name: Build and push staging docker image
+      - name: Build and push production docker image
         id: docker_build
         uses: docker/build-push-action@v4
         with:

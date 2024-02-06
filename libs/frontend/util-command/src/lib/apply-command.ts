@@ -27,7 +27,6 @@ import { applyRemovePage } from './page/remove-page'
 import { applySetHomePage } from './page/set-home-page'
 import { applySetPageHead } from './page/set-page-head'
 import { applyAddStyleMixin } from './style/add-style-mixin'
-import { applyCloseMixinMenu } from './style/close-mixin-menu'
 import { applyEditStyleMixin } from './style/edit-style-mixin'
 import { applyRemoveStyleMixin } from './style/remove-style-mixin'
 import { applySetMixinEntry } from './style/set-mixin-entry'
@@ -38,6 +37,7 @@ import { applyAddThemeVariable } from './theme-variable/add-theme-variable'
 import { applyEditThemeVariable } from './theme-variable/edit-theme-variable'
 import { applyRemoveThemeVariable } from './theme-variable/remove-theme-variable'
 import { applySetTranslations } from './translations/set-translations'
+import { applyUpdateUi } from './update-ui/update-ui'
 
 // Applies a command to the current site context
 export const applyCommand = (site: ISite, command: ICommand): ICommand => {
@@ -56,7 +56,6 @@ export const applyCommand = (site: ISite, command: ICommand): ICommand => {
     [CommandType.AddComponentMixin]: applyAddComponentMixin,
     [CommandType.RemoveComponentMixin]: applyRemoveComponentMixin,
     [CommandType.ReplaceComponentMixin]: applyReplaceComponentMixin,
-    [CommandType.CloseMixinMenu]: applyCloseMixinMenu,
     [CommandType.SetComponentInput]: applySetComponentInput,
     [CommandType.SetComponentEvent]: applySetComponentEvent,
     [CommandType.SetBehavior]: applySetBehavior,
@@ -81,6 +80,7 @@ export const applyCommand = (site: ISite, command: ICommand): ICommand => {
     [CommandType.MoveComponent]: applyMoveComponent,
     [CommandType.SetDefaultsHead]: applySetDefaultsHead,
     [CommandType.SetBreakpoint]: applySetBreakpoint,
+    [CommandType.UpdateUi]: applyUpdateUi,
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   applyFunctions[command.type](site, command.data as any)

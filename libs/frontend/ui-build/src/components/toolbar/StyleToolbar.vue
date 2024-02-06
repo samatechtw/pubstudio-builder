@@ -47,7 +47,7 @@
       <BoundingBox />
     </ToolbarItem>
     <ToolbarItem
-      :tooltip="t('style.toolbar.bounding')"
+      :tooltip="t('style.toolbar.bug_title')"
       class="bounding"
       @click="showBugReportModal = true"
     >

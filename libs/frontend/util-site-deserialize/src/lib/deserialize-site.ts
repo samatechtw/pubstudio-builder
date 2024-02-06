@@ -39,6 +39,7 @@ export const deserializeEditor = (
         // Added 231125
         componentsHidden: serializedEditor.componentsHidden ?? {},
         selectedThemeColors: new Set(serializedEditor.selectedThemeColors),
+        editingMixinData: serializedEditor.editingMixinData,
         builderWidth: serializedEditor.builderWidth,
         builderScale: serializedEditor.builderScale,
         cssPseudoClass: serializedEditor.cssPseudoClass,

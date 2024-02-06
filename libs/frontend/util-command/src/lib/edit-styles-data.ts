@@ -1,22 +1,18 @@
 import { CommandType, ICommand, StyleType } from '@pubstudio/shared/type-command'
 import {
-  ICloseMixinMenuData,
   ICommandGroupData,
   ISetComponentCustomStyleData,
 } from '@pubstudio/shared/type-command-data'
 import { ISite } from '@pubstudio/shared/type-site'
 import { ref } from 'vue'
-import { getLastCommand, pushCommandObject, undoLastCommand } from './command'
-import { replaceLastCommand } from './replace-last-command'
+import { pushCommandObject, undoLastCommand } from './command'
+import { setEditingMixinData } from './editor-helpers'
 
 // Names of editing style properties
 export const editStyles = ref(new Set<string>())
 // Command group for actively editing styles
 export const editCommands = ref<ICommandGroupData | undefined>()
 export const currentStyleType = ref<StyleType>()
-
-// Extra info for editing reusable styles/mixins
-export const editingMixinData = ref<ICloseMixinMenuData | undefined>()
 
 export const editingCommandCount = () => {
   return editCommands.value?.commands.length ?? 0
@@ -46,34 +42,16 @@ const clearBlankCommands = (site: ISite) => {
   }
 }
 
-const cancelEdit = () => {
+const cancelEdit = (site: ISite) => {
   editStyles.value.clear()
   editCommands.value = undefined
-  editingMixinData.value = undefined
+  setEditingMixinData(site.editor, undefined)
   currentStyleType.value = undefined
 }
 
 export const editStylesCancelEdit = (site: ISite) => {
   clearBlankCommands(site)
-  if (currentStyleType.value === StyleType.Mixin && editingMixinData.value) {
-    const closeCommand: ICommand<ICloseMixinMenuData> = {
-      type: CommandType.CloseMixinMenu,
-      data: editingMixinData.value,
-    }
-
-    if (getLastCommand(site)?.type === CommandType.CloseMixinMenu) {
-      replaceLastCommand(site, closeCommand)
-    } else {
-      pushCommandObject(site, closeCommand)
-    }
-  }
-  cancelEdit()
-}
-
-// Used by close-mixin-menu command to avoid recursively calling editStylesCancelEdit
-export const closeMixinMenu = (site: ISite) => {
-  clearBlankCommands(site)
-  cancelEdit()
+  cancelEdit(site)
 }
 
 export const setStyleType = (site: ISite, styleType: StyleType | undefined) => {
@@ -90,8 +68,8 @@ export const setEditingMixin = (
   originComponentId: string | undefined,
 ) => {
   setStyleType(site, StyleType.Mixin)
-  editingMixinData.value = {
-    id: mixinId,
-    componentId: originComponentId,
-  }
+  setEditingMixinData(site.editor, {
+    mixinId,
+    originComponentId,
+  })
 }
