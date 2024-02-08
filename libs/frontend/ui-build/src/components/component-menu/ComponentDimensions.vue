@@ -119,8 +119,8 @@ import PaddingMarginEdit from './PaddingMarginEdit.vue'
 import EditMenuTitle from '../EditMenuTitle.vue'
 
 const { t } = useI18n()
-const { editor, currentPseudoClass, removeComponentCustomStyle } = useBuild()
-const { getStyleValue, setStyle } = useToolbar()
+const { editor } = useBuild()
+const { getStyleValue, setOrRemoveStyle, setStyleOrReplace } = useToolbar()
 const { editValueData } = usePaddingMarginEdit()
 
 const collapsed = computed(
@@ -136,19 +136,7 @@ const toggleCollapse = () => {
 }
 
 const updateStyle = (property: Css, value: string | undefined) => {
-  const startsWithNumber = /^\d/.test(value ?? '')
-  if (startsWithNumber) {
-    // Update style
-    setStyle(property, value)
-  } else {
-    // Remove style
-    // We don't have to check if the property is in the component style
-    // because it's already covered in `removeComponentCustomStyle`.
-    removeComponentCustomStyle({
-      pseudoClass: currentPseudoClass.value,
-      property,
-    })
-  }
+  setStyleOrReplace(property, value)
 }
 
 const sectionHeight = computed(() => {
@@ -172,7 +160,10 @@ const overflowAuto = computed(() => {
 })
 
 const toggleOverflow = (value: string) => {
-  setStyle(Css.Overflow, getStyleValue(Css.Overflow) === value ? undefined : value)
+  setOrRemoveStyle(
+    Css.Overflow,
+    getStyleValue(Css.Overflow) === value ? undefined : value,
+  )
 }
 </script>
 

@@ -40,7 +40,9 @@ export interface IUseToolbar {
   getResolvedOrSelectedStyle(property: Css): IRawStyleWithSource | undefined
   getStyleValue(property: Css): string | undefined
   getResolvedStyle(property: Css): IRawStyleWithSource | undefined
-  setStyle(property: Css, value: string | undefined, replace?: boolean): void
+  setStyle(property: Css, value: string | undefined): void
+  setOrRemoveStyle(property: Css, value: string | undefined, replace?: boolean): void
+  setStyleOrReplace(property: Css, value: string | undefined): void
   toggleStyle(prop: Css, value: string): void
   setStyleEnsureFlex: (prop: Css, value: string | undefined) => void
   setProseMirrorStyle(view: EditorView, property: Css, value: string | undefined): void
@@ -247,14 +249,33 @@ export const useToolbar = (): IUseToolbar => {
     )
   }
 
-  const setStyle = (property: Css, value: string | undefined, replace?: boolean) => {
-    const editView = editor.value?.editView
-    if (!editor.value?.editView?.state.selection?.empty) {
-      editor.value?.editView?.focus()
+  // Set a style property, and replace the last command if it affected the same property
+  // Not command is issued or modified if the property is unchanged
+  const setStyleOrReplace = (property: Css, value: string | undefined) => {
+    if (getStyleValue(property) !== value) {
+      let replace = false
+      const lastCmd = getLastCommand(site.value)
+      if (value !== undefined && lastCmd?.type === CommandType.SetComponentCustomStyle) {
+        const prevNewStyle = (lastCmd?.data as ISetComponentCustomStyleData | undefined)
+          ?.newStyle
+        // Replace the last command if it's s Flex style update with match pseudoClass
+        if (
+          prevNewStyle?.property === property &&
+          prevNewStyle?.pseudoClass === currentPseudoClass.value
+        ) {
+          replace = true
+        }
+      }
+      setOrRemoveStyle(property, value, replace)
     }
-    if (property in selectionStyles && editView?.hasFocus()) {
-      setProseMirrorStyle(editView, property, value)
-    } else if (value === undefined) {
+  }
+
+  const setOrRemoveStyle = (
+    property: Css,
+    value: string | undefined,
+    replace?: boolean,
+  ) => {
+    if (value === undefined) {
       removeComponentCustomStyle({
         property,
         pseudoClass: currentPseudoClass.value,
@@ -262,6 +283,18 @@ export const useToolbar = (): IUseToolbar => {
     } else {
       const cmd = setStyleCommand(property, value, replace)
       pushOrReplaceCommand(site.value, cmd, !!replace)
+    }
+  }
+
+  const setStyle = (property: Css, value: string | undefined) => {
+    const editView = editor.value?.editView
+    if (!editor.value?.editView?.state.selection?.empty) {
+      editor.value?.editView?.focus()
+    }
+    if (property in selectionStyles && editView?.hasFocus()) {
+      setProseMirrorStyle(editView, property, value)
+    } else {
+      setOrRemoveStyle(property, value)
     }
   }
 
@@ -275,7 +308,7 @@ export const useToolbar = (): IUseToolbar => {
   }
 
   const setStyleEnsureFlex = (prop: Css, value: string | undefined) => {
-    setStyle(prop, value)
+    setOrRemoveStyle(prop, value)
     if (value !== undefined && getStyleValue(Css.Display) !== 'flex') {
       const cmd = getLastCommand(site.value)
       if (cmd) {
@@ -344,6 +377,8 @@ export const useToolbar = (): IUseToolbar => {
     getStyleValue,
     getResolvedStyle,
     setStyle,
+    setOrRemoveStyle,
+    setStyleOrReplace,
     toggleStyle,
     setStyleEnsureFlex,
     setProseMirrorStyle,

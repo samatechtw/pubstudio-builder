@@ -1,57 +1,36 @@
 <template>
   <div class="size-input-wrap">
-    <input
-      ref="inputRef"
-      class="size-input"
-      :class="{ invalid }"
-      :value="parsedSize.value"
-      type="text"
-      :tabindex="tabIndex"
-      :name="`input${uid}`"
-      @input="handleInput"
-      @focusout="update"
-      @keyup.enter="update"
-      @keyup.esc="inputRef.blur()"
-    />
-    <div class="size-unit-wrap">
-      <div ref="toggleRef" class="size-unit" @click="toggleMenu">
-        {{ parsedSize.unit }}
-      </div>
-      <div
-        ref="menuRef"
-        class="ps-dropdown unit-dropdown"
-        :class="{ 'ps-dropdown-opened': opened }"
-        :style="menuStyle"
-      >
-        <div
-          v-for="unit in units"
-          :key="unit"
-          class="unit-option"
-          @click="selectUnit(unit)"
-        >
-          {{ unit }}
-        </div>
-      </div>
+    <div class="input-wrap" @click="clickInputWrap">
+      <input
+        ref="inputRef"
+        class="size-input"
+        :class="{ invalid, auto: isAuto }"
+        :value="currentValue"
+        type="text"
+        :tabindex="rightMenuTabIndex"
+        :name="`input${uid}`"
+        @input="updateValue"
+        @keydown="inputKeydown"
+        @keyup.enter="update"
+        @keyup.esc="inputRef?.blur()"
+      />
     </div>
+    <SizeUnit ref="unitRef" :size="parsedSize" @updateSize="selectUnit" />
   </div>
 </template>
 
 <script lang="ts" setup>
-import { onMounted, watch, ref, toRefs, computed } from 'vue'
+import { toRefs } from 'vue'
 import { uidSingleton } from '@pubstudio/frontend/util-doc'
-import { useDropdown } from '@pubstudio/frontend/util-dropdown'
 import { Css } from '@pubstudio/shared/type-site'
-import { useToolbar, useBuild } from '@pubstudio/frontend/feature-build'
-import { runtimeContext } from '@pubstudio/frontend/util-runtime'
+import { useToolbar, useBuild, useCssSize } from '@pubstudio/frontend/feature-build'
+import { rightMenuTabIndex } from '@pubstudio/frontend/util-runtime'
+import { ICssSize } from '@pubstudio/frontend/util-component'
+import { SizeUnit } from '@pubstudio/frontend/ui-widgets'
 
 const uid = uidSingleton.next()
 const { editor } = useBuild()
 const { getStyleValue } = useToolbar()
-
-const { toggleRef, menuRef, opened, menuStyle, setMenuOpened, toggleMenu } = useDropdown({
-  clickawayIgnoreSelector: '.size-unit-wrap',
-  offset: { crossAxis: 24, mainAxis: 4 },
-})
 
 const props = defineProps<{
   cssProp: Css
@@ -61,77 +40,31 @@ const emit = defineEmits<{
   (e: 'update', size: string | undefined): void
 }>()
 
-// Set tabindex to -1 when right menu is not focused to make size input not tab-focusable when
-// right menu is not focused. In the builder, we can select the next component by pressing Tab
-// continuously. However, if the next component is currently not in the viewport, after the
-// scrollToComponent operation, the subsequent Tab press will focus on the first size input
-// instead of selecting the next component.
-const tabIndex = computed(() => (runtimeContext.rightMenuFocused.value ? 1 : -1))
+const getSize = () => getStyleValue(cssProp.value)
 
-type SizeUnit = 'px' | '%' | 'em' | 'rem' | 'vw' | 'vh' | 'auto' | '-'
-
-interface ISize {
-  value: string
-  unit: SizeUnit
-}
-
-const units: SizeUnit[] = ['px', '%', 'em', 'rem', 'vw', 'vh', 'auto', '-']
-const sizeRegex = new RegExp(`^([0-9.]*)((?:${units.join(')|(?:')}))$`, 'i')
-
-const inputRef = ref()
-const invalid = ref(false)
-
-const parseSize = (): ISize => {
-  const str = getStyleValue(cssProp.value)
-  const matches = (str ?? '').match(sizeRegex)
-  let unit = (matches?.[2] ?? '-') as SizeUnit
-  let value = matches?.[1] ?? ''
-  if (unit === 'auto') {
-    value = 'auto'
-    unit = '-'
-  }
-  return { value, unit }
-}
-
-const parsedSize = ref<ISize>(parseSize())
+const {
+  parsedSize,
+  currentValue,
+  isAuto,
+  invalid,
+  inputRef,
+  unitRef,
+  clickInputWrap,
+  inputKeydown,
+  handleInput,
+  updatedSize,
+} = useCssSize({
+  getSize,
+})
 
 const update = () => {
-  const { unit, value } = parsedSize.value
-  if (unit === '-') {
-    emit('update', '')
-    return
-  }
-  if (!unit) {
-    parsedSize.value.unit = 'px'
-  }
-  const newSize = unit === 'auto' ? unit : `${value}${parsedSize.value.unit}`
-  if (getStyleValue(cssProp.value) === newSize) {
-    // Don't update if value didn't change
-  } else if (sizeRegex.test(newSize)) {
-    emit('update', newSize)
-  } else {
-    invalid.value = true
-  }
+  const sizeStr = updatedSize()
+  emit('update', sizeStr)
 }
 
-const setInputValue = (val: string) => {
-  if (inputRef.value) {
-    ;(inputRef.value as HTMLInputElement).value = val ?? ''
-  }
-}
-
-const handleInput = (e: Event) => {
-  invalid.value = false
-  const newValue = (e.target as HTMLInputElement)?.value
-  const newChars = newValue.slice(parsedSize.value.value.length)
-  if (newChars && !/^(\d|\.)*$/.test(newChars)) {
-    setInputValue(parsedSize.value.value)
-    return
-  }
-  parsedSize.value.value = newValue
-  if (newValue && parsedSize.value.unit === '-') {
-    parsedSize.value.unit = 'px'
-  }
+const updateValue = (e: Event) => {
+  handleInput((e.target as HTMLInputElement)?.value)
+  update()
 }
 
 const componentSize = (): string => {
@@ -149,31 +82,14 @@ const componentSize = (): string => {
   return '0'
 }
 
-const selectUnit = (unit: SizeUnit) => {
+const selectUnit = (size: ICssSize) => {
   const prevUnit = parsedSize.value.unit
-  if (prevUnit !== unit) {
-    if (unit === 'auto' || unit === '-') {
-      parsedSize.value.value = ''
-    }
-    if (unit === 'px') {
-      parsedSize.value.value = componentSize()
-    }
-    parsedSize.value.unit = unit
-    update()
-    setMenuOpened(false)
+  parsedSize.value = { ...size }
+  if (prevUnit !== 'px' && size.unit === 'px') {
+    parsedSize.value.value = componentSize()
   }
+  update()
 }
-
-watch(
-  () => getStyleValue(cssProp.value),
-  () => {
-    parsedSize.value = parseSize()
-  },
-)
-
-onMounted(() => {
-  parsedSize.value = parseSize()
-})
 </script>
 
 <style lang="postcss" scoped>
@@ -181,36 +97,27 @@ onMounted(() => {
 
 .size-input-wrap {
   display: flex;
-  .unit-dropdown {
-    width: auto;
-    cursor: pointer;
-  }
+}
+.input-wrap {
+  display: flex;
+  cursor: pointer;
 }
 .size-input {
   @mixin input;
+  @mixin text 12px;
   width: 38px;
+  padding: 1px 2px 2px;
+  height: 20px;
+  border-radius: 4px;
+  &.auto {
+    cursor: pointer;
+    pointer-events: none;
+    text-align: center;
+  }
   &.invalid {
     outline: none;
     border-radius: 2px;
     border: 1px solid $color-error;
-  }
-}
-.size-unit-wrap {
-  @mixin title 11px;
-  display: flex;
-  align-items: center;
-  margin-left: 2px;
-  color: $color-primary;
-}
-.size-unit {
-  cursor: pointer;
-  padding-top: 2px;
-  width: 24px;
-}
-.unit-option {
-  padding: 4px 12px 6px;
-  &:hover {
-    background-color: $border1;
   }
 }
 </style>

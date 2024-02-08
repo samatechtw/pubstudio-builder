@@ -25,6 +25,17 @@
       >
         <FlexRow />
       </ToolbarItem>
+      <ToolbarFlex
+        :modelValue="flex.grow"
+        :label="t('style.toolbar.grow')"
+        @update:modelValue="updateGrow"
+      />
+      <ToolbarFlex
+        :modelValue="flex.shrink"
+        :label="t('style.toolbar.shrink')"
+        @update:modelValue="updateShrink"
+      />
+      <ToolbarFlexBasis :flex="flex" @updateBasis="updateBasis" />
     </div>
   </div>
 </template>
@@ -37,12 +48,20 @@ import {
   FlexColumn,
   FlexWrap,
   ToolbarItem,
+  ToolbarFlex,
+  ToolbarFlexBasis,
 } from '@pubstudio/frontend/ui-widgets'
 import { useToolbar } from '@pubstudio/frontend/feature-build'
 import { Css } from '@pubstudio/shared/type-site'
+import { parseFlex, IParsedFlex } from '@pubstudio/frontend/util-component'
 
 const { t } = useI18n()
-const { getStyleValue, setStyleEnsureFlex } = useToolbar()
+const { getStyleValue, setStyleEnsureFlex, setStyleOrReplace } = useToolbar()
+
+const flex = computed<IParsedFlex>(() => {
+  const val = getStyleValue(Css.Flex)
+  return parseFlex(val)
+})
 
 const isColumn = computed(() => {
   return getStyleValue(Css.FlexDirection) === 'column'
@@ -66,6 +85,29 @@ const toggleDirection = (value: string) => {
     setStyleEnsureFlex(Css.FlexDirection, value)
   }
 }
+
+const updateFlex = (newFlex: IParsedFlex) => {
+  const flexStr = `${newFlex.grow} ${newFlex.shrink} ${newFlex.basis}`
+  setStyleOrReplace(Css.Flex, flexStr)
+}
+
+const updateGrow = (grow: string) => {
+  if (grow) {
+    updateFlex({ ...flex.value, grow })
+  }
+}
+
+const updateShrink = (shrink: string) => {
+  if (shrink) {
+    updateFlex({ ...flex.value, shrink })
+  }
+}
+
+const updateBasis = (basis: string | undefined) => {
+  if (basis) {
+    updateFlex({ ...flex.value, basis })
+  }
+}
 </script>
 
 <style lang="postcss" scoped>
@@ -81,6 +123,7 @@ const toggleDirection = (value: string) => {
 }
 .flex-items {
   display: flex;
+  align-items: center;
   margin: 0 auto;
 }
 </style>

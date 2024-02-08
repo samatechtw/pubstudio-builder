@@ -135,7 +135,7 @@ $edit-height: 36px;
     }
   }
   .edit-cancel {
-    @mixin size 20px;
+    @mixin size 18px;
     cursor: pointer;
     margin-left: 8px;
   }
