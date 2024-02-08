@@ -50,7 +50,7 @@ export interface IEditValueData {
   inputValue: CssValue
 }
 
-const { getStyleValue, setStyle } = useToolbar()
+const { getStyleValue, setOrRemoveStyle } = useToolbar()
 
 const dragging = ref<IDragData>()
 // Used to disable closing the menu/container on mouseup
@@ -120,7 +120,7 @@ const drag = (e: MouseEvent) => {
           dragging.value.startY = e.clientY
         }
         const replace = !firstMove
-        setStyle(css, serializeSides(newCss), replace)
+        setOrRemoveStyle(css, serializeSides(newCss), replace)
       }
     }
 
@@ -167,7 +167,7 @@ export const usePaddingMarginEdit = (): IUsePaddingMarginEdit => {
       const { css, side } = editValueData.value
       const values = parseSides(getStyleValue(css))
       values[side] = value
-      setStyle(css, serializeSides(values))
+      setOrRemoveStyle(css, serializeSides(values))
       editValueData.value = undefined
     }
   }
