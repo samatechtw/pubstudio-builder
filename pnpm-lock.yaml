@@ -9,8 +9,8 @@ dependencies:
     specifier: ^1.0.4
     version: 1.0.4(vue@3.4.14)
   '@samatech/vue-store':
-    specifier: ^0.5.1
-    version: 0.5.1(vue@3.4.14)
+    specifier: ^0.6.0
+    version: 0.6.0(vue@3.4.14)
   '@sampullman/fetch-api':
     specifier: ^0.11.5
     version: 0.11.5
@@ -3179,8 +3179,8 @@ packages:
       postcss-value-parser: 4.2.0
     dev: true
 
-  /@samatech/vue-store@0.5.1(vue@3.4.14):
-    resolution: {integrity: sha512-7FR0Z17a/Sk9iMA0Q733/zAR04Qqf2gMVKbg+BM2dli+BIJ0R7F9Ug/iAJ8QlPM0GwsDO/wDfripIGUyvUJkmA==}
+  /@samatech/vue-store@0.6.0(vue@3.4.14):
+    resolution: {integrity: sha512-65AW7dej6YtUwPJumAHYEhJwl8Zdg6OXbJWoSR5aRnLCv6htpWFlIaxEpJe/0vof4YN/2eQzxg96aL9PGHyGqg==}
     peerDependencies:
       vue: '>=3.2.0'
     dependencies:

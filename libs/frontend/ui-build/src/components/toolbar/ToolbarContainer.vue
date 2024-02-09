@@ -21,7 +21,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, markRaw } from 'vue'
+import { computed, markRaw, onMounted } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import {
   AlignBottom,
@@ -70,7 +70,7 @@ const setBackgroundColor = (pickerColor: IToolbarPickerColor | undefined) => {
   const editView = editor.value?.editView
   if (editView && pickerColor?.textWasFocused) {
     refocusSelection()
-    setProseMirrorStyle(editView, Css.BackgroundColor, colorToCssValue(pickerColor))
+    setProseMirrorStyle(editView, Css.BackgroundColor, colorToCssValue(pickerColor, true))
   } else if (selectedComponent) {
     const cmdList: (ICommand | undefined)[] = []
     const background = getStyleValue(Css.Background)
@@ -79,7 +79,7 @@ const setBackgroundColor = (pickerColor: IToolbarPickerColor | undefined) => {
 
     const setBackgroundColorCommand = createSetComponentCustomStyleCommand(
       Css.BackgroundColor,
-      colorToCssValue(pickerColor),
+      colorToCssValue(pickerColor, false),
     )
     cmdList.push(setBackgroundColorCommand)
 
@@ -334,6 +334,12 @@ const iconColor = computed(() => {
 defineProps<{
   show: boolean
 }>()
+
+onMounted(() => {
+  if (showBackgroundPicker.value) {
+    activate()
+  }
+})
 </script>
 
 <style lang="postcss" setup>

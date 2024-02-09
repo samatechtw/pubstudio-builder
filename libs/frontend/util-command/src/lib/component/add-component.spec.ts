@@ -132,6 +132,12 @@ describe('Add Component', () => {
       expect(newComponentCount).toEqual(componentCount + 3)
       expect(serializeComponent(addedCmp as IComponent)).toEqual(serializedSource)
 
+      // Make sure copied component properties are new objects
+      const isCmp = resolveComponent(site.context, is)
+      expect(isCmp?.children?.[0].style.custom['breakpoint-1']).not.toBe(
+        addedCmp?.children?.[0].style.custom['breakpoint-1'],
+      )
+
       // Undo
       undoAddComponent(site, data)
 

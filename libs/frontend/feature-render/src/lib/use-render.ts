@@ -10,6 +10,7 @@ import {
   rawStyleToResolvedStyle,
   renderGoogleFontsLink,
   RenderMode,
+  themeToCssVars,
 } from '@pubstudio/frontend/util-render'
 import { Css, CssPseudoClass, IPage, ISite } from '@pubstudio/shared/type-site'
 import { Link, Meta, Script, useHead } from '@unhead/vue'
@@ -43,6 +44,9 @@ export const useRender = (options: IUseRenderOptions): IUseRender => {
   const reusableStyle = computed(() => {
     let styleContent = ''
     if (site.value) {
+      // Add theme colors as CSS variables for use in ProseMirror editor
+      styleContent = themeToCssVars(site.value.context.theme)
+
       const queryStyle = createQueryStyle(site.value.context)
 
       Object.entries(site.value.context.styles).forEach(([mixinId, style]) => {
@@ -58,7 +62,7 @@ export const useRender = (options: IUseRenderOptions): IUseRender => {
         })
       })
 
-      styleContent = queryStyleToString(site.value.context, queryStyle)
+      styleContent += queryStyleToString(site.value.context, queryStyle)
     }
     return h('style', styleContent)
   })

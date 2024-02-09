@@ -54,7 +54,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import {
   FontColor,
@@ -120,7 +120,7 @@ const setFontColor = (pickerColor: IToolbarPickerColor | undefined) => {
   const editView = editor.value?.editView
   if (editView && pickerColor?.textWasFocused) {
     refocusSelection()
-    setProseMirrorStyle(editView, Css.Color, colorToCssValue(pickerColor))
+    setProseMirrorStyle(editView, Css.Color, colorToCssValue(pickerColor, true))
   } else if (selectedComponent) {
     const cmdList: (ICommand | undefined)[] = []
     const background = getStyleValue(Css.Background)
@@ -129,7 +129,7 @@ const setFontColor = (pickerColor: IToolbarPickerColor | undefined) => {
 
     const setColorCommand = createSetComponentCustomStyleCommand(
       Css.Color,
-      colorToCssValue(pickerColor),
+      colorToCssValue(pickerColor, false),
     )
     cmdList.push(setColorCommand)
 
@@ -255,6 +255,12 @@ const iconColor = computed(() => {
   const background = getStyleValue(Css.Background)
   const gradientColors = parseGradientColors(background)
   return gradientColors[0]?.rgba ?? color
+})
+
+onMounted(() => {
+  if (showColorPicker.value) {
+    activate()
+  }
 })
 </script>
 

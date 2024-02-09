@@ -144,6 +144,7 @@ export interface IUseBuild {
   pasteComponent: (copiedComponentId: string, parent: IComponent) => void
   replacePageRoot: (copiedComponentId: string, pageRoute: string) => void
   addBuiltinComponent: (id: string, parentId?: string) => void
+  addBuiltinComponentData: (data: IAddComponentData) => void
   editSelectedComponent: (fields: IEditComponentFields) => void
   editComponent: (component: IComponent, fields: IEditComponentFields) => void
   getSelectedComponent: () => IComponent
@@ -325,29 +326,12 @@ export const useBuild = (): IUseBuild => {
     pushCommand(site.value, CommandType.AddComponent, addData)
   }
 
-  const addComponentData = (data: IAddComponentData) => {
-    pushCommand(site.value, CommandType.AddComponent, data)
-  }
-
-  const addBuiltinComponent = (id: string, parentId?: string) => {
-    if (!activePage.value) {
-      return
-    }
-    let parent: IComponent | undefined
-    if (parentId) {
-      parent = resolveComponent(site.value.context, parentId)
-    }
-    parent = parent ?? site.value.editor?.selectedComponent ?? activePage.value.root
-
-    const builtinComponent = resolveComponent(site.value.context, id)
-    const addBuiltinComponentData = makeAddBuiltinComponentData(
-      site.value,
-      id,
-      parent,
-      site.value.editor?.selectedComponent?.id,
-    )
-    if (!addBuiltinComponentData) {
-      return
+  // Get builtin mixins from a component & children that have not
+  // been added to the site
+  const getMissingMixins = (componentId: string | undefined): string[] => {
+    const builtinComponent = resolveComponent(site.value.context, componentId)
+    if (!builtinComponent) {
+      return []
     }
     // Iterate component/children and get mixins
     const stack = [builtinComponent]
@@ -361,11 +345,38 @@ export const useBuild = (): IUseBuild => {
         stack.push(...cmp.children)
       }
     }
-    pushCommandAndAddMissingMixins(
-      CommandType.AddComponent,
-      addBuiltinComponentData,
-      mixins,
+    return mixins
+  }
+
+  const addComponentData = (data: IAddComponentData) => {
+    pushCommand(site.value, CommandType.AddComponent, data)
+  }
+
+  const addBuiltinComponentData = (data: IAddComponentData) => {
+    const mixins = getMissingMixins(data.sourceId)
+    pushCommandAndAddMissingMixins(CommandType.AddComponent, data, mixins)
+  }
+
+  const addBuiltinComponent = (id: string, parentId?: string) => {
+    if (!activePage.value) {
+      return
+    }
+    let parent: IComponent | undefined
+    if (parentId) {
+      parent = resolveComponent(site.value.context, parentId)
+    }
+    parent = parent ?? site.value.editor?.selectedComponent ?? activePage.value.root
+
+    const data = makeAddBuiltinComponentData(
+      site.value,
+      id,
+      parent,
+      site.value.editor?.selectedComponent?.id,
     )
+    if (!data) {
+      return
+    }
+    addBuiltinComponentData(data)
   }
 
   const pushCommandAndAddMissingMixins = <Data>(
@@ -1253,6 +1264,7 @@ export const useBuild = (): IUseBuild => {
     pasteComponent,
     replacePageRoot,
     addBuiltinComponent,
+    addBuiltinComponentData,
     editComponent,
     editSelectedComponent,
     getSelectedComponent,

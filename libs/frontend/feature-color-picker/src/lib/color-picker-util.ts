@@ -127,12 +127,17 @@ export const colorCodeToRgbaString = (color: string): string => {
 // Convert IPickerColor to a CSS string value or theme variable that can be rendered
 export const colorToCssValue = (
   pickerColor: IPickerColor | undefined,
+  useCssVar: boolean,
 ): string | undefined => {
   if (pickerColor === undefined) {
     return undefined
   }
   if (pickerColor.themeVar) {
-    return `$\{${pickerColor.themeVar}}`
+    if (useCssVar) {
+      return `var(--${pickerColor.themeVar})`
+    } else {
+      return `$\{${pickerColor.themeVar}}`
+    }
   } else {
     const c = pickerColor.rgba
     return c ? `rgba(${c.r},${c.g},${c.b},${c.a})` : undefined

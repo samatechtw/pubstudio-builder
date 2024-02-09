@@ -99,7 +99,7 @@ export const useDragDrop = (props: IUseDragDropProps): IUseDragDrop => {
     dragend: dragendOption,
     drop: dropOption,
   } = props
-  const { moveComponent, moveAbsoluteComponent, addComponentData } = useBuild()
+  const { moveComponent, moveAbsoluteComponent, addBuiltinComponentData } = useBuild()
   const hovering = ref(false)
 
   const elementRef: Ref<HTMLElement | undefined> = ref()
@@ -298,7 +298,7 @@ export const useDragDrop = (props: IUseDragDropProps): IUseDragDrop => {
       if (dragSource.value.addData) {
         const addParentId = dndState.value?.hoverSelf ? componentId : getParentId()
         if (addParentId) {
-          addComponentData({
+          addBuiltinComponentData({
             ...dragSource.value.addData,
             parentId: addParentId,
             parentIndex: dropProps.value.destinationIndex,

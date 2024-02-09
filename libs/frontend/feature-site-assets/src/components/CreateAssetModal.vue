@@ -146,14 +146,20 @@ const validatedFile = ref<ValidatedFile | undefined>()
 
 const resolvedSites = computed<ISelectableSite[]>(() => {
   const resolved = (propSites.value || loadedSites.value) ?? []
-  const adminTemplate = []
+  const identity = store.user.identity.value
+  let extras: ISelectableSite[] = []
   if (store.user.isAdmin.value) {
-    adminTemplate.push({
+    const adminTemplate = {
       id: DEFAULT_TEMPLATE_ID,
       name: t('assets.template'),
-    })
+    }
+    if (identity.id === DEFAULT_TEMPLATE_ID) {
+      extras.push(adminTemplate)
+    } else {
+      extras = [adminTemplate, identity]
+    }
   }
-  return [...adminTemplate, store.user.identity.value, ...resolved]
+  return [...extras, ...resolved] as ISelectableSite[]
 })
 
 const handleAssetSelect = (validFile: ValidatedFile) => {

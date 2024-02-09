@@ -53,7 +53,11 @@
 import { computed, ref, toRefs } from 'vue'
 import { useDragDrop } from '@pubstudio/frontend/feature-render-builder'
 import { useBuild } from '@pubstudio/frontend/feature-build'
-import { makeAddImageData, makeAddLinkData } from '@pubstudio/frontend/util-command-data'
+import {
+  addAssetData,
+  makeAddImageData,
+  makeAddLinkData,
+} from '@pubstudio/frontend/util-command-data'
 import {
   Check,
   CopyText,
@@ -69,7 +73,6 @@ import { AssetContentType } from '@pubstudio/shared/type-api-platform-site-asset
 import PdfPreview from '@frontend-assets/icon/pdf.png'
 import AssetCardInfoBottom from './AssetCardInfoBottom.vue'
 import { ISiteAssetListItem, useSiteAssets } from '../lib/use-site-assets'
-import { IAddComponentData } from '@pubstudio/shared/type-command-data'
 
 const { updateAsset, loading } = useSiteAssets()
 const { activePage, site } = useBuild()
@@ -91,16 +94,7 @@ const dndProps = computed(() => {
   if (!small.value || !activePage.value) {
     return
   }
-  let addData: IAddComponentData | undefined
-  if (asset.value.content_type === AssetContentType.Pdf) {
-    addData = makeAddLinkData(site.value, activePage.value.root, {
-      src: assetUrl.value,
-      openInNewTab: true,
-      text: asset.value.name,
-    })
-  } else {
-    addData = makeAddImageData(site.value, activePage.value.root, assetUrl.value)
-  }
+  const addData = addAssetData(site.value, activePage.value, asset.value, assetUrl.value)
   if (!addData) {
     return undefined
   }

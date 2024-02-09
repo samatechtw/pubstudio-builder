@@ -6,6 +6,7 @@ import {
   IRawStyle,
   IRawStylesWithSource,
   ISiteContext,
+  ITheme,
   IThemeFont,
 } from '@pubstudio/shared/type-site'
 import { breakpointSortFn } from './sort-breakpoint-fn'
@@ -104,4 +105,13 @@ export const rawStyleToResolvedStyleWithSource = (
       result[css as Css] = resolveThemeVariables(context, source.value)
       return result
     }, {} as IRawStyle)
+}
+
+export const themeToCssVars = (theme: ITheme): string => {
+  const themeVars = Object.entries(theme.variables)
+    .map(([name, val]) => {
+      return `--${name}:${val};`
+    })
+    .join('')
+  return `:root{${themeVars}}`
 }
