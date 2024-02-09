@@ -4,6 +4,7 @@
       <div class="label">
         {{ t('theme.title') }}
       </div>
+      <img :src="IcX" class="theme-close" @click.stop="closeThemeMenu" />
     </div>
     <div class="ps-tabs">
       <div
@@ -22,9 +23,10 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
-import { ThemeTab } from '@pubstudio/shared/type-site'
+import { EditorMode, ThemeTab } from '@pubstudio/shared/type-site'
 import { useBuild } from '@pubstudio/frontend/feature-build'
-import { setThemeTab } from '@pubstudio/frontend/util-command'
+import { setThemeTab, toggleEditorMenu } from '@pubstudio/frontend/util-command'
+import IcX from '@frontend-assets/icon/x.svg'
 import ThemeVariables from './ThemeVariables.vue'
 import ThemeFonts from './ThemeFonts.vue'
 import ThemeMeta from './ThemeMeta.vue'
@@ -44,6 +46,10 @@ const tabContent = computed(() => {
   }
   return content[activeTab.value]
 })
+
+const closeThemeMenu = () => {
+  toggleEditorMenu(editor.value, EditorMode.SelectedComponent, true)
+}
 </script>
 
 <style lang="postcss" scoped>
@@ -53,5 +59,9 @@ const tabContent = computed(() => {
   .theme-tab-content {
     margin-top: 16px;
   }
+}
+.theme-close {
+  @mixin size 18px;
+  cursor: pointer;
 }
 </style>

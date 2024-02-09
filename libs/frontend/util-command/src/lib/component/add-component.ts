@@ -1,5 +1,9 @@
 import { resolveComponent } from '@pubstudio/frontend/util-builtin'
-import { detachComponent, detachOverrides } from '@pubstudio/frontend/util-component'
+import {
+  clone,
+  detachComponent,
+  detachOverrides,
+} from '@pubstudio/frontend/util-component'
 import { isDynamicComponent, nextComponentId } from '@pubstudio/frontend/util-ids'
 import { triggerEventBehaviors } from '@pubstudio/frontend/util-runtime'
 import { IAddComponentData } from '@pubstudio/shared/type-command-data'
@@ -57,8 +61,8 @@ export const addComponentHelper = (site: ISite, data: IAddComponentData): ICompo
           content: child.content,
           parentId: id,
           sourceId: child.id,
-          inputs: child.inputs,
-          style: child.style,
+          inputs: clone(child.inputs),
+          style: clone(child.style),
         })
       }
     }

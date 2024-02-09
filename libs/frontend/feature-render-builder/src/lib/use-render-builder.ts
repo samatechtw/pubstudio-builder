@@ -1,3 +1,4 @@
+import { useThemeMenuFonts } from '@pubstudio/frontend/feature-build'
 /* eslint-disable vue/one-component-per-file */
 import {
   IUseRender,
@@ -5,14 +6,14 @@ import {
   useRender,
 } from '@pubstudio/frontend/feature-render'
 import { NotFound } from '@pubstudio/frontend/ui-widgets'
-import { computed, defineComponent, h } from 'vue'
-import { renderPage } from './render-builder'
 import {
   rawStyleRecordToString,
   renderGoogleFontsLink,
+  themeToCssVars,
 } from '@pubstudio/frontend/util-render'
-import { useThemeMenuFonts } from '@pubstudio/frontend/feature-build'
+import { computed, defineComponent, h } from 'vue'
 import { computeBuilderReusableStyles } from './compute-builder-reusable-styles'
+import { renderPage } from './render-builder'
 
 export const useRenderBuilder = (options: IUseRenderOptions): IUseRender => {
   const { site, activePage } = options
@@ -22,8 +23,11 @@ export const useRenderBuilder = (options: IUseRenderOptions): IUseRender => {
   const reusableStyle = computed(() => {
     let styleContent = ''
     if (site.value) {
+      // Add theme colors as CSS variables for use in ProseMirror editor
+      styleContent = themeToCssVars(site.value.context.theme)
+
       const rawStyleRecord = computeBuilderReusableStyles(site.value)
-      styleContent = rawStyleRecordToString(rawStyleRecord, site.value.context)
+      styleContent += rawStyleRecordToString(rawStyleRecord, site.value.context)
     }
     return h('style', styleContent)
   })

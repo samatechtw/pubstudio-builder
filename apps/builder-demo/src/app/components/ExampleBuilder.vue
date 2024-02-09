@@ -109,7 +109,7 @@ const { droppedFile } = useDragDropData()
 
 const siteId = SITE_ID || 'scratch'
 const { siteStore, apiSiteId, isSaving } = useSiteSource()
-await initializeSiteStore({ siteId, apiSiteUrl: SITE_API_URL })
+await initializeSiteStore({ siteId, siteApiUrl: SITE_API_URL })
 useBuildEvent()
 const { undo, redo } = useHistory()
 

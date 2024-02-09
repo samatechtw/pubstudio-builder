@@ -10,7 +10,7 @@ import {
 } from '@pubstudio/shared/type-site'
 import { mergeRecord2 } from './helpers'
 
-const clone = <T>(object: T | undefined): T => {
+export const clone = <T>(object: T | undefined): T => {
   if (!object) {
     return object as T
   }

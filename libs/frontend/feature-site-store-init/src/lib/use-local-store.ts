@@ -6,6 +6,7 @@ import {
   ISite,
   ISiteRestore,
   ISiteStore,
+  IStoredSite,
   SiteSaveState,
 } from '@pubstudio/shared/type-site'
 import { ref } from 'vue'
@@ -30,14 +31,30 @@ export const useLocalStore = (storeName?: StoreKey): ISiteStore => {
   const saveState = ref(SiteSaveState.Saved)
 
   const save = async (site: ISite) => {
-    store[_storeName].setSite(storeSite(site))
+    const stored = storeSite(site)
+    const contentFields = ['defaults', 'context', 'pages']
+    const currentSite = store[_storeName].getSite.value
+    // Update site's content_updated_at if any content fields change
+    for (const field of contentFields) {
+      const k = field as keyof IStoredSite
+      if (stored[k] !== currentSite[k]) {
+        stored.content_updated_at = Date.now()
+        break
+      }
+    }
+    store[_storeName].setSite(stored)
   }
   const saveEditor = async (editor: IEditorContext) => {
     const serialized = serializeEditor(editor)
     store[_storeName].setEditor(serialized ? JSON.stringify(serialized) : null)
   }
-  const restore = async (): Promise<ISiteRestore> => {
-    return restoreSiteHelper(store[_storeName].getSite.value)
+  const restore = async (updateKey?: number): Promise<ISiteRestore | undefined> => {
+    store[_storeName].refreshData()
+    const restored = restoreSiteHelper(store[_storeName].getSite.value)
+    if (updateKey && restored.site.content_updated_at === updateKey) {
+      return undefined
+    }
+    return restored
   }
 
   return { siteId, saveState, saveError, initialize, save, saveEditor, restore }

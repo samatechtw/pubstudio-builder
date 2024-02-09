@@ -1,6 +1,7 @@
 export * from './lib/remove-component-data'
 export * from './lib/add-image-data'
 export * from './lib/add-link-data'
+export * from './lib/add-asset-data'
 export * from './lib/add-builtin-component-data'
 export * from './lib/set-input-data'
 export * from './lib/edit-component-data'

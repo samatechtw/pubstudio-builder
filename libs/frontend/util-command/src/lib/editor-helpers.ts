@@ -295,7 +295,12 @@ export const setEditingMixinData = (
   editor: IEditorContext | undefined,
   editingMixinData: IEditingMixinData | undefined,
 ) => {
-  if (editor) {
+  const prevData = editor?.editingMixinData
+  if (
+    editor &&
+    (prevData?.mixinId !== editingMixinData?.mixinId ||
+      prevData?.originComponentId !== editingMixinData?.originComponentId)
+  ) {
     editor.editingMixinData = editingMixinData
     editor.store?.saveEditor(editor)
   }

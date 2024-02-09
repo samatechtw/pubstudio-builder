@@ -3,7 +3,7 @@
     <div
       ref="tooltipRef"
       class="link-tooltip"
-      :style="{ ...tooltipStyle, 'z-index': 4000 }"
+      :style="{ ...tooltipStyle, 'z-index': 3000 }"
       @mousedown.stop
     >
       <PSInput

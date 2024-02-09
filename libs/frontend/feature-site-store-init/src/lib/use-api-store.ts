@@ -177,7 +177,7 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
     const serialized = serializeEditor(editor)
     if (serialized) {
       const editorStr = JSON.stringify(serialized)
-      dirty.value.editor = editorStr !== store.site.editor?.value
+      dirty.value.editor = dirty.value.editor || editorStr !== store.site.editor?.value
       if (dirty.value.editor) {
         store.site.setEditor(editorStr)
         // The editor changes often, so we don't want to over-burden the API
