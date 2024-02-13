@@ -24,7 +24,7 @@ export const link: IComponent = {
   id: linkId,
   name: 'Link',
   tag: Tag.A,
-  content: 'Link Text',
+  content: undefined,
   style: {
     custom: {},
     mixins: [linkStyle.id],

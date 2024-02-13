@@ -9,6 +9,7 @@ import {
 import {
   firstMarkInSelection,
   isMarkInSelection,
+  prosemirrorEditing,
   replaceMark,
   schemaText as schema,
   setOrRemoveStyleMark,
@@ -21,12 +22,11 @@ import {
 } from '@pubstudio/shared/type-command-data'
 import {
   Css,
-  IEditorContext,
   IRawStyleWithSource,
   IStyleEntry,
   StyleSourceType,
 } from '@pubstudio/shared/type-site'
-import { Command, TextSelection } from 'prosemirror-state'
+import { Command } from 'prosemirror-state'
 import { EditorView } from 'prosemirror-view'
 import { computed, ComputedRef, reactive, toRaw, UnwrapNestedRefs, watch } from 'vue'
 import { setCustomStyleCommand } from './build-command-helpers'
@@ -106,11 +106,6 @@ watch(editViewTxCount, (newCount, oldCount) => {
     selectionStyles[Css.FontSize] = sizeMark?.attrs[Css.FontSize]
   }
 })
-
-export const prosemirrorEditing = (editor: IEditorContext | undefined): boolean => {
-  const selection = editor?.editView?.state.selection as TextSelection
-  return selection?.empty === false || !!selection?.$cursor
-}
 
 export const useToolbar = (): IUseToolbar => {
   const {

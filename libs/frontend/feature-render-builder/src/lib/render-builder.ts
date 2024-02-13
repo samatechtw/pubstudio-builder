@@ -227,9 +227,11 @@ export const computePropsContent = (
   const isSelected = editor?.selectedComponent?.id === component.id
 
   const content: IBuildContent = []
-  if (component.children?.length) {
+  const hasChildren = (component.children?.length ?? 0) > 0
+
+  if (hasChildren) {
     content.push(
-      ...component.children.map((child, index) => renderComponent(site, child, index)),
+      ...component.children!.map((child, index) => renderComponent(site, child, index)),
     )
   } else if (component.content) {
     if (component.tag === Tag.Svg) {
@@ -246,13 +248,14 @@ export const computePropsContent = (
         }),
       )
     }
-  } else if (
-    component.tag !== Tag.Img &&
-    component.tag !== Tag.Svg &&
-    component.children === undefined
-  ) {
+  } else if (component.tag !== Tag.Img && component.tag !== Tag.Svg && !hasChildren) {
     if (isSelected) {
       content.push(h(ProseMirrorEditor, { component, editor }))
+      if (component.tag === Tag.A) {
+        content.push(
+          h('div', { class: '__link-placeholder' }, 'Add text or drop components'),
+        )
+      }
     } else {
       content.push(
         h('div', {
