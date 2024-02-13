@@ -17,13 +17,24 @@ import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { initializeSiteStore } from '@pubstudio/frontend/feature-site-store-init'
 import { useBuild } from '@pubstudio/frontend/feature-build'
 
+const emit = defineEmits<{
+  (e: 'unauthorized'): void
+}>()
+
 const route = useRoute()
 const { site } = useBuild()
 const { checkOutdated } = useSiteSource()
 const siteId = route.query.siteId ? route.query.siteId.toString() : undefined
 let checkInterval: ReturnType<typeof setInterval> | undefined
 // TODO -- API isn't working?
-await initializeSiteStore({ siteId })
+try {
+  await initializeSiteStore({ siteId })
+} catch (err) {
+  const e = err as Record<string, unknown>
+  if ('status' in e && e.status === 401) {
+    emit('unauthorized')
+  }
+}
 
 const notFoundPage = computed(() => {
   return Object.values(site.value?.pages ?? {}).find(
@@ -32,6 +43,9 @@ const notFoundPage = computed(() => {
 })
 
 const activePage = computed(() => {
+  if (!site.value) {
+    return undefined
+  }
   const path = route.path.replace('/preview', '') || '/'
   const pages = site.value.pages
   if (!pages[path]) {

@@ -139,9 +139,6 @@ $outline: $border-widget;
 .file-upload-wrap {
   @mixin flex-center;
   border: 1px solid $outline;
-  .nft-asset {
-    border: none;
-  }
   .file-upload-form {
     position: relative;
     height: 100%;
@@ -157,11 +154,6 @@ $outline: $border-widget;
     background-size: contain;
     background-position: center;
     padding: 0;
-    .nft-asset-image {
-      border-radius: 0;
-      background-size: contain;
-      background-repeat: no-repeat;
-    }
   }
   .file-upload {
     position: absolute;

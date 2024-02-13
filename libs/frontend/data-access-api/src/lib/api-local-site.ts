@@ -53,6 +53,9 @@ export const useLocalSiteApi = (_api: PSApi): IApiLocalSite => {
       method: 'GET',
       params: query as RequestParams | undefined,
     })
+    if (res.status === 401) {
+      throw res
+    }
     if (res.status === 204 || res.status >= 400) {
       return undefined
     }

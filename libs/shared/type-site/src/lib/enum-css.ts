@@ -35,6 +35,7 @@ export enum Css {
   Cursor = 'cursor',
   Display = 'display',
   Fill = 'fill',
+  Float = 'float',
   Flex = 'flex',
   FlexDirection = 'flex-direction',
   FlexWrap = 'flex-wrap',

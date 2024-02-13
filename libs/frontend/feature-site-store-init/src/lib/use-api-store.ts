@@ -202,6 +202,10 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
       return restoreSiteHelper(data)
     } catch (e) {
       console.log('Restore failed:', e)
+      const err = toApiError(e)
+      if (err?.status === 401) {
+        throw e
+      }
       return restoreSiteError(parseApiErrorKey(toApiError(e)))
     }
   }
