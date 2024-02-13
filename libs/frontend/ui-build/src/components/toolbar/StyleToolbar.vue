@@ -70,7 +70,11 @@
 <script lang="ts" setup>
 import { computed, ref } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
-import { useBuild, useHistory } from '@pubstudio/frontend/feature-build'
+import {
+  useBuild,
+  useHistory,
+  prosemirrorEditing,
+} from '@pubstudio/frontend/feature-build'
 import { setDebugBounding, setShowComponentTree } from '@pubstudio/frontend/util-command'
 import {
   BoundingBox,
@@ -107,7 +111,10 @@ const { apiSiteId } = useSiteSource()
 const showBugReportModal = ref(false)
 
 const showTextStyle = computed(() => {
-  return !!editor.value?.selectedComponent?.content
+  return (
+    editor.value?.selectedComponent?.content !== undefined ||
+    prosemirrorEditing(editor.value)
+  )
 })
 
 const showContainer = computed(() => {

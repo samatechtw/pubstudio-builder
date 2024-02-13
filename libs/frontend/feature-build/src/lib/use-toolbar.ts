@@ -21,6 +21,7 @@ import {
 } from '@pubstudio/shared/type-command-data'
 import {
   Css,
+  IEditorContext,
   IRawStyleWithSource,
   IStyleEntry,
   StyleSourceType,
@@ -106,6 +107,11 @@ watch(editViewTxCount, (newCount, oldCount) => {
   }
 })
 
+export const prosemirrorEditing = (editor: IEditorContext | undefined): boolean => {
+  const selection = editor?.editView?.state.selection as TextSelection
+  return selection?.empty === false || !!selection?.$cursor
+}
+
 export const useToolbar = (): IUseToolbar => {
   const {
     editor,
@@ -116,8 +122,7 @@ export const useToolbar = (): IUseToolbar => {
   } = useBuild()
 
   const isProsemirrorEditing = computed(() => {
-    const selection = editor.value?.editView?.state.selection as TextSelection
-    return !selection?.empty || !!selection.$cursor
+    return prosemirrorEditing(editor.value)
   })
 
   const getRawStyle = (property: Css): string | undefined => {

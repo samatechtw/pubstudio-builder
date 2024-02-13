@@ -5,11 +5,17 @@
         v-show="imageLoaded"
         :src="image"
         :class="imageClass"
+        :alt="alt"
         @load="imageLoaded = true"
       />
     </Transition>
     <Transition name="image-show">
-      <img v-show="!imageLoaded" :src="placeholder" :class="placeholderClass" />
+      <img
+        v-show="!imageLoaded"
+        :src="placeholder"
+        :class="placeholderClass"
+        :alt="alt"
+      />
     </Transition>
   </div>
 </template>
@@ -22,6 +28,7 @@ defineProps<{
   placeholder: string
   imageClass?: string | undefined
   placeholderClass?: string | undefined
+  alt?: string | undefined
 }>()
 
 const imageLoaded = ref(false)

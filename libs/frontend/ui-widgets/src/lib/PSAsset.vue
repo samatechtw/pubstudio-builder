@@ -33,14 +33,12 @@ const videoPlayer = ref<Element>()
 const props = withDefaults(
   defineProps<{
     asset?: string | null
-    nftId?: string | null
     asImg?: boolean
     contentHash?: string | number
     canPlayVideo?: boolean
   }>(),
   {
     asset: null,
-    nftId: null,
     contentHash: undefined,
     canPlayVideo: true,
   },

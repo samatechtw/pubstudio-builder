@@ -93,6 +93,7 @@ const exportSite = () => {
     const routeData = router.resolve(link)
     window.open(routeData.href, '_blank')
   }
+  emit('confirmExport')
 }
 
 onMounted(() => {

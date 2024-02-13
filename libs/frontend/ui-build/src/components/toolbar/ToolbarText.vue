@@ -67,11 +67,7 @@ import { PSInput } from '@pubstudio/frontend/ui-widgets'
 import { useControlledClickaway } from '@pubstudio/frontend/util-clickaway'
 import { colorToCssValue } from '@pubstudio/frontend/feature-color-picker'
 import { Css, StyleToolbarMenu } from '@pubstudio/shared/type-site'
-import {
-  IThemedGradient,
-  isTextGradient,
-  parseGradientColors,
-} from '@pubstudio/frontend/util-gradient'
+import { isTextGradient, parseGradientColors } from '@pubstudio/frontend/util-gradient'
 import { ICommand } from '@pubstudio/shared/type-command'
 import FontFamily from '../FontFamily.vue'
 import FontWeight from '../FontWeight.vue'
@@ -83,7 +79,7 @@ import {
 } from '@pubstudio/frontend/feature-build'
 import { setStyleToolbarMenu } from '@pubstudio/frontend/util-command'
 import ToolbarColorPicker from './ToolbarColorPicker.vue'
-import { IToolbarPickerColor } from './i-toolbar-color-picker'
+import { IToolbarPickerColor, IToolbarThemedGradient } from './i-toolbar-color-picker'
 
 const { t } = useI18n()
 const {
@@ -114,13 +110,13 @@ const { activate, deactivate } = useControlledClickaway(
 
 const fontUnits = ['px', 'em', 'rem', '%']
 
-const setFontColor = (pickerColor: IToolbarPickerColor | undefined) => {
+const setFontColor = (pickerColor: IToolbarPickerColor) => {
   const { selectedComponent } = editor.value ?? {}
 
   const editView = editor.value?.editView
-  if (editView && pickerColor?.textWasFocused) {
+  if (editView && pickerColor.textWasFocused) {
     refocusSelection()
-    setProseMirrorStyle(editView, Css.Color, colorToCssValue(pickerColor, true))
+    setProseMirrorStyle(editView, Css.Color, colorToCssValue(pickerColor.color, true))
   } else if (selectedComponent) {
     const cmdList: (ICommand | undefined)[] = []
     const background = getStyleValue(Css.Background)
@@ -129,7 +125,7 @@ const setFontColor = (pickerColor: IToolbarPickerColor | undefined) => {
 
     const setColorCommand = createSetComponentCustomStyleCommand(
       Css.Color,
-      colorToCssValue(pickerColor, false),
+      colorToCssValue(pickerColor.color, false),
     )
     cmdList.push(setColorCommand)
 
@@ -166,26 +162,27 @@ const setFontColor = (pickerColor: IToolbarPickerColor | undefined) => {
   setStyleToolbarMenu(editor.value, undefined)
 }
 
-const setGradient = (themedGradient: IThemedGradient | undefined) => {
+const setGradient = (pickerGradient: IToolbarThemedGradient) => {
   const { selectedComponent } = editor.value ?? {}
 
   if (selectedComponent) {
     // Remove color from text because text-color and text-gradient are mutually exclusive
     const removeColorCommand = createSetComponentCustomStyleCommand(Css.Color, undefined)
+    const gradient = pickerGradient.gradient
 
     const setBackgroundCommand = createSetComponentCustomStyleCommand(
       Css.Background,
-      themedGradient?.themed ?? themedGradient?.raw,
+      gradient?.themed ?? gradient?.raw,
     )
 
     const setBackgroundClipCommand = createSetComponentCustomStyleCommand(
       Css.WebkitBackgroundClip,
-      themedGradient ? 'text' : undefined,
+      gradient ? 'text' : undefined,
     )
 
     const setTextFillColorCommand = createSetComponentCustomStyleCommand(
       Css.WebkitTextFillColor,
-      themedGradient ? 'transparent' : undefined,
+      gradient ? 'transparent' : undefined,
     )
 
     const commands = [

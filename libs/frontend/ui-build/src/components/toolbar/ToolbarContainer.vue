@@ -37,7 +37,6 @@ import {
 import { colorToCssValue } from '@pubstudio/frontend/feature-color-picker'
 import {
   GradientTypeValues,
-  IThemedGradient,
   parseGradientColors,
 } from '@pubstudio/frontend/util-gradient'
 import { useControlledClickaway } from '@pubstudio/frontend/util-clickaway'
@@ -46,7 +45,7 @@ import { ICommand } from '@pubstudio/shared/type-command'
 import { useBuild, useToolbar, useThemeColors } from '@pubstudio/frontend/feature-build'
 import { setStyleToolbarMenu } from '@pubstudio/frontend/util-command'
 import ToolbarColorPicker from './ToolbarColorPicker.vue'
-import { IToolbarPickerColor } from './i-toolbar-color-picker'
+import { IToolbarPickerColor, IToolbarThemedGradient } from './i-toolbar-color-picker'
 
 const { t } = useI18n()
 
@@ -64,13 +63,17 @@ const {
 const { editor, pushGroupCommands } = useBuild()
 const { selectedThemeColors } = useThemeColors()
 
-const setBackgroundColor = (pickerColor: IToolbarPickerColor | undefined) => {
+const setBackgroundColor = (pickerColor: IToolbarPickerColor) => {
   const { selectedComponent } = editor.value ?? {}
 
   const editView = editor.value?.editView
-  if (editView && pickerColor?.textWasFocused) {
+  if (editView && pickerColor.textWasFocused) {
     refocusSelection()
-    setProseMirrorStyle(editView, Css.BackgroundColor, colorToCssValue(pickerColor, true))
+    setProseMirrorStyle(
+      editView,
+      Css.BackgroundColor,
+      colorToCssValue(pickerColor.color, true),
+    )
   } else if (selectedComponent) {
     const cmdList: (ICommand | undefined)[] = []
     const background = getStyleValue(Css.Background)
@@ -79,7 +82,7 @@ const setBackgroundColor = (pickerColor: IToolbarPickerColor | undefined) => {
 
     const setBackgroundColorCommand = createSetComponentCustomStyleCommand(
       Css.BackgroundColor,
-      colorToCssValue(pickerColor, false),
+      colorToCssValue(pickerColor.color, false),
     )
     cmdList.push(setBackgroundColorCommand)
 
@@ -120,16 +123,17 @@ const setBackgroundColor = (pickerColor: IToolbarPickerColor | undefined) => {
   setStyleToolbarMenu(editor.value, undefined)
 }
 
-const setGradientBackground = (themedGradient: IThemedGradient | undefined) => {
+const setGradientBackground = (pickerGradient: IToolbarThemedGradient) => {
   const { selectedComponent } = editor.value ?? {}
 
   if (selectedComponent) {
     const backgroundColor = getStyleValue(Css.BackgroundColor)
     const backgroundClip = getStyleValue(Css.WebkitBackgroundClip)
+    const gradient = pickerGradient.gradient
 
     const setBackgroundCommand = createSetComponentCustomStyleCommand(
       Css.Background,
-      themedGradient?.themed ?? themedGradient?.raw,
+      gradient?.themed ?? gradient?.raw,
     )
     const cmdList = [setBackgroundCommand]
 

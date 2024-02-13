@@ -58,22 +58,26 @@ const props = withDefaults(
 const { showPicker } = toRefs(props)
 const emit = defineEmits<{
   (e: 'click', event: Event): void
-  (e: 'selectColor', color: IToolbarPickerColor | undefined): void
-  (e: 'applyGradient', gradient: IToolbarThemedGradient | undefined): void
+  (e: 'selectColor', color: IToolbarPickerColor): void
+  (e: 'applyGradient', gradient: IToolbarThemedGradient): void
 }>()
 
 const { textWasFocused, toolbarItemRef, toolbarButtonMouseDown } =
   useToolbarResumeTextFocus({ editor })
 
 const selectColor = (color: IPickerColor | undefined) => {
-  const emitColor = color ? { ...color, textWasFocused: textWasFocused.value } : undefined
+  const emitColor: IToolbarPickerColor = {
+    color,
+    textWasFocused: textWasFocused.value,
+  }
   emit('selectColor', emitColor)
 }
 
 const applyGradient = (gradient: IThemedGradient | undefined) => {
-  const emitGradient = gradient
-    ? { ...gradient, textWasFocused: textWasFocused.value }
-    : undefined
+  const emitGradient: IToolbarThemedGradient = {
+    gradient,
+    textWasFocused: textWasFocused.value,
+  }
   emit('applyGradient', emitGradient)
 }
 </script>
