@@ -1,7 +1,6 @@
-import { Attrs, Mark, MarkType, ResolvedPos } from 'prosemirror-model'
+import { Attrs, Mark, MarkType, ResolvedPos, Schema } from 'prosemirror-model'
 import { Command, EditorState, SelectionRange, TextSelection } from 'prosemirror-state'
 import { EditorView } from 'prosemirror-view'
-import { Schema } from 'prosemirror-model'
 
 const posWithoutSpaces = (range: SelectionRange) => {
   const { $from, $to } = range
@@ -54,30 +53,59 @@ const findElementFromCursor = (
   return element ?? undefined
 }
 
-export const firstMarkInSelection = (
+// FIXME: this is a workaround for link mark not being found in `mark.isInSet`.
+const markInSet = (mark: MarkType, marks: readonly Mark[]): Mark | undefined => {
+  const markInSet = mark.isInSet(marks)
+  if (markInSet || marks[0]?.type.name === mark.name) {
+    return markInSet || marks[0]
+  }
+  return undefined
+}
+
+// Returns a mark and it's corresponding DOM element, if fully encompassed by the selection
+export const markSelected = (
   state: EditorState | undefined,
   mark: MarkType,
-  view?: EditorView,
+  view: EditorView | undefined,
 ): [Mark | undefined, Element | undefined] => {
   const selection = state?.selection as TextSelection
   if (!state || !selection || (selection.empty && !selection.$cursor)) {
     return [undefined, undefined]
   }
+  const { $cursor, $head, $anchor } = selection
+  let foundMark: Mark | undefined
+  if ($cursor) {
+    const marks = $cursor.marks()
+    foundMark = markInSet(mark, state.storedMarks || marks)
+  } else {
+    const begin = Math.min($head.pos, $anchor.pos)
+    const end = Math.max($head.pos, $anchor.pos)
+    const head2 = state.doc.resolve(begin + 1)
+    const anchor2 = state.doc.resolve(end - 1)
+    const inHead = markInSet(mark, $head.marks()) || markInSet(mark, head2.marks())
+    const inAnchor = markInSet(mark, $anchor.marks()) || markInSet(mark, anchor2.marks())
+    foundMark = inHead && inAnchor
+  }
+
+  if (foundMark) {
+    return [foundMark, findElementFromCursor(view, $cursor || selection.$head)]
+  }
+  return [undefined, undefined]
+}
+
+export const firstMarkInSelection = (
+  state: EditorState | undefined,
+  mark: MarkType,
+): Mark | undefined => {
+  const selection = state?.selection as TextSelection
+  if (!state || !selection || (selection.empty && !selection.$cursor)) {
+    return undefined
+  }
   const { $cursor, ranges } = selection
   if ($cursor) {
     const marks = $cursor.marks()
-    const markInSet = mark.isInSet(state.storedMarks || marks)
-    if (markInSet) {
-      return [markInSet, findElementFromCursor(view, $cursor)]
-    } else {
-      // FIXME: this is a workaround for link mark not being found in `mark.isInSet`.
-      const firstMark = marks[0]
-      if (firstMark?.type.name === mark.name) {
-        return [firstMark, findElementFromCursor(view, $cursor)]
-      } else {
-        return [undefined, undefined]
-      }
-    }
+    const foundMark = mark.isInSet(state.storedMarks || marks)
+    return foundMark
   } else {
     let found: Mark | undefined = undefined
     ranges.some((r) => {
@@ -87,7 +115,7 @@ export const firstMarkInSelection = (
       })
       return [!!found, undefined]
     })
-    return [found, undefined]
+    return found
   }
 }
 
@@ -172,11 +200,16 @@ export const replaceMark = (markType: MarkType, attrs: Attrs | null = null): Com
   }
 }
 
-export const createLinkNode = (schema: Schema, href: string, target?: string) => {
+export const createLinkNode = (
+  schema: Schema,
+  text: string,
+  href: string,
+  target: string | undefined,
+) => {
   const attrs = {
     title: href,
-    href: href,
+    href,
     target: target ?? null,
   }
-  return schema.text(href, [schema.mark('link', attrs), schema.mark('u')])
+  return schema.text(text, [schema.mark('link', attrs), schema.mark('u')])
 }

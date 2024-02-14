@@ -91,7 +91,7 @@ const convertTextToLinkWhenNecessary = (
       }
 
       const href = match[0]
-      nodes.push(createLinkNode(schema, href, '_blank'))
+      nodes.push(createLinkNode(schema, href, href, '_blank'))
 
       const endPos = state.selection.head
       const startPos = endPos - nodeBefore.nodeSize

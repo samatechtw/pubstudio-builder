@@ -73,6 +73,10 @@ export function buildKeymap(schema: Schema, overrideKeys?: { [key: string]: Comm
     bind('Mod-b', toggleMark(type))
     bind('Mod-B', toggleMark(type))
   }
+  if ((type = schema.marks.link)) {
+    bind('Mod-k', chainCommands(toggleMark(type), toggleMark(schema.marks.u)))
+    bind('Mod-K', chainCommands(toggleMark(type), toggleMark(schema.marks.u)))
+  }
   if ((type = schema.marks.em)) {
     bind('Mod-i', toggleMark(type))
     bind('Mod-I', toggleMark(type))

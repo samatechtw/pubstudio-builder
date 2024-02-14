@@ -14,6 +14,7 @@ import { getProseMirrorContainerId } from '@pubstudio/frontend/util-command'
 import { findStyles } from '@pubstudio/frontend/util-component'
 import {
   firstMarkInSelection,
+  markSelected,
   prosemirrorSetup,
   schemaText,
   setOrRemoveStyleMark,
@@ -60,7 +61,7 @@ export const ProseMirrorEditor = defineComponent({
 
     const markStrong = (state: EditorState, dispatch?: (tr: Transaction) => void) => {
       const fallbackStyle = getStyleValue(Css.FontWeight)
-      const [mark] = firstMarkInSelection(state, schemaText.marks.strong)
+      const mark = firstMarkInSelection(state, schemaText.marks.strong)
       const newWeight = mark?.attrs[Css.FontWeight] === '700' ? '400' : '700'
       const cmd = setOrRemoveStyleMark(
         schemaText.marks.strong,
@@ -212,7 +213,7 @@ export const ProseMirrorEditor = defineComponent({
       // check for links when the user selects text
       const { editView } = editor.value
       if (editView) {
-        const [linkMark, element] = firstMarkInSelection(
+        const [linkMark, element] = markSelected(
           editView.state,
           schemaText.marks.link,
           editView,
