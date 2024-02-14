@@ -172,7 +172,7 @@ const marks = {
     inclusive: false,
     parseDOM: [
       {
-        tag: 'a[href]',
+        tag: 'a',
         getAttrs(dom: HTMLElement) {
           return {
             href: dom.getAttribute('href'),

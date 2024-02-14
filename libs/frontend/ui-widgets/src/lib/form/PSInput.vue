@@ -196,11 +196,11 @@ const handleInput = (e: Event) => {
 }
 
 .ps-input-label {
-  @mixin title-thin 15px;
+  @mixin title-thin 14px;
   position: absolute;
-  top: 12px;
+  top: 7px;
   padding: 0 4px;
-  margin-left: 12px;
+  margin-left: 8px;
   color: rgba(0, 0, 0, 0.6);
   transition: 0.2 ease all;
   pointer-events: none;
