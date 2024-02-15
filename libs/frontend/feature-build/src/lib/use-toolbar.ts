@@ -23,7 +23,7 @@ import {
 import {
   Css,
   IRawStyleWithSource,
-  IStyleEntry,
+  IStyleEntryWithInherited,
   StyleSourceType,
 } from '@pubstudio/shared/type-site'
 import { Command } from 'prosemirror-state'
@@ -225,14 +225,15 @@ export const useToolbar = (): IUseToolbar => {
   }
 
   const setStyleCommand = (property: Css, value: string, replace?: boolean): ICommand => {
-    let currentStyle: IStyleEntry | undefined = undefined
+    let currentStyle: IStyleEntryWithInherited | undefined = undefined
 
-    const currentValue = getStyleValue(property)
-    if (currentValue) {
+    const currentValue = selectedComponentFlattenedStyles.value[property]
+    if (currentValue?.value) {
       currentStyle = {
         pseudoClass: currentPseudoClass.value,
         property,
-        value: currentValue,
+        value: currentValue.value,
+        inherited: currentValue.sourceType !== StyleSourceType.Custom,
       }
     }
 
@@ -244,6 +245,7 @@ export const useToolbar = (): IUseToolbar => {
         pseudoClass: currentPseudoClass.value,
         property,
         value,
+        inherited: false,
       },
       replace,
     )
@@ -346,6 +348,7 @@ export const useToolbar = (): IUseToolbar => {
             pseudoClass: currentPseudoClass.value,
             property,
             value: oldValue,
+            inherited: !!oldStyle && oldStyle.sourceType !== StyleSourceType.Custom,
           }
         : undefined,
       newStyle: newValue
@@ -353,6 +356,7 @@ export const useToolbar = (): IUseToolbar => {
             pseudoClass: currentPseudoClass.value,
             property,
             value: newValue,
+            inherited: false,
           }
         : undefined,
     }

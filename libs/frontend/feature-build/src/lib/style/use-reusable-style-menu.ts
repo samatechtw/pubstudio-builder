@@ -133,18 +133,19 @@ export const useReusableStyleMenu = (): IUseStyleMenuFeature => {
 
     return Object.entries(flattenedStyles)
       .sort((a, b) => a[0].localeCompare(b[0]))
-      .map(
-        ([css, source]) =>
-          ({
-            pseudoClass: currentPseudoClass.value,
-            property: css as Css,
-            value: source.value,
-            sourceType: source.sourceType,
-            sourceId: source.sourceId,
-            sourceBreakpointId: source.sourceBreakpointId,
-            inheritedFrom: getInheritedFrom(source),
-          }) as IInheritedStyleEntry,
-      )
+      .map(([css, source]) => {
+        const inheritedFrom = getInheritedFrom(source)
+        return {
+          pseudoClass: currentPseudoClass.value,
+          property: css as Css,
+          value: source.value,
+          sourceType: source.sourceType,
+          sourceId: source.sourceId,
+          sourceBreakpointId: source.sourceBreakpointId,
+          inheritedFrom,
+          inherited: !!inheritedFrom,
+        } as IInheritedStyleEntry
+      })
   })
 
   const getInheritedFrom = (entry: IRawStyleWithSource): string | undefined => {

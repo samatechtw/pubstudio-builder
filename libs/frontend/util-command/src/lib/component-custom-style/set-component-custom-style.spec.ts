@@ -15,7 +15,7 @@ import {
   CssPseudoClassValues,
   ISerializedComponent,
   ISite,
-  IStyleEntry,
+  IStyleEntryWithInherited,
 } from '@pubstudio/shared/type-site'
 import { applyAddComponent } from '../component/add-component'
 import {
@@ -26,8 +26,8 @@ import {
 describe('Set Component Custom Style', () => {
   let siteString: string
   let site: ISite
-  let oldStyle: IStyleEntry
-  let newStyle: IStyleEntry
+  let oldStyle: IStyleEntryWithInherited
+  let newStyle: IStyleEntryWithInherited
   let component: ISerializedComponent
 
   const getDefaultPseudo = (componentId: string, pseudo: CssPseudoClass) => {
@@ -46,6 +46,7 @@ describe('Set Component Custom Style', () => {
         pseudoClass: CssPseudoClass.Default,
         property: Css.BackgroundColor,
         value: 'red',
+        inherited: false,
       }
       component = mockSerializedComponent(site)
       applyAddComponent(site, mockAddComponentData(component))
@@ -116,6 +117,7 @@ describe('Set Component Custom Style', () => {
         pseudoClass: CssPseudoClass.Hover,
         property: Css.BackgroundColor,
         value: 'red',
+        inherited: false,
       }
       component = mockSerializedComponent(site, {
         style: {
@@ -139,9 +141,10 @@ describe('Set Component Custom Style', () => {
       expect(rawStyle?.[oldStyle.property]).toEqual(oldStyle.value)
 
       // Update custom style
-      const newStyle: IStyleEntry = {
+      const newStyle: IStyleEntryWithInherited = {
         ...oldStyle,
         value: newValue,
+        inherited: false,
       }
       const data = mockEditComponentCustomStyleData(
         component.id,
@@ -158,9 +161,10 @@ describe('Set Component Custom Style', () => {
 
     it('should undo edit component custom style', () => {
       // Update custom style and undo
-      const newStyle: IStyleEntry = {
+      const newStyle: IStyleEntryWithInherited = {
         ...oldStyle,
         value: 'blue',
+        inherited: false,
       }
       const data = mockEditComponentCustomStyleData(
         component.id,
@@ -179,10 +183,11 @@ describe('Set Component Custom Style', () => {
     // When a new custom component style is added in the editor, it starts with the empty
     // string as its property. This simulates adding and modifying a new style in the editor.
     it('should add and edit empty component style', () => {
-      const newStyle = {
+      const newStyle: IStyleEntryWithInherited = {
         pseudoClass: CssPseudoClass.Default,
         property: '' as Css,
         value: '',
+        inherited: false,
       }
       const pseudo = getDefaultPseudo(component.id, newStyle.pseudoClass)
       expect(pseudo?.[newStyle.property]).toBeUndefined()
@@ -200,7 +205,7 @@ describe('Set Component Custom Style', () => {
       expect(newPseudo?.[newStyle.property]).toEqual(newStyle.value)
 
       // Set empty property to new value
-      const editStyle: IStyleEntry = {
+      const editStyle: IStyleEntryWithInherited = {
         ...newStyle,
         property: Css.Margin,
       }
@@ -223,7 +228,7 @@ describe('Set Component Custom Style', () => {
   })
 
   describe('remove component custom style', () => {
-    let style: IStyleEntry
+    let style: IStyleEntryWithInherited
 
     beforeEach(() => {
       siteString = JSON.stringify(mockSerializedSite)
@@ -232,6 +237,7 @@ describe('Set Component Custom Style', () => {
         pseudoClass: CssPseudoClass.Hover,
         property: Css.BackgroundColor,
         value: 'green',
+        inherited: false,
       }
       component = mockSerializedComponent(site, {
         style: {

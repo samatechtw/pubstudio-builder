@@ -5,7 +5,7 @@ import {
   Css,
   IInheritedStyleEntry,
   IRawStyleWithSource,
-  IStyleEntry,
+  IStyleEntryWithInherited,
   StyleSourceType,
 } from '@pubstudio/shared/type-site'
 import { useI18n } from 'petite-vue-i18n'
@@ -26,23 +26,24 @@ export const useEditComponentStyles = (): IUseEditStyles => {
   const styleEntries = computed(() =>
     Object.entries(selectedComponentFlattenedStyles.value)
       .sort((a, b) => a[0].localeCompare(b[0]))
-      .map(
-        ([css, source]) =>
-          ({
-            pseudoClass: currentPseudoClass.value,
-            property: css as Css,
-            value: source.value,
-            sourceType: source.sourceType,
-            sourceId: source.sourceId,
-            sourceBreakpointId: source.sourceBreakpointId,
-            inheritedFrom: getInheritedFrom(source),
-          }) as IInheritedStyleEntry,
-      ),
+      .map(([css, source]) => {
+        const inheritedFrom = getInheritedFrom(source)
+        return {
+          pseudoClass: currentPseudoClass.value,
+          property: css as Css,
+          value: source.value,
+          sourceType: source.sourceType,
+          sourceId: source.sourceId,
+          sourceBreakpointId: source.sourceBreakpointId,
+          inheritedFrom,
+          inherited: !!inheritedFrom,
+        } as IInheritedStyleEntry
+      }),
   )
 
   const setStyle = (
-    oldStyle: IStyleEntry | undefined,
-    newStyle: IStyleEntry | undefined,
+    oldStyle: IStyleEntryWithInherited | undefined,
+    newStyle: IStyleEntryWithInherited | undefined,
   ) => {
     const firstEdit = !editCommands.value
     editCommands.value = editCommands.value ?? { commands: [] }

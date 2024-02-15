@@ -95,6 +95,7 @@ import {
   ISite,
   IStyle,
   IStyleEntry,
+  IStyleEntryWithInherited,
   IThemeFont,
   Tag,
   ThemeFontSource,
@@ -112,8 +113,8 @@ import {
 import { resetThemeMenuVariables } from './use-theme-menu-variables'
 
 export type IOldNewStyleEntry = {
-  oldStyle?: IStyleEntry
-  newStyle?: IStyleEntry
+  oldStyle?: IStyleEntryWithInherited
+  newStyle?: IStyleEntryWithInherited
 }
 
 export type ISetTranslationsProps = {
@@ -150,8 +151,8 @@ export interface IUseBuild {
   getSelectedComponent: () => IComponent
   setCustomStyle: (
     component: IComponent,
-    oldStyle: IStyleEntry | undefined,
-    newStyle: IStyleEntry,
+    oldStyle: IStyleEntryWithInherited | undefined,
+    newStyle: IStyleEntryWithInherited,
     replace?: boolean,
   ) => void
   setCustomStyles: (
@@ -159,7 +160,10 @@ export interface IUseBuild {
     styles: IOldNewStyleEntry[],
     replace?: boolean,
   ) => void
-  setPositionAbsolute: (oldStyle: IStyleEntry | undefined, newStyle: IStyleEntry) => void
+  setPositionAbsolute: (
+    oldStyle: IStyleEntryWithInherited | undefined,
+    newStyle: IStyleEntryWithInherited,
+  ) => void
   removeComponentCustomStyle: (style: IRemoveStyleEntry) => void
   setOverrideStyle: (
     selector: string,
@@ -496,8 +500,8 @@ export const useBuild = (): IUseBuild => {
   }
 
   const setPositionAbsolute = (
-    oldStyle: IStyleEntry | undefined,
-    newStyle: IStyleEntry,
+    oldStyle: IStyleEntryWithInherited | undefined,
+    newStyle: IStyleEntryWithInherited,
   ) => {
     const commands = setPositionAbsoluteCommands(site.value, oldStyle, newStyle)
     if (commands.length) {
@@ -516,8 +520,8 @@ export const useBuild = (): IUseBuild => {
 
   const setCustomStyle = (
     component: IComponent,
-    oldStyle: IStyleEntry | undefined,
-    newStyle: IStyleEntry,
+    oldStyle: IStyleEntryWithInherited | undefined,
+    newStyle: IStyleEntryWithInherited,
     replace = false,
   ) => {
     const command = setCustomStyleCommand(
@@ -809,11 +813,13 @@ export const useBuild = (): IUseBuild => {
                       pseudoClass,
                       property: css,
                       value: oldValue,
+                      inherited: false,
                     },
               newStyle: {
                 pseudoClass,
                 property: css,
                 value: val,
+                inherited: false,
               },
             }
             commands.push({
@@ -870,6 +876,7 @@ export const useBuild = (): IUseBuild => {
                   pseudoClass,
                   property: prop as Css,
                   value: val,
+                  inherited: false,
                 },
                 newStyle: undefined,
               }
@@ -1061,9 +1068,19 @@ export const useBuild = (): IUseBuild => {
             componentId: component.id,
             breakpointId,
             oldStyle: oldLeft
-              ? { pseudoClass, property: Css.Left, value: oldLeft }
+              ? {
+                  pseudoClass,
+                  property: Css.Left,
+                  value: oldLeft,
+                  inherited: false,
+                }
               : undefined,
-            newStyle: { pseudoClass, property: Css.Left, value: left },
+            newStyle: {
+              pseudoClass,
+              property: Css.Left,
+              value: left,
+              inherited: false,
+            },
           },
         },
         {
@@ -1076,12 +1093,14 @@ export const useBuild = (): IUseBuild => {
                   pseudoClass,
                   property: Css.Top,
                   value: oldTop,
+                  inherited: false,
                 }
               : undefined,
             newStyle: {
               pseudoClass,
               property: Css.Top,
               value: top,
+              inherited: false,
             },
           },
         },

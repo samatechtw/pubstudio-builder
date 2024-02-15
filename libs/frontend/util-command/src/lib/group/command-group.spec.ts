@@ -31,6 +31,7 @@ describe('Command Group', () => {
       pseudoClass: CssPseudoClass.Default,
       property: Css.BackgroundColor,
       value: 'red',
+      inherited: false,
     })
     const groupData: ICommandGroupData = {
       commands: [
@@ -73,11 +74,13 @@ describe('Command Group', () => {
       pseudoClass: CssPseudoClass.Default,
       property: Css.Position,
       value: 'relative',
+      inherited: false,
     })
     const styleData2 = mockAddComponentCustomStyleData(newCmp.id, DEFAULT_BREAKPOINT_ID, {
       pseudoClass: CssPseudoClass.Default,
       property: Css.BackgroundColor,
       value: 'red',
+      inherited: false,
     })
     const groupData: ICommandGroupData = {
       commands: [

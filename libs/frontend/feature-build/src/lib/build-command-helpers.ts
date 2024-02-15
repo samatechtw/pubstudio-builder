@@ -8,15 +8,21 @@ import {
   ISetComponentOverrideStyleData,
   ISetMixinEntryData,
 } from '@pubstudio/shared/type-command-data'
-import { Css, IComponent, ISite, IStyleEntry } from '@pubstudio/shared/type-site'
+import {
+  Css,
+  IComponent,
+  ISite,
+  IStyleEntry,
+  IStyleEntryWithInherited,
+} from '@pubstudio/shared/type-site'
 
 export type IRemoveStyleEntry = Omit<IStyleEntry, 'value'>
 
 export const setCustomStyleCommand = (
   site: ISite,
   component: IComponent,
-  oldStyle: IStyleEntry | undefined,
-  newStyle: IStyleEntry,
+  oldStyle: IStyleEntryWithInherited | undefined,
+  newStyle: IStyleEntryWithInherited,
   replace = false,
 ): ICommand => {
   const data: ISetComponentCustomStyleData = {
@@ -44,8 +50,8 @@ export const setCustomStyleCommand = (
 
 export const setComponentCustomStyleCommand = (
   site: ISite,
-  oldStyle: IStyleEntry | undefined,
-  newStyle: IStyleEntry,
+  oldStyle: IStyleEntryWithInherited | undefined,
+  newStyle: IStyleEntryWithInherited,
   replace = false,
 ): ICommand | undefined => {
   const selected = site.editor?.selectedComponent
@@ -73,6 +79,7 @@ export const removeComponentCustomStyleCommand = (
     oldStyle: {
       ...style,
       value: oldValue,
+      inherited: false,
     },
   }
   return { type: CommandType.SetComponentCustomStyle, data }
@@ -83,8 +90,8 @@ export const removeComponentCustomStyleCommand = (
 // set it to relative.
 export const setPositionAbsoluteCommands = (
   site: ISite,
-  oldStyle: IStyleEntry | undefined,
-  newStyle: IStyleEntry,
+  oldStyle: IStyleEntryWithInherited | undefined,
+  newStyle: IStyleEntryWithInherited,
 ): ICommand[] => {
   const pseudoClass = newStyle.pseudoClass
   const selected = site.editor?.selectedComponent
@@ -131,12 +138,14 @@ export const setPositionAbsoluteCommands = (
                 pseudoClass,
                 property: Css.Position,
                 value: oldValue,
+                inherited: false,
               }
             : undefined,
           newStyle: {
             pseudoClass,
             property: Css.Position,
             value: 'relative',
+            inherited: false,
           },
         },
       },

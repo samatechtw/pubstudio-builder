@@ -1,8 +1,8 @@
-import { IStyleEntry } from '@pubstudio/shared/type-site'
+import { IStyleEntryWithInherited } from '@pubstudio/shared/type-site'
 
 export interface ISetComponentCustomStyleData {
   componentId: string
   breakpointId: string
-  oldStyle?: IStyleEntry
-  newStyle?: IStyleEntry
+  oldStyle?: IStyleEntryWithInherited
+  newStyle?: IStyleEntryWithInherited
 }

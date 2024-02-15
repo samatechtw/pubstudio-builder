@@ -1,11 +1,11 @@
 import { ISetComponentCustomStyleData } from '@pubstudio/shared/type-command-data'
-import { IStyleEntry } from '@pubstudio/shared/type-site'
+import { IStyleEntryWithInherited } from '@pubstudio/shared/type-site'
 
 export const mockEditComponentCustomStyleData = (
   componentId: string,
   breakpointId: string,
-  oldStyle: IStyleEntry,
-  newStyle: IStyleEntry,
+  oldStyle: IStyleEntryWithInherited,
+  newStyle: IStyleEntryWithInherited,
 ): ISetComponentCustomStyleData => {
   const data: ISetComponentCustomStyleData = {
     componentId,
@@ -19,7 +19,7 @@ export const mockEditComponentCustomStyleData = (
 export const mockAddComponentCustomStyleData = (
   componentId: string,
   breakpointId: string,
-  newStyle: IStyleEntry,
+  newStyle: IStyleEntryWithInherited,
 ): ISetComponentCustomStyleData => {
   const data: ISetComponentCustomStyleData = {
     componentId,
@@ -32,7 +32,7 @@ export const mockAddComponentCustomStyleData = (
 export const mockRemoveComponentCustomStyleData = (
   componentId: string,
   breakpointId: string,
-  style: IStyleEntry,
+  style: IStyleEntryWithInherited,
 ): ISetComponentCustomStyleData => {
   const data: ISetComponentCustomStyleData = {
     componentId,

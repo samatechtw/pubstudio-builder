@@ -1,7 +1,7 @@
 import { resolveComponent } from '@pubstudio/frontend/util-builtin'
 import { CommandType, ICommand } from '@pubstudio/shared/type-command'
 import { ISetComponentCustomStyleData } from '@pubstudio/shared/type-command-data'
-import { IComponent, ISite, IStyleEntry } from '@pubstudio/shared/type-site'
+import { IComponent, ISite, IStyleEntryWithInherited } from '@pubstudio/shared/type-site'
 import { setSelectedComponent } from '../set-selected-component'
 
 export interface SetComponentCustomStyle extends ICommand<ISetComponentCustomStyleData> {
@@ -11,8 +11,8 @@ export interface SetComponentCustomStyle extends ICommand<ISetComponentCustomSty
 const setStyle = (
   component: IComponent | undefined,
   breakpointId: string,
-  oldStyle: IStyleEntry | undefined,
-  newStyle: IStyleEntry | undefined,
+  oldStyle: IStyleEntryWithInherited | undefined,
+  newStyle: IStyleEntryWithInherited | undefined,
 ) => {
   if (!oldStyle && !newStyle) {
     throw new Error('oldStyle or newStyle must be defined')
@@ -25,7 +25,7 @@ const setStyle = (
       ]
     }
     // Add new style
-    if (newStyle) {
+    if (newStyle && !newStyle.inherited) {
       const pseudoClass = component.style.custom[breakpointId]?.[newStyle.pseudoClass]
       if (pseudoClass) {
         pseudoClass[newStyle.property] = newStyle.value

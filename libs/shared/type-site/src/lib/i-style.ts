@@ -7,11 +7,16 @@ export interface IStyleEntry {
   value: string
 }
 
+export interface IStyleEntryWithInherited extends IStyleEntry {
+  inherited: boolean
+}
+
 export interface IInheritedStyleEntry extends IStyleEntry {
   sourceType: StyleSourceType
   sourceId: string
   sourceBreakpointId: string
   inheritedFrom: string | undefined
+  inherited: boolean
 }
 
 export interface IStyleOverrideEntry extends IStyleEntry {

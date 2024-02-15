@@ -5,13 +5,16 @@ import {
   IEditStyleMixinData,
   ISetComponentCustomStyleData,
 } from '@pubstudio/shared/type-command-data'
-import { Css, ISite, IStyleEntry } from '@pubstudio/shared/type-site'
+import { Css, ISite, IStyleEntryWithInherited } from '@pubstudio/shared/type-site'
 import { Ref } from 'vue'
 
 export const removeEditCommand = (
   editCommands: Ref<ICommandGroupData | undefined>,
   prop: Css | undefined,
-): { removeCmd: ICommand | undefined; originalStyle: IStyleEntry | undefined } => {
+): {
+  removeCmd: ICommand | undefined
+  originalStyle: IStyleEntryWithInherited | undefined
+} => {
   const removeIndex = editCommands.value?.commands.findIndex((cmd) => {
     const data = cmd.data as ISetComponentCustomStyleData
     // Remove command if it resulted in `prop` being changed or removed
