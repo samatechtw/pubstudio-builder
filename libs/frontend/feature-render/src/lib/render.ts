@@ -6,6 +6,7 @@ import { computeAttrsInputsMixins } from './compute-attrs-inputs-mixins'
 import { IContent, IPropsContent } from './i-props-content'
 import { LiveComponent } from './live-component'
 import { computeEvents, parseI18n } from './render-helpers'
+import { sanitizeCssClass } from './sanitize-css-class'
 
 export const renderPage = (
   site: ISite,
@@ -33,7 +34,7 @@ export const computePropsContent = (
   const props = {
     ...data.attrs,
     ...events.native,
-    class: data.mixins.concat(component.id),
+    class: data.mixins.concat(sanitizeCssClass(component.id)),
     id: component.id,
   }
 
