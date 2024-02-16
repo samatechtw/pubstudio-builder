@@ -23,8 +23,8 @@
         :omitEditProperties="nonInheritedProperties"
         :error="!resolveThemeVariables(site.context, entry.value)"
         class="menu-row"
-        @setProperty="setProperty(entry, $event)"
-        @setValue="setValue(entry, $event)"
+        @setProperty="setPropertyWrap(entry, $event)"
+        @setValue="setValueWrap(entry, $event)"
         @edit="editStyle(entry.property)"
         @save="saveStyle(entry.property)"
         @remove="removeStyle(entry)"
@@ -40,6 +40,8 @@ import { resolveThemeVariables } from '@pubstudio/frontend/util-builtin'
 import {
   ComponentMenuCollapsible,
   Css,
+  IInheritedStyleEntry,
+  StyleSourceType,
   StyleToolbarMenu,
 } from '@pubstudio/shared/type-site'
 import { IconTooltipDelay, ScaleIn } from '@pubstudio/frontend/ui-widgets'
@@ -90,6 +92,27 @@ const menuSubTitle = computed(() => `(${currentPseudoClass.value})`)
 const addStyle = () => {
   setComponentMenuCollapses(editor.value, ComponentMenuCollapsible.Styles, false)
   createStyle()
+}
+
+const setValueWrap = (oldEntry: IInheritedStyleEntry, newValue: string) => {
+  // If the property was inherited, create a new entry so undo works as expected
+  // Otherwise, the style would be reverted to `oldEntry` on undo
+  if (oldEntry.sourceType !== StyleSourceType.Custom) {
+    createStyle({ prop: oldEntry.property, value: newValue })
+  } else {
+    setValue(oldEntry, newValue)
+  }
+}
+
+const setPropertyWrap = (oldEntry: IInheritedStyleEntry, newProp: Css) => {
+  if (oldEntry.sourceType !== StyleSourceType.Custom) {
+    createStyle({ prop: newProp, value: oldEntry.value })
+    // Close the old style, since we're editing a new property and there were no changes
+    // to the old one
+    saveStyle(oldEntry.property)
+  } else {
+    setProperty(oldEntry, newProp)
+  }
 }
 
 const styleRowHeight = computed(() => {

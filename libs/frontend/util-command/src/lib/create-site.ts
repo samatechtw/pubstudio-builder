@@ -39,8 +39,8 @@ export const createEditorContext = (homePage: IPage): IEditorContext => {
   }
 }
 
-const makeNamespace = (name: string): string => {
-  return name.replace(' ', '-').toLocaleLowerCase()
+export const makeNamespace = (name: string): string => {
+  return name.replace(/[\s#.]/g, '-').toLocaleLowerCase()
 }
 
 export const createSite = (_namespace: string): ISite => {

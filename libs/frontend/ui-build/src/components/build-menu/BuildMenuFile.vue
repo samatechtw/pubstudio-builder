@@ -82,6 +82,7 @@ import {
 } from '@pubstudio/frontend/util-site-deserialize'
 import { ISerializedSite } from '@pubstudio/shared/type-site'
 import { useBuild } from '@pubstudio/frontend/feature-build'
+import { makeNamespace } from '@pubstudio/frontend/util-command'
 import BuildMenuIconText from './BuildMenuIconText.vue'
 
 const { t } = useI18n()
@@ -102,7 +103,7 @@ const defaultFileName = computed(() => defaultExportedFileName(site.value.name))
 
 const confirmImport = async () => {
   importing.value = true
-  const namespace = site.value.context.namespace
+  const namespace = makeNamespace(site.value.context.namespace)
   await replaceSite(replaceNamespace(pendingSiteImport.value, namespace))
   pendingSiteImport.value = undefined
   importing.value = false

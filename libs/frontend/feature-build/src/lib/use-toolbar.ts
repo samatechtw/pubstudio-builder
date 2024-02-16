@@ -224,22 +224,32 @@ export const useToolbar = (): IUseToolbar => {
     }
   }
 
-  const setStyleCommand = (property: Css, value: string, replace?: boolean): ICommand => {
-    let currentStyle: IStyleEntry | undefined = undefined
-
-    const currentValue = getStyleValue(property)
-    if (currentValue) {
-      currentStyle = {
+  const setStyleCommand = (
+    property: Css,
+    value: string,
+    replace?: boolean,
+  ): ICommand | undefined => {
+    let oldStyle: IStyleEntry | undefined = undefined
+    const currentStyle = selectedComponentFlattenedStyles.value[property]
+    // Style inherited from mixin should not be set as oldStyle,
+    // otherwise undo will create a duplicate custom style that didn't exist before
+    const oldValue =
+      currentStyle?.sourceType === StyleSourceType.Custom ? currentStyle.value : undefined
+    if (oldValue === value) {
+      return undefined
+    }
+    if (oldValue) {
+      oldStyle = {
         pseudoClass: currentPseudoClass.value,
         property,
-        value: currentValue,
+        value: oldValue,
       }
     }
 
     return setCustomStyleCommand(
       site.value,
       getSelectedComponent(),
-      currentStyle,
+      oldStyle,
       {
         pseudoClass: currentPseudoClass.value,
         property,
@@ -250,18 +260,18 @@ export const useToolbar = (): IUseToolbar => {
   }
 
   // Set a style property, and replace the last command if it affected the same property
-  // Not command is issued or modified if the property is unchanged
+  // No command is issued or modified if the property is unchanged
   const setStyleOrReplace = (property: Css, value: string | undefined) => {
     if (getStyleValue(property) !== value) {
       let replace = false
       const lastCmd = getLastCommand(site.value)
       if (value !== undefined && lastCmd?.type === CommandType.SetComponentCustomStyle) {
-        const prevNewStyle = (lastCmd?.data as ISetComponentCustomStyleData | undefined)
+        const prevStyle = (lastCmd?.data as ISetComponentCustomStyleData | undefined)
           ?.newStyle
-        // Replace the last command if it's s Flex style update with match pseudoClass
+        // Replace the last command if property and pseudoClass match
         if (
-          prevNewStyle?.property === property &&
-          prevNewStyle?.pseudoClass === currentPseudoClass.value
+          prevStyle?.property === property &&
+          prevStyle?.pseudoClass === currentPseudoClass.value
         ) {
           replace = true
         }
@@ -282,7 +292,9 @@ export const useToolbar = (): IUseToolbar => {
       })
     } else {
       const cmd = setStyleCommand(property, value, replace)
-      pushOrReplaceCommand(site.value, cmd, !!replace)
+      if (cmd) {
+        pushOrReplaceCommand(site.value, cmd, !!replace)
+      }
     }
   }
 
@@ -313,13 +325,15 @@ export const useToolbar = (): IUseToolbar => {
       const cmd = getLastCommand(site.value)
       if (cmd) {
         const flexCmd = setStyleCommand(Css.Display, 'flex')
-        const flexGroup: ICommand<ICommandGroupData> = {
-          type: CommandType.Group,
-          data: {
-            commands: [flexCmd, cmd],
-          },
+        if (flexCmd) {
+          const flexGroup: ICommand<ICommandGroupData> = {
+            type: CommandType.Group,
+            data: {
+              commands: [flexCmd, cmd],
+            },
+          }
+          replaceLastCommand(site.value, flexGroup, true)
         }
-        replaceLastCommand(site.value, flexGroup, true)
       }
     }
   }

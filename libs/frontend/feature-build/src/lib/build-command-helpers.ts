@@ -34,7 +34,7 @@ export const setCustomStyleCommand = (
       type: CommandType.SetComponentCustomStyle,
       data: {
         ...data,
-        oldStyle: oldStyle ?? data.oldStyle,
+        oldStyle,
       },
     }
   } else {
