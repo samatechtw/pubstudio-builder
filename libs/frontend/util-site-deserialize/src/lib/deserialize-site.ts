@@ -129,7 +129,7 @@ export const deserializedHelper = (serialized: ISerializedSite): ISite => {
     defaults,
     pages,
     editor: deserializeEditor(siteContext, editor),
-    history: { back: history.back, forward: history.forward },
+    history: { back: history?.back ?? [], forward: history?.forward ?? [] },
     updated_at: serialized.updated_at,
     content_updated_at: serialized.content_updated_at,
   }

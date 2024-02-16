@@ -13,7 +13,7 @@
       }
     }
   },
-  "defaultProject": "builder-demo",
+  "defaultProject": "web-site",
   "targetDefaults": {
     "build": {
       "dependsOn": ["^build"],

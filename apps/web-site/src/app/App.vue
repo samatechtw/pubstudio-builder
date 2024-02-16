@@ -234,4 +234,13 @@ a {
     }
   }
 }
+
+@media print {
+  @page {
+    padding: 0;
+    margin: -44px 0;
+    border: none;
+    border-collapse: collapse;
+  }
+}
 </style>

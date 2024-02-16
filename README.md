@@ -13,8 +13,8 @@
 ## Apps
 
 - [site-api](backend/site-api) - Basic REST API for persisting site data. Supports multiple sites, versioning, automated backups, and usage tracking.
-- [builder-demo](apps/builder-demo) - Vue app that demonstrates editor functionality. It can be used as a basic standalone site builder, but the main purpose is to provide a usage example for `@pubstudio/editor`.
 - [web-site](apps/web-site) - Barebones app that retrieves site data from a source (e.g. the `site-api` backend) and renders it. Built as a single HTML file served by `site-api`.
+- [builder-demo](https://github.com/samatechtw/pubstudio-builder-demo) - Vue app that demonstrates editor functionality. It can be used as a basic standalone site builder, but the main purpose is to provide a usage example for `@pubstudio/editor`.
 
 ## Documentation
 
@@ -31,8 +31,6 @@
 ## Run in Docker
 
 These instructions result in the backend running on port `3100`, and the demo frontend on port `8080`. Only the backend is necessary for serving sites. docker-compose can be used to bring up the services together, but we don't provide that here.
-
-See the respective Readme files for setting [builder-demo](apps/builder-demo/Readme.md) and [site-api](backend/site-api/Readme.md) environment variables and building from source.
 
 ### Site API backend
 
@@ -54,7 +52,7 @@ docker run -p 3100:3100 \
 ### Builder demo frontend
 
 ```bash
-docker run -p 8080:80 -e VITE_API_HOST='host.docker.internal:3100' ghcr.io/samatechtw/pubstudio-builder/stg/builder-demo
+docker run -p 8080:80 -e VITE_API_HOST='host.docker.internal:3100' ghcr.io/samatechtw/pubstudio-builder-demo/stg/builder-demo
 ```
 
 ## Development
