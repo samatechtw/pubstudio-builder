@@ -1,0 +1,41 @@
+{
+  "name": "@pubstudio/builder",
+  "version": "1.0.1",
+  "description": "PubStudio editor/renderer/utility functions.",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "./build.sh",
+    "preview": "vite preview"
+  },
+  "files": [
+    ".",
+    "./dist",
+    "./dist/assets"
+  ],
+  "main": "./dist/pubstudio-builder.umd.js",
+  "module": "./dist/pubstudio-builder.es.js",
+  "types": "./dist/pubstudio-builder.es.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/pubstudio-builder.es.d.ts",
+      "import": "./dist/pubstudio-builder.es.js",
+      "require": "./dist/pubstudio-builder.umd.js"
+    },
+    "./dist/style.css": {
+      "import": "./dist/style.css",
+      "require": "./dist/style.css"
+    }
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "vue": "^3.4.19"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.0.4",
+    "vite": "^5.1.2",
+    "vite-plugin-singlefile": "^2.0.0"
+  }
+}

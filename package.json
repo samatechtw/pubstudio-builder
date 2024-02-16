@@ -12,8 +12,9 @@
     "format:check": "nx format:check",
     "lint": "nx workspace-lint && nx lint",
     "lint:style": "./node_modules/stylelint/bin/stylelint.js \"**/src/**/*.{css,vue}\"",
-    "build:builder-demo": "cd apps/builder-demo && vite build --outDir ../../dist/apps/builder-demo --emptyOutDir",
     "build:web-site": "cd apps/web-site && vite build --outDir ../../dist/apps/web-site --emptyOutDir",
+    "build:feature-external": "cd libs/frontend/feature-external && npm run build",
+    "publish": "cd dist/libs/feature-external/ && npm publish --access=public",
     "dev:build-aarch": "cd backend && CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=aarch64-unknown-linux-gnu-gcc cargo build --target aarch64-unknown-linux-gnu",
     "dev:run-aarch": "cd backend && CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=aarch64-unknown-linux-gnu-gcc cargo run --target aarch64-unknown-linux-gnu",
     "dev:build": "cd backend && cargo build",
@@ -59,10 +60,11 @@
   "devDependencies": {
     "@commitlint/config-angular": "^18.4.4",
     "@jest/globals": "^29.7.0",
+    "@laynezh/vite-plugin-lib-assets": "^0.5.18",
+    "@nx/eslint": "17.2.8",
     "@nx/eslint-plugin": "17.2.8",
     "@nx/jest": "17.2.8",
     "@nx/js": "17.2.8",
-    "@nx/eslint": "17.2.8",
     "@nx/workspace": "17.2.8",
     "@playwright/test": "^1.40.1",
     "@samatech/image-api-types": "^0.0.2",
@@ -96,6 +98,7 @@
     "ts-jest": "^29.1.1",
     "typescript": "^5.3.3",
     "vite": "5.0.11",
+    "vite-plugin-dts": "^3.7.2",
     "vite-plugin-singlefile": "^1.0.0",
     "vue-eslint-parser": "^9.4.0"
   }

@@ -25,15 +25,6 @@
                 ]
               },
               {
-                "sourceTag": "scope:builder-demo",
-                "onlyDependOnLibsWithTags": [
-                  "scope:builder-demo",
-                  "scope:web-site",
-                  "scope:frontend",
-                  "scope:shared"
-                ]
-              },
-              {
                 "sourceTag": "scope:web-admin",
                 "onlyDependOnLibsWithTags": [
                   "scope:web-admin",
