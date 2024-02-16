@@ -95,7 +95,8 @@ const hoverOverlayStyle = computed(() => {
       return {
         top: `${top}px`,
         left: `${left}px`,
-        width: `${width}px`,
+        // -1 to prevent horizontal scrollbar from showing up.
+        width: `${width - 1}px`,
         height: `${height}px`,
         backgroundColor: overlayBackgroundColor,
         border: overlayBorder,
