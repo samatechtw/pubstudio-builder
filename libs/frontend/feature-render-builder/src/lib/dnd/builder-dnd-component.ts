@@ -178,6 +178,7 @@ export const BuilderDndComponent = defineComponent({
       const { editView, selectedComponent } = site.value.editor ?? {}
       const isRoot = !component.value.parent
       const editViewFocus = editView?.hasFocus()
+      const childrenEditViewMounted = !!editView?.dom.closest(`#${component.value.id}`)
       const droppableDndProps = {
         onDragenter: dnd.dragenter,
         onDragover: dnd.dragover,
@@ -190,7 +191,7 @@ export const BuilderDndComponent = defineComponent({
       // If the component is root component, only allow hover&drop events to be fired.
       // Otherwise allow all drag, hover, and drop events to be fired.
       let dndProps: Record<string, unknown> = {}
-      if (editViewFocus) {
+      if (editViewFocus || childrenEditViewMounted) {
         dndProps = { onDragend: dnd.dragend }
       } else if (isRoot) {
         dndProps = droppableDndProps
