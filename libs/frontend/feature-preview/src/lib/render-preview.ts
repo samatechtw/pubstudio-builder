@@ -4,7 +4,6 @@ import {
   IContent,
   IPropsContent,
   parseI18n,
-  sanitizeCssClass,
 } from '@pubstudio/frontend/feature-render'
 import { RenderMode } from '@pubstudio/frontend/util-render'
 import { resetRuntimeContext } from '@pubstudio/frontend/util-runtime'
@@ -34,7 +33,7 @@ export const computePropsContent = (
   const props = {
     ...data.attrs,
     ...events.native,
-    class: data.mixins.concat(sanitizeCssClass(component.id)),
+    class: data.mixins.concat(component.id),
     id: component.id,
   }
 

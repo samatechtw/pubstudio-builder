@@ -19,7 +19,6 @@ import {
   ISiteContext,
 } from '@pubstudio/shared/type-site'
 import { pseudoClassToCssClass } from './pseudo-class-to-css-class'
-import { sanitizeCssClass } from './sanitize-css-class'
 
 type ComponentIterFn = (component: IComponent) => void
 
@@ -40,14 +39,13 @@ export const getBuildPageStyle = (site: ISite, page: IPage): IRawStyleRecord => 
   const accumulatedBreakpointIds = getActiveBreakpointIds()
 
   const appendStyle = (component: IComponent) => {
-    const componentSelector = sanitizeCssClass(component.id)
     const currentPseudoClass = site.editor?.cssPseudoClass ?? CssPseudoClass.Default
 
     // Compute styles in default pseudo class
     accumulatedBreakpointIds.forEach((breakpointId) => {
       const bpStyle = component.style.custom[breakpointId]
       const rawStyle = bpStyle?.[CssPseudoClass.Default] ?? {}
-      const cls = `.${componentSelector}`
+      const cls = `.${component.id}`
       const style = pageStyle[cls] ?? {}
       pageStyle[cls] = { ...style, ...rawStyle }
 
@@ -55,7 +53,7 @@ export const getBuildPageStyle = (site: ISite, page: IPage): IRawStyleRecord => 
       if (currentPseudoClass !== CssPseudoClass.Default) {
         const rawStyle = bpStyle?.[currentPseudoClass] ?? {}
         const pseudoClassName = pseudoClassToCssClass(currentPseudoClass)
-        const cls = `.${componentSelector}.${pseudoClassName}`
+        const cls = `.${component.id}.${pseudoClassName}`
         const style = pageStyle[cls] ?? {}
         pageStyle[cls] = { ...style, ...rawStyle }
       }
@@ -64,21 +62,19 @@ export const getBuildPageStyle = (site: ISite, page: IPage): IRawStyleRecord => 
     if (component.style.overrides) {
       Object.entries(component.style.overrides).forEach(
         ([selector, breakpointStyles]) => {
-          const overrideSelector = sanitizeCssClass(selector)
           // Compute styles in default pseudo class
           accumulatedBreakpointIds.forEach((breakpointId) => {
             const bpStyle = breakpointStyles[breakpointId]
             const rawStyle = bpStyle?.[CssPseudoClass.Default] ?? {}
-            pageStyle[`.${componentSelector} .${overrideSelector}`] = { ...rawStyle }
+            pageStyle[`.${component.id} .${selector}`] = { ...rawStyle }
 
             // Compute styles in the current pseudo class
             if (currentPseudoClass !== CssPseudoClass.Default) {
               const rawStyle = bpStyle?.[currentPseudoClass] ?? {}
               const pseudoClassName = pseudoClassToCssClass(currentPseudoClass)
-              pageStyle[`.${componentSelector} .${overrideSelector}.${pseudoClassName}`] =
-                {
-                  ...rawStyle,
-                }
+              pageStyle[`.${component.id} .${selector}.${pseudoClassName}`] = {
+                ...rawStyle,
+              }
             }
           })
         },
@@ -122,7 +118,6 @@ export const getLivePageStyle = (context: ISiteContext, page: IPage): IQueryStyl
   const queryStyle = createQueryStyle(context)
 
   const appendStyle = (component: IComponent) => {
-    const componentSelector = sanitizeCssClass(component.id)
     const breakpointStyles = computeComponentBreakpointStyles(context, component, {
       // Ignore mixins because they're already handled by Reusable Styles in renderer.
       computeMixins: false,
@@ -134,20 +129,18 @@ export const getLivePageStyle = (context: ISiteContext, page: IPage): IQueryStyl
         Object.entries(pseudoStyle).forEach(([pseudoClass, rawStyle]) => {
           const pseudoValue = pseudoClass === CssPseudoClass.Default ? '' : pseudoClass
           const resolvedStyle = rawStyleToResolvedStyleWithSource(context, rawStyle)
-          queryStyle[breakpointId][`.${componentSelector}${pseudoValue}`] = resolvedStyle
+          queryStyle[breakpointId][`.${component.id}${pseudoValue}`] = resolvedStyle
         })
       }
       if (overrideStyles && overrideStyles[breakpointId]) {
         Object.entries(overrideStyles[breakpointId]).forEach(
           ([selector, selectorStyles]) => {
-            const overrideSelector = sanitizeCssClass(selector)
             Object.entries(selectorStyles).forEach(([pseudoClass, rawStyle]) => {
               const pseudoValue =
                 pseudoClass === CssPseudoClass.Default ? '' : pseudoClass
               const resolvedStyle = rawStyleToResolvedStyleWithSource(context, rawStyle)
-              queryStyle[breakpointId][
-                `.${componentSelector}${pseudoValue} .${overrideSelector}`
-              ] = resolvedStyle
+              queryStyle[breakpointId][`.${component.id}${pseudoValue} .${selector}`] =
+                resolvedStyle
             })
           },
         )

@@ -5,7 +5,6 @@ import {
   IBuildContent,
   IPropsBuildContent,
   parseI18n,
-  sanitizeCssClass,
 } from '@pubstudio/frontend/feature-render'
 import {
   activeBreakpoint,
@@ -280,10 +279,7 @@ export const computePropsContent = (
     ...data.attrs,
     ...builderStyleProps?.builderProps,
     ...events.native,
-    class: data.mixins.concat(
-      sanitizeCssClass(component.id),
-      builderStyleProps?.builderClass ?? [],
-    ),
+    class: data.mixins.concat(component.id, builderStyleProps?.builderClass ?? []),
     style: builderStyleProps?.builderStyle,
     id: component.id,
   }
