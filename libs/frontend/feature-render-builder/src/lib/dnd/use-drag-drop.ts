@@ -257,7 +257,15 @@ export const useDragDrop = (props: IUseDragDropProps): IUseDragDrop => {
           verticalOnly,
         })
         updateRuntimeContext(component.id)
+      } else {
+        // Reset `buildDndState` to avoid the hover overlay from being stuck.
+        // This handles the case where the dragged component is hovered on its children.
+        runtimeContext.buildDndState.value = undefined
       }
+    } else {
+      // Reset `buildDndState` to avoid the hover overlay from being stuck.
+      // This handles the case where the dragged component is hovered on itself.
+      runtimeContext.buildDndState.value = undefined
     }
   }
 
@@ -339,6 +347,7 @@ export const useDragDrop = (props: IUseDragDropProps): IUseDragDrop => {
     dropProps.value = defaultDropProps()
     dragSource.value = undefined
     dragendOption?.()
+    runtimeContext.buildDndState.value = undefined
   }
 
   return {
