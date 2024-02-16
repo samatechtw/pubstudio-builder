@@ -172,7 +172,7 @@ const toggleOverflow = (value: string) => {
 
 .component-dimensions {
   background-color: $menu-bg2;
-  padding: 4px 16px;
+  padding: 0 16px 2px;
 }
 
 .dimensions-wrap {

@@ -114,7 +114,7 @@ const removeMixin = (mixinId: string | undefined) => {
 .component-menu-mixins {
   background-color: $menu-bg2;
   width: 100%;
-  padding: 0 16px 4px;
+  padding: 0 16px;
 }
 .edit-icon {
   margin-left: auto;
