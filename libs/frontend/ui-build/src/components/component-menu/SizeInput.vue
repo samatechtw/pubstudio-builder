@@ -59,7 +59,9 @@ const {
 
 const update = () => {
   const sizeStr = updatedSize()
-  emit('update', sizeStr)
+  if (sizeStr !== undefined) {
+    emit('update', sizeStr)
+  }
 }
 
 const updateValue = (e: Event) => {

@@ -25,6 +25,11 @@ export interface IUseEditStylesOptions {
   setStyle: (oldStyle: IStyleEntry | undefined, newStyle: IStyleEntry | undefined) => void
 }
 
+export interface ICreateStyleOptions {
+  prop?: Css
+  value?: string
+}
+
 export interface IUseEditStyles extends Omit<IUseEditStylesOptions, 'setStyle'> {
   editCommands: Ref<ICommandGroupData | undefined>
   editStyles: Ref<Set<string>>
@@ -35,7 +40,7 @@ export interface IUseEditStyles extends Omit<IUseEditStylesOptions, 'setStyle'> 
   cancelEdit: (prop: Css) => void
   saveStyle: (prop: Css) => void
   removeStyle: (style: IStyleEntry) => void
-  createStyle: () => void
+  createStyle: (options?: ICreateStyleOptions) => void
   isEditing: (propName: string) => boolean
 }
 
@@ -82,11 +87,15 @@ export const useEditStyles = (options: IUseEditStylesOptions): IUseEditStyles =>
     }
   }
 
-  const createStyle = () => {
+  const createStyle = (options?: ICreateStyleOptions) => {
     setStyleType(site.value, styleType)
-    const property = '' as Css
+    const property = (options?.prop ?? '') as Css
     editStyle(property)
-    setStyle(undefined, { pseudoClass: currentPseudoClass.value, property, value: '' })
+    setStyle(undefined, {
+      pseudoClass: currentPseudoClass.value,
+      property,
+      value: options?.value ?? '',
+    })
   }
 
   const saveStyle = (prop: Css) => {
