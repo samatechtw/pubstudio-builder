@@ -12,7 +12,13 @@ import {
   RenderMode,
   themeToCssVars,
 } from '@pubstudio/frontend/util-render'
-import { Css, CssPseudoClass, IPage, ISite } from '@pubstudio/shared/type-site'
+import {
+  Css,
+  CssPseudoClass,
+  IPage,
+  ISite,
+  ThemeFontSource,
+} from '@pubstudio/shared/type-site'
 import { Link, Meta, Script, useHead } from '@unhead/vue'
 import { Component, computed, ComputedRef, defineComponent, h, Ref } from 'vue'
 import {
@@ -105,9 +111,9 @@ export const useRender = (options: IUseRenderOptions): IUseRender => {
   })
 
   const googleFonts = computed(() => {
-    const fontNames = Object.values(site.value?.context.theme.fonts ?? {}).map(
-      (font) => font.name,
-    )
+    const fontNames = Object.values(site.value?.context.theme.fonts ?? {})
+      .filter((font) => font.source === ThemeFontSource.Google)
+      .map((font) => font.name)
     return renderGoogleFontsLink(fontNames)
   })
 

@@ -11,6 +11,7 @@ import {
   renderGoogleFontsLink,
   themeToCssVars,
 } from '@pubstudio/frontend/util-render'
+import { ThemeFontSource } from '@pubstudio/shared/type-site'
 import { computed, defineComponent, h } from 'vue'
 import { computeBuilderReusableStyles } from './compute-builder-reusable-styles'
 import { renderPage } from './render-builder'
@@ -56,9 +57,9 @@ export const useRenderBuilder = (options: IUseRenderOptions): IUseRender => {
   })
 
   const googleFonts = computed(() => {
-    const themeFontNames = Object.values(site.value?.context.theme.fonts ?? {}).map(
-      (font) => font.name,
-    )
+    const themeFontNames = Object.values(site.value?.context.theme.fonts ?? {})
+      .filter((font) => font.source === ThemeFontSource.Google)
+      .map((font) => font.name)
 
     const fontNames = [...themeFontNames]
     for (const googleFontName of selectedGoogleFonts.value) {
