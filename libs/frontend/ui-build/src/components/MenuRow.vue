@@ -36,7 +36,7 @@
 </template>
 
 <script lang="ts" setup>
-import { nextTick, onMounted, ref, toRefs } from 'vue'
+import { nextTick, onMounted, ref, toRefs, watch } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { Copy, Edit, InfoBubble, PSInput } from '@pubstudio/frontend/ui-widgets'
 import { copy } from '@pubstudio/frontend/util-doc'
@@ -96,6 +96,10 @@ const setValue = () => {
   emit('update', newValue.value || undefined)
   editing.value = false
 }
+
+watch(value, (updatedValue) => {
+  newValue.value = updatedValue
+})
 
 onMounted(async () => {
   if (forceEdit.value) {

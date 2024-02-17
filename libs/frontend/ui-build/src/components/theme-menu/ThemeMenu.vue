@@ -30,9 +30,10 @@ const isEditingVariable = computed(() => editState.value !== IThemeVariableEditS
 @import '@theme/css/mixins.postcss';
 
 .theme-menu {
-  .theme-menu-content {
-    width: 100%;
-    padding: 16px;
-  }
+  height: 100%;
+}
+.theme-menu-content {
+  width: 100%;
+  padding: 16px;
 }
 </style>

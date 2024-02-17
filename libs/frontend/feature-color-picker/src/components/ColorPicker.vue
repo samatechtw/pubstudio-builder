@@ -33,6 +33,7 @@
           :height="previewHeight"
         />
         <ColorPickerButton
+          v-if="!forceNonGradient"
           class="add-gradient-color"
           :class="{ gradient: isGradient }"
           @click="addGradientColor(rgbaString, c.themeVar)"
@@ -384,7 +385,7 @@ onMounted(async () => {
   canvas {
     display: flex;
     height: 100%;
-    width: 50%;
+    width: 100%;
     aspect-ratio: 1;
   }
   .color-set {
@@ -398,6 +399,9 @@ onMounted(async () => {
     display: flex;
     width: 100%;
     margin-top: 6px;
+    > canvas {
+      width: v-bind(forceNonGradient ? '100%': '50%');
+    }
   }
   .select-wrap {
     display: flex;
