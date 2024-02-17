@@ -1,9 +1,7 @@
 import { selectColor } from '@pubstudio/frontend/util-command'
-import { isColor } from '@pubstudio/frontend/util-doc'
-import { builtinThemeVariables } from '@pubstudio/frontend/util-ids'
 import { IThemeVariable } from '@pubstudio/shared/type-site'
 import { useI18n } from 'petite-vue-i18n'
-import { computed, ComputedRef, reactive, Ref, ref, UnwrapNestedRefs } from 'vue'
+import { reactive, Ref, ref, UnwrapNestedRefs } from 'vue'
 import { useBuild } from './use-build'
 import { MAX_SELECTED_THEME_COLORS, useThemeColors } from './use-theme-colors'
 
@@ -11,7 +9,6 @@ export interface IUseThemeMenuFeature {
   editState: Ref<IThemeVariableEditState>
   editingThemeVariable: UnwrapNestedRefs<IThemeVariable>
   themeVariableError: Ref<string | undefined>
-  themeVariables: ComputedRef<IThemeVariables>
   clearEditingState: () => void
   newThemeVariable: () => void
   setEditingThemeVariable: (
@@ -19,6 +16,12 @@ export interface IUseThemeMenuFeature {
     state: IThemeVariableEditState,
   ) => void
   saveThemeVariable: () => void
+}
+
+export interface IThemeColorPickerData {
+  state: IThemeVariableEditState
+  variable: IThemeVariable
+  top: number
 }
 
 export interface IThemeVariables {
@@ -35,6 +38,7 @@ export enum IThemeVariableEditState {
 const emptyThemeVariable = (): IThemeVariable => ({
   key: '',
   value: '',
+  resolved: '',
   isColor: false,
 })
 
@@ -56,22 +60,6 @@ export const useThemeMenuVariables = (): IUseThemeMenuFeature => {
   const { t } = useI18n()
   const { site, addThemeVariable, editThemeVariable } = useBuild()
   const { selectedThemeColors } = useThemeColors()
-
-  const themeVariables = computed<IThemeVariables>(() => {
-    const builtin: IThemeVariable[] = []
-    const custom: IThemeVariable[] = []
-    for (const [key, value] of Object.entries(
-      site.value?.context.theme.variables ?? {},
-    )) {
-      const themeVar: IThemeVariable = { key, value, isColor: isColor(value) }
-      if (key in builtinThemeVariables) {
-        builtin.push(themeVar)
-      } else {
-        custom.push(themeVar)
-      }
-    }
-    return { builtin, custom }
-  })
 
   const clearEditingState = () => {
     Object.assign(editingThemeVariable, emptyThemeVariable())
@@ -138,7 +126,6 @@ export const useThemeMenuVariables = (): IUseThemeMenuFeature => {
     editState,
     editingThemeVariable,
     themeVariableError,
-    themeVariables,
     clearEditingState,
     newThemeVariable,
     setEditingThemeVariable,

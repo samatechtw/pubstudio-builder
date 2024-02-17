@@ -1,3 +1,4 @@
+import { resolveThemeVariables } from '@pubstudio/frontend/util-builtin'
 import { isColor } from '@pubstudio/frontend/util-doc'
 import { builtinThemeVariables } from '@pubstudio/frontend/util-ids'
 import { IThemeVariable } from '@pubstudio/shared/type-site'
@@ -16,10 +17,12 @@ export const useThemeColors = (): IUseThemeColors => {
   const themeColors = computed<IThemeVariable[]>(() => {
     return Object.entries(site.value.context.theme.variables)
       .map(([key, value]) => {
+        const resolved = resolveThemeVariables(site.value.context, value) ?? ''
         const variable: IThemeVariable = {
-          isColor: isColor(value),
+          isColor: isColor(resolved),
           key,
           value,
+          resolved,
         }
         return variable
       })
@@ -40,8 +43,8 @@ export const useThemeColors = (): IUseThemeColors => {
 
   // Returns at most 16 selected theme colors.
   const selectedThemeColors = computed<IThemeVariable[]>(() => {
-    const selected = themeColors.value.filter(
-      (variable) => editor.value?.selectedThemeColors.has(variable.key),
+    const selected = themeColors.value.filter((variable) =>
+      editor.value?.selectedThemeColors.has(variable.key),
     )
     return selected.slice(0, MAX_SELECTED_THEME_COLORS)
   })

@@ -8,6 +8,7 @@ export interface ITheme {
 export interface IThemeVariable {
   key: string
   value: string
+  resolved?: string
   isColor: boolean
 }
 
