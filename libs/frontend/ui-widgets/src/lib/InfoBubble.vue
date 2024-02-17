@@ -34,6 +34,7 @@
         :style="tooltipStyle"
         @mouseleave="hideBubble"
         @mouseenter="cancelBubbleDelay"
+        @click.stop
       >
         <slot v-if="useSlot"></slot>
         <div v-else-if="useHtml" class="message-html" v-html="message" />
@@ -49,8 +50,8 @@
 
 <script lang="ts" setup>
 import { Placement } from '@floating-ui/vue'
-import { useTooltip } from '@pubstudio/frontend/util-tooltip'
 import { toRefs } from 'vue'
+import { useInfoBubble } from '@pubstudio/frontend/util-tooltip'
 
 const props = withDefaults(
   defineProps<{
@@ -73,55 +74,23 @@ const props = withDefaults(
     useHtml: false,
   },
 )
+
 const { hideDelay, showArrow, placement } = toRefs(props)
 
 const {
+  show,
   itemRef,
   arrowStyle,
   tooltipRef,
   tooltipStyle,
-  show,
-  tooltipMouseEnter,
-  tooltipMouseLeave,
-} = useTooltip({
+  cancelBubbleDelay,
+  clickInfo,
+  hideBubble,
+} = useInfoBubble({
+  hideDelay,
+  showArrow: showArrow.value,
   placement: placement.value,
-  arrow: showArrow.value,
-  offset: 8,
-  shift: true,
 })
-let hoverTimer: ReturnType<typeof setTimeout> | undefined
-
-const clickInfo = () => {
-  setShow(!show.value)
-  cancelBubbleDelay()
-}
-
-const setShow = (newShow: boolean) => {
-  if (newShow === show.value) {
-    return
-  }
-  if (newShow) {
-    tooltipMouseEnter()
-  } else {
-    tooltipMouseLeave()
-  }
-}
-
-const cancelBubbleDelay = () => {
-  if (hoverTimer) {
-    clearTimeout(hoverTimer)
-    hoverTimer = undefined
-  }
-}
-
-const hideBubble = () => {
-  if (hideDelay.value) {
-    cancelBubbleDelay()
-    hoverTimer = setTimeout(() => setShow(false), hideDelay.value)
-  } else {
-    setShow(false)
-  }
-}
 </script>
 
 <style lang="postcss" scoped>
@@ -140,7 +109,9 @@ const hideBubble = () => {
 }
 .message {
   @mixin tooltip;
+  user-select: unset;
   position: absolute;
+  cursor: default;
   max-width: 200px;
   z-index: $z-index-tooltip;
   :deep(a) {
