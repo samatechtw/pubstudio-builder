@@ -2,17 +2,17 @@ import { UiAction } from '@pubstudio/shared/type-command-data'
 import { useBuild } from '../use-build'
 
 export interface IUseMixinMenuUi {
-  openMixinMenu: (mixinId: string) => void
+  openMixinMenu: (mixinId: string, fromComponent: boolean) => void
   closeMixinMenu: () => void
 }
 
 export const useMixinMenuUi = (): IUseMixinMenuUi => {
   const { editor, updateUi } = useBuild()
 
-  const openMixinMenu = (mixinId: string) => {
+  const openMixinMenu = (mixinId: string, fromComponent: boolean) => {
     updateUi(UiAction.OpenMixinMenu, {
       mixinId,
-      originComponentId: editor.value?.selectedComponent?.id,
+      originComponentId: fromComponent ? editor.value?.selectedComponent?.id : undefined,
     })
   }
 

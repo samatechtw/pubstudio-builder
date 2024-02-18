@@ -19,7 +19,7 @@
         :mixinOptions="mixinOptions"
         class="mixin"
         @set="setMixin($event.oldMixinId, $event.newMixinId)"
-        @edit="openMixinMenu"
+        @edit="openMixinMenu($event, true)"
         @remove="removeMixin($event)"
         @flatten="flattenMixin(mixin.id)"
       />

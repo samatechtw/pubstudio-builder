@@ -3,7 +3,7 @@
     <EditMenuTitle :title="t('style.reusable')" @add="newStyle" />
     <div v-if="styles.length" class="styles">
       <div v-for="style in styles" :key="style.id" class="style-entry edit-item">
-        <div class="style-name" @click="openMixinMenu(style.id)">
+        <div class="style-name" @click="openMixinMenu(style.id, false)">
           {{ style.name }}
         </div>
         <Minus class="item-delete" @click="deleteStyle(style)" />
