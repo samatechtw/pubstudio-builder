@@ -36,6 +36,10 @@ pub struct ApiError {
     pub status: StatusCode,
 }
 
+pub fn status_from_u16(num: u16) -> StatusCode {
+    StatusCode::from_u16(num).unwrap_or(StatusCode::INTERNAL_SERVER_ERROR)
+}
+
 impl ApiError {
     pub fn not_found() -> ApiError {
         Self {
