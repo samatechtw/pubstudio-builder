@@ -1,7 +1,7 @@
-use axum::{
+use axum::{http::Request, RequestPartsExt};
+use axum_extra::{
     headers::{authorization::Bearer, Authorization},
-    http::Request,
-    RequestPartsExt, TypedHeader,
+    TypedHeader,
 };
 
 use crate::error::api_error::ApiError;

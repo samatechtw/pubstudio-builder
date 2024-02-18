@@ -114,7 +114,6 @@ async fn main() {
     context.site_repo.migrate_all(sites).await.unwrap();
 
     // Run server
-    let bound = &api_url.parse().unwrap();
     let mut app = Router::new()
         .merge(app_router(&context))
         .with_state(context)
@@ -122,10 +121,7 @@ async fn main() {
     // Enables logging. Use `RUST_LOG=trace`
     app = create_trace_layer(app);
 
-    println!("Listening on {}", api_url);
-
-    axum::Server::bind(bound)
-        .serve(app.into_make_service())
-        .await
-        .unwrap();
+    let listener = tokio::net::TcpListener::bind(api_url).await.unwrap();
+    tracing::debug!("listening on {}", listener.local_addr().unwrap());
+    axum::serve(listener, app).await.unwrap();
 }

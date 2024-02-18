@@ -1,10 +1,11 @@
 use axum::{
+    body::Body,
     extract::{Path, State},
-    headers::{authorization::Bearer, Authorization},
     http::Request,
     middleware::Next,
     response::Response,
 };
+use axum_extra::headers::{authorization::Bearer, Authorization};
 use lib_shared_site_api::{
     auth::{
         util::{extract_bearer, extract_bearer_optional},
@@ -39,20 +40,20 @@ pub async fn verify_site_owner(
     Ok(())
 }
 
-pub async fn auth_admin<B>(
+pub async fn auth_admin(
     State(context): State<ApiContext>,
-    request: Request<B>,
-    next: Next<B>,
+    request: Request<Body>,
+    next: Next,
 ) -> Result<Response, ApiError> {
     let (bearer, request) = extract_bearer(request).await?;
 
     auth_user(vec![UserType::Admin], bearer, context, request, next).await
 }
 
-pub async fn auth_admin_owner<B>(
+pub async fn auth_admin_owner(
     State(context): State<ApiContext>,
-    request: Request<B>,
-    next: Next<B>,
+    request: Request<Body>,
+    next: Next,
 ) -> Result<Response, ApiError> {
     let (bearer, request) = extract_bearer(request).await?;
 
@@ -66,20 +67,20 @@ pub async fn auth_admin_owner<B>(
     .await
 }
 
-pub async fn auth_owner<B>(
+pub async fn auth_owner(
     State(context): State<ApiContext>,
-    request: Request<B>,
-    next: Next<B>,
+    request: Request<Body>,
+    next: Next,
 ) -> Result<Response, ApiError> {
     let (bearer, request) = extract_bearer(request).await?;
 
     auth_user(vec![UserType::Owner], bearer, context, request, next).await
 }
 
-pub async fn auth_admin_owner_anonymous<B>(
+pub async fn auth_admin_owner_anonymous(
     State(context): State<ApiContext>,
-    request: Request<B>,
-    next: Next<B>,
+    request: Request<Body>,
+    next: Next,
 ) -> Result<Response, ApiError> {
     let (bearer_opt, mut request) = extract_bearer_optional(request).await;
     if let Some(bearer) = bearer_opt {
@@ -100,12 +101,12 @@ pub async fn auth_admin_owner_anonymous<B>(
     }
 }
 
-pub async fn auth_user<B>(
+pub async fn auth_user(
     expected_types: Vec<UserType>,
     auth: Authorization<Bearer>,
     context: ApiContext,
-    mut request: Request<B>,
-    next: Next<B>,
+    mut request: Request<Body>,
+    next: Next,
 ) -> Result<Response, ApiError> {
     match verify_jwt(context.config.admin_public_key.to_string(), auth.token()) {
         Ok(user_token) => {
@@ -123,11 +124,11 @@ pub async fn auth_user<B>(
     }
 }
 
-pub async fn error_cache<B>(
+pub async fn error_cache(
     State(context): State<ApiContext>,
     Path(site_id): Path<String>,
-    request: Request<B>,
-    next: Next<B>,
+    request: Request<Body>,
+    next: Next,
 ) -> Result<Response, ApiError> {
     let response = next.run(request).await;
     if response.status() != 200 {
