@@ -9,10 +9,10 @@
     :clearable="false"
     :customSlot="true"
     :tooltip="t('history.command.changeP')"
-    :openControl="() => editor?.styleMenu === StyleToolbarMenu.Page"
+    :openControl="() => editor?.editorDropdown === EditorDropdown.Page"
     @select="setActivePage"
-    @open="setStyleToolbarMenu(editor, StyleToolbarMenu.Page)"
-    @close="setStyleToolbarMenu(editor, undefined)"
+    @open="setEditorDropdown(editor, EditorDropdown.Page)"
+    @close="setEditorDropdown(editor, undefined)"
     @click.stop
   >
     <template #customSlot>
@@ -27,9 +27,9 @@
 import { computed, onMounted } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { PSMultiselect } from '@pubstudio/frontend/ui-widgets'
-import { StyleToolbarMenu } from '@pubstudio/shared/type-site'
+import { EditorDropdown } from '@pubstudio/shared/type-site'
 import { useBuild, usePageMenu } from '@pubstudio/frontend/feature-build'
-import { setStyleToolbarMenu } from '@pubstudio/frontend/util-command'
+import { setEditorDropdown } from '@pubstudio/frontend/util-command'
 import { IMultiselectOption, IMultiselectObj } from '@pubstudio/frontend/type-ui-widgets'
 
 const { t } = useI18n()
@@ -59,8 +59,8 @@ const setActivePage = (option: IMultiselectOption | undefined) => {
 }
 
 onMounted(() => {
-  if (editor.value?.styleMenu === StyleToolbarMenu.Page) {
-    setStyleToolbarMenu(editor.value, undefined)
+  if (editor.value?.editorDropdown === EditorDropdown.Page) {
+    setEditorDropdown(editor.value, undefined)
   }
 })
 </script>

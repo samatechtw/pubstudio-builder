@@ -6,21 +6,21 @@
     :clearable="true"
     :caret="false"
     toggleId="style-menu"
-    :openControl="() => editor?.styleMenu === StyleToolbarMenu.FontWeight"
+    :openControl="() => editor?.editorDropdown === EditorDropdown.FontWeight"
     class="font-weight"
     @select="setStyle(Css.FontWeight, $event?.value)"
-    @open="setStyleToolbarMenu(editor, StyleToolbarMenu.FontWeight)"
-    @close="setStyleToolbarMenu(editor, undefined)"
+    @open="setEditorDropdown(editor, EditorDropdown.FontWeight)"
+    @close="setEditorDropdown(editor, undefined)"
   />
 </template>
 
 <script lang="ts" setup>
 import { computed, onMounted, toRefs } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
-import { Css, StyleToolbarMenu, ThemeFontSource } from '@pubstudio/shared/type-site'
+import { Css, EditorDropdown, ThemeFontSource } from '@pubstudio/shared/type-site'
 import { PSMultiselect } from '@pubstudio/frontend/ui-widgets'
 import { useBuild, useToolbar } from '@pubstudio/frontend/feature-build'
-import { setStyleToolbarMenu } from '@pubstudio/frontend/util-command'
+import { setEditorDropdown } from '@pubstudio/frontend/util-command'
 
 const { t } = useI18n()
 const { site, editor } = useBuild()
@@ -59,15 +59,17 @@ const fontWeight = computed(() => {
 })
 
 onMounted(() => {
-  if (editor.value?.styleMenu === StyleToolbarMenu.FontWeight) {
-    setStyleToolbarMenu(editor.value, undefined)
+  if (editor.value?.editorDropdown === EditorDropdown.FontWeight) {
+    setEditorDropdown(editor.value, undefined)
   }
 })
 </script>
 
 <style lang="postcss" scoped>
+@import '@theme/css/mixins.postcss';
+
 .font-weight {
-  width: 104px;
+  width: 50%;
   margin: 0 0 0 4px;
   :deep(.multiselect-placeholder) {
     padding: 0 0 0 6px;
@@ -77,6 +79,9 @@ onMounted(() => {
   }
   :deep(.ms-item) {
     padding: 6px 6px 5px;
+  }
+  :deep(.dropdown) {
+    z-index: $z-index-toolbar-dropdown1;
   }
 }
 </style>

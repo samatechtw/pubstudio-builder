@@ -46,7 +46,7 @@ export const serializeEditor = (
         editorEvents: editor.editorEvents,
         debugBounding: editor.debugBounding,
         buildSubmenu: editor.buildSubmenu,
-        styleMenu: editor.styleMenu,
+        editorDropdown: editor.editorDropdown,
         editBehavior: editor.editBehavior,
         translations: editor.translations,
         themeTab: editor.themeTab,

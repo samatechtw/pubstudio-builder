@@ -74,9 +74,9 @@ The stack represents the entire history of the site, and can be used as a form o
 
 TODO: data integrity/hashing
 
-## Style Toolbar
+## Site Toolbar
 
-The Style Toolbar (`StyleToolbar.vue`) acts as a UI wrapper for setting Component custom styles. The available options are split into sections, which are shown depending on properties of the selected component.
+The Site Toolbar (`SiteToolbar.vue`) acts as a UI wrapper for various site and editor settings.
 
 ### Alignment
 

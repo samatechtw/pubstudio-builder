@@ -1,6 +1,10 @@
 <template>
-  <Transition name="fade">
-    <div v-if="show">
+  <div class="toolbar-text" :class="{ show }">
+    <div class="toolbar-text-row">
+      <FontFamily @mousedown.prevent />
+      <FontWeight :fontFamily="fontFamily" @mousedown.prevent />
+    </div>
+    <div class="toolbar-text-row">
       <ToolbarItem
         :active="isUnderline"
         :tooltip="t('style.toolbar.underline')"
@@ -31,8 +35,6 @@
       >
         <FontColor :color="iconColor" />
       </ToolbarColorPicker>
-      <FontFamily @mousedown.prevent />
-      <FontWeight :fontFamily="fontFamily" @mousedown.prevent />
       <PSInput
         ref="fontSizeRef"
         v-model="fontSize.size"
@@ -50,7 +52,7 @@
         />
       </PSInput>
     </div>
-  </Transition>
+  </div>
 </template>
 
 <script lang="ts" setup>
@@ -66,7 +68,7 @@ import {
 import { PSInput } from '@pubstudio/frontend/ui-widgets'
 import { useControlledClickaway } from '@pubstudio/frontend/util-clickaway'
 import { colorToCssValue } from '@pubstudio/frontend/feature-color-picker'
-import { Css, StyleToolbarMenu } from '@pubstudio/shared/type-site'
+import { Css, EditorDropdown } from '@pubstudio/shared/type-site'
 import { isTextGradient, parseGradientColors } from '@pubstudio/frontend/util-gradient'
 import { ICommand } from '@pubstudio/shared/type-command'
 import FontFamily from '../FontFamily.vue'
@@ -77,7 +79,7 @@ import {
   useThemeColors,
   useToolbarFontSize,
 } from '@pubstudio/frontend/feature-build'
-import { setStyleToolbarMenu } from '@pubstudio/frontend/util-command'
+import { setEditorDropdown } from '@pubstudio/frontend/util-command'
 import ToolbarColorPicker from './ToolbarColorPicker.vue'
 import { IToolbarPickerColor, IToolbarThemedGradient } from './i-toolbar-color-picker'
 
@@ -159,7 +161,7 @@ const setFontColor = (pickerColor: IToolbarPickerColor) => {
     pushGroupCommands({ commands })
   }
 
-  setStyleToolbarMenu(editor.value, undefined)
+  setEditorDropdown(editor.value, undefined)
 }
 
 const setGradient = (pickerGradient: IToolbarThemedGradient) => {
@@ -197,19 +199,19 @@ const setGradient = (pickerGradient: IToolbarThemedGradient) => {
     }
   }
 
-  setStyleToolbarMenu(editor.value, undefined)
+  setEditorDropdown(editor.value, undefined)
 }
 
 const showColorPicker = computed(() => {
-  return editor.value?.styleMenu === StyleToolbarMenu.TextColor
+  return editor.value?.editorDropdown === EditorDropdown.TextColor
 })
 
 const togglePicker = (show: boolean) => {
   if (show) {
-    setStyleToolbarMenu(editor.value, StyleToolbarMenu.TextColor)
+    setEditorDropdown(editor.value, EditorDropdown.TextColor)
     activate()
   } else {
-    setStyleToolbarMenu(editor.value, undefined)
+    setEditorDropdown(editor.value, undefined)
     deactivate()
   }
 }
@@ -264,16 +266,43 @@ onMounted(() => {
 <style lang="postcss" scoped>
 @import '@theme/css/mixins.postcss';
 
+.toolbar-text {
+  @mixin flex-col;
+  align-items: center;
+  background-color: $blue-100;
+  max-height: 0;
+  opacity: 0;
+  transition: all 0.2s ease;
+  &.show {
+    opacity: 1;
+    max-height: 92px;
+  }
+}
+.toolbar-text-row {
+  @mixin flex-row;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  width: 100%;
+  &:first-child {
+    padding: 4px 0 3px;
+  }
+  &:last-child {
+    padding: 3px 0 8px;
+  }
+}
+
 .underline {
   margin-left: 16px;
 }
 
 .font-size {
   display: flex;
-  margin-left: 4px;
+  margin-left: 16px;
   :deep(.ps-input) {
     border: 1px solid $color-light1;
-    width: 70px;
+    width: 100px;
+    height: 36px;
     background-color: rgba(255, 255, 255, 0.8);
     font-size: 14px;
     padding: 9px 0 7px 6px;

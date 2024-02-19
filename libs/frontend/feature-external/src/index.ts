@@ -18,8 +18,8 @@ import {
   ComponentTree,
   PageMenu,
   SitePreview,
+  SiteToolbar,
   StyleMenu,
-  StyleToolbar,
   ThemeMenu,
 } from '@pubstudio/frontend/ui-build'
 import {
@@ -94,7 +94,7 @@ export {
   ComponentMenu,
   ComponentTree,
   PageMenu,
-  StyleToolbar,
+  SiteToolbar,
   SiteErrorModal,
   SitePreview,
   SiteSaveErrorModal,

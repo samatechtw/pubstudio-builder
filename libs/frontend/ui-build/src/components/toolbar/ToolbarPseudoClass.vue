@@ -7,10 +7,10 @@
     :caret="false"
     :clearable="false"
     :tooltip="t('pseudo_class')"
-    :openControl="() => editor?.styleMenu === StyleToolbarMenu.PseudoClass"
+    :openControl="() => editor?.editorDropdown === EditorDropdown.PseudoClass"
     @select="updatePseudoClass"
-    @open="setStyleToolbarMenu(editor, StyleToolbarMenu.PseudoClass)"
-    @close="setStyleToolbarMenu(editor, undefined)"
+    @open="setEditorDropdown(editor, EditorDropdown.PseudoClass)"
+    @close="setEditorDropdown(editor, undefined)"
     @click.stop
   />
 </template>
@@ -19,12 +19,12 @@
 import { onMounted } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { useBuild } from '@pubstudio/frontend/feature-build'
-import { setStyleToolbarMenu, setCssPseudoClass } from '@pubstudio/frontend/util-command'
+import { setEditorDropdown, setCssPseudoClass } from '@pubstudio/frontend/util-command'
 import { PSMultiselect } from '@pubstudio/frontend/ui-widgets'
 import {
   CssPseudoClass,
   CssPseudoClassValues,
-  StyleToolbarMenu,
+  EditorDropdown,
 } from '@pubstudio/shared/type-site'
 
 const { t } = useI18n()
@@ -37,8 +37,8 @@ const updatePseudoClass = (value: CssPseudoClass | undefined) => {
 }
 
 onMounted(() => {
-  if (editor.value?.styleMenu === StyleToolbarMenu.PseudoClass) {
-    setStyleToolbarMenu(editor.value, undefined)
+  if (editor.value?.editorDropdown === EditorDropdown.PseudoClass) {
+    setEditorDropdown(editor.value, undefined)
   }
 })
 </script>

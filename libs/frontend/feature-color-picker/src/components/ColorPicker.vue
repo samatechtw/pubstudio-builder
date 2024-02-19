@@ -358,7 +358,7 @@ onMounted(async () => {
   background: #1d2024;
   border-radius: 4px;
   box-shadow: 0 0 16px 0 rgba(0, 0, 0, 0.16);
-  z-index: $z-index-toolbar-dropdown;
+  z-index: $z-index-toolbar-dropdown1;
   position: absolute;
   &.gradient {
     flex-direction: row;

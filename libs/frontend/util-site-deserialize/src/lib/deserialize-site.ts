@@ -28,7 +28,7 @@ export const deserializeEditor = (
         editorEvents: serializedEditor.editorEvents ?? {},
         debugBounding: serializedEditor.debugBounding,
         buildSubmenu: serializedEditor.buildSubmenu,
-        styleMenu: serializedEditor.styleMenu,
+        editorDropdown: serializedEditor.editorDropdown,
         editBehavior: serializedEditor.editBehavior,
         translations: serializedEditor.translations,
         themeTab: serializedEditor.themeTab,

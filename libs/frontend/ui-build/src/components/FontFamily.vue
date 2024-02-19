@@ -9,13 +9,13 @@
     :caret="false"
     toggleId="style-menu"
     :emptyText="t('style.toolbar.no_fonts')"
-    :openControl="() => editor?.styleMenu === StyleToolbarMenu.FontFamily"
+    :openControl="() => editor?.editorDropdown === EditorDropdown.FontFamily"
     class="font-family-select"
     :class="{ inherited }"
     @select="setFontFamily"
     @selectEmpty="showFontMenu"
-    @open="setStyleToolbarMenu(editor, StyleToolbarMenu.FontFamily)"
-    @close="setStyleToolbarMenu(editor, undefined)"
+    @open="setEditorDropdown(editor, EditorDropdown.FontFamily)"
+    @close="setEditorDropdown(editor, undefined)"
   >
     <div
       :class="{ 'add-font': label === addFontText }"
@@ -32,14 +32,14 @@ import { useI18n } from 'petite-vue-i18n'
 import { PSMultiselect } from '@pubstudio/frontend/ui-widgets'
 import {
   Css,
+  EditorDropdown,
   EditorMode,
   StyleSourceType,
-  StyleToolbarMenu,
   ThemeTab,
 } from '@pubstudio/shared/type-site'
 import { useBuild, useToolbar } from '@pubstudio/frontend/feature-build'
 import {
-  setStyleToolbarMenu,
+  setEditorDropdown,
   setThemeTab,
   toggleEditorMenu,
 } from '@pubstudio/frontend/util-command'
@@ -85,8 +85,8 @@ const font = (label: string) => {
 
 onMounted(() => {
   // TODO -- why is this necessary, is there a better way to handle it?
-  if (editor.value?.styleMenu === StyleToolbarMenu.FontFamily) {
-    setStyleToolbarMenu(editor.value, undefined)
+  if (editor.value?.editorDropdown === EditorDropdown.FontFamily) {
+    setEditorDropdown(editor.value, undefined)
   }
 })
 </script>
@@ -96,13 +96,16 @@ onMounted(() => {
 
 .font-family-select {
   @mixin title-medium 13px;
-  width: 110px;
+  width: 50%;
   margin: 0 0 0 4px;
   :deep(.multiselect-placeholder) {
     padding: 0 0 0 6px;
   }
   :deep(.multiselect-single-label) {
     padding: 0 0 0 6px;
+  }
+  :deep(.dropdown) {
+    z-index: $z-index-toolbar-dropdown1;
   }
 }
 .add-font {
