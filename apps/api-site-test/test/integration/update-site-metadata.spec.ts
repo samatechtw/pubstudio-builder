@@ -1,5 +1,7 @@
+import { SiteType } from '@pubstudio/shared/type-api-platform-site'
 import {
   IGetSiteDomainsApiResponse,
+  IListSitesApiResponse,
   IUpdateSiteMetadataApiRequest,
 } from '@pubstudio/shared/type-api-site-sites'
 import { SiteApiResetService } from '@pubstudio/shared/util-test-reset'
@@ -14,88 +16,134 @@ describe('Update Site Metadata', () => {
   let api: TestAgent
   let resetService: SiteApiResetService
   let adminAuth: string
+  let ownerAuth: string
   let payload: IUpdateSiteMetadataApiRequest
   let siteId: string
-  let ownerId: string
 
   beforeAll(() => {
     api = supertest(testConfig.get('apiUrl'))
     adminAuth = adminAuthHeader()
+    ownerAuth = ownerAuthHeader('903b3c28-deaa-45dc-a43f-511fe965d34e')
     resetService = new SiteApiResetService('http://127.0.0.1:3100', adminAuth, SITE_SEEDS)
   })
 
   beforeEach(async () => {
     await resetService.reset()
-    ownerId = '903b3c28-deaa-45dc-a43f-511fe965d34e'
     siteId = '6d2c8359-6094-402c-bcbb-37202fd7c336'
     payload = { domains: ['update-subdomain.dev.pubstud.io', 'shop.abc.com'] }
   })
 
-  it('updates site and verifies result when requester is admin', async () => {
-    await api
-      .patch(`${testEndpoint}/${siteId}`)
-      .set('Authorization', adminAuth)
-      .send(payload)
-      .expect(200)
+  describe('when requester is admin', () => {
+    it('returns 200 status and message when update metadata', async () => {
+      await api
+        .patch(`${testEndpoint}/${siteId}`)
+        .set('Authorization', adminAuth)
+        .send(payload)
+        .expect(200)
 
-    // Verify domains are updated
-    const getResponse = await api
-      .get(`/api/sites/${siteId}/domains`)
-      .set('Authorization', adminAuth)
-      .expect(200)
-    const getBody: IGetSiteDomainsApiResponse = getResponse.body
+      // Verify domains are updated
+      const getResponse = await api
+        .get(`/api/sites/${siteId}/domains`)
+        .set('Authorization', adminAuth)
+        .expect(200)
+      const getBody: IGetSiteDomainsApiResponse = getResponse.body
 
-    expect(getBody.domains).toEqual(payload.domains)
-  })
-
-  it('disables site and verifies it cannot be retrieved', async () => {
-    payload = {
-      disabled: true,
-    }
-    await api
-      .patch(`${testEndpoint}/${siteId}`)
-      .set('Authorization', adminAuth)
-      .send(payload)
-      .expect(200)
-
-    // Verify owner can no longer access
-    const ownerAuth = ownerAuthHeader(ownerId)
-    await api.get(`/api/sites/${siteId}`).set('Authorization', ownerAuth).expect(403, {
-      code: 'SiteDisabled',
-      message: 'Forbidden',
-      status: 403,
+      expect(getBody.domains).toEqual(payload.domains)
     })
 
-    // Verify anonymous can no longer access
-    await api.get('/api/sites/current').set('Host', 'www.myblog.org').expect(403, {
-      code: 'SiteDisabled',
-      message: 'Forbidden',
-      status: 403,
+    it('returns 200 status and message when update site type', async () => {
+      payload.site_type = SiteType.Paid1
+      await api
+        .patch(`${testEndpoint}/${siteId}`)
+        .set('Authorization', adminAuth)
+        .send(payload)
+        .expect(200)
+
+      // Verify site_type is updated
+      const getResponse = await api
+        .get(`/api/sites`)
+        .set('Authorization', adminAuth)
+        .expect(200)
+      const body: IListSitesApiResponse = getResponse.body
+      const targetSite = body.find((site) => site.id.toString() == siteId)
+
+      expect(targetSite?.site_type).toEqual(payload.site_type)
+    })
+
+    it('disables site and verifies it cannot be retrieved', async () => {
+      payload = {
+        disabled: true,
+      }
+      await api
+        .patch(`${testEndpoint}/${siteId}`)
+        .set('Authorization', adminAuth)
+        .send(payload)
+        .expect(200)
+
+      // Verify owner can no longer access
+      await api.get(`/api/sites/${siteId}`).set('Authorization', ownerAuth).expect(403, {
+        code: 'SiteDisabled',
+        message: 'Forbidden',
+        status: 403,
+      })
+
+      // Verify anonymous can no longer access
+      await api.get('/api/sites/current').set('Host', 'www.myblog.org').expect(403, {
+        code: 'SiteDisabled',
+        message: 'Forbidden',
+        status: 403,
+      })
     })
   })
 
-  it('updates metadata and verifies result when requester is owner', async () => {
-    const ownerAuth = ownerAuthHeader(ownerId)
-    await api
-      .patch(`${testEndpoint}/${siteId}`)
-      .set('Authorization', ownerAuth)
-      .send(payload)
-      .expect(200)
+  describe('when requester is owner', () => {
+    it('returns 200 status and message when update metadata', async () => {
+      await api
+        .patch(`${testEndpoint}/${siteId}`)
+        .set('Authorization', ownerAuth)
+        .send(payload)
+        .expect(200)
 
-    // Verify domains are updated
-    const getResponse = await api
-      .get(`/api/sites/${siteId}/domains`)
-      .set('Authorization', adminAuth)
-      .expect(200)
-    const getBody: IGetSiteDomainsApiResponse = getResponse.body
+      // Verify domains are updated
+      const getResponse = await api
+        .get(`/api/sites/${siteId}/domains`)
+        .set('Authorization', adminAuth)
+        .expect(200)
+      const getBody: IGetSiteDomainsApiResponse = getResponse.body
 
-    expect(getBody.domains).toEqual(payload.domains)
+      expect(getBody.domains).toEqual(payload.domains)
+    })
+
+    it('returns 403 when updates site_type', () => {
+      payload.site_type = SiteType.Paid1
+      return api
+        .patch(`${testEndpoint}/${siteId}`)
+        .send(payload)
+        .set('Authorization', ownerAuth)
+        .expect(403, {
+          code: 'None',
+          message: 'Forbidden',
+          status: 403,
+        })
+    })
+
+    it('returns 403 when owner updates disabled', () => {
+      payload.disabled = true
+      return api
+        .patch(`${testEndpoint}/${siteId}`)
+        .send(payload)
+        .set('Authorization', ownerAuth)
+        .expect(403, {
+          code: 'None',
+          message: 'Forbidden',
+          status: 403,
+        })
+    })
   })
 
   describe('when request is not valid', () => {
     it('when user is other owner', () => {
       const ownerAuth = ownerAuthHeader('0c069253-e45d-487c-b7c0-cbe467c33a10')
-
       return api
         .patch(`${testEndpoint}/${siteId}`)
         .send(payload)
@@ -109,25 +157,10 @@ describe('Update Site Metadata', () => {
 
     it('when user is not authorized', () => {
       const ownerAuth = ownerAuthHeader('ecee2f88-024b-467b-81ec-bf92b06c86e1')
-
       return api
         .patch(`${testEndpoint}/${siteId}`)
         .set('Authorization', ownerAuth)
         .send(payload)
-        .expect(403, {
-          code: 'None',
-          message: 'Forbidden',
-          status: 403,
-        })
-    })
-
-    it('when owner updates disabled', () => {
-      payload.disabled = true
-      const ownerAuth = ownerAuthHeader(ownerId)
-      return api
-        .patch(`${testEndpoint}/${siteId}`)
-        .send(payload)
-        .set('Authorization', ownerAuth)
         .expect(403, {
           code: 'None',
           message: 'Forbidden',

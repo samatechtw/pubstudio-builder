@@ -137,7 +137,7 @@ impl SitesMetadataRepoTrait for SitesMetadataRepo {
         let (mut query, count) = append_comma(query, "disabled", dto.disabled, count);
 
         if count == 0 {
-            return Err(DbError::NoUpdate);
+            return Ok(());
         }
 
         query.push(" WHERE id = ");
