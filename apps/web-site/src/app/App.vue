@@ -174,6 +174,10 @@ body {
   }
 }
 
+.pm-p {
+  word-wrap: break-word;
+  white-space: pre-wrap;
+}
 .pm-p::after {
   content: '\200b';
 }

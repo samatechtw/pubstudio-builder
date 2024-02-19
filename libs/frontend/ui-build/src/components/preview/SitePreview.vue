@@ -102,6 +102,10 @@ html {
       flex-shrink: 0;
     }
   }
+  .pm-p {
+    word-wrap: break-word;
+    white-space: pre-wrap;
+  }
   .pm-p::after {
     content: '\200b';
   }

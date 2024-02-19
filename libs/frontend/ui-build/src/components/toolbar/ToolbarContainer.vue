@@ -199,7 +199,7 @@ const showBackgroundPicker = computed(() => {
 
 const togglePicker = (show: boolean) => {
   if (show) {
-    setEditorDropdown(editor.value, EditorDropdownBackgroundColor)
+    setEditorDropdown(editor.value, EditorDropdown.BackgroundColor)
     activate()
   } else {
     setEditorDropdown(editor.value, undefined)
