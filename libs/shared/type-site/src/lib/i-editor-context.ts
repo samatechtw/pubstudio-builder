@@ -28,7 +28,7 @@ export enum ComponentMenuCollapsible {
   ChildStyles = 'childStyles',
 }
 
-export enum StyleToolbarMenu {
+export enum EditorDropdown {
   BackgroundColor = 'bgColor',
   TextColor = 'textColor',
   FontFamily = 'fontFamily',
@@ -115,8 +115,8 @@ export interface IEditorContext {
   mode: EditorMode
   // Active Build submenu
   buildSubmenu?: BuildSubmenu
-  // Style toolbar active dropdown menu
-  styleMenu?: StyleToolbarMenu
+  // Editor active dropdown menu
+  editorDropdown?: EditorDropdown
   // Saved state of behavior edit modal
   editBehavior?: IEditBehavior
   // Saved state of SVG edit modal

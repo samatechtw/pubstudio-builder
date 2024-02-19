@@ -1,23 +1,42 @@
 <template>
-  <Transition name="fade">
-    <div v-if="show" class="toolbar-container">
-      <ToolbarItemDropdown :items="alignHorizontalItems" />
-      <ToolbarItemDropdown :items="alignVerticalItems" />
-      <ToolbarColorPicker
-        :tooltip="t('style.toolbar.background_color')"
-        :color="getRawOrSelectedStyle(Css.BackgroundColor)"
-        :gradient="getRawStyle(Css.Background)"
-        :showPicker="showBackgroundPicker"
-        :selectedThemeColors="selectedThemeColors"
-        class="toolbar-menu"
-        @selectColor="setBackgroundColor($event)"
-        @applyGradient="setGradientBackground($event)"
-        @click.stop="togglePicker(!showBackgroundPicker)"
-      >
-        <BackgroundColor :fill="iconColor" />
-      </ToolbarColorPicker>
-    </div>
-  </Transition>
+  <div class="toolbar-container">
+    <ToolbarItemDropdown :items="alignHorizontalItems" />
+    <ToolbarItemDropdown :items="alignVerticalItems" />
+    <ToolbarColorPicker
+      :tooltip="t('style.toolbar.background_color')"
+      :color="getRawOrSelectedStyle(Css.BackgroundColor)"
+      :gradient="getRawStyle(Css.Background)"
+      :showPicker="showBackgroundPicker"
+      :selectedThemeColors="selectedThemeColors"
+      class="toolbar-menu"
+      @selectColor="setBackgroundColor($event)"
+      @applyGradient="setGradientBackground($event)"
+      @click.stop="togglePicker(!showBackgroundPicker)"
+    >
+      <BackgroundColor :fill="iconColor" />
+    </ToolbarColorPicker>
+    <ToolbarItem
+      :active="isColumn"
+      :tooltip="t('style.toolbar.flex_vertical')"
+      @click="toggleDirection('column')"
+    >
+      <FlexColumn />
+    </ToolbarItem>
+    <ToolbarItem
+      :active="isRow"
+      :tooltip="t('style.toolbar.flex_horizontal')"
+      @click="toggleDirection('row')"
+    >
+      <FlexRow />
+    </ToolbarItem>
+    <ToolbarItem
+      :active="isWrap"
+      :tooltip="t('style.toolbar.flex_wrap')"
+      @click="toggleWrap"
+    >
+      <FlexWrap />
+    </ToolbarItem>
+  </div>
 </template>
 
 <script lang="ts" setup>
@@ -33,6 +52,10 @@ import {
   BackgroundColor,
   ToolbarItemDropdown,
   IToolbarDropdownItem,
+  ToolbarItem,
+  FlexColumn,
+  FlexWrap,
+  FlexRow,
 } from '@pubstudio/frontend/ui-widgets'
 import { colorToCssValue } from '@pubstudio/frontend/feature-color-picker'
 import {
@@ -40,10 +63,11 @@ import {
   parseGradientColors,
 } from '@pubstudio/frontend/util-gradient'
 import { useControlledClickaway } from '@pubstudio/frontend/util-clickaway'
-import { Css, StyleToolbarMenu } from '@pubstudio/shared/type-site'
+import { Css, EditorDropdown } from '@pubstudio/shared/type-site'
 import { ICommand } from '@pubstudio/shared/type-command'
 import { useBuild, useToolbar, useThemeColors } from '@pubstudio/frontend/feature-build'
-import { setStyleToolbarMenu } from '@pubstudio/frontend/util-command'
+import { setEditorDropdown } from '@pubstudio/frontend/util-command'
+
 import ToolbarColorPicker from './ToolbarColorPicker.vue'
 import { IToolbarPickerColor, IToolbarThemedGradient } from './i-toolbar-color-picker'
 
@@ -120,7 +144,7 @@ const setBackgroundColor = (pickerColor: IToolbarPickerColor) => {
     pushGroupCommands({ commands })
   }
 
-  setStyleToolbarMenu(editor.value, undefined)
+  setEditorDropdown(editor.value, undefined)
 }
 
 const setGradientBackground = (pickerGradient: IToolbarThemedGradient) => {
@@ -160,7 +184,7 @@ const setGradientBackground = (pickerGradient: IToolbarThemedGradient) => {
     pushGroupCommands({ commands })
   }
 
-  setStyleToolbarMenu(editor.value, undefined)
+  setEditorDropdown(editor.value, undefined)
 }
 
 const { activate, deactivate } = useControlledClickaway(
@@ -170,15 +194,15 @@ const { activate, deactivate } = useControlledClickaway(
 )
 
 const showBackgroundPicker = computed(() => {
-  return editor.value?.styleMenu === StyleToolbarMenu.BackgroundColor
+  return editor.value?.editorDropdown === EditorDropdown.BackgroundColor
 })
 
 const togglePicker = (show: boolean) => {
   if (show) {
-    setStyleToolbarMenu(editor.value, StyleToolbarMenu.BackgroundColor)
+    setEditorDropdown(editor.value, EditorDropdownBackgroundColor)
     activate()
   } else {
-    setStyleToolbarMenu(editor.value, undefined)
+    setEditorDropdown(editor.value, undefined)
     deactivate()
   }
 }
@@ -335,9 +359,24 @@ const iconColor = computed(() => {
   return gradientColors[0]?.rgba ?? backgroundColor
 })
 
-defineProps<{
-  show: boolean
-}>()
+const isWrap = computed(() => {
+  return getStyleValue(Css.FlexWrap) === 'wrap'
+})
+
+const toggleWrap = () => {
+  const value = isWrap.value ? undefined : 'wrap'
+  setStyleEnsureFlex(Css.FlexWrap, value)
+}
+
+const isRow = computed(() => {
+  return getStyleValue(Css.FlexDirection) === 'row'
+})
+
+const toggleDirection = (value: string) => {
+  if (getStyleValue(Css.FlexDirection) !== value) {
+    setStyleEnsureFlex(Css.FlexDirection, value)
+  }
+}
 
 onMounted(() => {
   if (showBackgroundPicker.value) {
@@ -349,6 +388,11 @@ onMounted(() => {
 <style lang="postcss" setup>
 @import '@theme/css/mixins.postcss';
 
+.toolbar-container {
+  display: flex;
+  justify-content: center;
+  padding: 6px 0 2px;
+}
 .background-item {
   position: relative;
 }

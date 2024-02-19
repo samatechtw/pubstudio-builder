@@ -18,8 +18,10 @@
     />
     <template v-else>
       <ComponentTabInfo :component="component" />
-      <ComponentDimensions />
+      <ToolbarText :show="showTextStyle" />
+      <ToolbarContainer />
       <ComponentFlex />
+      <ComponentDimensions />
       <ComponentTabStyle :component="component" />
       <ComponentInputs
         :component="component"
@@ -66,6 +68,7 @@
 import { computed, toRefs } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { PSButton, InfoBubble } from '@pubstudio/frontend/ui-widgets'
+import { prosemirrorEditing } from '@pubstudio/frontend/util-edit-text'
 import { IComponent } from '@pubstudio/shared/type-site'
 import { noBehaviorId } from '@pubstudio/frontend/util-ids'
 import { serializeComponent } from '@pubstudio/frontend/util-site-store'
@@ -86,6 +89,8 @@ import ComponentEvents from './ComponentEvents.vue'
 import ComponentEventEdit from './ComponentEventEdit.vue'
 import StyleMenuEdit from '../StyleMenuEdit.vue'
 import ComponentFlex from './ComponentFlex.vue'
+import ToolbarContainer from '../toolbar/ToolbarContainer.vue'
+import ToolbarText from '../toolbar/ToolbarText.vue'
 
 const { t } = useI18n()
 const { editor, replacePageRoot } = useBuild()
@@ -140,6 +145,13 @@ const replaceRootWithCopiedComponent = () => {
     editor.value.copiedComponent = undefined
   }
 }
+
+const showTextStyle = computed(() => {
+  return (
+    editor.value?.selectedComponent?.content !== undefined ||
+    prosemirrorEditing(editor.value)
+  )
+})
 </script>
 
 <style lang="postcss" scoped>

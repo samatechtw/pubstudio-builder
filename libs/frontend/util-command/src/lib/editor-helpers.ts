@@ -4,13 +4,13 @@ import {
   ComponentMenuCollapsible,
   ComponentTabState,
   CssPseudoClass,
+  EditorDropdown,
   EditorMode,
   IComponent,
   IEditBehavior,
   IEditingMixinData,
   IEditorContext,
   IEditSvg,
-  StyleToolbarMenu,
   ThemeTab,
 } from '@pubstudio/shared/type-site'
 
@@ -56,13 +56,13 @@ export const setBuildSubmenu = (
   }
 }
 
-export const setStyleToolbarMenu = (
+export const setEditorDropdown = (
   editor: IEditorContext | undefined,
-  menu: StyleToolbarMenu | undefined,
+  menu: EditorDropdown | undefined,
 ) => {
   if (editor) {
-    const prevMenu = editor.styleMenu
-    editor.styleMenu = menu
+    const prevMenu = editor.editorDropdown
+    editor.editorDropdown = menu
     if (menu !== prevMenu) {
       editor.store?.saveEditor(editor)
     }

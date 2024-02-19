@@ -12,7 +12,7 @@ import {
   clearComponentTabState,
   editingCommandCount,
   setBuildSubmenu,
-  setStyleToolbarMenu,
+  setEditorDropdown,
 } from '@pubstudio/frontend/util-command'
 import { resolvedComponentStyle } from '@pubstudio/frontend/util-component'
 import { isDynamicComponent } from '@pubstudio/frontend/util-ids'
@@ -212,8 +212,8 @@ export const useBuildEvent = () => {
       // the input has lost focus. i.e. clicking on the hide/show button of the
       // same component in the tree during rename.
       runtimeContext.componentTreeItemRenameData.value.renaming = false
-    } else if (editor.value?.styleMenu) {
-      setStyleToolbarMenu(editor.value, undefined)
+    } else if (editor.value?.editorDropdown) {
+      setEditorDropdown(editor.value, undefined)
     } else if (editor.value?.buildSubmenu) {
       setBuildSubmenu(editor.value, undefined)
     } else if (

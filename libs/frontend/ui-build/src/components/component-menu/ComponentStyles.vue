@@ -40,9 +40,9 @@ import { resolveThemeVariables } from '@pubstudio/frontend/util-builtin'
 import {
   ComponentMenuCollapsible,
   Css,
+  EditorDropdown,
   IInheritedStyleEntry,
   StyleSourceType,
-  StyleToolbarMenu,
 } from '@pubstudio/shared/type-site'
 import { IconTooltipDelay, ScaleIn } from '@pubstudio/frontend/ui-widgets'
 import {
@@ -51,7 +51,7 @@ import {
   useEditComponentStyles,
 } from '@pubstudio/frontend/feature-build'
 import {
-  setStyleToolbarMenu,
+  setEditorDropdown,
   setComponentMenuCollapses,
 } from '@pubstudio/frontend/util-command'
 import StyleRow from '../StyleRow.vue'
@@ -129,10 +129,10 @@ const styleRowHeight = computed(() => {
 
 const clickSubTitle = () => {
   const newVal =
-    editor.value?.styleMenu === StyleToolbarMenu.PseudoClass
+    editor.value?.editorDropdown === EditorDropdown.PseudoClass
       ? undefined
-      : StyleToolbarMenu.PseudoClass
-  setStyleToolbarMenu(editor.value, newVal)
+      : EditorDropdown.PseudoClass
+  setEditorDropdown(editor.value, newVal)
 }
 
 const convertToMixin = () => {

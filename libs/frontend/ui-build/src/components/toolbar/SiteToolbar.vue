@@ -25,8 +25,6 @@
     >
       <Redo />
     </ToolbarItem>
-    <ToolbarContainer :show="showContainer" class="toolbar-section" />
-    <ToolbarText :show="showTextStyle" class="toolbar-section" />
     <ToolbarPage class="toolbar-page" />
     <ToolbarBreakpoint class="toolbar-breakpoint" />
     <ToolbarPseudoClass class="toolbar-pseudo-class" />
@@ -68,10 +66,9 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { useBuild, useHistory } from '@pubstudio/frontend/feature-build'
-import { prosemirrorEditing } from '@pubstudio/frontend/util-edit-text'
 import { setDebugBounding, setShowComponentTree } from '@pubstudio/frontend/util-command'
 import {
   BoundingBox,
@@ -84,8 +81,6 @@ import {
 } from '@pubstudio/frontend/ui-widgets'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { CommandType } from '@pubstudio/shared/type-command'
-import ToolbarText from './ToolbarText.vue'
-import ToolbarContainer from './ToolbarContainer.vue'
 import ToolbarPage from './ToolbarPage.vue'
 import ToolbarPseudoClass from './ToolbarPseudoClass.vue'
 import ToolbarBuilderWidth from './ToolbarBuilderWidth.vue'
@@ -106,17 +101,6 @@ const { siteStore, isSaving } = useSiteSource()
 const { canUndo, canRedo, undo, redo } = useHistory()
 const { apiSiteId } = useSiteSource()
 const showBugReportModal = ref(false)
-
-const showTextStyle = computed(() => {
-  return (
-    editor.value?.selectedComponent?.content !== undefined ||
-    prosemirrorEditing(editor.value)
-  )
-})
-
-const showContainer = computed(() => {
-  return !!editor.value?.selectedComponent
-})
 
 const toggleComponentTree = () => {
   if (editor.value) {
