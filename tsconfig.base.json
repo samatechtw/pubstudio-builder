@@ -87,6 +87,7 @@
       "@pubstudio/shared/type-api-platform-user": [
         "libs/shared/type-api-platform-user/src/index.ts"
       ],
+      "@pubstudio/shared/type-api-shared": ["libs/shared/type-api-shared/src/index.ts"],
       "@pubstudio/shared/type-api-site-backup": [
         "libs/shared/type-api-site-backup/src/index.ts"
       ],

@@ -21,11 +21,10 @@ pub async fn update_site_metadata(
 ) -> Result<(), ApiError> {
     verify_site_owner(&context, &user, &id).await?;
 
+    let admin_or_cron = user.user_type == UserType::Admin || user.user_type == UserType::Cron;
+
     // Owner can only update domains
-    if dto.disabled.is_some()
-        && user.user_type != UserType::Admin
-        && user.user_type != UserType::Cron
-    {
+    if (dto.disabled.is_some() || dto.site_type.is_some()) && !admin_or_cron {
         return Err(ApiError::forbidden());
     }
 
@@ -33,9 +32,6 @@ pub async fn update_site_metadata(
         validate_custom_domains(domains)?;
     }
 
-    if !dto.domains.is_some() && !dto.disabled.is_some() {
-        return Ok(());
-    }
     let mut tx = context
         .metadata_repo
         .start_transaction()
@@ -44,15 +40,11 @@ pub async fn update_site_metadata(
             ApiError::internal_error().message(format!("Failed to save domains: {}", e))
         })?;
 
-    if dto.disabled.is_some() {
-        context
-            .metadata_repo
-            .update_site_metadata(&mut tx, &id, &dto)
-            .await
-            .map_err(|e| {
-                ApiError::internal_error().message(format!("Failed to update site: {}", e))
-            })?;
-    }
+    context
+        .metadata_repo
+        .update_site_metadata(&mut tx, &id, &dto)
+        .await
+        .map_err(|e| ApiError::internal_error().message(format!("Failed to update site: {}", e)))?;
 
     if let Some(domains) = &dto.domains {
         context
