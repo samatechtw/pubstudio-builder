@@ -27,45 +27,66 @@ describe('Publish Site', () => {
   beforeEach(async () => {
     ownerId = '903b3c28-deaa-45dc-a43f-511fe965d34e'
     siteId = '6d2c8359-6094-402c-bcbb-37202fd7c336'
-    payload = { version_id: 1 }
+    payload = { publish: true }
     await resetService.reset()
   })
 
-  it('returns 200 status code when requester is admin', async () => {
+  const verifyPublished = async (siteId: string, published: boolean) => {
     const response = await api
+      .get(`${testEndpoint}/${siteId}`)
+      .set('Authorization', adminAuth)
+      .expect(200)
+    const body: IGetSiteApiResponse = response.body
+    expect(body.published).toEqual(published)
+  }
+
+  it('publishes site when requester is admin', async () => {
+    await api
       .post(`${testEndpoint}/${siteId}/actions/publish`)
       .send(payload)
       .set('Authorization', adminAuth)
+      .expect(204)
 
-    const body: IGetSiteApiResponse = response.body
-
-    expect(response.status).toBe(200)
-    expect(body.published).toEqual(true)
+    await verifyPublished(siteId, true)
   })
 
-  it('returns 200 status code when requester is owner', async () => {
-    const ownerAuth = ownerAuthHeader(ownerId)
+  describe('when requestor is Owner', () => {
+    let ownerAuth: string
 
-    const response = await api
-      .post(`${testEndpoint}/${siteId}/actions/publish`)
-      .send(payload)
-      .set('Authorization', ownerAuth)
+    beforeEach(async () => {
+      ownerAuth = ownerAuthHeader(ownerId)
+    })
 
-    const body: IGetSiteApiResponse = response.body
+    it('publishes site when requester is owner', async () => {
+      await api
+        .post(`${testEndpoint}/${siteId}/actions/publish`)
+        .send(payload)
+        .set('Authorization', ownerAuth)
 
-    expect(response.status).toBe(200)
-    expect(body.published).toEqual(true)
+      await verifyPublished(siteId, true)
+    })
+
+    it('unpublishes site when requester is owner', async () => {
+      payload.publish = false
+
+      await api
+        .post(`${testEndpoint}/${siteId}/actions/publish`)
+        .send(payload)
+        .set('Authorization', ownerAuth)
+
+      await verifyPublished(siteId, false)
+    })
   })
 
-  it('returns 400 status code when request is not valid', async () => {
-    // Set an invalid version_id
-    payload.version_id = -1
+  // TODO -- add test for site with draft
 
-    const response = await api
-      .post(`${testEndpoint}/${siteId}/actions/publish`)
-      .send(payload)
-      .set('Authorization', adminAuth)
-
-    expect(response.status).toBe(400)
+  describe('when requester is Anonymous', () => {
+    it('returns 403 error', async () => {
+      await api.get(`${testEndpoint}/${siteId}`).expect(401, {
+        code: 'Unauthorized',
+        message: 'Unauthorized',
+        status: 401,
+      })
+    })
   })
 })

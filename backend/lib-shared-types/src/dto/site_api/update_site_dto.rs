@@ -15,7 +15,6 @@ pub struct UpdateSiteDto {
     pub editor: Option<serde_json::Value>,
     pub history: Option<serde_json::Value>,
     pub pages: Option<serde_json::Value>,
-    pub published: Option<bool>,
     pub disabled: Option<bool>,
     #[validate(regex = "REGEX_DATE")]
     pub update_key: Option<String>,
