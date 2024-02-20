@@ -9,8 +9,7 @@ use lib_shared_types::{
     dto::{
         query_dto::ListQuery,
         site_api::{
-            create_site_dto::CreateSiteDto, publish_site_dto::PublishSiteDto,
-            update_site_dto::UpdateSiteDtoWithContentUpdatedAt,
+            create_site_dto::CreateSiteDto, update_site_dto::UpdateSiteDtoWithContentUpdatedAt,
         },
     },
     entity::site_api::{site_entity::SiteEntity, site_metadata_entity::SiteMetadataEntity},
@@ -55,7 +54,8 @@ pub trait SiteRepoTrait {
         id: &str,
         req: UpdateSiteDtoWithContentUpdatedAt,
     ) -> Result<SiteEntity, DbError>;
-    async fn publish_site(&self, id: &str, req: PublishSiteDto) -> Result<SiteEntity, DbError>;
+    async fn publish_site(&self, id: &str) -> Result<(), DbError>;
+    async fn publish_all_versions(&self, id: &str, published: bool) -> Result<(), DbError>;
     async fn export_backup(&self, id: &str) -> Result<Vec<u8>, DbError>;
     async fn import_backup(&self, id: &str, backup_data: Vec<u8>) -> Result<(), DbError>;
 }
@@ -194,8 +194,6 @@ impl SiteRepoTrait for SiteRepo {
         let (query, update_count) = append_comma(query, "editor", req.dto.editor, update_count);
         let (query, update_count) = append_comma(query, "history", req.dto.history, update_count);
         let (query, update_count) = append_comma(query, "pages", req.dto.pages, update_count);
-        let (query, update_count) =
-            append_comma(query, "published", req.dto.published, update_count);
         let (mut query, update_count) = append_comma(
             query,
             "content_updated_at",
@@ -289,58 +287,74 @@ impl SiteRepoTrait for SiteRepo {
         }
     }
 
-    async fn publish_site(&self, id: &str, req: PublishSiteDto) -> Result<SiteEntity, DbError> {
+    async fn publish_all_versions(&self, id: &str, published: bool) -> Result<(), DbError> {
         let pool = self.get_db_pool(id).await?;
 
-        // Start an sqlx transaction
-        let mut transaction = pool.begin().await?;
-
-        // Set published = false for the current published version (if one exists)
         sqlx::query(
             r#"
                UPDATE site_versions
-               SET published = FALSE
-               WHERE published = TRUE
+               SET published = ?
             "#,
         )
-        .execute(&mut transaction)
+        .bind(published)
+        .execute(&pool)
         .await?;
+        Ok(())
+    }
 
-        // Set published = true for the specified site_id
-        let site = sqlx::query(formatcp!(
+    async fn publish_site(&self, id: &str) -> Result<(), DbError> {
+        let pool = self.get_db_pool(id).await?;
+
+        let mut sites = sqlx::query(formatcp!(
             r#"
-                UPDATE site_versions
-                SET published = true
-                WHERE id = ?
-                RETURNING {}
-            "#,
+            SELECT {}
+            FROM site_versions
+            ORDER BY id DESC
+            LIMIT 2
+        "#,
             SITE_COLUMNS
         ))
-        .bind(req.version_id)
         .try_map(map_to_site_entity)
-        .fetch_one(&mut transaction)
-        .await?;
+        .fetch_all(&pool)
+        .await
+        .map_err(|e| DbError::Query(e.to_string()))?
+        .into_iter();
+        if sites.len() < 2 {
+            return Err(DbError::EntityNotFound());
+        }
+        let published_site = sites.next().ok_or(DbError::EntityNotFound())?;
+        let draft = sites.next().ok_or(DbError::EntityNotFound())?;
 
-        // if the latest site version is published, create a new version and copy data from the latest version
-        sqlx::query(
-            r#"
-            INSERT INTO site_versions (name, version, context, defaults, editor, history, pages, published, content_updated_at)
-            SELECT name, version, context, defaults, editor, history, pages, false, content_updated_at
-            FROM site_versions
-            WHERE id = (
-                SELECT MAX(id)
-                FROM site_versions
-            )
-            AND published = true
-            "#,
-        )
-        .execute(&mut transaction)
-        .await?;
+        let query = QueryBuilder::new("UPDATE site_versions SET");
+        let update_count = 0;
 
-        // Commit the transaction
-        transaction.commit().await?;
+        let (query, update_count) =
+            append_comma(query, "version", Some(draft.version), update_count);
+        let (query, update_count) =
+            append_comma(query, "context", Some(draft.context), update_count);
+        let (query, update_count) =
+            append_comma(query, "defaults", Some(draft.defaults), update_count);
+        let (query, update_count) = append_comma(query, "editor", Some(draft.editor), update_count);
+        let (query, update_count) =
+            append_comma(query, "history", Some(draft.history), update_count);
+        let (query, update_count) = append_comma(query, "pages", Some(draft.pages), update_count);
+        let (query, update_count) = append_comma(query, "published", Some(true), update_count);
+        let (mut query, update_count) = append_comma(
+            query,
+            "content_updated_at",
+            Some(draft.content_updated_at),
+            update_count,
+        );
 
-        Ok(site)
+        if update_count == 0 {
+            return Err(DbError::NoUpdate);
+        }
+
+        query.push(" WHERE id = ");
+        query.push_bind(published_site.id);
+        query.build().execute(&pool).await.map_err(map_sqlx_err)?;
+
+        Ok(())
     }
 
     async fn list_site_versions(
@@ -354,7 +368,7 @@ impl SiteRepoTrait for SiteRepo {
             r#"
                 SELECT {}
                 FROM site_versions
-                ORDER BY id ASC
+                ORDER BY id DESC
                 LIMIT ? OFFSET ?
             "#,
             SITE_COLUMNS

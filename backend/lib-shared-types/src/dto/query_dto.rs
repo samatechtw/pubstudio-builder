@@ -19,3 +19,12 @@ fn default_from() -> i32 {
 fn default_to() -> i32 {
     10
 }
+
+impl ListQuery {
+    pub fn default() -> ListQuery {
+        Self {
+            from: default_from(),
+            to: default_to(),
+        }
+    }
+}
