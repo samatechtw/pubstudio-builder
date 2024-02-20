@@ -94,14 +94,13 @@ async fn get_site_result(
                 ))
                 .into_response())
             };
-        } else {
-            return Ok(Json(to_api_response(
-                site,
-                admin_or_owner,
-                site_metadata.disabled,
-            ))
-            .into_response());
         };
+        return Ok(Json(to_api_response(
+            site,
+            admin_or_owner,
+            site_metadata.disabled,
+        ))
+        .into_response());
     }
     Err(ApiError::forbidden())
 }
