@@ -1,7 +1,11 @@
-import { RenderMode } from '@pubstudio/frontend/util-render'
+import {
+  RenderMode,
+  isNoWrapEllipsis,
+  toNoWrapHtml,
+} from '@pubstudio/frontend/util-render'
 import { RouterLink } from '@pubstudio/frontend/util-router'
 import { IComponent, ISite, Tag } from '@pubstudio/shared/type-site'
-import { defineComponent, h, onMounted, onUnmounted, PropType, toRefs } from 'vue'
+import { defineComponent, h, onMounted, onUnmounted, PropType, toRefs, ref } from 'vue'
 import { registerCustomEvents, removeListeners } from './custom-event-handlers'
 import { IContent } from './i-props-content'
 import { computePropsContent } from './render'
@@ -34,9 +38,12 @@ export const LiveComponent = () => {
       const { custom } = computeEvents(site.value, component.value)
       registerCustomEvents(component.value, custom, null, true)
 
+      const noWrapEllipsis = ref(false)
+
       onMounted(() => {
         const { custom } = computeEvents(site.value, component.value)
         registerCustomEvents(component.value, custom, null, false)
+        noWrapEllipsis.value = isNoWrapEllipsis(component.value.id)
       })
       onUnmounted(() => {
         removeListeners(component.value)
@@ -56,7 +63,12 @@ export const LiveComponent = () => {
           // `innerHTML` should not exist in `props` when content (children) is a
           // non-string value because Vue will use whatever value it contains to
           // render components when using `h()`.
-          renderProps = { ...props, innerHTML: content }
+          if (noWrapEllipsis.value) {
+            const noWrapHtml = toNoWrapHtml(content)
+            renderProps = { ...props, innerHTML: noWrapHtml }
+          } else {
+            renderProps = { ...props, innerHTML: content }
+          }
 
           // Vue render function requires a tag, and we don't want two layers of <svg>
           if (tag === Tag.Svg && content.includes('<svg')) {

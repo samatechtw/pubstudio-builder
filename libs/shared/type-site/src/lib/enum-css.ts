@@ -1,6 +1,8 @@
 export enum Css {
   Empty = '',
   WebkitBackgroundClip = '-webkit-background-clip',
+  WebkitBoxOrient = '-webkit-box-orient',
+  WebkitLineClamp = '-webkit-line-clamp',
   WebkitTextFillColor = '-webkit-text-fill-color',
   AlignContent = 'align-content',
   AlignItems = 'align-items',
