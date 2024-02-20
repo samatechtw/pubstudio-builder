@@ -83,7 +83,9 @@ export const getBuildPageStyle = (site: ISite, page: IPage): IRawStyleRecord => 
   }
   iteratePage(page, appendStyle)
 
-  return pageStyle
+  const sortedPageStyle = sortRawStyleRecord(pageStyle)
+
+  return sortedPageStyle
 }
 
 export const getRootBackgroundStyle = (
@@ -149,5 +151,34 @@ export const getLivePageStyle = (context: ISiteContext, page: IPage): IQueryStyl
   }
   iteratePage(page, appendStyle)
 
-  return queryStyle
+  const sortedQueryStyle = sortQueryStyle(queryStyle)
+
+  return sortedQueryStyle
+}
+
+const sortQueryStyle = (queryStyle: IQueryStyle): IQueryStyle => {
+  return Object.entries(queryStyle).reduce((result, [breakpointId, rawStyleRecord]) => {
+    result[breakpointId] = sortRawStyleRecord(rawStyleRecord)
+    return result
+  }, {} as IQueryStyle)
+}
+
+const sortRawStyleRecord = (rawStyleRecord: IRawStyleRecord): IRawStyleRecord => {
+  return Object.entries(rawStyleRecord).reduce((result, [selector, rawStyle]) => {
+    result[selector] = sortRawStyle(rawStyle)
+    return result
+  }, {} as IRawStyleRecord)
+}
+
+// Order raw style by properties so that -webkit CSS properties would always
+// be added at the end. This is necessary in some cases, for example, for gradient
+// background color to work, `-webkit-background-clip: text` should always be after
+// `background`.
+const sortRawStyle = (rawStyle: IRawStyle): IRawStyle => {
+  return Object.entries(rawStyle)
+    .sort((a, b) => b[0].localeCompare(a[0]))
+    .reduce((result, [property, value]) => {
+      result[property as Css] = value
+      return result
+    }, {} as IRawStyle)
 }
