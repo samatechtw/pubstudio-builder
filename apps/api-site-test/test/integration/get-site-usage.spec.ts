@@ -19,6 +19,7 @@ describe('Get Site Usage', () => {
   let resetService: SiteApiResetService
   let adminAuth: string
   let siteId: string
+  let publishedSiteId: string
 
   beforeAll(() => {
     api = supertest(testConfig.get('apiUrl'))
@@ -29,13 +30,14 @@ describe('Get Site Usage', () => {
   beforeEach(async () => {
     await resetService.reset()
     siteId = '6d2c8359-6094-402c-bcbb-37202fd7c336'
+    publishedSiteId = '870aafc9-36e9-476a-b38c-c1aaaad9d9fe'
   })
 
   describe('Admin Requestor Site Usage Tracking', () => {
     it('tracks successful site request for site usage', async () => {
       // Initial site usage request
       const res1 = await api
-        .get(testEndpoint(siteId))
+        .get(testEndpoint(publishedSiteId))
         .set('Authorization', adminAuth)
         .expect(200)
 
@@ -46,11 +48,11 @@ describe('Get Site Usage', () => {
       expect(body1.last_updated).toMatch(new RegExp(commonRegex.date))
 
       // Successful site request
-      await api.get(`/api/sites/${siteId}`).set('Authorization', adminAuth).expect(200)
+      await api.get('/api/sites/current').set('Host', 'test3.com').expect(200)
 
       // Verify updated site usage after successful request
       const res2 = await api
-        .get(testEndpoint(siteId))
+        .get(testEndpoint(publishedSiteId))
         .set('Authorization', adminAuth)
         .expect(200)
 
@@ -73,7 +75,7 @@ describe('Get Site Usage', () => {
       expect(body1.site_size).toEqual(body1.total_bandwidth)
 
       // Failed site request
-      await api.get(`/api/sites/${siteId}`).set('Authorization', 'invalid').expect(403)
+      await api.get(`/api/sites/${siteId}`).set('Authorization', 'invalid').expect(401)
 
       // Verify updated site usage after failed request
       const res2 = await api
@@ -89,32 +91,21 @@ describe('Get Site Usage', () => {
     })
 
     it('tracks site usage after successful site creation', async () => {
-      // Initial site usage request
-      const res1 = await api
-        .get(testEndpoint(siteId))
-        .set('Authorization', adminAuth)
-        .expect(200)
-
-      const body1: IGetSiteUsageApiResponse = res1.body
-      expect(body1.request_count).toEqual(1)
-      expect(body1.request_error_count).toEqual(0)
-      expect(body1.site_size).toEqual(body1.total_bandwidth)
-
       // Create a site
-      const res2 = await api
+      const res1 = await api
         .post(`/api/sites`)
         .set('Authorization', adminAuth)
         .send(mockCreateSitePayload())
         .expect(201)
-      const body: ICreateSiteApiResponse = res2.body
+      const body: ICreateSiteApiResponse = res1.body
 
       // Verify site usage after successful creation
-      const res3 = await api
+      const res2 = await api
         .get(testEndpoint(body.id))
         .set('Authorization', adminAuth)
         .expect(200)
 
-      const body2: IGetSiteUsageApiResponse = res3.body
+      const body2: IGetSiteUsageApiResponse = res2.body
       expect(body2.site_size).toEqual(body2.total_bandwidth)
       expect(body2.request_count).toEqual(1)
       expect(body2.request_error_count).toEqual(0)

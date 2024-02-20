@@ -45,10 +45,7 @@ fn api_router(context: &ApiContext) -> Router<ApiContext> {
         .route(
             "/sites/:site_id",
             get(site::get_site::get_site
-                .layer(from_fn_with_state(
-                    context.clone(),
-                    auth_admin_owner_anonymous,
-                ))
+                .layer(from_fn_with_state(context.clone(), auth_admin_owner))
                 .layer(from_fn_with_state(context.clone(), error_cache)))
             .patch(
                 site::update_site::update_site
