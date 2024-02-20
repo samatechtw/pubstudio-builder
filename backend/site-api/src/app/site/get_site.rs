@@ -15,8 +15,6 @@ use validator::Validate;
 
 use crate::{api_context::ApiContext, middleware::auth::verify_site_owner};
 
-use super::util::is_admin_or_site_owner;
-
 #[debug_handler]
 pub async fn get_site(
     Path(site_id): Path<String>,
@@ -59,48 +57,13 @@ async fn get_site_result(
         .await
         .map_err(|e| ApiError::not_found().message(e))?;
 
-    // Check whether the non-admin/owner's bandwidth usage exceeds the allowed limit
-    let admin_or_owner = is_admin_or_site_owner(&site_metadata, &user);
-    if !admin_or_owner {
-        context
-            .cache
-            .check_bandwidth_exceeded(
-                &site_id,
-                site.calculate_site_size(),
-                site_metadata.site_type,
-            )
-            .await?;
-    }
-
-    if site.published || admin_or_owner {
-        context
-            .cache
-            .increase_request_count(
-                &site_id,
-                site.calculate_site_size(),
-                site_metadata.site_type,
-            )
-            .await;
-
-        if let Some(update_key) = query.update_key {
-            let content_updated = site.content_updated_at;
-            return if content_updated == update_key {
-                Ok(StatusCode::NO_CONTENT.into_response())
-            } else {
-                Ok(Json(to_api_response(
-                    site,
-                    admin_or_owner,
-                    site_metadata.disabled,
-                ))
-                .into_response())
-            };
+    if let Some(update_key) = query.update_key {
+        let content_updated = site.content_updated_at;
+        return if content_updated == update_key {
+            Ok(StatusCode::NO_CONTENT.into_response())
+        } else {
+            Ok(Json(to_api_response(site, true, site_metadata.disabled)).into_response())
         };
-        return Ok(Json(to_api_response(
-            site,
-            admin_or_owner,
-            site_metadata.disabled,
-        ))
-        .into_response());
-    }
-    Err(ApiError::forbidden())
+    };
+    return Ok(Json(to_api_response(site, true, site_metadata.disabled)).into_response());
 }

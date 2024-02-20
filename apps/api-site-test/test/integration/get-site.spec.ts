@@ -9,7 +9,6 @@ import {
   ownerAuthHeader,
 } from '../helpers/auth-helpers'
 import { SITE_SEEDS } from '../mocks/site-seeds'
-import { mockUpdateSitePayload } from '../mocks/update-create-site-payload'
 import { testConfig } from '../test.config'
 
 describe('Get Site', () => {
@@ -147,60 +146,11 @@ describe('Get Site', () => {
   })
 
   describe('when requester is Anonymous', () => {
-    it('returns 200 status when site is already published', async () => {
-      // This helps verify that the fixtures are working as expected
-      const publishedSiteId = '870aafc9-36e9-476a-b38c-c1aaaad9d9fe'
-
-      const response = await api.get(`${testEndpoint}/${publishedSiteId}`).expect(200)
-      const body: IGetSiteApiResponse = response.body
-
-      expect(body.id).toEqual(1)
-      expect(body.name).toEqual('Test Site 3')
-      expect(body.published).toEqual(null)
-      expect(body.pages).toBeDefined()
-      expect(body.history).toEqual(null)
-      expect(body.editor).toEqual(null)
-    })
-
-    it('returns 200 status after new site version is published', async () => {
-      // Create a published version for the site
-      const publishVersion = 1
-      await api
-        .post(`${testEndpoint}/${siteId}/actions/publish`)
-        .send({ version_id: publishVersion })
-        .set('Authorization', ownerAuth)
-
-      const response = await api.get(`${testEndpoint}/${siteId}`).expect(200)
-      const body: IGetSiteApiResponse = response.body
-
-      expect(body.id).toEqual(publishVersion)
-      expect(body.name).toEqual('Test Site 2')
-      expect(body.published).toEqual(null)
-      expect(body.pages).toBeDefined()
-      expect(body.history).toEqual(null)
-      expect(body.editor).toEqual(null)
-    })
-
-    it('returns 403 error if no published version exists', async () => {
-      await api.get(`${testEndpoint}/${siteId}`).expect(403)
-    })
-
-    it('returns 509 error when bandwidth usage exceeds allowance', async () => {
-      const payload = mockUpdateSitePayload()
-      // Generate a large JSON string by repeating '{"some":"stringified_json"}' 80 times
-      payload.context = '{"some":"stringified_json"}'.repeat(80)
-
-      // Perform the update request to the API
-      await api
-        .patch(`${testEndpoint}/${siteId}`)
-        .set('Authorization', adminAuth)
-        .send(payload)
-        .expect(200)
-
-      return api.get(`${testEndpoint}/${siteId}`).expect(509, {
-        code: 'None',
-        message: 'Bandwidth exceeded',
-        status: 509,
+    it('returns 403 error', async () => {
+      await api.get(`${testEndpoint}/${siteId}`).expect(401, {
+        code: 'Unauthorized',
+        message: 'Unauthorized',
+        status: 401,
       })
     })
   })
