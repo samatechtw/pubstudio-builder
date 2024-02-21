@@ -58,6 +58,7 @@ pub trait SiteRepoTrait {
         id: &str,
         req: UpdateSiteDtoWithContentUpdatedAt,
     ) -> Result<SiteEntity, DbError>;
+    async fn create_draft(&self, id: &str, from_id: i64) -> Result<(), DbError>;
     async fn publish_site(&self, id: &str) -> Result<(), DbError>;
     async fn publish_all_versions(&self, id: &str, published: bool) -> Result<(), DbError>;
     async fn export_backup(&self, id: &str) -> Result<Vec<u8>, DbError>;
@@ -291,6 +292,21 @@ impl SiteRepoTrait for SiteRepo {
         }
     }
 
+    async fn create_draft(&self, id: &str, from_id: i64) -> Result<(), DbError> {
+        let pool = self.get_db_pool(id).await?;
+
+        sqlx::query(
+            r#"INSERT INTO site_versions (name, version, context, defaults, editor, history, pages, content_updated_at)
+            SELECT name, version, context, defaults, editor, history, pages, content_updated_at FROM site_versions WHERE id = ?
+            "#,
+        )
+        .bind(from_id)
+        .execute(&pool)
+        .await?;
+
+        Ok(())
+    }
+
     async fn publish_all_versions(&self, id: &str, published: bool) -> Result<(), DbError> {
         let pool = self.get_db_pool(id).await?;
 
@@ -326,8 +342,8 @@ impl SiteRepoTrait for SiteRepo {
         if sites.len() < 2 {
             return Err(DbError::EntityNotFound());
         }
-        let published_site = sites.next().ok_or(DbError::EntityNotFound())?;
         let draft = sites.next().ok_or(DbError::EntityNotFound())?;
+        let published_site = sites.next().ok_or(DbError::EntityNotFound())?;
 
         let query = QueryBuilder::new("UPDATE site_versions SET");
         let update_count = 0;

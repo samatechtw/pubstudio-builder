@@ -1,4 +1,7 @@
-import { IGetSiteApiResponse } from '@pubstudio/shared/type-api-site-sites'
+import {
+  IGetSiteApiResponse,
+  IListSiteVersionsApiResponse,
+} from '@pubstudio/shared/type-api-site-sites'
 import { SiteApiResetService } from '@pubstudio/shared/util-test-reset'
 import supertest from 'supertest'
 import TestAgent from 'supertest/lib/agent'
@@ -28,11 +31,32 @@ describe('List Site Versions', () => {
 
   describe('when request is valid', () => {
     describe('and requestor is Owner', () => {
-      it('returns unauthorized user is Owner', async () => {
+      it('returns site versions', async () => {
         const ownerAuth = ownerAuthHeader(ownerId)
 
         const response = await api
           .get(`${testEndpoint}/${siteId}/versions`)
+          .set('Authorization', ownerAuth)
+          .expect(200)
+
+        const body: IListSiteVersionsApiResponse = response.body
+
+        expect(response.status).toBe(200)
+        expect(body.length).toEqual(1)
+        expect(body[0].id).toEqual(1)
+      })
+
+      it('returns filtered site versions after creating draft', async () => {
+        const ownerAuth = ownerAuthHeader(ownerId)
+
+        // Create a draft, which adds a new site version
+        await api
+          .post(`/api/sites/${siteId}/actions/create_draft`)
+          .set('Authorization', ownerAuth)
+          .expect(200)
+
+        const response = await api
+          .get(`${testEndpoint}/${siteId}/versions?from=2&to=2`)
           .set('Authorization', ownerAuth)
           .expect(200)
 
@@ -43,31 +67,17 @@ describe('List Site Versions', () => {
         expect(body[0].id).toEqual(1)
       })
     })
-  })
-
-  /* TODO -- uncomment and fix tests once create_draft endpoint is implemented
-    describe('and requestor is Owner', () => {
-      it('returns unauthorized user is Owner', async () => {
-        const ownerAuth = ownerAuthHeader(ownerId)
-
-        const response = await api
-          .get(`${testEndpoint}/${siteId}/versions?from=2&to=3`)
-          .set('Authorization', ownerAuth)
-          .expect(200)
-
-        const body: IGetSiteApiResponse[] = response.body
-
-        expect(response.status).toBe(200)
-        expect(body.length).toEqual(2)
-        expect(body[0].id).toEqual(2)
-        expect(body[1].id).toEqual(3)
-      })
-    })
 
     describe('when requestor is Admin', () => {
       it('returns 200 status code', async () => {
+        // Create a draft, which adds a new site version
+        await api
+          .post(`/api/sites/${siteId}/actions/create_draft`)
+          .set('Authorization', adminAuth)
+          .expect(200)
+
         const response = await api
-          .get(`${testEndpoint}/${siteId}/versions?from=2&to=3`)
+          .get(`${testEndpoint}/${siteId}/versions?from=1&to=3`)
           .set('Authorization', adminAuth)
 
         const body: IGetSiteApiResponse[] = response.body
@@ -75,7 +85,7 @@ describe('List Site Versions', () => {
         expect(response.status).toBe(200)
         expect(body.length).toEqual(2)
         expect(body[0].id).toEqual(2)
-        expect(body[1].id).toEqual(3)
+        expect(body[1].id).toEqual(1)
       })
 
       it('returns 200 code with default from and to values', async () => {
@@ -86,22 +96,9 @@ describe('List Site Versions', () => {
         const body: IGetSiteApiResponse[] = response.body
 
         expect(response.status).toBe(200)
-        expect(body.length).toEqual(3)
-        expect(body[0].id).toEqual(1)
-        expect(body[1].id).toEqual(2)
-        expect(body[2].id).toEqual(3)
-      })
-
-      it('returns 200 code with default "to" value', async () => {
-        const response = await api
-          .get(`${testEndpoint}/${siteId}/versions?from=3`)
-          .set('Authorization', adminAuth)
-
-        const body: IGetSiteApiResponse[] = response.body
-
-        expect(response.status).toBe(200)
-        expect(body.length).toBe(1)
-        expect(body[0].id).toEqual(3)
+        expect(body.length).toEqual(2)
+        expect(body[0].id).toEqual(2)
+        expect(body[1].id).toEqual(1)
       })
 
       it('returns 200 code if from and to exceed data count', async () => {
@@ -114,7 +111,6 @@ describe('List Site Versions', () => {
       })
     })
   })
-  */
 
   describe('when request is not valid', () => {
     it('returns 400 code for invalid from or to value', async () => {
