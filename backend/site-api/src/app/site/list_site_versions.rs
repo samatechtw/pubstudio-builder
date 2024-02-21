@@ -9,7 +9,7 @@ use lib_shared_site_api::{
 use lib_shared_types::{
     dto::{
         query_dto::ListQuery,
-        site_api::site_viewmodel::{to_api_response, SiteViewModel},
+        site_api::site_info_viewmodel::{to_api_response, SiteInfoViewModel},
     },
     error::api_error::ApiErrorCode,
     shared::user::RequestUser,
@@ -23,7 +23,7 @@ pub async fn list_site_versions(
     Query(query): Query<ListQuery>,
     Extension(user): Extension<RequestUser>,
     State(context): State<ApiContext>,
-) -> Result<Json<Vec<SiteViewModel>>, ApiError> {
+) -> Result<Json<Vec<SiteInfoViewModel>>, ApiError> {
     check_bad_form(query.validate())?;
     validate_query(&query)?;
     verify_site_owner(&context, &user, &id).await?;
@@ -37,7 +37,7 @@ pub async fn list_site_versions(
             _ => ApiError::internal_error().message(e),
         })?;
 
-    let view_models: Vec<SiteViewModel> = versions
+    let view_models: Vec<SiteInfoViewModel> = versions
         .into_iter()
         .map(|version| to_api_response(version))
         .collect();

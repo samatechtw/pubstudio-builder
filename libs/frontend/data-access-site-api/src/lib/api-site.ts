@@ -4,6 +4,7 @@ import {
   IGetSiteApiRequest,
   IGetSiteApiResponse,
   IGetSiteUsageApiResponse,
+  IListSiteVersionsApiResponse,
   IUpdateSiteApiRequest,
   IUpdateSiteApiResponse,
 } from '@pubstudio/shared/type-api-site-sites'
@@ -17,6 +18,7 @@ export interface IUseSiteApiParams {
 
 export interface IApiSite {
   getSite(siteId: string): Promise<IGetSiteApiResponse | undefined>
+  listSiteVersions(siteId: string): Promise<IListSiteVersionsApiResponse>
   getSiteUsage(siteId: string): Promise<IGetSiteUsageApiResponse>
   updateSite(
     siteId: string,
@@ -77,6 +79,16 @@ export const useSiteApi = (params: IUseSiteApiParams): IApiSite => {
     return data
   }
 
+  const listSiteVersions = async (
+    siteId: string,
+  ): Promise<IListSiteVersionsApiResponse> => {
+    const res = await api.authOptRequest({
+      url: `sites/${siteId}/versions`,
+      method: 'GET',
+    })
+    return res.data as IListSiteVersionsApiResponse
+  }
+
   const updateSite = async (
     siteId: string,
     payload: IUpdateSiteApiRequest,
@@ -109,5 +121,6 @@ export const useSiteApi = (params: IUseSiteApiParams): IApiSite => {
     updateSite,
     getSiteUsage,
     getSite,
+    listSiteVersions,
   }
 }

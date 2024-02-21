@@ -24,17 +24,6 @@ describe('List Site Versions', () => {
   beforeEach(async () => {
     ownerId = '903b3c28-deaa-45dc-a43f-511fe965d34e'
     siteId = '6d2c8359-6094-402c-bcbb-37202fd7c336'
-
-    // publish more versions for test
-    await api
-      .post(`${testEndpoint}/${siteId}/actions/publish`)
-      .send({ version_id: 1 })
-      .set('Authorization', adminAuth)
-
-    await api
-      .post(`${testEndpoint}/${siteId}/actions/publish`)
-      .send({ version_id: 2 })
-      .set('Authorization', adminAuth)
   })
 
   describe('when request is valid', () => {

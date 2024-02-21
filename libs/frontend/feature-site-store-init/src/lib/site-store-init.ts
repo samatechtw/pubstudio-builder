@@ -1,4 +1,5 @@
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
+import { useSiteVersion } from '@pubstudio/frontend/feature-site-version'
 import { useApiStore } from './use-api-store'
 import { useLocalStore } from './use-local-store'
 
@@ -7,7 +8,7 @@ export interface IInitializeSiteStoreOptions {
   siteId: string | undefined
 }
 
-export const initializeSiteStore = (options: IInitializeSiteStoreOptions) => {
+export const initializeSiteStore = async (options: IInitializeSiteStoreOptions) => {
   const { initializeSite } = useSiteSource()
   const { siteId, siteApiUrl } = options
 
@@ -18,8 +19,9 @@ export const initializeSiteStore = (options: IInitializeSiteStoreOptions) => {
   const localStoreKey = isScratch ? 'scratchSite' : 'site'
   const localStore = useLocalStore(localStoreKey)
   const store = isScratch ? localStore : useApiStore({ siteId, siteApiUrl })
-  return initializeSite({
+  const serverAddress = await initializeSite({
     store,
     siteId,
   })
+  await useSiteVersion({ serverAddress }).listVersions(siteId)
 }

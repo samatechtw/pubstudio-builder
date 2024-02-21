@@ -12,7 +12,10 @@ use lib_shared_types::{
             create_site_dto::CreateSiteDto, update_site_dto::UpdateSiteDtoWithContentUpdatedAt,
         },
     },
-    entity::site_api::{site_entity::SiteEntity, site_metadata_entity::SiteMetadataEntity},
+    entity::site_api::{
+        site_entity::SiteEntity, site_info_entity::SiteInfoEntity,
+        site_metadata_entity::SiteMetadataEntity,
+    },
 };
 use sqlx::{
     migrate::MigrateDatabase,
@@ -32,6 +35,7 @@ pub type SiteDbPools = RwLock<HashMap<String, SqlitePool>>;
 pub type DynSiteRepo = Arc<dyn SiteRepoTrait + Send + Sync>;
 
 const SITE_COLUMNS: &str = r#"id, name, version, context, defaults, editor, history, pages, created_at, updated_at, content_updated_at, published"#;
+const SITE_INFO_COLUMNS: &str = r#"id, name, updated_at, published"#;
 
 #[async_trait]
 pub trait SiteRepoTrait {
@@ -48,7 +52,7 @@ pub trait SiteRepoTrait {
         &self,
         id: &str,
         query: ListQuery,
-    ) -> Result<Vec<SiteEntity>, DbError>;
+    ) -> Result<Vec<SiteInfoEntity>, DbError>;
     async fn update_site(
         &self,
         id: &str,
@@ -361,7 +365,7 @@ impl SiteRepoTrait for SiteRepo {
         &self,
         id: &str,
         query: ListQuery,
-    ) -> Result<Vec<SiteEntity>, DbError> {
+    ) -> Result<Vec<SiteInfoEntity>, DbError> {
         let pool = self.get_db_pool(id).await?;
 
         let result = sqlx::query(formatcp!(
@@ -371,11 +375,11 @@ impl SiteRepoTrait for SiteRepo {
                 ORDER BY id DESC
                 LIMIT ? OFFSET ?
             "#,
-            SITE_COLUMNS
+            SITE_INFO_COLUMNS
         ))
         .bind(query.to - query.from + 1)
         .bind(query.from - 1)
-        .try_map(map_to_site_entity)
+        .try_map(map_site_info_entity)
         .fetch_all(&pool)
         .await?;
 
@@ -443,6 +447,15 @@ fn map_to_site_entity(row: SqliteRow) -> Result<SiteEntity, Error> {
         created_at: row.try_get("created_at")?,
         updated_at: row.try_get("updated_at")?,
         content_updated_at: row.try_get("content_updated_at")?,
+        published: row.try_get("published")?,
+    })
+}
+
+fn map_site_info_entity(row: SqliteRow) -> Result<SiteInfoEntity, Error> {
+    Ok(SiteInfoEntity {
+        id: row.try_get("id")?,
+        name: row.try_get("name")?,
+        updated_at: row.try_get("updated_at")?,
         published: row.try_get("published")?,
     })
 }

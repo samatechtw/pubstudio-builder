@@ -16,7 +16,7 @@ export interface IUseSiteSource {
   apiSiteId: Ref<string | undefined>
   siteStore: Ref<ISiteStore>
   isSaving: ComputedRef<boolean>
-  initializeSite: (options: IInitializeSiteOptions) => Promise<void>
+  initializeSite: (options: IInitializeSiteOptions) => Promise<string | undefined>
   checkOutdated: () => Promise<void>
   replaceSite: (newSite: ISite) => void
 }
@@ -53,16 +53,19 @@ export const useSiteSource = (): IUseSiteSource => {
     }
   }
 
-  const initializeSite = async (options: IInitializeSiteOptions) => {
+  const initializeSite = async (
+    options: IInitializeSiteOptions,
+  ): Promise<string | undefined> => {
     const { siteId, store } = options
     apiSiteId.value = siteId
     siteStore.value = {
       ...store,
     }
 
-    await siteStore.value.initialize()
+    const serverAddress = await siteStore.value.initialize()
     const restored = await siteStore.value.restore()
     setRestoredSite(restored)
+    return serverAddress
   }
 
   const checkOutdated = async () => {

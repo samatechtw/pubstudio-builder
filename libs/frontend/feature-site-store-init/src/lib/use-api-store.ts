@@ -73,14 +73,14 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
 
   // Set up the get/update functions for syncing to the Platform API (local site)
   // or Site API (free/paid site)
-  const initialize = async () => {
+  const initialize = async (): Promise<string | undefined> => {
+    let serverAddress: string | undefined
     if (siteId.value === 'identity') {
       const platformSiteApi = useLocalSiteApi(platformApi)
       siteId.value = store.user.identity.value.id
       getFn = platformSiteApi.getLocalSite
       updateFn = platformSiteApi.updateLocalSite
     } else {
-      let serverAddress: string
       if (props.siteApiUrl) {
         serverAddress = props.siteApiUrl
       } else {
@@ -94,6 +94,7 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
       getFn = siteApi.getSite
       updateFn = siteApi.updateSite
     }
+    return serverAddress
   }
 
   // Post the updated Site fields to the API

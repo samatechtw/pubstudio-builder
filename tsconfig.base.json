@@ -148,6 +148,9 @@
       "@pubstudio/frontend/feature-site-store-init": [
         "libs/frontend/feature-site-store-init/src/index.ts"
       ],
+      "@pubstudio/frontend/feature-site-version": [
+        "libs/frontend/feature-site-version/src/index.ts"
+      ],
       "@pubstudio/frontend/feature-sites": ["libs/frontend/feature-sites/src/index.ts"],
       "@pubstudio/web/type-builtins": ["libs/web/type-builtins/src/index.ts"],
       "@pubstudio/frontend/ui-build": ["libs/frontend/ui-build/src/index.ts"],
