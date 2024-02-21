@@ -62,6 +62,7 @@ describe('Publish Site', () => {
         .post(`${testEndpoint}/${siteId}/actions/publish`)
         .send(payload)
         .set('Authorization', ownerAuth)
+        .expect(204)
 
       await verifyPublished(siteId, true)
     })
@@ -73,12 +74,57 @@ describe('Publish Site', () => {
         .post(`${testEndpoint}/${siteId}/actions/publish`)
         .send(payload)
         .set('Authorization', ownerAuth)
+        .expect(204)
 
       await verifyPublished(siteId, false)
     })
-  })
 
-  // TODO -- add test for site with draft
+    it('creates a draft, updates it, and publishes', async () => {
+      const newData1 = '{"test":"SOME TEST DATA"}'
+      // Create a draft
+      await api
+        .post(`/api/sites/${siteId}/actions/create_draft`)
+        .set('Authorization', ownerAuth)
+        .expect(200)
+
+      // Update the draft
+      await api
+        .patch(`/api/sites/${siteId}`)
+        .send({ pages: newData1 })
+        .set('Authorization', ownerAuth)
+        .expect(200)
+
+      // Publish the draft
+      await api
+        .post(`${testEndpoint}/${siteId}/actions/publish`)
+        .send(payload)
+        .set('Authorization', ownerAuth)
+        .expect(204)
+
+      // Verify published version is updated
+      const r1 = await api
+        .get(`/api/sites/${siteId}/versions/1`)
+        .set('Authorization', ownerAuth)
+        .expect(200)
+      const body1: IGetSiteApiResponse = r1.body
+      expect(body1.pages).toEqual(JSON.stringify(newData1))
+
+      // Update the draft again
+      await api
+        .patch(`/api/sites/${siteId}`)
+        .send({ pages: '{"test":"SOME NEWER DATA"}' })
+        .set('Authorization', ownerAuth)
+        .expect(200)
+
+      // Verify published version is not changed
+      const r2 = await api
+        .get(`/api/sites/${siteId}/versions/1`)
+        .set('Authorization', ownerAuth)
+        .expect(200)
+      const body2: IGetSiteApiResponse = r2.body
+      expect(body2.pages).toEqual(JSON.stringify(newData1))
+    })
+  })
 
   describe('when requester is Anonymous', () => {
     it('returns 403 error', async () => {

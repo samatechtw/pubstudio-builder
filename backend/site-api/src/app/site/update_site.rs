@@ -64,6 +64,7 @@ pub async fn update_site(
     if dto.defaults.is_some() || dto.context.is_some() || dto.pages.is_some() {
         content_updated_at = Some(Utc::now().timestamp_millis());
     }
+    let ptest = dto.pages.clone();
 
     let site = context
         .site_repo
