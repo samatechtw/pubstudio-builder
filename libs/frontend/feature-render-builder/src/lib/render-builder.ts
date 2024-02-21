@@ -12,7 +12,11 @@ import {
 } from '@pubstudio/frontend/feature-site-source'
 import { setSelectedComponent } from '@pubstudio/frontend/util-command'
 import { findStyles } from '@pubstudio/frontend/util-component'
-import { RenderMode } from '@pubstudio/frontend/util-render'
+import {
+  RenderMode,
+  isNoWrapEllipsis,
+  toNoWrapHtml,
+} from '@pubstudio/frontend/util-render'
 import { resetRuntimeContext, runtimeContext } from '@pubstudio/frontend/util-runtime'
 import {
   Css,
@@ -123,6 +127,10 @@ export const computeBuilderStyleProps = (
       // Add an icon that shows SvgEditModal on click
       extraChildren = [h(SvgEdit, { componentId: component.id })]
       forceRelative()
+    }
+
+    if (typeof component.content === 'string') {
+      builderClass.push('prevent-line-clamp')
     }
   }
 
@@ -241,10 +249,19 @@ export const computePropsContent = (
     } else if (isSelected) {
       content.push(h(ProseMirrorEditor, { component, editor }))
     } else {
+      const classes = ['component-content-container']
+      const noWrapEllipsis = isNoWrapEllipsis(component.id)
+
+      let innerHTML = parseI18n(site, component.content)
+      if (noWrapEllipsis && innerHTML) {
+        classes.push('nowrap-ellipsis')
+        innerHTML = toNoWrapHtml(innerHTML)
+      }
+
       content.push(
         h('div', {
-          class: 'component-content-container',
-          innerHTML: parseI18n(site, component.content),
+          class: classes.join(' '),
+          innerHTML,
         }),
       )
     }

@@ -21,6 +21,7 @@
       <ToolbarText :show="showTextStyle" />
       <ToolbarContainer />
       <ComponentFlex />
+      <ComponentTruncate v-if="showTruncate" />
       <ComponentDimensions />
       <ComponentTabStyle :component="component" />
       <ComponentInputs
@@ -69,7 +70,7 @@ import { computed, toRefs } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { PSButton, InfoBubble } from '@pubstudio/frontend/ui-widgets'
 import { prosemirrorEditing } from '@pubstudio/frontend/util-edit-text'
-import { IComponent } from '@pubstudio/shared/type-site'
+import { IComponent, Tag } from '@pubstudio/shared/type-site'
 import { noBehaviorId } from '@pubstudio/frontend/util-ids'
 import { serializeComponent } from '@pubstudio/frontend/util-site-store'
 import { useHUD } from '@pubstudio/frontend/util-ui-alert'
@@ -91,6 +92,7 @@ import StyleMenuEdit from '../StyleMenuEdit.vue'
 import ComponentFlex from './ComponentFlex.vue'
 import ToolbarContainer from '../toolbar/ToolbarContainer.vue'
 import ToolbarText from '../toolbar/ToolbarText.vue'
+import ComponentTruncate from './ComponentTruncate.vue'
 
 const { t } = useI18n()
 const { editor, replacePageRoot } = useBuild()
@@ -152,6 +154,10 @@ const showTextStyle = computed(() => {
     prosemirrorEditing(editor.value)
   )
 })
+
+const showTruncate = computed(
+  () => component.value.tag !== Tag.Svg && typeof component.value.content === 'string',
+)
 </script>
 
 <style lang="postcss" scoped>

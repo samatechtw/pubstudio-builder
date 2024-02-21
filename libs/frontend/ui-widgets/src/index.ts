@@ -57,6 +57,8 @@ export { default as Versions } from './lib/svg/Versions.vue'
 export { default as Print } from './lib/svg/Print.vue'
 export { default as Shrink } from './lib/svg/Shrink.vue'
 export { default as Text } from './lib/svg/Text.vue'
+export { default as HorizontalEllipsis } from './lib/svg/HorizontalEllipsis.vue'
+export { default as JustifyLeft } from './lib/svg/JustifyLeft.vue'
 
 // toolbar
 export { default as AlignBottom } from './lib/toolbar/AlignBottom.vue'
