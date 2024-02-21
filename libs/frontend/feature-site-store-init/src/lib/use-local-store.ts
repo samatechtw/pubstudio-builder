@@ -26,6 +26,7 @@ export const useLocalStore = (storeName?: StoreKey): ISiteStore => {
 
   const initialize = async () => {
     // No async initialization needed
+    return undefined
   }
 
   const saveState = ref(SiteSaveState.Saved)

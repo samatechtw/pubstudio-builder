@@ -25,7 +25,7 @@ export interface ISiteStore {
   saveState: Ref<SiteSaveState> | ComputedRef<SiteSaveState>
   siteId: Ref<string>
   saveError: Ref<IApiError | undefined>
-  initialize(): Promise<void>
+  initialize(): Promise<string | undefined>
   save(site: ISite, options?: ISiteSaveOptions): Promise<void>
   saveEditor(editor: IEditorContext): Promise<void>
   restore(updateKey?: number): Promise<ISiteRestore | undefined>

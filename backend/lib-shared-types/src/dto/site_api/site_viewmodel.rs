@@ -19,7 +19,7 @@ pub struct SiteViewModel {
 }
 
 pub fn to_api_response(site_entity: SiteEntity) -> SiteViewModel {
-    return SiteViewModel {
+    SiteViewModel {
         id: site_entity.id,
         name: site_entity.name,
         version: site_entity.version,
@@ -36,5 +36,5 @@ pub fn to_api_response(site_entity: SiteEntity) -> SiteViewModel {
             timestamp: site_entity.updated_at,
         },
         published: site_entity.published,
-    };
+    }
 }

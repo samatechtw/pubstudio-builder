@@ -20,7 +20,7 @@ export const makeMockStore = (): ISiteStore => {
   const saveError = ref()
   const saveState = ref(SiteSaveState.Saved)
 
-  const initialize = async () => {}
+  const initialize = async () => undefined
   const save = async (_site: ISite) => {}
   const saveEditor = async (_editor: IEditorContext) => {}
   const restore = async (): Promise<ISiteRestore> => {
