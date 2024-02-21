@@ -180,6 +180,17 @@ $border-offset: 0px;
     :deep(.force-relative) {
       position: relative;
     }
+    /* This is for nowrap ellipsis to work in build mode when the component is not selected. */
+    :deep(.nowrap-ellipsis) {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+    /* This is to avoid multi line truncate in build mode when the component is selected. */
+    :deep(.prevent-line-clamp) {
+      -webkit-line-clamp: initial;
+      -webkit-box-orient: initial;
+    }
     :deep(.hover) {
       &.hover-wrap-absolute {
         position: absolute;

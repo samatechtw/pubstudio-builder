@@ -6,14 +6,14 @@
     <div class="truncate-items">
       <ToolbarItem
         :active="isNoWrapEllipsis"
-        :tooltip="t('build.no_wrap')"
+        :tooltip="t('build.single_line')"
         @click="toggleNoWrapEllipsis"
       >
         <HorizontalEllipsis />
       </ToolbarItem>
       <ToolbarItem
         :active="isLineClamp"
-        :tooltip="t('build.line_clamp')"
+        :tooltip="t('build.multi_line')"
         @click="toggleLineClamp"
       >
         <JustifyLeft />
@@ -27,7 +27,7 @@
           type="number"
           min="1"
           step="1"
-          :value="lineClamp"
+          :value="lineClampValue"
           @input="updateLineClamp"
         />
       </div>
@@ -48,7 +48,7 @@ import {
   useBuild,
   IOldNewStyleEntry,
 } from '@pubstudio/frontend/feature-build'
-import { Css } from '@pubstudio/shared/type-site'
+import { Css, IComponent } from '@pubstudio/shared/type-site'
 
 const { t } = useI18n()
 const { getStyleValue, setStyleOrReplace } = useToolbar()
@@ -66,43 +66,58 @@ const isNoWrapEllipsis = computed(() => {
 const toggleNoWrapEllipsis = () => {
   const selectedComponent = editor.value?.selectedComponent
 
-  if (!isNoWrapEllipsis.value && selectedComponent) {
-    const setOverflowEntry = makeOldNewStyleEntry(Css.Overflow, 'hidden')
-    const setWhiteSpaceEntry = makeOldNewStyleEntry(Css.WhiteSpace, 'nowrap')
-    const setTextOverflowEntry = makeOldNewStyleEntry(Css.TextOverflow, 'ellipsis')
-
-    const entries: IOldNewStyleEntry[] = [
-      setOverflowEntry,
-      setWhiteSpaceEntry,
-      setTextOverflowEntry,
-    ]
-
-    const currentDisplay = getStyleValue(Css.Display)
-    const currentBoxOrient = getStyleValue(Css.WebkitBoxOrient)
-    const currentLineClamp = getStyleValue(Css.WebkitLineClamp)
-
-    if (
-      currentDisplay === '-webkit-box' ||
-      currentDisplay === 'flex' ||
-      currentDisplay === 'inline-flex'
-    ) {
-      // Remove `display` if the value is `-webkit-box`, `flex`, or `inline-flex`
-      // for nowrap ellipsis to work.
-      const removeDisplayEntry = makeOldNewStyleEntry(Css.Display, undefined)
-      entries.push(removeDisplayEntry)
+  if (selectedComponent) {
+    if (isNoWrapEllipsis.value) {
+      removeNoWrapEllipsis(selectedComponent)
+    } else {
+      applyNoWrapEllipsis(selectedComponent)
     }
-
-    if (currentBoxOrient) {
-      const removeBoxOrientEntry = makeOldNewStyleEntry(Css.WebkitBoxOrient, undefined)
-      entries.push(removeBoxOrientEntry)
-    }
-
-    if (currentLineClamp) {
-      const removeLineClampEntry = makeOldNewStyleEntry(Css.WebkitLineClamp, undefined)
-      entries.push(removeLineClampEntry)
-    }
-    setCustomStyles(selectedComponent, entries)
   }
+}
+
+const removeNoWrapEllipsis = (selectedComponent: IComponent) => {
+  // Remove all nowrap-ellipsis related CSS properties from the custom style
+  // of the selected component.
+  const entries = [
+    makeOldNewStyleEntry(Css.Overflow, undefined),
+    makeOldNewStyleEntry(Css.WhiteSpace, undefined),
+    makeOldNewStyleEntry(Css.TextOverflow, undefined),
+  ]
+  setCustomStyles(selectedComponent, entries)
+}
+
+const applyNoWrapEllipsis = (selectedComponent: IComponent) => {
+  const setOverflowEntry = makeOldNewStyleEntry(Css.Overflow, 'hidden')
+  const setWhiteSpaceEntry = makeOldNewStyleEntry(Css.WhiteSpace, 'nowrap')
+  const setTextOverflowEntry = makeOldNewStyleEntry(Css.TextOverflow, 'ellipsis')
+
+  const entries = [setOverflowEntry, setWhiteSpaceEntry, setTextOverflowEntry]
+
+  const currentDisplay = getStyleValue(Css.Display)
+  const currentBoxOrient = getStyleValue(Css.WebkitBoxOrient)
+  const currentLineClamp = getStyleValue(Css.WebkitLineClamp)
+
+  if (
+    currentDisplay === '-webkit-box' ||
+    currentDisplay === 'flex' ||
+    currentDisplay === 'inline-flex'
+  ) {
+    // Remove `display` if the value is `-webkit-box`, `flex`, or `inline-flex`
+    // for nowrap ellipsis to work.
+    const removeDisplayEntry = makeOldNewStyleEntry(Css.Display, undefined)
+    entries.push(removeDisplayEntry)
+  }
+
+  if (currentBoxOrient) {
+    const removeBoxOrientEntry = makeOldNewStyleEntry(Css.WebkitBoxOrient, undefined)
+    entries.push(removeBoxOrientEntry)
+  }
+
+  if (currentLineClamp) {
+    const removeLineClampEntry = makeOldNewStyleEntry(Css.WebkitLineClamp, undefined)
+    entries.push(removeLineClampEntry)
+  }
+  setCustomStyles(selectedComponent, entries)
 }
 
 const makeOldNewStyleEntry = (
@@ -142,39 +157,59 @@ const isLineClamp = computed(() => {
 const toggleLineClamp = () => {
   const selectedComponent = editor.value?.selectedComponent
 
-  if (!isLineClamp.value && selectedComponent) {
-    const setDisplayEntry = makeOldNewStyleEntry(Css.Display, '-webkit-box')
-    const setWhiteSpaceEntry = makeOldNewStyleEntry(Css.WebkitBoxOrient, 'vertical')
-    const setOverflowEntry = makeOldNewStyleEntry(Css.Overflow, 'hidden')
-    const setLineClampEntry = makeOldNewStyleEntry(Css.WebkitLineClamp, '3')
-
-    const entries: IOldNewStyleEntry[] = [
-      setDisplayEntry,
-      setWhiteSpaceEntry,
-      setWhiteSpaceEntry,
-      setOverflowEntry,
-      setLineClampEntry,
-    ]
-
-    const currentWhiteSpace = getStyleValue(Css.WhiteSpace)
-    const currentTextOverflow = getStyleValue(Css.TextOverflow)
-
-    if (currentWhiteSpace === 'nowrap') {
-      // Remove `whitespace: nowrap` for `-webkit-line-clamp` to work.
-      const removeWhiteSpaceEntry = makeOldNewStyleEntry(Css.WhiteSpace, undefined)
-      entries.push(removeWhiteSpaceEntry)
+  if (selectedComponent) {
+    if (isLineClamp.value) {
+      removeLineClamp(selectedComponent)
+    } else {
+      applyLineClamp(selectedComponent)
     }
-
-    if (currentTextOverflow === 'ellipsis') {
-      const removeTextOverflowEntry = makeOldNewStyleEntry(Css.TextOverflow, undefined)
-      entries.push(removeTextOverflowEntry)
-    }
-
-    setCustomStyles(selectedComponent, entries)
   }
 }
 
-const lineClamp = computed(() => getStyleValue(Css.WebkitLineClamp))
+const removeLineClamp = (selectedComponent: IComponent) => {
+  // Remove all line clamp related CSS properties from the custom style
+  // of the selected component.
+  const entries = [
+    makeOldNewStyleEntry(Css.Display, undefined),
+    makeOldNewStyleEntry(Css.WebkitBoxOrient, undefined),
+    makeOldNewStyleEntry(Css.Overflow, undefined),
+    makeOldNewStyleEntry(Css.WebkitLineClamp, undefined),
+  ]
+  setCustomStyles(selectedComponent, entries)
+}
+
+const applyLineClamp = (selectedComponent: IComponent) => {
+  const setDisplayEntry = makeOldNewStyleEntry(Css.Display, '-webkit-box')
+  const setWhiteSpaceEntry = makeOldNewStyleEntry(Css.WebkitBoxOrient, 'vertical')
+  const setOverflowEntry = makeOldNewStyleEntry(Css.Overflow, 'hidden')
+  const setLineClampEntry = makeOldNewStyleEntry(Css.WebkitLineClamp, '3')
+
+  const entries = [
+    setDisplayEntry,
+    setWhiteSpaceEntry,
+    setWhiteSpaceEntry,
+    setOverflowEntry,
+    setLineClampEntry,
+  ]
+
+  const currentWhiteSpace = getStyleValue(Css.WhiteSpace)
+  const currentTextOverflow = getStyleValue(Css.TextOverflow)
+
+  if (currentWhiteSpace === 'nowrap') {
+    // Remove `whitespace: nowrap` for `-webkit-line-clamp` to work.
+    const removeWhiteSpaceEntry = makeOldNewStyleEntry(Css.WhiteSpace, undefined)
+    entries.push(removeWhiteSpaceEntry)
+  }
+
+  if (currentTextOverflow === 'ellipsis') {
+    const removeTextOverflowEntry = makeOldNewStyleEntry(Css.TextOverflow, undefined)
+    entries.push(removeTextOverflowEntry)
+  }
+
+  setCustomStyles(selectedComponent, entries)
+}
+
+const lineClampValue = computed(() => getStyleValue(Css.WebkitLineClamp))
 
 const updateLineClamp = (e: Event) => {
   const { value } = e.target as HTMLInputElement

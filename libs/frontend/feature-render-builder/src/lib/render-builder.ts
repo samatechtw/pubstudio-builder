@@ -128,6 +128,10 @@ export const computeBuilderStyleProps = (
       extraChildren = [h(SvgEdit, { componentId: component.id })]
       forceRelative()
     }
+
+    if (typeof component.content === 'string') {
+      builderClass.push('prevent-line-clamp')
+    }
   }
 
   const hoveredInComponentTree =
