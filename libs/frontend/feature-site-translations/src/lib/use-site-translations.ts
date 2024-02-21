@@ -25,7 +25,7 @@ export interface ISiteTranslationsFeature {
   confirmDeleteTranslation: Ref<string | undefined>
   confirmSaveTranslationKey: Ref<string | undefined>
   confirmAddLanguage: () => void
-  selectActiveLanguage: (option: IMultiselectObj) => void
+  selectActiveLanguage: (option: IMultiselectObj | undefined) => void
   showEditTranslation: (key?: string) => Promise<void>
   saveTranslation: () => void
   deleteTranslation: () => void
@@ -34,13 +34,14 @@ export interface ISiteTranslationsFeature {
   cancelTranslation: () => void
 }
 
+const DEFAULT_LANGUAGE = 'en'
+
 export const useSiteTranslations = (): ISiteTranslationsFeature => {
   const { t } = useI18n()
   const { editor, site, setTranslations } = useBuild()
 
   const addLanguage = ref(false)
   const newLanguage = ref()
-  const lang = ref()
   const editTranslation = ref<IEditTranslation | undefined>()
   const editorRef = ref()
   const saveTranslationError = ref()
@@ -51,8 +52,17 @@ export const useSiteTranslations = (): ISiteTranslationsFeature => {
   watch(
     () => editor.value?.translations,
     (show) => {
-      if (show) {
-        lang.value = getActiveI18n()
+      const { activeI18n, i18n } = site.value.context
+      if (show && activeI18n && !(activeI18n in i18n)) {
+        // Set the active language back to default if it does not exist
+        // in the editor context. This is most likely to occur when the
+        // language is removed using the undo command.
+        const defaultLanguage = currentLanguages.value.find(
+          (language) => language.value === DEFAULT_LANGUAGE,
+        )
+        if (defaultLanguage) {
+          selectActiveLanguage(defaultLanguage)
+        }
       }
     },
   )
@@ -63,14 +73,14 @@ export const useSiteTranslations = (): ISiteTranslationsFeature => {
 
   const newLanguages = computed(() => {
     return Object.keys(languageDict)
-      .filter((k) => k !== 'en' && !(k in site.value.context.i18n))
+      .filter((k) => k !== DEFAULT_LANGUAGE && !(k in site.value.context.i18n))
       .map(makeOption)
   })
 
   const currentLanguages = computed(() => {
     let langs = Object.keys(site.value.context.i18n).map(makeOption)
-    if (!site.value.context.i18n['en']) {
-      langs = [makeOption('en'), ...langs]
+    if (!site.value.context.i18n[DEFAULT_LANGUAGE]) {
+      langs = [makeOption(DEFAULT_LANGUAGE), ...langs]
     }
     return langs
   })
@@ -85,8 +95,8 @@ export const useSiteTranslations = (): ISiteTranslationsFeature => {
 
   // TODO -- should this be a command? We'll also need to control it somehow from the
   // user/viewer perspective, maybe cached via localstorage
-  const selectActiveLanguage = (option: IMultiselectObj) => {
-    site.value.context.activeI18n = option.value as string
+  const selectActiveLanguage = (option: IMultiselectObj | undefined) => {
+    site.value.context.activeI18n = option?.value as string
   }
 
   const activeTranslations = computed(() => {
@@ -100,7 +110,7 @@ export const useSiteTranslations = (): ISiteTranslationsFeature => {
   const showEditTranslation = async (editKey?: string) => {
     const isNew = editKey === undefined
     const key = editKey ?? ''
-    const text = isNew ? '' : activeTranslations.value[key]
+    const text = isNew ? '' : appendPmWrapper(activeTranslations.value[key])
     editTranslation.value = {
       code: getActiveI18n(),
       isNew,
@@ -115,8 +125,17 @@ export const useSiteTranslations = (): ISiteTranslationsFeature => {
     )
   }
 
+  // Wraps each line of content in a `<div class="pm-p">...</div>` wrapper
+  // so that text can be correctly displayed in a ProseMirror editor.
+  const appendPmWrapper = (text: string) => {
+    return text
+      .split('\n')
+      .map((line) => `<div class="pm-p">${line}</div>`)
+      .join('')
+  }
+
   const getActiveI18n = (): string => {
-    return site.value.context.activeI18n ?? 'en'
+    return site.value.context.activeI18n ?? DEFAULT_LANGUAGE
   }
 
   const confirmSaveTranslation = () => {
@@ -124,7 +143,7 @@ export const useSiteTranslations = (): ISiteTranslationsFeature => {
     if (!edit) {
       return
     }
-    const updates: INewTranslations = { [edit.key]: edit.text }
+    const updates: INewTranslations = { [edit.key]: stripPmWrappers() }
 
     if (edit.key !== edit.originalKey) {
       updates[edit.originalKey ?? ''] = undefined
@@ -140,6 +159,23 @@ export const useSiteTranslations = (): ISiteTranslationsFeature => {
     editorView = undefined
     confirmSaveTranslationKey.value = undefined
     saveTranslationError.value = undefined
+  }
+
+  // The content from ProseMirror editor is wrapped in `<div class="pm-p">...<div>` for each line.
+  // This function removes those wrappers and use `\n` as the new line character.
+  const stripPmWrappers = () => {
+    const div = document.createElement('div')
+    div.innerHTML = editTranslation.value?.text ?? ''
+
+    let strippedContent = ''
+    div.childNodes.forEach((childNode, index) => {
+      if (index > 0) {
+        strippedContent += '\n'
+      }
+      strippedContent += childNode.textContent
+    })
+
+    return strippedContent
   }
 
   const saveTranslation = () => {

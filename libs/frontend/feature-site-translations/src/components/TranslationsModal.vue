@@ -45,14 +45,14 @@
           :disabled="currentLanguages.length <= 1"
           @select="selectActiveLanguage"
         />
-        <div v-if="addLanguage" class="i18n-new" @click="confirmAddLanguage">
+        <div v-if="addLanguage" class="i18n-new">
           <PSMultiselect
             :value="newLanguage"
             :options="newLanguages"
             :openInitial="true"
             @select="selectNewLanguage"
           />
-          <Check class="i18n-new-save" color="#009879" />
+          <Cross class="i18n-new-cancel" @click="confirmAddLanguage" />
         </div>
         <div
           v-else-if="newLanguages.length > 0"
@@ -142,8 +142,9 @@ const showAddLanguage = () => {
   addLanguage.value = true
 }
 
-const selectNewLanguage = (lang: IMultiselectObj) => {
-  newLanguage.value = lang.value as string
+const selectNewLanguage = (lang: IMultiselectObj | undefined) => {
+  newLanguage.value = lang?.value as string
+  confirmAddLanguage()
 }
 </script>
 
@@ -179,8 +180,8 @@ const selectNewLanguage = (lang: IMultiselectObj) => {
     align-items: center;
     margin-left: 12px;
   }
-  .i18n-new-save {
-    @mixin size 24px;
+  .i18n-new-cancel {
+    @mixin size 18px;
     margin-left: 8px;
     cursor: pointer;
   }
