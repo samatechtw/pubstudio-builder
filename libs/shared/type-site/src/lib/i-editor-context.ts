@@ -35,6 +35,7 @@ export enum EditorDropdown {
   FontWeight = 'fontWeight',
   Page = 'page',
   PseudoClass = 'pseudoClass',
+  Version = 'version',
 }
 
 export enum ThemeTab {

@@ -27,6 +27,7 @@
     </ToolbarItem>
     <ToolbarPage class="toolbar-page" />
     <ToolbarBreakpoint class="toolbar-breakpoint" />
+    <ToolbarVersion />
     <ToolbarPseudoClass class="toolbar-pseudo-class" />
     <ToolbarBuilderWidth class="toolbar-builder-width" />
     <ToolbarItem
