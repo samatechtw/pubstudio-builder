@@ -2,11 +2,14 @@ import { useSiteApi } from '@pubstudio/frontend/data-access-site-api'
 import { store } from '@pubstudio/frontend/data-access-web-store'
 import { SiteVariant } from '@pubstudio/shared/type-api-platform-site'
 import { ISiteInfoViewModel } from '@pubstudio/shared/type-api-site-sites'
-import { Ref, ref } from 'vue'
+import { computed, ComputedRef, Ref, ref } from 'vue'
 
 export interface IUseSiteVersion {
   hasVersions: Ref<boolean>
   versions: Ref<ISiteInfoViewModel[]>
+  hasDraft: ComputedRef<boolean>
+  sitePublished: ComputedRef<boolean>
+  activeVersionId: Ref<string | undefined>
   listVersions: (siteId: string | undefined) => Promise<void>
 }
 
@@ -16,10 +19,22 @@ export interface IUseSiteVersionOptions {
 
 const versions = ref<ISiteInfoViewModel[]>([])
 const hasVersions = ref<boolean>(false)
+// Only set when viewing the live version
+const activeVersionId = ref<string | undefined>()
 let serverAddress: string | undefined = undefined
 
-export const useSiteVersion = (options: IUseSiteVersionOptions): IUseSiteVersion => {
-  serverAddress = options.serverAddress
+const hasDraft = computed(() => {
+  return hasVersions.value && versions.value.length > 1 && !versions.value[0]?.published
+})
+
+const sitePublished = computed(() => {
+  return versions.value.some((v) => v.published)
+})
+
+export const useSiteVersion = (options?: IUseSiteVersionOptions): IUseSiteVersion => {
+  if (options) {
+    serverAddress = options.serverAddress
+  }
 
   const listVersions = async (siteId: string | undefined) => {
     hasVersions.value =
@@ -40,6 +55,9 @@ export const useSiteVersion = (options: IUseSiteVersionOptions): IUseSiteVersion
   return {
     hasVersions,
     versions,
+    hasDraft,
+    sitePublished,
+    activeVersionId,
     listVersions,
   }
 }
