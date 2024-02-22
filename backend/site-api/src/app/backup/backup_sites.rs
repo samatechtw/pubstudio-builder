@@ -86,89 +86,98 @@ pub async fn backup_all_sites(context: ApiContext) -> BackupSitesResult {
         }
     };
 
-    backup_sites(&context, sites).await
-}
-
-// TODO -- parallelize steps where possible
-pub async fn backup_sites(
-    context: &ApiContext,
-    sites: Vec<SiteMetadataEntity>,
-) -> BackupSitesResult {
     let sites_count = sites.len();
 
-    // Vacuum sites to local file
-    let mut vacuumed_sites: Vec<(SiteMetadataEntity, Vec<u8>)> = Vec::new();
+    let mut backup_results = Vec::new();
+
+    // Backup each site individually
     for site in sites {
-        match context.site_repo.export_backup(&site.id).await {
-            Ok(file_content) => {
-                let tuple = (site, file_content);
-                vacuumed_sites.push(tuple);
-            }
-            Err(e) => error!("Failed to vacuum site: {}, {}", site.id, e.to_string()),
+        if let Ok(created_backup) = backup_site(&context, site).await {
+            backup_results.push(created_backup);
         }
     }
 
-    // Upload backups
-    let mut entity_props: Vec<BackupEntityProps> = Vec::new();
-    for site in &vacuumed_sites {
-        if let Some(props) = upload_backup(context.config.exec_env, &context.s3_client, site).await
-        {
-            entity_props.push(props);
-        }
-    }
+    BackupSitesResult::new(sites_count, backup_results.len())
+}
 
-    // Record backups in DB
-    let mut backup_counts: Vec<CreateBackupEntityResult> = Vec::new();
-    for props in entity_props {
-        let url = props.url.clone();
-        match context.backup_repo.create_backup(props).await {
-            Ok(backup) => {
-                backup_counts.push(backup);
+pub async fn backup_site(
+    context: &ApiContext,
+    site: SiteMetadataEntity,
+) -> Result<CreateBackupEntityResult, String> {
+    // Vacuum site to local file
+    let vacuumed_site = match context.site_repo.export_backup(&site.id).await {
+        Ok(file_content) => (site.clone(), file_content),
+        Err(e) => {
+            let err = format!("Failed to vacuum site: {}, {}", site.id, e.to_string());
+            error!(err);
+            return Err(err);
+        }
+    };
+
+    // Upload backup
+    let props =
+        match upload_backup(context.config.exec_env, &context.s3_client, &vacuumed_site).await {
+            Some(props) => props,
+            None => {
+                let err = format!("Failed to upload backup for site: {}", site.id);
+                error!(err);
+                return Err(err);
             }
-            Err(e) => error!("Failed to record backup to DB: {}, {}", url, e.to_string()),
         };
-    }
 
-    // Delete extra backups
-    for record in &backup_counts {
-        if record.count > 10 {
-            // Get oldest backups starting with the 10th
-            match context
-                .backup_repo
-                .list_backups_after(&record.site_id, 10)
-                .await
-            {
-                Ok(sites_to_delete) => {
-                    // Delete old backups from R2
-                    for delete_site in sites_to_delete {
-                        if delete_backup_from_r2(
-                            context.config.exec_env,
-                            &context.s3_client,
-                            &delete_site.url,
-                        )
-                        .await
-                        {
-                            // Delete backup from DB
-                            match context.backup_repo.delete_backup(delete_site.id).await {
-                                Ok(_) => {}
-                                Err(e) => error!(
-                                    "Failed to delete backup record: {}, {}",
-                                    delete_site.url,
-                                    e.to_string()
-                                ),
-                            };
+    // Record backup in DB
+    match context.backup_repo.create_backup(props).await {
+        Ok(created_backup) => {
+            // Delete extra backups if needed
+            if created_backup.count > 10 {
+                // Get oldest backups starting with the 10th
+                match context
+                    .backup_repo
+                    .list_backups_after(&created_backup.site_id, 10)
+                    .await
+                {
+                    Ok(sites_to_delete) => {
+                        // Delete old backups from R2
+                        for delete_site in sites_to_delete {
+                            if delete_backup_from_r2(
+                                context.config.exec_env,
+                                &context.s3_client,
+                                &delete_site.url,
+                            )
+                            .await
+                            {
+                                // Delete backup from DB
+                                match context.backup_repo.delete_backup(delete_site.id).await {
+                                    Ok(_) => {}
+                                    Err(e) => error!(
+                                        "Failed to delete backup record: {}, {}",
+                                        delete_site.url,
+                                        e.to_string()
+                                    ),
+                                };
+                            }
                         }
                     }
+                    Err(e) => error!(
+                        "Failed to query backups for deletion: {}, {}",
+                        created_backup.site_id,
+                        e.to_string()
+                    ),
                 }
-                Err(e) => error!(
-                    "Failed to query backups for deletion: {}, {}",
-                    record.site_id,
-                    e.to_string()
-                ),
             }
+            info!("Backup successful for site: {}", site.id);
+            Ok(created_backup)
+        }
+        Err(e) => {
+            let err = format!(
+                "Failed to record backup to DB: {}, {}",
+                site.id,
+                e.to_string()
+            );
+            error!(err);
+            Err(err)
         }
     }
-    BackupSitesResult::new(sites_count, backup_counts.len())
 }
 
 // To satisfy tokio-cron async closure constraints, which expects an async function with empty return

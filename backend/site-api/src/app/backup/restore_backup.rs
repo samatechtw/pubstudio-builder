@@ -9,7 +9,32 @@ use lib_shared_types::shared::{core::ExecEnv, user::RequestUser};
 
 use crate::{api_context::ApiContext, middleware::auth::verify_site_owner};
 
-use super::backup_sites::backup_sites;
+use super::backup_sites::backup_site;
+
+pub async fn restore_backup_helper(
+    context: &ApiContext,
+    site_id: &str,
+    backup_url: &str,
+) -> Result<(), ApiError> {
+    // Get the backup file from R2
+    let backup_data = match context.config.exec_env {
+        ExecEnv::Prod | ExecEnv::Stg => context.s3_client.get_backup(backup_url).await?,
+        _ => {
+            // In dev and ci environments, use a pre-set backup for testing
+            let backup_file_path = "db/sites/backups/backup_test_dev_ci.db";
+            fs::read(backup_file_path).map_err(|e| ApiError::internal_error().message(e))?
+        }
+    };
+
+    // Import backup
+    context
+        .site_repo
+        .import_backup(site_id, backup_data)
+        .await
+        .map_err(|e| ApiError::internal_error().message(e))?;
+
+    Ok(())
+}
 
 pub async fn restore_backup(
     Path((site_id, backup_id)): Path<(String, String)>,
@@ -43,24 +68,9 @@ pub async fn restore_backup(
         .await
         .map_err(|e| ApiError::not_found().message(e))?;
 
-    let _ = backup_sites(&context, vec![site]).await;
+    let _ = backup_site(&context, site).await;
 
-    // Get the backup file from R2
-    let backup_data = match context.config.exec_env {
-        ExecEnv::Prod | ExecEnv::Stg => context.s3_client.get_backup(&backup.url).await?,
-        _ => {
-            // In dev and ci environments, use a pre-set backup for testing
-            let backup_file_path = "db/sites/backups/backup_test_dev_ci.db";
-            fs::read(backup_file_path).map_err(|e| ApiError::internal_error().message(e))?
-        }
-    };
-
-    // Import backup
-    context
-        .site_repo
-        .import_backup(&site_id, backup_data)
-        .await
-        .map_err(|e| ApiError::internal_error().message(e))?;
+    restore_backup_helper(&context, &site_id, &backup.url).await?;
 
     Ok(())
 }
