@@ -1,7 +1,7 @@
 use axum::extract::{Path, State};
 use lib_shared_site_api::{db::db_error::DbError, error::api_error::ApiError};
 
-use crate::{api_context::ApiContext, app::backup::backup_sites::backup_sites};
+use crate::{api_context::ApiContext, app::backup::backup_sites::backup_site};
 
 pub async fn delete_site(
     Path(id): Path<String>,
@@ -14,7 +14,7 @@ pub async fn delete_site(
         .await
         .map_err(|e| ApiError::not_found().message(e))?;
 
-    let _ = backup_sites(&context, vec![site]).await;
+    let _ = backup_site(&context, site).await;
 
     // Remove row in sites_metadata.db
     context.metadata_repo.delete_site(&id).await.map_err(|e| {

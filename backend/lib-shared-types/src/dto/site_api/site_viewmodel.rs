@@ -1,8 +1,8 @@
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use crate::{entity::site_api::site_entity::SiteEntity, shared::js_date::JsDate};
 
-#[derive(Serialize)]
+#[derive(Serialize, Deserialize)]
 pub struct SiteViewModel {
     pub id: i64,
     pub name: String,
