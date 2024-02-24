@@ -2,7 +2,7 @@
   <PSMultiselect
     :options="options"
     :value="fontWeight?.value"
-    :placeholder="t('style.toolbar.font_weight')"
+    :placeholder="t('toolbar.font_weight')"
     :clearable="true"
     :caret="false"
     toggleId="style-menu"
@@ -49,7 +49,7 @@ const options = computed(() => {
   }
 
   return availableWeights.map((weight) => ({
-    label: t(`style.toolbar.font_weights.${weight}`),
+    label: t(`toolbar.font_weights.${weight}`),
     value: weight.toString(),
   }))
 })

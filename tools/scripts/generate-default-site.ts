@@ -26,7 +26,17 @@ export const makeMockStore = (): ISiteStore => {
   const restore = async (): Promise<ISiteRestore> => {
     return {} as ISiteRestore
   }
-  return { siteId, saveState, saveError, initialize, save, saveEditor, restore }
+  const setUpdateKey = (_key: string | undefined) => {}
+  return {
+    siteId,
+    saveState,
+    saveError,
+    initialize,
+    save,
+    saveEditor,
+    restore,
+    setUpdateKey,
+  }
 }
 
 const { initializeSite, site } = useSiteSource()

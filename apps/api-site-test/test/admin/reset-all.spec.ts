@@ -40,7 +40,10 @@ describe('Admin reset all endpoint', () => {
       .expect(200)
 
     // Ensure site no longer exists
-    return api.get(`/api/sites/${body.id}`).set('Authorization', authHeader).expect(404)
+    return api
+      .get(`/api/sites/${body.id}/versions/latest`)
+      .set('Authorization', authHeader)
+      .expect(404)
   })
 
   it('returns 403 status when requester is Owner', () => {

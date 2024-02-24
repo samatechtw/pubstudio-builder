@@ -4,13 +4,13 @@ import { useSiteApi } from '@pubstudio/frontend/data-access-site-api'
 import { store } from '@pubstudio/frontend/data-access-web-store'
 import { PSApi } from '@pubstudio/frontend/util-api'
 import { SiteType, SiteVariant } from '@pubstudio/shared/type-api-platform-site'
-import { IGetSiteApiResponse } from '@pubstudio/shared/type-api-site-sites'
+import { IGetSiteVersionApiResponse } from '@pubstudio/shared/type-api-site-sites'
 import { inject } from 'vue'
 import { IMergedSiteData } from './i-merged-site-data'
 
 export interface IUseGetSite {
   getSiteInfo: (id: string) => Promise<IMergedSiteData | undefined>
-  getSiteData: (id: string) => Promise<IGetSiteApiResponse | undefined>
+  getSiteData: (id: string) => Promise<IGetSiteVersionApiResponse | undefined>
 }
 
 export const useGetSite = (): IUseGetSite => {
@@ -48,8 +48,10 @@ export const useGetSite = (): IUseGetSite => {
   }
 
   // TODO -- may be possible to reuse/merge with libs/frontend/feature-site-store/src/lib/use-api-store.ts
-  const getSiteData = async (id: string): Promise<IGetSiteApiResponse | undefined> => {
-    let siteData: IGetSiteApiResponse | undefined = undefined
+  const getSiteData = async (
+    id: string,
+  ): Promise<IGetSiteVersionApiResponse | undefined> => {
+    let siteData: IGetSiteVersionApiResponse | undefined = undefined
     try {
       if (id === 'identity') {
         const { getLocalSite } = useLocalSiteApi(rootApi)
@@ -59,7 +61,7 @@ export const useGetSite = (): IUseGetSite => {
         const { getSite } = usePlatformSiteApi(rootApi)
         const site = await getSite(id)
         const siteApi = useSiteApi({ store, serverAddress: site.site_server.address })
-        siteData = await siteApi.getSite(id)
+        siteData = await siteApi.getSiteVersion(id)
       }
     } catch (e) {
       console.log('Failed to get site:', e)

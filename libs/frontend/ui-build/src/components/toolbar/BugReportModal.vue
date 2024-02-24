@@ -1,9 +1,9 @@
 <template>
   <Modal cls="confirm-modal" @cancel="emit('cancel')">
     <div class="modal-title">
-      {{ t('style.toolbar.bug_title') }}
+      {{ t('toolbar.bug_title') }}
     </div>
-    <div class="modal-text" v-html="t('style.toolbar.bug_text')"></div>
+    <div class="modal-text" v-html="t('toolbar.bug_text')"></div>
     <div class="modal-buttons">
       <PSButton
         :text="t('contact')"

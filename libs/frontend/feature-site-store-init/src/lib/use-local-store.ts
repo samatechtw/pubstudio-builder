@@ -57,6 +57,16 @@ export const useLocalStore = (storeName?: StoreKey): ISiteStore => {
     }
     return restored
   }
+  const setUpdateKey = (_key: string | undefined) => {}
 
-  return { siteId, saveState, saveError, initialize, save, saveEditor, restore }
+  return {
+    siteId,
+    saveState,
+    saveError,
+    initialize,
+    save,
+    saveEditor,
+    restore,
+    setUpdateKey,
+  }
 }

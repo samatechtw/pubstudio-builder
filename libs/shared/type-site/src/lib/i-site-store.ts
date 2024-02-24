@@ -29,4 +29,5 @@ export interface ISiteStore {
   save(site: ISite, options?: ISiteSaveOptions): Promise<void>
   saveEditor(editor: IEditorContext): Promise<void>
   restore(updateKey?: number): Promise<ISiteRestore | undefined>
+  setUpdateKey(key: string | undefined): void
 }

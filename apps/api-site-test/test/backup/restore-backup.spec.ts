@@ -1,4 +1,4 @@
-import { IGetSiteApiResponse } from '@pubstudio/shared/type-api-site-sites'
+import { IGetSiteVersionApiResponse } from '@pubstudio/shared/type-api-site-sites'
 import { SiteApiResetService } from '@pubstudio/shared/util-test-reset'
 import supertest from 'supertest'
 import TestAgent from 'supertest/lib/agent'
@@ -44,11 +44,11 @@ describe('Restore Backup', () => {
 
       // Verify backup has restored
       const response = await api
-        .get(`${testEndpoint}/${siteId}`)
+        .get(`${testEndpoint}/${siteId}/versions/latest`)
         .set('Authorization', adminAuth)
         .expect(200)
 
-      const body: IGetSiteApiResponse = response.body
+      const body: IGetSiteVersionApiResponse = response.body
       expect(body.name).toEqual('TEST BACKUP')
       expect(body.published).toEqual(false)
     })
@@ -63,11 +63,11 @@ describe('Restore Backup', () => {
 
       // Verify backup has restored
       const response = await api
-        .get(`${testEndpoint}/${siteId}`)
+        .get(`${testEndpoint}/${siteId}/versions/latest`)
         .set('Authorization', ownerAuth)
         .expect(200)
 
-      const body: IGetSiteApiResponse = response.body
+      const body: IGetSiteVersionApiResponse = response.body
       expect(body.name).toEqual('TEST BACKUP')
       expect(body.published).toEqual(false)
     })

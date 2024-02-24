@@ -11,7 +11,7 @@
       @blur="onBlur"
     />
     <ColorPickerButton class="reset-gradient-degree-button" @click="onKnobRotate(0)">
-      {{ t('style.toolbar.reset_degree') }}
+      {{ t('toolbar.reset_degree') }}
     </ColorPickerButton>
   </div>
 </template>

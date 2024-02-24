@@ -1,7 +1,7 @@
 import {
   ICreateSiteApiResponse,
-  IGetSiteApiResponse,
   IGetSiteUsageApiResponse,
+  ISiteViewModel,
 } from '@pubstudio/shared/type-api-site-sites'
 import { commonRegex } from '@pubstudio/shared/util-parse'
 import { SiteApiResetService } from '@pubstudio/shared/util-test-reset'
@@ -75,7 +75,11 @@ describe('Get Site Usage', () => {
       expect(body1.site_size).toEqual(body1.total_bandwidth)
 
       // Failed site request
-      await api.get(`/api/sites/${siteId}`).set('Authorization', 'invalid').expect(401)
+      await api
+        .patch(`/api/sites/${siteId}`)
+        .send({ name: 'Update fail' })
+        .set('Authorization', 'invalid')
+        .expect(401)
 
       // Verify updated site usage after failed request
       const res2 = await api
@@ -129,7 +133,7 @@ describe('Get Site Usage', () => {
         .set('Authorization', adminAuth)
         .send(mockUpdateSitePayload())
         .expect(200)
-      const body: IGetSiteApiResponse = res2.body
+      const body: ISiteViewModel = res2.body
       const siteSize = body.context.length + body.defaults.length + body.pages.length
 
       // Verify site usage after successful update

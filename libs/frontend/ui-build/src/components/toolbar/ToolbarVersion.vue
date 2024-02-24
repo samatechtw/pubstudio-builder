@@ -1,19 +1,33 @@
 <template>
-  <PSMultiselect
-    v-if="hasVersions"
-    :value="editor?.cssPseudoClass"
-    class="toolbar-version"
-    :placeholder="t('pseudo_class')"
-    :options="options"
-    :caret="false"
-    :clearable="false"
-    :tooltip="t('pseudo_class')"
-    :openControl="() => editor?.editorDropdown === EditorDropdown.Version"
-    @select="setVersion"
-    @open="setEditorDropdown(editor, EditorDropdown.PseudoClass)"
-    @close="setEditorDropdown(editor, undefined)"
-    @click.stop
-  />
+  <div class="toolbar-version-wrap">
+    <PSMultiselect
+      v-if="hasVersions"
+      :value="value"
+      :forceLabel="t(`toolbar.version.${value}`)"
+      class="toolbar-version"
+      :options="options"
+      :caret="false"
+      :clearable="false"
+      :tooltip="tooltip"
+      :openControl="() => editor?.editorDropdown === EditorDropdown.Version"
+      @select="setVersion"
+      @open="setEditorDropdown(editor, EditorDropdown.Version)"
+      @close="setEditorDropdown(editor, undefined)"
+      @click.stop
+    />
+    <ToolbarItem
+      v-if="hasDraft"
+      :tooltip="t('toolbar.publish')"
+      class="toolbar-publish"
+      @click="publishSite"
+    >
+      <Publish />
+    </ToolbarItem>
+    <div v-if="loading" class="spinner-overlay">
+      <Spinner />
+    </div>
+    <div class="disabled-alert" :class="{ active: siteSaveAlert }"></div>
+  </div>
 </template>
 
 <script lang="ts" setup>
@@ -21,34 +35,68 @@ import { computed, onMounted } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { useBuild } from '@pubstudio/frontend/feature-build'
 import { setEditorDropdown } from '@pubstudio/frontend/util-command'
-import { PSMultiselect } from '@pubstudio/frontend/ui-widgets'
+import { siteSaveAlert } from '@pubstudio/frontend/feature-site-store-init'
+import {
+  PSMultiselect,
+  Publish,
+  Spinner,
+  ToolbarItem,
+} from '@pubstudio/frontend/ui-widgets'
 import { EditorDropdown } from '@pubstudio/shared/type-site'
-import { useSiteVersion } from '@pubstudio/frontend/feature-site-version'
-
-enum VersionOption {
-  Unpublished = 'unpublished',
-  Live = 'live',
-  Draft = 'draft',
-  Create = 'create',
-}
+import { useSiteVersion, VersionOption } from '@pubstudio/frontend/feature-site-version'
+import { IMultiselectObj } from '@pubstudio/frontend/type-ui-widgets'
 
 const { t } = useI18n()
 const { editor } = useBuild()
-const { hasDraft, hasVersions, sitePublished } = useSiteVersion()
+const {
+  hasDraft,
+  loading,
+  hasVersions,
+  sitePublished,
+  activeVersionId,
+  createDraft,
+  publishSite,
+  setActiveVersion,
+} = useSiteVersion()
+
+const makeOptions = (versions: VersionOption[]) => {
+  return versions
+    .filter((v) => v !== value.value)
+    .map((v) => ({ value: v, label: t(`toolbar.version.${v}`) }))
+}
 
 const options = computed(() => {
+  let options: VersionOption[]
   if (hasDraft.value) {
-    return [VersionOption.Live, VersionOption.Draft]
+    options = [VersionOption.Live, VersionOption.Draft]
+  } else {
+    options = sitePublished.value
+      ? [VersionOption.Live, VersionOption.Create]
+      : [VersionOption.Unpublished]
   }
-  return sitePublished.value
-    ? [VersionOption.Live, VersionOption.Create]
-    : [VersionOption.Unpublished]
+  return makeOptions(options)
 })
 
-const setVersion = (version: VersionOption | undefined) => {
-  if (version === VersionOption.Live) {
-  } else if (version === VersionOption.Draft) {
-  } else if (version === VersionOption.Create) {
+const value = computed(() => {
+  if (hasDraft.value) {
+    return activeVersionId.value ? VersionOption.Live : VersionOption.Draft
+  }
+  return VersionOption.Live
+})
+
+const tooltip = computed(() => {
+  if (hasDraft.value) {
+    return activeVersionId.value ? t('toolbar.live') : t('toolbar.draft')
+  }
+  return t('toolbar.no_draft')
+})
+
+const setVersion = async (opt: IMultiselectObj | undefined) => {
+  const version = opt?.value
+  if (version === VersionOption.Live || version === VersionOption.Draft) {
+    setActiveVersion(version)
+  } else if (version === VersionOption.Create || version === VersionOption.Unpublished) {
+    await createDraft()
   }
 }
 
@@ -60,7 +108,37 @@ onMounted(() => {
 </script>
 
 <style lang="postcss" scoped>
-.style-pseudo-class {
-  width: 72px;
+@import '@theme/css/mixins.postcss';
+
+.toolbar-version-wrap {
+  display: flex;
+  position: relative;
+  align-items: center;
+}
+.spinner-overlay {
+  @mixin overlay;
+  @mixin flex-center;
+  background-color: rgba(0, 0, 0, 0.3);
+}
+.disabled-alert {
+  @mixin overlay;
+  pointer-events: none;
+  animation-timing-function: ease-out;
+  opacity: 0;
+  &.active {
+    animation: disable-flash 1.4s;
+  }
+}
+@keyframes disable-flash {
+  0% {
+    background: $purple-button;
+    opacity: 1;
+  }
+  100% {
+    background: none;
+  }
+}
+.toolbar-version {
+  width: 94px;
 }
 </style>

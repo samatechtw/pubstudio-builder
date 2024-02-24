@@ -3,7 +3,7 @@
     v-slot="{ label }"
     :customLabel="true"
     :value="undefined"
-    :placeholder="t('style.toolbar.font_family')"
+    :placeholder="t('toolbar.font_family')"
     :options="options"
     :caret="false"
     toggleId="theme-variable-edit"

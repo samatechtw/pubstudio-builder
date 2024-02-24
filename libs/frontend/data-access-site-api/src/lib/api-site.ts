@@ -1,10 +1,11 @@
 import { IFrontendStore } from '@pubstudio/frontend/data-access-state'
 import { PSApi } from '@pubstudio/frontend/util-api'
 import {
-  IGetSiteApiRequest,
-  IGetSiteApiResponse,
   IGetSiteUsageApiResponse,
+  IGetSiteVersionApiRequest,
+  IGetSiteVersionApiResponse,
   IListSiteVersionsApiResponse,
+  IPublishSiteApiRequest,
   IUpdateSiteApiRequest,
   IUpdateSiteApiResponse,
 } from '@pubstudio/shared/type-api-site-sites'
@@ -16,8 +17,14 @@ export interface IUseSiteApiParams {
   store: IFrontendStore
 }
 
+export type GetSiteVersionFn = (
+  siteId: string,
+  versionId: string,
+  query?: IGetSiteVersionApiRequest,
+) => Promise<IGetSiteVersionApiResponse | undefined>
+
 export interface IApiSite {
-  getSite(siteId: string): Promise<IGetSiteApiResponse | undefined>
+  getSiteVersion: GetSiteVersionFn
   listSiteVersions(siteId: string): Promise<IListSiteVersionsApiResponse>
   getSiteUsage(siteId: string): Promise<IGetSiteUsageApiResponse>
   updateSite(
@@ -25,6 +32,8 @@ export interface IApiSite {
     payload: IUpdateSiteApiRequest,
     keepalive?: boolean,
   ): Promise<IUpdateSiteApiResponse>
+  createDraft(siteId: string): Promise<IListSiteVersionsApiResponse>
+  publishSite(siteId: string, publish: boolean): Promise<void>
 }
 
 export const useSiteApi = (params: IUseSiteApiParams): IApiSite => {
@@ -43,19 +52,20 @@ export const useSiteApi = (params: IUseSiteApiParams): IApiSite => {
     responseInterceptors: [...plainResponseInterceptors],
   })
 
-  const getSite = async (
+  const getSiteVersion = async (
     siteId: string,
-    query?: IGetSiteApiRequest,
-  ): Promise<IGetSiteApiResponse | undefined> => {
+    versionId: string,
+    query?: IGetSiteVersionApiRequest,
+  ): Promise<IGetSiteVersionApiResponse | undefined> => {
     const res = await api.authRequest({
-      url: `sites/${siteId}`,
+      url: `sites/${siteId}/versions/${versionId}`,
       method: 'GET',
       params: query as RequestParams | undefined,
     })
     if (res.status === 204) {
       return undefined
     }
-    const serialized = res.data as IGetSiteApiResponse
+    const serialized = res.data as IGetSiteVersionApiResponse
     return {
       id: serialized.id,
       name: serialized.name,
@@ -89,6 +99,23 @@ export const useSiteApi = (params: IUseSiteApiParams): IApiSite => {
     return res.data as IListSiteVersionsApiResponse
   }
 
+  const createDraft = async (siteId: string): Promise<IListSiteVersionsApiResponse> => {
+    const res = await api.authOptRequest({
+      url: `sites/${siteId}/actions/create_draft`,
+      method: 'POST',
+    })
+    return res.data as IListSiteVersionsApiResponse
+  }
+
+  const publishSite = async (siteId: string, publish: boolean): Promise<void> => {
+    const data: IPublishSiteApiRequest = { publish }
+    await api.authOptRequest({
+      url: `sites/${siteId}/actions/publish`,
+      method: 'POST',
+      data,
+    })
+  }
+
   const updateSite = async (
     siteId: string,
     payload: IUpdateSiteApiRequest,
@@ -100,7 +127,7 @@ export const useSiteApi = (params: IUseSiteApiParams): IApiSite => {
       data: payload,
       keepalive,
     })
-    const serialized = data as IGetSiteApiResponse
+    const serialized = data as IGetSiteVersionApiResponse
     return {
       id: serialized.id,
       name: serialized.name,
@@ -120,7 +147,9 @@ export const useSiteApi = (params: IUseSiteApiParams): IApiSite => {
   return {
     updateSite,
     getSiteUsage,
-    getSite,
+    getSiteVersion,
     listSiteVersions,
+    createDraft,
+    publishSite,
   }
 }

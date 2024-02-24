@@ -1,3 +1,4 @@
+import { store } from '@pubstudio/frontend/data-access-web-store'
 import { CommandType, ICommand } from '@pubstudio/shared/type-command'
 import {
   ICommandGroupData,
@@ -14,6 +15,10 @@ import { undoCommand } from './undo-command'
 const pushCommandHelper = (site: ISite, command: ICommand, clearRedo = true) => {
   const cmd = optimizeCommandGroup(command)
   const { editingMixinData } = site.editor ?? {}
+
+  if (store.version.activeVersionId.value) {
+    return
+  }
 
   // Push a command to close mixin menu for user when necessary
   if (editingMixinData && shouldCloseMixinMenuForUser(cmd)) {

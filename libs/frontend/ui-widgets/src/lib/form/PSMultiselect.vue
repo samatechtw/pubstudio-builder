@@ -66,7 +66,7 @@
         v-if="tooltip && !opened && showTooltip"
         ref="tooltipRef"
         class="multiselect-tooltip"
-        :style="tooltipStyle"
+        :style="{ ...tooltipStyle }"
       >
         {{ tooltip }}
       </div>
@@ -436,6 +436,7 @@ defineExpose({ multiselectRef, toggleDropdown })
 .multiselect-tooltip {
   @mixin tooltip;
   margin-top: 4px;
+  max-width: 220px;
 }
 
 .slide-enter-from,

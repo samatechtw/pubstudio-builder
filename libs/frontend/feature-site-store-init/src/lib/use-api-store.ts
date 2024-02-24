@@ -1,14 +1,12 @@
 import { useLocalSiteApi, usePlatformSiteApi } from '@pubstudio/frontend/data-access-api'
 import { ApiInjectionKey } from '@pubstudio/frontend/data-access-injection'
-import { useSiteApi } from '@pubstudio/frontend/data-access-site-api'
+import { GetSiteVersionFn, useSiteApi } from '@pubstudio/frontend/data-access-site-api'
 import { store } from '@pubstudio/frontend/data-access-web-store'
 import { parseApiErrorKey, PSApi, toApiError } from '@pubstudio/frontend/util-api'
 import { restoreSiteError, restoreSiteHelper } from '@pubstudio/frontend/util-command'
 import { serializeEditor, storeSite } from '@pubstudio/frontend/util-site-store'
 import { IApiError } from '@pubstudio/shared/type-api'
 import {
-  IGetSiteApiRequest,
-  IGetSiteApiResponse,
   IUpdateSiteApiRequest,
   IUpdateSiteApiResponse,
 } from '@pubstudio/shared/type-api-site-sites'
@@ -22,6 +20,7 @@ import {
   SiteSaveState,
 } from '@pubstudio/shared/type-site'
 import { computed, inject, ref } from 'vue'
+import { SiteSaveAlert, siteSaveAlert } from './site-save-alert'
 
 export interface IUseApiStoreProps {
   siteId: string
@@ -38,10 +37,7 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
   const siteId = ref(props.siteId)
   const saveError = ref<IApiError | undefined>()
   let saveTimer: ReturnType<typeof setTimeout> | undefined
-  let getFn: (
-    siteId: string,
-    query?: IGetSiteApiRequest,
-  ) => Promise<IGetSiteApiResponse | undefined>
+  let getFn: GetSiteVersionFn
   let updateFn: (
     siteId: string,
     payload: IUpdateSiteApiRequest,
@@ -78,7 +74,7 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
     if (siteId.value === 'identity') {
       const platformSiteApi = useLocalSiteApi(platformApi)
       siteId.value = store.user.identity.value.id
-      getFn = platformSiteApi.getLocalSite
+      getFn = platformSiteApi.getLocalSiteVersion
       updateFn = platformSiteApi.updateLocalSite
     } else {
       if (props.siteApiUrl) {
@@ -91,7 +87,7 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
       }
 
       const siteApi = useSiteApi({ store, serverAddress })
-      getFn = siteApi.getSite
+      getFn = siteApi.getSiteVersion
       updateFn = siteApi.updateSite
     }
     return serverAddress
@@ -143,6 +139,11 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
   // Save the Site to localstorage, and start the API update timer
   // The API timer is reset if currently active
   const save = async (site: ISite, options?: ISiteSaveOptions): Promise<void> => {
+    // Live site cannot be updated when a draft exists
+    if (store.version.activeVersionId.value) {
+      siteSaveAlert.value = SiteSaveAlert.Disabled
+      return
+    }
     const storedSite = storeSite(site)
     let changed = false
     for (const key in site) {
@@ -175,6 +176,9 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
   }
 
   const saveEditor = async (editor: IEditorContext): Promise<void> => {
+    if (store.version.activeVersionId.value) {
+      return
+    }
     const serialized = serializeEditor(editor)
     if (serialized) {
       const editorStr = JSON.stringify(serialized)
@@ -190,7 +194,10 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
 
   const restore = async (checkUpdateKey?: number): Promise<ISiteRestore | undefined> => {
     try {
-      const siteData = await getFn(siteId.value, { update_key: checkUpdateKey })
+      const versionId = store.version.activeVersionId.value ?? 'latest'
+      const siteData = await getFn(siteId.value, versionId, {
+        update_key: checkUpdateKey,
+      })
       if (!siteData) {
         return undefined
       }
@@ -211,6 +218,11 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
     }
   }
 
+  // Manually set the update key, for example when a new draft/version is created
+  const setUpdateKey = (key: string | undefined) => {
+    updateKey.value = key
+  }
+
   return {
     siteId,
     saveState,
@@ -219,5 +231,6 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
     save,
     saveEditor,
     restore,
+    setUpdateKey,
   }
 }

@@ -7,7 +7,7 @@
     <div class="toolbar-text-row">
       <ToolbarItem
         :active="isUnderline"
-        :tooltip="t('style.toolbar.underline')"
+        :tooltip="t('toolbar.underline')"
         class="underline"
         @mousedown.prevent
         @click="toggleTextDecoration('underline')"
@@ -16,14 +16,14 @@
       </ToolbarItem>
       <ToolbarItem
         :active="isItalic"
-        :tooltip="t('style.toolbar.italic')"
+        :tooltip="t('toolbar.italic')"
         @mousedown.prevent
         @click="toggleFontStyle('italic')"
       >
         <Italic />
       </ToolbarItem>
       <ToolbarColorPicker
-        :tooltip="t('style.toolbar.font_color')"
+        :tooltip="t('toolbar.font_color')"
         :color="getRawOrSelectedStyle(Css.Color)"
         :gradient="getRawStyle(Css.Background)"
         :forceNonGradient="isProsemirrorEditing"

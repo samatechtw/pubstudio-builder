@@ -5,12 +5,12 @@
     </div>
     <ToolbarFlex
       :modelValue="flex.grow"
-      :label="t('style.toolbar.grow')"
+      :label="t('toolbar.grow')"
       @update:modelValue="updateGrow"
     />
     <ToolbarFlex
       :modelValue="flex.shrink"
-      :label="t('style.toolbar.shrink')"
+      :label="t('toolbar.shrink')"
       @update:modelValue="updateShrink"
     />
     <ToolbarFlexBasis :flex="flex" @updateBasis="updateBasis" />

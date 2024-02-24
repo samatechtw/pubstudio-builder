@@ -5,10 +5,7 @@
       :key="breakpoint.id"
       :breakpoint="breakpoint"
     />
-    <ToolbarItem
-      :tooltip="t('style.toolbar.edit_breakpoint')"
-      @click="openEditBreakpointMenu"
-    >
+    <ToolbarItem :tooltip="t('toolbar.edit_breakpoint')" @click="openEditBreakpointMenu">
       <Edit class="edit-breakpoints" />
     </ToolbarItem>
     <EditBreakpointModal
