@@ -4,6 +4,7 @@
     "strict": true,
     "outDir": "../../../dist/out-tsc",
     "declaration": true,
+    "module": "ESNext",
     "target": "ESNext"
   },
   "include": ["**/*.ts"],
