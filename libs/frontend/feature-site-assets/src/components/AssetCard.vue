@@ -53,11 +53,7 @@
 import { computed, ref, toRefs } from 'vue'
 import { useDragDrop } from '@pubstudio/frontend/feature-render-builder'
 import { useBuild } from '@pubstudio/frontend/feature-build'
-import {
-  addAssetData,
-  makeAddImageData,
-  makeAddLinkData,
-} from '@pubstudio/frontend/util-command-data'
+import { addAssetData } from '@pubstudio/frontend/util-command-data'
 import {
   Check,
   CopyText,

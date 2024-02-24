@@ -1,4 +1,14 @@
 import {
+  createSite,
+  editStylesCancelEdit,
+  getLastCommand,
+  pushCommand,
+  pushCommandObject,
+  pushOrReplaceCommand,
+  replaceLastCommand,
+  setSelectedComponent,
+} from '@pubstudio/frontend/data-access-command'
+import {
   activeBreakpoint,
   descSortedBreakpoints,
 } from '@pubstudio/frontend/feature-site-source'
@@ -8,16 +18,6 @@ import {
   resolveComponent,
   resolveStyle,
 } from '@pubstudio/frontend/util-builtin'
-import {
-  createSite,
-  editStylesCancelEdit,
-  getLastCommand,
-  pushCommand,
-  pushCommandObject,
-  pushOrReplaceCommand,
-  replaceLastCommand,
-  setSelectedComponent,
-} from '@pubstudio/frontend/util-command'
 import {
   makeAddBuiltinComponentData,
   makeEditComponentData,

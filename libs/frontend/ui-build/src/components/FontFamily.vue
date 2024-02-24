@@ -42,7 +42,7 @@ import {
   setEditorDropdown,
   setThemeTab,
   toggleEditorMenu,
-} from '@pubstudio/frontend/util-command'
+} from '@pubstudio/frontend/data-access-command'
 
 const { t } = useI18n()
 const { site, editor } = useBuild()

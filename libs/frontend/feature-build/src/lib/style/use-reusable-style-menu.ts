@@ -1,15 +1,15 @@
 import {
-  activeBreakpoint,
-  descSortedBreakpoints,
-} from '@pubstudio/frontend/feature-site-source'
-import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
-import {
   currentStyleType,
   editCommands,
   editStyles,
   setEditingMixin,
   undoCommand,
-} from '@pubstudio/frontend/util-command'
+} from '@pubstudio/frontend/data-access-command'
+import {
+  activeBreakpoint,
+  descSortedBreakpoints,
+} from '@pubstudio/frontend/feature-site-source'
+import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { computeComponentFlattenedStyles } from '@pubstudio/frontend/util-component'
 import { styleId } from '@pubstudio/frontend/util-ids'
 import { ICommand, StyleType } from '@pubstudio/shared/type-command'

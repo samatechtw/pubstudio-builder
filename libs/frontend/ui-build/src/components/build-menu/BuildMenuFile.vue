@@ -82,7 +82,7 @@ import {
 } from '@pubstudio/frontend/util-site-deserialize'
 import { ISerializedSite } from '@pubstudio/shared/type-site'
 import { useBuild } from '@pubstudio/frontend/feature-build'
-import { makeNamespace } from '@pubstudio/frontend/util-command'
+import { makeNamespace } from '@pubstudio/frontend/data-access-command'
 import BuildMenuIconText from './BuildMenuIconText.vue'
 
 const { t } = useI18n()

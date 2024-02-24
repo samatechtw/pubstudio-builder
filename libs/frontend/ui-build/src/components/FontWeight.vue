@@ -20,7 +20,7 @@ import { useI18n } from 'petite-vue-i18n'
 import { Css, EditorDropdown, ThemeFontSource } from '@pubstudio/shared/type-site'
 import { PSMultiselect } from '@pubstudio/frontend/ui-widgets'
 import { useBuild, useToolbar } from '@pubstudio/frontend/feature-build'
-import { setEditorDropdown } from '@pubstudio/frontend/util-command'
+import { setEditorDropdown } from '@pubstudio/frontend/data-access-command'
 
 const { t } = useI18n()
 const { site, editor } = useBuild()

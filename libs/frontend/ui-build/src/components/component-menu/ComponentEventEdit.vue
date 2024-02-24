@@ -115,7 +115,7 @@ import {
 } from '@pubstudio/shared/type-site'
 import { Checkbox, Plus } from '@pubstudio/frontend/ui-widgets'
 import { useBuild } from '@pubstudio/frontend/feature-build'
-import { setEditBehavior } from '@pubstudio/frontend/util-command'
+import { setEditBehavior } from '@pubstudio/frontend/data-access-command'
 import EditMenuTitle from '../EditMenuTitle.vue'
 import EventBehaviorRow from './EventBehaviorRow.vue'
 import { IUpdateComponentArgPayload } from '../component-arg/i-update-component-arg-payload'

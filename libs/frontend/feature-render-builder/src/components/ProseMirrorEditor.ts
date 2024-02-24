@@ -1,3 +1,5 @@
+import { getProseMirrorContainerId } from '@pubstudio/frontend/data-access-command'
+import { store } from '@pubstudio/frontend/data-access-web-store'
 import {
   createComponentEditorView,
   editViewTxCount,
@@ -10,7 +12,6 @@ import {
 } from '@pubstudio/frontend/feature-site-source'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { resolveThemeVariables } from '@pubstudio/frontend/util-builtin'
-import { getProseMirrorContainerId } from '@pubstudio/frontend/util-command'
 import { findStyles } from '@pubstudio/frontend/util-component'
 import {
   firstMarkInSelection,
@@ -180,7 +181,9 @@ export const ProseMirrorEditor = defineComponent({
     })
 
     onBeforeUnmount(() => {
-      siteStore.value.save(site.value)
+      if (store.version.editingEnabled.value) {
+        siteStore.value.save(site.value)
+      }
       editor.value.editView?.destroy()
       editor.value.editView = undefined
     })

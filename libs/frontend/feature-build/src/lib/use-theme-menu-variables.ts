@@ -1,4 +1,4 @@
-import { selectColor } from '@pubstudio/frontend/util-command'
+import { selectColor } from '@pubstudio/frontend/data-access-command'
 import { IThemeVariable } from '@pubstudio/shared/type-site'
 import { useI18n } from 'petite-vue-i18n'
 import { reactive, Ref, ref, UnwrapNestedRefs } from 'vue'

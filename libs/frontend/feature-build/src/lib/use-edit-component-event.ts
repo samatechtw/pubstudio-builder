@@ -1,4 +1,4 @@
-import { setComponentEditEvent } from '@pubstudio/frontend/util-command'
+import { setComponentEditEvent } from '@pubstudio/frontend/data-access-command'
 import { ComponentTabState, IComponentEvent } from '@pubstudio/shared/type-site'
 import { computed, ComputedRef } from 'vue'
 import { useBuild } from './use-build'

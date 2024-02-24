@@ -113,7 +113,7 @@ import {
   usePaddingMarginEdit,
   useToolbar,
 } from '@pubstudio/frontend/feature-build'
-import { setComponentMenuCollapses } from '@pubstudio/frontend/util-command'
+import { setComponentMenuCollapses } from '@pubstudio/frontend/data-access-command'
 import SizeInput from './SizeInput.vue'
 import PaddingMarginEdit from './PaddingMarginEdit.vue'
 import EditMenuTitle from '../EditMenuTitle.vue'

@@ -49,7 +49,7 @@ import { useDropdown } from '@pubstudio/frontend/util-dropdown'
 import { ToolbarItem } from '@pubstudio/frontend/ui-widgets'
 import { PSInput } from '@pubstudio/frontend/ui-widgets'
 import { useBuild } from '@pubstudio/frontend/feature-build'
-import { setBuilderWidth, setBuilderScale } from '@pubstudio/frontend/util-command'
+import { setBuilderWidth, setBuilderScale } from '@pubstudio/frontend/data-access-command'
 
 const { t } = useI18n()
 const { editor } = useBuild()

@@ -62,7 +62,7 @@ import { useControlledClickaway } from '@pubstudio/frontend/util-clickaway'
 import { Css, EditorDropdown } from '@pubstudio/shared/type-site'
 import { ICommand } from '@pubstudio/shared/type-command'
 import { useBuild, useToolbar, useThemeColors } from '@pubstudio/frontend/feature-build'
-import { setEditorDropdown } from '@pubstudio/frontend/util-command'
+import { setEditorDropdown } from '@pubstudio/frontend/data-access-command'
 
 import ToolbarColorPicker from './ToolbarColorPicker.vue'
 import { IToolbarPickerColor, IToolbarThemedGradient } from './i-toolbar-color-picker'

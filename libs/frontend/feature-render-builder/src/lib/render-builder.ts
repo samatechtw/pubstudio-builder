@@ -1,3 +1,4 @@
+import { setSelectedComponent } from '@pubstudio/frontend/data-access-command'
 import {
   computeAttrsInputsMixins,
   computeEvents,
@@ -10,7 +11,6 @@ import {
   activeBreakpoint,
   descSortedBreakpoints,
 } from '@pubstudio/frontend/feature-site-source'
-import { setSelectedComponent } from '@pubstudio/frontend/util-command'
 import { findStyles } from '@pubstudio/frontend/util-component'
 import { RenderMode } from '@pubstudio/frontend/util-render'
 import { resetRuntimeContext, runtimeContext } from '@pubstudio/frontend/util-runtime'

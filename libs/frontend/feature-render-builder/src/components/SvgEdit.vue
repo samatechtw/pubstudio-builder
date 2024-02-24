@@ -7,7 +7,7 @@
 <script lang="ts" setup>
 import { onMounted, ref, toRefs, watch } from 'vue'
 import { Edit } from '@pubstudio/frontend/ui-widgets'
-import { setEditSvg } from '@pubstudio/frontend/util-command'
+import { setEditSvg } from '@pubstudio/frontend/data-access-command'
 import { useBuild } from '@pubstudio/frontend/feature-build'
 
 const { editor, site } = useBuild()

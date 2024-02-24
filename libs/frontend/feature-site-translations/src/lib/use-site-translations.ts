@@ -1,10 +1,10 @@
+import { showTranslations } from '@pubstudio/frontend/data-access-command'
 import {
   createTranslationEditorView,
   IEditTranslation,
   useBuild,
 } from '@pubstudio/frontend/feature-build'
 import { IMultiselectObj } from '@pubstudio/frontend/type-ui-widgets'
-import { showTranslations } from '@pubstudio/frontend/util-command'
 import { INewTranslations } from '@pubstudio/shared/type-command-data'
 import { ITranslations } from '@pubstudio/shared/type-site'
 import { useI18n } from 'petite-vue-i18n'

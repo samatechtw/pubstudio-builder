@@ -61,7 +61,7 @@ import { EditorView } from 'prosemirror-view'
 import { Modal, PSButton } from '@pubstudio/frontend/ui-widgets'
 import { IEditSvg } from '@pubstudio/shared/type-site'
 import { createCodeEditorView, useBuild } from '@pubstudio/frontend/feature-build'
-import { setEditSvg } from '@pubstudio/frontend/util-command'
+import { setEditSvg } from '@pubstudio/frontend/data-access-command'
 
 hljs.registerLanguage('xml', xml)
 

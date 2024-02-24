@@ -1,9 +1,12 @@
 import { useLocalSiteApi, usePlatformSiteApi } from '@pubstudio/frontend/data-access-api'
+import {
+  restoreSiteError,
+  restoreSiteHelper,
+} from '@pubstudio/frontend/data-access-command'
 import { ApiInjectionKey } from '@pubstudio/frontend/data-access-injection'
 import { GetSiteVersionFn, useSiteApi } from '@pubstudio/frontend/data-access-site-api'
 import { store } from '@pubstudio/frontend/data-access-web-store'
 import { parseApiErrorKey, PSApi, toApiError } from '@pubstudio/frontend/util-api'
-import { restoreSiteError, restoreSiteHelper } from '@pubstudio/frontend/util-command'
 import { serializeEditor, storeSite } from '@pubstudio/frontend/util-site-store'
 import { IApiError } from '@pubstudio/shared/type-api'
 import {
@@ -30,6 +33,13 @@ export interface IUseApiStoreProps {
 interface IUpdateApiOptions {
   keepalive?: boolean
   ignoreUpdateKey?: boolean
+}
+
+// The intent is to refresh the page when the API store is affected, otherwise we lose track
+// of the update key and the next update-site call fails. It would be better to find a way
+// to refresh the key or ignore it for the next update-site call after HMR.
+if (import.meta.hot) {
+  import.meta.hot.decline()
 }
 
 export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
@@ -140,7 +150,7 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
   // The API timer is reset if currently active
   const save = async (site: ISite, options?: ISiteSaveOptions): Promise<void> => {
     // Live site cannot be updated when a draft exists
-    if (store.version.activeVersionId.value) {
+    if (!store.version.editingEnabled.value) {
       siteSaveAlert.value = SiteSaveAlert.Disabled
       return
     }
@@ -176,7 +186,7 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
   }
 
   const saveEditor = async (editor: IEditorContext): Promise<void> => {
-    if (store.version.activeVersionId.value) {
+    if (!store.version.editingEnabled.value) {
       return
     }
     const serialized = serializeEditor(editor)

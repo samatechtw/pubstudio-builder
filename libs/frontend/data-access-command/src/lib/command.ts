@@ -16,7 +16,8 @@ const pushCommandHelper = (site: ISite, command: ICommand, clearRedo = true) => 
   const cmd = optimizeCommandGroup(command)
   const { editingMixinData } = site.editor ?? {}
 
-  if (store.version.activeVersionId.value) {
+  // Live site cannot be updated when a draft exists
+  if (!store.version.editingEnabled.value) {
     return
   }
 

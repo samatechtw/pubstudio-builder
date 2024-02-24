@@ -29,7 +29,7 @@ import { useI18n } from 'petite-vue-i18n'
 import { PSMultiselect } from '@pubstudio/frontend/ui-widgets'
 import { EditorDropdown } from '@pubstudio/shared/type-site'
 import { useBuild, usePageMenu } from '@pubstudio/frontend/feature-build'
-import { setEditorDropdown } from '@pubstudio/frontend/util-command'
+import { setEditorDropdown } from '@pubstudio/frontend/data-access-command'
 import { IMultiselectOption, IMultiselectObj } from '@pubstudio/frontend/type-ui-widgets'
 
 const { t } = useI18n()

@@ -15,7 +15,6 @@
       :forceNonGradient="forceNonGradient"
       :selectedThemeColors="selectedThemeColors"
       :resolveThemeVar="resolveThemeVar"
-      class="font-color"
       @selectColor="selectColor"
       @applyGradient="applyGradient"
       @click.stop
@@ -81,3 +80,12 @@ const applyGradient = (gradient: IThemedGradient | undefined) => {
   emit('applyGradient', emitGradient)
 }
 </script>
+
+<style lang="postcss" scoped>
+.color-picker-wrap {
+  position: relative;
+}
+.color-picker {
+  left: -24px;
+}
+</style>

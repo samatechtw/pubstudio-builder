@@ -25,7 +25,7 @@
 import { computed } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { useBuild } from '@pubstudio/frontend/feature-build'
-import { setEditBehavior } from '@pubstudio/frontend/util-command'
+import { setEditBehavior } from '@pubstudio/frontend/data-access-command'
 import { Edit, Plus } from '@pubstudio/frontend/ui-widgets'
 import BehaviorModal from '../component-menu/BehaviorModal.vue'
 

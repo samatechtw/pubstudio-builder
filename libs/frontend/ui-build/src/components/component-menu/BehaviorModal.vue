@@ -74,7 +74,7 @@ import { IBehaviorArg, IEditBehavior } from '@pubstudio/shared/type-site'
 import MenuRow from '../MenuRow.vue'
 import BehaviorArgs from './BehaviorArgs.vue'
 import { useBuild, createCodeEditorView } from '@pubstudio/frontend/feature-build'
-import { setEditBehavior } from '@pubstudio/frontend/util-command'
+import { setEditBehavior } from '@pubstudio/frontend/data-access-command'
 import BehaviorContextVars from './BehaviorContextVars.vue'
 
 hljs.registerLanguage('javascript', js)

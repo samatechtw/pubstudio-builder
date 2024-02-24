@@ -1,5 +1,5 @@
+import { editCommands, undoCommand } from '@pubstudio/frontend/data-access-command'
 import { activeBreakpoint } from '@pubstudio/frontend/feature-site-source'
-import { editCommands, undoCommand } from '@pubstudio/frontend/util-command'
 import { ICommand, StyleType } from '@pubstudio/shared/type-command'
 import {
   Css,

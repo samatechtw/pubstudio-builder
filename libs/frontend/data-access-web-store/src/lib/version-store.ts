@@ -9,6 +9,9 @@ export const versionStoreGetters = (state: IVersionState) => ({
   activeVersionId(): string | null {
     return state.activeVersionId
   },
+  editingEnabled(): boolean {
+    return !state.activeVersionId
+  },
 })
 
 export const versionStoreMutations = (state: IVersionState) => ({
