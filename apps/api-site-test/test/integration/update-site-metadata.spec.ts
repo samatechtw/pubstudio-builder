@@ -61,7 +61,7 @@ describe('Update Site Metadata', () => {
 
       // Verify site_type is updated
       const getResponse = await api
-        .get(`/api/sites`)
+        .get('/api/sites')
         .set('Authorization', adminAuth)
         .expect(200)
       const body: IListSitesApiResponse = getResponse.body
@@ -81,11 +81,14 @@ describe('Update Site Metadata', () => {
         .expect(200)
 
       // Verify owner can no longer access
-      await api.get(`/api/sites/${siteId}`).set('Authorization', ownerAuth).expect(403, {
-        code: 'SiteDisabled',
-        message: 'Forbidden',
-        status: 403,
-      })
+      await api
+        .get(`/api/sites/${siteId}/versions/latest`)
+        .set('Authorization', ownerAuth)
+        .expect(403, {
+          code: 'SiteDisabled',
+          message: 'Forbidden',
+          status: 403,
+        })
 
       // Verify anonymous can no longer access
       await api.get('/api/sites/current').set('Host', 'www.myblog.org').expect(403, {

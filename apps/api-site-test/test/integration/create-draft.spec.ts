@@ -1,4 +1,8 @@
-import { IListSiteVersionsApiResponse } from '@pubstudio/shared/type-api-site-sites'
+import {
+  IGetSiteApiResponse,
+  IGetSiteVersionApiResponse,
+  IListSiteVersionsApiResponse,
+} from '@pubstudio/shared/type-api-site-sites'
 import { SiteApiResetService } from '@pubstudio/shared/util-test-reset'
 import supertest from 'supertest'
 import TestAgent from 'supertest/lib/agent'
@@ -77,6 +81,39 @@ describe('Create Site Draft', () => {
       const body: IListSiteVersionsApiResponse = res.body
 
       expect(versionsBefore + 1).toEqual(body.length)
+    })
+
+    it('creates a draft and updates it', async () => {
+      siteId = '870aafc9-36e9-476a-b38c-c1aaaad9d9fe'
+      ownerId = '903b3c28-deaa-45dc-a43f-511fe965d34e'
+
+      const newData1 = '{"test":"SOME TEST DATA"}'
+
+      const res = await api.get('/api/sites/current').set('Host', 'test3.com').expect(200)
+      const initialData = (res.body as IGetSiteApiResponse).pages
+
+      // Create draft
+      await api.post(testEndpoint(siteId)).set('Authorization', ownerAuth).expect(200)
+
+      // Update draft
+      await api
+        .patch(`/api/sites/${siteId}`)
+        .send({ pages: newData1 })
+        .set('Authorization', ownerAuth)
+        .expect(200)
+
+      // Published version not updated
+      const r1 = await api.get('/api/sites/current').set('Host', 'test3.com').expect(200)
+      const b1: IGetSiteVersionApiResponse = r1.body
+      expect(b1.pages).toEqual(initialData)
+
+      // Draft version updated
+      const r2 = await api
+        .get(`/api/sites/${siteId}/versions/latest`)
+        .set('Authorization', ownerAuth)
+        .expect(200)
+      const b2: IGetSiteVersionApiResponse = r2.body
+      expect(b2.pages).toEqual(JSON.stringify(newData1))
     })
 
     it('creates draft for published site', async () => {

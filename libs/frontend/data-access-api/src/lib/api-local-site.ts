@@ -14,6 +14,12 @@ export interface IApiLocalSite {
     data: IUpdateLocalSiteApiRequest,
     keepalive?: boolean,
   ) => Promise<IUpdateLocalSiteApiResponse>
+  // Wrapper for API compatibility with site-api `getSiteVersion`
+  getLocalSiteVersion(
+    siteId: string,
+    versionId: string,
+    query?: IGetLocalSiteApiRequest,
+  ): Promise<IGetLocalSiteApiResponse | undefined>
   getLocalSite(
     siteId: string,
     query?: IGetLocalSiteApiRequest,
@@ -78,8 +84,17 @@ export const useLocalSiteApi = (_api: PSApi): IApiLocalSite => {
     }
   }
 
+  const getLocalSiteVersion = async (
+    siteId: string,
+    _versionId: string,
+    query?: IGetLocalSiteApiRequest,
+  ): Promise<IGetLocalSiteApiResponse | undefined> => {
+    return getLocalSite(siteId, query)
+  }
+
   return {
     updateLocalSite,
     getLocalSite,
+    getLocalSiteVersion,
   }
 }

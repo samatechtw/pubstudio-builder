@@ -3,12 +3,12 @@
     v-slot="{ label }"
     :customLabel="true"
     :value="fontFamily?.value"
-    :placeholder="t('style.toolbar.font_family')"
+    :placeholder="t('toolbar.font_family')"
     :options="options"
     :clearable="!inherited"
     :caret="false"
     toggleId="style-menu"
-    :emptyText="t('style.toolbar.no_fonts')"
+    :emptyText="t('toolbar.no_fonts')"
     :openControl="() => editor?.editorDropdown === EditorDropdown.FontFamily"
     class="font-family-select"
     :class="{ inherited }"
@@ -48,7 +48,7 @@ const { t } = useI18n()
 const { site, editor } = useBuild()
 const { getResolvedOrSelectedStyle, setStyle } = useToolbar()
 
-const addFontText = t('style.toolbar.add_font')
+const addFontText = t('toolbar.add_font')
 
 const options = computed(() => {
   const options = Object.keys(site.value.context.theme.fonts)

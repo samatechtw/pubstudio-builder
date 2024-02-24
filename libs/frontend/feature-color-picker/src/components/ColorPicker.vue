@@ -39,14 +39,14 @@
           @click="addGradientColor(rgbaString, c.themeVar)"
         >
           <Plus color="white" plusColor="#6a5cf5" class="plus" />
-          {{ t('style.toolbar.add_gradient') }}
+          {{ t('toolbar.add_gradient') }}
         </ColorPickerButton>
       </div>
       <Box name="HEX" :color="modelHex" @inputColor="inputHex" />
       <Box name="RGBA" :color="modelRgba" @inputColor="inputRgba" />
       <div class="select-wrap">
         <ColorPickerButton class="color-select" @click="emitResult">
-          {{ t('style.toolbar.select_color') }}
+          {{ t('toolbar.select_color') }}
         </ColorPickerButton>
         <Trash color="#b7436a" @click="clearColor" />
       </div>
@@ -62,7 +62,7 @@
           />
         </div>
         <div v-else class="theme-color-empty">
-          {{ t('style.toolbar.no_theme_colors') }}
+          {{ t('toolbar.no_theme_colors') }}
         </div>
       </div>
     </div>

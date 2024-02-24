@@ -2,14 +2,14 @@
   <div class="style-toolbar">
     <ToolbarItem
       :active="editor?.showComponentTree"
-      :tooltip="t('style.toolbar.component_tree')"
+      :tooltip="t('toolbar.component_tree')"
       class="toolbar-tree"
       @click="toggleComponentTree"
     >
       <Hierarchy />
     </ToolbarItem>
     <ToolbarItem
-      :tooltip="t('style.toolbar.undo')"
+      :tooltip="t('toolbar.undo')"
       :disabled="!canUndo"
       :alert="commandAlert === CommandType.Undo"
       class="toolbar-undo"
@@ -18,7 +18,7 @@
       <Undo />
     </ToolbarItem>
     <ToolbarItem
-      :tooltip="t('style.toolbar.redo')"
+      :tooltip="t('toolbar.redo')"
       :disabled="!canRedo"
       :alert="commandAlert === CommandType.Redo"
       @click="redo()"
@@ -39,14 +39,14 @@
     </ToolbarItem>
     <ToolbarItem
       :active="editor?.debugBounding"
-      :tooltip="t('style.toolbar.bounding')"
+      :tooltip="t('toolbar.bounding')"
       class="bounding"
       @click="setDebugBounding(editor, !editor?.debugBounding)"
     >
       <BoundingBox />
     </ToolbarItem>
     <ToolbarItem
-      :tooltip="t('style.toolbar.bug_title')"
+      :tooltip="t('toolbar.bug_title')"
       class="bounding"
       @click="showBugReportModal = true"
     >
@@ -59,7 +59,7 @@
     >
       <Settings />
     </ToolbarItem>
-    <ToolbarItem :tooltip="t(`style.toolbar.save.${siteStore.saveState}`)">
+    <ToolbarItem :tooltip="t(`toolbar.save.${siteStore.saveState}`)">
       <div class="save-state" :class="siteStore.saveState" />
     </ToolbarItem>
     <BugReportModal :show="showBugReportModal" @cancel="showBugReportModal = false" />
@@ -87,6 +87,7 @@ import ToolbarPseudoClass from './ToolbarPseudoClass.vue'
 import ToolbarBuilderWidth from './ToolbarBuilderWidth.vue'
 import ToolbarBreakpoint from './ToolbarBreakpoint.vue'
 import BugReportModal from './BugReportModal.vue'
+import ToolbarVersion from './ToolbarVersion.vue'
 
 defineProps<{
   hideSettings?: boolean

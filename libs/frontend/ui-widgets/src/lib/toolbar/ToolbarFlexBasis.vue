@@ -1,7 +1,7 @@
 <template>
   <ToolbarFlex
     :modelValue="currentValue"
-    :label="t('style.toolbar.basis')"
+    :label="t('toolbar.basis')"
     :isAuto="isAuto"
     :invalid="invalid"
     inputWrapClass="flex-basis-input"

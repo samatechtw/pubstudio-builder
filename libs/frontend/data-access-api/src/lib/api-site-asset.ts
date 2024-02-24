@@ -11,7 +11,6 @@ import {
   IUpdatePlatformSiteAssetResponse,
   IVerifyPlatformSiteAssetResponse,
 } from '@pubstudio/shared/type-api-platform-site-asset'
-import { IGetSiteApiResponse } from '@pubstudio/shared/type-api-site-sites'
 import { sleep } from '@pubstudio/shared/util-core'
 import { RequestParams } from '@sampullman/fetch-api'
 import {
@@ -43,7 +42,6 @@ export interface IApiSiteAsset {
     id: string,
     payload: IUpdatePlatformSiteAssetRequest,
   ) => Promise<IUpdatePlatformSiteAssetResponse>
-  getSiteAsset: (siteId: string) => Promise<IGetSiteApiResponse>
   listSiteAssets: (
     params: IListPlatformSiteAssetsRequest,
   ) => Promise<IListPlatformSiteAssetsResponse>
@@ -115,14 +113,6 @@ export const useSiteAssetApi = (api: PSApi): IApiSiteAsset => {
     })
   }
 
-  const getSiteAsset = async (siteId: string): Promise<IGetSiteApiResponse> => {
-    const { data } = await api.request({
-      url: `site-assets/${siteId}`,
-      method: 'GET',
-    })
-    return data as IGetSiteApiResponse
-  }
-
   const uploadFileWithSignedUrl = (url: string, file: File): Promise<Response> => {
     return fetch(url, { method: 'PUT', body: file, mode: 'cors' })
   }
@@ -180,7 +170,6 @@ export const useSiteAssetApi = (api: PSApi): IApiSiteAsset => {
     replaceSiteAsset,
     verifySiteAsset,
     updateSiteAsset,
-    getSiteAsset,
     listSiteAssets,
     deleteSiteAsset,
     uploadFileWithSignedUrl,

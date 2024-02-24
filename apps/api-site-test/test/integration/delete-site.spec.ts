@@ -31,7 +31,10 @@ describe('Delete Site', () => {
       .expect(200)
 
     // Make sure Site no longer exists
-    await api.get(`${testEndpoint}/${siteId}`).expect(404)
+    await api
+      .get(`${testEndpoint}/${siteId}/versions/latest`)
+      .set('Authorization', adminAuth)
+      .expect(404)
   })
 
   describe('when request is not valid', () => {

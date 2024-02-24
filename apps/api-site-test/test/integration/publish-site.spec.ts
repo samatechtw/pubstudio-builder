@@ -1,5 +1,5 @@
 import {
-  IGetSiteApiResponse,
+  IGetSiteVersionApiResponse,
   IPublishSiteApiRequest,
 } from '@pubstudio/shared/type-api-site-sites'
 import { SiteApiResetService } from '@pubstudio/shared/util-test-reset'
@@ -33,10 +33,10 @@ describe('Publish Site', () => {
 
   const verifyPublished = async (siteId: string, published: boolean) => {
     const response = await api
-      .get(`${testEndpoint}/${siteId}`)
+      .get(`${testEndpoint}/${siteId}/versions/latest`)
       .set('Authorization', adminAuth)
       .expect(200)
-    const body: IGetSiteApiResponse = response.body
+    const body: IGetSiteVersionApiResponse = response.body
     expect(body.published).toEqual(published)
   }
 
@@ -106,7 +106,7 @@ describe('Publish Site', () => {
         .get(`/api/sites/${siteId}/versions/1`)
         .set('Authorization', ownerAuth)
         .expect(200)
-      const body1: IGetSiteApiResponse = r1.body
+      const body1: IGetSiteVersionApiResponse = r1.body
       expect(body1.pages).toEqual(JSON.stringify(newData1))
 
       // Update the draft again
@@ -121,14 +121,14 @@ describe('Publish Site', () => {
         .get(`/api/sites/${siteId}/versions/1`)
         .set('Authorization', ownerAuth)
         .expect(200)
-      const body2: IGetSiteApiResponse = r2.body
+      const body2: IGetSiteVersionApiResponse = r2.body
       expect(body2.pages).toEqual(JSON.stringify(newData1))
     })
   })
 
   describe('when requester is Anonymous', () => {
     it('returns 403 error', async () => {
-      await api.get(`${testEndpoint}/${siteId}`).expect(401, {
+      await api.post(`${testEndpoint}/${siteId}/actions/publish`).expect(401, {
         code: 'Unauthorized',
         message: 'Unauthorized',
         status: 401,

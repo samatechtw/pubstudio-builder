@@ -1,5 +1,5 @@
 import {
-  IGetSiteApiResponse,
+  IGetSiteVersionApiResponse,
   IUpdateSiteApiRequest,
   IUpdateSiteApiResponse,
 } from '@pubstudio/shared/type-api-site-sites'
@@ -70,11 +70,11 @@ describe('Update Site', () => {
 
   it('updates site when update_key matches the saved content_updated_at', async () => {
     const prevResponse = await api
-      .get(`${testEndpoint}/${siteId}`)
+      .get(`${testEndpoint}/${siteId}/versions/latest`)
       .set('Authorization', adminAuth)
       .expect(200)
 
-    const prevBody: IGetSiteApiResponse = prevResponse.body
+    const prevBody: IGetSiteVersionApiResponse = prevResponse.body
 
     payload.update_key = prevBody.updated_at.toString()
 

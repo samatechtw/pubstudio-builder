@@ -112,7 +112,7 @@ export const ProseMirrorEditor = defineComponent({
             },
           },
         })
-        plugins.push(selPlugin)
+        // plugins.push(selPlugin)
 
         editor.editView?.destroy()
         editor.editView = createComponentEditorView(

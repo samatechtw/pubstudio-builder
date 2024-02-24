@@ -3,7 +3,7 @@
     <ToolbarItemDropdown :items="alignHorizontalItems" />
     <ToolbarItemDropdown :items="alignVerticalItems" />
     <ToolbarColorPicker
-      :tooltip="t('style.toolbar.background_color')"
+      :tooltip="t('toolbar.background_color')"
       :color="getRawOrSelectedStyle(Css.BackgroundColor)"
       :gradient="getRawStyle(Css.Background)"
       :showPicker="showBackgroundPicker"
@@ -17,23 +17,19 @@
     </ToolbarColorPicker>
     <ToolbarItem
       :active="isColumn"
-      :tooltip="t('style.toolbar.flex_vertical')"
+      :tooltip="t('toolbar.flex_vertical')"
       @click="toggleDirection('column')"
     >
       <FlexColumn />
     </ToolbarItem>
     <ToolbarItem
       :active="isRow"
-      :tooltip="t('style.toolbar.flex_horizontal')"
+      :tooltip="t('toolbar.flex_horizontal')"
       @click="toggleDirection('row')"
     >
       <FlexRow />
     </ToolbarItem>
-    <ToolbarItem
-      :active="isWrap"
-      :tooltip="t('style.toolbar.flex_wrap')"
-      @click="toggleWrap"
-    >
+    <ToolbarItem :active="isWrap" :tooltip="t('toolbar.flex_wrap')" @click="toggleWrap">
       <FlexWrap />
     </ToolbarItem>
   </div>
@@ -279,19 +275,19 @@ const alignHorizontalItems: IToolbarDropdownItem[] = [
   {
     active: isAlignLeft,
     icon: markRaw(AlignLeft),
-    tooltip: t('style.toolbar.align_left'),
+    tooltip: t('toolbar.align_left'),
     click: toggleAlignLeft,
   },
   {
     active: isAlignCenter,
     icon: markRaw(AlignCenter),
-    tooltip: t('style.toolbar.align_center'),
+    tooltip: t('toolbar.align_center'),
     click: toggleAlignCenter,
   },
   {
     active: isAlignRight,
     icon: markRaw(AlignRight),
-    tooltip: t('style.toolbar.align_right'),
+    tooltip: t('toolbar.align_right'),
     click: toggleAlignRight,
   },
 ]
@@ -331,19 +327,19 @@ const alignVerticalItems: IToolbarDropdownItem[] = [
   {
     active: isAlignTop,
     icon: markRaw(AlignTop),
-    tooltip: t('style.toolbar.align_top'),
+    tooltip: t('toolbar.align_top'),
     click: toggleAlignTop,
   },
   {
     active: isAlignCenterVertical,
     icon: markRaw(AlignCenterVertical),
-    tooltip: t('style.toolbar.align_center_vertical'),
+    tooltip: t('toolbar.align_center_vertical'),
     click: toggleAlignCenterVertical,
   },
   {
     active: isAlignBottom,
     icon: markRaw(AlignBottom),
-    tooltip: t('style.toolbar.align_bottom'),
+    tooltip: t('toolbar.align_bottom'),
     click: toggleAlignBottom,
   },
 ]

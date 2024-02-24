@@ -19,6 +19,7 @@ export interface IUseSiteSource {
   initializeSite: (options: IInitializeSiteOptions) => Promise<string | undefined>
   checkOutdated: () => Promise<void>
   replaceSite: (newSite: ISite) => void
+  setRestoredSite: (restored: ISiteRestore | undefined) => void
 }
 
 export interface IInitializeSiteOptions {
@@ -85,6 +86,7 @@ export const useSiteSource = (): IUseSiteSource => {
     initializeSite,
     checkOutdated,
     replaceSite,
+    setRestoredSite,
     apiSiteId,
     siteStore,
     isSaving,

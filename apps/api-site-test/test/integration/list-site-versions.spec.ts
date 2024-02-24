@@ -1,7 +1,4 @@
-import {
-  IGetSiteApiResponse,
-  IListSiteVersionsApiResponse,
-} from '@pubstudio/shared/type-api-site-sites'
+import { IListSiteVersionsApiResponse } from '@pubstudio/shared/type-api-site-sites'
 import { SiteApiResetService } from '@pubstudio/shared/util-test-reset'
 import supertest from 'supertest'
 import TestAgent from 'supertest/lib/agent'
@@ -60,7 +57,7 @@ describe('List Site Versions', () => {
           .set('Authorization', ownerAuth)
           .expect(200)
 
-        const body: IGetSiteApiResponse[] = response.body
+        const body: IListSiteVersionsApiResponse = response.body
 
         expect(response.status).toBe(200)
         expect(body.length).toEqual(1)
@@ -80,7 +77,7 @@ describe('List Site Versions', () => {
           .get(`${testEndpoint}/${siteId}/versions?from=1&to=3`)
           .set('Authorization', adminAuth)
 
-        const body: IGetSiteApiResponse[] = response.body
+        const body: IListSiteVersionsApiResponse = response.body
 
         expect(response.status).toBe(200)
         expect(body.length).toEqual(2)
@@ -93,7 +90,7 @@ describe('List Site Versions', () => {
           .get(`${testEndpoint}/${siteId}/versions`)
           .set('Authorization', adminAuth)
 
-        const body: IGetSiteApiResponse[] = response.body
+        const body: IListSiteVersionsApiResponse = response.body
 
         expect(response.status).toBe(200)
         expect(body.length).toEqual(2)

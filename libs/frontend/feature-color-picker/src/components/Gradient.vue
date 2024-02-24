@@ -14,7 +14,7 @@
       <div class="gradient-color-labels">
         <div class="color-label">#</div>
         <div class="stop-label">
-          {{ t('style.toolbar.stop') }}
+          {{ t('toolbar.stop') }}
         </div>
         <div class="delete-label" />
       </div>
@@ -37,7 +37,7 @@
         :class="{ active: gradientType === typeValue }"
         @click="emit('update:type', typeValue)"
       >
-        {{ t(`style.toolbar.gradients.${typeValue}`) }}
+        {{ t(`toolbar.gradients.${typeValue}`) }}
       </div>
     </div>
     <GradientDegree

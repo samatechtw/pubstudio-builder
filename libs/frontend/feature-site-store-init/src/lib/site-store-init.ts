@@ -23,5 +23,5 @@ export const initializeSiteStore = async (options: IInitializeSiteStoreOptions) 
     store,
     siteId,
   })
-  await useSiteVersion({ serverAddress }).listVersions(siteId)
+  await useSiteVersion({ serverAddress, siteId }).listVersions()
 }

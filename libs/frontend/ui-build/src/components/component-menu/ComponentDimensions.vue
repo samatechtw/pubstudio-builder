@@ -67,25 +67,25 @@
       <div class="divider" />
       <div class="size-row overflow">
         <div class="size-label label-title">
-          {{ t('style.toolbar.overflow') }}
+          {{ t('toolbar.overflow') }}
         </div>
         <ToolbarItem
           :active="overflowVisible"
-          :tooltip="t('style.toolbar.visible')"
+          :tooltip="t('toolbar.visible')"
           @click="toggleOverflow('visible')"
         >
           <Eye />
         </ToolbarItem>
         <ToolbarItem
           :active="overflowHidden"
-          :tooltip="t('style.toolbar.hidden')"
+          :tooltip="t('toolbar.hidden')"
           @click="toggleOverflow('hidden')"
         >
           <Hide />
         </ToolbarItem>
         <ToolbarItem
           :active="overflowScroll"
-          :tooltip="t('style.toolbar.scroll')"
+          :tooltip="t('toolbar.scroll')"
           @click="toggleOverflow('scroll')"
         >
           <Scroll />
@@ -95,7 +95,7 @@
           class="overflow-auto"
           @click="toggleOverflow('auto')"
         >
-          {{ t('style.toolbar.auto') }}
+          {{ t('toolbar.auto') }}
         </ToolbarItem>
       </div>
     </div>

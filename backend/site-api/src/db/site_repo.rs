@@ -46,7 +46,11 @@ pub trait SiteRepoTrait {
     async fn create_site(&self, req: CreateSiteDto) -> Result<SiteEntity, DbError>;
     async fn migrate_db(&self, pool: &SqlitePool) -> Result<(), DbError>;
     async fn migrate_all(&self, sites: Vec<SiteMetadataEntity>) -> Result<(), DbError>;
-    async fn get_site_latest_version(&self, id: &str) -> Result<SiteEntity, DbError>;
+    async fn get_site_latest_version(
+        &self,
+        id: &str,
+        published: bool,
+    ) -> Result<SiteEntity, DbError>;
     async fn get_site_by_version(&self, id: &str, version_id: &str) -> Result<SiteEntity, DbError>;
     async fn list_site_versions(
         &self,
@@ -140,21 +144,30 @@ impl SiteRepoTrait for SiteRepo {
         Ok(site_response)
     }
 
-    async fn get_site_latest_version(&self, id: &str) -> Result<SiteEntity, DbError> {
+    async fn get_site_latest_version(
+        &self,
+        id: &str,
+        published: bool,
+    ) -> Result<SiteEntity, DbError> {
         let pool = self.get_db_pool(id).await?;
 
-        let site = sqlx::query(formatcp!(
-            r#"
-            SELECT {}
-            FROM site_versions
-            ORDER BY published DESC, id DESC
-        "#,
-            SITE_COLUMNS
-        ))
-        .try_map(map_to_site_entity)
-        .fetch_one(&pool)
-        .await
-        .map_err(|e| DbError::Query(e.to_string()))?;
+        let query = if published {
+            formatcp!(
+                r#" SELECT {} FROM site_versions ORDER BY published DESC, id DESC"#,
+                SITE_COLUMNS
+            )
+        } else {
+            formatcp!(
+                r#" SELECT {} FROM site_versions ORDER BY id DESC"#,
+                SITE_COLUMNS
+            )
+        };
+
+        let site = sqlx::query(query)
+            .try_map(map_to_site_entity)
+            .fetch_one(&pool)
+            .await
+            .map_err(|e| DbError::Query(e.to_string()))?;
 
         Ok(site)
     }

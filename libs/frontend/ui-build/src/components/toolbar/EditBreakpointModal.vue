@@ -5,7 +5,7 @@
     @cancel="emit('cancel')"
   >
     <div class="modal-title">
-      {{ t('style.toolbar.edit_breakpoint') }}
+      {{ t('toolbar.edit_breakpoint') }}
       <Plus class="breakpoint-add" @click="showAddBreakpointModal = true" />
     </div>
     <div class="modal-content">

@@ -19,7 +19,7 @@ pub async fn reset_cache(State(context): State<ApiContext>) -> Result<(), ApiErr
         // Insert the usage_entity into the cache
         let site = context
             .site_repo
-            .get_site_latest_version(site_id)
+            .get_site_latest_version(site_id, true)
             .await
             .map_err(|e| ApiError::not_found().message(e))?;
 
