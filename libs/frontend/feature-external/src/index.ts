@@ -1,5 +1,6 @@
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 
+import { toggleEditorMenu } from '@pubstudio/frontend/data-access-command'
 import {
   ApiInjectionKey,
   StoreInjectionKey,
@@ -29,7 +30,6 @@ import {
   SiteSaveErrorModal,
 } from '@pubstudio/frontend/ui-widgets'
 import { PSApi } from '@pubstudio/frontend/util-api'
-import { toggleEditorMenu } from '@pubstudio/frontend/util-command'
 import { Keys, useKeyListener } from '@pubstudio/frontend/util-key-listener'
 import { RenderMode } from '@pubstudio/frontend/util-render'
 import {

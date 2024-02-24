@@ -1,4 +1,10 @@
 import {
+  clearComponentTabState,
+  editingCommandCount,
+  setBuildSubmenu,
+  setEditorDropdown,
+} from '@pubstudio/frontend/data-access-command'
+import {
   useBuild,
   useCopyPaste,
   useDuplicateComponent,
@@ -8,12 +14,6 @@ import {
 import { activeBreakpoint } from '@pubstudio/frontend/feature-site-source'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { resolveComponent } from '@pubstudio/frontend/util-builtin'
-import {
-  clearComponentTabState,
-  editingCommandCount,
-  setBuildSubmenu,
-  setEditorDropdown,
-} from '@pubstudio/frontend/util-command'
 import { resolvedComponentStyle } from '@pubstudio/frontend/util-component'
 import { isDynamicComponent } from '@pubstudio/frontend/util-ids'
 import { Keys } from '@pubstudio/frontend/util-key-listener'
@@ -113,7 +113,7 @@ export const useBuildEvent = () => {
     setBuildSubmenu(editor.value, undefined)
     if (site.value.editor?.resizeData) {
       site.value.editor.resizeData = undefined
-      siteStore.value.save(site.value)
+      siteStore.value.saveEditor(site.value.editor)
     } else {
       const componentId =
         target?.id || target?.closest('.component-content-container')?.parentElement?.id
@@ -481,7 +481,7 @@ export const useBuildEvent = () => {
     const editor = site.value.editor
     if (editor?.resizeData) {
       editor.resizeData = undefined
-      siteStore.value.save(site.value)
+      siteStore.value.saveEditor(editor)
     }
     if (paddingMarginDragData.value) {
       stopDrag(e)

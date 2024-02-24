@@ -4,7 +4,7 @@ import {
   editStyles,
   editStylesCancelEdit,
   setStyleType,
-} from '@pubstudio/frontend/util-command'
+} from '@pubstudio/frontend/data-access-command'
 import { StyleType } from '@pubstudio/shared/type-command'
 import { ICommandGroupData } from '@pubstudio/shared/type-command-data'
 import {

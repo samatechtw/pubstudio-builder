@@ -1,4 +1,4 @@
-import { redoCommand, undoLastCommand } from '@pubstudio/frontend/util-command'
+import { redoCommand, undoLastCommand } from '@pubstudio/frontend/data-access-command'
 import { CommandType } from '@pubstudio/shared/type-command'
 import { computed, ComputedRef } from 'vue'
 import { useBuild } from './use-build'

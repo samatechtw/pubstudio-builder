@@ -50,7 +50,7 @@ import {
   convertComponentArg,
   getLinkDatalistOptions,
 } from '@pubstudio/frontend/feature-build'
-import { setComponentEditInputValue } from '@pubstudio/frontend/util-command'
+import { setComponentEditInputValue } from '@pubstudio/frontend/data-access-command'
 
 const { t } = useI18n()
 

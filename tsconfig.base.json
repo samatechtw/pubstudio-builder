@@ -155,7 +155,9 @@
       "@pubstudio/web/type-builtins": ["libs/web/type-builtins/src/index.ts"],
       "@pubstudio/frontend/ui-build": ["libs/frontend/ui-build/src/index.ts"],
       "@pubstudio/frontend/ui-theme": ["libs/frontend/ui-theme/src"],
-      "@pubstudio/frontend/util-command": ["libs/frontend/util-command/src/index.ts"],
+      "@pubstudio/frontend/data-access-command": [
+        "libs/frontend/data-access-command/src/index.ts"
+      ],
       "@pubstudio/frontend/util-command-data": [
         "libs/frontend/util-command-data/src/index.ts"
       ],

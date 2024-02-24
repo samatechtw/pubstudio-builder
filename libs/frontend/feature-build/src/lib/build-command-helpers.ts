@@ -1,5 +1,5 @@
+import { getLastCommand } from '@pubstudio/frontend/data-access-command'
 import { activeBreakpoint } from '@pubstudio/frontend/feature-site-source'
-import { getLastCommand } from '@pubstudio/frontend/util-command'
 import { resolvedComponentStyle } from '@pubstudio/frontend/util-component'
 import { CommandType, ICommand } from '@pubstudio/shared/type-command'
 import {

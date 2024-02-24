@@ -35,7 +35,10 @@ import {
   buildContentWindowId,
   buildContentWindowInnerId,
 } from '@pubstudio/frontend/feature-build'
-import { setBuilderWidth, setSelectedComponent } from '@pubstudio/frontend/util-command'
+import {
+  setBuilderWidth,
+  setSelectedComponent,
+} from '@pubstudio/frontend/data-access-command'
 import { useRenderBuilder } from '@pubstudio/frontend/feature-render-builder'
 
 const { site, activePage, editor } = useBuild()

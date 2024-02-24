@@ -1,8 +1,8 @@
+import { setBuilderWidth } from '@pubstudio/frontend/data-access-command'
 import {
   activeBreakpoint,
   sortedBreakpoints,
 } from '@pubstudio/frontend/feature-site-source'
-import { setBuilderWidth } from '@pubstudio/frontend/util-command'
 import { runtimeContext } from '@pubstudio/frontend/util-runtime'
 import { IBreakpoint, IEditorContext } from '@pubstudio/shared/type-site'
 import { ComputedRef } from 'vue'

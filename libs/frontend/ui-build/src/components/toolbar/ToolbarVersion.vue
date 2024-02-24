@@ -34,7 +34,7 @@
 import { computed, onMounted } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { useBuild } from '@pubstudio/frontend/feature-build'
-import { setEditorDropdown } from '@pubstudio/frontend/util-command'
+import { setEditorDropdown } from '@pubstudio/frontend/data-access-command'
 import { siteSaveAlert } from '@pubstudio/frontend/feature-site-store-init'
 import {
   PSMultiselect,
@@ -131,7 +131,7 @@ onMounted(() => {
 }
 @keyframes disable-flash {
   0% {
-    background: $purple-button;
+    background: $blue-500;
     opacity: 1;
   }
   100% {

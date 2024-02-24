@@ -1,7 +1,7 @@
 import {
   scrollToComponentTreeItem,
   setSelectedComponent,
-} from '@pubstudio/frontend/util-command'
+} from '@pubstudio/frontend/data-access-command'
 import { IComponent, ISite } from '@pubstudio/shared/type-site'
 
 export const selectComponent = (site: ISite, component: IComponent) => {

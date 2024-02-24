@@ -1,4 +1,7 @@
-import { pushCommandObject, replaceLastCommand } from '@pubstudio/frontend/util-command'
+import {
+  pushCommandObject,
+  replaceLastCommand,
+} from '@pubstudio/frontend/data-access-command'
 import { CommandType, ICommand } from '@pubstudio/shared/type-command'
 import {
   ICommandGroupData,

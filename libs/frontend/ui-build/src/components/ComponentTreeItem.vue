@@ -76,7 +76,7 @@ import {
   toggleComponentHidden,
   getComponentTreeItemId,
   setSelectedComponent,
-} from '@pubstudio/frontend/util-command'
+} from '@pubstudio/frontend/data-access-command'
 import { Eye, Hide } from '@pubstudio/frontend/ui-widgets'
 import { runtimeContext } from '@pubstudio/frontend/util-runtime'
 import ComponentTreeItemRename from './ComponentTreeItemRename.vue'

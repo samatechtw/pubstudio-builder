@@ -1,11 +1,11 @@
 module.exports = {
-  displayName: 'frontend-util-command',
+  displayName: 'frontend-data-access-command',
   preset: '../../../jest.preset.ts',
   testEnvironment: 'node',
   transform: {
     '^.+\\.[tj]sx?$': ['ts-jest', { tsconfig: '<rootDir>/tsconfig.spec.json' }],
   },
   moduleFileExtensions: ['ts', 'js'],
-  coverageDirectory: '../../../coverage/libs/frontend/util-command',
+  coverageDirectory: '../../../coverage/libs/frontend/data-access-command',
   setupFilesAfterEnv: ['./jest.setup.ts'],
 }

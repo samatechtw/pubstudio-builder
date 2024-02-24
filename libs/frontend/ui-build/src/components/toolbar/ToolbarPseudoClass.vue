@@ -19,7 +19,10 @@
 import { onMounted } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { useBuild } from '@pubstudio/frontend/feature-build'
-import { setEditorDropdown, setCssPseudoClass } from '@pubstudio/frontend/util-command'
+import {
+  setEditorDropdown,
+  setCssPseudoClass,
+} from '@pubstudio/frontend/data-access-command'
 import { PSMultiselect } from '@pubstudio/frontend/ui-widgets'
 import {
   CssPseudoClass,

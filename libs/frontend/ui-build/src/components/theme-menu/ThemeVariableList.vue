@@ -48,7 +48,7 @@ import {
   useThemeMenuVariables,
 } from '@pubstudio/frontend/feature-build'
 import { IThemeVariable } from '@pubstudio/shared/type-site'
-import { selectColor, unselectColor } from '@pubstudio/frontend/util-command'
+import { selectColor, unselectColor } from '@pubstudio/frontend/data-access-command'
 import { Checkbox, Minus } from '@pubstudio/frontend/ui-widgets'
 
 const { t } = useI18n()

@@ -79,7 +79,7 @@ import {
   useThemeColors,
   useToolbarFontSize,
 } from '@pubstudio/frontend/feature-build'
-import { setEditorDropdown } from '@pubstudio/frontend/util-command'
+import { setEditorDropdown } from '@pubstudio/frontend/data-access-command'
 import ToolbarColorPicker from './ToolbarColorPicker.vue'
 import { IToolbarPickerColor, IToolbarThemedGradient } from './i-toolbar-color-picker'
 

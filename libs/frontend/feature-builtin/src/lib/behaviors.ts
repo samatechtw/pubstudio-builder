@@ -1,3 +1,4 @@
+import { mergeLastCommand } from '@pubstudio/frontend/data-access-command'
 import {
   builtinStyles,
   defaultNavMenuItemInputs,
@@ -5,7 +6,6 @@ import {
   resolveComponent,
   resolveStyle,
 } from '@pubstudio/frontend/util-builtin'
-import { mergeLastCommand } from '@pubstudio/frontend/util-command'
 import {
   makeAddBuiltinComponentData,
   makeEditComponentData,

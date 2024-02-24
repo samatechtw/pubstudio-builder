@@ -44,7 +44,7 @@ import {
   setComponentTabState,
   setComponentTabEditInfo,
   setEditSvg,
-} from '@pubstudio/frontend/util-command'
+} from '@pubstudio/frontend/data-access-command'
 import MenuRow from '../MenuRow.vue'
 import MenuRowSimple from '../MenuRowSimple.vue'
 import ComponentTag from './ComponentTag.vue'

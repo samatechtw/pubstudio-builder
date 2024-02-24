@@ -1,8 +1,8 @@
+import { editCommands, undoCommand } from '@pubstudio/frontend/data-access-command'
 import {
   activeBreakpoint,
   descSortedBreakpoints,
 } from '@pubstudio/frontend/feature-site-source'
-import { editCommands, undoCommand } from '@pubstudio/frontend/util-command'
 import {
   computeComponentFlattenedStyles,
   computeComponentOverrideStyle,

@@ -70,7 +70,10 @@
 import { ref } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { useBuild, useHistory } from '@pubstudio/frontend/feature-build'
-import { setDebugBounding, setShowComponentTree } from '@pubstudio/frontend/util-command'
+import {
+  setDebugBounding,
+  setShowComponentTree,
+} from '@pubstudio/frontend/data-access-command'
 import {
   BoundingBox,
   Bug,

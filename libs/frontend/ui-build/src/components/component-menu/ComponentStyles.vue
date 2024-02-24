@@ -53,7 +53,7 @@ import {
 import {
   setEditorDropdown,
   setComponentMenuCollapses,
-} from '@pubstudio/frontend/util-command'
+} from '@pubstudio/frontend/data-access-command'
 import StyleRow from '../StyleRow.vue'
 import EditMenuTitle from '../EditMenuTitle.vue'
 
