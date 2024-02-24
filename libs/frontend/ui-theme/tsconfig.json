@@ -7,10 +7,5 @@
     "target": "ESNext"
   },
   "include": ["**/*.ts", "**/*.vue"],
-  "exclude": ["**/*.spec.ts"],
-  "references": [
-    {
-      "path": "./tsconfig.spec.json"
-    }
-  ]
+  "exclude": ["**/*.spec.ts"]
 }
