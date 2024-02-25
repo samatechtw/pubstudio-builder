@@ -33,12 +33,12 @@ const { toasts, removeToast } = useToast()
 .ps-toast-wrap {
   @mixin flex-col;
   align-items: center;
-  margin-top: 100px;
+  margin-top: 60px;
   position: absolute;
   top: 0;
   width: 100%;
   .toast-left {
-    @mixin title-thin 15px;
+    @mixin title 15px;
     color: $color-primary;
   }
   .ps-toast {
@@ -47,10 +47,10 @@ const { toasts, removeToast } = useToast()
     justify-content: space-between;
     align-items: center;
     padding: 0 24px;
-    width: 400px;
-    min-height: 68px;
-    box-shadow: 0 16px 40px rgba(#000, 0.15);
-    border-radius: 4px;
+    min-width: 240px;
+    min-height: 58px;
+    box-shadow: 0 16px 40px rgba(#000, 0.25);
+    border-radius: 29px;
     margin-top: 16px;
     z-index: $z-index-toast;
     background-color: white;

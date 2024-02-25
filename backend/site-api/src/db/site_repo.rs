@@ -3,7 +3,7 @@ use chrono::Utc;
 use const_format::formatcp;
 use lib_shared_site_api::db::{
     db_error::{map_sqlx_err, DbError},
-    util::append_comma,
+    util::{append_comma, append_nullable_comma},
 };
 use lib_shared_types::{
     dto::{
@@ -29,12 +29,13 @@ use std::{
     sync::Arc,
 };
 use tokio::sync::RwLock;
+use uuid::Uuid;
 
 pub type SiteDbPools = RwLock<HashMap<String, SqlitePool>>;
 
 pub type DynSiteRepo = Arc<dyn SiteRepoTrait + Send + Sync>;
 
-const SITE_COLUMNS: &str = r#"id, name, version, context, defaults, editor, history, pages, created_at, updated_at, content_updated_at, published"#;
+const SITE_COLUMNS: &str = r#"id, name, version, context, defaults, editor, history, pages, created_at, updated_at, content_updated_at, published, preview_id"#;
 const SITE_INFO_COLUMNS: &str = r#"id, name, updated_at, published"#;
 
 #[async_trait]
@@ -52,6 +53,11 @@ pub trait SiteRepoTrait {
         published: bool,
     ) -> Result<SiteEntity, DbError>;
     async fn get_site_by_version(&self, id: &str, version_id: &str) -> Result<SiteEntity, DbError>;
+    async fn get_site_by_preview_id(
+        &self,
+        id: &str,
+        preview_id: &str,
+    ) -> Result<SiteEntity, DbError>;
     async fn list_site_versions(
         &self,
         id: &str,
@@ -179,11 +185,7 @@ impl SiteRepoTrait for SiteRepo {
 
         match version_id_result {
             Ok(version_id) => Ok(sqlx::query(formatcp!(
-                r#"
-                   SELECT {}
-                   FROM site_versions
-                   WHERE id = ?
-                "#,
+                r#"SELECT {} FROM site_versions WHERE id = ?"#,
                 SITE_COLUMNS
             ))
             .bind(version_id)
@@ -193,6 +195,24 @@ impl SiteRepoTrait for SiteRepo {
             .map_err(|e| DbError::Query(e.to_string()))?),
             Err(e) => Err(DbError::Query(e.to_string())),
         }
+    }
+
+    async fn get_site_by_preview_id(
+        &self,
+        id: &str,
+        preview_id: &str,
+    ) -> Result<SiteEntity, DbError> {
+        let pool = self.get_db_pool(id).await?;
+
+        Ok(sqlx::query(formatcp!(
+            r#"SELECT {} FROM site_versions WHERE preview_id = ?"#,
+            SITE_COLUMNS
+        ))
+        .bind(preview_id)
+        .try_map(map_to_site_entity)
+        .fetch_one(&pool)
+        .await
+        .map_err(|e| DbError::Query(e.to_string()))?)
     }
 
     async fn update_site(
@@ -212,12 +232,22 @@ impl SiteRepoTrait for SiteRepo {
         let (query, update_count) = append_comma(query, "editor", req.dto.editor, update_count);
         let (query, update_count) = append_comma(query, "history", req.dto.history, update_count);
         let (query, update_count) = append_comma(query, "pages", req.dto.pages, update_count);
-        let (mut query, update_count) = append_comma(
+        let (query, update_count) = append_comma(
             query,
             "content_updated_at",
             req.content_updated_at,
             update_count,
         );
+        let (mut query, update_count) = if let Some(enable_preview) = req.dto.enable_preview {
+            let preview_id = if enable_preview {
+                Some(Uuid::new_v4().to_string())
+            } else {
+                None
+            };
+            append_nullable_comma(query, "preview_id", preview_id, update_count)
+        } else {
+            (query, update_count)
+        };
 
         if update_count == 0 {
             return Err(DbError::NoUpdate);
@@ -477,6 +507,7 @@ fn map_to_site_entity(row: SqliteRow) -> Result<SiteEntity, Error> {
         updated_at: row.try_get("updated_at")?,
         content_updated_at: row.try_get("content_updated_at")?,
         published: row.try_get("published")?,
+        preview_id: row.try_get_unchecked("preview_id")?,
     })
 }
 

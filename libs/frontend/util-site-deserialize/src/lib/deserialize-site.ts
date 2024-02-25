@@ -132,6 +132,7 @@ export const deserializedHelper = (serialized: ISerializedSite): ISite => {
     history: { back: history?.back ?? [], forward: history?.forward ?? [] },
     updated_at: serialized.updated_at,
     content_updated_at: serialized.content_updated_at,
+    preview_id: serialized.preview_id,
   }
   return site
 }
@@ -169,6 +170,7 @@ export const storedToSerializedSite = (
         },
     updated_at: stored.updated_at || undefined,
     content_updated_at: stored.content_updated_at || undefined,
+    preview_id: stored.preview_id || undefined,
   }
   return serialized
 }

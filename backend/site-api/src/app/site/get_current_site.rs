@@ -1,9 +1,10 @@
 use axum::{
-    extract::{Host, State},
+    extract::{Host, Query, State},
     Extension, Json,
 };
 use lib_shared_site_api::error::api_error::ApiError;
 use lib_shared_types::{
+    dto::site_api::get_current_site_dto::GetCurrentSiteQuery,
     entity::site_api::site_entity::SiteEntity, shared::user::RequestUser, type_util::REGEX_PORT,
 };
 use lib_shared_types::{error::api_error::ApiErrorCode, type_util::is_port};
@@ -36,6 +37,7 @@ pub async fn get_current_site(
     State(context): State<ApiContext>,
     Host(hostname): Host,
     Extension(user): Extension<RequestUser>,
+    Query(query): Query<GetCurrentSiteQuery>,
 ) -> Result<Json<GetCurrentSiteResponse>, ApiError> {
     let domain_without_port = if is_port(&hostname) {
         let domain = REGEX_PORT.replace(&hostname, "");
@@ -44,6 +46,7 @@ pub async fn get_current_site(
         hostname
     };
 
+    println!("GET CUR {}", domain_without_port);
     let site_id = context
         .metadata_repo
         .get_site_id_by_hostname(&domain_without_port)
@@ -61,15 +64,24 @@ pub async fn get_current_site(
         return Err(ApiError::forbidden().code(ApiErrorCode::SiteDisabled));
     }
 
-    let site = context
-        .site_repo
-        .get_site_latest_version(&site_id, true)
-        .await
-        .map_err(|e| ApiError::not_found().message(e))?;
+    let site = if let Some(preview_id) = query.p {
+        context
+            .site_repo
+            .get_site_by_preview_id(&site_id, &preview_id)
+            .await
+            .map_err(|_| ApiError::not_found().message("Site preview not found"))?
+    } else {
+        let site = context
+            .site_repo
+            .get_site_latest_version(&site_id, true)
+            .await
+            .map_err(|e| ApiError::not_found().message(e))?;
 
-    if !site.published && !is_admin_or_site_owner(&site_metadata, &user) {
-        return Err(ApiError::bad_request().code(ApiErrorCode::SiteUnpublished));
-    }
+        if !site.published && !is_admin_or_site_owner(&site_metadata, &user) {
+            return Err(ApiError::bad_request().code(ApiErrorCode::SiteUnpublished));
+        }
+        site
+    };
 
     let site_size = site.calculate_site_size();
 

@@ -36,6 +36,7 @@ export enum EditorDropdown {
   Page = 'page',
   PseudoClass = 'pseudoClass',
   Version = 'version',
+  Preview = 'preview',
 }
 
 export enum ThemeTab {

@@ -25,4 +25,5 @@ export interface ISite {
   pages: Record<string, IPage>
   updated_at?: string
   content_updated_at?: number
+  preview_id?: string
 }

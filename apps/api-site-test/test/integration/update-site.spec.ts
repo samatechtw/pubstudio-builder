@@ -3,6 +3,7 @@ import {
   IUpdateSiteApiRequest,
   IUpdateSiteApiResponse,
 } from '@pubstudio/shared/type-api-site-sites'
+import { commonRegex } from '@pubstudio/shared/util-parse'
 import { SiteApiResetService } from '@pubstudio/shared/util-test-reset'
 import supertest from 'supertest'
 import TestAgent from 'supertest/lib/agent'
@@ -92,6 +93,26 @@ describe('Update Site', () => {
     expect(JSON.parse(body.editor)).toEqual(payload.editor)
     expect(JSON.parse(body.history)).toEqual(payload.history)
     expect(JSON.parse(body.pages)).toEqual(payload.pages)
+  })
+
+  it('sets and un-sets preview link using enable_preview', async () => {
+    payload = { enable_preview: true }
+    const setResponse = await api
+      .patch(`${testEndpoint}/${siteId}`)
+      .set('Authorization', adminAuth)
+      .send(payload)
+      .expect(200)
+    const setBody: IUpdateSiteApiResponse = setResponse.body
+    expect(setBody.preview_id).toMatch(new RegExp(commonRegex.uuid))
+
+    payload = { enable_preview: false }
+    const unsetResponse = await api
+      .patch(`${testEndpoint}/${siteId}`)
+      .set('Authorization', adminAuth)
+      .send(payload)
+      .expect(200)
+    const unsetBody: IUpdateSiteApiResponse = unsetResponse.body
+    expect(unsetBody.preview_id).toBe(null)
   })
 
   describe('when request is not valid', () => {

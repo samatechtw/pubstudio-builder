@@ -16,6 +16,7 @@ pub struct SiteViewModel {
     pub content_updated_at: i64,
     pub updated_at: JsDate,
     pub published: bool,
+    pub preview_id: Option<String>,
 }
 
 pub fn to_api_response(site_entity: SiteEntity) -> SiteViewModel {
@@ -36,5 +37,6 @@ pub fn to_api_response(site_entity: SiteEntity) -> SiteViewModel {
             timestamp: site_entity.updated_at,
         },
         published: site_entity.published,
+        preview_id: site_entity.preview_id,
     }
 }
