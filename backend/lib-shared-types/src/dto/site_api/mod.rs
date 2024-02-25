@@ -1,5 +1,6 @@
 pub mod create_metadata_dto;
 pub mod create_site_dto;
+pub mod get_current_site_dto;
 pub mod get_site_domains_dto;
 pub mod get_site_version_dto;
 pub mod publish_site_dto;

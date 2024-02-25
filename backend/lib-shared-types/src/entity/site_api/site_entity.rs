@@ -15,6 +15,7 @@ pub struct SiteEntity {
     pub updated_at: DateTime<Utc>,
     pub content_updated_at: i64,
     pub published: bool,
+    pub preview_id: Option<String>,
 }
 
 impl SiteEntity {

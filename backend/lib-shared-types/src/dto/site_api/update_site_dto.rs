@@ -18,6 +18,7 @@ pub struct UpdateSiteDto {
     pub disabled: Option<bool>,
     #[validate(regex = "REGEX_DATE")]
     pub update_key: Option<String>,
+    pub enable_preview: Option<bool>,
 }
 
 pub struct UpdateSiteDtoWithContentUpdatedAt {

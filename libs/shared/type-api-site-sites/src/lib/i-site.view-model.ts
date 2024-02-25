@@ -11,4 +11,5 @@ export interface ISiteViewModel {
   disabled?: boolean
   updated_at: Date
   content_updated_at: number
+  preview_id?: string
 }

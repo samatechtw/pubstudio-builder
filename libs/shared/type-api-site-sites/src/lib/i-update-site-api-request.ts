@@ -7,4 +7,5 @@ export interface IUpdateSiteApiRequest {
   history?: string
   pages?: string
   update_key?: string
+  enable_preview?: boolean
 }

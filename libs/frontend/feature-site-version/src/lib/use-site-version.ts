@@ -15,6 +15,7 @@ export interface IUseSiteVersion {
   activeVersionId: Ref<string | null | undefined>
   loading: Ref<boolean>
   listVersions: () => Promise<void>
+  enablePreview: (enable: boolean) => Promise<void>
   createDraft: () => Promise<void>
   publishSite: () => Promise<void>
   setActiveVersion: (version: VersionOption) => Promise<void>
@@ -62,6 +63,22 @@ export const useSiteVersion = (options?: IUseSiteVersionOptions): IUseSiteVersio
     }
   }
 
+  const enablePreview = async (enable: boolean) => {
+    const { updateSite } = useSiteApi({
+      store,
+      serverAddress: serverAddress as string,
+    })
+    loading.value = true
+    try {
+      const res = await updateSite(siteId as string, { enable_preview: enable })
+      site.value.preview_id = res.preview_id
+      siteStore.value.setUpdateKey(res.updated_at.toString())
+    } catch (e) {
+      console.log(`Failed to set preview ${enable}`, e)
+    }
+    loading.value = false
+  }
+
   const createDraft = async () => {
     const { siteStore } = useSiteSource()
     const { createDraft } = useSiteApi({
@@ -76,7 +93,7 @@ export const useSiteVersion = (options?: IUseSiteVersionOptions): IUseSiteVersio
         siteStore.value.setUpdateKey(versions.value[0].updated_at.toString())
       }
     } catch (e) {
-      console.log('Failed to create draft')
+      console.log('Failed to create draft', e)
     }
     loading.value = false
   }
@@ -125,6 +142,7 @@ export const useSiteVersion = (options?: IUseSiteVersionOptions): IUseSiteVersio
     activeVersionId: store.version.activeVersionId,
     loading,
     listVersions,
+    enablePreview,
     createDraft,
     publishSite,
     setActiveVersion,

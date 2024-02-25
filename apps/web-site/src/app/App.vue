@@ -89,6 +89,11 @@ const getUserSite = async () => {
         host += `:${window.location.port}`
       }
       url = `${host}/api/sites/current`
+      const query = new URLSearchParams(location.search)
+      const p = query.get('p')
+      if (p) {
+        url += `?p=${p}`
+      }
     }
     const userSite = await getSite(url)
     return userSite

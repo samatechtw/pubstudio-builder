@@ -34,24 +34,49 @@ pub fn append_eq<
     (query, count)
 }
 
-pub fn append_comma<
+fn push_comma<'a, DB: sqlx::Database>(
+    mut query: QueryBuilder<'a, DB>,
+    arg_name: &str,
+    count: u32,
+) -> QueryBuilder<'a, DB> {
+    if count == 0 {
+        query.push(format!(" {} = ", arg_name));
+    } else {
+        query.push(format!(", {} = ", arg_name));
+    }
+    query
+}
+
+// Appends a comma separated value to the query.
+// Option/None is accepted, which converts to NULL
+pub fn append_nullable_comma<
     'a,
     T: 'a + sqlx::Type<DB> + sqlx::Encode<'a, DB> + Send,
     DB: sqlx::Database,
 >(
     mut query: QueryBuilder<'a, DB>,
     arg_name: &str,
+    arg: T,
+    count: u32,
+) -> (QueryBuilder<'a, DB>, u32) {
+    query = push_comma(query, arg_name, count);
+    query.push_bind(arg);
+    (query, count + 1)
+}
+
+// Appends a non-null comma separated value to the query.
+pub fn append_comma<
+    'a,
+    T: 'a + sqlx::Type<DB> + sqlx::Encode<'a, DB> + Send,
+    DB: sqlx::Database,
+>(
+    query: QueryBuilder<'a, DB>,
+    arg_name: &str,
     arg: Option<T>,
     count: u32,
 ) -> (QueryBuilder<'a, DB>, u32) {
     if let Some(arg_val) = arg {
-        if count == 0 {
-            query.push(format!(" {} = ", arg_name));
-        } else {
-            query.push(format!(", {} = ", arg_name));
-        }
-        query.push_bind(arg_val);
-        return (query, count + 1);
+        return append_nullable_comma(query, arg_name, arg_val, count);
     }
     (query, count)
 }
