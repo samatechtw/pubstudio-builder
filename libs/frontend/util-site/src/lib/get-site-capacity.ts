@@ -11,6 +11,6 @@ export function getCapacity(siteType: SiteType): number {
     case SiteType.Paid3:
       return 50
     default:
-      throw new Error('Invalid SiteType')
+      return 0
   }
 }

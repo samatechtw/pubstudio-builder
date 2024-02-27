@@ -1,7 +1,7 @@
 <template>
   <div class="dropdown-menu-items" :class="{ opened }">
     <slot name="before"></slot>
-    <template v-for="(item, index) in items" :key="index">
+    <template v-for="(item, index) in items" :key="index.toString()">
       <component
         :is="itemTag(item)"
         class="ps-dropdown-item"
@@ -23,10 +23,11 @@
 import { useI18n } from 'petite-vue-i18n'
 import { IDropdownMenuItem } from '@pubstudio/frontend/type-ui-widgets'
 import Spinner from '../Spinner.vue'
+import { toRefs } from 'vue'
 
 const { t } = useI18n()
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     opened: boolean
     items: IDropdownMenuItem[]
@@ -37,6 +38,7 @@ withDefaults(
     extraHeight: 0,
   },
 )
+const { items } = toRefs(props)
 
 const emit = defineEmits<{
   (e: 'itemClick', item: IDropdownMenuItem): void

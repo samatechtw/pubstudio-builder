@@ -70,7 +70,7 @@ pub async fn reset_all(
                         published: data.published.clone(),
                         domains: merge_domains(
                             data.custom_domains.clone(),
-                            data.subdomain.clone(),
+                            &data.subdomain,
                             &format!("{}.pubstud.io", context.config.exec_env),
                         ),
                         site_type: data.site_type.clone(),
