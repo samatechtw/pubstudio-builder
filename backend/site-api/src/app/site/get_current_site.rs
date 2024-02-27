@@ -46,7 +46,6 @@ pub async fn get_current_site(
         hostname
     };
 
-    println!("GET CUR {}", domain_without_port);
     let site_id = context
         .metadata_repo
         .get_site_id_by_hostname(&domain_without_port)
