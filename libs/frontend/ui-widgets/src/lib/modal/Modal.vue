@@ -13,6 +13,7 @@
 
 <script lang="ts" setup>
 import { onMounted, onUnmounted, ref, toRefs, watch } from 'vue'
+import { setCancelNextEsc } from '@pubstudio/frontend/feature-build-event'
 import ModalClose from './ModalClose.vue'
 
 const props = withDefaults(
@@ -52,8 +53,11 @@ function clickOutside(e: Event) {
   }
 }
 function escape(e: KeyboardEvent) {
-  if (cancelWithEscape.value && e.key === 'Escape') {
-    emit('cancel')
+  if (e.key === 'Escape') {
+    setCancelNextEsc(true)
+    if (cancelWithEscape.value && e.key === 'Escape') {
+      emit('cancel')
+    }
   }
 }
 

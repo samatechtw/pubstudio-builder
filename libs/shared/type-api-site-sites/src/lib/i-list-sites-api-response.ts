@@ -1,5 +1,6 @@
 export interface ISiteMetadata {
-  id: number
+  id: string
+  disabled: boolean
   location: string
   site_type: string
 }

@@ -40,7 +40,7 @@ const sitePublished = computed(() => {
 })
 
 export const useSiteVersion = (options?: IUseSiteVersionOptions): IUseSiteVersion => {
-  const { siteStore, setRestoredSite } = useSiteSource()
+  const { siteStore, setRestoredSite, syncUpdateKey } = useSiteSource()
   if (options) {
     serverAddress = options.serverAddress
     siteId = options.siteId
@@ -71,8 +71,7 @@ export const useSiteVersion = (options?: IUseSiteVersionOptions): IUseSiteVersio
     loading.value = true
     try {
       const res = await updateSite(siteId as string, { enable_preview: enable })
-      site.value.preview_id = res.preview_id
-      siteStore.value.setUpdateKey(res.updated_at.toString())
+      syncUpdateKey(res)
     } catch (e) {
       console.log(`Failed to set preview ${enable}`, e)
     }
