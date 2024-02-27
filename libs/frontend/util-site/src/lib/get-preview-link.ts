@@ -1,4 +1,4 @@
-import { ISite } from '@pubstudio/frontend/type-site'
+import { ISite } from '@pubstudio/shared/type-site'
 
 export const getPreviewLink = (
   site: ISite,
