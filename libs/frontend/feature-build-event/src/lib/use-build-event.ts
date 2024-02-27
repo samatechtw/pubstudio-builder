@@ -200,14 +200,7 @@ export const useBuildEvent = () => {
   }
 
   const pressEscape = () => {
-    if (
-      editor.value?.editBehavior ||
-      editor.value?.editSvg ||
-      editor.value?.translations
-    ) {
-      // Handled directly in SVG/Behavior/Translations modal
-      // This is also checked in `hotkeysDisabled`
-    } else if (runtimeContext.componentTreeItemRenameData.value.renaming) {
+    if (runtimeContext.componentTreeItemRenameData.value.renaming) {
       // This is for the case where rename input is still visible in the tree, but
       // the input has lost focus. i.e. clicking on the hide/show button of the
       // same component in the tree during rename.

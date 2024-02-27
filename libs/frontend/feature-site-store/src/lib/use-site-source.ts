@@ -1,4 +1,5 @@
 import { site } from '@pubstudio/frontend/feature-site-source'
+import { IUpdateSiteApiResponse } from '@pubstudio/shared/type-api-site-sites'
 import {
   ISite,
   ISiteRestore,
@@ -18,6 +19,7 @@ export interface IUseSiteSource {
   isSaving: ComputedRef<boolean>
   initializeSite: (options: IInitializeSiteOptions) => Promise<string | undefined>
   checkOutdated: () => Promise<void>
+  syncUpdateKey: (updateBody: IUpdateSiteApiResponse) => void
   replaceSite: (newSite: ISite) => void
   setRestoredSite: (restored: ISiteRestore | undefined) => void
 }
@@ -69,6 +71,13 @@ export const useSiteSource = (): IUseSiteSource => {
     return serverAddress
   }
 
+  // When a site is updated outside the siteStore, the update_key needs to be synced.
+  // Otherwise, the next `save` call will fail with the outdated update_key
+  const syncUpdateKey = (updateBody: IUpdateSiteApiResponse) => {
+    site.value.preview_id = updateBody.preview_id
+    siteStore.value.setUpdateKey(updateBody.updated_at.toString())
+  }
+
   const checkOutdated = async () => {
     if (!site.value) {
       return
@@ -84,6 +93,7 @@ export const useSiteSource = (): IUseSiteSource => {
 
   return {
     initializeSite,
+    syncUpdateKey,
     checkOutdated,
     replaceSite,
     setRestoredSite,

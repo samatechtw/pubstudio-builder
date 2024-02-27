@@ -39,8 +39,14 @@ fn api_router(context: &ApiContext) -> Router<ApiContext> {
         )
         .route(
             "/sites_metadata/:site_id",
-            patch(site::update_site_metadata::update_site_metadata)
-                .layer(from_fn_with_state(context.clone(), auth_admin_owner)),
+            patch(
+                site::update_site_metadata::update_site_metadata
+                    .layer(from_fn_with_state(context.clone(), auth_admin_owner)),
+            )
+            .get(
+                site::get_site_metadata::get_site_metadata
+                    .layer(from_fn_with_state(context.clone(), auth_admin)),
+            ),
         )
         .route(
             "/sites/:site_id",

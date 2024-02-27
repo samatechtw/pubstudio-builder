@@ -20,6 +20,7 @@ import {
   ICreatePlatformSiteRequest,
   IListPlatformSitesRequest,
   ISiteViewModel,
+  IUpdatePlatformSiteApiResponse,
   IUpdatePlatformSiteRequest,
 } from '@pubstudio/shared/type-api-platform-site'
 import { useI18n } from 'petite-vue-i18n'
@@ -48,7 +49,10 @@ export interface ISitesFeature {
   sites: Ref<ISiteViewModel[] | undefined>
   usageAllowance: Ref<number | undefined>
   createSite: (data: ICreatePlatformSiteRequest) => Promise<void>
-  updateSite: (id: string, data: IUpdatePlatformSiteRequest) => Promise<void>
+  updateSite: (
+    id: string,
+    data: IUpdatePlatformSiteRequest,
+  ) => Promise<IUpdatePlatformSiteApiResponse | undefined>
   updateLocalSite: (id: string, data: IUpdateLocalSiteApiRequest) => Promise<void>
   listSites: (params: IListPlatformSitesRequest) => Promise<void>
   deleteSite: (id: string) => Promise<void>
@@ -85,15 +89,16 @@ export const useSites = (): ISitesFeature => {
   const updateSite = async (
     id: string,
     data: IUpdatePlatformSiteRequest,
-  ): Promise<void> => {
+  ): Promise<IUpdatePlatformSiteApiResponse | undefined> => {
     try {
       loading.value = true
-      await api.updateSite(id, data)
+      return await api.updateSite(id, data)
     } catch (e) {
       error.value = parseApiError(i18n, toApiError(e))
     } finally {
       loading.value = false
     }
+    return undefined
   }
 
   const updateLocalSite = async (id: string, data: IUpdateLocalSiteApiRequest) => {
