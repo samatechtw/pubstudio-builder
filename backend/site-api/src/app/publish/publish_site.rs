@@ -47,11 +47,29 @@ pub async fn publish_site(
         return Ok(StatusCode::NO_CONTENT.into_response());
     }
 
-    context
+    let site = context
         .site_repo
         .publish_site(&id)
         .await
         .map_err(|e| ApiError::internal_error().message(e))?;
+
+    // Update cache
+    let site_type = match context.cache.get_metadata(&id).await {
+        Some(data) => data.site_type,
+        None => {
+            context
+                .metadata_repo
+                .get_site_metadata(&id)
+                .await
+                .map_err(|e| ApiError::not_found().message(e))?
+                .site_type
+        }
+    };
+
+    context
+        .cache
+        .create_or_update_usage(&id, &site, site_type)
+        .await;
 
     Ok(StatusCode::NO_CONTENT.into_response())
 }

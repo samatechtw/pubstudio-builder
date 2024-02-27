@@ -5,11 +5,18 @@ use lib_shared_types::{
         create_metadata_dto::CreateSiteMetadataDto, update_metadata_dto::UpdateSiteMetadataDto,
     },
     entity::site_api::site_metadata_entity::SiteMetadataEntity,
+    shared::site::SiteType,
 };
 use sqlx::{sqlite::SqliteRow, Error, QueryBuilder, Row, Sqlite, SqlitePool, Transaction};
 use std::sync::Arc;
 
 pub type DynSitesMetadataRepo = Arc<dyn SitesMetadataRepoTrait + Send + Sync>;
+
+pub struct SiteMetadataResult {
+    pub owner_id: String,
+    pub site_type: SiteType,
+    pub disabled: bool,
+}
 
 #[async_trait]
 pub trait SitesMetadataRepoTrait {
@@ -22,7 +29,7 @@ pub trait SitesMetadataRepoTrait {
         tx: &mut Transaction<'_, Sqlite>,
         id: &str,
         dto: &UpdateSiteMetadataDto,
-    ) -> Result<(), DbError>;
+    ) -> Result<SiteMetadataResult, DbError>;
     async fn list_sites(&self) -> Result<Vec<SiteMetadataEntity>, Error>;
     async fn delete_site(&self, id: &str) -> Result<(), Error>;
     async fn set_site_domains(
@@ -46,6 +53,14 @@ fn row_to_site_metadata(row: SqliteRow) -> Result<SiteMetadataEntity, Error> {
         location: row.try_get("location")?,
         owner_id: row.try_get("owner_id")?,
         domains: domains.split(",").map(|d| d.to_string()).collect(),
+        site_type: row.try_get("site_type")?,
+        disabled: row.try_get("disabled")?,
+    })
+}
+
+fn to_metadata_cache(row: SqliteRow) -> Result<SiteMetadataResult, Error> {
+    Ok(SiteMetadataResult {
+        owner_id: row.try_get("owner_id")?,
         site_type: row.try_get("site_type")?,
         disabled: row.try_get("disabled")?,
     })
@@ -129,7 +144,7 @@ impl SitesMetadataRepoTrait for SitesMetadataRepo {
         tx: &mut Transaction<'_, Sqlite>,
         id: &str,
         dto: &UpdateSiteMetadataDto,
-    ) -> Result<(), DbError> {
+    ) -> Result<SiteMetadataResult, DbError> {
         let query = QueryBuilder::new("UPDATE sites SET");
         let count = 0;
 
@@ -137,17 +152,19 @@ impl SitesMetadataRepoTrait for SitesMetadataRepo {
         let (mut query, count) = append_comma(query, "disabled", dto.disabled, count);
 
         if count == 0 {
-            return Ok(());
+            return Err(DbError::NoUpdate);
         }
 
         query.push(" WHERE id = ");
         query.push_bind(id);
-        query
+        query.push(" RETURNING *");
+
+        Ok(query
             .build()
-            .execute(tx)
+            .try_map(to_metadata_cache)
+            .fetch_one(tx)
             .await
-            .map_err(|e| DbError::Query(e.to_string()))?;
-        Ok(())
+            .map_err(|e| DbError::Query(e.to_string()))?)
     }
 
     async fn delete_site(&self, id: &str) -> Result<(), Error> {

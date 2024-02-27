@@ -40,11 +40,26 @@ pub async fn update_site_metadata(
             ApiError::internal_error().message(format!("Failed to save domains: {}", e))
         })?;
 
-    context
-        .metadata_repo
-        .update_site_metadata(&mut tx, &id, &dto)
-        .await
-        .map_err(|e| ApiError::internal_error().message(format!("Failed to update site: {}", e)))?;
+    if dto.disabled.is_some() || dto.site_type.is_some() {
+        let metadata = context
+            .metadata_repo
+            .update_site_metadata(&mut tx, &id, &dto)
+            .await
+            .map_err(|e| {
+                ApiError::internal_error().message(format!("Failed to update site: {}", e))
+            })?;
+
+        // Update Metadata Cache
+        context
+            .cache
+            .create_or_update_metadata(
+                &id,
+                &metadata.owner_id,
+                metadata.site_type,
+                metadata.disabled,
+            )
+            .await;
+    }
 
     if let Some(domains) = &dto.domains {
         context
@@ -54,6 +69,9 @@ pub async fn update_site_metadata(
             .map_err(|e| {
                 ApiError::internal_error().message(format!("Failed to save domains: {}", e))
             })?;
+
+        // Update domain -> site_id mapping
+        context.cache.update_site_domains(&id, domains).await
     }
 
     tx.commit().await.map_err(|e| {

@@ -25,9 +25,11 @@ pub async fn create_site_helper(
     validator.validate_history(&dto.history)?;
     validator.validate_pages(&dto.pages)?;
 
-    validate_custom_domains(&dto.domains)?;
+    let domains = &dto.domains.clone();
+    validate_custom_domains(domains)?;
 
     let site_id = dto.id.clone();
+    let owner_id = dto.owner_id.clone();
     let metadata_dto = to_metadata_dto(&dto);
 
     // Create and run migrations on a new site database
@@ -45,9 +47,16 @@ pub async fn create_site_helper(
         .map_err(|e| ApiError::internal_error().message(e))?;
 
     // Add an in-memory cache to the app
+    for domain in domains {
+        context.cache.insert_domain_mapping(&site_id, domain).await;
+    }
     context
         .cache
-        .create_or_update_cache(&site_id, site.calculate_site_size(), site_type)
+        .create_or_update_usage(&site_id, &site, site_type)
+        .await;
+    context
+        .cache
+        .create_or_update_metadata(&site_id, &owner_id, site_type, false)
         .await;
 
     Ok(site_id)

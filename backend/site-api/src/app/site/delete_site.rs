@@ -31,5 +31,9 @@ pub async fn delete_site(
             _ => ApiError::internal_error().message(format!("Clean up db failed: {}", e)),
         })?;
 
+    // Remove cache
+    context.cache.remove_domain_mapping(&id).await;
+    context.cache.remove_metadata(&id).await;
+
     Ok(())
 }

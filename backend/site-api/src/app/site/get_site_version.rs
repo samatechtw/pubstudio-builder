@@ -45,17 +45,20 @@ pub async fn get_site_version_result(
     if version_id != "latest" {
         validate_integer(&version_id)?
     }
-    let site_metadata = context
-        .metadata_repo
-        .get_site_metadata(&site_id)
-        .await
-        .map_err(|e| ApiError::not_found().message(e))?;
+    let disabled = match context.cache.get_metadata(&site_id).await {
+        Some(data) => data.disabled,
+        None => {
+            context
+                .metadata_repo
+                .get_site_metadata(&site_id)
+                .await
+                .map_err(|e| ApiError::not_found().message(e))?
+                .disabled
+        }
+    };
 
     // Check if site is disabled
-    if site_metadata.disabled
-        && user.user_type != UserType::Admin
-        && user.user_type != UserType::Cron
-    {
+    if disabled && user.user_type != UserType::Admin && user.user_type != UserType::Cron {
         return Err(ApiError::forbidden().code(ApiErrorCode::SiteDisabled));
     }
 

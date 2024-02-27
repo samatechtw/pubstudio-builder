@@ -15,7 +15,7 @@ use lib_shared_site_api::{
 };
 use lib_shared_types::shared::user::{RequestUser, UserType};
 
-use crate::api_context::ApiContext;
+use crate::{api_context::ApiContext, app::site::helpers::get_site_from_cache_or_repo};
 
 // Verify that the requestor ID matches the Site Owner
 // Note -- this assumes all Owner endpoints include a site_id
@@ -132,22 +132,23 @@ pub async fn error_cache(
 ) -> Result<Response, ApiError> {
     let response = next.run(request).await;
     if response.status() != 200 {
-        let site = context
-            .site_repo
-            .get_site_latest_version(&site_id, true)
-            .await
-            .map_err(|e| ApiError::not_found().message(e))?;
+        let site = get_site_from_cache_or_repo(&context, &site_id).await?;
 
-        let site_type = context
-            .metadata_repo
-            .get_site_metadata(&site_id)
-            .await
-            .map_err(|e| ApiError::not_found().message(e))?
-            .site_type;
+        let site_type = match context.cache.get_metadata(&site_id).await {
+            Some(data) => data.site_type,
+            None => {
+                context
+                    .metadata_repo
+                    .get_site_metadata(&site_id)
+                    .await
+                    .map_err(|e| ApiError::not_found().message(e))?
+                    .site_type
+            }
+        };
 
         context
             .cache
-            .increase_request_error_count(&site_id, site.calculate_site_size(), site_type)
+            .increase_request_error_count(&site_id, &site, site_type)
             .await;
     }
     Ok(response)

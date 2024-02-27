@@ -96,7 +96,7 @@ pub async fn update_site(
     // Update in-memory cache
     context
         .cache
-        .create_or_update_cache(&id, site.calculate_site_size(), site_type)
+        .create_or_update_usage(&id, &site, site_type)
         .await;
 
     Ok((StatusCode::OK, Json(to_api_response(site))))

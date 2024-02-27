@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::shared::site::SiteType;
 
-#[derive(Deserialize, Serialize, Clone)]
+#[derive(Deserialize, Serialize, Clone, Debug)]
 pub struct SiteMetadataEntity {
     pub id: String,
     pub location: String,

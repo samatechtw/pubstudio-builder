@@ -24,6 +24,114 @@ describe('Get Current Site', () => {
   })
 
   describe('Request with Valid Hostname', () => {
+    it('updates site, gets current site, creates a draft, updates it, and publishes', async () => {
+      const execEnv = testConfig.get('execEnv')
+      const siteId = '870aafc9-36e9-476a-b38c-c1aaaad9d9fe'
+      const newData1 = '{"test":"SOME TEST DATA"}'
+      const newData2 = '{"test":"SOME TEST DATA 2"}'
+
+      // Update the live site
+      await api
+        .patch(`/api/sites/${siteId}`)
+        .set('Authorization', adminAuth)
+        .send({ context: newData1 })
+        .expect(200)
+
+      // Get current site
+      const r1 = await api
+        .get(testEndpoint)
+        .set('Host', `user1-site3-subdomain.${execEnv}.pubstud.io`)
+        .set('Authorization', adminAuth)
+        .expect(200)
+
+      const body1: IGetSiteApiResponse = r1.body
+      expect(body1.context).toEqual(JSON.stringify(newData1))
+
+      // Create a draft
+      await api
+        .post(`/api/sites/${siteId}/actions/create_draft`)
+        .set('Authorization', adminAuth)
+        .expect(200)
+
+      // Update the draft
+      await api
+        .patch(`/api/sites/${siteId}`)
+        .send({ context: newData2 })
+        .set('Authorization', adminAuth)
+        .expect(200)
+
+      // Verify current site is not changed
+      const r2 = await api
+        .get(testEndpoint)
+        .set('Host', `user1-site3-subdomain.${execEnv}.pubstud.io`)
+        .set('Authorization', adminAuth)
+        .expect(200)
+      const body2: IGetSiteApiResponse = r2.body
+      expect(body2.context).toEqual(JSON.stringify(newData1))
+
+      // Publish the draft
+      await api
+        .post(`/api/sites/${siteId}/actions/publish`)
+        .send({ publish: true })
+        .set('Authorization', adminAuth)
+        .expect(204)
+
+      // Verify current site is updated
+      const r3 = await api
+        .get(testEndpoint)
+        .set('Host', `user1-site3-subdomain.${execEnv}.pubstud.io`)
+        .set('Authorization', adminAuth)
+        .expect(200)
+      const body3: IGetSiteApiResponse = r3.body
+      expect(body3.context).toEqual(JSON.stringify(newData2))
+    })
+
+    it('returns current site and filters pages with public: false', async () => {
+      const execEnv = testConfig.get('execEnv')
+      const siteId = '870aafc9-36e9-476a-b38c-c1aaaad9d9fe'
+      const pagesBefore = JSON.stringify({
+        '/home': {
+          public: true,
+        },
+        '/page1': {
+          abc: 'test',
+          public: false,
+        },
+        '/page2': {
+          abc: 'test',
+          public: true,
+        },
+      })
+
+      const pagesAfter = JSON.stringify({
+        '/home': {
+          public: true,
+        },
+        '/page2': {
+          abc: 'test',
+          public: true,
+        },
+      })
+
+      // Update site pages
+      await api
+        .patch(`/api/sites/${siteId}`)
+        .set('Authorization', adminAuth)
+        .send({ pages: pagesBefore })
+        .expect(200)
+
+      // Verify pages filter out with `public: false`
+      const response = await api
+        .get(testEndpoint)
+        .set('Host', `user1-site3-subdomain.${execEnv}.pubstud.io`)
+        .set('Authorization', adminAuth)
+        .expect(200)
+
+      const body: IGetSiteApiResponse = response.body
+      expect(body.name).toEqual('Test Site 3')
+      expect(body.pages).toEqual(pagesAfter)
+    })
+
     it('returns current when requester is admin site for subdomain', async () => {
       const execEnv = testConfig.get('execEnv')
       const response = await api
@@ -105,11 +213,18 @@ describe('Get Current Site', () => {
 
     it('returns 509 when bandwidth usage exceeds allowance', async () => {
       const payload = mockUpdateSitePayload()
+      const siteId = '6d2c8359-6094-402c-bcbb-37202fd7c336'
       // Generate a large JSON string by repeating '{"some":"stringified_json"}' 80 times
       payload.context = '{"some":"stringified_json"}'.repeat(80)
 
+      // Publish the draft
+      await api
+        .post(`/api/sites/${siteId}/actions/publish`)
+        .send({ publish: true })
+        .set('Authorization', adminAuth)
+        .expect(204)
+
       // Perform the update request to the API
-      const siteId = '6d2c8359-6094-402c-bcbb-37202fd7c336'
       await api
         .patch(`/api/sites/${siteId}`)
         .set('Authorization', adminAuth)
