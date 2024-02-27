@@ -31,7 +31,7 @@ pub async fn reset_cache(State(context): State<ApiContext>) -> Result<(), ApiErr
 
         context
             .cache
-            .reset_cache(usage, site.calculate_site_size(), site_metadata.site_type)
+            .reset_cache(usage, &site, site_metadata.site_type)
             .await
     }
 

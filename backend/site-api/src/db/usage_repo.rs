@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use axum::async_trait;
 use chrono::Utc;
-use lib_shared_site_api::cache::cache::SiteDataCache;
+use lib_shared_site_api::cache::cache::SiteUsageCache;
 use lib_shared_types::entity::site_api::site_usage_entity::SiteUsageEntity;
 use sqlx::{sqlite::SqliteRow, Error, QueryBuilder, Row, Sqlite, SqlitePool};
 
@@ -11,7 +11,7 @@ pub type DynUsageRepo = Arc<dyn UsageRepoTrait + Send + Sync>;
 #[async_trait]
 pub trait UsageRepoTrait {
     fn get_db_pool(&self) -> &SqlitePool;
-    async fn insert_usage(&self, cache: &SiteDataCache) -> Result<(), Error>;
+    async fn insert_usage(&self, cache: &SiteUsageCache) -> Result<(), Error>;
     async fn list_usages_by_site_id(&self, site_id: &str) -> Result<Vec<SiteUsageEntity>, Error>;
     async fn list_latest_usages(&self) -> Result<Vec<SiteUsageEntity>, Error>;
 }
@@ -38,7 +38,7 @@ impl UsageRepoTrait for UsageRepo {
         return &self.metadata_db_pool;
     }
 
-    async fn insert_usage(&self, cache: &SiteDataCache) -> Result<(), Error> {
+    async fn insert_usage(&self, cache: &SiteUsageCache) -> Result<(), Error> {
         if cache.entry_count() == 0 {
             return Ok(());
         }

@@ -69,7 +69,7 @@ pub trait SiteRepoTrait {
         req: UpdateSiteDtoWithContentUpdatedAt,
     ) -> Result<SiteEntity, DbError>;
     async fn create_draft(&self, id: &str, from_id: i64) -> Result<(), DbError>;
-    async fn publish_site(&self, id: &str) -> Result<(), DbError>;
+    async fn publish_site(&self, id: &str) -> Result<SiteEntity, DbError>;
     async fn publish_all_versions(&self, id: &str, published: bool) -> Result<(), DbError>;
     async fn export_backup(&self, id: &str) -> Result<Vec<u8>, DbError>;
     async fn import_backup(&self, id: &str, backup_data: Vec<u8>) -> Result<(), DbError>;
@@ -365,7 +365,7 @@ impl SiteRepoTrait for SiteRepo {
         Ok(())
     }
 
-    async fn publish_site(&self, id: &str) -> Result<(), DbError> {
+    async fn publish_site(&self, id: &str) -> Result<SiteEntity, DbError> {
         let pool = self.get_db_pool(id).await?;
 
         let mut sites = sqlx::query(formatcp!(
@@ -415,9 +415,14 @@ impl SiteRepoTrait for SiteRepo {
 
         query.push(" WHERE id = ");
         query.push_bind(published_site.id);
-        query.build().execute(&pool).await.map_err(map_sqlx_err)?;
+        query.push(formatcp!(" RETURNING {}", SITE_COLUMNS));
 
-        Ok(())
+        Ok(query
+            .build()
+            .try_map(map_to_site_entity)
+            .fetch_one(&pool)
+            .await
+            .map_err(map_sqlx_err)?)
     }
 
     async fn list_site_versions(

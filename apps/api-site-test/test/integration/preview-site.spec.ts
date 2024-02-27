@@ -69,7 +69,7 @@ describe('Publish Site', () => {
 
   it('returns preview site when site has draft', async () => {
     const siteId = '870aafc9-36e9-476a-b38c-c1aaaad9d9fe'
-    const newPages = '{"test": "data"}'
+    const newContext = '{"test": "data"}'
 
     // Create draft
     await api
@@ -81,7 +81,7 @@ describe('Publish Site', () => {
     await api
       .patch(`${testEndpoint}/${siteId}`)
       .set('Authorization', adminAuth)
-      .send({ pages: newPages })
+      .send({ context: newContext })
       .expect(200)
 
     // Create preview link
@@ -101,7 +101,7 @@ describe('Publish Site', () => {
 
     const body: IGetSiteApiResponse = response.body
     expect(body.name).toEqual('Test Site 3')
-    expect(body.pages).toEqual(JSON.stringify(newPages))
+    expect(body.context).toEqual(JSON.stringify(newContext))
   })
 
   it('returns error when preview id does not exist', () => {
