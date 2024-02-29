@@ -53,22 +53,23 @@ const emit = defineEmits<{
   &:not(:first-child):not(:last-child) {
     border-radius: 0;
   }
-  .ps-toggle-button-text {
-    @mixin title-thin 15px;
-    &:not(:only-child) {
-      margin-left: 8px;
-    }
-  }
   &:active {
     background-color: $grey-300;
   }
-  &.ps-toggle-button--on {
-    color: white;
-    border-color: transparent;
-    background-color: $purple-button;
-    &:active {
-      opacity: 0.85;
-    }
+}
+
+.ps-toggle-button-text {
+  @mixin title-thin 15px;
+  &:not(:only-child) {
+    margin-left: 8px;
+  }
+}
+.ps-toggle-button--on {
+  color: white;
+  border-color: transparent;
+  background-color: $purple-button;
+  &:active {
+    opacity: 0.85;
   }
 }
 </style>
