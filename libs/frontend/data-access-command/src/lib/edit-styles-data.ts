@@ -18,6 +18,10 @@ export const editingCommandCount = () => {
   return editCommands.value?.commands.length ?? 0
 }
 
+export const isEditingStyles = () => {
+  return editStyles.value.size > 0
+}
+
 const clearBlankCommands = (site: ISite) => {
   // Clear any blank commands (no property or value set)
   if (editCommands.value) {

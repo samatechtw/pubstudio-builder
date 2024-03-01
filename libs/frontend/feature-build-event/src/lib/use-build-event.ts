@@ -1,6 +1,7 @@
 import {
   clearComponentTabState,
   editingCommandCount,
+  isEditingStyles,
   setBuildSubmenu,
   setEditorDropdown,
 } from '@pubstudio/frontend/data-access-command'
@@ -216,6 +217,8 @@ export const useBuildEvent = () => {
       editor.value?.componentTab.editInfo !== undefined
     ) {
       clearComponentTabState(editor.value)
+    } else if (isEditingStyles()) {
+      // Let the style menu handle escape
     } else if (editor.value?.editingMixinData) {
       closeMixinMenu()
     } else {
