@@ -9,6 +9,7 @@ export const cssValues = new Map<Css, string[]>([
     ['center', 'flex-end', 'flex-start', 'space-around', 'space-between', 'stretch'],
   ],
   [Css.AlignItems, ['baseline', 'center', 'flex-end', 'flex-start', 'stretch']],
+  [Css.AlignSelf, ['baseline', 'center', 'flex-end', 'flex-start', 'stretch']],
   [Css.BackgroundOrigin, ['border-box', 'content-box', 'padding-box']],
   [Css.Cursor, ['auto', 'default', 'none', 'pointer', 'text']],
   [Css.Display, ['block', 'flex', 'inline', 'inline-block', 'none']],

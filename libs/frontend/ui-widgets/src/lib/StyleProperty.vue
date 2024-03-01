@@ -2,7 +2,6 @@
   <PSMultiselect
     ref="multiselectRef"
     :value="newVal"
-    class="style-property"
     :placeholder="t('property')"
     :options="options"
     :searchable="true"

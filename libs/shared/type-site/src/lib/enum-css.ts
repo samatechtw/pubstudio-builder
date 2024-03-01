@@ -4,6 +4,7 @@ export enum Css {
   WebkitTextFillColor = '-webkit-text-fill-color',
   AlignContent = 'align-content',
   AlignItems = 'align-items',
+  AlignSelf = 'align-self',
   Animation = 'animation',
   AspectRatio = 'aspect-ratio',
   Background = 'background',

@@ -101,9 +101,11 @@ const { addToast } = useToast()
 
 const siteData = ref<IMergedSiteData>()
 
-useClickaway('.preview-link-wrap,.toolbar-link', () =>
-  setEditorDropdown(editor.value, undefined),
-)
+useClickaway('.preview-link-wrap,.toolbar-link', () => {
+  if (showPreview.value) {
+    setEditorDropdown(editor.value, undefined)
+  }
+})
 
 const showPreview = computed(() => {
   return editor.value?.editorDropdown === EditorDropdown.Preview

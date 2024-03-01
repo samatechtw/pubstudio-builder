@@ -295,6 +295,7 @@ const handleKeydown = (e: KeyboardEvent) => {
     e.stopPropagation()
     e.preventDefault()
     closeMenu()
+    setMenuOpened(false)
   } else if (e.key === Keys.ArrowUp) {
     searchIndex.value = (searchIndex.value + optionsLen - 1) % optionsLen
   } else if (e.key === Keys.ArrowDown) {

@@ -226,6 +226,9 @@ const checkEscape = (e: KeyboardEvent) => {
 const saveStyle = () => {
   if (style.value.property && isValueValid.value) {
     emit('save')
+  } else if (!style.value.property && !style.value.value) {
+    // Clear empty style on save
+    emit('remove')
   }
 }
 

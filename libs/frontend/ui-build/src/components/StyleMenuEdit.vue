@@ -1,5 +1,5 @@
 <template>
-  <div class="style-menu-edit" @keydown.esc.stop.prevent="saveMixinStyles">
+  <div class="style-menu-edit" @keydown.esc.stop.prevent="handleEsc">
     <MenuRowEdit
       :label="t('name')"
       :modelValue="editingStyle?.name"
@@ -44,7 +44,10 @@ import { computed, onUnmounted } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { ErrorMessage, PSButton } from '@pubstudio/frontend/ui-widgets'
 import { useBuild, useReusableStyleMenu } from '@pubstudio/frontend/feature-build'
-import { editStylesCancelEdit } from '@pubstudio/frontend/data-access-command'
+import {
+  editStylesCancelEdit,
+  isEditingStyles,
+} from '@pubstudio/frontend/data-access-command'
 import EditMenuTitle from './EditMenuTitle.vue'
 import MenuRowEdit from './MenuRowEdit.vue'
 import StyleRow from './StyleRow.vue'
@@ -70,6 +73,12 @@ const {
 const { site, currentPseudoClass } = useBuild()
 
 const menuSubTitle = computed(() => `(${currentPseudoClass.value})`)
+
+const handleEsc = () => {
+  if (!isEditingStyles()) {
+    saveMixinStyles()
+  }
+}
 
 onUnmounted(() => {
   editStylesCancelEdit(site.value)
