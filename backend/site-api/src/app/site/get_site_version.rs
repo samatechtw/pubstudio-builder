@@ -16,7 +16,10 @@ use lib_shared_types::{
 };
 use validator::Validate;
 
-use crate::{api_context::ApiContext, middleware::auth::verify_site_owner};
+use crate::{
+    api_context::ApiContext, db::cache_helpers::get_metadata_from_cache_or_repo,
+    middleware::auth::verify_site_owner,
+};
 
 #[debug_handler]
 pub async fn get_site_version(
@@ -45,20 +48,10 @@ pub async fn get_site_version_result(
     if version_id != "latest" {
         validate_integer(&version_id)?
     }
-    let disabled = match context.cache.get_metadata(&site_id).await {
-        Some(data) => data.disabled,
-        None => {
-            context
-                .metadata_repo
-                .get_site_metadata(&site_id)
-                .await
-                .map_err(|e| ApiError::not_found().message(e))?
-                .disabled
-        }
-    };
+    let metadata = get_metadata_from_cache_or_repo(&context, &site_id).await?;
 
     // Check if site is disabled
-    if disabled && user.user_type != UserType::Admin && user.user_type != UserType::Cron {
+    if metadata.disabled && user.user_type != UserType::Admin && user.user_type != UserType::Cron {
         return Err(ApiError::forbidden().code(ApiErrorCode::SiteDisabled));
     }
 

@@ -129,54 +129,7 @@ describe('Get Current Site', () => {
 
       const body: IGetSiteApiResponse = response.body
       expect(body.name).toEqual('Test Site 3')
-      expect(body.pages).toEqual(pagesAfter)
-    })
-
-    it('returns current when requester is admin site for subdomain', async () => {
-      const execEnv = testConfig.get('execEnv')
-      const response = await api
-        .get(testEndpoint)
-        .set('Host', `my-subdomain.${execEnv}.pubstud.io`)
-        .set('Authorization', adminAuth)
-        .expect(200)
-
-      const body: IGetSiteApiResponse = response.body
-      expect(body.name).toEqual('Test Site 1')
-      expect(body.version).toEqual('0.1')
-      expect(body.context).toBeDefined()
-      expect(body.defaults).toBeDefined()
-      expect(body.pages).toBeDefined()
-    })
-
-    it('returns current site when requester is admin for custom domain', async () => {
-      const response = await api
-        .get(testEndpoint)
-        .set('Host', 'www.myblog.org')
-        .set('Authorization', adminAuth)
-        .expect(200)
-
-      const body: IGetSiteApiResponse = response.body
-      expect(body.name).toEqual('Test Site 2')
-      expect(body.version).toEqual('0.1')
-      expect(body.context).toBeDefined()
-      expect(body.defaults).toBeDefined()
-      expect(body.pages).toBeDefined()
-    })
-
-    it('returns current site when requester is owner for custom domain', async () => {
-      const ownerAuth = ownerAuthHeader('903b3c28-deaa-45dc-a43f-511fe965d34e')
-      const response = await api
-        .get(testEndpoint)
-        .set('Host', 'www.myblog.org')
-        .set('Authorization', ownerAuth)
-        .expect(200)
-
-      const body: IGetSiteApiResponse = response.body
-      expect(body.name).toEqual('Test Site 2')
-      expect(body.version).toEqual('0.1')
-      expect(body.context).toBeDefined()
-      expect(body.defaults).toBeDefined()
-      expect(body.pages).toBeDefined()
+      expect(body.pages).toEqual(JSON.stringify(pagesAfter))
     })
 
     it('returns current site when requester is anonymous', async () => {
@@ -196,6 +149,18 @@ describe('Get Current Site', () => {
         .get(testEndpoint)
         .set('Host', 'www.myblog.org')
         .set('Authorization', ownerAuth)
+        .expect(400, {
+          code: 'SiteUnpublished',
+          message: 'Failed to validate request',
+          status: 400,
+        })
+    })
+
+    it('returns error requester is admin and site is unpublished', () => {
+      return api
+        .get(testEndpoint)
+        .set('Host', 'www.myblog.org')
+        .set('Authorization', adminAuth)
         .expect(400, {
           code: 'SiteUnpublished',
           message: 'Failed to validate request',
