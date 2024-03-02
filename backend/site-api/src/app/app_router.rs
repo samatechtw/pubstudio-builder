@@ -1,9 +1,7 @@
 use crate::api_context::ApiContext;
 
 use crate::app::{health, publish, site, usage};
-use crate::middleware::auth::{
-    auth_admin, auth_admin_owner, auth_admin_owner_anonymous, error_cache,
-};
+use crate::middleware::auth::{auth_admin, auth_admin_owner, error_cache};
 use axum::handler::Handler;
 
 use axum::http::StatusCode;
@@ -72,12 +70,7 @@ fn api_router(context: &ApiContext) -> Router<ApiContext> {
         )
         .route(
             "/sites/current",
-            get(
-                site::get_current_site::get_current_site.layer(from_fn_with_state(
-                    context.clone(),
-                    auth_admin_owner_anonymous,
-                )),
-            ),
+            get(site::get_current_site::get_current_site),
         )
         .route(
             "/sites/:site_id/versions/:version_id",

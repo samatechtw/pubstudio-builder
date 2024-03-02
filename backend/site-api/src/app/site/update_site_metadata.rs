@@ -3,6 +3,7 @@ use axum::{
     Extension,
 };
 use lib_shared_site_api::{
+    cache::cache::SiteMetadata,
     error::{api_error::ApiError, helpers::validate_custom_domains},
     util::json_extractor::PsJson,
 };
@@ -49,14 +50,16 @@ pub async fn update_site_metadata(
                 ApiError::internal_error().message(format!("Failed to update site: {}", e))
             })?;
 
-        // Update Metadata Cache
+        // Clear Metadata Cache
         context
             .cache
             .create_or_update_metadata(
                 &id,
-                &metadata.owner_id,
-                metadata.site_type,
-                metadata.disabled,
+                SiteMetadata {
+                    owner_id: metadata.owner_id,
+                    site_type: metadata.site_type,
+                    disabled: metadata.disabled,
+                },
             )
             .await;
     }

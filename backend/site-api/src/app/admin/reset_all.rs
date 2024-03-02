@@ -48,6 +48,10 @@ pub async fn reset_all(
     // Clear all caches
     context.cache.cache.invalidate_all();
     context.cache.sync().await;
+    context.cache.metadata_cache.invalidate_all();
+    context.cache.metadata_cache.run_pending_tasks().await;
+    context.cache.domain_cache.invalidate_all();
+    context.cache.domain_cache.run_pending_tasks().await;
 
     // Seed new sites
     let seed_data = sites_seed_data();

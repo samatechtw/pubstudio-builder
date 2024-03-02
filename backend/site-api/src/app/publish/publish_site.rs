@@ -15,7 +15,10 @@ use lib_shared_types::{
 };
 use validator::Validate;
 
-use crate::{api_context::ApiContext, middleware::auth::verify_site_owner};
+use crate::{
+    api_context::ApiContext, db::cache_helpers::get_metadata_from_cache_or_repo,
+    middleware::auth::verify_site_owner,
+};
 
 pub async fn publish_site(
     Path(id): Path<String>,
@@ -54,21 +57,11 @@ pub async fn publish_site(
         .map_err(|e| ApiError::internal_error().message(e))?;
 
     // Update cache
-    let site_type = match context.cache.get_metadata(&id).await {
-        Some(data) => data.site_type,
-        None => {
-            context
-                .metadata_repo
-                .get_site_metadata(&id)
-                .await
-                .map_err(|e| ApiError::not_found().message(e))?
-                .site_type
-        }
-    };
+    let metadata = get_metadata_from_cache_or_repo(&context, &id).await?;
 
     context
         .cache
-        .create_or_update_usage(&id, &site, site_type)
+        .create_or_update_usage(&id, &site, metadata.site_type)
         .await;
 
     Ok(StatusCode::NO_CONTENT.into_response())
