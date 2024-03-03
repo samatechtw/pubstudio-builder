@@ -95,6 +95,13 @@ describe('Create Site Draft', () => {
       // Create draft
       await api.post(testEndpoint(siteId)).set('Authorization', ownerAuth).expect(200)
 
+      // Make sure site is live/published
+      await api
+        .post(`/api/sites/${siteId}/actions/publish`)
+        .send({ publish: true })
+        .set('Authorization', ownerAuth)
+        .expect(204)
+
       // Update draft
       await api
         .patch(`/api/sites/${siteId}`)

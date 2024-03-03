@@ -18,13 +18,13 @@ pub struct GetCurrentSiteResponse {
     pub published: bool,
 }
 
-pub fn to_api_response(site: &SiteEntity, filtered_pages: String) -> GetCurrentSiteResponse {
+pub fn to_api_response(site: &SiteEntity) -> GetCurrentSiteResponse {
     GetCurrentSiteResponse {
         name: site.name.clone(),
         version: site.version.clone(),
         context: site.context.clone(),
         defaults: site.defaults.clone(),
-        pages: filtered_pages,
+        pages: site.pages.clone(),
         published: site.published,
     }
 }

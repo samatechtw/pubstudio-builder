@@ -37,6 +37,13 @@ describe('Get Current Site', () => {
         .send({ context: newData1 })
         .expect(200)
 
+      // Make sure live site is published
+      await api
+        .post(`/api/sites/${siteId}/actions/publish`)
+        .send({ publish: true })
+        .set('Authorization', adminAuth)
+        .expect(204)
+
       // Get current site
       const r1 = await api
         .get(testEndpoint)
@@ -196,15 +203,11 @@ describe('Get Current Site', () => {
         .send(payload)
         .expect(200)
 
-      return api
-        .get(testEndpoint)
-        .set('Host', 'www.myblog.org')
-        .set('Authorization', adminAuth)
-        .expect(509, {
-          code: 'None',
-          message: 'Bandwidth exceeded',
-          status: 509,
-        })
+      return api.get(testEndpoint).set('Host', 'www.myblog.org').expect(509, {
+        code: 'None',
+        message: 'Bandwidth exceeded',
+        status: 509,
+      })
     })
   })
 

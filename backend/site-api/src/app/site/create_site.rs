@@ -49,9 +49,10 @@ pub async fn create_site_helper(
     for domain in domains {
         context.cache.insert_domain_mapping(&site_id, domain).await;
     }
+    let size = site.calculate_site_size();
     context
         .cache
-        .create_or_update_usage(&site_id, &site, site_type)
+        .create_or_update_usage(&site_id, size, site_type)
         .await;
 
     Ok(site_id)

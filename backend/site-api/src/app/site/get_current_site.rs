@@ -56,7 +56,7 @@ pub async fn get_current_site(
             .get_site_by_preview_id(&site_id, &preview_id)
             .await
             .map_err(|_| ApiError::not_found().message("Site preview not found"))?;
-        to_api_response(&site, site.pages.clone())
+        to_api_response(&site)
     } else {
         // Get site from cache
         let site = get_site_from_cache_or_repo(&context, &site_id).await?;
@@ -68,14 +68,15 @@ pub async fn get_current_site(
     };
 
     // Check if the bandwidth usage exceeds the allowed limit
+    let site_size = site.calculate_site_size();
     context
         .cache
-        .check_bandwidth_exceeded(&site_id, &site, metadata.site_type)
+        .check_bandwidth_exceeded(&site_id, site_size, metadata.site_type)
         .await?;
 
     context
         .cache
-        .increase_request_count(&site_id, &site, metadata.site_type)
+        .increase_request_count(&site_id, site_size, metadata.site_type)
         .await;
 
     Ok(Json(site))
