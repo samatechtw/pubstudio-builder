@@ -93,10 +93,13 @@ pub async fn update_site(
             _ => ApiError::internal_error().message(e),
         })?;
 
-    // Update in-memory cache
+    // Reset site data cache. This only needs to be done if there's no draft, but we would have to do
+    // extra work to determine that, so it's easier and more efficient just to let get_current_site
+    // take care of refreshing the cache
+    context.cache.remove_site(&id).await;
     context
         .cache
-        .create_or_update_usage(&id, &site, site_type)
+        .create_or_update_usage(&id, site.calculate_site_size(), site_type)
         .await;
 
     Ok((StatusCode::OK, Json(to_api_response(site))))

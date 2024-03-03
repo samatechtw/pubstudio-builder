@@ -141,7 +141,7 @@ pub async fn error_cache(
 
         context
             .cache
-            .increase_request_error_count(&site_id, &site, metadata.site_type)
+            .increase_request_error_count(&site_id, site.calculate_site_size(), metadata.site_type)
             .await;
     }
     Ok(response)

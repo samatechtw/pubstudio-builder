@@ -7,7 +7,7 @@ use lib_shared_types::{
 };
 use moka::future::Cache;
 use serde::Serialize;
-use serde_json::{json, Map, Value};
+use serde_json::{Map, Value};
 
 use crate::error::api_error::ApiError;
 
@@ -19,7 +19,6 @@ pub struct SiteUsageData {
     pub total_bandwidth: u64,
     pub bandwidth_allowance: u64,
     pub last_updated: JsDate,
-    pub site_data: Value,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -32,16 +31,18 @@ pub struct SiteMetadata {
 pub type SiteUsageCache = Cache<String, SiteUsageData>; // key: site_id, value: SiteUsageData
 pub type SiteDomainCache = Cache<String, String>; // key: domain, value: site_id
 pub type SiteMetadataCache = Cache<String, SiteMetadata>; // key: site_id, value: SiteMetadata
+pub type SiteDataCache = Cache<String, Value>; // key: site_id, value: site JSON
 
 #[derive(Clone)]
 pub struct AppCache {
     pub cache: SiteUsageCache,
     pub domain_cache: SiteDomainCache,
     pub metadata_cache: SiteMetadataCache,
+    pub site_data_cache: SiteDataCache,
     exec_env: ExecEnv,
 }
 
-fn site_to_value(site: &SiteEntity) -> Result<GetCurrentSiteResponse, serde_json::Error> {
+pub fn site_to_value(site: &SiteEntity) -> Result<Value, serde_json::Error> {
     let unwrapped_pages: String = serde_json::from_str(&site.pages)?;
     let mut pages: Map<String, Value> = serde_json::from_str(&unwrapped_pages)?;
 
@@ -55,26 +56,29 @@ fn site_to_value(site: &SiteEntity) -> Result<GetCurrentSiteResponse, serde_json
     }
     let pages_json = serde_json::to_string(&filtered_json)?;
     let filtered_pages = serde_json::to_string(&pages_json)?;
-    Ok(GetCurrentSiteResponse {
+    let response = GetCurrentSiteResponse {
         name: site.name.clone(),
         version: site.version.clone(),
         context: site.context.clone(),
         defaults: site.defaults.clone(),
         pages: filtered_pages,
         published: site.published,
-    })
+    };
+    Ok(serde_json::to_value(response)?)
 }
 
 impl AppCache {
     pub fn new(exec_env: ExecEnv) -> AppCache {
         // Create a cache that can store up to 10,000 entries.
-        let cache = Cache::new(10_000);
+        let cache = Cache::new(2_000);
         let domain_cache = Cache::new(10_000);
-        let metadata_cache = Cache::new(10_000);
+        let metadata_cache = Cache::new(2_000);
+        let site_data_cache = Cache::new(2_000);
         AppCache {
             cache,
             domain_cache,
             metadata_cache,
+            site_data_cache,
             exec_env,
         }
     }
@@ -83,19 +87,18 @@ impl AppCache {
     async fn get_with_usage(
         &self,
         site_id: &str,
-        site: &GetCurrentSiteResponse,
+        site_size: u64,
         site_type: SiteType,
     ) -> SiteUsageData {
         self.cache
             .get_with(site_id.to_string(), async move {
                 SiteUsageData {
-                    site_size: site.calculate_site_size(),
+                    site_size,
                     request_count: 0,
                     request_error_count: 0,
                     total_bandwidth: 0,
                     last_updated: JsDate::now(),
                     bandwidth_allowance: site_type.get_bandwidth_allowance(self.exec_env),
-                    site_data: serde_json::to_value(site).unwrap_or(json!({})),
                 }
             })
             .await
@@ -113,34 +116,19 @@ impl AppCache {
         self.cache.run_pending_tasks().await;
     }
 
-    pub async fn create_or_update_usage(
-        &self,
-        site_id: &str,
-        site: &SiteEntity,
-        site_type: SiteType,
-    ) {
-        if let Ok(site_value) = site_to_value(site) {
-            let mut data = self.get_with_usage(site_id, &site_value, site_type).await;
+    pub async fn create_or_update_usage(&self, site_id: &str, site_size: u64, site_type: SiteType) {
+        let mut data = self.get_with_usage(site_id, site_size, site_type).await;
 
-            data.site_size = site.calculate_site_size();
-            data.request_count += 1;
-            data.total_bandwidth = data.site_size * data.request_count;
-            data.last_updated = JsDate::now();
-            if site.published {
-                data.site_data = serde_json::to_value(site_value).unwrap_or(json!({}));
-            }
+        data.site_size = site_size;
+        data.request_count += 1;
+        data.total_bandwidth = data.site_size * data.request_count;
+        data.last_updated = JsDate::now();
 
-            self.cache.insert(site_id.to_string(), data).await;
-        }
+        self.cache.insert(site_id.to_string(), data).await;
     }
 
-    pub async fn increase_request_count(
-        &self,
-        site_id: &str,
-        site: &GetCurrentSiteResponse,
-        site_type: SiteType,
-    ) {
-        let mut data = self.get_with_usage(site_id, site, site_type).await;
+    pub async fn increase_request_count(&self, site_id: &str, site_size: u64, site_type: SiteType) {
+        let mut data = self.get_with_usage(site_id, site_size, site_type).await;
 
         data.request_count += 1;
         data.total_bandwidth = data.site_size * data.request_count;
@@ -152,10 +140,10 @@ impl AppCache {
     pub async fn increase_request_error_count(
         &self,
         site_id: &str,
-        site: &GetCurrentSiteResponse,
+        site_size: u64,
         site_type: SiteType,
     ) {
-        let mut data = self.get_with_usage(site_id, site, site_type).await;
+        let mut data = self.get_with_usage(site_id, site_size, site_type).await;
 
         data.request_error_count += 1;
         data.last_updated = JsDate::now();
@@ -166,47 +154,43 @@ impl AppCache {
     pub async fn check_bandwidth_exceeded(
         &self,
         site_id: &str,
-        site: &GetCurrentSiteResponse,
+        site_size: u64,
         site_type: SiteType,
     ) -> Result<(), ApiError> {
-        let data = self.get_with_usage(site_id, site, site_type).await;
+        let data = self.get_with_usage(site_id, site_size, site_type).await;
 
         if data.total_bandwidth != 0 && data.total_bandwidth > data.bandwidth_allowance {
             return Err(ApiError::bandwidth_exceeded());
         }
+        println!(
+            "UPD {} {} {}",
+            data.request_count, data.total_bandwidth, data.bandwidth_allowance
+        );
 
         Ok(())
     }
 
     pub async fn reset_bandwidth(&self) {
-        for (site_id, mut site_data) in self.cache.iter() {
-            site_data.request_count = 0;
-            site_data.request_error_count = 0;
-            site_data.total_bandwidth = 0;
-            site_data.last_updated = JsDate::now();
+        for (site_id, mut usage_data) in self.cache.iter() {
+            usage_data.request_count = 0;
+            usage_data.request_error_count = 0;
+            usage_data.total_bandwidth = 0;
+            usage_data.last_updated = JsDate::now();
 
-            self.cache.insert(site_id.to_string(), site_data).await;
+            self.cache.insert(site_id.to_string(), usage_data).await;
         }
     }
 
-    pub async fn reset_cache(
-        &self,
-        usage: &SiteUsageEntity,
-        site: &SiteEntity,
-        site_type: SiteType,
-    ) {
-        if let Ok(site_value) = site_to_value(site) {
-            let data = SiteUsageData {
-                site_size: site.calculate_site_size(),
-                request_count: usage.request_count as u64,
-                request_error_count: usage.request_error_count as u64,
-                total_bandwidth: usage.total_bandwidth as u64,
-                last_updated: JsDate::now(),
-                bandwidth_allowance: site_type.get_bandwidth_allowance(self.exec_env),
-                site_data: serde_json::to_value(site_value).unwrap_or(json!({})),
-            };
-            self.cache.insert(usage.site_id.clone(), data).await;
-        }
+    pub async fn reset_usage(&self, usage: &SiteUsageEntity, site_size: u64, site_type: SiteType) {
+        let data = SiteUsageData {
+            site_size,
+            request_count: usage.request_count as u64,
+            request_error_count: usage.request_error_count as u64,
+            total_bandwidth: usage.total_bandwidth as u64,
+            last_updated: JsDate::now(),
+            bandwidth_allowance: site_type.get_bandwidth_allowance(self.exec_env),
+        };
+        self.cache.insert(usage.site_id.clone(), data).await;
     }
 
     // SiteDomain
@@ -245,10 +229,6 @@ impl AppCache {
             .await;
     }
 
-    pub async fn get_metadata(&self, site_id: &str) -> Option<SiteMetadata> {
-        self.metadata_cache.get(site_id).await
-    }
-
     pub async fn get_metadata_with(
         &self,
         site_id: &str,
@@ -262,5 +242,25 @@ impl AppCache {
 
     pub async fn remove_metadata(&self, site_id: &str) {
         self.metadata_cache.invalidate(site_id).await;
+    }
+
+    // Site Data
+    pub async fn get_site_with(
+        &self,
+        site_id: &str,
+        init: impl Future<Output = Result<Value, ApiError>>,
+    ) -> Result<Value, ApiError> {
+        self.site_data_cache
+            .try_get_with(site_id.to_string(), init)
+            .await
+            .map_err(|e| Borrow::<ApiError>::borrow(&e).clone())
+    }
+
+    pub async fn get_site(&self, site_id: &str) -> Option<Value> {
+        self.site_data_cache.get(site_id).await
+    }
+
+    pub async fn remove_site(&self, site_id: &str) {
+        self.site_data_cache.invalidate(site_id).await;
     }
 }
