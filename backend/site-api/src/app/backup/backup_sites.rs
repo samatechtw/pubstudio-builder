@@ -9,6 +9,7 @@ use uuid::Uuid;
 
 use crate::{
     api_context::ApiContext,
+    app::backup::helpers::check_s3_config,
     db::backup_repo::{BackupEntityProps, CreateBackupEntityResult},
 };
 
@@ -182,7 +183,11 @@ pub async fn backup_site(
 
 // To satisfy tokio-cron async closure constraints, which expects an async function with empty return
 pub async fn backup_sites_helper(context: ApiContext) -> () {
-    let result = backup_all_sites(context).await;
+    let result = match check_s3_config(&context.config) {
+        Ok(()) => backup_all_sites(context).await,
+        Err(_) => BackupSitesResult::new(0, 0),
+    };
+
     info!(
         "Backed up {} of {} sites",
         result.successful_backups, result.total_sites

@@ -2,6 +2,7 @@ use crate::reqwest::Url;
 use crate::{error::api_error::ApiError, reqwest};
 use rusty_s3::{Bucket, Credentials, S3Action, UrlStyle};
 use std::time::Duration;
+use tracing::warn;
 
 #[derive(Clone)]
 pub struct S3Client {
@@ -13,6 +14,9 @@ pub struct S3Client {
 
 impl S3Client {
     pub fn new(s3_url: String, s3_access_key_id: String, s3_secret_access_key: String) -> S3Client {
+        if s3_url.is_empty() || s3_secret_access_key.is_empty() || s3_access_key_id.is_empty() {
+            warn!("Missing S3 configuration, please check the following information is provided: S3_URL, S3_ACCESS_KEY_ID, S3_SECRET_ACCESS_KEY")
+        }
         let endpoint: Url = s3_url.parse().expect("s3 endpoint is invalid");
         let path_style = UrlStyle::Path;
         let site_asset_name = "site-assets";
