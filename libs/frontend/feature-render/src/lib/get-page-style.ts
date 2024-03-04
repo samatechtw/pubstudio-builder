@@ -7,6 +7,7 @@ import {
   createQueryStyle,
   IQueryStyle,
   IRawStyleRecord,
+  iteratePage,
   rawStyleToResolvedStyleWithSource,
 } from '@pubstudio/frontend/util-render'
 import {
@@ -19,20 +20,6 @@ import {
   ISiteContext,
 } from '@pubstudio/shared/type-site'
 import { pseudoClassToCssClass } from './pseudo-class-to-css-class'
-
-type ComponentIterFn = (component: IComponent) => void
-
-export const iteratePage = (page: IPage, fn: ComponentIterFn) => {
-  // Tree iteration
-  const stack = [page.root]
-  while (stack.length > 0) {
-    const cmp = stack.pop()
-    fn(cmp as IComponent)
-    if (cmp?.children) {
-      stack.push(...cmp.children)
-    }
-  }
-}
 
 export const getBuildPageStyle = (site: ISite, page: IPage): IRawStyleRecord => {
   const pageStyle: IRawStyleRecord = {}

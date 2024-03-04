@@ -1,0 +1,17 @@
+{
+  "name": "frontend-util-external",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/frontend/util-external/src",
+  "projectType": "library",
+  "targets": {
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/frontend/util-external/**/*.ts"],
+        "eslintConfig": "libs/frontend/util-external/.eslintrc.cjs"
+      }
+    }
+  },
+  "tags": ["scope:frontend", "type:util"]
+}
