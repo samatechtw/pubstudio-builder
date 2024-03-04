@@ -7,7 +7,7 @@ use lib_shared_types::shared::user::RequestUser;
 
 use crate::{api_context::ApiContext, middleware::auth::verify_site_owner};
 
-use super::helpers::delete_backup_from_r2;
+use super::helpers::{check_s3_config, delete_backup_from_r2};
 
 pub async fn delete_backup(
     Path((site_id, backup_id)): Path<(String, String)>,
@@ -15,6 +15,7 @@ pub async fn delete_backup(
     Extension(user): Extension<RequestUser>,
 ) -> Result<(), ApiError> {
     verify_site_owner(&context, &user, &site_id).await?;
+    check_s3_config(&context.config)?;
 
     let backup_id_int = backup_id
         .parse::<u32>()

@@ -9,7 +9,7 @@ use lib_shared_types::shared::{core::ExecEnv, user::RequestUser};
 
 use crate::{api_context::ApiContext, middleware::auth::verify_site_owner};
 
-use super::backup_sites::backup_site;
+use super::{backup_sites::backup_site, helpers::check_s3_config};
 
 pub async fn restore_backup_helper(
     context: &ApiContext,
@@ -42,6 +42,7 @@ pub async fn restore_backup(
     Extension(user): Extension<RequestUser>,
 ) -> Result<(), ApiError> {
     verify_site_owner(&context, &user, &site_id).await?;
+    check_s3_config(&context.config)?;
 
     let backup_id_int = backup_id
         .parse::<u32>()

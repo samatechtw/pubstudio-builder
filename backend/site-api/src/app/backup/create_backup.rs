@@ -3,12 +3,14 @@ use lib_shared_site_api::error::api_error::ApiError;
 
 use crate::api_context::ApiContext;
 
-use super::backup_sites::backup_site;
+use super::{backup_sites::backup_site, helpers::check_s3_config};
 
 pub async fn create_backup(
     Path(site_id): Path<String>,
     State(context): State<ApiContext>,
 ) -> Result<(), ApiError> {
+    check_s3_config(&context.config)?;
+
     let site = context
         .metadata_repo
         .get_site_metadata(&site_id)
