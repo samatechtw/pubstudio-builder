@@ -8,7 +8,7 @@ import {
 import { store } from '@pubstudio/frontend/data-access-web-store'
 import { useBuild, useHistory } from '@pubstudio/frontend/feature-build'
 import { hotkeysDisabled, useBuildEvent } from '@pubstudio/frontend/feature-build-event'
-import { iteratePage, useRender } from '@pubstudio/frontend/feature-render'
+import { useRender } from '@pubstudio/frontend/feature-render'
 import { useDragDropData } from '@pubstudio/frontend/feature-render-builder'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { initializeSiteStore } from '@pubstudio/frontend/feature-site-store-init'
@@ -31,7 +31,7 @@ import {
 } from '@pubstudio/frontend/ui-widgets'
 import { PSApi } from '@pubstudio/frontend/util-api'
 import { Keys, useKeyListener } from '@pubstudio/frontend/util-key-listener'
-import { RenderMode } from '@pubstudio/frontend/util-render'
+import { iteratePage, RenderMode } from '@pubstudio/frontend/util-render'
 import {
   computeLocationParts,
   getCurrentPath,

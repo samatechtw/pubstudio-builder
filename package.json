@@ -14,6 +14,7 @@
     "lint:style": "./node_modules/stylelint/bin/stylelint.js \"**/src/**/*.{css,vue}\"",
     "build:web-site": "cd apps/web-site && vite build --outDir ../../dist/apps/web-site --emptyOutDir",
     "build:feature-external": "cd libs/frontend/feature-external && npm run build",
+    "build:util-external": "cd libs/frontend/util-external && npm run build",
     "publish": "cd dist/libs/feature-external/ && npm publish --access=public",
     "dev:build-aarch": "cd backend && CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=aarch64-unknown-linux-gnu-gcc cargo build --target aarch64-unknown-linux-gnu",
     "dev:run-aarch": "cd backend && CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=aarch64-unknown-linux-gnu-gcc cargo run --target aarch64-unknown-linux-gnu",
