@@ -91,6 +91,8 @@ export const ProseMirrorEditor = defineComponent({
             },
           }),
         ]
+        // Helps retain the current selection if the editor is unfocused
+        // Used for setting selection text size
         const selPlugin: Plugin = new Plugin({
           state: {
             init() {},
@@ -113,7 +115,7 @@ export const ProseMirrorEditor = defineComponent({
             },
           },
         })
-        // plugins.push(selPlugin)
+        plugins.push(selPlugin)
 
         editor.editView?.destroy()
         editor.editView = createComponentEditorView(
@@ -165,11 +167,16 @@ export const ProseMirrorEditor = defineComponent({
     onMounted(() => {
       mountProseMirrorEditor(editor.value, container.value)
       const el = container.value
-      el?.addEventListener('focusout', () => {
-        const view = toRaw(editor.value?.editView)
-        if (view) {
-          const tr = view.state.tr.setMeta('selDeco', {})
-          view.dispatch(tr)
+      el?.addEventListener('focusout', (e) => {
+        const tag = (e.relatedTarget as HTMLElement)?.tagName?.toLowerCase()
+        // Only set selection when an input is focused (e.g. text size), otherwise
+        // the browser will scroll back to the editor component when the transaction is dispatched
+        if (tag === 'input') {
+          const view = toRaw(editor.value?.editView)
+          if (view) {
+            const tr = view.state.tr.setMeta('selDeco', {})
+            view.dispatch(tr)
+          }
         }
       })
     })
