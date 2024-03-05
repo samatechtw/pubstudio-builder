@@ -96,6 +96,14 @@ export interface IComponentStyle {
   overrides?: IComponentStyleOverrides
 }
 
+export interface IReusableComponentData {
+  // Reusable component id
+  id: string
+  // Inputs override
+  // Key: input key, value: input `is`
+  inputs?: Record<string, unknown>
+}
+
 export interface IComponent {
   // ID unique to the namespace
   id: string
@@ -105,12 +113,15 @@ export interface IComponent {
   tag: Tag
   // ARIA role
   role?: AriaRole
-  // HTML content
+  // HTML content.
+  // This is also used to override reusable component content.
   content?: string
   // DOM parent
   parent?: IComponent
   // DOM children
   children?: IComponent[]
+  // Reusable component data
+  reusableComponentData?: IReusableComponentData
   // Input values
   style: IComponentStyle
   state?: Record<string, IComponentState>

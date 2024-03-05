@@ -54,7 +54,8 @@ export const computeAttrsInputsMixins = (
   // Add attrs and inputs from default `inputs`
   for (const [key, input] of Object.entries(c.inputs ?? {})) {
     if (!inputs[key]) {
-      inputs[key] = resolveInput(input.is ?? input.default)
+      const overrideInput = c.reusableComponentData?.inputs?.[key]
+      inputs[key] = resolveInput(overrideInput ?? input.is ?? input.default)
     }
     if (input.attr && !attrs[key]) {
       attrs[key] = resolveInput(inputs[key] ?? input.default)

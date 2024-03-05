@@ -38,6 +38,7 @@ import { undoEditThemeVariable } from './theme-variable/edit-theme-variable'
 import { undoRemoveThemeVariable } from './theme-variable/remove-theme-variable'
 import { undoSetTranslations } from './translations/set-translations'
 import { undoUpdateUi } from './update-ui/update-ui'
+import { undoAddReusableComponent } from './reusable-component/add-reusable-component'
 
 // Undo the most recent command and shift it to the redo stack
 export const undoCommand = (site: ISite, command: ICommand) => {
@@ -81,6 +82,7 @@ export const undoCommand = (site: ISite, command: ICommand) => {
     [CommandType.SetDefaultsHead]: undoSetDefaultsHead,
     [CommandType.SetBreakpoint]: undoSetBreakpoint,
     [CommandType.UpdateUi]: undoUpdateUi,
+    [CommandType.addReusableComponent]: undoAddReusableComponent,
   }[command.type]
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   applyFunction(site, command.data as any)

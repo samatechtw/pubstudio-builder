@@ -66,6 +66,7 @@ const deserializeComponent = (ser: ISerializedComponent): IComponent => {
     inputs: ser.inputs,
     events: ser.events,
     editorEvents: ser.editorEvents,
+    reusableComponentData: ser.reusableComponentData,
   }
 }
 
@@ -114,6 +115,7 @@ export const deserializedHelper = (serialized: ISerializedSite): ISite => {
     namespace: context.namespace,
     nextId: context.nextId,
     components,
+    reusableComponents: context.reusableComponents,
     behaviors: context.behaviors,
     styles: context.styles,
     theme: context.theme,

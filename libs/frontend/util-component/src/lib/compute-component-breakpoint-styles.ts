@@ -8,6 +8,7 @@ import {
   IPseudoStyle,
   IPseudoStyleWithSource,
   IRawStylesWithSource,
+  IReusableComponent,
   ISiteContext,
   StyleSourceType,
 } from '@pubstudio/shared/type-site'
@@ -26,7 +27,7 @@ export interface IComputeComponentBreakpointStylesOptions {
 
 export const computeComponentBreakpointStyles = (
   context: ISiteContext,
-  component: IComponent,
+  component: IComponent | IReusableComponent,
   options?: IComputeComponentBreakpointStylesOptions,
 ): IBreakpointStylesWithSource => {
   const { computeMixins = true } = options ?? {}
@@ -100,6 +101,7 @@ const computePseudoStyleWithSource = (
 
     Object.entries(customRawStyle).forEach(([css, value]) => {
       rawStyle[css as Css] = {
+        // TODO: add style source type for reusable component
         sourceType: StyleSourceType.Custom,
         sourceId: componentId,
         sourceBreakpointId: breakpointId,
@@ -110,7 +112,7 @@ const computePseudoStyleWithSource = (
 }
 
 const computeCustomBreakpointStyles = (
-  component: IComponent,
+  component: IComponent | IReusableComponent,
 ): IBreakpointStylesWithSource => {
   const result: IBreakpointStylesWithSource = {}
   Object.entries(component.style.custom).forEach(([breakpointId, customPseudoStyle]) => {
@@ -165,7 +167,7 @@ export const computeComponentOverrideStyle = (
 }
 
 export const computeComponentOverrideStyles = (
-  component: IComponent,
+  component: IComponent | IReusableComponent,
 ): IBreakpointOverrideStylesWithSource | undefined => {
   if (!component.style.overrides) {
     return undefined

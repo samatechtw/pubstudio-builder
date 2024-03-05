@@ -39,6 +39,7 @@ import {
   IAddComponentData,
   IAddComponentMixinData,
   IAddPageData,
+  IAddReusableComponentData,
   IAddStyleMixinData,
   IAddThemeFontData,
   IAddThemeVariableData,
@@ -229,6 +230,7 @@ export interface IUseBuild {
     action: Action,
     params: IUpdateUiParams[Action],
   ) => void
+  addReusableComponent: (component: IComponent) => void
 }
 
 // Briefly indicates active command
@@ -1247,6 +1249,21 @@ export const useBuild = (): IUseBuild => {
     pushCommand(site.value, CommandType.UpdateUi, data)
   }
 
+  const addReusableComponent = (component: IComponent) => {
+    const data: IAddReusableComponentData = {
+      name: component.name,
+      tag: component.tag,
+      content: component.content,
+      parentId: undefined,
+      sourceId: component.id,
+      style: component.style,
+      inputs: component.inputs,
+      events: component.events,
+      editorEvents: component.editorEvents,
+    }
+    pushCommand(site.value, CommandType.addReusableComponent, data)
+  }
+
   return {
     site,
     siteError,
@@ -1320,5 +1337,6 @@ export const useBuild = (): IUseBuild => {
     setBreakpoint,
     pushGroupCommands,
     updateUi,
+    addReusableComponent,
   }
 }

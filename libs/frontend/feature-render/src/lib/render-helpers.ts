@@ -1,14 +1,20 @@
-import { NativeEvents } from '@pubstudio/frontend/util-builtin'
+import { NativeEvents, resolveReusableComponent } from '@pubstudio/frontend/util-builtin'
 import { triggerEventBehaviors } from '@pubstudio/frontend/util-runtime'
 import { IComponent, IEventCollection, ISite } from '@pubstudio/shared/type-site'
 
 export const computeEvents = (site: ISite, component: IComponent): IEventCollection => {
+  const reusableCmp = resolveReusableComponent(
+    site.context,
+    component.reusableComponentData?.id,
+  )
+  const cmpEvents = reusableCmp?.events ?? component.events
+
   const events: IEventCollection = {
     native: {},
     custom: {},
   }
 
-  for (const event of Object.values(component.events ?? {})) {
+  for (const event of Object.values(cmpEvents ?? {})) {
     const nativeEventName = NativeEvents[event.name]
 
     const eventHandler = (_e: Event | undefined) => {

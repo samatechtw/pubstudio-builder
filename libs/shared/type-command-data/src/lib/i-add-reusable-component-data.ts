@@ -7,10 +7,10 @@ import {
   Tag,
 } from '@pubstudio/shared/type-site'
 
-export interface IAddComponentData {
+export interface IAddReusableComponentData {
   // Populate the ID so if we're creating children, the undo command knows which component
   // to delete. (the latest ID would be the last added child)
-  // `nextComponentId` must be called in the apply command, otherwise re-doing the command later will
+  // `nextReusableComponentId` must be called in the apply command, otherwise re-doing the command later will
   // not update context `nextId` correctly.
   id?: string
   // Human readable name
@@ -19,14 +19,10 @@ export interface IAddComponentData {
   tag: Tag
   // HTML content
   content?: string
-  // DOM parent
-  parentId: string
-  // Index to insert new component in parent's children array
-  parentIndex?: number
-  // Source to copy props from
+  // Parent reusable component id
+  parentId?: string
+  // Component to copy props from
   sourceId?: string
-  // Reusable component id
-  reusableComponentId?: string
   style?: IComponentStyle
   inputs?: IComponentInputs
   events?: IComponentEvents
@@ -35,6 +31,6 @@ export interface IAddComponentData {
   selectedComponentId?: string
 }
 
-export interface AddComponent extends ICommand<IAddComponentData> {
+export interface AddReusableComponent extends ICommand<IAddReusableComponentData> {
   type: CommandType.AddComponent
 }

@@ -2,6 +2,7 @@
   <div class="component-inputs">
     <EditMenuTitle
       :title="t('inputs')"
+      :showAdd="!isReusableInstance"
       @add="
         emit('showEditInput', {
           name: '',
@@ -20,7 +21,7 @@
       :argType="getArgType(input[0])"
       :tag="component.tag"
       :componentId="component.id"
-      :showEditInput="input[0] in (component.inputs ?? {})"
+      :showEditInput="!isReusableInstance && input[0] in (component.inputs ?? {})"
       :error="getError(input[0], input[1])"
       @editInput="emit('showEditInput', (component.inputs ?? {})[input[0]])"
       @update="setInput(input[0], $event)"
@@ -115,6 +116,8 @@ const onImageAssetSelected = (asset: ISiteAssetViewModel) => {
   showSelectAssetModal.value = false
   setInput('src', urlFromAsset(asset))
 }
+
+const isReusableInstance = computed(() => !!component.value.reusableComponentData)
 </script>
 
 <style lang="postcss" scoped>

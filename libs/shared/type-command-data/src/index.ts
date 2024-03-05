@@ -1,4 +1,5 @@
 export * from './lib/i-add-component-data'
+export * from './lib/i-add-reusable-component-data'
 export * from './lib/i-edit-component-data'
 export * from './lib/i-remove-component-data'
 export * from './lib/i-set-component-custom-style-data'

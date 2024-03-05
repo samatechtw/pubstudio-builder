@@ -38,6 +38,7 @@ import { applyEditThemeVariable } from './theme-variable/edit-theme-variable'
 import { applyRemoveThemeVariable } from './theme-variable/remove-theme-variable'
 import { applySetTranslations } from './translations/set-translations'
 import { applyUpdateUi } from './update-ui/update-ui'
+import { applyAddReusableComponent } from './reusable-component/add-reusable-component'
 
 // Applies a command to the current site context
 export const applyCommand = (site: ISite, command: ICommand): ICommand => {
@@ -81,6 +82,7 @@ export const applyCommand = (site: ISite, command: ICommand): ICommand => {
     [CommandType.SetDefaultsHead]: applySetDefaultsHead,
     [CommandType.SetBreakpoint]: applySetBreakpoint,
     [CommandType.UpdateUi]: applyUpdateUi,
+    [CommandType.addReusableComponent]: applyAddReusableComponent,
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   applyFunctions[command.type](site, command.data as any)
