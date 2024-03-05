@@ -30,6 +30,7 @@ import SvgEdit from '../components/SvgEdit.vue'
 import { IDndState } from './dnd/builder-dnd'
 import { BuilderDndComponent } from './dnd/builder-dnd-component'
 import { LinkTooltipMode } from './enum-link-tooltip-mode'
+import { resolveReusableComponent } from '@pubstudio/frontend/util-builtin'
 
 // Style and props for a component rendered in the builder
 export interface IBuilderStyleProps {
@@ -53,6 +54,10 @@ export const computeBuilderStyleProps = (
   const builderClass: string[] = []
   let position: string | null | undefined = undefined
 
+  const cmp =
+    resolveReusableComponent(site.context, component.reusableComponentData?.id) ??
+    component
+
   // Cache the CSS position. Must be called before using `position`
   const getPosition = (): string | null => {
     if (position !== undefined) {
@@ -62,7 +67,7 @@ export const computeBuilderStyleProps = (
       findStyles(
         [Css.Position],
         site,
-        component,
+        cmp,
         descSortedBreakpoints.value,
         activeBreakpoint.value,
       ).position ?? null
@@ -98,7 +103,7 @@ export const computeBuilderStyleProps = (
         findStyles(
           [Css.Display],
           site,
-          component,
+          cmp,
           descSortedBreakpoints.value,
           activeBreakpoint.value,
         ).display ?? null
@@ -225,32 +230,54 @@ export const computePropsContent = (
 
   const { editor } = site
   const isSelected = editor?.selectedComponent?.id === component.id
+  const reusableCmp = resolveReusableComponent(
+    site.context,
+    component.reusableComponentData?.id,
+  )
+
+  const cmpContent = component.content ?? reusableCmp?.content
+  const cmpWithDefaultContent: IComponent = {
+    ...component,
+    content: component.content ?? reusableCmp?.content,
+  }
 
   const content: IBuildContent = []
   const hasChildren = (component.children?.length ?? 0) > 0
+  const reusableCmpHasChildren = (reusableCmp?.children?.length ?? 0) > 0
 
   if (hasChildren) {
     content.push(
       ...component.children!.map((child, index) => renderComponent(site, child, index)),
     )
-  } else if (component.content) {
+  } else if (reusableCmpHasChildren) {
+    content.push(
+      ...reusableCmp!.children!.map((child, index) =>
+        renderComponent(site, child, index),
+      ),
+    )
+  } else if (cmpContent) {
     if (component.tag === Tag.Svg) {
       content.push(
-        h('div', { class: 'component-content-container', innerHTML: component.content }),
+        h('div', { class: 'component-content-container', innerHTML: cmpContent }),
       )
     } else if (isSelected) {
-      content.push(h(ProseMirrorEditor, { component, editor }))
+      content.push(h(ProseMirrorEditor, { component: cmpWithDefaultContent, editor }))
     } else {
       content.push(
         h('div', {
           class: 'component-content-container',
-          innerHTML: parseI18n(site, component.content),
+          innerHTML: parseI18n(site, cmpContent),
         }),
       )
     }
-  } else if (component.tag !== Tag.Img && component.tag !== Tag.Svg && !hasChildren) {
+  } else if (
+    component.tag !== Tag.Img &&
+    component.tag !== Tag.Svg &&
+    !hasChildren &&
+    !reusableCmpHasChildren
+  ) {
     if (isSelected) {
-      content.push(h(ProseMirrorEditor, { component, editor }))
+      content.push(h(ProseMirrorEditor, { component: cmpWithDefaultContent, editor }))
       if (component.tag === Tag.A) {
         content.push(
           h('div', { class: '__link-placeholder' }, 'Add text or drop components'),

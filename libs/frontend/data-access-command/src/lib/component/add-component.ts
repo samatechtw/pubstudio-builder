@@ -1,4 +1,7 @@
-import { resolveComponent } from '@pubstudio/frontend/util-builtin'
+import {
+  resolveComponent,
+  resolveReusableComponent,
+} from '@pubstudio/frontend/util-builtin'
 import {
   clone,
   detachComponent,
@@ -16,8 +19,18 @@ import { setSelectedComponent } from '../set-selected-component'
 
 export const addComponentHelper = (site: ISite, data: IAddComponentData): IComponent => {
   const context = site.context
-  const { name, tag, content, parentId, events, inputs, parentIndex, sourceId, style } =
-    data
+  const {
+    name,
+    tag,
+    content,
+    parentId,
+    parentIndex,
+    sourceId,
+    reusableComponentId,
+    style,
+    inputs,
+    events,
+  } = data
   const id = nextComponentId(context)
   data.id = id
   const parent = resolveComponent(context, parentId)
@@ -35,8 +48,21 @@ export const addComponentHelper = (site: ISite, data: IAddComponentData): ICompo
   }
 
   const sourceComponent = resolveComponent(context, sourceId)
+  const reusableCmp = resolveReusableComponent(context, reusableComponentId)
+
   if (sourceComponent) {
     component = detachComponent(component, sourceComponent)
+  } else if (reusableCmp) {
+    component = {
+      ...component,
+      style: clone(reusableCmp.style),
+      inputs: clone(reusableCmp.inputs),
+      events: clone(reusableCmp.events),
+      editorEvents: clone(reusableCmp.editorEvents),
+      reusableComponentData: {
+        id: reusableCmp.id,
+      },
+    }
   }
 
   if (!parent) {
@@ -61,6 +87,22 @@ export const addComponentHelper = (site: ISite, data: IAddComponentData): ICompo
           content: child.content,
           parentId: id,
           sourceId: child.id,
+          inputs: clone(child.inputs),
+          style: clone(child.style),
+        })
+      }
+    }
+  } else if (reusableCmp?.children) {
+    for (const child of reusableCmp.children) {
+      if (isDynamicComponent(child.id)) {
+        console.log('Skip adding dynamic reusable component', child.id)
+      } else {
+        addComponentHelper(site, {
+          name: child.name,
+          tag: child.tag,
+          content: child.content,
+          parentId: id,
+          reusableComponentId: child.id,
           inputs: clone(child.inputs),
           style: clone(child.style),
         })

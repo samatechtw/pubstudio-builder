@@ -10,6 +10,13 @@
       @update="setName"
     />
     <MenuRow :label="t('id')" :value="component.id" :copyValue="true" class="id" />
+    <MenuRow
+      v-if="isReusableInstance"
+      :label="t('build.reusable_cmp_id')"
+      :value="component.reusableComponentData?.id"
+      :info="reusableCmpInfo"
+      class="reusable-cmp-id"
+    />
     <MenuRowSimple
       :label="t('content')"
       :value="component.content"
@@ -22,7 +29,11 @@
       @update="setContent"
     />
     <div class="tag-role">
-      <ComponentTag :tag="component.tag" @setTag="setTag" />
+      <ComponentTag
+        :tag="component.tag"
+        :disabled="isReusableInstance"
+        @setTag="setTag"
+      />
       <ComponentRole :role="component.role" @setRole="setRole" />
     </div>
     <!-- TODO: children UI
@@ -61,6 +72,18 @@ const { editSelectedComponent, editor } = useBuild()
 
 const contentInfo = computed(() => {
   return component.value.children?.length ? t('build.content_info') : undefined
+})
+
+const isReusableInstance = computed(() => !!component.value.reusableComponentData)
+
+const reusableCmpInfo = computed(() => {
+  if (!isReusableInstance.value) {
+    return undefined
+  } else {
+    return t('build.reusable_cmp_info', {
+      id: component.value.reusableComponentData?.id,
+    })
+  }
 })
 
 const editingContent = computed(() => {
