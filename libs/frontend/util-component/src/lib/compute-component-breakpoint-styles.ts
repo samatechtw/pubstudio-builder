@@ -1,4 +1,4 @@
-import { resolveStyle } from '@pubstudio/frontend/util-resolve'
+import { resolveComponent, resolveStyle } from '@pubstudio/frontend/util-resolve'
 import {
   Css,
   CssPseudoClass,
@@ -38,8 +38,26 @@ export const computeComponentBreakpointStyles = (
 
   const customBreakpointStyles = computeCustomBreakpointStyles(component)
 
-  // Priority: custom style > mixin
+  const reusableCmp = resolveComponent(context, component.reusableSourceId)
+  let reusableCmpMixinBpStyles: IBreakpointStylesWithSource = {}
+  let reusableCmpCustomBpStyles: IBreakpointStylesWithSource = {}
+  if (reusableCmp) {
+    reusableCmpMixinBpStyles = computeMixinBreakpointStyles(
+      context,
+      reusableCmp.style.mixins,
+      StyleSourceType.ReusableComponent,
+      reusableCmp.id,
+    )
+    reusableCmpCustomBpStyles = computeCustomBreakpointStyles(
+      reusableCmp,
+      StyleSourceType.ReusableComponent,
+    )
+  }
+
+  // Priority: custom style > custom mixin > reusable component style > reusable component mixin
   const mergedBreakpointStylesWithSource = mergeBreakpointStylesWithSource(
+    reusableCmpMixinBpStyles,
+    reusableCmpCustomBpStyles,
     mixinBreakpointStyles,
     customBreakpointStyles,
   )
@@ -50,6 +68,8 @@ export const computeComponentBreakpointStyles = (
 const computeMixinBreakpointStyles = (
   context: ISiteContext,
   mixinIds: string[] | undefined,
+  overrideSourceType?: StyleSourceType,
+  overrideSourceId?: string,
 ): IBreakpointStylesWithSource => {
   const result: IBreakpointStylesWithSource = {}
 
@@ -72,8 +92,8 @@ const computeMixinBreakpointStyles = (
 
           Object.entries(mixinRawStyle).forEach(([css, value]) => {
             rawStyle[css as Css] = {
-              sourceType: StyleSourceType.Mixin,
-              sourceId: mixinId,
+              sourceType: overrideSourceType ?? StyleSourceType.Mixin,
+              sourceId: overrideSourceId ?? mixinId,
               sourceBreakpointId: breakpointId,
               value,
             }
@@ -91,6 +111,7 @@ const computePseudoStyleWithSource = (
   breakpointId: string,
   pseudo: IPseudoStyle,
   result: IPseudoStyleWithSource,
+  overrideSourceType?: StyleSourceType,
 ) => {
   Object.entries(pseudo).forEach(([pseudoClass, customRawStyle]) => {
     if (!result[pseudoClass as CssPseudoClass]) {
@@ -100,7 +121,8 @@ const computePseudoStyleWithSource = (
 
     Object.entries(customRawStyle).forEach(([css, value]) => {
       rawStyle[css as Css] = {
-        sourceType: StyleSourceType.Custom,
+        // TODO: add style source type for reusable component
+        sourceType: overrideSourceType ?? StyleSourceType.Custom,
         sourceId: componentId,
         sourceBreakpointId: breakpointId,
         value,
@@ -111,6 +133,7 @@ const computePseudoStyleWithSource = (
 
 const computeCustomBreakpointStyles = (
   component: IComponent,
+  overrideSourceType?: StyleSourceType,
 ): IBreakpointStylesWithSource => {
   const result: IBreakpointStylesWithSource = {}
   Object.entries(component.style.custom).forEach(([breakpointId, customPseudoStyle]) => {
@@ -122,6 +145,7 @@ const computeCustomBreakpointStyles = (
       breakpointId,
       customPseudoStyle,
       result[breakpointId],
+      overrideSourceType,
     )
   })
 

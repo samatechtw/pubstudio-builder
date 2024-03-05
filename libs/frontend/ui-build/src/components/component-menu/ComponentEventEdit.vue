@@ -86,7 +86,7 @@
         @click.stop="save"
       />
       <PSButton
-        v-if="editedEvent"
+        v-if="editedEvent && canDelete"
         class="delete-button"
         :text="t('delete')"
         :secondary="true"
@@ -151,6 +151,14 @@ const newEvent = ref<IResolvedComponentEvent>(
   editOrNewEvent(site.value, editedEvent.value),
 )
 const inputError = ref()
+
+const canDelete = computed(() => {
+  const { selectedComponent } = editor.value ?? {}
+  if (editedEvent.value && selectedComponent?.events) {
+    return editedEvent.value.name in selectedComponent.events
+  }
+  return false
+})
 
 const addEventBehavior = () => {
   newEvent.value.behaviors.push({

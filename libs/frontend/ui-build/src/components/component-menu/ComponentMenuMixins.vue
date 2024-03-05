@@ -13,10 +13,11 @@
         />
       </div>
       <MixinSelect
-        v-for="mixin in mixins"
-        :key="mixin.id"
-        :mixin="mixin"
+        v-for="mixin in resolvedMixins"
+        :key="`${mixin.id}-${mixin.sourceReusableComponentId}`"
+        :mixin="mixin.style"
         :mixinOptions="mixinOptions"
+        :sourceReusableComponentId="mixin.sourceReusableComponentId"
         class="mixin"
         @set="setMixin($event.oldMixinId, $event.newMixinId)"
         @edit="openMixinMenu($event, true)"
@@ -30,17 +31,17 @@
 <script lang="ts" setup>
 import { computed, ref, toRefs } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
-import { IStyle } from '@pubstudio/shared/type-site'
 import { resolveStyle } from '@pubstudio/frontend/util-resolve'
 import { builtinStyles } from '@pubstudio/frontend/util-builtin'
 import { useBuild, useMixinMenuUi } from '@pubstudio/frontend/feature-build'
 import EditMenuTitle from '../EditMenuTitle.vue'
 import MixinSelect from './MixinSelect.vue'
+import { IComponentMixin, IResolvedComponentMixin } from './i-component-mixin'
 
 const props = defineProps<{
-  mixinIds: string[]
+  mixins: IComponentMixin[]
 }>()
-const { mixinIds } = toRefs(props)
+const { mixins } = toRefs(props)
 
 const { t } = useI18n()
 const {
@@ -69,15 +70,18 @@ const mixinOptions = computed(() => {
   }))
 })
 
-const mixins = computed(() => {
-  const mixins: IStyle[] = []
-  for (const id of mixinIds.value) {
-    const style = resolveStyle(site.value.context, id)
+const resolvedMixins = computed(() => {
+  const resolvedMixins: IResolvedComponentMixin[] = []
+  for (const mixin of mixins.value) {
+    const style = resolveStyle(site.value.context, mixin.id)
     if (style) {
-      mixins.push(style)
+      resolvedMixins.push({
+        ...mixin,
+        style,
+      })
     }
   }
-  return mixins
+  return resolvedMixins
 })
 
 const addMixin = async () => {

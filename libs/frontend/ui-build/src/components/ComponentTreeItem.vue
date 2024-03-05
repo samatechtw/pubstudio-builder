@@ -91,7 +91,12 @@ const { component, level, componentIndex } = toRefs(props)
 
 const { site, editor } = useBuild()
 
-const canDrag = computed(() => !!component.value?.parent)
+const canDrag = computed(
+  () =>
+    !component.value.parent ||
+    // Prevent reusable instance children from being dragged.
+    !component.value.parent.reusableSourceId,
+)
 
 const mouseEnter = () => {
   runtimeContext.hoveredComponentIdInComponentTree.value = component.value.id

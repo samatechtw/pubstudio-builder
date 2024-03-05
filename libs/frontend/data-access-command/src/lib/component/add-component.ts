@@ -14,6 +14,35 @@ import {
 } from '../editor-event-handlers'
 import { setSelectedComponent } from '../set-selected-component'
 
+const addChildrenHelper = (
+  site: ISite,
+  parentId: string,
+  children: IComponent[],
+  sourceField: 'sourceId' | 'reusableComponentId',
+) => {
+  for (const child of children) {
+    if (sourceField === 'sourceId') {
+      addComponentHelper(site, {
+        name: child.name,
+        tag: child.tag,
+        content: child.content,
+        parentId,
+        [sourceField]: child.id,
+        state: clone(child.state),
+        inputs: clone(child.inputs),
+        style: clone(child.style),
+      })
+    } else {
+      addComponentHelper(site, {
+        name: child.name,
+        tag: child.tag,
+        parentId,
+        reusableComponentId: child.id,
+      })
+    }
+  }
+}
+
 export const addComponentHelper = (site: ISite, data: IAddComponentData): IComponent => {
   const context = site.context
   const {
@@ -25,6 +54,7 @@ export const addComponentHelper = (site: ISite, data: IAddComponentData): ICompo
     events,
     inputs,
     parentIndex,
+    reusableComponentId,
     sourceId,
     style,
   } = data
@@ -46,20 +76,41 @@ export const addComponentHelper = (site: ISite, data: IAddComponentData): ICompo
   }
 
   const sourceComponent = resolveComponent(context, sourceId)
+  const reusableCmp = resolveComponent(context, reusableComponentId)
+
   if (sourceComponent) {
     component = detachComponent(component, sourceComponent)
+  } else if (reusableCmp) {
+    component = {
+      id,
+      name: component.name,
+      parent: component.parent,
+      tag: component.tag,
+      content: undefined,
+      children: component.children,
+      // Only overridden inputs will be added to a reusable instance.
+      inputs: {},
+      // Only overridden events will be added to a reusable instance.
+      events: {},
+      editorEvents: clone(reusableCmp.editorEvents),
+      style: { custom: {} },
+      reusableSourceId: reusableCmp.id,
+    }
   }
+
+  let parentNewChildren = parent?.children ? [...parent.children] : undefined
 
   if (!parent) {
     // Pages have a root component by default
     // A Component without a parent is a template
   } else if (!parent.children) {
-    parent.children = [component]
+    parentNewChildren = [component]
   } else if (parentIndex === undefined) {
-    parent.children.push(component)
+    parentNewChildren?.push(component)
   } else {
-    parent.children.splice(parentIndex, 0, component)
+    parentNewChildren?.splice(parentIndex, 0, component)
   }
+
   context.components[id] = component
   // Children overridden in builtin component definition take precedence
   if (data.children) {
@@ -77,19 +128,15 @@ export const addComponentHelper = (site: ISite, data: IAddComponentData): ICompo
       })
     }
   } else if (sourceComponent?.children) {
-    // Add defaults from builtin component
-    for (const child of sourceComponent.children) {
-      addComponentHelper(site, {
-        name: child.name,
-        tag: child.tag,
-        content: child.content,
-        parentId: id,
-        sourceId: child.id,
-        state: clone(child.state),
-        inputs: clone(child.inputs),
-        style: clone(child.style),
-      })
-    }
+    addChildrenHelper(site, id, sourceComponent.children, 'sourceId')
+  } else if (reusableCmp?.children) {
+    addChildrenHelper(site, id, reusableCmp.children, 'reusableComponentId')
+  }
+
+  // Update `parent.children` after `addChildrenHelper` to avoid infinite loop
+  // when a reusable component is inserted as a instance of itself.
+  if (parent) {
+    parent.children = parentNewChildren
   }
 
   // Copy override styles and assign them to new children where possible

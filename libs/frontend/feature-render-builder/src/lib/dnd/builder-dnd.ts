@@ -1,5 +1,5 @@
+import { IDraggedComponentAddData } from './i-dragged-component-add-data'
 import { XYCoord } from './row-layout'
-import { IDropComponentData } from './use-drag-drop'
 
 export enum BuilderDndType {
   Component = 'c',
@@ -11,7 +11,7 @@ export interface IDraggedComponent {
   // left/top offset from element when clicked
   clickOffset: XYCoord
   index: number
-  addData?: IDropComponentData
+  addData?: IDraggedComponentAddData
 }
 
 export interface IDragProps {

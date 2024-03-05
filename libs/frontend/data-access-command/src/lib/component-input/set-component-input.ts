@@ -22,15 +22,11 @@ const setInputs = (
   newInput: IComponentInput | undefined,
 ) => {
   if (component) {
-    // Add or change
+    removeInput(component, oldInput)
     if (newInput !== undefined) {
-      removeInput(component, oldInput)
+      // Add or change
       addInput(component, newInput)
-    } else {
-      // Remove input
-      removeInput(component, oldInput)
-    }
-    if (component.inputs && Object.values(component.inputs).length === 0) {
+    } else if (component.inputs && Object.values(component.inputs).length === 0) {
       component.inputs = undefined
     }
   }

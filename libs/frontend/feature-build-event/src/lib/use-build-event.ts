@@ -131,6 +131,8 @@ export const useBuildEvent = () => {
       !(
         (editor.value?.buildSubmenu === BuildSubmenu.New &&
           target?.closest('#build-new')) ||
+        (editor.value?.buildSubmenu === BuildSubmenu.Reusable &&
+          target?.closest('#build-reusable')) ||
         (editor.value?.buildSubmenu === BuildSubmenu.Page &&
           target?.closest('#build-page')) ||
         (editor.value?.buildSubmenu === BuildSubmenu.File &&
@@ -149,8 +151,10 @@ export const useBuildEvent = () => {
   const clickStyleToolbar = (_target: HTMLElement | undefined) => {
     setBuildSubmenu(editor.value, undefined)
   }
-  const clickRightMenu = (_target: HTMLElement | undefined) => {
-    setBuildSubmenu(editor.value, undefined)
+  const clickRightMenu = (target: HTMLElement | undefined) => {
+    if (!target?.closest('.to-reusable-button')) {
+      setBuildSubmenu(editor.value, undefined)
+    }
     runtimeContext.rightMenuFocused.value = true
   }
   const clickComponentTree = (componentTreeItemId: string) => {

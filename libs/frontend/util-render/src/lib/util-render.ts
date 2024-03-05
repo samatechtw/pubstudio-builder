@@ -16,16 +16,22 @@ export const rawStyleRecordToString = (
   record: IRawStyleRecord,
   context: ISiteContext,
 ): string => {
-  return Object.entries(record).reduce((result, [selector, rawStyle]) => {
-    const fields = Object.entries(rawStyle)
-      .map(([prop, value]) => {
-        const computedValue = computeCssValue(prop as Css, value, context)
-        const supportedValue = CSS.supports(prop, computedValue) ? computedValue : ''
-        return `${prop}:${supportedValue};`
-      })
-      .join('')
-    return `${result}${selector}{${fields}}`
-  }, '')
+  return (
+    Object.entries(record)
+      // Sort the styles by selector in ascending order so that styles can be overridden
+      // in reusable instances.
+      .sort(([keyA], [keyB]) => keyA.localeCompare(keyB))
+      .reduce((result, [selector, rawStyle]) => {
+        const fields = Object.entries(rawStyle)
+          .map(([prop, value]) => {
+            const computedValue = computeCssValue(prop as Css, value, context)
+            const supportedValue = CSS.supports(prop, computedValue) ? computedValue : ''
+            return `${prop}:${supportedValue};`
+          })
+          .join('')
+        return `${result}${selector}{${fields}}`
+      }, '')
+  )
 }
 
 const computeCssValue = (prop: Css, value: string, context: ISiteContext): string => {
