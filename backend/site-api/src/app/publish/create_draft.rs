@@ -14,7 +14,7 @@ use lib_shared_types::{
 
 use crate::{api_context::ApiContext, middleware::auth::verify_site_owner};
 
-async fn list_versions(context: &ApiContext, id: &str) -> Result<Vec<SiteInfoEntity>, ApiError> {
+pub async fn list_versions(context: &ApiContext, id: &str) -> Result<Vec<SiteInfoEntity>, ApiError> {
     Ok(context
         .site_repo
         .list_site_versions(&id, ListQuery::default())

@@ -69,6 +69,7 @@ pub trait SiteRepoTrait {
         req: UpdateSiteDtoWithContentUpdatedAt,
     ) -> Result<SiteEntity, DbError>;
     async fn create_draft(&self, id: &str, from_id: i64) -> Result<(), DbError>;
+    async fn delete_draft(&self, id: &str) -> Result<(), DbError>;
     async fn publish_site(&self, id: &str) -> Result<SiteEntity, DbError>;
     async fn publish_all_versions(&self, id: &str, published: bool) -> Result<(), DbError>;
     async fn export_backup(&self, id: &str) -> Result<Vec<u8>, DbError>;
@@ -344,6 +345,21 @@ impl SiteRepoTrait for SiteRepo {
             "#,
         )
         .bind(from_id)
+        .execute(&pool)
+        .await?;
+
+        Ok(())
+    }
+
+    async fn delete_draft(&self, id: &str) -> Result<(), DbError> {
+        let pool = self.get_db_pool(id).await?;
+
+        sqlx::query(
+            r#"
+               DELETE FROM site_versions
+               WHERE id = (SELECT MAX(id) FROM site_versions)
+            "#,
+        )
         .execute(&pool)
         .await?;
 
