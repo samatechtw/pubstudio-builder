@@ -98,6 +98,11 @@ fn api_router(context: &ApiContext) -> Router<ApiContext> {
                 .route_layer(from_fn_with_state(context.clone(), auth_admin_owner)),
         )
         .route(
+            "/sites/:site_id/actions/delete_draft",
+            delete(publish::delete_draft::delete_draft)
+                .route_layer(from_fn_with_state(context.clone(), auth_admin_owner)),
+        )
+        .route(
             "/sites/:site_id/backups",
             post(
                 backup::create_backup::create_backup
