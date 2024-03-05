@@ -35,6 +35,7 @@ import {
   IAddComponentData,
   IAddComponentMixinData,
   IAddPageData,
+  IAddReusableComponentData,
   IAddStyleMixinData,
   IAddThemeFontData,
   IAddThemeVariableData,
@@ -228,6 +229,7 @@ export interface IUseBuild {
     action: Action,
     params: IUpdateUiParams[Action],
   ) => void
+  addReusableComponent: (component: IComponent) => void
 }
 
 // Briefly indicates active command
@@ -954,8 +956,8 @@ export const useBuild = (): IUseBuild => {
   const deleteSelected = () => {
     const selected = site.value.editor?.selectedComponent
     const parent = selected?.parent
-    // Cannot delete root component
-    if (!activePage.value || !selected || !parent) {
+    // Cannot delete root component and reusable instance children
+    if (!activePage.value || !selected || !parent || parent.reusableSourceId) {
       return
     }
     const data = makeRemoveComponentData(site.value, selected)
@@ -1177,6 +1179,22 @@ export const useBuild = (): IUseBuild => {
     pushCommand(site.value, CommandType.UpdateUi, data)
   }
 
+  const addReusableComponent = (component: IComponent) => {
+    const componentIds: string[] = []
+
+    const recurse = (cmp: IComponent) => {
+      componentIds.push(cmp.id)
+      cmp.children?.forEach(recurse)
+    }
+
+    recurse(component)
+
+    const data: IAddReusableComponentData = {
+      componentIds,
+    }
+    pushCommand(site.value, CommandType.AddReusableComponent, data)
+  }
+
   return {
     site,
     siteError,
@@ -1249,5 +1267,6 @@ export const useBuild = (): IUseBuild => {
     setBreakpoint,
     pushGroupCommands,
     updateUi,
+    addReusableComponent,
   }
 }

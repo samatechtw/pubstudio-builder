@@ -14,12 +14,21 @@ const addComponentInput = (component: IComponent, input: IComponentInput) => {
   component.inputs[input.name] = input
 }
 
-const addTagInputs = (component: IComponent, fields: IEditComponentFields) => {
+const addTagInputs = (
+  site: ISite,
+  component: IComponent,
+  fields: IEditComponentFields,
+) => {
   const tag = fields.tag
+  const reusableCmp = resolveComponent(site.context, component.reusableSourceId)
+  const mergedInputs = {
+    ...reusableCmp?.inputs,
+    ...component.inputs,
+  }
   if (tag) {
-    if (tag === Tag.A && !component.inputs?.['href']) {
+    if (tag === Tag.A && !mergedInputs.href) {
       addComponentInput(component, defaultLinkInputs().href)
-    } else if (tag === Tag.Img && !component.inputs?.['src']) {
+    } else if (tag === Tag.Img && !mergedInputs.src) {
       addComponentInput(component, defaultImageInputs().src)
     }
   }
@@ -32,18 +41,27 @@ export const applyEditComponent = (site: ISite, data: IEditComponentData) => {
   for (const key in data.new) {
     component[key] = data.new[key as keyof IEditComponentFields]
   }
-  addTagInputs(component, data.new)
-  removeTagInputs(component, data.old)
+  addTagInputs(site, component, data.new)
+  removeTagInputs(site, component, data.old)
   // Select edited component for redo
   setSelectedComponent(site, component)
 }
 
-const removeTagInputs = (component: IComponent, fields: IEditComponentFields) => {
+const removeTagInputs = (
+  site: ISite,
+  component: IComponent,
+  fields: IEditComponentFields,
+) => {
   const tag = fields.tag
+  const reusableCmp = resolveComponent(site.context, component.reusableSourceId)
+  const mergedInputs = {
+    ...reusableCmp?.inputs,
+    ...component.inputs,
+  }
   if (tag) {
-    if (tag === Tag.A && !component.inputs?.['href']?.is) {
+    if (tag === Tag.A && !mergedInputs.href?.is) {
       delete component.inputs?.['href']
-    } else if (tag === Tag.Img && !component.inputs?.['src']?.is) {
+    } else if (tag === Tag.Img && !mergedInputs.src?.is) {
       delete component.inputs?.['src']
     }
   }
@@ -57,8 +75,8 @@ export const undoEditComponent = (site: ISite, data: IEditComponentData) => {
     for (const key in data.new) {
       component[key] = data.old[key as keyof IEditComponentFields]
     }
-    addTagInputs(component, data.old)
-    removeTagInputs(component, data.new)
+    addTagInputs(site, component, data.old)
+    removeTagInputs(site, component, data.new)
     // Select edited component for undo
     setSelectedComponent(site, component)
   }

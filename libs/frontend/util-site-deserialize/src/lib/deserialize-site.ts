@@ -14,16 +14,19 @@ import {
 interface IDeserializePagesResult {
   pages: Record<string, IPage>
   components: Record<string, IComponent>
+  reusableComponentIds: Set<string>
 }
 
 export const deserializeEditor = (
   context: ISiteContext,
   serializedEditor: ISerializedEditorContext | undefined | null,
+  reusableComponentIds: Set<string>,
 ): IEditorContext | undefined => {
   const selectedId = serializedEditor?.selectedComponentId
   const editor = serializedEditor
     ? {
         selectedComponent: selectedId ? context.components[selectedId] : undefined,
+        reusableComponentIds,
         active: serializedEditor.active,
         editorEvents: serializedEditor.editorEvents ?? {},
         debugBounding: serializedEditor.debugBounding,
@@ -72,6 +75,8 @@ const deserializeComponent = (ser: ISerializedComponent): IComponent => {
     inputs: ser.inputs,
     events: ser.events,
     editorEvents: ser.editorEvents,
+    isReusable: ser.isReusable,
+    reusableSourceId: ser.reusableSourceId,
   }
 }
 
@@ -80,10 +85,14 @@ export const deserializePages = (
 ): IDeserializePagesResult => {
   const pages: Record<string, IPage> = {}
   const components: Record<string, IComponent> = {}
+  const reusableComponentIds: Set<string> = new Set()
   // First, generate the component cache width empty parent/children
   for (const [name, page] of Object.entries(serializedPages)) {
     // Set up the page with root
     const root = deserializeComponent(page.root)
+    if (root.isReusable) {
+      reusableComponentIds.add(root.id)
+    }
     components[root.id] = root
     pages[name] = {
       name: page.name,
@@ -96,7 +105,11 @@ export const deserializePages = (
     for (;;) {
       const cur = queue.shift()
       if (!cur) break
-      components[cur.id] = deserializeComponent(cur)
+      const newCmp = deserializeComponent(cur)
+      components[cur.id] = newCmp
+      if (newCmp.isReusable) {
+        reusableComponentIds.add(newCmp.id)
+      }
       queue.push(...(cur.children ?? []))
     }
     // Fill in the parent and children relationships
@@ -110,12 +123,12 @@ export const deserializePages = (
       queue.push(...(cur.children ?? []))
     }
   }
-  return { pages, components }
+  return { pages, components, reusableComponentIds }
 }
 
 export const deserializedHelper = (serialized: ISerializedSite): ISite => {
   const { context, defaults, editor, history } = serialized
-  const { pages, components } = deserializePages(serialized.pages)
+  const { pages, components, reusableComponentIds } = deserializePages(serialized.pages)
   const siteContext: ISiteContext = {
     namespace: context.namespace,
     nextId: context.nextId,
@@ -136,7 +149,7 @@ export const deserializedHelper = (serialized: ISerializedSite): ISite => {
     version: serialized.version,
     defaults,
     pages,
-    editor: deserializeEditor(siteContext, editor),
+    editor: deserializeEditor(siteContext, editor, reusableComponentIds),
     history: { back: history?.back ?? [], forward: history?.forward ?? [] },
     updated_at: serialized.updated_at,
     content_updated_at: serialized.content_updated_at,

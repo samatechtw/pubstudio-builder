@@ -7,16 +7,59 @@
       :event="entry"
       class="menu-row"
       @edit="emit('edit', entry)"
+      @reset="emit('reset', entry.name)"
     />
   </div>
 </template>
 
+<script lang="ts">
+import { resolveComponent } from '@pubstudio/frontend/util-builtin'
+import { IComponent, IComponentEvent, ISite } from '@pubstudio/shared/type-site'
+
+interface IComponentEventWithSource extends IComponentEvent {
+  source: ComponentEventSource
+}
+
+enum ComponentEventSource {
+  Reusable,
+  Custom,
+}
+
+const computeComponentEvents = (
+  site: ISite,
+  component: IComponent,
+): Record<string, IComponentEventWithSource> => {
+  const mergedEvents: Record<string, IComponentEventWithSource> = {}
+
+  // Append reusable component inputs
+  const reusableCmp = resolveComponent(site.context, component.reusableSourceId)
+  if (reusableCmp) {
+    Object.entries(reusableCmp.events ?? {}).forEach(([key, event]) => {
+      mergedEvents[key] = {
+        ...event,
+        source: ComponentEventSource.Reusable,
+      }
+    })
+  }
+
+  // Append custom inputs
+  Object.entries(component.events ?? {}).forEach(([key, event]) => {
+    mergedEvents[key] = {
+      ...event,
+      source: ComponentEventSource.Custom,
+    }
+  })
+
+  return mergedEvents
+}
+</script>
+
 <script lang="ts" setup>
 import { computed, toRefs } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
-import { IComponent, IComponentEvent } from '@pubstudio/shared/type-site'
 import EditMenuTitle from '../EditMenuTitle.vue'
 import EventRow from './EventRow.vue'
+import { useBuild } from '@pubstudio/frontend/feature-build'
 
 const props = defineProps<{
   component: IComponent
@@ -30,9 +73,11 @@ const emit = defineEmits<{
 
 const { t } = useI18n()
 
-const events = computed(() => {
-  return Object.values(component.value.events ?? {})
-})
+const { site } = useBuild()
+
+const events = computed(() =>
+  Object.values(computeComponentEvents(site.value, component.value)),
+)
 </script>
 
 <style lang="postcss" scoped>

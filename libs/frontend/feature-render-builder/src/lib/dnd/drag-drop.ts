@@ -85,7 +85,10 @@ export const onDrag = (options: IOnDragOptions): IDropProps => {
 
       if (
         addNewComponentToRoot ||
-        (hoverCmp.id !== dragCmpParentId && !hoverCmp.content && hoverCmp.tag !== Tag.Img)
+        (hoverCmp.id !== dragCmpParentId &&
+          !hoverCmp.content &&
+          hoverCmp.tag !== Tag.Img &&
+          !hoverCmp.reusableSourceId)
       ) {
         dropProps.hoverSelf = true
         dropProps.destinationIndex = hoverCmp.children?.length ?? 0

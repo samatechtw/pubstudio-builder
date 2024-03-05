@@ -19,8 +19,9 @@
       <ComponentInputs
         :component="component"
         :siteId="siteId"
-        @setInput="setInputIs($event)"
+        @setInput="upsertInput($event)"
         @showEditInput="setEditedInput($event)"
+        @removeInput="removeInput($event)"
       />
       <ComponentEvents
         :component="component"
@@ -39,6 +40,14 @@
           size="small"
           :text="t('debug')"
           @click="debugComponent"
+        />
+        <PSButton
+          v-if="showToReusableComponent"
+          class="to-reusable-button"
+          size="small"
+          :text="t('build.to_reusable')"
+          :secondary="true"
+          @click="toReusableComponent"
         />
         <div v-if="showPasteReplaceButton" className="paste-replace-wrap">
           <PSButton
@@ -62,7 +71,7 @@ import { computed, toRefs } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { PSButton, InfoBubble } from '@pubstudio/frontend/ui-widgets'
 import { prosemirrorEditing } from '@pubstudio/frontend/util-edit-text'
-import { ComponentTabState, IComponent } from '@pubstudio/shared/type-site'
+import { BuildSubmenu, ComponentTabState, IComponent } from '@pubstudio/shared/type-site'
 import { noBehaviorId } from '@pubstudio/frontend/util-ids'
 import { serializeComponent } from '@pubstudio/frontend/util-site-store'
 import { useHUD } from '@pubstudio/frontend/util-ui-alert'
@@ -76,6 +85,7 @@ import {
   useEditComponentEvent,
   useReusableStyleMenu,
 } from '@pubstudio/frontend/feature-build'
+import { setBuildSubmenu } from '@pubstudio/frontend/data-access-command'
 import ComponentInputEdit from './ComponentInputEdit.vue'
 import ComponentInputs from './ComponentInputs.vue'
 import ComponentEvents from './ComponentEvents.vue'
@@ -86,7 +96,7 @@ import ToolbarContainer from '../toolbar/ToolbarContainer.vue'
 import ToolbarText from '../toolbar/ToolbarText.vue'
 
 const { t } = useI18n()
-const { editor, replacePageRoot } = useBuild()
+const { editor, replacePageRoot, addReusableComponent } = useBuild()
 const { isEditingMixin } = useReusableStyleMenu()
 const { addHUD } = useHUD()
 
@@ -96,14 +106,8 @@ const props = defineProps<{
 }>()
 const { component } = toRefs(props)
 
-const {
-  isEditingInput,
-  editedInput,
-  setEditedInput,
-  upsertInput,
-  removeInput,
-  setInputIs,
-} = useEditComponentInput()
+const { isEditingInput, editedInput, setEditedInput, upsertInput, removeInput } =
+  useEditComponentInput()
 
 const { setEditedEvent } = useEditComponentEvent()
 
@@ -143,6 +147,24 @@ const showTextStyle = computed(() => {
     prosemirrorEditing(editor.value)
   )
 })
+
+const showToReusableComponent = computed(() => {
+  const { reusableSourceId, isReusable } = component.value
+  let parent: IComponent | undefined = component.value
+  if (!parent || reusableSourceId || isReusable) {
+    return false
+  }
+  while (parent) {
+    if (parent.isReusable || parent.reusableSourceId) return false
+    parent = parent.parent
+  }
+  return true
+})
+
+const toReusableComponent = () => {
+  addReusableComponent(component.value)
+  setBuildSubmenu(editor.value, BuildSubmenu.Reusable)
+}
 </script>
 
 <style lang="postcss" scoped>
@@ -157,6 +179,9 @@ const showTextStyle = computed(() => {
   align-items: flex-end;
   margin-top: 24px;
   padding-left: 16px;
+  .to-reusable-button {
+    margin-left: 8px;
+  }
 }
 .paste-replace-wrap {
   display: flex;

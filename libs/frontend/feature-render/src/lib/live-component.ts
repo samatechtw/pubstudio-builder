@@ -69,10 +69,8 @@ export const LiveComponent = () => {
           const path = props.href ?? ''
           const linkProps = {
             ...renderProps,
-            href: undefined,
             to: { path },
           }
-          delete linkProps['href']
           return h(RouterLink, linkProps, () => children)
         }
 

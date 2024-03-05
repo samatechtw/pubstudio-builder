@@ -1,5 +1,9 @@
 import { setBuildSubmenu } from '@pubstudio/frontend/data-access-command'
-import { addBuiltinComponent, useBuild } from '@pubstudio/frontend/feature-build'
+import {
+  addBuiltinComponent,
+  addReusableComponentData,
+  useBuild,
+} from '@pubstudio/frontend/feature-build'
 import { activeBreakpoint } from '@pubstudio/frontend/feature-site-source'
 import { resolvedComponentStyle } from '@pubstudio/frontend/util-component'
 import { resolveComponent } from '@pubstudio/frontend/util-resolve'
@@ -14,6 +18,10 @@ import {
 import { computed, ComputedRef, Ref, ref } from 'vue'
 import { IDndState, IDraggedComponent, IDroppedFile, IDropProps } from './builder-dnd'
 import { onDrag, onDrop } from './drag-drop'
+import {
+  DraggedComponentAddDataType,
+  IDraggedComponentAddData,
+} from './i-dragged-component-add-data'
 import { XYCoord } from './row-layout'
 
 export interface IUseDragDrop {
@@ -42,7 +50,7 @@ export interface IUseDragDropProps {
   componentId: string | undefined
   getParentId: () => string | undefined
   getComponentIndex: () => number
-  addData?: IDropComponentData
+  addData?: IDraggedComponentAddData
   // A parent of the target component is being dragged
   isParent?: boolean
   verticalOnly?: boolean
@@ -139,7 +147,8 @@ export const useDragDrop = (props: IUseDragDropProps): IUseDragDrop => {
     if (
       !hoveredComponent ||
       (!draggedComponent && !srcIsFile) ||
-      hoveredComponent.id === draggedComponent?.id
+      hoveredComponent.id === draggedComponent?.id ||
+      hoveredComponent.reusableSourceId
     ) {
       return false
     }
@@ -298,11 +307,23 @@ export const useDragDrop = (props: IUseDragDropProps): IUseDragDrop => {
       if (dragSource.value.addData) {
         const addParentId = dndState.value?.hoverSelf ? componentId : getParentId()
         if (addParentId) {
-          addBuiltinComponent(site, {
-            id: dragSource.value.addData.id,
-            parentId: addParentId,
-            parentIndex: dropProps.value.destinationIndex,
-          })
+          const { type: addDataType } = dragSource.value.addData
+          if (addDataType === DraggedComponentAddDataType.BuiltinComponent) {
+            addBuiltinComponent(site, {
+              id: dragSource.value.addData.id,
+              parentId: addParentId,
+              parentIndex: dropProps.value.destinationIndex,
+            })
+            return
+          } else if (addDataType === DraggedComponentAddDataType.ReusableComponent) {
+            addReusableComponentData(site, {
+              id: dragSource.value.addData.id,
+              parentId: addParentId,
+              parentIndex: dropProps.value.destinationIndex,
+            })
+          } else {
+            throw new Error(`UNKNOWN_ADD_DATA_TYPE_${addDataType}`)
+          }
         }
       } else if (
         sourceComponent &&

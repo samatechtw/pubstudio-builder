@@ -1,6 +1,6 @@
 import { setComponentEditEvent } from '@pubstudio/frontend/data-access-command'
 import { noBehavior } from '@pubstudio/frontend/feature-builtin'
-import { resolveBehavior } from '@pubstudio/frontend/util-resolve'
+import { resolveBehavior, resolveComponent } from '@pubstudio/frontend/util-resolve'
 import {
   ComponentEventType,
   IBehavior,
@@ -66,6 +66,7 @@ export const editOrNewEvent = (
 
 export const useEditComponentEvent = (): IUseEditComponentEventFeature => {
   const {
+    site,
     editor,
     addSelectedComponentEvent,
     updateSelectedComponentEvent,
@@ -74,8 +75,19 @@ export const useEditComponentEvent = (): IUseEditComponentEventFeature => {
 
   const editedEvent = computed(() => {
     const name = editor.value?.componentTab.editEvent
-    if (name) {
-      return editor.value?.selectedComponent?.events?.[name]
+    const { selectedComponent } = editor.value ?? {}
+    if (name && selectedComponent) {
+      const reusableCmp = resolveComponent(
+        site.value.context,
+        selectedComponent.reusableSourceId,
+      )
+
+      const mergedEvents = {
+        ...reusableCmp?.events,
+        ...selectedComponent.events,
+      }
+
+      return mergedEvents?.[name]
     }
     return undefined
   })
@@ -87,7 +99,11 @@ export const useEditComponentEvent = (): IUseEditComponentEventFeature => {
   const upsertEvent = (event: IComponentEvent, oldEventName?: string) => {
     const selectedComponent = editor.value?.selectedComponent
     if (selectedComponent) {
-      if (oldEventName) {
+      if (
+        oldEventName &&
+        selectedComponent.events &&
+        oldEventName in selectedComponent.events
+      ) {
         updateSelectedComponentEvent(oldEventName, event)
       } else {
         addSelectedComponentEvent(event)

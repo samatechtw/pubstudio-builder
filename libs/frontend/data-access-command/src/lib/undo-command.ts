@@ -26,6 +26,7 @@ import { undoEditPage } from './page/edit-page'
 import { undoRemovePage } from './page/remove-page'
 import { undoSetHomePage } from './page/set-home-page'
 import { undoSetPageHead } from './page/set-page-head'
+import { undoAddReusableComponent } from './reusable-component/add-reusable-component'
 import { undoAddStyleMixin } from './style/add-style-mixin'
 import { undoEditStyleMixin } from './style/edit-style-mixin'
 import { undoRemoveStyleMixin } from './style/remove-style-mixin'
@@ -83,6 +84,7 @@ export const undoCommand = (site: ISite, command: ICommand) => {
     [CommandType.SetBreakpoint]: undoSetBreakpoint,
     [CommandType.SetGlobalStyle]: undoSetGlobalStyle,
     [CommandType.UpdateUi]: undoUpdateUi,
+    [CommandType.AddReusableComponent]: undoAddReusableComponent,
   }[command.type]
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   applyFunction(site, command.data as any)

@@ -1,5 +1,5 @@
 import { RenderMode } from '@pubstudio/frontend/util-render'
-import { resolveThemeVariables } from '@pubstudio/frontend/util-resolve'
+import { resolveComponent, resolveThemeVariables } from '@pubstudio/frontend/util-resolve'
 import {
   CssPseudoClass,
   IComponent,
@@ -41,8 +41,13 @@ export const computeAttrsInputsMixins = (
   const { renderMode, resolveTheme = true, editor } = options
 
   const c: IComponent = component
+  let r: IComponent | undefined = undefined
+  if (component.reusableSourceId) {
+    r = resolveComponent(context, c.reusableSourceId)
+  }
   const attrs: Record<string, unknown> = {}
   const mixins: string[] = []
+  const content = c.content ?? r?.content
 
   if (editor) {
     const { cssPseudoClass } = editor
@@ -54,12 +59,27 @@ export const computeAttrsInputsMixins = (
   if (c.style.mixins) {
     mixins.push(...c.style.mixins)
   }
-  // Add attrs and inputs from default `inputs`
-  for (const [key, input] of Object.entries(c.inputs ?? {})) {
-    if (input.attr) {
-      attrs[key] = resolveInput(context, input.is ?? input.default, resolveTheme)
+  if (r?.style.mixins) {
+    mixins.push(...r.style.mixins)
+  }
+
+  if (r?.inputs) {
+    for (const [key, input] of Object.entries(r.inputs)) {
+      if (input.attr) {
+        attrs[key] = resolveInput(context, input.is ?? input.default, resolveTheme)
+      }
     }
   }
+
+  if (c.inputs) {
+    // If the component is a reusable instance, only the overridden inputs will be in `c.inputs`.
+    for (const [key, input] of Object.entries(c.inputs)) {
+      if (input.attr) {
+        attrs[key] = resolveInput(context, input.is ?? input.default, resolveTheme)
+      }
+    }
+  }
+
   // Add role
   if (!attrs.role && c.role) {
     attrs.role = c.role
@@ -69,5 +89,5 @@ export const computeAttrsInputsMixins = (
     attrs.href = attrs.href?.toString()
   }
 
-  return { attrs, mixins }
+  return { content, attrs, mixins }
 }

@@ -26,6 +26,7 @@ import { applyEditPage } from './page/edit-page'
 import { applyRemovePage } from './page/remove-page'
 import { applySetHomePage } from './page/set-home-page'
 import { applySetPageHead } from './page/set-page-head'
+import { applyAddReusableComponent } from './reusable-component/add-reusable-component'
 import { applyAddStyleMixin } from './style/add-style-mixin'
 import { applyEditStyleMixin } from './style/edit-style-mixin'
 import { applyRemoveStyleMixin } from './style/remove-style-mixin'
@@ -83,6 +84,7 @@ export const applyCommand = (site: ISite, command: ICommand): ICommand => {
     [CommandType.SetBreakpoint]: applySetBreakpoint,
     [CommandType.SetGlobalStyle]: applySetGlobalStyle,
     [CommandType.UpdateUi]: applyUpdateUi,
+    [CommandType.AddReusableComponent]: applyAddReusableComponent,
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   applyFunctions[command.type](site, command.data as any)

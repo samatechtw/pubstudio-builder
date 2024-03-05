@@ -27,12 +27,12 @@ export const computePropsContent = (
 
   const content: IContent = component.children?.length
     ? component.children.map((child) => renderComponent(site, child, renderMode))
-    : parseI18n(site, component.content)
+    : parseI18n(site, data.content)
 
   const props = {
     ...data.attrs,
     ...events.native,
-    class: data.mixins.concat(component.id),
+    class: data.mixins.concat(component.id, component.reusableSourceId ?? []),
     id: component.id,
   }
 

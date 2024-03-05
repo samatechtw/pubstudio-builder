@@ -20,8 +20,11 @@
 <script lang="ts" setup>
 import { toRefs } from 'vue'
 import { addBuiltinComponent } from '@pubstudio/frontend/feature-build'
-import { useDragDrop } from '@pubstudio/frontend/feature-render-builder'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
+import {
+  DraggedComponentAddDataType,
+  useDragDrop,
+} from '@pubstudio/frontend/feature-render-builder'
 
 const props = defineProps<{
   text: string
@@ -49,7 +52,10 @@ const { dndState, elementRef, dragstart, drag, dragenter, dragover, dragleave, d
     getParentId: () => undefined,
     getComponentIndex: () => 0,
     isParent: false,
-    addData: { id: builtinComponentId.value },
+    addData: {
+      id: builtinComponentId.value,
+      type: DraggedComponentAddDataType.BuiltinComponent,
+    },
   })
 </script>
 

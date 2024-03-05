@@ -95,7 +95,6 @@ export interface IComponentStyle {
   // Custom style selectors scoped to this component
   overrides?: IComponentStyleOverrides
 }
-
 export interface IComponent {
   // ID unique to the namespace
   id: string
@@ -105,12 +104,17 @@ export interface IComponent {
   tag: Tag
   // ARIA role
   role?: AriaRole
-  // HTML content
+  // HTML content.
+  // This is also used to override reusable component content.
   content?: string
   // DOM parent
   parent?: IComponent
   // DOM children
   children?: IComponent[]
+  // Whether the component shows in the reusable menu
+  isReusable?: boolean
+  // ID of reusable component to inherit properties from
+  reusableSourceId?: string
   // Input values
   style: IComponentStyle
   state?: Record<string, IComponentState>

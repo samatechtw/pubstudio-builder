@@ -44,4 +44,5 @@ export enum CommandType {
   SetTranslations = 'setT',
   SetGlobalStyle = 'setGS',
   UpdateUi = 'uUi',
+  AddReusableComponent = 'addR',
 }

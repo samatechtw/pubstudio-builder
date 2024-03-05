@@ -38,6 +38,10 @@ export const addBuiltinComponentData = (site: ISite, data: IAddComponentData) =>
   pushCommandAndAddMissingMixins(site, CommandType.AddComponent, data, mixins)
 }
 
+export const addReusableComponentData = (site: ISite, data: IAddComponentData) => {
+  pushCommand(site, CommandType.AddComponent, data)
+}
+
 export interface IAddBuiltinComponentOptions {
   id: string
   parentId?: string
