@@ -10,7 +10,7 @@ import {
   descSortedBreakpoints,
 } from '@pubstudio/frontend/feature-site-source'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
-import { computeComponentFlattenedStyles } from '@pubstudio/frontend/util-component'
+import { computeFlattenedStyles } from '@pubstudio/frontend/util-component'
 import { styleId } from '@pubstudio/frontend/util-ids'
 import { ICommand, StyleType } from '@pubstudio/shared/type-command'
 import {
@@ -123,7 +123,7 @@ export const useReusableStyleMenu = (): IUseStyleMenuFeature => {
       },
     )
 
-    const flattenedStyles = computeComponentFlattenedStyles(
+    const flattenedStyles = computeFlattenedStyles(
       editor.value,
       breakpointStylesWithSource,
       descSortedBreakpoints.value,

@@ -4,7 +4,7 @@ import {
   descSortedBreakpoints,
 } from '@pubstudio/frontend/feature-site-source'
 import {
-  computeComponentFlattenedStyles,
+  computeFlattenedStyles,
   computeComponentOverrideStyle,
 } from '@pubstudio/frontend/util-component'
 import { ICommand, StyleType } from '@pubstudio/shared/type-command'
@@ -58,7 +58,7 @@ export const useEditComponentChildStyles = (
         selectedComponent,
         selector.value,
       )
-      return computeComponentFlattenedStyles(
+      return computeFlattenedStyles(
         editor.value,
         breakpointStyles,
         descSortedBreakpoints.value,
