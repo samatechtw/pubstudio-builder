@@ -204,7 +204,6 @@ const {
   itemRef: tooltipAnchorRef,
   tooltipMouseEnter,
   tooltipMouseLeave,
-  cancelHoverTimer,
   tooltipRef,
   tooltipStyle,
   show: showTooltip,
@@ -321,7 +320,7 @@ const toggleDropdown = async () => {
     return
   }
   toggleMenu()
-  cancelHoverTimer()
+  tooltipMouseLeave()
   if (searchable.value && opened.value) {
     searchActive.value = true
     searchIndex.value = 0

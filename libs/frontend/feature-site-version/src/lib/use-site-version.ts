@@ -1,10 +1,13 @@
+import { usePlatformSiteApi } from '@pubstudio/frontend/data-access-api'
+import { ApiInjectionKey } from '@pubstudio/frontend/data-access-injection'
 import { useSiteApi } from '@pubstudio/frontend/data-access-site-api'
 import { store } from '@pubstudio/frontend/data-access-web-store'
 import { site } from '@pubstudio/frontend/feature-site-source'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
+import { parseApiErrorKey, PSApi, toApiError } from '@pubstudio/frontend/util-api'
 import { SiteVariant } from '@pubstudio/shared/type-api-platform-site'
 import { ISiteInfoViewModel } from '@pubstudio/shared/type-api-site-sites'
-import { computed, ComputedRef, Ref, ref } from 'vue'
+import { computed, ComputedRef, inject, Ref, ref } from 'vue'
 import { VersionOption } from './enum-version-option'
 
 export interface IUseSiteVersion {
@@ -14,9 +17,11 @@ export interface IUseSiteVersion {
   sitePublished: ComputedRef<boolean>
   activeVersionId: Ref<string | null | undefined>
   loading: Ref<boolean>
+  error: Ref<string | undefined>
   listVersions: () => Promise<void>
   enablePreview: (enable: boolean) => Promise<void>
   createDraft: () => Promise<void>
+  deleteDraft: () => Promise<void>
   publishSite: () => Promise<void>
   setActiveVersion: (version: VersionOption) => Promise<void>
 }
@@ -40,12 +45,14 @@ const sitePublished = computed(() => {
 })
 
 export const useSiteVersion = (options?: IUseSiteVersionOptions): IUseSiteVersion => {
+  const rootApi = inject(ApiInjectionKey) as PSApi
   const { siteStore, setRestoredSite, syncUpdateKey } = useSiteSource()
   if (options) {
     serverAddress = options.serverAddress
     siteId = options.siteId
   }
   const loading = ref(false)
+  const error = ref()
 
   const listVersions = async () => {
     hasVersions.value =
@@ -74,11 +81,13 @@ export const useSiteVersion = (options?: IUseSiteVersionOptions): IUseSiteVersio
       syncUpdateKey(res)
     } catch (e) {
       console.log(`Failed to set preview ${enable}`, e)
+      error.value = parseApiErrorKey(toApiError(e))
     }
     loading.value = false
   }
 
   const createDraft = async () => {
+    error.value = undefined
     const { siteStore } = useSiteSource()
     const { createDraft } = useSiteApi({
       store,
@@ -93,24 +102,52 @@ export const useSiteVersion = (options?: IUseSiteVersionOptions): IUseSiteVersio
       }
     } catch (e) {
       console.log('Failed to create draft', e)
+      error.value = parseApiErrorKey(toApiError(e))
+    }
+    loading.value = false
+  }
+
+  const deleteDraft = async () => {
+    error.value = undefined
+    const { siteStore } = useSiteSource()
+    const { deleteDraft } = useSiteApi({
+      store,
+      serverAddress: serverAddress as string,
+    })
+    loading.value = true
+    try {
+      await deleteDraft(siteId as string)
+      await listVersions()
+      // Set the update key, since the live version's `updated_at` will be different
+      if (versions.value[0]) {
+        siteStore.value.setUpdateKey(versions.value[0].updated_at.toString())
+      }
+      store.version.setActiveVersion(undefined)
+      const restored = await siteStore.value.restore()
+      setRestoredSite(restored)
+    } catch (e) {
+      console.log('Failed to create draft', e)
+      error.value = parseApiErrorKey(toApiError(e))
     }
     loading.value = false
   }
 
   const publishSite = async () => {
-    const { publishSite } = useSiteApi({
-      store,
-      serverAddress: serverAddress as string,
-    })
+    error.value = undefined
+    // Update through the platform API so that `published` field is synced
+    // Could be optimized by using the site API if the platform/site published states match
+    // TODO -- fall back to site API if platform API not available
+    const platformApi = usePlatformSiteApi(rootApi)
     loading.value = true
     try {
       await siteStore.value.save(site.value, {
         immediate: true,
         ignoreUpdateKey: true,
       })
-      await publishSite(siteId as string, true)
+      await platformApi.publishSite(siteId as string, { publish: true })
     } catch (e) {
-      console.log('Failed to publish')
+      console.log('Failed to publish', e)
+      error.value = parseApiErrorKey(toApiError(e))
     }
     loading.value = false
   }
@@ -140,9 +177,11 @@ export const useSiteVersion = (options?: IUseSiteVersionOptions): IUseSiteVersio
     sitePublished,
     activeVersionId: store.version.activeVersionId,
     loading,
+    error,
     listVersions,
     enablePreview,
     createDraft,
+    deleteDraft,
     publishSite,
     setActiveVersion,
   }
