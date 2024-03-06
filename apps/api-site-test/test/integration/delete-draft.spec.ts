@@ -77,7 +77,7 @@ describe('Delete Draft', () => {
     it('returns 400 when there is no draft to delete', async () => {
       await api.delete(testEndpoint(siteId)).set('Authorization', ownerAuth).expect(400, {
         code: 'None',
-        message: 'Request is missing draft',
+        message: 'Site is missing draft',
         status: 400,
       })
     })

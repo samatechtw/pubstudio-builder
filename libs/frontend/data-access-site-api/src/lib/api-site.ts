@@ -33,6 +33,7 @@ export interface IApiSite {
     keepalive?: boolean,
   ): Promise<IUpdateSiteApiResponse>
   createDraft(siteId: string): Promise<IListSiteVersionsApiResponse>
+  deleteDraft(siteId: string): Promise<void>
   publishSite(siteId: string, publish: boolean): Promise<void>
 }
 
@@ -108,6 +109,13 @@ export const useSiteApi = (params: IUseSiteApiParams): IApiSite => {
     return res.data as IListSiteVersionsApiResponse
   }
 
+  const deleteDraft = async (siteId: string): Promise<void> => {
+    await api.authOptRequest({
+      url: `sites/${siteId}/actions/delete_draft`,
+      method: 'DELETE',
+    })
+  }
+
   const publishSite = async (siteId: string, publish: boolean): Promise<void> => {
     const data: IPublishSiteApiRequest = { publish }
     await api.authOptRequest({
@@ -152,6 +160,7 @@ export const useSiteApi = (params: IUseSiteApiParams): IApiSite => {
     getSiteVersion,
     listSiteVersions,
     createDraft,
+    deleteDraft,
     publishSite,
   }
 }

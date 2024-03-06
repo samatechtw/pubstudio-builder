@@ -19,6 +19,7 @@ import { IUpdateLocalSiteApiRequest } from '@pubstudio/shared/type-api-local-sit
 import {
   ICreatePlatformSiteRequest,
   IListPlatformSitesRequest,
+  IPublishPlatformSiteRequest,
   ISiteViewModel,
   IUpdatePlatformSiteApiResponse,
   IUpdatePlatformSiteRequest,
@@ -53,6 +54,7 @@ export interface ISitesFeature {
     id: string,
     data: IUpdatePlatformSiteRequest,
   ) => Promise<IUpdatePlatformSiteApiResponse | undefined>
+  publishSite: (id: string, data: IPublishPlatformSiteRequest) => Promise<void>
   updateLocalSite: (id: string, data: IUpdateLocalSiteApiRequest) => Promise<void>
   listSites: (params: IListPlatformSitesRequest) => Promise<void>
   deleteSite: (id: string) => Promise<void>
@@ -99,6 +101,20 @@ export const useSites = (): ISitesFeature => {
       loading.value = false
     }
     return undefined
+  }
+
+  const publishSite = async (
+    id: string,
+    data: IPublishPlatformSiteRequest,
+  ): Promise<void> => {
+    try {
+      loading.value = true
+      await api.publishSite(id, data)
+    } catch (e) {
+      error.value = parseApiError(i18n, toApiError(e))
+    } finally {
+      loading.value = false
+    }
   }
 
   const updateLocalSite = async (id: string, data: IUpdateLocalSiteApiRequest) => {
@@ -178,6 +194,7 @@ export const useSites = (): ISitesFeature => {
     usageAllowance,
     createSite,
     updateSite,
+    publishSite,
     updateLocalSite,
     listSites,
     deleteSite,

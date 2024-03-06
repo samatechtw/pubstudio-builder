@@ -21,7 +21,7 @@ pub async fn delete_draft(
     let no_draft = versions.len() == 1 || versions.get(0).is_some_and(|v| v.published);
 
     if no_draft {
-        return Err(ApiError::bad_request().message("Request is missing draft"));
+        return Err(ApiError::bad_request().message("Site is missing draft"));
     } else {
         context
             .site_repo

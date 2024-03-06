@@ -5,6 +5,7 @@ import {
   IGetPlatformSiteApiResponse,
   IListPlatformSitesRequest,
   IListPlatformSitesResponse,
+  IPublishPlatformSiteRequest,
   IUpdatePlatformSiteApiResponse,
   IUpdatePlatformSiteRequest,
 } from '@pubstudio/shared/type-api-platform-site'
@@ -16,6 +17,7 @@ export interface IApiPlatformSite {
     id: string,
     data: IUpdatePlatformSiteRequest,
   ) => Promise<IUpdatePlatformSiteApiResponse>
+  publishSite: (id: string, data: IPublishPlatformSiteRequest) => Promise<void>
   listSites: (params: IListPlatformSitesRequest) => Promise<IListPlatformSitesResponse>
   getSite(siteId: string): Promise<IGetPlatformSiteApiResponse>
   deleteSite(siteId: string): Promise<void>
@@ -43,6 +45,17 @@ export const usePlatformSiteApi = (api: PSApi): IApiPlatformSite => {
       data: payload,
     })
     return data as IUpdatePlatformSiteApiResponse
+  }
+
+  const publishSite = async (
+    id: string,
+    payload: IPublishPlatformSiteRequest,
+  ): Promise<void> => {
+    await api.authRequest({
+      url: `sites/${id}/actions/publish`,
+      method: 'POST',
+      data: payload,
+    })
   }
 
   const listSites = async (
@@ -74,6 +87,7 @@ export const usePlatformSiteApi = (api: PSApi): IApiPlatformSite => {
   return {
     createSite,
     updateSite,
+    publishSite,
     listSites,
     getSite,
     deleteSite,
