@@ -7,9 +7,10 @@ import {
   IEditorContext,
   IRawStyleWithSource,
   IRawStylesWithSource,
+  StyleSourceType,
 } from '@pubstudio/shared/type-site'
 
-export const computeComponentFlattenedStyles = (
+export const computeFlattenedStyles = (
   editor: IEditorContext | undefined,
   breakpointStyles: IBreakpointStylesWithSource,
   descSortedBreakpoints: IBreakpoint[],
@@ -41,6 +42,8 @@ export const computeComponentFlattenedStyles = (
 
   // Add other styles to the result
   for (const { id: breakpointId } of descSortedBreakpoints) {
+    // Skip default breakpoint with default pseudo class because
+    // it's already added to the result before entering this for-loop.
     if (
       breakpointId === DEFAULT_BREAKPOINT_ID &&
       currentPseudoClass === CssPseudoClass.Default
@@ -51,10 +54,19 @@ export const computeComponentFlattenedStyles = (
     const sourceRawStyle = breakpointStyles[breakpointId]?.[currentPseudoClass] ?? {}
 
     Object.entries(sourceRawStyle).forEach(([css, source]) => {
-      result[css as Css] = { ...source }
-      if (includePseudoClass) {
-        ;(result[css as Css] as IRawStyleWithSource).sourcePseudoClass =
-          currentPseudoClass
+      const key = css as Css
+      // Only update the result when the source type is component custom style
+      // since custom style has higher priority, or when the existing entry is
+      // not from component custom style.
+      if (
+        source.sourceType === StyleSourceType.Custom ||
+        result[key]?.sourceType !== StyleSourceType.Custom
+      ) {
+        result[key] = { ...source }
+        if (includePseudoClass) {
+          ;(result[css as Css] as IRawStyleWithSource).sourcePseudoClass =
+            currentPseudoClass
+        }
       }
     })
 

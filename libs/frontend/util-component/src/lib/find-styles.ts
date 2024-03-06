@@ -6,7 +6,7 @@ import {
   ISite,
 } from '@pubstudio/shared/type-site'
 import { computeComponentBreakpointStyles } from './compute-component-breakpoint-styles'
-import { computeComponentFlattenedStyles } from './compute-component-flattened-styles'
+import { computeFlattenedStyles } from './compute-component-flattened-styles'
 
 export const findStyles = (
   finds: Css[],
@@ -17,7 +17,7 @@ export const findStyles = (
 ): IRawStyle => {
   const result: IRawStyle = {}
   const breakpointStyles = computeComponentBreakpointStyles(site.context, component)
-  const flattenedStyles = computeComponentFlattenedStyles(
+  const flattenedStyles = computeFlattenedStyles(
     site.editor,
     breakpointStyles,
     descSortedBreakpoints,

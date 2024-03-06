@@ -28,7 +28,7 @@ import {
 } from '@pubstudio/frontend/util-command-data'
 import {
   computeComponentBreakpointStyles,
-  computeComponentFlattenedStyles,
+  computeFlattenedStyles,
   flattenedComponentStyle,
 } from '@pubstudio/frontend/util-component'
 import { DEFAULT_BREAKPOINT_ID, styleId } from '@pubstudio/frontend/util-ids'
@@ -261,7 +261,7 @@ export const useBuild = (): IUseBuild => {
         site.value.context,
         selectedComponent,
       )
-      const flattenedStyles = computeComponentFlattenedStyles(
+      const flattenedStyles = computeFlattenedStyles(
         editor.value,
         breakpointStyles,
         descSortedBreakpoints.value,
