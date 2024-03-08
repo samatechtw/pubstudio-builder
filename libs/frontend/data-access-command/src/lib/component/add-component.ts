@@ -17,6 +17,29 @@ import {
 } from '../editor-event-handlers'
 import { setSelectedComponent } from '../set-selected-component'
 
+const addChildrenHelper = (
+  site: ISite,
+  parentId: string,
+  children: IComponent[],
+  sourceField: keyof Pick<IAddComponentData, 'sourceId' | 'reusableComponentId'>,
+) => {
+  for (const child of children) {
+    if (isDynamicComponent(child.id)) {
+      console.log(`Skip add dynamic component with ${sourceField}: ${child.id}`)
+    } else {
+      addComponentHelper(site, {
+        name: child.name,
+        tag: child.tag,
+        content: child.content,
+        parentId,
+        [sourceField]: child.id,
+        inputs: clone(child.inputs),
+        style: clone(child.style),
+      })
+    }
+  }
+}
+
 export const addComponentHelper = (site: ISite, data: IAddComponentData): IComponent => {
   const context = site.context
   const {
@@ -77,37 +100,9 @@ export const addComponentHelper = (site: ISite, data: IAddComponentData): ICompo
   }
   context.components[id] = component
   if (sourceComponent?.children) {
-    for (const child of sourceComponent.children) {
-      if (isDynamicComponent(child.id)) {
-        console.log('Skip adding dynamic component', child.id)
-      } else {
-        addComponentHelper(site, {
-          name: child.name,
-          tag: child.tag,
-          content: child.content,
-          parentId: id,
-          sourceId: child.id,
-          inputs: clone(child.inputs),
-          style: clone(child.style),
-        })
-      }
-    }
+    addChildrenHelper(site, id, sourceComponent.children, 'sourceId')
   } else if (reusableCmp?.children) {
-    for (const child of reusableCmp.children) {
-      if (isDynamicComponent(child.id)) {
-        console.log('Skip adding dynamic reusable component', child.id)
-      } else {
-        addComponentHelper(site, {
-          name: child.name,
-          tag: child.tag,
-          content: child.content,
-          parentId: id,
-          reusableComponentId: child.id,
-          inputs: clone(child.inputs),
-          style: clone(child.style),
-        })
-      }
-    }
+    addChildrenHelper(site, id, reusableCmp.children, 'reusableComponentId')
   }
 
   // Copy override styles and assign them to new children where possible

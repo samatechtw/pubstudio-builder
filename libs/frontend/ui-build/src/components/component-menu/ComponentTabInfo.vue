@@ -77,13 +77,8 @@ const contentInfo = computed(() => {
 const isReusableInstance = computed(() => !!component.value.reusableComponentData)
 
 const reusableCmpInfo = computed(() => {
-  if (!isReusableInstance.value) {
-    return undefined
-  } else {
-    return t('build.reusable_cmp_info', {
-      id: component.value.reusableComponentData?.id,
-    })
-  }
+  const id = component.value.reusableComponentData?.id
+  return id ? t('build.reusable_cmp_info', { id }) : undefined
 })
 
 const editingContent = computed(() => {

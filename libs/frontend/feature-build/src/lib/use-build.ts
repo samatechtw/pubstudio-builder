@@ -1261,7 +1261,7 @@ export const useBuild = (): IUseBuild => {
       events: component.events,
       editorEvents: component.editorEvents,
     }
-    pushCommand(site.value, CommandType.addReusableComponent, data)
+    pushCommand(site.value, CommandType.AddReusableComponent, data)
   }
 
   return {
