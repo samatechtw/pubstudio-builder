@@ -3,6 +3,10 @@
     <div class="title">
       {{ t('build.reusable_components') }}
     </div>
+
+    <div v-if="topLevelReusableComponents.length === 0" class="reusable-empty">
+      {{ t('build.reusable_empty') }}
+    </div>
     <ReusableComponent
       v-for="cmp in topLevelReusableComponents"
       :key="cmp.id"
@@ -35,7 +39,7 @@ const topLevelReusableComponents = computed(() =>
   @mixin flex-col;
   height: 100%;
   width: 200px;
-  padding: 12px 0;
+  padding: 24px 0 16px;
   background-color: $blue-100;
   overflow: auto;
 }
@@ -44,6 +48,11 @@ const topLevelReusableComponents = computed(() =>
   @mixin title-semibold 15px;
   padding: 0 8px;
   margin-bottom: 8px;
+}
+.reusable-empty {
+  @mixin title-medium 15px;
+  color: $grey-500;
+  padding: 16px 4px 4px 16px;
 }
 
 .reusable-cmp {

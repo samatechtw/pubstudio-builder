@@ -11,6 +11,7 @@ import {
   activeBreakpoint,
   descSortedBreakpoints,
 } from '@pubstudio/frontend/feature-site-source'
+import { resolveReusableComponent } from '@pubstudio/frontend/util-builtin'
 import { findStyles } from '@pubstudio/frontend/util-component'
 import { RenderMode } from '@pubstudio/frontend/util-render'
 import { resetRuntimeContext, runtimeContext } from '@pubstudio/frontend/util-runtime'
@@ -30,7 +31,6 @@ import SvgEdit from '../components/SvgEdit.vue'
 import { IDndState } from './dnd/builder-dnd'
 import { BuilderDndComponent } from './dnd/builder-dnd-component'
 import { LinkTooltipMode } from './enum-link-tooltip-mode'
-import { resolveReusableComponent } from '@pubstudio/frontend/util-builtin'
 
 // Style and props for a component rendered in the builder
 export interface IBuilderStyleProps {
@@ -236,10 +236,6 @@ export const computePropsContent = (
   )
 
   const cmpContent = component.content ?? reusableCmp?.content
-  const cmpWithDefaultContent: IComponent = {
-    ...component,
-    content: component.content ?? reusableCmp?.content,
-  }
 
   const content: IBuildContent = []
   const hasChildren = (component.children?.length ?? 0) > 0
@@ -261,6 +257,7 @@ export const computePropsContent = (
         h('div', { class: 'component-content-container', innerHTML: cmpContent }),
       )
     } else if (isSelected) {
+      const cmpWithDefaultContent: IComponent = { ...component, content: cmpContent }
       content.push(h(ProseMirrorEditor, { component: cmpWithDefaultContent, editor }))
     } else {
       content.push(
@@ -277,6 +274,7 @@ export const computePropsContent = (
     !reusableCmpHasChildren
   ) {
     if (isSelected) {
+      const cmpWithDefaultContent: IComponent = { ...component, content: cmpContent }
       content.push(h(ProseMirrorEditor, { component: cmpWithDefaultContent, editor }))
       if (component.tag === Tag.A) {
         content.push(
