@@ -95,15 +95,6 @@ export interface IComponentStyle {
   // Custom style selectors scoped to this component
   overrides?: IComponentStyleOverrides
 }
-
-export interface IReusableComponentData {
-  // Reusable component id
-  id: string
-  // Inputs override
-  // Key: input key, value: input `is`
-  inputs?: Record<string, unknown>
-}
-
 export interface IComponent {
   // ID unique to the namespace
   id: string
@@ -120,8 +111,10 @@ export interface IComponent {
   parent?: IComponent
   // DOM children
   children?: IComponent[]
-  // Reusable component data
-  reusableComponentData?: IReusableComponentData
+  // Whether the component shows in the reusable menu
+  isReusable?: boolean
+  // ID of reusable component to inherit properties from
+  reusableSourceId?: string
   // Input values
   style: IComponentStyle
   state?: Record<string, IComponentState>

@@ -1251,15 +1251,7 @@ export const useBuild = (): IUseBuild => {
 
   const addReusableComponent = (component: IComponent) => {
     const data: IAddReusableComponentData = {
-      name: component.name,
-      tag: component.tag,
-      content: component.content,
-      parentId: undefined,
-      sourceId: component.id,
-      style: component.style,
-      inputs: component.inputs,
-      events: component.events,
-      editorEvents: component.editorEvents,
+      componentId: component.id,
     }
     pushCommand(site.value, CommandType.AddReusableComponent, data)
   }

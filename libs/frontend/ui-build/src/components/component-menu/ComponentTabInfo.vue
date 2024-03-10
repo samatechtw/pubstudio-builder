@@ -13,7 +13,7 @@
     <MenuRow
       v-if="isReusableInstance"
       :label="t('build.reusable_cmp_id')"
-      :value="component.reusableComponentData?.id"
+      :value="component.reusableSourceId"
       :info="reusableCmpInfo"
       class="reusable-cmp-id"
     />
@@ -74,10 +74,10 @@ const contentInfo = computed(() => {
   return component.value.children?.length ? t('build.content_info') : undefined
 })
 
-const isReusableInstance = computed(() => !!component.value.reusableComponentData)
+const isReusableInstance = computed(() => !!component.value.reusableSourceId)
 
 const reusableCmpInfo = computed(() => {
-  const id = component.value.reusableComponentData?.id
+  const id = component.value.reusableSourceId
   return id ? t('build.reusable_cmp_info', { id }) : undefined
 })
 

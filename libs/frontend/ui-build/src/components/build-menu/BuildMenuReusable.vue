@@ -20,16 +20,20 @@ import { computed } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { useBuild } from '@pubstudio/frontend/feature-build'
 import ReusableComponent from './ReusableComponent.vue'
+import { resolveComponent } from '@pubstudio/frontend/util-builtin'
+import { IComponent } from '@pubstudio/shared/type-site'
 
 const { t } = useI18n()
 
 const { site } = useBuild()
 
-const topLevelReusableComponents = computed(() =>
-  Object.values(site.value.context.reusableComponents ?? {}).filter(
-    (reusableCmp) => reusableCmp.parentId === undefined,
-  ),
-)
+const topLevelReusableComponents = computed<IComponent[]>(() => {
+  const { context, editor } = site.value
+  const ids = editor?.reusableComponentIds.values() ?? []
+  return Array.from(ids)
+    .map((id) => resolveComponent(context, id))
+    .filter((cmp) => !!cmp) as IComponent[]
+})
 </script>
 
 <style lang="postcss" scoped>

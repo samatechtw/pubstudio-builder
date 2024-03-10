@@ -117,7 +117,7 @@ const onImageAssetSelected = (asset: ISiteAssetViewModel) => {
   setInput('src', urlFromAsset(asset))
 }
 
-const isReusableInstance = computed(() => !!component.value.reusableComponentData)
+const isReusableInstance = computed(() => !!component.value.reusableSourceId)
 </script>
 
 <style lang="postcss" scoped>
