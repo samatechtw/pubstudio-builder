@@ -1,4 +1,4 @@
-import { resolveReusableComponent } from '@pubstudio/frontend/util-builtin'
+import { resolveComponent } from '@pubstudio/frontend/util-builtin'
 import { IAddComponentData } from '@pubstudio/shared/type-command-data'
 import { IComponent, ISite } from '@pubstudio/shared/type-site'
 import { selectAddParent } from './select-add-parent'
@@ -10,13 +10,12 @@ export const makeAddComponentFromReusableData = (
   parent: IComponent,
   selectedComponentId: string | undefined,
 ): IAddComponentData | undefined => {
-  const reusableCmp = resolveReusableComponent(site.context, reusableComponentId)
+  const reusableCmp = resolveComponent(site.context, reusableComponentId)
   if (!reusableCmp) {
     return undefined
   }
   const data: IAddComponentData = {
     tag: reusableCmp.tag,
-    content: reusableCmp.content,
     ...selectAddParent(parent, undefined),
     reusableComponentId: reusableCmp.id,
     selectedComponentId,

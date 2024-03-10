@@ -8,7 +8,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, onUnmounted } from 'vue'
+import { computed, inject, onMounted, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { RenderMode } from '@pubstudio/frontend/util-render'
 import { useRenderPreview } from '@pubstudio/frontend/feature-preview'
@@ -16,10 +16,14 @@ import { NotFound } from '@pubstudio/frontend/ui-widgets'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { initializeSiteStore } from '@pubstudio/frontend/feature-site-store-init'
 import { useBuild } from '@pubstudio/frontend/feature-build'
+import { ApiInjectionKey } from '@pubstudio/frontend/data-access-injection'
+import { PSApi } from '@pubstudio/frontend/util-api'
 
 const emit = defineEmits<{
   (e: 'unauthorized'): void
 }>()
+
+const rootApi = inject(ApiInjectionKey) as PSApi
 
 const route = useRoute()
 const { site } = useBuild()
@@ -28,7 +32,7 @@ const siteId = route.query.siteId ? route.query.siteId.toString() : undefined
 let checkInterval: ReturnType<typeof setInterval> | undefined
 // TODO -- API isn't working?
 try {
-  await initializeSiteStore({ siteId })
+  await initializeSiteStore({ siteId, rootApi })
 } catch (err) {
   const e = err as Record<string, unknown>
   if ('status' in e && e.status === 401) {

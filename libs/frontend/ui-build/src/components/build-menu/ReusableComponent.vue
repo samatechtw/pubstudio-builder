@@ -18,10 +18,10 @@ import {
   makeAddBuiltinComponentData,
   makeAddComponentFromReusableData,
 } from '@pubstudio/frontend/util-command-data'
-import { IComponent, IReusableComponent } from '@pubstudio/shared/type-site'
+import { IComponent } from '@pubstudio/shared/type-site'
 
 const props = defineProps<{
-  reusableComponent: IReusableComponent
+  reusableComponent: IComponent
 }>()
 
 const { reusableComponent } = toRefs(props)

@@ -26,6 +26,7 @@ export const createEditorContext = (homePage: IPage): IEditorContext => {
     componentTreeExpandedItems: {
       [homePage.root.id]: true,
     },
+    reusableComponentIds: new Set<string>(),
     componentsHidden: {},
     selectedThemeColors: new Set<string>(),
     builderWidth: 1080,

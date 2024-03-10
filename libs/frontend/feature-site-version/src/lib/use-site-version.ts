@@ -1,5 +1,4 @@
 import { usePlatformSiteApi } from '@pubstudio/frontend/data-access-api'
-import { ApiInjectionKey } from '@pubstudio/frontend/data-access-injection'
 import { useSiteApi } from '@pubstudio/frontend/data-access-site-api'
 import { store } from '@pubstudio/frontend/data-access-web-store'
 import { site } from '@pubstudio/frontend/feature-site-source'
@@ -7,7 +6,7 @@ import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { parseApiErrorKey, PSApi, toApiError } from '@pubstudio/frontend/util-api'
 import { SiteVariant } from '@pubstudio/shared/type-api-platform-site'
 import { ISiteInfoViewModel } from '@pubstudio/shared/type-api-site-sites'
-import { computed, ComputedRef, inject, Ref, ref } from 'vue'
+import { computed, ComputedRef, Ref, ref } from 'vue'
 import { VersionOption } from './enum-version-option'
 
 export interface IUseSiteVersion {
@@ -29,12 +28,14 @@ export interface IUseSiteVersion {
 export interface IUseSiteVersionOptions {
   serverAddress: string | undefined
   siteId: string | undefined
+  rootApi: PSApi
 }
 
 const versions = ref<ISiteInfoViewModel[]>([])
 const hasVersions = ref<boolean>(false)
 let serverAddress: string | undefined = undefined
 let siteId: string | undefined = undefined
+let rootApi: PSApi
 
 const hasDraft = computed(() => {
   return hasVersions.value && versions.value.length > 1 && !versions.value[0]?.published
@@ -45,11 +46,11 @@ const sitePublished = computed(() => {
 })
 
 export const useSiteVersion = (options?: IUseSiteVersionOptions): IUseSiteVersion => {
-  const rootApi = inject(ApiInjectionKey) as PSApi
   const { siteStore, setRestoredSite, syncUpdateKey } = useSiteSource()
   if (options) {
     serverAddress = options.serverAddress
     siteId = options.siteId
+    rootApi = options.rootApi
   }
   const loading = ref(false)
   const error = ref()

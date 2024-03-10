@@ -162,9 +162,18 @@ const showTextStyle = computed(() => {
   )
 })
 
-const showToReusableComponent = computed(
-  () => !!component.value.parent && !component.value.reusableComponentData,
-)
+const showToReusableComponent = computed(() => {
+  const { reusableSourceId, isReusable } = component.value
+  let parent: IComponent | undefined = component.value
+  if (!parent || reusableSourceId || isReusable) {
+    return false
+  }
+  while (parent) {
+    if (parent.isReusable || parent.reusableSourceId) return false
+    parent = parent.parent
+  }
+  return true
+})
 
 const toReusableComponent = () => {
   addReusableComponent(component.value)

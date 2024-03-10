@@ -40,14 +40,6 @@ export const nextComponentId = (context: ISiteContext) => {
   return componentId(context.namespace, nextId(context))
 }
 
-export const reusableComponentId = (namespace: string, id: string): string => {
-  return `${namespace}-r-${id}`
-}
-
-export const nextReusableComponentId = (context: ISiteContext) => {
-  return reusableComponentId(context.namespace, nextId(context))
-}
-
 export const styleId = (namespace: string, id: string): string => {
   return `${namespace}-s-${id}`
 }

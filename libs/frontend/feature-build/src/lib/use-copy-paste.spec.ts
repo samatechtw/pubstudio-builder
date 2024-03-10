@@ -1,5 +1,6 @@
 import { applyAddComponent } from '@pubstudio/frontend/data-access-command'
 import { initializeSiteStore } from '@pubstudio/frontend/feature-site-store-init'
+import { PSApi } from '@pubstudio/frontend/util-api'
 import { resolveComponent } from '@pubstudio/frontend/util-builtin'
 import { DEFAULT_BREAKPOINT_ID } from '@pubstudio/frontend/util-ids'
 import {
@@ -23,7 +24,7 @@ describe('use-build composable', () => {
 
   beforeEach(async () => {
     build = useBuild()
-    await initializeSiteStore({ siteId: undefined })
+    await initializeSiteStore({ siteId: undefined, rootApi: {} as PSApi })
     site = build.site.value
     copyPaste = useCopyPaste()
 

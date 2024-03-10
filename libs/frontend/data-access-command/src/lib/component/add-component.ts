@@ -1,7 +1,4 @@
-import {
-  resolveComponent,
-  resolveReusableComponent,
-} from '@pubstudio/frontend/util-builtin'
+import { resolveComponent } from '@pubstudio/frontend/util-builtin'
 import {
   clone,
   detachComponent,
@@ -26,15 +23,22 @@ const addChildrenHelper = (
   for (const child of children) {
     if (isDynamicComponent(child.id)) {
       console.log(`Skip add dynamic component with ${sourceField}: ${child.id}`)
-    } else {
+    } else if (sourceField === 'sourceId') {
       addComponentHelper(site, {
         name: child.name,
         tag: child.tag,
         content: child.content,
         parentId,
-        [sourceField]: child.id,
+        sourceId: child.id,
         inputs: clone(child.inputs),
         style: clone(child.style),
+      })
+    } else {
+      addComponentHelper(site, {
+        name: child.name,
+        tag: child.tag,
+        parentId,
+        reusableComponentId: child.id,
       })
     }
   }
@@ -71,20 +75,23 @@ export const addComponentHelper = (site: ISite, data: IAddComponentData): ICompo
   }
 
   const sourceComponent = resolveComponent(context, sourceId)
-  const reusableCmp = resolveReusableComponent(context, reusableComponentId)
+  const reusableCmp = resolveComponent(context, reusableComponentId)
 
   if (sourceComponent) {
     component = detachComponent(component, sourceComponent)
   } else if (reusableCmp) {
     component = {
-      ...component,
-      style: clone(reusableCmp.style),
+      id,
+      name: component.name,
+      parent: component.parent,
+      tag: component.tag,
+      content: undefined,
+      children: component.children,
       inputs: clone(reusableCmp.inputs),
       events: clone(reusableCmp.events),
       editorEvents: clone(reusableCmp.editorEvents),
-      reusableComponentData: {
-        id: reusableCmp.id,
-      },
+      style: { custom: {} },
+      reusableSourceId: reusableCmp.id,
     }
   }
 

@@ -26,7 +26,8 @@ export const serializeComponent = (component: IComponent): ISerializedComponent 
     inputs: component.inputs,
     events: component.events,
     editorEvents: component.editorEvents,
-    reusableComponentData: component.reusableComponentData,
+    isReusable: component.isReusable,
+    reusableSourceId: component.reusableSourceId,
   }
 }
 
@@ -71,7 +72,6 @@ export const serializeSiteContext = (context: ISiteContext): ISerializedSiteCont
   return {
     namespace: context.namespace,
     nextId: context.nextId,
-    reusableComponents: context.reusableComponents,
     styles: context.styles,
     behaviors: context.behaviors,
     theme: context.theme,

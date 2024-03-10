@@ -11,7 +11,7 @@ import {
   descSortedBreakpoints,
 } from '@pubstudio/frontend/feature-site-source'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
-import { resolveThemeVariables } from '@pubstudio/frontend/util-builtin'
+import { resolveComponent, resolveThemeVariables } from '@pubstudio/frontend/util-builtin'
 import { findStyles } from '@pubstudio/frontend/util-component'
 import {
   firstMarkInSelection,
@@ -59,6 +59,14 @@ export const ProseMirrorEditor = defineComponent({
 
     const container = ref<HTMLDivElement>()
     const containerId = computed(() => getProseMirrorContainerId(component.value))
+
+    const getContent = (component: IComponent, defaultContent = ''): string => {
+      if (component.content) {
+        return component.content
+      }
+      const reusable = resolveComponent(site.value.context, component.reusableSourceId)
+      return reusable?.content ?? defaultContent
+    }
 
     const markStrong = (state: EditorState, dispatch?: (tr: Transaction) => void) => {
       const fallbackStyle = getStyleValue(Css.FontWeight)
@@ -120,7 +128,7 @@ export const ProseMirrorEditor = defineComponent({
         editor.editView?.destroy()
         editor.editView = createComponentEditorView(
           {
-            content: selectedComponent.content || '<div class="pm-p"></div>',
+            content: getContent(selectedComponent, '<div class="pm-p"></div>'),
             plugins,
             mapKeys: { 'Mod-b': markStrong, 'Mod-B': markStrong },
           },
@@ -208,7 +216,7 @@ export const ProseMirrorEditor = defineComponent({
         if (!proseMirrorFocused) {
           const newState = prosemirrorSetup({
             schema: schemaText,
-            content: component.value.content ?? '',
+            content: getContent(component.value),
           })
           editor.value?.editView?.updateState(newState)
         }

@@ -35,7 +35,7 @@ interface IUpdateApiOptions {
   ignoreUpdateKey?: boolean
 }
 
-// The intent is to refresh the page when the API store is affected, otherwise we lose track
+// TODO - The intent is to refresh the page when the API store is affected, otherwise we lose track
 // of the update key and the next update-site call fails. It would be better to find a way
 // to refresh the key or ignore it for the next update-site call after HMR.
 if (import.meta.hot) {

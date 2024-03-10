@@ -1,16 +1,18 @@
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { useSiteVersion } from '@pubstudio/frontend/feature-site-version'
+import { PSApi } from '@pubstudio/frontend/util-api'
 import { useApiStore } from './use-api-store'
 import { useLocalStore } from './use-local-store'
 
 export interface IInitializeSiteStoreOptions {
   siteApiUrl?: string
   siteId: string | undefined
+  rootApi: PSApi
 }
 
 export const initializeSiteStore = async (options: IInitializeSiteStoreOptions) => {
   const { initializeSite } = useSiteSource()
-  const { siteId, siteApiUrl } = options
+  const { siteId, siteApiUrl, rootApi } = options
 
   // The reason we initialize localstore like this is not obvious, the purpose
   // is to allow other code to later call `useLocalStore` without calculating the key,
@@ -23,5 +25,5 @@ export const initializeSiteStore = async (options: IInitializeSiteStoreOptions) 
     store,
     siteId,
   })
-  await useSiteVersion({ serverAddress, siteId }).listVersions()
+  await useSiteVersion({ serverAddress, siteId, rootApi }).listVersions()
 }

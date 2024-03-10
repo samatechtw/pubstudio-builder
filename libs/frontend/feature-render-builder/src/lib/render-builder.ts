@@ -11,7 +11,7 @@ import {
   activeBreakpoint,
   descSortedBreakpoints,
 } from '@pubstudio/frontend/feature-site-source'
-import { resolveReusableComponent } from '@pubstudio/frontend/util-builtin'
+import { resolveComponent } from '@pubstudio/frontend/util-builtin'
 import { findStyles } from '@pubstudio/frontend/util-component'
 import { RenderMode } from '@pubstudio/frontend/util-render'
 import { resetRuntimeContext, runtimeContext } from '@pubstudio/frontend/util-runtime'
@@ -54,9 +54,7 @@ export const computeBuilderStyleProps = (
   const builderClass: string[] = []
   let position: string | null | undefined = undefined
 
-  const cmp =
-    resolveReusableComponent(site.context, component.reusableComponentData?.id) ??
-    component
+  const cmp = resolveComponent(site.context, component.reusableSourceId) ?? component
 
   // Cache the CSS position. Must be called before using `position`
   const getPosition = (): string | null => {
@@ -230,10 +228,7 @@ export const computePropsContent = (
 
   const { editor } = site
   const isSelected = editor?.selectedComponent?.id === component.id
-  const reusableCmp = resolveReusableComponent(
-    site.context,
-    component.reusableComponentData?.id,
-  )
+  const reusableCmp = resolveComponent(site.context, component.reusableSourceId)
 
   const cmpContent = component.content ?? reusableCmp?.content
 
@@ -304,7 +299,11 @@ export const computePropsContent = (
     ...data.attrs,
     ...builderStyleProps?.builderProps,
     ...events.native,
-    class: data.mixins.concat(component.id, builderStyleProps?.builderClass ?? []),
+    class: data.mixins.concat(
+      component.id,
+      component.reusableSourceId ?? [],
+      builderStyleProps?.builderClass ?? [],
+    ),
     style: builderStyleProps?.builderStyle,
     id: component.id,
   }
