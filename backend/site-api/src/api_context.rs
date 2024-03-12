@@ -3,7 +3,7 @@ use lib_shared_site_api::{cache::cache::AppCache, clients::s3_client::S3Client};
 use crate::{
     config::Config,
     db::{
-        backup_repo::DynBackupRepo, site_repo::DynSiteRepo,
+        backup_repo::DynBackupRepo, custom_data_repo::DynCustomDataRepo, site_repo::DynSiteRepo,
         sites_metadata_repo::DynSitesMetadataRepo, usage_repo::DynUsageRepo,
     },
 };
@@ -17,5 +17,6 @@ pub struct ApiContext {
     pub backup_repo: DynBackupRepo,
     pub site_repo: DynSiteRepo,
     pub usage_repo: DynUsageRepo,
+    pub custom_data_repo: DynCustomDataRepo,
     pub cache: AppCache,
 }
