@@ -10,6 +10,8 @@ use site_api::app::app_router::app_router;
 use site_api::config::Config;
 use site_api::cron::setup_cron_jobs;
 use site_api::db::backup_repo::{BackupRepo, DynBackupRepo};
+use site_api::db::custom_data_repo::{CustomDataRepo, DynCustomDataRepo};
+use site_api::db::site_db_pool_manager::DbPoolManager;
 use site_api::db::site_repo::{DynSiteRepo, SiteRepo};
 use site_api::db::sites_metadata_repo::{DynSitesMetadataRepo, SitesMetadataRepo};
 use site_api::db::usage_repo::{DynUsageRepo, UsageRepo};
@@ -62,11 +64,17 @@ async fn main() {
         metadata_db_pool: metadata_db_pool.clone(),
     }) as DynUsageRepo;
 
-    let site_db_pools = RwLock::new(HashMap::default());
+    let site_db_pools = Arc::new(RwLock::new(HashMap::default()));
+    let db_pool_manager = DbPoolManager::new(site_db_pools);
+
     let site_repo = Arc::new(SiteRepo {
-        site_db_pools,
-        manifest_dir,
+        db_pool_manager: db_pool_manager.clone(),
+        manifest_dir: manifest_dir.clone(),
     }) as DynSiteRepo;
+    let custom_data_repo = Arc::new(CustomDataRepo {
+        db_pool_manager,
+        manifest_dir,
+    }) as DynCustomDataRepo;
 
     let s3_client = S3Client::new(s3_url, s3_access_key_id, s3_secret_access_key);
 
@@ -79,6 +87,7 @@ async fn main() {
         backup_repo,
         site_repo,
         usage_repo,
+        custom_data_repo,
         cache,
     };
 
