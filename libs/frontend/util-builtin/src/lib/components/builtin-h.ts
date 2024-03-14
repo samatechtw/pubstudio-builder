@@ -13,7 +13,7 @@ import {
   h6Id,
   h6StyleId,
 } from '@pubstudio/frontend/util-ids'
-import { IComponent, IStyle, Tag } from '@pubstudio/shared/type-site'
+import { IBreakpointStyles, IComponent, IStyle, Tag } from '@pubstudio/shared/type-site'
 
 export const h1Style: IStyle = {
   id: h1StyleId,
@@ -60,16 +60,25 @@ export const h2Style: IStyle = {
   },
 }
 
-export const h2: IComponent = {
-  id: h2Id,
-  name: 'H2',
-  tag: Tag.H2,
-  content: 'Heading 2',
-  style: {
-    custom: {},
-    mixins: [h2Style.id],
-  },
+// Helper for creating an H2. Helpers for other headers can be added as needed
+export const makeH2 = (
+  name?: string,
+  content?: string,
+  style?: IBreakpointStyles,
+): IComponent => {
+  return {
+    id: h2Id,
+    name: name ?? 'H2',
+    tag: Tag.H2,
+    content: content ?? 'Heading 2',
+    style: {
+      custom: style ?? {},
+      mixins: [h2Style.id],
+    },
+  }
 }
+
+export const h2: IComponent = makeH2()
 
 export const h3Style: IStyle = {
   id: h3StyleId,
