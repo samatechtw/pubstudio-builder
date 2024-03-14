@@ -6,4 +6,5 @@ export interface ICreatePlatformSiteRequest {
   subdomain: string
   custom_domains: string[]
   checkout_id?: string
+  user_id?: string
 }
