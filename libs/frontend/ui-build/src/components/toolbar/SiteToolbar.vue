@@ -60,7 +60,7 @@
       <Settings />
     </ToolbarItem>
     <ToolbarItem :tooltip="t(`toolbar.save.${siteStore.saveState}`)">
-      <div class="save-state" :class="siteStore.saveState" />
+      <div class="save-state" :class="siteStore.saveState" @click="forceSave" />
     </ToolbarItem>
     <BugReportModal :show="showBugReportModal" @cancel="showBugReportModal = false" />
   </div>
@@ -91,6 +91,7 @@ import ToolbarBuilderWidth from './ToolbarBuilderWidth.vue'
 import ToolbarBreakpoint from './ToolbarBreakpoint.vue'
 import BugReportModal from './BugReportModal.vue'
 import ToolbarVersion from './ToolbarVersion.vue'
+import { SiteSaveState } from '@pubstudio/shared/type-site'
 
 defineProps<{
   hideSettings?: boolean
@@ -101,7 +102,7 @@ const emit = defineEmits<{
 
 const { t } = useI18n()
 
-const { commandAlert, editor } = useBuild()
+const { site, commandAlert, editor } = useBuild()
 const { siteStore, isSaving } = useSiteSource()
 const { canUndo, canRedo, undo, redo } = useHistory()
 const { apiSiteId } = useSiteSource()
@@ -111,6 +112,16 @@ const toggleComponentTree = () => {
   if (editor.value) {
     const show = !!editor.value.showComponentTree
     setShowComponentTree(editor.value, !show)
+  }
+}
+
+const forceSave = async () => {
+  if (siteStore.value.saveState !== SiteSaveState.Saved) {
+    await siteStore.value.save(site.value, {
+      immediate: true,
+      ignoreUpdateKey: true,
+      forceUpdate: true,
+    })
   }
 }
 </script>
