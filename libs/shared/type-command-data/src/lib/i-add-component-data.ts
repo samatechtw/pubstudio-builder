@@ -4,6 +4,7 @@ import {
   IComponentEvents,
   IComponentInputs,
   IComponentStyle,
+  ISerializedComponent,
   Tag,
 } from '@pubstudio/shared/type-site'
 
@@ -29,6 +30,8 @@ export interface IAddComponentData {
   inputs?: IComponentInputs
   events?: IComponentEvents
   editorEvents?: IComponentEditorEvents
+  // Used for builtin components with deep children
+  children?: ISerializedComponent[]
   // Used to set selected component back after undo
   selectedComponentId?: string
 }
