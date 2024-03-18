@@ -4,16 +4,19 @@ import {
   registerCustomEvents,
   removeListeners,
 } from '@pubstudio/frontend/feature-render'
+import { RenderMode } from '@pubstudio/frontend/util-render'
 import { hrefToUrl } from '@pubstudio/frontend/util-router'
 import { IComponent, ISite, Tag } from '@pubstudio/shared/type-site'
 import { defineComponent, h, onMounted, onUnmounted, PropType, toRefs } from 'vue'
 import { RouterLink } from 'vue-router'
+import EmbedRouterLink from './EmbedRouterLink.vue'
 import { mergeSearch } from './merge-search'
 import { computePropsContent } from './render-preview'
 
 export interface ILiveComponentProps {
   site: ISite
   component: IComponent
+  renderMode: string
 }
 
 export const PreviewComponent = () => {
@@ -27,9 +30,14 @@ export const PreviewComponent = () => {
         type: Object as PropType<IComponent>,
         required: true,
       },
+      renderMode: {
+        type: String,
+        required: true,
+      },
     },
     setup(props: ILiveComponentProps) {
-      const { site, component } = toRefs(props)
+      const { site, component, renderMode } = toRefs(props)
+      const mode = renderMode.value as RenderMode
       const { custom } = computeEvents(site.value, component.value)
       registerCustomEvents(component.value, custom, null, false)
 
@@ -41,7 +49,7 @@ export const PreviewComponent = () => {
         removeListeners(component.value)
       })
       return () => {
-        const { content, props } = computePropsContent(site.value, component.value)
+        const { content, props } = computePropsContent(site.value, component.value, mode)
 
         let renderProps = props
         let children: IContent
@@ -62,8 +70,8 @@ export const PreviewComponent = () => {
         if (tag === Tag.A) {
           // TODO: merge back with `live-component.ts` once the custom router is used for `web`
           const hrefProp = (props.href ?? '') as string
-
-          const { url, isExternal } = hrefToUrl(hrefProp, '/preview')
+          const pathPrefix = mode === RenderMode.PreviewEmbed ? '/' : '/preview'
+          const { url, isExternal } = hrefToUrl(hrefProp, pathPrefix)
           if (isExternal) {
             // Absolute path, use the `href` in renderProps as is (don't forward query string and hash).
             // We are unable to use router-link here because router-link treats any given link as a
@@ -109,7 +117,11 @@ export const PreviewComponent = () => {
             }
             delete (copiedRenderProps as Record<string, unknown>).href
 
-            return h(RouterLink, copiedRenderProps, () => children)
+            if (mode === RenderMode.PreviewEmbed) {
+              return h(EmbedRouterLink, copiedRenderProps, () => children)
+            } else {
+              return h(RouterLink, copiedRenderProps, () => children)
+            }
           }
         }
 

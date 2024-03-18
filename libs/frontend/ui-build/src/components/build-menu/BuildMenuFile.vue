@@ -9,7 +9,7 @@
       </BuildMenuIconText>
     </SimpleFileUpload>
     <BuildMenuIconText
-      :text="t('templates')"
+      :text="t('template.title')"
       class="templates"
       @click="emit('showTemplates')"
     >

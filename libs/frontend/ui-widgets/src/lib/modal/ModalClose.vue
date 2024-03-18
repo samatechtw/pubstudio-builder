@@ -28,6 +28,7 @@ withDefaults(
   right: 8px;
   padding: 8px;
   cursor: pointer;
+  z-index: 10;
   > svg {
     width: v-bind(size + 'px');
     height: v-bind(size + 'px');

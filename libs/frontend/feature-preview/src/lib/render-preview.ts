@@ -11,17 +11,21 @@ import { IComponent, IPage, ISite } from '@pubstudio/shared/type-site'
 import { h, VNode } from 'vue'
 import { PreviewComponent } from './preview-component'
 
-export const renderPage = (site: ISite, page: IPage): VNode | undefined => {
+export const renderPage = (
+  site: ISite,
+  page: IPage,
+  renderMode: RenderMode,
+): VNode | undefined => {
   resetRuntimeContext()
-  const rootNode = renderComponent(site, page.root, RenderMode.Preview)
+  const rootNode = renderComponent(site, page.root, renderMode)
   return rootNode
 }
 
 export const computePropsContent = (
   site: ISite,
   component: IComponent,
+  renderMode: RenderMode,
 ): IPropsContent => {
-  const renderMode = RenderMode.Preview
   // TODO -- handle inputs
   const data = computeAttrsInputsMixins(site.context, component, { renderMode })
   const events = computeEvents(site, component)

@@ -286,9 +286,9 @@ export const useBuild = (): IUseBuild => {
   }
 
   const replaceSite = (newSite: ISite) => {
-    replaceSiteSource(newSite)
     // Basic name sanitization
-    site.value.name = site.value.name.replace(/[-_]/g, ' ')
+    newSite.name = newSite.name.replace(/[-_]/g, ' ')
+    replaceSiteSource(newSite)
     return siteStore.value.save(site.value, {
       immediate: true,
       forceUpdate: true,

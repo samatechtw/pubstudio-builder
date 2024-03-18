@@ -2,4 +2,4 @@ export const RouteLevelSymbol = Symbol('routeLevel')
 
 export const MatchedRoutesSymbol = Symbol('matchedRoutes')
 
-export const RouterSymol = Symbol('router')
+export const RouterSymbol = Symbol('router')
