@@ -8,51 +8,25 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, onUnmounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { toRefs } from 'vue'
 import { RenderMode } from '@pubstudio/frontend/util-render'
 import { useRenderPreview } from '@pubstudio/frontend/feature-preview'
 import { NotFound } from '@pubstudio/frontend/ui-widgets'
-import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
-import { initializeSiteStore } from '@pubstudio/frontend/feature-site-store-init'
 import { useBuild } from '@pubstudio/frontend/feature-build'
+import { IPage } from '@pubstudio/shared/type-site'
 
-const emit = defineEmits<{
-  (e: 'unauthorized'): void
-}>()
-
-const route = useRoute()
 const { site } = useBuild()
-const { checkOutdated } = useSiteSource()
-const siteId = route.query.siteId ? route.query.siteId.toString() : undefined
-let checkInterval: ReturnType<typeof setInterval> | undefined
-// TODO -- API isn't working?
-try {
-  await initializeSiteStore({ siteId })
-} catch (err) {
-  const e = err as Record<string, unknown>
-  if ('status' in e && e.status === 401) {
-    emit('unauthorized')
-  }
-}
 
-const notFoundPage = computed(() => {
-  return Object.values(site.value?.pages ?? {}).find(
-    (page) => page.route === '/not-found',
-  )
-})
-
-const activePage = computed(() => {
-  if (!site.value) {
-    return undefined
-  }
-  const path = route.path.replace('/preview', '') || '/'
-  const pages = site.value.pages
-  if (!pages[path]) {
-    return pages[site.value.defaults.homePage] ?? notFoundPage.value
-  }
-  return pages[path]
-})
+const props = withDefaults(
+  defineProps<{
+    renderMode?: RenderMode
+    activePage: IPage | undefined
+  }>(),
+  {
+    renderMode: RenderMode.Preview,
+  },
+)
+const { renderMode, activePage } = toRefs(props)
 
 const {
   ReusableStyle,
@@ -63,27 +37,9 @@ const {
 } = useRenderPreview({
   site,
   activePage,
-  renderMode: RenderMode.Preview,
+  renderMode: renderMode.value,
   notFoundComponent: NotFound,
   unhead: true,
-})
-
-const pollOutdated = () => {
-  if (!document.hidden) {
-    checkOutdated()
-  }
-}
-
-onMounted(() => {
-  checkInterval = setInterval(checkOutdated, 3000)
-  document.addEventListener('visibilitychange', pollOutdated)
-})
-
-onUnmounted(() => {
-  if (checkInterval) {
-    clearInterval(checkInterval)
-  }
-  document.removeEventListener('visibilitychange', pollOutdated)
 })
 </script>
 

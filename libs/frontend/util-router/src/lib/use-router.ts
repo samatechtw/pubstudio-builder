@@ -1,9 +1,9 @@
 import { inject } from 'vue'
 import { IRouter } from './i-router'
-import { RouterSymol } from './router-injection-keys'
+import { RouterSymbol } from './router-injection-keys'
 
 export const useRouter = <M = unknown>(): IRouter<M> => {
-  const router = inject<IRouter<M>>(RouterSymol)
+  const router = inject<IRouter<M>>(RouterSymbol)
 
   if (!router) {
     throw new Error(

@@ -15,17 +15,15 @@
 
 <script setup lang="ts">
 import { computed, ref, onMounted } from 'vue'
+import { useRoute, useRouter } from '@pubstudio/frontend/util-router'
 import {
-  IRouteWithPathRegex,
-  computeLocationParts,
-  getCurrentPath,
-  useRoute,
-  useRouter,
-} from '@pubstudio/frontend/util-router'
-import { useRender } from '@pubstudio/frontend/feature-render'
+  setupRoutes,
+  useNotFoundPage,
+  useRender,
+} from '@pubstudio/frontend/feature-render'
 import { RenderMode } from '@pubstudio/frontend/util-render'
 import { unstoreSite } from '@pubstudio/frontend/util-site-deserialize'
-import { IPage, ISite } from '@pubstudio/shared/type-site'
+import { ISite } from '@pubstudio/shared/type-site'
 import { IGetSiteApiResponse } from '@pubstudio/shared/type-api-site-sites'
 import ErrorMessage from './components/ErrorMessage.vue'
 import PSSpinner from './components/PSSpinner.vue'
@@ -34,10 +32,11 @@ import { rootSiteApi } from './web-site-api'
 
 const API_URL = '___SITE_API_URL___'
 
-const route = useRoute()
 const router = useRouter()
+const route = useRoute()
 
 const site = ref<ISite | undefined>()
+const { notFoundPage } = useNotFoundPage(site)
 
 // Duplicate of libs/frontend/data-access-site-api/src/lib/api-site.ts to avoid pulling in deps
 const getSite = async (url: string): Promise<ISite | undefined> => {
@@ -55,12 +54,6 @@ const getSite = async (url: string): Promise<ISite | undefined> => {
     pages: JSON.parse(serialized.pages),
   })
 }
-
-const notFoundPage = computed(() => {
-  return Object.values(site.value?.pages ?? {}).find(
-    (page) => page.route === '/not-found',
-  )
-})
 
 const activePage = computed(() => {
   const page = site.value?.pages[route.value?.path ?? '']
@@ -108,59 +101,10 @@ const getUserSite = async () => {
   }
 }
 
-const setupRoutes = (userSite: ISite) => {
-  let homePageName = ''
-
-  const pageMap = new Map<string, IPage>()
-
-  Object.values(userSite.pages).forEach((page) => {
-    if (userSite.defaults.homePage === page.route) {
-      homePageName = page.name
-    }
-
-    if (page.route === '/not-found') {
-      router.overwriteRouteComponent('NotFound', PageContent)
-    } else {
-      router.addRoute({
-        path: page.route,
-        name: page.name,
-        component: PageContent,
-      })
-    }
-
-    pageMap.set(page.route, page)
-  })
-
-  const { pathname } = window.location
-  const currentPage = pageMap.get(pathname)
-  const currentPath = getCurrentPath()
-
-  if (currentPage) {
-    const route = router.findRouteByName(currentPage.name) as IRouteWithPathRegex<unknown>
-    const locationParts = computeLocationParts(route, currentPath)
-    router.replace({
-      name: currentPage.name,
-      ...locationParts,
-    })
-  } else if (pathname === '/') {
-    // Automatically navigate users to default page if current route is '/'
-    const homeRoute = router.findRouteByName(homePageName) as IRouteWithPathRegex<unknown>
-    const locationParts = computeLocationParts(homeRoute, currentPath)
-    router.replace({
-      name: homePageName,
-      ...locationParts,
-    })
-  } else {
-    router.replace({
-      path: currentPath,
-    })
-  }
-}
-
 onMounted(async () => {
   const userSite = await getUserSite()
   if (userSite) {
-    setupRoutes(userSite)
+    setupRoutes(router, userSite, PageContent)
     site.value = userSite
   }
   loading.value = false

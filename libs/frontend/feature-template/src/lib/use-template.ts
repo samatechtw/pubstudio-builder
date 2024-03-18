@@ -1,14 +1,19 @@
 import { IApiTemplate, useTemplateApi } from '@pubstudio/frontend/data-access-api'
+import { createEditorContext } from '@pubstudio/frontend/data-access-command'
 import { ApiInjectionKey } from '@pubstudio/frontend/data-access-injection'
 import { parseApiErrorKey, PSApi, toApiError } from '@pubstudio/frontend/util-api'
+import { S3_TEMPLATE_PREVIEWS_URL } from '@pubstudio/frontend/util-config'
+import { serializeEditor } from '@pubstudio/frontend/util-site-store'
 import {
   GLOBAL_TEMPLATE_COLLECTION_ID,
   ICreatePlatformTemplateRequest,
   IGetPlatformTemplateResponse,
   IListPlatformTemplatesRequest,
   IListPlatformTemplatesResponse,
+  ITemplateViewModel,
   IUpdatePlatformTemplateRequest,
 } from '@pubstudio/shared/type-api-platform-template'
+import { IPage, ISerializedSite } from '@pubstudio/shared/type-site'
 import { inject, Ref, ref } from 'vue'
 
 export interface ITemplateFeature {
@@ -21,6 +26,13 @@ export interface ITemplateFeature {
   listTemplates: (query?: IListPlatformTemplatesRequest) => Promise<void>
   createTemplate: (data: ICreatePlatformTemplateRequest) => Promise<void>
   updateTemplate: (id: string, data: IUpdatePlatformTemplateRequest) => Promise<void>
+  templateToSerializedSite: (
+    template: ITemplateViewModel | undefined,
+  ) => ISerializedSite | undefined
+}
+
+export const templatePreviewUrl = (rel: string) => {
+  return `url(${S3_TEMPLATE_PREVIEWS_URL}/${rel})`
 }
 
 export const useTemplate = (): ITemplateFeature => {
@@ -86,6 +98,24 @@ export const useTemplate = (): ITemplateFeature => {
     }
   }
 
+  const templateToSerializedSite = (
+    template: ITemplateViewModel | undefined,
+  ): ISerializedSite | undefined => {
+    if (template) {
+      const pages = JSON.parse(template.pages)
+      const homePage = Object.values(pages)[0] as IPage
+      return {
+        name: template.name,
+        version: template.version,
+        context: JSON.parse(template.context),
+        defaults: JSON.parse(template.defaults),
+        editor: serializeEditor(createEditorContext(homePage)),
+        history: { back: [], forward: [] },
+        pages: JSON.parse(template.pages),
+      }
+    }
+  }
+
   return {
     api,
     saving,
@@ -96,5 +126,6 @@ export const useTemplate = (): ITemplateFeature => {
     listTemplates,
     getTemplate,
     updateTemplate,
+    templateToSerializedSite,
   }
 }

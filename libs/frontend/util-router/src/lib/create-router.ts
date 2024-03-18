@@ -36,7 +36,7 @@ import {
 import {
   MatchedRoutesSymbol,
   RouteLevelSymbol,
-  RouterSymol,
+  RouterSymbol,
 } from './router-injection-keys'
 import {
   _ScrollPositionNormalized,
@@ -431,7 +431,7 @@ export const createRouter = <M = Record<string, unknown>>(
   const install = (app: App) => {
     app.provide<number>(RouteLevelSymbol, 0)
     app.provide<Ref<IResolvedRoute<M>[]>>(MatchedRoutesSymbol, matchedRoutes)
-    app.provide<IRouter<M>>(RouterSymol, router)
+    app.provide<IRouter<M>>(RouterSymbol, router)
     app.component('router-link', RouterLink)
     app.component('router-view', RouterView)
 
