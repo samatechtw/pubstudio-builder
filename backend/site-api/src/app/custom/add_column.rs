@@ -1,6 +1,7 @@
-use lib_shared_site_api::error::api_error::ApiError;
-use lib_shared_types::dto::site_api::custom_data_dto::{AddColumn, UpdateColumnResponse};
+use lib_shared_site_api::error::{api_error::ApiError, helpers::check_bad_form};
+use lib_shared_types::dto::custom_data::add_column_dto::{AddColumn, UpdateColumnResponse};
 use serde_json::{json, Value};
+use validator::Validate;
 
 use crate::api_context::ApiContext;
 
@@ -17,11 +18,11 @@ use super::custom_data::parse_request_data;
             "validation_rules": [
                 {
                     "rule_type": "MinLength",
-                    "parameters": 1
+                    "parameter": 1
                 },
                 {
                     "rule_type": "MaxLength",
-                    "parameters": 10
+                    "parameter": 10
                 }
             ]
         }
@@ -31,9 +32,11 @@ use super::custom_data::parse_request_data;
 */
 pub async fn add_column(
     context: &ApiContext,
+    site_id: &String,
     data: Value,
 ) -> Result<UpdateColumnResponse, ApiError> {
     let dto: AddColumn = parse_request_data(data)?;
+    check_bad_form(dto.validate())?;
 
     for (k, v) in &dto.column {
         println!("added key: {}, info: {:?}", k, v);

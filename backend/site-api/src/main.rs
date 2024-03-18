@@ -10,6 +10,7 @@ use site_api::app::app_router::app_router;
 use site_api::config::Config;
 use site_api::cron::setup_cron_jobs;
 use site_api::db::backup_repo::{BackupRepo, DynBackupRepo};
+use site_api::db::custom_data_info_repo::{CustomDataInfoRepo, DynCustomDataInfoRepo};
 use site_api::db::custom_data_repo::{CustomDataRepo, DynCustomDataRepo};
 use site_api::db::site_db_pool_manager::DbPoolManager;
 use site_api::db::site_repo::{DynSiteRepo, SiteRepo};
@@ -71,6 +72,10 @@ async fn main() {
         db_pool_manager: db_pool_manager.clone(),
         manifest_dir: manifest_dir.clone(),
     }) as DynSiteRepo;
+    let custom_data_info_repo = Arc::new(CustomDataInfoRepo {
+        db_pool_manager: db_pool_manager.clone(),
+        manifest_dir: manifest_dir.clone(),
+    }) as DynCustomDataInfoRepo;
     let custom_data_repo = Arc::new(CustomDataRepo {
         db_pool_manager,
         manifest_dir,
@@ -87,6 +92,7 @@ async fn main() {
         backup_repo,
         site_repo,
         usage_repo,
+        custom_data_info_repo,
         custom_data_repo,
         cache,
     };
