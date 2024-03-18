@@ -1,7 +1,5 @@
 pub mod create_metadata_dto;
 pub mod create_site_dto;
-pub mod custom_data_dto;
-pub mod custom_metadata_viewmodel;
 pub mod get_current_site_dto;
 pub mod get_site_domains_dto;
 pub mod get_site_version_dto;

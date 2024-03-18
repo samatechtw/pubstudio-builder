@@ -9,7 +9,7 @@ use lib_shared_site_api::{
     util::json_extractor::PsJson,
 };
 use lib_shared_types::{
-    dto::site_api::custom_data_dto::{Action, CustomTableDto},
+    dto::custom_data::custom_data_dto::{Action, CustomDataDto},
     shared::user::RequestUser,
 };
 use serde::de::DeserializeOwned;
@@ -33,19 +33,19 @@ pub async fn custom_data(
     Path(id): Path<String>,
     State(context): State<ApiContext>,
     Extension(user): Extension<RequestUser>,
-    PsJson(dto): PsJson<CustomTableDto>,
+    PsJson(dto): PsJson<CustomDataDto>,
 ) -> Result<(StatusCode, Response), ApiError> {
     check_bad_form(dto.validate())?;
     verify_site_owner(&context, &user, &id).await?;
 
     return match dto.action {
         Action::CreateTable => {
-            let response = create_table(&context, dto.data).await?;
+            let response = create_table(&context, &id, dto.data).await?;
 
             Ok((StatusCode::CREATED, Json(response).into_response()))
         }
         Action::AddRow => {
-            add_row(&context, dto.data).await?;
+            add_row(&context, &id, dto.data).await?;
 
             Ok((
                 StatusCode::NO_CONTENT,
@@ -53,27 +53,27 @@ pub async fn custom_data(
             ))
         }
         Action::ListTables => {
-            let response = list_tables(&context, dto.data).await?;
+            let response = list_tables(&context, &id, dto.data).await?;
 
             Ok((StatusCode::OK, Json(response).into_response()))
         }
         Action::ListRows => {
-            let response = list_rows(&context, dto.data).await?;
+            let response = list_rows(&context, &id, dto.data).await?;
 
             Ok((StatusCode::OK, Json(response).into_response()))
         }
         Action::UpdateRow => {
-            let response = update_row(&context, dto.data).await?;
+            let response = update_row(&context, &id, dto.data).await?;
 
             Ok((StatusCode::OK, Json(response).into_response()))
         }
         Action::AddColumn => {
-            let response = add_column(&context, dto.data).await?;
+            let response = add_column(&context, &id, dto.data).await?;
 
             Ok((StatusCode::OK, Json(response).into_response()))
         }
         Action::RemoveColumn => {
-            remove_column(&context, dto.data).await?;
+            remove_column(&context, &id, dto.data).await?;
 
             Ok((
                 StatusCode::NO_CONTENT,
@@ -81,7 +81,7 @@ pub async fn custom_data(
             ))
         }
         Action::ModifyColumn => {
-            let response = modify_column(&context, dto.data).await?;
+            let response = modify_column(&context, &id, dto.data).await?;
 
             Ok((StatusCode::OK, Json(response).into_response()))
         }
