@@ -31,12 +31,16 @@ export class PSApi extends FetchApi<ApiResponse> {
 
   authRequest<T>(config: FetchRequestConfig): Promise<ApiResponse<T>> {
     const { headers, ...rest } = config
-    return this.request<T>({
-      ...rest,
-      headers: {
+    let authHeaders = headers
+    if (this.userToken.value) {
+      authHeaders = {
         ...headers,
         Authorization: `Bearer ${this.userToken.value}`,
-      },
+      }
+    }
+    return this.request<T>({
+      ...rest,
+      headers: authHeaders,
     })
   }
 
