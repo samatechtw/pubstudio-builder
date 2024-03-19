@@ -26,15 +26,15 @@ describe('Create Custom Table', () => {
     api = supertest(testConfig.get('apiUrl'))
     adminAuth = adminAuthHeader()
     resetService = new SiteApiResetService('http://127.0.0.1:3100', adminAuth, SITE_SEEDS)
+  })
+
+  beforeEach(async () => {
+    siteId = '6d2c8359-6094-402c-bcbb-37202fd7c336'
     tableName = 'custom_table'
     payload = {
       action: Action.CreateTable,
       data: mockCreateTablePayload(tableName),
     }
-  })
-
-  beforeEach(async () => {
-    siteId = '6d2c8359-6094-402c-bcbb-37202fd7c336'
     await resetService.reset()
   })
 
