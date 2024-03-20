@@ -20,6 +20,7 @@ export const makeAddBuiltinComponentData = (
     content: builtinComponent.content,
     ...selectAddParent(parent, undefined),
     sourceId: builtinComponent.id,
+    children: builtinComponent.children,
     inputs: structuredClone(builtinComponent.inputs),
     events: structuredClone(builtinComponent.events),
     editorEvents: structuredClone(builtinComponent.editorEvents),

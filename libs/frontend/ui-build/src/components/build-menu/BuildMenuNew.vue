@@ -82,6 +82,11 @@
         :text="t('build.divider_vertical')"
         :builtinComponentId="dividerVertical.id"
       />
+      <NewComponent
+        class="new-divider-vertical"
+        :text="t('build.contact_form')"
+        :builtinComponentId="contactForm.id"
+      />
     </div>
   </div>
 </template>
@@ -112,6 +117,7 @@ import {
   svg,
   dividerVertical,
   dividerHorizontal,
+  contactForm,
 } from '@pubstudio/frontend/util-builtin'
 import NewComponent from './NewComponent.vue'
 

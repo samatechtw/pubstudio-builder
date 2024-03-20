@@ -4,7 +4,8 @@ use lib_shared_site_api::{
         db_error::DbError,
         sites_seed_data::{
             make_namespace, make_site_context, make_site_editor, make_site_history,
-            make_site_pages, sites_seed_data, SITE_SEED_DEFAULTS, SITE_SEED_VERSION,
+            make_site_pages, sites_seed_data, SITE_SEED_CONTACT_TABLE, SITE_SEED_DEFAULTS,
+            SITE_SEED_VERSION,
         },
     },
     error::api_error::ApiError,
@@ -15,7 +16,12 @@ use lib_shared_types::{
     shared::core::ExecEnv,
 };
 
-use crate::{api_context::ApiContext, app::site::create_site::create_site_helper};
+use crate::{
+    api_context::ApiContext,
+    app::{
+        custom::create_table::create_custom_table_helper, site::create_site::create_site_helper,
+    },
+};
 
 pub async fn reset_all(
     State(context): State<ApiContext>,
@@ -64,7 +70,7 @@ pub async fn reset_all(
                 create_site_helper(
                     &context,
                     CreateSiteDto {
-                        id: site_id,
+                        id: site_id.clone(),
                         owner_id: data.owner_id.to_string(),
                         name: data.name.clone(),
                         version: SITE_SEED_VERSION.into(),
@@ -81,6 +87,13 @@ pub async fn reset_all(
                         ),
                         site_type: data.site_type.clone(),
                     },
+                )
+                .await?;
+
+                create_custom_table_helper(
+                    &context,
+                    &site_id,
+                    serde_json::from_str(SITE_SEED_CONTACT_TABLE).unwrap(),
                 )
                 .await?;
             }

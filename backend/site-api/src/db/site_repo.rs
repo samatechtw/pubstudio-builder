@@ -23,15 +23,14 @@ use sqlx::{
     Error, QueryBuilder, Row, SqlitePool,
 };
 use std::{
-    collections::HashMap,
     fs::{self, File},
     io::Write,
     sync::Arc,
 };
-use tokio::sync::RwLock;
+
 use uuid::Uuid;
 
-pub type SiteDbPools = RwLock<HashMap<String, SqlitePool>>;
+use super::site_db_pool_manager::DbPoolManager;
 
 pub type DynSiteRepo = Arc<dyn SiteRepoTrait + Send + Sync>;
 
@@ -77,7 +76,7 @@ pub trait SiteRepoTrait {
 }
 
 pub struct SiteRepo {
-    pub site_db_pools: SiteDbPools,
+    pub db_pool_manager: DbPoolManager,
     pub manifest_dir: String,
 }
 
@@ -88,38 +87,9 @@ impl SiteRepoTrait for SiteRepo {
     }
 
     async fn get_db_pool(&self, id: &str) -> Result<SqlitePool, DbError> {
-        let try_connect;
-        {
-            let db_pools = self.site_db_pools.read().await;
-            if let Some(pool) = db_pools.get(id) {
-                if pool.is_closed() {
-                    print!("DB pool is closed");
-                    try_connect = true;
-                } else {
-                    return Ok(pool.clone());
-                }
-            } else {
-                try_connect = true;
-            }
-        }
-        // Read lock is released
-        if try_connect {
-            let mut db_pools = self.site_db_pools.write().await;
-            let site_db_url = self.site_db_url(id);
-
-            if let Some(pool) = db_pools.get_mut(id) {
-                *pool = SqlitePool::connect(&site_db_url)
-                    .await
-                    .map_err(|e| DbError::NoDb(e.to_string()))?;
-                return Ok(pool.clone());
-            } else {
-                if let Ok(new_pool) = SqlitePool::connect(&site_db_url).await {
-                    db_pools.insert(id.to_string(), new_pool.clone());
-                    return Ok(new_pool.clone());
-                }
-            }
-        }
-        Err(DbError::NoDb("Failed to get DB pool".into()))
+        self.db_pool_manager
+            .get_db_pool(id, &self.manifest_dir)
+            .await
     }
 
     async fn create_site(&self, req: CreateSiteDto) -> Result<SiteEntity, DbError> {
@@ -285,8 +255,9 @@ impl SiteRepoTrait for SiteRepo {
         let pool = SqlitePoolOptions::new().connect(&site_db_url).await?;
 
         // Insert the connection pool into the map.
-        let mut db_pools = self.site_db_pools.write().await;
-        db_pools.insert(id.to_string(), pool.clone());
+        self.db_pool_manager
+            .insert_db_pool(id, pool.clone())
+            .await?;
 
         self.migrate_db(&pool).await?;
 
@@ -317,15 +288,7 @@ impl SiteRepoTrait for SiteRepo {
 
         if sqlx::Sqlite::database_exists(&site_db_url).await? {
             // Remove the connection pool from the map
-            let mut db_pools = self.site_db_pools.write().await;
-
-            match db_pools.get(id) {
-                Some(&ref pool) => {
-                    pool.close().await;
-                    db_pools.remove(id);
-                }
-                _ => println!("DB pool not found"),
-            }
+            self.db_pool_manager.remove_db_pool(id).await?;
 
             // Delete the database
             sqlx::Sqlite::drop_database(&site_db_url).await?;
@@ -487,15 +450,8 @@ impl SiteRepoTrait for SiteRepo {
 
     async fn import_backup(&self, id: &str, backup_data: Vec<u8>) -> Result<(), DbError> {
         // Close the current DB connection/pool
-        let mut db_pools = self.site_db_pools.write().await;
+        self.db_pool_manager.remove_db_pool(id).await?;
 
-        match db_pools.get(id) {
-            Some(&ref pool) => {
-                pool.close().await;
-                db_pools.remove(id);
-            }
-            _ => println!("DB pool has already been closed"),
-        }
         // Replace the database file
         let backup_file = format!("db/sites/site_{}.db", id);
         let mut file = File::create(&backup_file).map_err(|e| DbError::FileError(e.to_string()))?;
@@ -507,7 +463,9 @@ impl SiteRepoTrait for SiteRepo {
         // Create new DB pool
         let site_db_url = self.site_db_url(id);
         let pool = SqlitePoolOptions::new().connect(&site_db_url).await?;
-        db_pools.insert(id.to_string(), pool.clone());
+        self.db_pool_manager
+            .insert_db_pool(id, pool.clone())
+            .await?;
 
         // Run migrations in case a new one was added since the snapshot was saved
         Ok(self.migrate_db(&pool).await?)

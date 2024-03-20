@@ -77,3 +77,6 @@ export const headerNavMenuId = componentId(defaultContext.namespace, 'headerNavM
 
 export const textareaStyleId = nextStyleId(defaultContext)
 export const textareaId = componentId(defaultContext.namespace, 'textarea')
+
+// Advanced
+export const contactFormId = componentId(defaultContext.namespace, 'contactform')

@@ -41,6 +41,7 @@ pub enum ApiErrorCode {
     SiteUnpublished,
     SubdomainReserved,
     SubdomainTaken,
+    CustomTableNameExists,
     None,
 }
 

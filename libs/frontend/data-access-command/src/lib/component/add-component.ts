@@ -50,7 +50,22 @@ export const addComponentHelper = (site: ISite, data: IAddComponentData): ICompo
     parent.children.splice(parentIndex, 0, component)
   }
   context.components[id] = component
-  if (sourceComponent?.children) {
+  // Children overridden in builtin component definition take precedence
+  if (data.children) {
+    for (const child of data.children) {
+      addComponentHelper(site, {
+        name: child.name,
+        tag: child.tag,
+        content: child.content,
+        parentId: id,
+        sourceId: child.id,
+        children: child.children,
+        inputs: clone(child.inputs),
+        style: clone(child.style),
+      })
+    }
+  } else if (sourceComponent?.children) {
+    // Add defaults from builtin component
     for (const child of sourceComponent.children) {
       if (isDynamicComponent(child.id)) {
         console.log('Skip adding dynamic component', child.id)

@@ -2,7 +2,8 @@ import { CommandType, ICommand } from '@pubstudio/shared/type-command'
 import { IAddComponentData } from './i-add-component-data'
 
 // We need to be able to recreate the component for undo
-export interface IRemoveComponentData extends Omit<IAddComponentData, 'childIds'> {
+export interface IRemoveComponentData
+  extends Omit<IAddComponentData, 'childIds' | 'children'> {
   id: string
   children?: IRemoveComponentData[]
   parentIndex: number

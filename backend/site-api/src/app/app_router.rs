@@ -1,6 +1,6 @@
 use crate::api_context::ApiContext;
 
-use crate::app::{health, publish, site, usage};
+use crate::app::{custom, health, publish, site, usage};
 use crate::middleware::auth::{auth_admin, auth_admin_owner, error_cache};
 use axum::handler::Handler;
 
@@ -100,6 +100,11 @@ fn api_router(context: &ApiContext) -> Router<ApiContext> {
         .route(
             "/sites/:site_id/actions/delete_draft",
             delete(publish::delete_draft::delete_draft)
+                .route_layer(from_fn_with_state(context.clone(), auth_admin_owner)),
+        )
+        .route(
+            "/sites/:site_id/custom_data",
+            post(custom::custom_data::custom_data)
                 .route_layer(from_fn_with_state(context.clone(), auth_admin_owner)),
         )
         .route(

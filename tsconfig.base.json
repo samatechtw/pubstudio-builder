@@ -91,6 +91,9 @@
       "@pubstudio/shared/type-api-site-backup": [
         "libs/shared/type-api-site-backup/src/index.ts"
       ],
+      "@pubstudio/shared/type-api-site-custom-data": [
+        "libs/shared/type-api-site-custom-data/src/index.ts"
+      ],
       "@pubstudio/shared/type-api-site-sites": [
         "libs/shared/type-api-site-sites/src/index.ts"
       ],
