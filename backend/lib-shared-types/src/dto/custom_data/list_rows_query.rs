@@ -1,3 +1,5 @@
+use std::collections::BTreeMap;
+
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 
@@ -14,10 +16,10 @@ pub struct ListRowsQuery {
     pub to: i32,
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Debug)]
 pub struct ListRowsResponse {
-    pub total: usize,
-    pub results: Vec<serde_json::Value>,
+    pub total: i64,
+    pub results: Vec<BTreeMap<String, String>>,
 }
 
 fn default_from() -> i32 {
