@@ -11,7 +11,7 @@ use super::custom_data::parse_request_data;
 {
   "action": "ListRows",
   "data": {
-    "table_name": "custom_table",
+    "table_name": "contact_form",
     "from": 1,
     "to": 10
   }
@@ -22,13 +22,14 @@ pub async fn list_rows(
     site_id: &String,
     data: Value,
 ) -> Result<ListRowsResponse, ApiError> {
-    let dto: ListRowsQuery = parse_request_data(data)?;
-    check_bad_form(dto.validate())?;
+    let query: ListRowsQuery = parse_request_data(data)?;
+    check_bad_form(query.validate())?;
 
-    println!("table_name: {}", dto.table_name);
+    let rows = context
+        .custom_data_repo
+        .list_rows(site_id, query)
+        .await
+        .map_err(|e| ApiError::internal_error().message(e))?;
 
-    Ok(ListRowsResponse {
-        total: 0,
-        results: vec![],
-    })
+    Ok(rows)
 }

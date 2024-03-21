@@ -27,14 +27,18 @@ pub async fn list_tables(
     let query: ListTablesQuery = parse_request_data(data)?;
     check_bad_form(query.validate())?;
 
-    let results = context
+    let tables = context
         .custom_data_info_repo
         .list_tables(site_id, query)
         .await
         .map_err(|e| ApiError::internal_error().message(e))?;
 
     Ok(ListTablesResponse {
-        total: results.len(),
-        results: results.into_iter().map(|r| to_api_response(r)).collect(),
+        total: tables.total,
+        results: tables
+            .results
+            .into_iter()
+            .map(|r| to_api_response(r))
+            .collect(),
     })
 }
