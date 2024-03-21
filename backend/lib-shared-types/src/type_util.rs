@@ -13,6 +13,8 @@ lazy_static! {
     pub static ref REGEX_ARRAY: Regex = Regex::new(r"^\[.*\]$").unwrap();
     pub static ref REGEX_PORT: Regex = Regex::new(r":\d+$").unwrap();
     pub static ref REGEX_SITE_NAME: Regex = Regex::new(r"^[a-zA-Z0-9 ]{2,50}$").unwrap();
+    pub static ref REGEX_EMAIL: Regex =
+        Regex::new(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$").unwrap();
 }
 
 pub fn is_uuid(str: &str) -> bool {
@@ -41,4 +43,8 @@ pub fn is_array(str: &str) -> bool {
 
 pub fn is_port(str: &str) -> bool {
     REGEX_PORT.is_match(str)
+}
+
+pub fn is_email(str: &str) -> bool {
+    REGEX_EMAIL.is_match(str)
 }

@@ -3,7 +3,7 @@ use lib_shared_types::dto::custom_data::update_row_dto::{UpdateRow, UpdateRowRes
 use serde_json::{json, Value};
 use validator::Validate;
 
-use crate::api_context::ApiContext;
+use crate::{api_context::ApiContext, app::custom::helpers::validate_row_data};
 
 use super::custom_data::parse_request_data;
 
@@ -26,6 +26,9 @@ pub async fn update_row(
 ) -> Result<UpdateRowResponse, ApiError> {
     let dto: UpdateRow = parse_request_data(data)?;
     check_bad_form(dto.validate())?;
+
+    // Validate data by checking columns in custom_data_info
+    validate_row_data(context, site_id, &dto.table_name, &dto.new_row).await?;
 
     println!("id: {}", dto.row_id);
     for (k, v) in &dto.new_row {

@@ -10,7 +10,7 @@ use lib_shared_site_api::{
 };
 use lib_shared_types::{
     dto::custom_data::custom_data_dto::{Action, CustomDataDto},
-    shared::user::RequestUser,
+    shared::user::{RequestUser, UserType},
 };
 use serde::de::DeserializeOwned;
 
@@ -36,7 +36,12 @@ pub async fn custom_data(
     PsJson(dto): PsJson<CustomDataDto>,
 ) -> Result<(StatusCode, Response), ApiError> {
     check_bad_form(dto.validate())?;
-    verify_site_owner(&context, &user, &id).await?;
+    if dto.action != Action::AddRow && user.user_type == UserType::Anonymous {
+        return Err(ApiError::forbidden());
+    }
+    if dto.action != Action::AddRow {
+        verify_site_owner(&context, &user, &id).await?;
+    }
 
     return match dto.action {
         Action::CreateTable => {

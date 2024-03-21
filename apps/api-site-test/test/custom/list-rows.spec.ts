@@ -1,17 +1,22 @@
 import {
   Action,
   ICustomDataApiRequest,
-  IListTablesResponse,
+  IListRowsResponse,
 } from '@pubstudio/shared/type-api-site-custom-data'
 import { SiteApiResetService } from '@pubstudio/shared/util-test-reset'
 import supertest from 'supertest'
 import TestAgent from 'supertest/lib/agent'
 import { adminAuthHeader, ownerAuthHeader } from '../helpers/auth-helpers'
-import { mockListTablesPayload } from '../mocks/mock-list-tables-payload'
+import {
+  mockAddRowPayload1,
+  mockAddRowPayload2,
+  mockAddRowPayload3,
+} from '../mocks/mock-add-row-payload'
+import { mockListRowsPayload } from '../mocks/mock-list-rows-payload'
 import { SITE_SEEDS } from '../mocks/site-seeds'
 import { testConfig } from '../test.config'
 
-describe('List Custom Tables', () => {
+describe('List Rows', () => {
   const testEndpoint = (siteId: string) => `/api/sites/${siteId}/custom_data`
   let api: TestAgent
   let resetService: SiteApiResetService
@@ -24,8 +29,8 @@ describe('List Custom Tables', () => {
     adminAuth = adminAuthHeader()
     resetService = new SiteApiResetService('http://127.0.0.1:3100', adminAuth, SITE_SEEDS)
     payload = {
-      action: Action.ListTables,
-      data: mockListTablesPayload(),
+      action: Action.ListRows,
+      data: mockListRowsPayload('contact_form'),
     }
   })
 
@@ -34,22 +39,80 @@ describe('List Custom Tables', () => {
     await resetService.reset()
   })
 
-  it('list tables when requester is admin', async () => {
+  it('list rows when requester is admin', async () => {
     const res = await api
       .post(testEndpoint(siteId))
       .set('Authorization', adminAuth)
       .send(payload)
       .expect(200)
 
-    const body: IListTablesResponse = res.body
-    expect(body.total).toEqual(1)
-    expect(body.results[0].id).toEqual('1')
-    expect(body.results[0].name).toEqual('contact_form')
+    const beforeLen = 0
+    const body: IListRowsResponse = res.body
+    expect(body.total).toEqual(beforeLen)
+
+    // Add Row
+    const addPayload = {
+      action: Action.AddRow,
+      data: mockAddRowPayload1(),
+    }
+
+    await api
+      .post(testEndpoint(siteId))
+      .set('Authorization', adminAuth)
+      .send(addPayload)
+      .expect(204)
+
+    // Verify
+    const res1 = await api
+      .post(testEndpoint(siteId))
+      .set('Authorization', adminAuth)
+      .send(payload)
+      .expect(200)
+
+    const body1: IListRowsResponse = res1.body
+    expect(body1.total).toEqual(beforeLen + 1)
   })
 
-  it('list tables when requester is owner', async () => {
+  it('list rows when requester is owner and filtering from 2 to 3', async () => {
     const ownerId = '903b3c28-deaa-45dc-a43f-511fe965d34e'
     const ownerAuth = ownerAuthHeader(ownerId)
+
+    // Add Rows
+    const addPayload1 = {
+      action: Action.AddRow,
+      data: mockAddRowPayload1(),
+    }
+
+    await api
+      .post(testEndpoint(siteId))
+      .set('Authorization', ownerAuth)
+      .send(addPayload1)
+      .expect(204)
+
+    const addPayload2 = {
+      action: Action.AddRow,
+      data: mockAddRowPayload2(),
+    }
+
+    await api
+      .post(testEndpoint(siteId))
+      .set('Authorization', ownerAuth)
+      .send(addPayload2)
+      .expect(204)
+
+    const addPayload3 = {
+      action: Action.AddRow,
+      data: mockAddRowPayload3(),
+    }
+
+    await api
+      .post(testEndpoint(siteId))
+      .set('Authorization', ownerAuth)
+      .send(addPayload3)
+      .expect(204)
+
+    // List
+    payload.data = mockListRowsPayload('contact_form', 2, 3)
 
     const res = await api
       .post(testEndpoint(siteId))
@@ -57,10 +120,17 @@ describe('List Custom Tables', () => {
       .send(payload)
       .expect(200)
 
-    const body: IListTablesResponse = res.body
-    expect(body.total).toEqual(1)
-    expect(body.results[0].id).toEqual('1')
-    expect(body.results[0].name).toEqual('contact_form')
+    const body: IListRowsResponse = res.body
+
+    expect(body.total).toEqual(3)
+
+    expect(body.results[0]['name']).toEqual('Andy')
+    expect(body.results[0]['age']).toEqual('40')
+    expect(body.results[0]['email']).toEqual('andy123@gmail.com')
+
+    expect(body.results[1]['name']).toEqual('Flora')
+    expect(body.results[1]['age']).toEqual('18')
+    expect(body.results[1]['email']).toEqual('flora@samatech.com')
   })
 
   describe('when request is not valid', () => {
