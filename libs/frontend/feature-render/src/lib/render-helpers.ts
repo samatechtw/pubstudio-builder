@@ -3,27 +3,37 @@ import { triggerEventBehaviors } from '@pubstudio/frontend/util-runtime'
 import { IComponent, IEventCollection, ISite } from '@pubstudio/shared/type-site'
 
 export const computeEvents = (site: ISite, component: IComponent): IEventCollection => {
-  const reusableCmp = resolveComponent(site.context, component.reusableSourceId)
-  const cmpEvents = reusableCmp?.events ?? component.events
-
   const events: IEventCollection = {
     native: {},
     custom: {},
   }
 
-  for (const event of Object.values(cmpEvents ?? {})) {
-    const nativeEventName = NativeEvents[event.name]
+  const appendEvents = (cmp: IComponent) => {
+    for (const event of Object.values(cmp.events ?? {})) {
+      const nativeEventName = NativeEvents[event.name]
 
-    const eventHandler = (_e: Event | undefined) => {
-      triggerEventBehaviors(event.behaviors, site, component)
-    }
+      const eventHandler = (_e: Event | undefined) => {
+        triggerEventBehaviors(event.behaviors, site, component)
+      }
 
-    if (nativeEventName) {
-      events.native[nativeEventName] = eventHandler
-    } else {
-      events.custom[event.name] = [eventHandler, event.eventParams]
+      if (nativeEventName) {
+        events.native[nativeEventName] = eventHandler
+      } else {
+        events.custom[event.name] = [eventHandler, event.eventParams]
+      }
     }
   }
+
+  const reusableCmp = resolveComponent(site.context, component.reusableSourceId)
+
+  // Append reusable source events
+  if (reusableCmp) {
+    appendEvents(reusableCmp)
+  }
+
+  // Append component events
+  appendEvents(component)
+
   return events
 }
 

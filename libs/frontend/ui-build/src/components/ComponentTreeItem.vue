@@ -92,7 +92,13 @@ const { component, level, componentIndex } = toRefs(props)
 const { site, editor } = useBuild()
 
 const nonDynamicComponent = computed(() => findNonDynamic(component.value))
-const canDrag = computed(() => !!nonDynamicComponent.value?.parent)
+const canDrag = computed(
+  () =>
+    !!nonDynamicComponent.value?.parent &&
+    (!component.value.parent ||
+      // Prevent reusable instance children from being dragged.
+      !component.value.parent.reusableSourceId),
+)
 
 const mouseEnter = () => {
   runtimeContext.hoveredComponentIdInComponentTree.value = component.value.id

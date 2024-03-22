@@ -4,7 +4,13 @@
     class="reusable-component"
     :class="{ dragging: dndState?.dragging }"
     :title="text"
+    :draggable="true"
+    @mouseenter.stop="mouseEnter"
+    @mouseleave.stop="mouseLeave"
     @click="addReusableComponent"
+    @dragstart="dragstart"
+    @dragend="dragend"
+    @drag="drag"
   >
     {{ text }}
   </div>
@@ -13,12 +19,17 @@
 <script lang="ts" setup>
 import { computed, toRefs } from 'vue'
 import { useBuild } from '@pubstudio/frontend/feature-build'
-import { useDragDrop } from '@pubstudio/frontend/feature-render-builder'
 import {
-  makeAddBuiltinComponentData,
+  DraggedComponentAddDataType,
+  useDragDrop,
+} from '@pubstudio/frontend/feature-render-builder'
+import {
   makeAddComponentFromReusableData,
+  selectAddParent,
 } from '@pubstudio/frontend/util-command-data'
 import { IComponent } from '@pubstudio/shared/type-site'
+import { clone } from '@pubstudio/frontend/util-component'
+import { runtimeContext } from '@pubstudio/frontend/util-runtime'
 
 const props = defineProps<{
   reusableComponent: IComponent
@@ -50,20 +61,34 @@ const addReusableComponent = () => {
   }
 }
 
-const { dndState, elementRef, dragstart, drag, dragenter, dragover, dragleave, dragend } =
-  useDragDrop({
-    site: site.value,
-    componentId: reusableComponent.value.id,
-    getParentId: () => undefined,
-    getComponentIndex: () => 0,
-    isParent: false,
-    addData: makeAddBuiltinComponentData(
-      site.value,
-      reusableComponent.value.id,
-      activePage.value?.root as IComponent,
-      editor.value?.selectedComponent?.id,
-    ),
-  })
+const { dndState, elementRef, dragstart, drag, dragend } = useDragDrop({
+  site: site.value,
+  componentId: reusableComponent.value.id,
+  getParentId: () => undefined,
+  getComponentIndex: () => 0,
+  isParent: false,
+  addData: {
+    type: DraggedComponentAddDataType.ReusableComponent,
+    name: reusableComponent.value.name,
+    tag: reusableComponent.value.tag,
+    content: reusableComponent.value.content,
+    ...selectAddParent(activePage.value?.root as IComponent, undefined),
+    sourceId: undefined,
+    reusableComponentId: reusableComponent.value.id,
+    inputs: clone(reusableComponent.value.inputs),
+    events: clone(reusableComponent.value.events),
+    editorEvents: clone(reusableComponent.value.editorEvents),
+    selectedComponentId: editor.value?.selectedComponent?.id,
+  },
+})
+
+const mouseEnter = () => {
+  runtimeContext.hoveredComponentIdInComponentTree.value = reusableComponent.value.id
+}
+
+const mouseLeave = () => {
+  runtimeContext.hoveredComponentIdInComponentTree.value = undefined
+}
 </script>
 
 <style lang="postcss" scoped>

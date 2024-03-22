@@ -8,11 +8,14 @@ export const addReusableComponentHelper = (
   data: IAddReusableComponentData,
 ) => {
   const { context, editor } = site
-  const component = resolveComponent(context, data.componentId)
-
-  if (editor && component && !isDynamicComponent(component.id)) {
-    editor.reusableComponentIds.add(component.id)
-    component.isReusable = true
+  if (editor) {
+    data.componentIds.forEach((componentId) => {
+      const component = resolveComponent(context, componentId)
+      if (component && !isDynamicComponent(component.id)) {
+        editor.reusableComponentIds.add(component.id)
+        component.isReusable = true
+      }
+    })
   }
 }
 
@@ -23,22 +26,24 @@ export const applyAddReusableComponent = (
   addReusableComponentHelper(site, data)
 }
 
-export const deleteReusableComponentWithId = (
+export const deleteReusableComponentWithIds = (
   site: ISite,
-  reusableComponentId?: string,
+  reusableComponentIds: string[],
 ) => {
   const { context, editor } = site
-  const reusableCmp = resolveComponent(context, reusableComponentId)
-  if (reusableCmp && editor) {
-    editor.reusableComponentIds.delete(reusableCmp.id)
-    reusableCmp.isReusable = undefined
-  }
+  reusableComponentIds.forEach((componentId) => {
+    const reusableCmp = resolveComponent(context, componentId)
+    if (reusableCmp && editor) {
+      editor.reusableComponentIds.delete(reusableCmp.id)
+      delete reusableCmp.isReusable
+    }
+  })
 }
 
 export const undoAddReusableComponent = (
   site: ISite,
   data: IAddReusableComponentData,
 ) => {
-  const { componentId } = data
-  deleteReusableComponentWithId(site, componentId)
+  const { componentIds } = data
+  deleteReusableComponentWithIds(site, componentIds)
 }

@@ -7,7 +7,6 @@
       :value="tag"
       class="component-tag"
       :options="TagValues"
-      :disabled="disabled"
       :clearable="false"
       @select="setTag"
       @click.stop
@@ -23,7 +22,6 @@ import { PSMultiselect } from '@pubstudio/frontend/ui-widgets'
 
 const props = defineProps<{
   tag: Tag
-  disabled?: boolean
 }>()
 const { tag } = toRefs(props)
 const emit = defineEmits<{

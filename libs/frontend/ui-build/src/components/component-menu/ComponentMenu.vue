@@ -26,8 +26,9 @@
       <ComponentInputs
         :component="component"
         :siteId="siteId"
-        @setInput="setInputIs($event)"
+        @setInput="upsertInput($event)"
         @showEditInput="setEditedInput($event)"
+        @removeInput="removeInput($event)"
       />
       <ComponentEvents
         :component="component"
@@ -112,14 +113,8 @@ const props = defineProps<{
 }>()
 const { component } = toRefs(props)
 
-const {
-  isEditingInput,
-  editedInput,
-  setEditedInput,
-  upsertInput,
-  removeInput,
-  setInputIs,
-} = useEditComponentInput()
+const { isEditingInput, editedInput, setEditedInput, upsertInput, removeInput } =
+  useEditComponentInput()
 
 const { isEditingEvent, editedEvent, setEditedEvent, upsertEvent, removeEvent } =
   useEditComponentEvent()

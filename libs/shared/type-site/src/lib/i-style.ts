@@ -63,4 +63,5 @@ export enum StyleSourceType {
   Is = 'is',
   // Component custom style
   Custom = 'custom',
+  ReusableComponent = 'reusableComponent',
 }

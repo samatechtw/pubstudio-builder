@@ -18,7 +18,7 @@ const addChildrenHelper = (
   site: ISite,
   parentId: string,
   children: IComponent[],
-  sourceField: keyof Pick<IAddComponentData, 'sourceId' | 'reusableComponentId'>,
+  sourceField: 'sourceId' | 'reusableComponentId',
 ) => {
   for (const child of children) {
     if (isDynamicComponent(child.id)) {
@@ -87,29 +87,40 @@ export const addComponentHelper = (site: ISite, data: IAddComponentData): ICompo
       tag: component.tag,
       content: undefined,
       children: component.children,
-      inputs: clone(reusableCmp.inputs),
-      events: clone(reusableCmp.events),
+      // Only overridden inputs will be added to a reusable instance.
+      inputs: {},
+      // Only overridden events will be added to a reusable instance.
+      events: {},
       editorEvents: clone(reusableCmp.editorEvents),
       style: { custom: {} },
       reusableSourceId: reusableCmp.id,
     }
   }
 
+  let parentNewChildren = parent?.children ? [...parent.children] : undefined
+
   if (!parent) {
     // Pages have a root component by default
     // A Component without a parent is a template
   } else if (!parent.children) {
-    parent.children = [component]
+    parentNewChildren = [component]
   } else if (parentIndex === undefined) {
-    parent.children.push(component)
+    parentNewChildren?.push(component)
   } else {
-    parent.children.splice(parentIndex, 0, component)
+    parentNewChildren?.splice(parentIndex, 0, component)
   }
+
   context.components[id] = component
   if (sourceComponent?.children) {
     addChildrenHelper(site, id, sourceComponent.children, 'sourceId')
   } else if (reusableCmp?.children) {
     addChildrenHelper(site, id, reusableCmp.children, 'reusableComponentId')
+  }
+
+  // Update `parent.children` after `addChildrenHelper` to avoid infinite loop
+  // when a reusable component is inserted as a instance of itself.
+  if (parent) {
+    parent.children = parentNewChildren
   }
 
   // Copy override styles and assign them to new children where possible

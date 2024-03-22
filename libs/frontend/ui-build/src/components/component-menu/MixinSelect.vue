@@ -8,6 +8,7 @@
       :options="mixinOptions"
       :searchable="true"
       :clearable="false"
+      :disabled="isInherited"
       @select="
         emit('set', { oldMixinId: mixin?.id, newMixinId: $event?.value as string })
       "
@@ -18,29 +19,37 @@
       <ScaleOut v-if="!isNew" class="out-icon" @click="flatten" />
     </IconTooltipDelay>
     <Edit v-if="mixin?.id" class="edit-icon" @click="emit('edit', mixin.id)" />
-    <Minus class="item-delete" @click.stop="emit('remove', mixin?.id)" />
+    <InfoBubble v-if="isInherited" class="inherited-from" :message="inheritedMessage" />
+    <Minus v-else class="item-delete" @click.stop="emit('remove', mixin?.id)" />
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { computed, ref, toRefs } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { IStyle } from '@pubstudio/shared/type-site'
 import {
   Edit,
   IconTooltipDelay,
+  InfoBubble,
   Minus,
   PSMultiselect,
   ScaleOut,
 } from '@pubstudio/frontend/ui-widgets'
+import { useBuild } from '@pubstudio/frontend/feature-build'
 
 const { t } = useI18n()
 
-defineProps<{
+const props = defineProps<{
   isNew?: boolean
   mixin?: IStyle | undefined
   mixinOptions: { label: string; value: string }[]
+  sourceReusableComponentId?: string
 }>()
+
+const { sourceReusableComponentId } = toRefs(props)
+
+const isInherited = computed(() => !!sourceReusableComponentId.value)
 
 interface ISetMixinEmit {
   oldMixinId?: string
@@ -54,6 +63,8 @@ const emit = defineEmits<{
   (e: 'flatten'): void
 }>()
 
+const { site } = useBuild()
+
 const flattenRef = ref()
 const multiselectRef = ref()
 
@@ -61,6 +72,17 @@ const flatten = () => {
   flattenRef.value?.cancelHoverTimer()
   emit('flatten')
 }
+
+const inheritedMessage = computed(() => {
+  if (sourceReusableComponentId.value) {
+    const sourceName =
+      site.value.context.components[sourceReusableComponentId.value]?.name
+    return t('style.inherited_source', {
+      source: `${sourceName}#${sourceReusableComponentId.value}`,
+    })
+  }
+  return undefined
+})
 
 defineExpose({ multiselectRef })
 </script>

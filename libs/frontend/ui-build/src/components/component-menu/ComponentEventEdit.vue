@@ -86,7 +86,7 @@
         @click.stop="save"
       />
       <PSButton
-        v-if="editedEvent"
+        v-if="editedEvent && canDelete"
         class="delete-button"
         :text="t('delete')"
         :secondary="true"
@@ -177,7 +177,7 @@ const editOrNewEvent = (
 import { ref, toRefs } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { ErrorMessage, PSButton, PSMultiselect } from '@pubstudio/frontend/ui-widgets'
-import { resolveBehavior } from '@pubstudio/frontend/util-builtin'
+import { resolveBehavior, resolveComponent } from '@pubstudio/frontend/util-builtin'
 import { builtinBehaviors } from '@pubstudio/frontend/util-builtin'
 import { noBehavior } from '@pubstudio/frontend/feature-builtin'
 import MenuRow from '../MenuRow.vue'
@@ -203,6 +203,14 @@ const emit = defineEmits<{
 
 const newEvent = ref<IResolvedComponentEvent>(editOrNewEvent(editedEvent.value))
 const inputError = ref()
+
+const canDelete = computed(() => {
+  const { selectedComponent } = editor.value ?? {}
+  if (editedEvent.value && selectedComponent?.events) {
+    return editedEvent.value.name in selectedComponent.events
+  }
+  return false
+})
 
 const addEventBehavior = () => {
   newEvent.value.behaviors.push({

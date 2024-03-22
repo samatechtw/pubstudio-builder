@@ -33,6 +33,7 @@
       <Edit class="edit-icon" @click="edit" />
       <slot />
       <Settings v-if="showEditInput" class="edit-icon" @click="emit('editInput')" />
+      <Minus v-else-if="showReset" class="reset-icon" @click="emit('reset')" />
     </template>
   </div>
 </template>
@@ -40,7 +41,7 @@
 <script lang="ts" setup>
 import { computed, ref, toRefs } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
-import { Check, Checkbox, Edit, PSInput } from '@pubstudio/frontend/ui-widgets'
+import { Check, Checkbox, Edit, Minus, PSInput } from '@pubstudio/frontend/ui-widgets'
 import { IDatalistOption } from '@pubstudio/frontend/type-ui-widgets'
 import { Settings } from '@pubstudio/frontend/ui-widgets'
 import { ComponentArgType, ComponentArgPrimitive, Tag } from '@pubstudio/shared/type-site'
@@ -65,6 +66,7 @@ const props = withDefaults(
     // For datalist in PSInput
     componentId?: string
     showEditInput?: boolean
+    showReset?: boolean
     error?: boolean
   }>(),
   {
@@ -78,6 +80,7 @@ const { property, value, argType, tag, componentId, error } = toRefs(props)
 const emit = defineEmits<{
   (e: 'update', value: unknown): void
   (e: 'editInput'): void
+  (e: 'reset'): void
 }>()
 
 const newValue = ref(value.value)
@@ -134,6 +137,13 @@ const datalist = computed<IDatalistOption[] | undefined>(() => {
 
 .edit-icon {
   flex-shrink: 0;
+}
+.reset-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  margin-left: 6px;
+  cursor: pointer;
 }
 .menu-row .label {
   max-width: 100px;

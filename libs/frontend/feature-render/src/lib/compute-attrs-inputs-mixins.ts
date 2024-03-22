@@ -39,20 +39,12 @@ export const computeAttrsInputsMixins = (
   const content = c.content ?? r?.content
 
   if (editor) {
-    // TODO -- is this still used? pseudo styles still seem to work without it
     const { cssPseudoClass } = editor
     if (cssPseudoClass !== CssPseudoClass.Default) {
       mixins.push(pseudoClassToCssClass(cssPseudoClass))
     }
   }
 
-  const resolveInput = (value: unknown): unknown => {
-    if (resolveTheme && typeof value === 'string') {
-      return resolveThemeVariables(context, value, false) ?? value
-    } else {
-      return value
-    }
-  }
   // Collect mixins
   if (c.style.mixins) {
     mixins.push(...c.style.mixins)
@@ -60,15 +52,37 @@ export const computeAttrsInputsMixins = (
   if (r?.style.mixins) {
     mixins.push(...r.style.mixins)
   }
+
   // Add attrs and inputs from default `inputs`
-  for (const [key, input] of Object.entries(c.inputs ?? {})) {
-    if (!inputs[key]) {
-      inputs[key] = resolveInput(input.is ?? input.default)
-    }
-    if (input.attr && !attrs[key]) {
-      attrs[key] = resolveInput(inputs[key] ?? input.default)
+  const resolveInput = (value: unknown): unknown => {
+    if (resolveTheme && typeof value === 'string') {
+      return resolveThemeVariables(context, value, false) ?? value
+    } else {
+      return value
     }
   }
+
+  if (r?.inputs) {
+    for (const [key, input] of Object.entries(r.inputs)) {
+      const resolvedVaue = resolveInput(input.is ?? input.default)
+      inputs[key] = resolvedVaue
+      if (input.attr) {
+        attrs[key] = resolvedVaue
+      }
+    }
+  }
+
+  if (c.inputs) {
+    // If the component is a reusable instance, only the overridden inputs will be in `c.inputs`.
+    for (const [key, input] of Object.entries(c.inputs)) {
+      const resolvedVaue = resolveInput(input.is ?? input.default)
+      inputs[key] = resolvedVaue
+      if (input.attr) {
+        attrs[key] = resolvedVaue
+      }
+    }
+  }
+
   // Add role
   if (!attrs.role && c.role) {
     attrs.role = c.role

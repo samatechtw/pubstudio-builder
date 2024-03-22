@@ -29,11 +29,7 @@
       @update="setContent"
     />
     <div class="tag-role">
-      <ComponentTag
-        :tag="component.tag"
-        :disabled="isReusableInstance"
-        @setTag="setTag"
-      />
+      <ComponentTag :tag="component.tag" @setTag="setTag" />
       <ComponentRole :role="component.role" @setRole="setRole" />
     </div>
     <!-- TODO: children UI
