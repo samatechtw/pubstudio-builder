@@ -1,4 +1,5 @@
 import { resolveComponent } from '@pubstudio/frontend/util-builtin'
+import { clone } from '@pubstudio/frontend/util-component'
 import { IAddComponentData } from '@pubstudio/shared/type-command-data'
 import { IComponent, ISite } from '@pubstudio/shared/type-site'
 import { selectAddParent } from './select-add-parent'
@@ -20,9 +21,9 @@ export const makeAddBuiltinComponentData = (
     content: builtinComponent.content,
     ...selectAddParent(parent, undefined),
     sourceId: builtinComponent.id,
-    inputs: structuredClone(builtinComponent.inputs),
-    events: structuredClone(builtinComponent.events),
-    editorEvents: structuredClone(builtinComponent.editorEvents),
+    inputs: clone(builtinComponent.inputs),
+    events: clone(builtinComponent.events),
+    editorEvents: clone(builtinComponent.editorEvents),
     selectedComponentId,
   }
   return data

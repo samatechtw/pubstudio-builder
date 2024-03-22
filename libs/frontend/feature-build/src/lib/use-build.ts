@@ -39,6 +39,7 @@ import {
   IAddComponentData,
   IAddComponentMixinData,
   IAddPageData,
+  IAddReusableComponentData,
   IAddStyleMixinData,
   IAddThemeFontData,
   IAddThemeVariableData,
@@ -145,6 +146,7 @@ export interface IUseBuild {
   replacePageRoot: (copiedComponentId: string, pageRoute: string) => void
   addBuiltinComponent: (id: string, parentId?: string) => void
   addBuiltinComponentData: (data: IAddComponentData) => void
+  addReusableComponentData: (data: IAddComponentData) => void
   editSelectedComponent: (fields: IEditComponentFields) => void
   editComponent: (component: IComponent, fields: IEditComponentFields) => void
   getSelectedComponent: () => IComponent
@@ -229,6 +231,7 @@ export interface IUseBuild {
     action: Action,
     params: IUpdateUiParams[Action],
   ) => void
+  addReusableComponent: (component: IComponent) => void
 }
 
 // Briefly indicates active command
@@ -355,6 +358,10 @@ export const useBuild = (): IUseBuild => {
   const addBuiltinComponentData = (data: IAddComponentData) => {
     const mixins = getMissingMixins(data.sourceId)
     pushCommandAndAddMissingMixins(CommandType.AddComponent, data, mixins)
+  }
+
+  const addReusableComponentData = (data: IAddComponentData) => {
+    pushCommand(site.value, CommandType.AddComponent, data)
   }
 
   const addBuiltinComponent = (id: string, parentId?: string) => {
@@ -1024,8 +1031,8 @@ export const useBuild = (): IUseBuild => {
   const deleteSelected = () => {
     const selected = site.value.editor?.selectedComponent
     const parent = selected?.parent
-    // Cannot delete root component
-    if (!activePage.value || !selected || !parent) {
+    // Cannot delete root component and reusable instance children
+    if (!activePage.value || !selected || !parent || parent.reusableSourceId) {
       return
     }
     const data = makeRemoveComponentData(site.value, selected)
@@ -1247,6 +1254,22 @@ export const useBuild = (): IUseBuild => {
     pushCommand(site.value, CommandType.UpdateUi, data)
   }
 
+  const addReusableComponent = (component: IComponent) => {
+    const componentIds: string[] = []
+
+    const recurse = (cmp: IComponent) => {
+      componentIds.push(cmp.id)
+      cmp.children?.forEach(recurse)
+    }
+
+    recurse(component)
+
+    const data: IAddReusableComponentData = {
+      componentIds,
+    }
+    pushCommand(site.value, CommandType.AddReusableComponent, data)
+  }
+
   return {
     site,
     siteError,
@@ -1265,6 +1288,7 @@ export const useBuild = (): IUseBuild => {
     replacePageRoot,
     addBuiltinComponent,
     addBuiltinComponentData,
+    addReusableComponentData,
     editComponent,
     editSelectedComponent,
     getSelectedComponent,
@@ -1320,5 +1344,6 @@ export const useBuild = (): IUseBuild => {
     setBreakpoint,
     pushGroupCommands,
     updateUi,
+    addReusableComponent,
   }
 }

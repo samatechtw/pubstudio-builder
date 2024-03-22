@@ -16,6 +16,7 @@ export enum EditorMode {
 export enum BuildSubmenu {
   Asset = 'asset',
   New = 'new',
+  Reusable = 'reusable',
   File = 'file',
   Page = 'page',
   Behavior = 'behavior',
@@ -104,6 +105,7 @@ export interface IEditorContext {
   copiedComponent?: ISerializedComponent
   hoveredComponent?: IComponent
   selectedComponent?: IComponent
+  reusableComponentIds: Set<string>
   // ProseMirror EditView object
   editView?: EditorView
   resizeData?: IResizeData

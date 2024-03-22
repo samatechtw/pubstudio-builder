@@ -19,6 +19,7 @@ export const makeRemoveComponentData = (
     content: component.content,
     parentId: parent?.id ?? '',
     children: component.children?.map((c) => makeRemoveComponentData(site, c)),
+    reusableComponentId: component.reusableSourceId,
     style: component.style,
     inputs: component.inputs,
     events: component.events,

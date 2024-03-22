@@ -11,6 +11,7 @@ import {
   activeBreakpoint,
   descSortedBreakpoints,
 } from '@pubstudio/frontend/feature-site-source'
+import { resolveComponent } from '@pubstudio/frontend/util-builtin'
 import { findStyles } from '@pubstudio/frontend/util-component'
 import { RenderMode } from '@pubstudio/frontend/util-render'
 import { resetRuntimeContext, runtimeContext } from '@pubstudio/frontend/util-runtime'
@@ -53,6 +54,8 @@ export const computeBuilderStyleProps = (
   const builderClass: string[] = []
   let position: string | null | undefined = undefined
 
+  const cmp = resolveComponent(site.context, component.reusableSourceId) ?? component
+
   // Cache the CSS position. Must be called before using `position`
   const getPosition = (): string | null => {
     if (position !== undefined) {
@@ -62,7 +65,7 @@ export const computeBuilderStyleProps = (
       findStyles(
         [Css.Position],
         site,
-        component,
+        cmp,
         descSortedBreakpoints.value,
         activeBreakpoint.value,
       ).position ?? null
@@ -98,7 +101,7 @@ export const computeBuilderStyleProps = (
         findStyles(
           [Css.Display],
           site,
-          component,
+          cmp,
           descSortedBreakpoints.value,
           activeBreakpoint.value,
         ).display ?? null
@@ -225,32 +228,49 @@ export const computePropsContent = (
 
   const { editor } = site
   const isSelected = editor?.selectedComponent?.id === component.id
+  const reusableCmp = resolveComponent(site.context, component.reusableSourceId)
+
+  const cmpContent = component.content ?? reusableCmp?.content
 
   const content: IBuildContent = []
   const hasChildren = (component.children?.length ?? 0) > 0
+  const reusableCmpHasChildren = (reusableCmp?.children?.length ?? 0) > 0
 
   if (hasChildren) {
     content.push(
       ...component.children!.map((child, index) => renderComponent(site, child, index)),
     )
-  } else if (component.content) {
+  } else if (reusableCmpHasChildren) {
+    content.push(
+      ...reusableCmp!.children!.map((child, index) =>
+        renderComponent(site, child, index),
+      ),
+    )
+  } else if (cmpContent) {
     if (component.tag === Tag.Svg) {
       content.push(
-        h('div', { class: 'component-content-container', innerHTML: component.content }),
+        h('div', { class: 'component-content-container', innerHTML: cmpContent }),
       )
     } else if (isSelected) {
-      content.push(h(ProseMirrorEditor, { component, editor }))
+      const cmpWithDefaultContent: IComponent = { ...component, content: cmpContent }
+      content.push(h(ProseMirrorEditor, { component: cmpWithDefaultContent, editor }))
     } else {
       content.push(
         h('div', {
           class: 'component-content-container',
-          innerHTML: parseI18n(site, component.content),
+          innerHTML: parseI18n(site, cmpContent),
         }),
       )
     }
-  } else if (component.tag !== Tag.Img && component.tag !== Tag.Svg && !hasChildren) {
+  } else if (
+    component.tag !== Tag.Img &&
+    component.tag !== Tag.Svg &&
+    !hasChildren &&
+    !reusableCmpHasChildren
+  ) {
     if (isSelected) {
-      content.push(h(ProseMirrorEditor, { component, editor }))
+      const cmpWithDefaultContent: IComponent = { ...component, content: cmpContent }
+      content.push(h(ProseMirrorEditor, { component: cmpWithDefaultContent, editor }))
       if (component.tag === Tag.A) {
         content.push(
           h('div', { class: '__link-placeholder' }, 'Add text or drop components'),
@@ -279,7 +299,11 @@ export const computePropsContent = (
     ...data.attrs,
     ...builderStyleProps?.builderProps,
     ...events.native,
-    class: data.mixins.concat(component.id, builderStyleProps?.builderClass ?? []),
+    class: data.mixins.concat(
+      component.id,
+      component.reusableSourceId ?? [],
+      builderStyleProps?.builderClass ?? [],
+    ),
     style: builderStyleProps?.builderStyle,
     id: component.id,
   }

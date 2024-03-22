@@ -1,4 +1,4 @@
-import { resolveThemeVariables } from '@pubstudio/frontend/util-builtin'
+import { resolveComponent, resolveThemeVariables } from '@pubstudio/frontend/util-builtin'
 import { RenderMode } from '@pubstudio/frontend/util-render'
 import {
   CssPseudoClass,
@@ -29,9 +29,14 @@ export const computeAttrsInputsMixins = (
   const { renderMode, resolveTheme = true, editor } = options
 
   const c: IComponent = component
+  let r: IComponent | undefined = undefined
+  if (component.reusableSourceId) {
+    r = resolveComponent(context, c.reusableSourceId)
+  }
   const inputs: Record<string, unknown> = {}
   const attrs: Record<string, unknown> = {}
   const mixins: string[] = []
+  const content = c.content ?? r?.content
 
   if (editor) {
     const { cssPseudoClass } = editor
@@ -40,6 +45,15 @@ export const computeAttrsInputsMixins = (
     }
   }
 
+  // Collect mixins
+  if (c.style.mixins) {
+    mixins.push(...c.style.mixins)
+  }
+  if (r?.style.mixins) {
+    mixins.push(...r.style.mixins)
+  }
+
+  // Add attrs and inputs from default `inputs`
   const resolveInput = (value: unknown): unknown => {
     if (resolveTheme && typeof value === 'string') {
       return resolveThemeVariables(context, value, false) ?? value
@@ -47,19 +61,28 @@ export const computeAttrsInputsMixins = (
       return value
     }
   }
-  // Collect mixins
-  if (c.style.mixins) {
-    mixins.push(...c.style.mixins)
-  }
-  // Add attrs and inputs from default `inputs`
-  for (const [key, input] of Object.entries(c.inputs ?? {})) {
-    if (!inputs[key]) {
-      inputs[key] = resolveInput(input.is ?? input.default)
-    }
-    if (input.attr && !attrs[key]) {
-      attrs[key] = resolveInput(inputs[key] ?? input.default)
+
+  if (r?.inputs) {
+    for (const [key, input] of Object.entries(r.inputs)) {
+      const resolvedVaue = resolveInput(input.is ?? input.default)
+      inputs[key] = resolvedVaue
+      if (input.attr) {
+        attrs[key] = resolvedVaue
+      }
     }
   }
+
+  if (c.inputs) {
+    // If the component is a reusable instance, only the overridden inputs will be in `c.inputs`.
+    for (const [key, input] of Object.entries(c.inputs)) {
+      const resolvedVaue = resolveInput(input.is ?? input.default)
+      inputs[key] = resolvedVaue
+      if (input.attr) {
+        attrs[key] = resolvedVaue
+      }
+    }
+  }
+
   // Add role
   if (!attrs.role && c.role) {
     attrs.role = c.role
@@ -69,5 +92,5 @@ export const computeAttrsInputsMixins = (
     attrs.href = attrs.href?.toString()
   }
 
-  return { attrs, inputs, mixins }
+  return { content, attrs, inputs, mixins }
 }

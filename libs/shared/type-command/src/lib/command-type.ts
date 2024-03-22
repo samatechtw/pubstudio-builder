@@ -43,4 +43,5 @@ export enum CommandType {
   SetBreakpoint = 'setBP',
   SetTranslations = 'setT',
   UpdateUi = 'uUi',
+  AddReusableComponent = 'addR',
 }

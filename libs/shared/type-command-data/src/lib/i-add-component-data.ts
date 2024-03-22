@@ -25,6 +25,8 @@ export interface IAddComponentData {
   parentIndex?: number
   // Source to copy props from
   sourceId?: string
+  // Reusable component id
+  reusableComponentId?: string
   style?: IComponentStyle
   inputs?: IComponentInputs
   events?: IComponentEvents

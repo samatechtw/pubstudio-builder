@@ -9,6 +9,13 @@
         <BuildNew />
       </BuildMenuIcon>
       <BuildMenuIcon
+        id="build-reusable"
+        :text="t('build.reusable_components')"
+        @click="toggleSubMenu(BuildSubmenu.Reusable)"
+      >
+        <Reusable />
+      </BuildMenuIcon>
+      <BuildMenuIcon
         id="build-page"
         :text="t('build.pages')"
         @click="toggleSubMenu(BuildSubmenu.Page)"
@@ -90,13 +97,21 @@ import {
   showTranslations,
 } from '@pubstudio/frontend/data-access-command'
 import { store } from '@pubstudio/frontend/data-access-web-store'
-import { Assets, BuildNew, Command, Pages, Text } from '@pubstudio/frontend/ui-widgets'
+import {
+  Assets,
+  BuildNew,
+  Command,
+  Reusable,
+  Pages,
+  Text,
+} from '@pubstudio/frontend/ui-widgets'
 import { Code, Theme, Style, File } from '@pubstudio/frontend/ui-widgets'
 import { TranslationsModal } from '@pubstudio/frontend/feature-site-translations'
 import { BuildSubmenu } from '@pubstudio/shared/type-site'
 import { dragSource } from '@pubstudio/frontend/feature-render-builder'
 import BuildMenuIcon from './BuildMenuIcon.vue'
 import BuildMenuNew from './BuildMenuNew.vue'
+import BuildMenuReusable from './BuildMenuReusable.vue'
 import BuildMenuPage from './BuildMenuPage.vue'
 import BuildMenuFile from './BuildMenuFile.vue'
 import BuildMenuAsset from './BuildMenuAsset.vue'
@@ -117,6 +132,7 @@ const submenu = computed(() => {
   const menus = {
     [BuildSubmenu.Asset]: BuildMenuAsset,
     [BuildSubmenu.New]: BuildMenuNew,
+    [BuildSubmenu.Reusable]: BuildMenuReusable,
     [BuildSubmenu.Page]: BuildMenuPage,
     [BuildSubmenu.Behavior]: BuildMenuBehavior,
     [BuildSubmenu.History]: BuildMenuHistory,

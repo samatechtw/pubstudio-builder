@@ -26,6 +26,8 @@ export const serializeComponent = (component: IComponent): ISerializedComponent 
     inputs: component.inputs,
     events: component.events,
     editorEvents: component.editorEvents,
+    isReusable: component.isReusable,
+    reusableSourceId: component.reusableSourceId,
   }
 }
 

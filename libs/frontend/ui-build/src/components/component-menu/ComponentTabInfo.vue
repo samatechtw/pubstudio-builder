@@ -10,6 +10,13 @@
       @update="setName"
     />
     <MenuRow :label="t('id')" :value="component.id" :copyValue="true" class="id" />
+    <MenuRow
+      v-if="isReusableInstance"
+      :label="t('build.reusable_cmp_id')"
+      :value="component.reusableSourceId"
+      :info="reusableCmpInfo"
+      class="reusable-cmp-id"
+    />
     <MenuRowSimple
       :label="t('content')"
       :value="component.content"
@@ -61,6 +68,13 @@ const { editSelectedComponent, editor } = useBuild()
 
 const contentInfo = computed(() => {
   return component.value.children?.length ? t('build.content_info') : undefined
+})
+
+const isReusableInstance = computed(() => !!component.value.reusableSourceId)
+
+const reusableCmpInfo = computed(() => {
+  const id = component.value.reusableSourceId
+  return id ? t('build.reusable_cmp_info', { id }) : undefined
 })
 
 const editingContent = computed(() => {
