@@ -10,7 +10,7 @@ export const mockCreateTablePayload = (tableName: string) => {
           }
         ]
       },
-      "age": {
+      "phone": {
         "data_type": "TEXT",
         "validation_rules": [
           {

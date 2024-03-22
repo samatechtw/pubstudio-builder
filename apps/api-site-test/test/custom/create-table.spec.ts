@@ -102,10 +102,10 @@ describe('Create Custom Table', () => {
     })
 
     it('when requester is anonymous', () => {
-      return api.post(testEndpoint(siteId)).expect(401, {
-        code: 'Unauthorized',
-        message: 'Unauthorized',
-        status: 401,
+      return api.post(testEndpoint(siteId)).send(payload).expect(403, {
+        code: 'None',
+        message: 'Forbidden',
+        status: 403,
       })
     })
 

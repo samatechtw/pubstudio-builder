@@ -1,7 +1,9 @@
 use crate::api_context::ApiContext;
 
 use crate::app::{custom, health, publish, site, usage};
-use crate::middleware::auth::{auth_admin, auth_admin_owner, error_cache};
+use crate::middleware::auth::{
+    auth_admin, auth_admin_owner, auth_admin_owner_anonymous, error_cache,
+};
 use axum::handler::Handler;
 
 use axum::http::StatusCode;
@@ -104,8 +106,10 @@ fn api_router(context: &ApiContext) -> Router<ApiContext> {
         )
         .route(
             "/sites/:site_id/custom_data",
-            post(custom::custom_data::custom_data)
-                .route_layer(from_fn_with_state(context.clone(), auth_admin_owner)),
+            post(custom::custom_data::custom_data).route_layer(from_fn_with_state(
+                context.clone(),
+                auth_admin_owner_anonymous,
+            )),
         )
         .route(
             "/sites/:site_id/backups",

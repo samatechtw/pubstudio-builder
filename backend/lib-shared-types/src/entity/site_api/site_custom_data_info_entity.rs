@@ -6,3 +6,9 @@ pub struct CustomDataInfoEntity {
     pub name: String,
     pub columns: String,
 }
+
+#[derive(Debug)]
+pub struct CustomDataInfoEntityResult {
+    pub total: i64,
+    pub results: Vec<CustomDataInfoEntity>,
+}

@@ -33,6 +33,6 @@ impl ListTablesQuery {
 
 #[derive(Deserialize, Serialize)]
 pub struct ListTablesResponse {
-    pub total: usize,
+    pub total: i64,
     pub results: Vec<CustomDataInfoViewModel>,
 }

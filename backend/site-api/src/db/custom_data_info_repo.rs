@@ -1,12 +1,14 @@
 use std::sync::Arc;
 
 use axum::async_trait;
-use lib_shared_site_api::db::db_error::DbError;
+use lib_shared_site_api::db::{db_error::DbError, db_result::list_result};
 use lib_shared_types::{
     dto::custom_data::{
         custom_data_info_dto::CustomDataInfoDto, list_tables_query::ListTablesQuery,
     },
-    entity::site_api::site_custom_data_info_entity::CustomDataInfoEntity,
+    entity::site_api::site_custom_data_info_entity::{
+        CustomDataInfoEntity, CustomDataInfoEntityResult,
+    },
 };
 use sqlx::{sqlite::SqliteRow, Error, Row, SqlitePool};
 
@@ -27,12 +29,23 @@ pub trait CustomDataInfoRepoTrait {
         &self,
         id: &str,
         query: ListTablesQuery,
-    ) -> Result<Vec<CustomDataInfoEntity>, DbError>;
+    ) -> Result<CustomDataInfoEntityResult, DbError>;
+    async fn get_columns_from_table(
+        &self,
+        id: &str,
+        table_name: &String,
+    ) -> Result<String, DbError>;
 }
 
 pub struct CustomDataInfoRepo {
     pub db_pool_manager: DbPoolManager,
     pub manifest_dir: String,
+}
+
+fn row_to_list_result(row: SqliteRow) -> Result<(CustomDataInfoEntity, i64), Error> {
+    let count = row.try_get("count")?;
+    let entity = map_to_custom_data_info_entity(row)?;
+    Ok((entity, count))
 }
 
 fn map_to_custom_data_info_entity(row: SqliteRow) -> Result<CustomDataInfoEntity, Error> {
@@ -82,12 +95,12 @@ impl CustomDataInfoRepoTrait for CustomDataInfoRepo {
         &self,
         id: &str,
         query: ListTablesQuery,
-    ) -> Result<Vec<CustomDataInfoEntity>, DbError> {
+    ) -> Result<CustomDataInfoEntityResult, DbError> {
         let pool = self.get_db_pool(id).await?;
 
         let result = sqlx::query(
             r#"
-            SELECT *
+            SELECT *, COUNT(*) OVER () AS count
             FROM custom_data_info
             ORDER BY id ASC
             LIMIT ? OFFSET ?
@@ -95,10 +108,34 @@ impl CustomDataInfoRepoTrait for CustomDataInfoRepo {
         )
         .bind(query.to - query.from + 1)
         .bind(query.from - 1)
-        .try_map(map_to_custom_data_info_entity)
+        .try_map(row_to_list_result)
         .fetch_all(&pool)
         .await?;
 
-        Ok(result)
+        let (results, total) = list_result(result);
+
+        Ok(CustomDataInfoEntityResult { total, results })
+    }
+
+    async fn get_columns_from_table(
+        &self,
+        id: &str,
+        table_name: &String,
+    ) -> Result<String, DbError> {
+        let pool = self.get_db_pool(id).await?;
+
+        let columns = sqlx::query(
+            r#"
+            SELECT columns
+            FROM custom_data_info
+            WHERE name = ?1
+        "#,
+        )
+        .bind(table_name)
+        .try_map(|r: SqliteRow| r.try_get("columns"))
+        .fetch_one(&pool)
+        .await?;
+
+        Ok(columns)
     }
 }

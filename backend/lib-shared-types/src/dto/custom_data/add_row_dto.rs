@@ -8,5 +8,5 @@ use validator::Validate;
 pub struct AddRow {
     #[validate(length(min = 1, max = 100))]
     pub table_name: String,
-    pub values: HashMap<String, String>,
+    pub row: HashMap<String, String>,
 }

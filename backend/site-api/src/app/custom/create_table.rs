@@ -27,7 +27,7 @@ use super::custom_data::parse_request_data;
             }
         ]
       },
-      "age": {
+      "phone": {
         "data_type": "TEXT",
         "validation_rules": [
             {
@@ -36,7 +36,7 @@ use super::custom_data::parse_request_data;
             },
             {
                 "rule_type": "MaxLength",
-                "parameter": 3
+                "parameter": 10
             }
         ]
       }
@@ -61,10 +61,6 @@ pub async fn create_custom_table_helper(
 ) -> Result<String, ApiError> {
     let dto: CreateTable = parse_request_data(data.clone())?;
     check_bad_form(dto.validate())?;
-
-    for (k, v) in &dto.columns {
-        println!("key: {}, column info: {:?}", k, v);
-    }
 
     if dto.table_name == "site_versions" || dto.table_name == "custom_data_info" {
         return Err(ApiError::bad_request()
