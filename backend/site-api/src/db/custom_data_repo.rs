@@ -10,6 +10,7 @@ use lib_shared_types::dto::custom_data::{
     add_row_dto::AddRow,
     create_table_dto::{CreateTable, RuleType},
     list_rows_query::{ListRowsQuery, ListRowsResponse},
+    update_row_dto::UpdateRow,
 };
 use sqlx::{sqlite::SqliteRow, Column, Error, QueryBuilder, Row, Sqlite, SqlitePool};
 
@@ -24,7 +25,11 @@ pub trait CustomDataRepoTrait {
     async fn create_table(&self, id: &str, dto: CreateTable) -> Result<(), DbError>;
     async fn insert(&self, id: &str, dto: AddRow) -> Result<(), DbError>;
     async fn list_rows(&self, id: &str, query: ListRowsQuery) -> Result<ListRowsResponse, DbError>;
-    async fn update_row(&self, id: &str) -> Result<(), DbError>;
+    async fn update_row(
+        &self,
+        id: &str,
+        dto: UpdateRow,
+    ) -> Result<BTreeMap<String, String>, DbError>;
     async fn add_column(&self, id: &str) -> Result<(), DbError>;
     async fn remove_column(&self, id: &str) -> Result<(), DbError>;
     async fn modify_column(&self, id: &str) -> Result<(), DbError>;
@@ -221,9 +226,40 @@ impl CustomDataRepoTrait for CustomDataRepo {
         Ok(ListRowsResponse { total, results })
     }
 
-    async fn update_row(&self, id: &str) -> Result<(), DbError> {
+    async fn update_row(
+        &self,
+        id: &str,
+        dto: UpdateRow,
+    ) -> Result<BTreeMap<String, String>, DbError> {
         let pool = self.get_db_pool(id).await?;
-        Ok(())
+
+        let table_name = dto.table_name;
+
+        let mut query = QueryBuilder::new("UPDATE ");
+        query.push(table_name);
+        query.push(" SET ");
+
+        let mut set_values = String::new();
+        for (k, v) in dto.new_row.iter() {
+            if !set_values.is_empty() {
+                set_values.push_str(", ");
+            }
+            set_values.push_str(&format!("{} = '{}'", k, v));
+        }
+
+        query.push(set_values);
+        query.push(" WHERE id = ");
+        query.push_bind(dto.row_id);
+        query.push(" RETURNING *");
+
+        println!("SQL Query: {}", query.sql());
+
+        Ok(query
+            .build()
+            .try_map(map_to_key_value)
+            .fetch_one(&pool)
+            .await
+            .map_err(map_custom_data_sqlx_err)?)
     }
 
     async fn add_column(&self, id: &str) -> Result<(), DbError> {
