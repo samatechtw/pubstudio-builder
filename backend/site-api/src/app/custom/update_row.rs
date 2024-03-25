@@ -1,6 +1,6 @@
 use lib_shared_site_api::error::{api_error::ApiError, helpers::check_bad_form};
 use lib_shared_types::dto::custom_data::update_row_dto::{UpdateRow, UpdateRowResponse};
-use serde_json::{json, Value};
+use serde_json::Value;
 use validator::Validate;
 
 use crate::{api_context::ApiContext, app::custom::helpers::validate_row_data};
@@ -11,8 +11,8 @@ use super::custom_data::parse_request_data;
 {
   "action": "UpdateRow",
   "data": {
-    "table_name": "custom_table",
-    "row_id": 123,
+    "table_name": "contact_form",
+    "row_id": 1,
     "new_row": {
         "age": "36"
     }
@@ -30,12 +30,11 @@ pub async fn update_row(
     // Validate data by checking columns in custom_data_info
     validate_row_data(context, site_id, &dto.table_name, &dto.new_row).await?;
 
-    println!("id: {}", dto.row_id);
-    for (k, v) in &dto.new_row {
-        println!("updated key: {}, updated value: {}", k, v);
-    }
+    let updated_row = context
+        .custom_data_repo
+        .update_row(site_id, dto)
+        .await
+        .map_err(|e| ApiError::internal_error().message(e))?;
 
-    Ok(UpdateRowResponse {
-        updated_row: json!({}),
-    })
+    Ok(UpdateRowResponse { updated_row })
 }
