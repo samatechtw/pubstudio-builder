@@ -37,6 +37,20 @@ export const mockAddRowPayload3 = () => {
   `)
 }
 
+export const mockAddRowPayload4 = () => {
+  return JSON.parse(`
+  {
+    "table_name": "contact_form",
+    "row": {
+      "name": "Cindy",
+      "age": "22",
+      "email": "ccc@hotmail.com",
+      "phone": "0987654321"
+    }
+  }
+  `)
+}
+
 export const mockAddInvalidRow1 = () => {
   return JSON.parse(`
   {
@@ -84,6 +98,20 @@ export const mockAddInvalidRow4 = (email: string) => {
       "name": "Lisa",
       "age": "50",
       "email": "${email}"
+    }
+  }
+  `)
+}
+
+export const mockAddInvalidRow5 = () => {
+  return JSON.parse(`
+  {
+    "table_name": "contact_form",
+    "row": {
+      "name": "Iris",
+      "age": "40",
+      "email": "iris@lol.com",
+      "phone": "100000000000000"
     }
   }
   `)

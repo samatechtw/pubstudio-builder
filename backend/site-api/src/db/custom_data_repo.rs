@@ -2,14 +2,18 @@ use std::borrow::Cow::Borrowed;
 use std::{collections::BTreeMap, sync::Arc};
 
 use axum::async_trait;
+use lib_shared_site_api::db::util::append_column_info_to_query;
 use lib_shared_site_api::db::{
     db_error::{map_sqlx_err, DbError},
     db_result::list_result,
 };
+use lib_shared_types::dto::custom_data::add_column_dto::AddColumn;
+use lib_shared_types::dto::custom_data::custom_data_dto::Action;
 use lib_shared_types::dto::custom_data::{
     add_row_dto::AddRow,
-    create_table_dto::{CreateTable, RuleType},
+    create_table_dto::CreateTable,
     list_rows_query::{ListRowsQuery, ListRowsResponse},
+    update_row_dto::UpdateRow,
 };
 use sqlx::{sqlite::SqliteRow, Column, Error, QueryBuilder, Row, Sqlite, SqlitePool};
 
@@ -24,8 +28,12 @@ pub trait CustomDataRepoTrait {
     async fn create_table(&self, id: &str, dto: CreateTable) -> Result<(), DbError>;
     async fn insert(&self, id: &str, dto: AddRow) -> Result<(), DbError>;
     async fn list_rows(&self, id: &str, query: ListRowsQuery) -> Result<ListRowsResponse, DbError>;
-    async fn update_row(&self, id: &str) -> Result<(), DbError>;
-    async fn add_column(&self, id: &str) -> Result<(), DbError>;
+    async fn update_row(
+        &self,
+        id: &str,
+        dto: UpdateRow,
+    ) -> Result<BTreeMap<String, String>, DbError>;
+    async fn add_column(&self, id: &str, dto: AddColumn) -> Result<(), DbError>;
     async fn remove_column(&self, id: &str) -> Result<(), DbError>;
     async fn modify_column(&self, id: &str) -> Result<(), DbError>;
 }
@@ -118,39 +126,7 @@ impl CustomDataRepoTrait for CustomDataRepo {
         query.push(table_name);
         query.push(" (id INTEGER PRIMARY KEY NOT NULL");
 
-        for (column_name, column_info) in dto.columns.iter() {
-            let column_type = column_info.data_type.to_string();
-
-            query.push(format!(", {}", column_name));
-            query.push(" ");
-            query.push(column_type);
-            query.push(" NOT NULL");
-
-            for rule in column_info.validation_rules.iter() {
-                match rule.rule_type {
-                    RuleType::Unique => {
-                        query.push(" UNIQUE");
-                    }
-                    RuleType::MinLength => {
-                        if let Some(min_length) = rule.parameter {
-                            query.push(&format!(
-                                " CHECK (length({}) >= {}) ",
-                                column_name, min_length
-                            ));
-                        }
-                    }
-                    RuleType::MaxLength => {
-                        if let Some(max_length) = rule.parameter {
-                            query.push(&format!(
-                                " CHECK (length({}) <= {}) ",
-                                column_name, max_length
-                            ));
-                        }
-                    }
-                    _ => {}
-                }
-            }
-        }
+        let mut query = append_column_info_to_query(query, Action::CreateTable, &dto.columns);
 
         query.push(")");
 
@@ -221,13 +197,61 @@ impl CustomDataRepoTrait for CustomDataRepo {
         Ok(ListRowsResponse { total, results })
     }
 
-    async fn update_row(&self, id: &str) -> Result<(), DbError> {
+    async fn update_row(
+        &self,
+        id: &str,
+        dto: UpdateRow,
+    ) -> Result<BTreeMap<String, String>, DbError> {
         let pool = self.get_db_pool(id).await?;
-        Ok(())
+
+        let table_name = dto.table_name;
+
+        let mut query = QueryBuilder::new("UPDATE ");
+        query.push(table_name);
+        query.push(" SET ");
+
+        let mut set_values = String::new();
+        for (k, v) in dto.new_row.iter() {
+            if !set_values.is_empty() {
+                set_values.push_str(", ");
+            }
+            set_values.push_str(&format!("{} = '{}'", k, v));
+        }
+
+        query.push(set_values);
+        query.push(" WHERE id = ");
+        query.push_bind(dto.row_id);
+        query.push(" RETURNING *");
+
+        println!("SQL Query: {}", query.sql());
+
+        Ok(query
+            .build()
+            .try_map(map_to_key_value)
+            .fetch_one(&pool)
+            .await
+            .map_err(map_custom_data_sqlx_err)?)
     }
 
-    async fn add_column(&self, id: &str) -> Result<(), DbError> {
+    async fn add_column(&self, id: &str, dto: AddColumn) -> Result<(), DbError> {
         let pool = self.get_db_pool(id).await?;
+
+        let table_name = dto.table_name;
+
+        let mut query: QueryBuilder<'_, Sqlite> = QueryBuilder::new("ALTER TABLE ");
+        query.push(table_name);
+        query.push(" ADD COLUMN ");
+
+        let mut query = append_column_info_to_query(query, Action::AddColumn, &dto.column);
+
+        println!("SQL Query: {}", query.sql());
+
+        query
+            .build()
+            .execute(&pool)
+            .await
+            .map_err(map_custom_data_sqlx_err)?;
+
         Ok(())
     }
 

@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
 
 use serde::{Deserialize, Serialize};
 use validator::Validate;
@@ -14,5 +14,5 @@ pub struct UpdateRow {
 
 #[derive(Serialize, Deserialize)]
 pub struct UpdateRowResponse {
-    pub updated_row: serde_json::Value,
+    pub updated_row: BTreeMap<String, String>,
 }

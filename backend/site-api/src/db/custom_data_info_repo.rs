@@ -25,6 +25,11 @@ pub trait CustomDataInfoRepoTrait {
         id: &str,
         dto: CustomDataInfoDto,
     ) -> Result<CustomDataInfoEntity, DbError>;
+    async fn update_info(
+        &self,
+        id: &str,
+        dto: CustomDataInfoDto,
+    ) -> Result<CustomDataInfoEntity, DbError>;
     async fn list_tables(
         &self,
         id: &str,
@@ -84,6 +89,30 @@ impl CustomDataInfoRepoTrait for CustomDataInfoRepo {
         )
         .bind(dto.name)
         .bind(dto.columns)
+        .try_map(map_to_custom_data_info_entity)
+        .fetch_one(&pool)
+        .await?;
+
+        Ok(result)
+    }
+
+    async fn update_info(
+        &self,
+        id: &str,
+        dto: CustomDataInfoDto,
+    ) -> Result<CustomDataInfoEntity, DbError> {
+        let pool = self.get_db_pool(id).await?;
+
+        let result: CustomDataInfoEntity = sqlx::query(
+            r#"
+          UPDATE custom_data_info
+          SET columns = ?1
+          WHERE name = ?2
+          RETURNING id, name, columns
+        "#,
+        )
+        .bind(dto.columns)
+        .bind(dto.name)
         .try_map(map_to_custom_data_info_entity)
         .fetch_one(&pool)
         .await?;
