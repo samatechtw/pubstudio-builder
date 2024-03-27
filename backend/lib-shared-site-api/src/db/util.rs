@@ -1,3 +1,9 @@
+use std::collections::HashMap;
+
+use lib_shared_types::dto::custom_data::{
+    create_table_dto::{ColumnInfo, RuleType},
+    custom_data_dto::Action,
+};
 use sqlx::{Database, QueryBuilder};
 use uuid::Uuid;
 
@@ -127,6 +133,63 @@ where
         return (q, count + 1);
     }
     (query, count)
+}
+
+pub fn append_column_info_to_query<'a, DB: Database>(
+    mut query: QueryBuilder<'a, DB>,
+    action_type: Action,
+    columns: &HashMap<String, ColumnInfo>,
+) -> QueryBuilder<'a, DB> {
+    for (column_name, column_info) in columns.iter() {
+        let column_type = column_info.data_type.to_string();
+
+        match action_type {
+            Action::CreateTable => {
+                query.push(format!(", {}", column_name));
+            }
+            Action::AddColumn => {
+                query.push(column_name);
+            }
+            _ => {}
+        }
+
+        query.push(" ");
+        query.push(column_type);
+        query.push(" NOT NULL");
+
+        match action_type {
+            Action::AddColumn => {
+                query.push(" DEFAULT ''");
+            }
+            _ => {}
+        }
+
+        for rule in column_info.validation_rules.iter() {
+            match rule.rule_type {
+                RuleType::Unique => {
+                    query.push(" UNIQUE");
+                }
+                RuleType::MinLength => {
+                    if let Some(min_length) = rule.parameter {
+                        query.push(&format!(
+                            " CHECK (length({}) >= {}) ",
+                            column_name, min_length
+                        ));
+                    }
+                }
+                RuleType::MaxLength => {
+                    if let Some(max_length) = rule.parameter {
+                        query.push(&format!(
+                            " CHECK (length({}) <= {}) ",
+                            column_name, max_length
+                        ));
+                    }
+                }
+                _ => {}
+            }
+        }
+    }
+    query
 }
 
 pub fn option_string_to_uuid(str: Option<String>) -> Option<Uuid> {

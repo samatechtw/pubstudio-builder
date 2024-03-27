@@ -5,7 +5,7 @@ use validator::Validate;
 
 use super::create_table_dto::ColumnInfo;
 
-#[derive(Deserialize, Validate)]
+#[derive(Deserialize, Validate, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct AddColumn {
     #[validate(length(min = 1, max = 100))]

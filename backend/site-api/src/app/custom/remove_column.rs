@@ -11,7 +11,7 @@ use super::custom_data::parse_request_data;
 {
   "action": "RemoveColumn",
   "data": {
-    "table_name": "custom_table",
+    "table_name": "contact_form",
     "column_name": "age"
   }
 }
@@ -23,8 +23,6 @@ pub async fn remove_column(
 ) -> Result<(), ApiError> {
     let dto: RemoveColumn = parse_request_data(data)?;
     check_bad_form(dto.validate())?;
-
-    println!("removed column name: {:?}", dto.column_name);
 
     Ok(())
 }
