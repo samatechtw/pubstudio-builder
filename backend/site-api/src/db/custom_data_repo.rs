@@ -2,13 +2,16 @@ use std::borrow::Cow::Borrowed;
 use std::{collections::BTreeMap, sync::Arc};
 
 use axum::async_trait;
+use lib_shared_site_api::db::util::append_column_info_to_query;
 use lib_shared_site_api::db::{
     db_error::{map_sqlx_err, DbError},
     db_result::list_result,
 };
+use lib_shared_types::dto::custom_data::add_column_dto::AddColumn;
+use lib_shared_types::dto::custom_data::custom_data_dto::Action;
 use lib_shared_types::dto::custom_data::{
     add_row_dto::AddRow,
-    create_table_dto::{CreateTable, RuleType},
+    create_table_dto::CreateTable,
     list_rows_query::{ListRowsQuery, ListRowsResponse},
     update_row_dto::UpdateRow,
 };
@@ -30,7 +33,7 @@ pub trait CustomDataRepoTrait {
         id: &str,
         dto: UpdateRow,
     ) -> Result<BTreeMap<String, String>, DbError>;
-    async fn add_column(&self, id: &str) -> Result<(), DbError>;
+    async fn add_column(&self, id: &str, dto: AddColumn) -> Result<(), DbError>;
     async fn remove_column(&self, id: &str) -> Result<(), DbError>;
     async fn modify_column(&self, id: &str) -> Result<(), DbError>;
 }
@@ -123,39 +126,7 @@ impl CustomDataRepoTrait for CustomDataRepo {
         query.push(table_name);
         query.push(" (id INTEGER PRIMARY KEY NOT NULL");
 
-        for (column_name, column_info) in dto.columns.iter() {
-            let column_type = column_info.data_type.to_string();
-
-            query.push(format!(", {}", column_name));
-            query.push(" ");
-            query.push(column_type);
-            query.push(" NOT NULL");
-
-            for rule in column_info.validation_rules.iter() {
-                match rule.rule_type {
-                    RuleType::Unique => {
-                        query.push(" UNIQUE");
-                    }
-                    RuleType::MinLength => {
-                        if let Some(min_length) = rule.parameter {
-                            query.push(&format!(
-                                " CHECK (length({}) >= {}) ",
-                                column_name, min_length
-                            ));
-                        }
-                    }
-                    RuleType::MaxLength => {
-                        if let Some(max_length) = rule.parameter {
-                            query.push(&format!(
-                                " CHECK (length({}) <= {}) ",
-                                column_name, max_length
-                            ));
-                        }
-                    }
-                    _ => {}
-                }
-            }
-        }
+        let mut query = append_column_info_to_query(query, Action::CreateTable, &dto.columns);
 
         query.push(")");
 
@@ -262,8 +233,25 @@ impl CustomDataRepoTrait for CustomDataRepo {
             .map_err(map_custom_data_sqlx_err)?)
     }
 
-    async fn add_column(&self, id: &str) -> Result<(), DbError> {
+    async fn add_column(&self, id: &str, dto: AddColumn) -> Result<(), DbError> {
         let pool = self.get_db_pool(id).await?;
+
+        let table_name = dto.table_name;
+
+        let mut query: QueryBuilder<'_, Sqlite> = QueryBuilder::new("ALTER TABLE ");
+        query.push(table_name);
+        query.push(" ADD COLUMN ");
+
+        let mut query = append_column_info_to_query(query, Action::AddColumn, &dto.column);
+
+        println!("SQL Query: {}", query.sql());
+
+        query
+            .build()
+            .execute(&pool)
+            .await
+            .map_err(map_custom_data_sqlx_err)?;
+
         Ok(())
     }
 

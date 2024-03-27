@@ -43,7 +43,7 @@ pub async fn validate_row_data(
     Ok(())
 }
 
-fn parse_column_info(columns: &str) -> Result<HashMap<String, ColumnInfo>, ApiError> {
+pub fn parse_column_info(columns: &str) -> Result<HashMap<String, ColumnInfo>, ApiError> {
     let json_value = serde_json::from_str(&columns).map_err(|e| {
         ApiError::internal_error().message(format!("Failed to parse columns str to JSON : {}", e))
     })?;

@@ -17,7 +17,7 @@ pub struct CreateTableResponse {
     pub id: String,
 }
 
-#[derive(Deserialize, Validate, Debug)]
+#[derive(Deserialize, Serialize, Validate, Debug, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct ColumnInfo {
     pub data_type: DataType,
@@ -30,14 +30,14 @@ pub enum DataType {
     // Add more types if needed
 }
 
-#[derive(Deserialize, Validate, Debug)]
+#[derive(Deserialize, Serialize, Validate, Debug, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct ValidationRule {
     pub rule_type: RuleType,
     pub parameter: Option<i32>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum RuleType {
     Unique,
     Email,
