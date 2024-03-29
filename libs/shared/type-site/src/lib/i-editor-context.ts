@@ -121,6 +121,8 @@ export interface IEditorContext {
   editorDropdown?: EditorDropdown
   // Saved state of behavior edit modal
   editBehavior?: IEditBehavior
+  // Selected table name in custom data modal
+  selectedTable?: string
   // Saved state of SVG edit modal
   editSvg?: IEditSvg
   // Toggle translations modal
