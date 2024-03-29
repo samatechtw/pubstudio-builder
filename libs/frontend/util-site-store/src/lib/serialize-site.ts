@@ -48,6 +48,7 @@ export const serializeEditor = (
         buildSubmenu: editor.buildSubmenu,
         editorDropdown: editor.editorDropdown,
         editBehavior: editor.editBehavior,
+        selectedTable: editor.selectedTable,
         translations: editor.translations,
         themeTab: editor.themeTab,
         styleTab: editor.styleTab,
