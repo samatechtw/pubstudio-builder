@@ -32,6 +32,7 @@ export const deserializeEditor = (
         buildSubmenu: serializedEditor.buildSubmenu,
         editorDropdown: serializedEditor.editorDropdown,
         editBehavior: serializedEditor.editBehavior,
+        selectedTable: serializedEditor.selectedTable,
         translations: serializedEditor.translations,
         themeTab: serializedEditor.themeTab,
         styleTab: serializedEditor.styleTab,
