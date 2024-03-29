@@ -429,3 +429,13 @@ export const setEditingMixinData = (
     editor.store?.saveEditor(editor)
   }
 }
+
+export const setSelectedTable = (
+  editor: IEditorContext | undefined,
+  tableName: string | undefined,
+) => {
+  if (editor) {
+    editor.selectedTable = tableName
+    editor.store?.saveEditor(editor)
+  }
+}
