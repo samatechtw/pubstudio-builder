@@ -13,6 +13,7 @@ import {
   makeSetInputData,
 } from '@pubstudio/frontend/util-command-data'
 import {
+  contactFormBehaviorId,
   homeLinkBehaviorId,
   navItemBehaviorId,
   navMenuBehaviorId,
@@ -224,3 +225,27 @@ export const navMenuBehavior: IBehavior = {
   },
 }
 registerBuiltinBehavior(navMenuBehavior)
+
+export const contactFormBehavior: IBehavior = {
+  id: contactFormBehaviorId,
+  name: 'Contact Form Submit',
+  args: {
+    tableId: {
+      name: 'tableId',
+      type: ComponentArgPrimitive.String,
+      help: 'The ID of the API table linked to the contact form.',
+    },
+  },
+  builtin: (
+    _helpers: IBehaviorHelpers,
+    _behaviorContext: IBehaviorContext,
+    args?: IBehaviorCustomArgs,
+  ) => {
+    if (args?.tableId) {
+      // TODO -- submit contact request to API
+    } else {
+      console.warn('Missing tableId arg')
+    }
+  },
+}
+registerBuiltinBehavior(contactFormBehavior)

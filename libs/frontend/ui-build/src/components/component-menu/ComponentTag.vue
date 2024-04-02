@@ -49,5 +49,6 @@ const setTag = (newTag: Tag | undefined) => {
 .component-tag {
   max-width: 140px;
   margin: 0 16px 0 0;
+  z-index: $z-index-toolbar-dropdown1;
 }
 </style>

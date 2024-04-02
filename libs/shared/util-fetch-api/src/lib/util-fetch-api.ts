@@ -1,3 +1,4 @@
+import { ApiResponse } from '@pubstudio/shared/type-api'
 import {
   FetchApi,
   FetchRequestConfig,
@@ -5,7 +6,6 @@ import {
   RequestInterceptor,
   ResponseInterceptor,
 } from '@sampullman/fetch-api'
-import { ApiResponse } from './api-response'
 import { transformRequestData } from './api-transforms'
 import { defaultResponseInterceptors } from './default-response-interceptors'
 

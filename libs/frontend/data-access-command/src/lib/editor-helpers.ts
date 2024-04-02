@@ -3,6 +3,7 @@ import {
   BuildSubmenu,
   ComponentMenuCollapsible,
   ComponentTabState,
+  ContactFormWalkthroughState,
   CssPseudoClass,
   EditorDropdown,
   EditorMode,
@@ -266,6 +267,25 @@ export const setCssPseudoClass = (
 ) => {
   if (editor) {
     editor.cssPseudoClass = pseudoClass
+    editor.store?.saveEditor(editor)
+  }
+}
+
+export const setContactFormWalkthrough = (
+  editor: IEditorContext | undefined,
+  state: ContactFormWalkthroughState | undefined,
+  formId?: string,
+) => {
+  if (editor) {
+    if (editor?.contactFormWalkthrough) {
+      if (state) {
+        editor.contactFormWalkthrough.state = state
+      } else {
+        editor.contactFormWalkthrough = undefined
+      }
+    } else if (state && formId) {
+      editor.contactFormWalkthrough = { state, formId }
+    }
     editor.store?.saveEditor(editor)
   }
 }

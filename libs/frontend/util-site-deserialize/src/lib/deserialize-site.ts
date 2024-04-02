@@ -46,6 +46,8 @@ export const deserializeEditor = (
         templatesShown: serializedEditor.templatesShown,
         // Added 231201
         componentMenuCollapses: serializedEditor.componentMenuCollapses ?? {},
+        // Added 240320
+        contactFormWalkthroughState: serializedEditor.contactFormWalkthroughState,
       }
     : undefined
 

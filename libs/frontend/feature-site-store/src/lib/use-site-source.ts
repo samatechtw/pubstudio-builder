@@ -1,4 +1,5 @@
 import { site } from '@pubstudio/frontend/feature-site-source'
+import { PSApi } from '@pubstudio/frontend/util-api'
 import { IUpdateSiteApiResponse } from '@pubstudio/shared/type-api-site-sites'
 import {
   ISite,
@@ -6,6 +7,7 @@ import {
   ISiteStore,
   SiteSaveState,
 } from '@pubstudio/shared/type-site'
+import { plainResponseInterceptors } from '@pubstudio/shared/util-fetch-api'
 import { computed, ComputedRef, Ref, ref } from 'vue'
 
 // This file is here, instead of frontend/feature-site-source, to decouple the `site`
@@ -15,6 +17,7 @@ export interface IUseSiteSource {
   site: Ref<ISite>
   siteError: Ref<string | undefined>
   apiSiteId: Ref<string | undefined>
+  apiSite: PSApi | undefined
   siteStore: Ref<ISiteStore>
   isSaving: ComputedRef<boolean>
   initializeSite: (options: IInitializeSiteOptions) => Promise<string | undefined>
@@ -27,12 +30,14 @@ export interface IUseSiteSource {
 export interface IInitializeSiteOptions {
   store: ISiteStore
   siteId: string | undefined
+  userToken?: Ref<string | null>
 }
 
 const siteStore = ref() as Ref<ISiteStore>
 let restoredSite: ISiteRestore
 const siteError = ref<string>()
 const apiSiteId = ref<string>()
+let apiSite: PSApi
 
 const isSaving = computed(() => {
   // TODO -- figure out how to avoid nested ComputedRef in `siteStore` Ref
@@ -59,13 +64,20 @@ export const useSiteSource = (): IUseSiteSource => {
   const initializeSite = async (
     options: IInitializeSiteOptions,
   ): Promise<string | undefined> => {
-    const { siteId, store } = options
+    const { siteId, store, userToken } = options
     apiSiteId.value = siteId
     siteStore.value = {
       ...store,
     }
 
     const serverAddress = await siteStore.value.initialize()
+    if (serverAddress) {
+      apiSite = new PSApi({
+        baseUrl: `${serverAddress}/api/`,
+        userToken,
+        responseInterceptors: [...plainResponseInterceptors],
+      })
+    }
     const restored = await siteStore.value.restore()
     setRestoredSite(restored)
     return serverAddress
@@ -97,6 +109,7 @@ export const useSiteSource = (): IUseSiteSource => {
     checkOutdated,
     replaceSite,
     setRestoredSite,
+    apiSite,
     apiSiteId,
     siteStore,
     isSaving,

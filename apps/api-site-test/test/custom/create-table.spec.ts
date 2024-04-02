@@ -1,5 +1,5 @@
 import {
-  Action,
+  CustomDataAction,
   ICreateTableResponse,
   ICustomDataApiRequest,
   IListTablesResponse,
@@ -32,14 +32,14 @@ describe('Create Custom Table', () => {
     siteId = '6d2c8359-6094-402c-bcbb-37202fd7c336'
     tableName = 'custom_table'
     payload = {
-      action: Action.CreateTable,
+      action: CustomDataAction.CreateTable,
       data: mockCreateTablePayload(tableName),
     }
     await resetService.reset()
   })
 
   const verifyTable = async () => {
-    payload.action = Action.ListTables
+    payload.action = CustomDataAction.ListTables
     payload.data = mockListTablesPayload()
 
     const res2 = await api
@@ -110,7 +110,7 @@ describe('Create Custom Table', () => {
     })
 
     it('when table_name is invalid', async () => {
-      payload.action = Action.CreateTable
+      payload.action = CustomDataAction.CreateTable
       payload.data = mockCreateTablePayload('site_versions')
 
       await api
