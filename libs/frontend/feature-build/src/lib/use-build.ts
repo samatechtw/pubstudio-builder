@@ -143,7 +143,7 @@ export interface IUseBuild {
   duplicateComponent: () => void
   pasteComponent: (copiedComponentId: string, parent: IComponent) => void
   replacePageRoot: (copiedComponentId: string, pageRoute: string) => void
-  addBuiltinComponent: (id: string, parentId?: string) => void
+  addBuiltinComponent: (id: string, parentId?: string) => string | undefined
   addBuiltinComponentData: (data: IAddComponentData) => void
   editSelectedComponent: (fields: IEditComponentFields) => void
   editComponent: (component: IComponent, fields: IEditComponentFields) => void
@@ -172,9 +172,10 @@ export interface IUseBuild {
   addComponentMixin: (mixinId: string) => void
   removeComponentMixin: (mixinId: string) => void
   replaceComponentMixin: (oldMixinId: string, newMixinId: string) => void
-  removeComponentEvent: (name: string) => void
-  addComponentEvent: (newEvent: IComponentEvent) => void
-  updateComponentEvent: (oldEventName: string, newEvent: IComponentEvent) => void
+  addComponentEvent: (component: IComponent, newEvent: IComponentEvent) => void
+  addSelectedComponentEvent: (newEvent: IComponentEvent) => void
+  removeSelectedComponentEvent: (name: string) => void
+  updateSelectedComponentEvent: (oldEventName: string, newEvent: IComponentEvent) => void
   addOrUpdateComponentInput: (property: string, payload: Partial<IComponentInput>) => void
   removeComponentInput: (name: string) => void
   setSelectedIsInput: (prop: string, newValue: unknown) => void
@@ -357,7 +358,7 @@ export const useBuild = (): IUseBuild => {
     pushCommandAndAddMissingMixins(CommandType.AddComponent, data, mixins)
   }
 
-  const addBuiltinComponent = (id: string, parentId?: string) => {
+  const addBuiltinComponent = (id: string, parentId?: string): string | undefined => {
     if (!activePage.value) {
       return
     }
@@ -377,6 +378,7 @@ export const useBuild = (): IUseBuild => {
       return
     }
     addBuiltinComponentData(data)
+    return data.id
   }
 
   const pushCommandAndAddMissingMixins = <Data>(
@@ -653,21 +655,28 @@ export const useBuild = (): IUseBuild => {
     )
   }
 
-  const addComponentEvent = (newEvent: IComponentEvent) => {
-    const selected = site.value.editor?.selectedComponent
-    const oldEvent = selected?.events?.[newEvent.name]
-    if (!selected) {
-      return
-    }
+  const addComponentEvent = (component: IComponent, newEvent: IComponentEvent) => {
+    const oldEvent = component.events?.[newEvent.name]
     const data: ISetComponentEventData = {
-      componentId: selected.id,
+      componentId: component.id,
       oldEvent,
       newEvent,
     }
     pushCommand(site.value, CommandType.SetComponentEvent, data)
   }
 
-  const updateComponentEvent = (oldEventName: string, newEvent: IComponentEvent) => {
+  const addSelectedComponentEvent = (newEvent: IComponentEvent) => {
+    const selected = site.value.editor?.selectedComponent
+    if (!selected) {
+      return
+    }
+    addComponentEvent(selected, newEvent)
+  }
+
+  const updateSelectedComponentEvent = (
+    oldEventName: string,
+    newEvent: IComponentEvent,
+  ) => {
     // TODO -- don't update if event is unchanged
     const selected = site.value.editor?.selectedComponent
     const oldEvent = selected?.events?.[oldEventName]
@@ -682,7 +691,7 @@ export const useBuild = (): IUseBuild => {
     pushCommand(site.value, CommandType.SetComponentEvent, data)
   }
 
-  const removeComponentEvent = (name: string) => {
+  const removeSelectedComponentEvent = (name: string) => {
     const selected = site.value.editor?.selectedComponent
     const oldEvent = selected?.events?.[name]
     if (!selected) {
@@ -1280,8 +1289,9 @@ export const useBuild = (): IUseBuild => {
     removeComponentMixin,
     replaceComponentMixin,
     addComponentEvent,
-    updateComponentEvent,
-    removeComponentEvent,
+    addSelectedComponentEvent,
+    updateSelectedComponentEvent,
+    removeSelectedComponentEvent,
     addOrUpdateComponentInput,
     removeComponentInput,
     setSelectedIsInput,

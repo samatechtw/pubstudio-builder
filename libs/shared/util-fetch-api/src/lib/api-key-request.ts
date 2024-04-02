@@ -1,5 +1,5 @@
+import { ApiResponse } from '@pubstudio/shared/type-api'
 import { FetchRequestConfig } from '@sampullman/fetch-api'
-import { ApiResponse } from './api-response'
 import { BasicFetchApi } from './util-fetch-api'
 
 export interface ApiKeyRequestOptions extends FetchRequestConfig {

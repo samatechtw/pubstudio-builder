@@ -1,4 +1,5 @@
-import { IApiError } from '@pubstudio/shared/type-api'
+import { ApiResponse, IApiError } from '@pubstudio/shared/type-api'
+import { FetchApi, FetchRequestConfig } from '@sampullman/fetch-api'
 import { IEditorContext } from './i-editor-context'
 import { ISite } from './i-site'
 
@@ -12,6 +13,17 @@ export interface ISiteSaveOptions {
   immediate?: boolean
   ignoreUpdateKey?: boolean
   forceUpdate?: boolean
+}
+
+// Types to mimic site API in `apps/web-site/src/app/api.ts`
+export type ISiteApi = FetchApi<ApiResponse> & {
+  authRequest<T>(config: FetchRequestConfig): Promise<ApiResponse<T>>
+  authOptRequest<T>(config: FetchRequestConfig): Promise<ApiResponse<T>>
+}
+
+export interface IInitializeApiStore {
+  siteApi: ISiteApi
+  serverAddress: string
 }
 
 export enum SiteSaveState {

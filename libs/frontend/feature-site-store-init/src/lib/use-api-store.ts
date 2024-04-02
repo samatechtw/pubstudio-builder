@@ -22,6 +22,7 @@ import {
   IStoredSiteDirty,
   SiteSaveState,
 } from '@pubstudio/shared/type-site'
+import { plainResponseInterceptors } from '@pubstudio/shared/util-fetch-api'
 import { computed, inject, ref } from 'vue'
 import { SiteSaveAlert, siteSaveAlert } from './site-save-alert'
 
@@ -95,12 +96,25 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
         const site = await getSite(siteId.value)
         serverAddress = site.site_server.address
       }
+      // Convert cluster URLs for dev/CI
+      serverAddress =
+        {
+          'http://site-api1:3100': 'http://127.0.0.1:3100',
+          'http://site-api1:3110': 'http://127.0.0.1:3110',
+        }[serverAddress] ?? serverAddress
 
-      const siteApi = useSiteApi({ store, serverAddress })
+      const api = new PSApi({
+        baseUrl: `${serverAddress}/api/`,
+        userToken: store.auth.token,
+        responseInterceptors: [...plainResponseInterceptors],
+      })
+
+      const siteApi = useSiteApi(api)
       getFn = siteApi.getSiteVersion
       updateFn = siteApi.updateSite
+      return serverAddress
     }
-    return serverAddress
+    return undefined
   }
 
   // Post the updated Site fields to the API

@@ -9,7 +9,6 @@ import {
   IUpdateSiteApiRequest,
   IUpdateSiteApiResponse,
 } from '@pubstudio/shared/type-api-site-sites'
-import { plainResponseInterceptors } from '@pubstudio/shared/util-fetch-api'
 import { RequestParams } from '@sampullman/fetch-api'
 
 export interface IUseSiteApiParams {
@@ -37,22 +36,7 @@ export interface IApiSite {
   publishSite(siteId: string, publish: boolean): Promise<void>
 }
 
-export const useSiteApi = (params: IUseSiteApiParams): IApiSite => {
-  const { store, serverAddress } = params
-
-  // Convert cluster URLs for dev/CI
-  const address =
-    {
-      'http://site-api1:3100': 'http://127.0.0.1:3100',
-      'http://site-api1:3110': 'http://127.0.0.1:3110',
-    }[serverAddress] ?? serverAddress
-
-  const api = new PSApi({
-    baseUrl: `${address}/api/`,
-    userToken: store.auth.token,
-    responseInterceptors: [...plainResponseInterceptors],
-  })
-
+export const useSiteApi = (api: PSApi): IApiSite => {
   const getSiteVersion = async (
     siteId: string,
     versionId: string,

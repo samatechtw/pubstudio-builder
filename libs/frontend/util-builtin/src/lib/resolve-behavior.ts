@@ -19,6 +19,7 @@ export const NativeEvents: Record<string, string> = {
   click: 'onClick',
   mouseover: 'onMouseover',
   mouseleave: 'onMouseleave',
+  submit: 'onSubmit',
   [ComponentEventType.Input]: 'onInput',
 }
 

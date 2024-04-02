@@ -1,4 +1,5 @@
 import { EditorView } from 'prosemirror-view'
+import { ContactFormWalkthroughState } from './enum-contact-form-state'
 import { CssPseudoClass } from './enum-css-pseudo-class'
 import { CssUnit } from './enum-css-unit'
 import { IBehavior, IComponent, IComponentEvent } from './i-component'
@@ -72,6 +73,11 @@ export interface IEditBehavior extends Omit<IBehavior, 'id'> {
 
 export interface IEditSvg {
   content: string
+}
+
+export interface IContactFormWalkthrough {
+  state: ContactFormWalkthroughState
+  formId: string
 }
 
 export interface IResizeData {
@@ -156,7 +162,10 @@ export interface IEditorContext {
   builderWidth: number
   // Defaults to 1
   builderScale: number
+  // Active pseudo class
   cssPseudoClass: CssPseudoClass
   // If false/undefined, template selector is shown when the site is loaded
   templatesShown?: boolean
+  // State of contact form walkthrough modal
+  contactFormWalkthrough?: IContactFormWalkthrough
 }

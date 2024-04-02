@@ -2,6 +2,7 @@ import { useLocalSiteApi, usePlatformSiteApi } from '@pubstudio/frontend/data-ac
 import { ApiInjectionKey } from '@pubstudio/frontend/data-access-injection'
 import { useSiteApi } from '@pubstudio/frontend/data-access-site-api'
 import { store } from '@pubstudio/frontend/data-access-web-store'
+import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { PSApi } from '@pubstudio/frontend/util-api'
 import { SiteType, SiteVariant } from '@pubstudio/shared/type-api-platform-site'
 import { IGetSiteVersionApiResponse } from '@pubstudio/shared/type-api-site-sites'
@@ -15,6 +16,7 @@ export interface IUseGetSite {
 
 export const useGetSite = (): IUseGetSite => {
   const rootApi = inject(ApiInjectionKey) as PSApi
+  const { apiSite } = useSiteSource()
 
   // Get local/identity or site-api site info
   const getSiteInfo = async (id: string): Promise<IMergedSiteData | undefined> => {
@@ -57,11 +59,10 @@ export const useGetSite = (): IUseGetSite => {
         const { getLocalSite } = useLocalSiteApi(rootApi)
         siteData = await getLocalSite(store.user.identity.value.id)
       } else if (id) {
-        // Get site server address from Platform API
-        const { getSite } = usePlatformSiteApi(rootApi)
-        const site = await getSite(id)
-        const siteApi = useSiteApi({ store, serverAddress: site.site_server.address })
-        siteData = await siteApi.getSiteVersion(id)
+        if (apiSite) {
+          const siteApi = useSiteApi(apiSite)
+          siteData = await siteApi?.getSiteVersion(id, 'latest')
+        }
       }
     } catch (e) {
       console.log('Failed to get site:', e)

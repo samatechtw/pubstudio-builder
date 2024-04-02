@@ -15,7 +15,7 @@ import {
 import { ComponentArgPrimitive, IComponentInput, Tag } from '@pubstudio/shared/type-site'
 import { makeH2 } from './builtin-h'
 
-const makePlaceholder = (text: string): IComponentInput => {
+const makeInput = (name: string, text: string): IComponentInput => {
   return {
     type: ComponentArgPrimitive.String,
     name: 'placeholder',
@@ -60,7 +60,7 @@ export const contactForm = {
     {
       id: containerVerticalId,
       name: 'ContactForm',
-      tag: Tag.Div,
+      tag: Tag.Form,
       children: [
         makeH2('ContactFormTitle', '<div class="pm-p">Get in touch.</div>', {
           [DEFAULT_BREAKPOINT_ID]: {
@@ -99,7 +99,8 @@ export const contactForm = {
                 mixins: [inputStyleId],
               },
               inputs: {
-                placeholder: makePlaceholder('Email'),
+                placeholder: makeInput('placeholder', 'Email'),
+                name: makeInput('name', 'contact-email'),
               },
             },
             {
@@ -125,7 +126,8 @@ export const contactForm = {
                 mixins: [inputStyleId],
               },
               inputs: {
-                placeholder: makePlaceholder('Name (optional)'),
+                placeholder: makeInput('placeholder', 'Name (optional)'),
+                name: makeInput('name', 'contact-name'),
               },
             },
           ],
@@ -163,7 +165,8 @@ export const contactForm = {
             mixins: [textareaStyleId],
           },
           inputs: {
-            placeholder: makePlaceholder('Message'),
+            placeholder: makeInput('placeholder', 'Message'),
+            name: makeInput('name', 'contact-message'),
             rows: {
               name: 'rows',
               type: ComponentArgPrimitive.String,

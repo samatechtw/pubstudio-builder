@@ -1,9 +1,6 @@
+import { ApiResponse } from '@pubstudio/shared/type-api'
 import { FetchApi, FetchRequestConfig, IJsonObject } from '@sampullman/fetch-api'
 import { Ref } from 'vue'
-
-export class ApiResponse<T = IJsonObject> extends Response {
-  data!: T
-}
 
 export const defaultResponseInterceptors = [
   async (res: Response): Promise<ApiResponse> => {

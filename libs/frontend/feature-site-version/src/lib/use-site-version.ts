@@ -1,10 +1,11 @@
 import { usePlatformSiteApi } from '@pubstudio/frontend/data-access-api'
 import { ApiInjectionKey } from '@pubstudio/frontend/data-access-injection'
-import { useSiteApi } from '@pubstudio/frontend/data-access-site-api'
+import { IApiSite, useSiteApi } from '@pubstudio/frontend/data-access-site-api'
 import { store } from '@pubstudio/frontend/data-access-web-store'
 import { site } from '@pubstudio/frontend/feature-site-source'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { parseApiErrorKey, PSApi, toApiError } from '@pubstudio/frontend/util-api'
+import { ApiErrorCode, IApiError } from '@pubstudio/shared/type-api'
 import { SiteVariant } from '@pubstudio/shared/type-api-platform-site'
 import { ISiteInfoViewModel } from '@pubstudio/shared/type-api-site-sites'
 import { computed, ComputedRef, inject, Ref, ref } from 'vue'
@@ -27,14 +28,13 @@ export interface IUseSiteVersion {
 }
 
 export interface IUseSiteVersionOptions {
-  serverAddress: string | undefined
   siteId: string | undefined
 }
 
 const versions = ref<ISiteInfoViewModel[]>([])
 const hasVersions = ref<boolean>(false)
-let serverAddress: string | undefined = undefined
 let siteId: string | undefined = undefined
+let api: IApiSite
 
 const hasDraft = computed(() => {
   return hasVersions.value && versions.value.length > 1 && !versions.value[0]?.published
@@ -46,38 +46,36 @@ const sitePublished = computed(() => {
 
 export const useSiteVersion = (options?: IUseSiteVersionOptions): IUseSiteVersion => {
   const rootApi = inject(ApiInjectionKey) as PSApi
-  const { siteStore, setRestoredSite, syncUpdateKey } = useSiteSource()
+  const { siteStore, setRestoredSite, syncUpdateKey, apiSite } = useSiteSource()
   if (options) {
-    serverAddress = options.serverAddress
     siteId = options.siteId
+  }
+  if (!api && apiSite) {
+    api = useSiteApi(apiSite)
   }
   const loading = ref(false)
   const error = ref()
 
   const listVersions = async () => {
-    hasVersions.value =
-      !!serverAddress && !(siteId === SiteVariant.Local || siteId === SiteVariant.Scratch)
-    if (hasVersions.value) {
-      const { listSiteVersions } = useSiteApi({
-        store,
-        serverAddress: serverAddress as string,
-      })
+    hasVersions.value = !(siteId === SiteVariant.Local || siteId === SiteVariant.Scratch)
+    if (api && hasVersions.value) {
       try {
-        versions.value = await listSiteVersions(siteId as string)
+        versions.value = await api.listSiteVersions(siteId as string)
       } catch (e) {
         console.log('Failed to list site versions', e)
+        const err = e as IApiError
+        if (err.status) {
+          store.auth.setLoginRedirect(location.pathname)
+          store.auth.logOut()
+        }
       }
     }
   }
 
   const enablePreview = async (enable: boolean) => {
-    const { updateSite } = useSiteApi({
-      store,
-      serverAddress: serverAddress as string,
-    })
     loading.value = true
     try {
-      const res = await updateSite(siteId as string, { enable_preview: enable })
+      const res = await api.updateSite(siteId as string, { enable_preview: enable })
       syncUpdateKey(res)
     } catch (e) {
       console.log(`Failed to set preview ${enable}`, e)
@@ -89,13 +87,9 @@ export const useSiteVersion = (options?: IUseSiteVersionOptions): IUseSiteVersio
   const createDraft = async () => {
     error.value = undefined
     const { siteStore } = useSiteSource()
-    const { createDraft } = useSiteApi({
-      store,
-      serverAddress: serverAddress as string,
-    })
     loading.value = true
     try {
-      versions.value = await createDraft(siteId as string)
+      versions.value = await api.createDraft(siteId as string)
       // Set the update key, since the new draft's `updated_at` will be different
       if (versions.value[0]) {
         siteStore.value.setUpdateKey(versions.value[0].updated_at.toString())
@@ -110,13 +104,9 @@ export const useSiteVersion = (options?: IUseSiteVersionOptions): IUseSiteVersio
   const deleteDraft = async () => {
     error.value = undefined
     const { siteStore } = useSiteSource()
-    const { deleteDraft } = useSiteApi({
-      store,
-      serverAddress: serverAddress as string,
-    })
     loading.value = true
     try {
-      await deleteDraft(siteId as string)
+      await api.deleteDraft(siteId as string)
       await listVersions()
       // Set the update key, since the live version's `updated_at` will be different
       if (versions.value[0]) {

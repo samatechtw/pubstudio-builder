@@ -1,5 +1,5 @@
 import {
-  Action,
+  CustomDataAction,
   ICustomDataApiRequest,
   IListTablesResponse,
 } from '@pubstudio/shared/type-api-site-custom-data'
@@ -24,7 +24,7 @@ describe('List Custom Tables', () => {
     adminAuth = adminAuthHeader()
     resetService = new SiteApiResetService('http://127.0.0.1:3100', adminAuth, SITE_SEEDS)
     payload = {
-      action: Action.ListTables,
+      action: CustomDataAction.ListTables,
       data: mockListTablesPayload(),
     }
   })

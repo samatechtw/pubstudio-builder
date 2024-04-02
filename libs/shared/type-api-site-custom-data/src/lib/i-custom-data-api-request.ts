@@ -1,6 +1,6 @@
-import { Action } from './enum-action'
+import { CustomDataAction } from './enum-custom-data-action'
 
 export interface ICustomDataApiRequest {
-  action: Action
-  data: string
+  action: CustomDataAction
+  data: unknown
 }

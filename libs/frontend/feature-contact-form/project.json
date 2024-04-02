@@ -1,0 +1,25 @@
+{
+  "name": "frontend-feature-contact-form",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/frontend/feature-contact-form/src",
+  "projectType": "library",
+  "targets": {
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/frontend/feature-contact-form/**/*.ts"],
+        "eslintConfig": "libs/frontend/feature-contact-form/.eslintrc.cjs"
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/libs/frontend/feature-contact-form"],
+      "options": {
+        "jestConfig": "libs/frontend/feature-contact-form/jest.config.ts",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": ["scope:frontend", "type:feature"]
+}

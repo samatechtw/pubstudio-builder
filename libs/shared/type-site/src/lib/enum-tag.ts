@@ -10,6 +10,7 @@ export enum Tag {
   H5 = 'h5',
   H6 = 'h6',
   Footer = 'footer',
+  Form = 'Form',
   Header = 'header',
   Img = 'img',
   Span = 'span',

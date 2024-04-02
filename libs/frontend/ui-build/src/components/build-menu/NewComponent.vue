@@ -11,7 +11,7 @@
     @dragstart="dragstart"
     @dragend="dragend"
     @drag="drag"
-    @click="addBuiltinComponent(builtinComponentId)"
+    @click="clickAddComponent"
   >
     {{ text }}
   </div>
@@ -30,9 +30,18 @@ const props = defineProps<{
   builtinComponentId: string
 }>()
 
+const emit = defineEmits<{
+  (e: 'add', componentId: string | undefined): void
+}>()
+
 const { builtinComponentId } = toRefs(props)
 
 const { site, editor, activePage, addBuiltinComponent } = useBuild()
+
+const clickAddComponent = () => {
+  const componentId = addBuiltinComponent(builtinComponentId.value)
+  emit('add', componentId)
+}
 
 const { dndState, elementRef, dragstart, drag, dragenter, dragover, dragleave, dragend } =
   useDragDrop({

@@ -12,8 +12,12 @@ export interface IUseEditComponentEventFeature {
 }
 
 export const useEditComponentEvent = (): IUseEditComponentEventFeature => {
-  const { editor, addComponentEvent, updateComponentEvent, removeComponentEvent } =
-    useBuild()
+  const {
+    editor,
+    addSelectedComponentEvent,
+    updateSelectedComponentEvent,
+    removeSelectedComponentEvent,
+  } = useBuild()
 
   const isEditingEvent = computed(() => {
     return editor.value?.componentTab?.state === ComponentTabState.EditEvent
@@ -35,16 +39,16 @@ export const useEditComponentEvent = (): IUseEditComponentEventFeature => {
     const selectedComponent = editor.value?.selectedComponent
     if (selectedComponent) {
       if (oldEventName) {
-        updateComponentEvent(oldEventName, event)
+        updateSelectedComponentEvent(oldEventName, event)
       } else {
-        addComponentEvent(event)
+        addSelectedComponentEvent(event)
       }
       setEditedEvent(undefined)
     }
   }
 
   const removeEvent = (name: string) => {
-    removeComponentEvent(name)
+    removeSelectedComponentEvent(name)
     setEditedEvent(undefined)
   }
 

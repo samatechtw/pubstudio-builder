@@ -362,6 +362,9 @@ onUnmounted(() => {
     width: 100%;
     padding: 6px 8px 5px;
   }
+  :deep(.ps-input-label) {
+    top: 7px;
+  }
 }
 
 .editing-wrap {

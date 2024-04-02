@@ -86,8 +86,10 @@
         class="new-divider-vertical"
         :text="t('build.contact_form')"
         :builtinComponentId="contactForm.id"
+        @add="showContactFormWalkthrough"
       />
     </div>
+    <ContactFormWalkthroughModal />
   </div>
 </template>
 
@@ -119,9 +121,14 @@ import {
   dividerHorizontal,
   contactForm,
 } from '@pubstudio/frontend/util-builtin'
+import {
+  ContactFormWalkthroughModal,
+  useContactForm,
+} from '@pubstudio/frontend/feature-contact-form'
 import NewComponent from './NewComponent.vue'
 
 const { t } = useI18n()
+const { showContactFormWalkthrough } = useContactForm()
 </script>
 
 <style lang="postcss" scoped>

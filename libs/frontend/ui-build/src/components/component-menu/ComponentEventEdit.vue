@@ -161,10 +161,6 @@ const editOrNewEvent = (
     }
   })
 
-  if (!eventBehaviors.length) {
-    return defaultEvent()
-  }
-
   return {
     name: editedEvent.name,
     eventParams: editedEvent.eventParams ? { ...editedEvent.eventParams } : undefined,

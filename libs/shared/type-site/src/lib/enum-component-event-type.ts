@@ -7,6 +7,7 @@ export enum ComponentEventType {
   OnAppear = 'appear',
   ScrollIntoView = 'scrollIntoView',
   Input = 'input',
+  Submit = 'submit',
 }
 
 export const ComponentEventTypeValues: ComponentEventType[] =
