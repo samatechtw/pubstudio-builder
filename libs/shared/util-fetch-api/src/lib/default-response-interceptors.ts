@@ -1,5 +1,5 @@
+import { ApiResponse } from '@pubstudio/shared/type-api'
 import { IJsonObject } from '@sampullman/fetch-api'
-import { ApiResponse } from './api-response'
 import { transformResponseData } from './api-transforms'
 
 // Convert errors to exceptions and extract JSON

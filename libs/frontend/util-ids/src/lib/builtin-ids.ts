@@ -80,3 +80,4 @@ export const textareaId = componentId(defaultContext.namespace, 'textarea')
 
 // Advanced
 export const contactFormId = componentId(defaultContext.namespace, 'contactform')
+export const contactFormBehaviorId = behaviorId(defaultContext.namespace, 'contactform')

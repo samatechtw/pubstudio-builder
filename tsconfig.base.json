@@ -39,6 +39,9 @@
       "@pubstudio/frontend/feature-color-picker": [
         "libs/frontend/feature-color-picker/src/index.ts"
       ],
+      "@pubstudio/frontend/feature-contact-form": [
+        "libs/frontend/feature-contact-form/src/index.ts"
+      ],
       "@pubstudio/frontend/feature-template": [
         "libs/frontend/feature-template/src/index.ts"
       ],

@@ -5,14 +5,11 @@ import { containerVertical, h1 } from '@pubstudio/frontend/util-builtin'
 import { DEFAULT_BREAKPOINT_ID } from '@pubstudio/frontend/util-ids'
 import { storeSite } from '@pubstudio/frontend/util-site-store'
 import {
-  Css,
-  CssPseudoClass,
-  IEditorContext,
-  ISite,
   ISiteRestore,
   ISiteStore,
   SiteSaveState,
-} from '@pubstudio/shared/type-site'
+} from '@pubstudio/shared/feature-site-store-init'
+import { Css, CssPseudoClass, IEditorContext, ISite } from '@pubstudio/shared/type-site'
 import { ref } from 'vue'
 
 export const makeMockStore = (): ISiteStore => {

@@ -1,5 +1,5 @@
+import { ApiResponse } from '@pubstudio/shared/type-api'
 import {
-  ApiResponse,
   defaultResponseInterceptors,
   transformRequestData,
 } from '@pubstudio/shared/util-fetch-api'
@@ -8,13 +8,13 @@ import { Ref } from 'vue'
 
 export interface PSApiOptions {
   baseUrl: string
-  userToken: Ref<string | null>
+  userToken?: Ref<string | null>
   cors?: boolean
   responseInterceptors?: ((res: Response) => Promise<ApiResponse>)[]
 }
 
 export class PSApi extends FetchApi<ApiResponse> {
-  userToken: Ref<string | null>
+  userToken?: Ref<string | null>
   cors: boolean
 
   constructor(options: PSApiOptions) {
@@ -32,7 +32,7 @@ export class PSApi extends FetchApi<ApiResponse> {
   authRequest<T>(config: FetchRequestConfig): Promise<ApiResponse<T>> {
     const { headers, ...rest } = config
     let authHeaders = headers
-    if (this.userToken.value) {
+    if (this.userToken?.value) {
       authHeaders = {
         ...headers,
         Authorization: `Bearer ${this.userToken.value}`,
@@ -45,7 +45,7 @@ export class PSApi extends FetchApi<ApiResponse> {
   }
 
   authOptRequest<T>(config: FetchRequestConfig): Promise<ApiResponse<T>> {
-    if (this.userToken.value) {
+    if (this.userToken?.value) {
       return this.authRequest(config)
     } else {
       return this.request(config)

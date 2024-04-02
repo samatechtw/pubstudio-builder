@@ -1,4 +1,4 @@
-export enum Action {
+export enum CustomDataAction {
   CreateTable = 'CreateTable',
   AddRow = 'AddRow',
   ListTables = 'ListTables',
