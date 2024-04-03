@@ -62,7 +62,7 @@ export const serializeEditor = (
         cssPseudoClass: editor.cssPseudoClass,
         templatesShown: editor.templatesShown,
         componentMenuCollapses: editor.componentMenuCollapses,
-        contactFormWalkthroughState: editor.contactFormWalkthroughState,
+        contactFormWalkthrough: editor.contactFormWalkthrough,
       }
     : undefined
 }

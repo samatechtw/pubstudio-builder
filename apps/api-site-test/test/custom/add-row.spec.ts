@@ -1,5 +1,5 @@
 import {
-  Action,
+  CustomDataAction,
   ICustomDataApiRequest,
 } from '@pubstudio/shared/type-api-site-custom-data'
 import { SiteApiResetService } from '@pubstudio/shared/util-test-reset'
@@ -29,7 +29,7 @@ describe('Add Row', () => {
     adminAuth = adminAuthHeader()
     resetService = new SiteApiResetService('http://127.0.0.1:3100', adminAuth, SITE_SEEDS)
     payload = {
-      action: Action.AddRow,
+      action: CustomDataAction.AddRow,
       data: mockAddRowPayload1(),
     }
   })

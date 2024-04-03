@@ -1,5 +1,5 @@
 import {
-  Action,
+  CustomDataAction,
   ICustomDataApiRequest,
   IUpdateRowResponse,
 } from '@pubstudio/shared/type-api-site-custom-data'
@@ -32,7 +32,7 @@ describe('Update Row', () => {
     adminAuth = adminAuthHeader()
     resetService = new SiteApiResetService('http://127.0.0.1:3100', adminAuth, SITE_SEEDS)
     payload = {
-      action: Action.UpdateRow,
+      action: CustomDataAction.UpdateRow,
       data: mockUpdateRowPayload1(),
     }
   })
@@ -46,7 +46,7 @@ describe('Update Row', () => {
       .post(testEndpoint(siteId))
       .set('Authorization', adminAuth)
       .send({
-        action: Action.AddRow,
+        action: CustomDataAction.AddRow,
         data: mockAddRowPayload1(),
       })
       .expect(204)
@@ -128,7 +128,7 @@ describe('Update Row', () => {
         .post(testEndpoint(siteId))
         .set('Authorization', adminAuth)
         .send({
-          action: Action.AddRow,
+          action: CustomDataAction.AddRow,
           data: mockAddRowPayload2(),
         })
         .expect(204)

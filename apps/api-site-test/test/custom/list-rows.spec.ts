@@ -1,5 +1,5 @@
 import {
-  Action,
+  CustomDataAction,
   ICustomDataApiRequest,
   IListRowsResponse,
 } from '@pubstudio/shared/type-api-site-custom-data'
@@ -29,7 +29,7 @@ describe('List Rows', () => {
     adminAuth = adminAuthHeader()
     resetService = new SiteApiResetService('http://127.0.0.1:3100', adminAuth, SITE_SEEDS)
     payload = {
-      action: Action.ListRows,
+      action: CustomDataAction.ListRows,
       data: mockListRowsPayload('contact_form'),
     }
   })
@@ -52,7 +52,7 @@ describe('List Rows', () => {
 
     // Add Row
     const addPayload = {
-      action: Action.AddRow,
+      action: CustomDataAction.AddRow,
       data: mockAddRowPayload1(),
     }
 
@@ -79,7 +79,7 @@ describe('List Rows', () => {
 
     // Add Rows
     const addPayload1 = {
-      action: Action.AddRow,
+      action: CustomDataAction.AddRow,
       data: mockAddRowPayload1(),
     }
 
@@ -90,7 +90,7 @@ describe('List Rows', () => {
       .expect(204)
 
     const addPayload2 = {
-      action: Action.AddRow,
+      action: CustomDataAction.AddRow,
       data: mockAddRowPayload2(),
     }
 
@@ -101,7 +101,7 @@ describe('List Rows', () => {
       .expect(204)
 
     const addPayload3 = {
-      action: Action.AddRow,
+      action: CustomDataAction.AddRow,
       data: mockAddRowPayload3(),
     }
 

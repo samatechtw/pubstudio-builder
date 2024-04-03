@@ -1,5 +1,5 @@
 import {
-  Action,
+  CustomDataAction,
   ICustomDataApiRequest,
   IUpdateColumnApiResponse,
 } from '@pubstudio/shared/type-api-site-custom-data'
@@ -35,13 +35,13 @@ describe('Add Column', () => {
     await resetService.reset()
 
     payload = {
-      action: Action.AddColumn,
+      action: CustomDataAction.AddColumn,
       data: mockAddColumnPayload1(),
     }
   })
 
   const verifyAddRow = async () => {
-    payload.action = Action.AddRow
+    payload.action = CustomDataAction.AddRow
     payload.data = mockAddRowPayload4()
 
     await api
@@ -52,7 +52,7 @@ describe('Add Column', () => {
   }
 
   const verifyAddInvalidRow = async () => {
-    payload.action = Action.AddRow
+    payload.action = CustomDataAction.AddRow
     payload.data = mockAddInvalidRow5()
 
     await api
@@ -106,7 +106,7 @@ describe('Add Column', () => {
   it('add column with existing data', async () => {
     // Add Row
     payload = {
-      action: Action.AddRow,
+      action: CustomDataAction.AddRow,
       data: mockAddRowPayload1(),
     }
 
@@ -118,7 +118,7 @@ describe('Add Column', () => {
 
     // Add Column
     payload = {
-      action: Action.AddColumn,
+      action: CustomDataAction.AddColumn,
       data: mockAddColumnPayload1(),
     }
 
