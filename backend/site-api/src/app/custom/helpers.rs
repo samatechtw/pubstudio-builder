@@ -11,8 +11,8 @@ use crate::api_context::ApiContext;
 
 pub async fn validate_row_data(
     context: &ApiContext,
-    site_id: &String,
-    table: &String,
+    site_id: &str,
+    table: &str,
     values: &HashMap<String, String>,
 ) -> Result<(), ApiError> {
     let columns = context
@@ -23,21 +23,58 @@ pub async fn validate_row_data(
 
     let column_info = parse_column_info(&columns)?;
 
+    let mut unique_entries = Vec::<(String, String)>::new();
     for (k, info) in column_info {
+        let val = values.get(&k).map(|k| k as &str);
         for rule in info.validation_rules.iter() {
             match rule.rule_type {
                 RuleType::Email => {
-                    if let Some(v) = values.get(&k) {
+                    if let Some(v) = val {
                         if !is_email(v) {
                             return Err(ApiError::bad_request()
-                                .code(ApiErrorCode::CustomColumnValidationFail)
+                                .code(ApiErrorCode::CustomDataInvalidEmail)
                                 .message(format!("{} is not a valid email", v)));
                         }
                     }
                 }
-                _ => {}
+                RuleType::Required => {
+                    if val.is_none() {
+                        return Err(ApiError::bad_request().code(ApiErrorCode::CustomDataRequired));
+                    }
+                }
+                RuleType::MinLength => {
+                    if let Some(v) = val {
+                        let min = rule.parameter.unwrap_or(0) as usize;
+                        if v.len() < min {
+                            return Err(ApiError::bad_request()
+                                .code(ApiErrorCode::CustomDataMinLengthFail)
+                                .message(format!("{} length must be greater than {}", k, min)));
+                        }
+                    }
+                }
+                RuleType::MaxLength => {
+                    if let Some(v) = val {
+                        let max = rule.parameter.unwrap_or(0) as usize;
+                        if v.len() > max {
+                            return Err(ApiError::bad_request()
+                                .code(ApiErrorCode::CustomDataMaxLengthFail)
+                                .message(format!("{} length must be less than {}", k, max)));
+                        }
+                    }
+                }
+                RuleType::Unique => unique_entries.push((k.clone(), val.unwrap_or("").to_string())),
             }
         }
+    }
+    if !context
+        .custom_data_repo
+        .verify_unique(site_id, table, unique_entries)
+        .await
+        .map_err(|e| ApiError::internal_error().message(e))?
+    {
+        return Err(ApiError::bad_request()
+            .code(ApiErrorCode::CustomDataUniqueFail)
+            .message(format!("Unique constraint violation")));
     }
 
     Ok(())

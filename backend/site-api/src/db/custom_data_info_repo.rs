@@ -35,11 +35,7 @@ pub trait CustomDataInfoRepoTrait {
         id: &str,
         query: ListTablesQuery,
     ) -> Result<CustomDataInfoEntityResult, DbError>;
-    async fn get_columns_from_table(
-        &self,
-        id: &str,
-        table_name: &String,
-    ) -> Result<String, DbError>;
+    async fn get_columns_from_table(&self, id: &str, table_name: &str) -> Result<String, DbError>;
 }
 
 pub struct CustomDataInfoRepo {
@@ -146,11 +142,7 @@ impl CustomDataInfoRepoTrait for CustomDataInfoRepo {
         Ok(CustomDataInfoEntityResult { total, results })
     }
 
-    async fn get_columns_from_table(
-        &self,
-        id: &str,
-        table_name: &String,
-    ) -> Result<String, DbError> {
+    async fn get_columns_from_table(&self, id: &str, table_name: &str) -> Result<String, DbError> {
         let pool = self.get_db_pool(id).await?;
 
         let columns = sqlx::query(
