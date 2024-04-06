@@ -2,7 +2,7 @@ use std::borrow::Cow::Borrowed;
 use std::{collections::BTreeMap, sync::Arc};
 
 use axum::async_trait;
-use lib_shared_site_api::db::util::append_column_info_to_query;
+use lib_shared_site_api::db::util::{append_column_info_to_query, append_or_eq};
 use lib_shared_site_api::db::{
     db_error::{map_sqlx_err, DbError},
     db_result::list_result,
@@ -27,6 +27,12 @@ pub trait CustomDataRepoTrait {
     async fn get_db_pool(&self, id: &str) -> Result<SqlitePool, DbError>;
     async fn create_table(&self, id: &str, dto: CreateTable) -> Result<(), DbError>;
     async fn insert(&self, id: &str, dto: AddRow) -> Result<(), DbError>;
+    async fn verify_unique(
+        &self,
+        id: &str,
+        table_name: &str,
+        entries: Vec<(String, String)>,
+    ) -> Result<bool, DbError>;
     async fn list_rows(&self, id: &str, query: ListRowsQuery) -> Result<ListRowsResponse, DbError>;
     async fn update_row(
         &self,
@@ -169,6 +175,30 @@ impl CustomDataRepoTrait for CustomDataRepo {
             .map_err(map_custom_data_sqlx_err)?;
 
         Ok(())
+    }
+
+    async fn verify_unique(
+        &self,
+        id: &str,
+        table_name: &str,
+        entries: Vec<(String, String)>,
+    ) -> Result<bool, DbError> {
+        let pool = self.get_db_pool(id).await?;
+        let mut count = 0;
+
+        let mut query = QueryBuilder::new("SELECT id FROM ");
+        query.push(table_name);
+        query.push(" WHERE ");
+
+        for (name, val) in entries.iter() {
+            let result = append_or_eq(query, name, Some(val), count);
+            query = result.0;
+            count = result.1;
+        }
+
+        let result = query.build().fetch_optional(&pool).await?;
+
+        return Ok(result.is_none());
     }
 
     async fn list_rows(&self, id: &str, query: ListRowsQuery) -> Result<ListRowsResponse, DbError> {

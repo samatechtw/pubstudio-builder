@@ -87,9 +87,9 @@ describe('Add Row', () => {
         .set('Authorization', adminAuth)
         .send(payload)
         .expect({
-          code: 'None',
-          message: 'name already exists',
-          status: 500,
+          code: 'CustomDataUniqueFail',
+          message: 'Unique constraint violation',
+          status: 400,
         })
     })
 
@@ -101,9 +101,9 @@ describe('Add Row', () => {
         .set('Authorization', adminAuth)
         .send(payload)
         .expect({
-          code: 'None',
-          message: 'Length check failed: age',
-          status: 500,
+          code: 'CustomDataMinLengthFail',
+          message: 'age length must be greater than 1',
+          status: 400,
         })
 
       payload.data = mockAddInvalidRow3()
@@ -113,9 +113,9 @@ describe('Add Row', () => {
         .set('Authorization', adminAuth)
         .send(payload)
         .expect({
-          code: 'None',
-          message: 'Length check failed: age',
-          status: 500,
+          code: 'CustomDataMaxLengthFail',
+          message: 'age length must be less than 3',
+          status: 400,
         })
     })
 
@@ -128,7 +128,7 @@ describe('Add Row', () => {
         .set('Authorization', adminAuth)
         .send(payload)
         .expect({
-          code: 'CustomColumnValidationFail',
+          code: 'CustomDataInvalidEmail',
           message: `${invalidEmail} is not a valid email`,
           status: 400,
         })

@@ -140,9 +140,9 @@ describe('Update Row', () => {
         .set('Authorization', adminAuth)
         .send(payload)
         .expect({
-          code: 'None',
-          message: 'name already exists',
-          status: 500,
+          code: 'CustomDataUniqueFail',
+          message: 'Unique constraint violation',
+          status: 400,
         })
     })
 
@@ -154,9 +154,9 @@ describe('Update Row', () => {
         .set('Authorization', adminAuth)
         .send(payload)
         .expect({
-          code: 'None',
-          message: 'Length check failed: age',
-          status: 500,
+          code: 'CustomDataMinLengthFail',
+          message: 'age length must be greater than 1',
+          status: 400,
         })
 
       payload.data = mockUpdateInvalidRow3()
@@ -166,9 +166,9 @@ describe('Update Row', () => {
         .set('Authorization', adminAuth)
         .send(payload)
         .expect({
-          code: 'None',
-          message: 'Length check failed: age',
-          status: 500,
+          code: 'CustomDataMaxLengthFail',
+          message: 'age length must be less than 3',
+          status: 400,
         })
     })
 
@@ -181,7 +181,7 @@ describe('Update Row', () => {
         .set('Authorization', adminAuth)
         .send(payload)
         .expect({
-          code: 'CustomColumnValidationFail',
+          code: 'CustomDataInvalidEmail',
           message: `${invalidEmail} is not a valid email`,
           status: 400,
         })
