@@ -41,7 +41,8 @@ pub struct ValidationRule {
 pub enum RuleType {
     Unique,
     Email,
+    Required,
     MinLength,
     MaxLength,
-    // Add more validation rules if needed
+    // Add more validation rules as needed
 }

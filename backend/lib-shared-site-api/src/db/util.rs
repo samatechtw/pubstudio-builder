@@ -1,19 +1,25 @@
 use std::collections::HashMap;
 
-use lib_shared_types::dto::custom_data::{
-    create_table_dto::{ColumnInfo, RuleType},
-    custom_data_dto::Action,
-};
+use lib_shared_types::dto::custom_data::{create_table_dto::ColumnInfo, custom_data_dto::Action};
 use sqlx::{Database, QueryBuilder};
+use strum::{Display, EnumString};
 use uuid::Uuid;
 
-/// Appends " AND" if count is greater than 0
-pub fn append_and<'a, DB: Database>(
+#[derive(Debug, Display, PartialEq, EnumString)]
+#[strum(serialize_all = "UPPERCASE")]
+pub enum DbOp {
+    And,
+    Or,
+}
+
+/// Appends " <op>" if count is greater than 0
+pub fn append_op<'a, DB: Database>(
     mut query: QueryBuilder<'a, DB>,
+    op: DbOp,
     count: u32,
 ) -> (QueryBuilder<'a, DB>, u32) {
     if count != 0 {
-        query.push(format!(" AND"));
+        query.push(format!(" {}", op));
     }
     (query, count + 1)
 }
@@ -27,17 +33,44 @@ pub fn append_eq<
     T: 'a + ToString + sqlx::Type<DB> + sqlx::Encode<'a, DB> + Send,
 >(
     query: QueryBuilder<'a, DB>,
+    op: DbOp,
     arg_name: &str,
     arg: Option<T>,
     count: u32,
 ) -> (QueryBuilder<'a, DB>, u32) {
     if let Some(arg_val) = arg {
-        let (mut q, count) = append_and(query, count);
+        let (mut q, count) = append_op(query, op, count);
         q.push(format!(" \"{}\" = ", arg_name));
         q.push_bind(arg_val);
         return (q, count + 1);
     }
     (query, count)
+}
+
+pub fn append_and_eq<
+    'a,
+    DB: Database,
+    T: 'a + ToString + sqlx::Type<DB> + sqlx::Encode<'a, DB> + Send,
+>(
+    query: QueryBuilder<'a, DB>,
+    arg_name: &str,
+    arg: Option<T>,
+    count: u32,
+) -> (QueryBuilder<'a, DB>, u32) {
+    append_eq(query, DbOp::And, arg_name, arg, count)
+}
+
+pub fn append_or_eq<
+    'a,
+    DB: Database,
+    T: 'a + ToString + sqlx::Type<DB> + sqlx::Encode<'a, DB> + Send,
+>(
+    query: QueryBuilder<'a, DB>,
+    arg_name: &str,
+    arg: Option<T>,
+    count: u32,
+) -> (QueryBuilder<'a, DB>, u32) {
+    append_eq(query, DbOp::Or, arg_name, arg, count)
 }
 
 fn push_comma<'a, DB: sqlx::Database>(
@@ -126,7 +159,7 @@ where
     T: 'a + sqlx::Type<DB> + sqlx::Encode<'a, DB> + Send,
 {
     if let Some(arg_val) = arg {
-        let (mut q, count) = append_and(query, count);
+        let (mut q, count) = append_op(query, DbOp::And, count);
         q.push(" ");
         q.push_bind(arg_val);
         q.push(format!(" <@ {}", arg_name));
@@ -162,31 +195,6 @@ pub fn append_column_info_to_query<'a, DB: Database>(
                 query.push(" DEFAULT ''");
             }
             _ => {}
-        }
-
-        for rule in column_info.validation_rules.iter() {
-            match rule.rule_type {
-                RuleType::Unique => {
-                    query.push(" UNIQUE");
-                }
-                RuleType::MinLength => {
-                    if let Some(min_length) = rule.parameter {
-                        query.push(&format!(
-                            " CHECK (length({}) >= {}) ",
-                            column_name, min_length
-                        ));
-                    }
-                }
-                RuleType::MaxLength => {
-                    if let Some(max_length) = rule.parameter {
-                        query.push(&format!(
-                            " CHECK (length({}) <= {}) ",
-                            column_name, max_length
-                        ));
-                    }
-                }
-                _ => {}
-            }
         }
     }
     query

@@ -60,9 +60,9 @@ describe('Add Column', () => {
       .set('Authorization', adminAuth)
       .send(payload)
       .expect({
-        code: 'None',
-        message: 'Length check failed: phone',
-        status: 500,
+        code: 'CustomDataMaxLengthFail',
+        message: 'phone length must be less than 10',
+        status: 400,
       })
   }
 
