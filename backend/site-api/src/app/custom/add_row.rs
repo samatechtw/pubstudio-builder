@@ -29,7 +29,7 @@ pub async fn add_row(context: &ApiContext, site_id: &String, data: Value) -> Res
 
     context
         .custom_data_repo
-        .insert(site_id, dto)
+        .add_row(site_id, dto)
         .await
         .map_err(|e| ApiError::internal_error().message(e))?;
 

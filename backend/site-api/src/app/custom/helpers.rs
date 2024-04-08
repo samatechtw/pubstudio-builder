@@ -2,10 +2,15 @@ use std::collections::HashMap;
 
 use lib_shared_site_api::error::api_error::ApiError;
 use lib_shared_types::{
-    dto::custom_data::create_table_dto::{ColumnInfo, RuleType},
+    dto::custom_data::{
+        create_table_dto::{ColumnInfo, RuleType},
+        custom_data_info_dto::CustomDataInfoDto,
+    },
+    entity::site_api::site_custom_data_info_entity::CustomDataInfoEntity,
     error::api_error::ApiErrorCode,
     type_util::is_email,
 };
+use serde_json::Value;
 
 use crate::api_context::ApiContext;
 
@@ -23,6 +28,16 @@ pub async fn validate_row_data(
 
     let column_info = parse_column_info(&columns)?;
 
+    // Make sure each value is associated with a column
+    for k in values.keys() {
+        if column_info.get(k).is_none() {
+            return Err(ApiError::bad_request()
+                .code(ApiErrorCode::CustomDataInvalidColumn)
+                .message(format!("Invalid column: {}", k)));
+        }
+    }
+
+    // Check column validation rules
     let mut unique_entries = Vec::<(String, String)>::new();
     for (k, info) in column_info {
         let val = values.get(&k).map(|k| k as &str);
@@ -66,6 +81,9 @@ pub async fn validate_row_data(
             }
         }
     }
+    if unique_entries.len() == 0 {
+        return Ok(());
+    }
     if !context
         .custom_data_repo
         .verify_unique(site_id, table, unique_entries)
@@ -91,4 +109,42 @@ pub fn parse_column_info(columns: &str) -> Result<HashMap<String, ColumnInfo>, A
         })?;
 
     Ok(column_info_map)
+}
+
+pub async fn get_column_info(
+    context: &ApiContext,
+    site_id: &str,
+    table_name: &str,
+) -> Result<HashMap<String, ColumnInfo>, ApiError> {
+    let original_columns = context
+        .custom_data_info_repo
+        .get_columns_from_table(site_id, table_name)
+        .await
+        .map_err(|e| ApiError::internal_error().message(e))?;
+
+    Ok(parse_column_info(&original_columns)?)
+}
+
+pub async fn save_column_info(
+    context: &ApiContext,
+    site_id: &str,
+    table_name: &str,
+    columns_map: HashMap<String, ColumnInfo>,
+) -> Result<CustomDataInfoEntity, ApiError> {
+    let column_value: Value = serde_json::to_value(columns_map).map_err(|e| {
+        ApiError::internal_error().message(format!("Failed to convert HashMap to JSON: {}", e))
+    })?;
+
+    let metadata_dto = CustomDataInfoDto {
+        name: table_name.to_string(),
+        columns: column_value,
+    };
+
+    let result = context
+        .custom_data_info_repo
+        .update_info(site_id, metadata_dto)
+        .await
+        .map_err(|e| ApiError::internal_error().message(e))?;
+
+    Ok(result)
 }

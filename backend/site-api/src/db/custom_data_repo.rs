@@ -9,6 +9,7 @@ use lib_shared_site_api::db::{
 };
 use lib_shared_types::dto::custom_data::add_column_dto::AddColumn;
 use lib_shared_types::dto::custom_data::custom_data_dto::Action;
+use lib_shared_types::dto::custom_data::remove_column_dto::RemoveColumn;
 use lib_shared_types::dto::custom_data::{
     add_row_dto::AddRow,
     create_table_dto::CreateTable,
@@ -26,7 +27,7 @@ pub trait CustomDataRepoTrait {
     fn site_db_url(&self, id: &str) -> String;
     async fn get_db_pool(&self, id: &str) -> Result<SqlitePool, DbError>;
     async fn create_table(&self, id: &str, dto: CreateTable) -> Result<(), DbError>;
-    async fn insert(&self, id: &str, dto: AddRow) -> Result<(), DbError>;
+    async fn add_row(&self, id: &str, dto: AddRow) -> Result<(), DbError>;
     async fn verify_unique(
         &self,
         id: &str,
@@ -40,7 +41,7 @@ pub trait CustomDataRepoTrait {
         dto: UpdateRow,
     ) -> Result<BTreeMap<String, String>, DbError>;
     async fn add_column(&self, id: &str, dto: AddColumn) -> Result<(), DbError>;
-    async fn remove_column(&self, id: &str) -> Result<(), DbError>;
+    async fn remove_column(&self, id: &str, dto: &RemoveColumn) -> Result<(), DbError>;
     async fn modify_column(&self, id: &str) -> Result<(), DbError>;
 }
 
@@ -102,11 +103,10 @@ fn map_custom_data_sqlx_err(e: sqlx::Error) -> DbError {
                     .unwrap_or("Unknown");
                 return DbError::CheckLengthFailed(failed_constraint.into());
             }
-            {
-                return DbError::Query(err_str);
-            }
+            DbError::Query(err_str)
         }
         sqlx::Error::RowNotFound => return DbError::EntityNotFound(),
+        sqlx::Error::ColumnNotFound(name) => return DbError::ColumnNotFound(name),
         _ => return DbError::Query(err_str),
     }
 }
@@ -143,7 +143,7 @@ impl CustomDataRepoTrait for CustomDataRepo {
         Ok(())
     }
 
-    async fn insert(&self, id: &str, dto: AddRow) -> Result<(), DbError> {
+    async fn add_row(&self, id: &str, dto: AddRow) -> Result<(), DbError> {
         let pool = self.get_db_pool(id).await?;
 
         let table_name = dto.table_name;
@@ -285,8 +285,19 @@ impl CustomDataRepoTrait for CustomDataRepo {
         Ok(())
     }
 
-    async fn remove_column(&self, id: &str) -> Result<(), DbError> {
+    async fn remove_column(&self, id: &str, dto: &RemoveColumn) -> Result<(), DbError> {
         let pool = self.get_db_pool(id).await?;
+
+        let table_name = dto.table_name.clone();
+        let column = dto.column_name.clone();
+
+        sqlx::query(&format!(
+            "ALTER TABLE {} DROP COLUMN {}",
+            table_name, column
+        ))
+        .execute(&pool)
+        .await?;
+
         Ok(())
     }
 
