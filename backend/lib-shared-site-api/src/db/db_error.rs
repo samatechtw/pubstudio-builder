@@ -39,6 +39,8 @@ pub enum DbError {
     Parse(String),
     #[error("Entity not found")]
     EntityNotFound(),
+    #[error("Column not found: {0}")]
+    ColumnNotFound(String),
     #[error("Length check failed: {0}")]
     CheckLengthFailed(String),
 }

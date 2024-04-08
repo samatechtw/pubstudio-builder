@@ -78,12 +78,9 @@ pub async fn custom_data(
             Ok((StatusCode::OK, Json(response).into_response()))
         }
         Action::RemoveColumn => {
-            remove_column(&context, &id, dto.data).await?;
+            let response = remove_column(&context, &id, dto.data).await?;
 
-            Ok((
-                StatusCode::NO_CONTENT,
-                StatusCode::NO_CONTENT.into_response(),
-            ))
+            Ok((StatusCode::OK, Json(response).into_response()))
         }
         Action::ModifyColumn => {
             let response = modify_column(&context, &id, dto.data).await?;
