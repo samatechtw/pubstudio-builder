@@ -10,6 +10,7 @@ use lib_shared_site_api::db::{
 use lib_shared_types::dto::custom_data::add_column_dto::AddColumn;
 use lib_shared_types::dto::custom_data::custom_data_dto::Action;
 use lib_shared_types::dto::custom_data::remove_column_dto::RemoveColumn;
+use lib_shared_types::dto::custom_data::remove_row_dto::RemoveRow;
 use lib_shared_types::dto::custom_data::{
     add_row_dto::AddRow,
     create_table_dto::CreateTable,
@@ -28,6 +29,7 @@ pub trait CustomDataRepoTrait {
     async fn get_db_pool(&self, id: &str) -> Result<SqlitePool, DbError>;
     async fn create_table(&self, id: &str, dto: CreateTable) -> Result<(), DbError>;
     async fn add_row(&self, id: &str, dto: AddRow) -> Result<(), DbError>;
+    async fn remove_row(&self, id: &str, dto: RemoveRow) -> Result<(), DbError>;
     async fn verify_unique(
         &self,
         id: &str,
@@ -179,6 +181,19 @@ impl CustomDataRepoTrait for CustomDataRepo {
             .execute(&pool)
             .await
             .map_err(map_custom_data_sqlx_err)?;
+
+        Ok(())
+    }
+
+    async fn remove_row(&self, id: &str, dto: RemoveRow) -> Result<(), DbError> {
+        let pool = self.get_db_pool(id).await?;
+
+        let table_name = dto.table_name;
+
+        sqlx::query(&format!("DELETE FROM {} WHERE id = ?1", table_name))
+            .bind(dto.row_id)
+            .execute(&pool)
+            .await?;
 
         Ok(())
     }
