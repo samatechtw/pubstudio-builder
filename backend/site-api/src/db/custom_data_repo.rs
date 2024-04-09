@@ -42,7 +42,13 @@ pub trait CustomDataRepoTrait {
     ) -> Result<BTreeMap<String, String>, DbError>;
     async fn add_column(&self, id: &str, dto: AddColumn) -> Result<(), DbError>;
     async fn remove_column(&self, id: &str, dto: &RemoveColumn) -> Result<(), DbError>;
-    async fn modify_column(&self, id: &str) -> Result<(), DbError>;
+    async fn modify_column(
+        &self,
+        id: &str,
+        table: &str,
+        old_column: &str,
+        new_column: &str,
+    ) -> Result<(), DbError>;
 }
 
 pub struct CustomDataRepo {
@@ -301,8 +307,22 @@ impl CustomDataRepoTrait for CustomDataRepo {
         Ok(())
     }
 
-    async fn modify_column(&self, id: &str) -> Result<(), DbError> {
+    async fn modify_column(
+        &self,
+        id: &str,
+        table: &str,
+        old_column: &str,
+        new_column: &str,
+    ) -> Result<(), DbError> {
         let pool = self.get_db_pool(id).await?;
+
+        sqlx::query(&format!(
+            "ALTER TABLE {} RENAME COLUMN {} TO {}",
+            table, old_column, new_column
+        ))
+        .execute(&pool)
+        .await?;
+
         Ok(())
     }
 }

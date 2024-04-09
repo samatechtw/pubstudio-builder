@@ -8,7 +8,6 @@ import { SiteApiResetService } from '@pubstudio/shared/util-test-reset'
 import supertest from 'supertest'
 import TestAgent from 'supertest/lib/agent'
 import { adminAuthHeader, ownerAuthHeader } from '../helpers/auth-helpers'
-import { mockAddColumnPayload1 } from '../mocks/mock-add-column-payload'
 import { mockAddRowPayload1 } from '../mocks/mock-add-row-payload'
 import { SITE_SEEDS } from '../mocks/site-seeds'
 import { testConfig } from '../test.config'
@@ -45,7 +44,6 @@ describe('Remove Column', () => {
   const verifyRemoveColumn = async () => {
     const addRow = {
       action: CustomDataAction.AddRow,
-      // payload: mockAddRowPayload3(),
       data: {
         table_name: 'contact_form',
         row: {
