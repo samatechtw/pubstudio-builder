@@ -8,4 +8,5 @@ pub mod list_rows_query;
 pub mod list_tables_query;
 pub mod modify_column_dto;
 pub mod remove_column_dto;
+pub mod remove_row_dto;
 pub mod update_row_dto;

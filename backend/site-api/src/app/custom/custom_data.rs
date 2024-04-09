@@ -21,7 +21,7 @@ use crate::{api_context::ApiContext, middleware::auth::verify_site_owner};
 use super::{
     add_column::add_column, add_row::add_row, create_table::create_table, list_rows::list_rows,
     list_tables::list_tables, modify_column::modify_column, remove_column::remove_column,
-    update_row::update_row,
+    remove_row::remove_row, update_row::update_row,
 };
 
 pub fn parse_request_data<T: DeserializeOwned>(data: serde_json::Value) -> Result<T, ApiError> {
@@ -51,6 +51,14 @@ pub async fn custom_data(
         }
         Action::AddRow => {
             add_row(&context, &id, dto.data).await?;
+
+            Ok((
+                StatusCode::NO_CONTENT,
+                StatusCode::NO_CONTENT.into_response(),
+            ))
+        }
+        Action::RemoveRow => {
+            remove_row(&context, &id, dto.data).await?;
 
             Ok((
                 StatusCode::NO_CONTENT,
