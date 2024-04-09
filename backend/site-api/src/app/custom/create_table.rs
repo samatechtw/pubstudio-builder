@@ -62,10 +62,13 @@ pub async fn create_custom_table_helper(
     let dto: CreateTable = parse_request_data(data.clone())?;
     check_bad_form(dto.validate())?;
 
-    if dto.table_name == "site_versions" || dto.table_name == "custom_data_info" {
+    if dto.table_name == "site_versions"
+        || dto.table_name == "custom_data_info"
+        || dto.table_name.starts_with("sqlite_")
+    {
         return Err(ApiError::bad_request()
-            .code(ApiErrorCode::CustomTableNameExists)
-            .message("table_name cannot be site_versions or custom_data_info".to_string()));
+            .code(ApiErrorCode::CustomTableNameInvalid)
+            .message("Restricted table name".to_string()));
     }
 
     let metadata_dto = CustomDataInfoDto {
