@@ -7,4 +7,5 @@ pub mod list_rows;
 pub mod list_tables;
 pub mod modify_column;
 pub mod remove_column;
+pub mod remove_row;
 pub mod update_row;

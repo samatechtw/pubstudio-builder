@@ -19,6 +19,7 @@ pub enum Action {
     RemoveColumn,
     ModifyColumn,
     AddRow,
+    RemoveRow,
     UpdateRow,
     ListRows,
 }
