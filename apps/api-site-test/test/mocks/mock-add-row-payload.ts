@@ -1,4 +1,6 @@
-export const mockAddRowPayload1 = () => {
+import { IAddRowApiRequest } from '@pubstudio/shared/type-api-site-custom-data'
+
+export const mockAddRowPayload1 = (): IAddRowApiRequest => {
   return {
     table_name: 'contact_form',
     row: {
@@ -9,7 +11,7 @@ export const mockAddRowPayload1 = () => {
   }
 }
 
-export const mockAddRowPayload2 = () => {
+export const mockAddRowPayload2 = (): IAddRowApiRequest => {
   return {
     table_name: 'contact_form',
     row: {
@@ -20,7 +22,7 @@ export const mockAddRowPayload2 = () => {
   }
 }
 
-export const mockAddRowPayload3 = () => {
+export const mockAddRowPayload3 = (): IAddRowApiRequest => {
   return {
     table_name: 'contact_form',
     row: {
@@ -31,7 +33,7 @@ export const mockAddRowPayload3 = () => {
   }
 }
 
-export const mockAddRowPayload4 = () => {
+export const mockAddRowPayload4 = (): IAddRowApiRequest => {
   return {
     table_name: 'contact_form',
     row: {
@@ -43,7 +45,7 @@ export const mockAddRowPayload4 = () => {
   }
 }
 
-export const mockAddInvalidRow1 = () => {
+export const mockAddInvalidRow1 = (): IAddRowApiRequest => {
   return {
     table_name: 'contact_form',
     row: {
@@ -54,7 +56,7 @@ export const mockAddInvalidRow1 = () => {
   }
 }
 
-export const mockAddInvalidRow2 = () => {
+export const mockAddInvalidRow2 = (): IAddRowApiRequest => {
   return {
     table_name: 'contact_form',
     row: {
@@ -65,7 +67,7 @@ export const mockAddInvalidRow2 = () => {
   }
 }
 
-export const mockAddInvalidRow3 = () => {
+export const mockAddInvalidRow3 = (): IAddRowApiRequest => {
   return {
     table_name: 'contact_form',
     row: {
@@ -76,7 +78,7 @@ export const mockAddInvalidRow3 = () => {
   }
 }
 
-export const mockAddInvalidRow4 = (email: string) => {
+export const mockAddInvalidRow4 = (email: string): IAddRowApiRequest => {
   return {
     table_name: 'contact_form',
     row: {
@@ -87,7 +89,7 @@ export const mockAddInvalidRow4 = (email: string) => {
   }
 }
 
-export const mockAddInvalidRow5 = () => {
+export const mockAddInvalidRow5 = (): IAddRowApiRequest => {
   return {
     table_name: 'contact_form',
     row: {

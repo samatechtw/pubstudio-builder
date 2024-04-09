@@ -118,8 +118,8 @@ describe('Create Custom Table', () => {
         .set('Authorization', adminAuth)
         .send(payload)
         .expect(400, {
-          code: 'CustomTableNameExists',
-          message: 'table_name cannot be site_versions or custom_data_info',
+          code: 'CustomTableNameInvalid',
+          message: 'Restricted table name',
           status: 400,
         })
 
@@ -130,8 +130,20 @@ describe('Create Custom Table', () => {
         .set('Authorization', adminAuth)
         .send(payload)
         .expect(400, {
-          code: 'CustomTableNameExists',
-          message: 'table_name cannot be site_versions or custom_data_info',
+          code: 'CustomTableNameInvalid',
+          message: 'Restricted table name',
+          status: 400,
+        })
+
+      payload.data = mockCreateTablePayload('sqlite_table')
+
+      await api
+        .post(testEndpoint(siteId))
+        .set('Authorization', adminAuth)
+        .send(payload)
+        .expect(400, {
+          code: 'CustomTableNameInvalid',
+          message: 'Restricted table name',
           status: 400,
         })
     })
