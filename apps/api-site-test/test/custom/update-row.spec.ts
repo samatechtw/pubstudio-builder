@@ -1,6 +1,7 @@
 import {
   CustomDataAction,
   ICustomDataApiRequest,
+  IUpdateRowApiRequest,
   IUpdateRowResponse,
 } from '@pubstudio/shared/type-api-site-custom-data'
 import { SiteApiResetService } from '@pubstudio/shared/util-test-reset'
@@ -26,20 +27,23 @@ describe('Update Row', () => {
   let adminAuth: string
   let siteId: string
   let payload: ICustomDataApiRequest
+  let updateData: IUpdateRowApiRequest
 
   beforeAll(() => {
     api = supertest(testConfig.get('apiUrl'))
     adminAuth = adminAuthHeader()
     resetService = new SiteApiResetService('http://127.0.0.1:3100', adminAuth, SITE_SEEDS)
-    payload = {
-      action: CustomDataAction.UpdateRow,
-      data: mockUpdateRowPayload1(),
-    }
   })
 
   beforeEach(async () => {
     siteId = '6d2c8359-6094-402c-bcbb-37202fd7c336'
     await resetService.reset()
+
+    updateData = mockUpdateRowPayload1()
+    payload = {
+      action: CustomDataAction.UpdateRow,
+      data: updateData,
+    }
 
     // Add Row
     await api
@@ -86,6 +90,38 @@ describe('Update Row', () => {
   })
 
   describe('when request is not valid', () => {
+    it('when table_name is invalid', async () => {
+      updateData.table_name = 'a'
+
+      await api
+        .post(testEndpoint(siteId))
+        .set('Authorization', adminAuth)
+        .send(payload)
+        .expect(400, {
+          code: 'CustomTableNameInvalid',
+          message: 'Restricted table name',
+          status: 400,
+        })
+    })
+
+    it('when column name is invalid', async () => {
+      updateData.new_row = {
+        a: 'Jessie',
+        age: '19',
+        email: 'jjj@abc.com',
+      }
+
+      await api
+        .post(testEndpoint(siteId))
+        .set('Authorization', adminAuth)
+        .send(payload)
+        .expect(400, {
+          code: 'CustomColumnNameInvalid',
+          message: 'Invalid column name: a',
+          status: 400,
+        })
+    })
+
     it('when user is other owner', () => {
       const ownerAuth = ownerAuthHeader('0c069253-e45d-487c-b7c0-cbe467c33a10')
 

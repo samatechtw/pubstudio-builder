@@ -1,5 +1,6 @@
 import {
   CustomDataAction,
+  IAddColumnApiRequest,
   ICustomDataApiRequest,
   IUpdateColumnApiResponse,
 } from '@pubstudio/shared/type-api-site-custom-data'
@@ -22,6 +23,7 @@ describe('Add Column', () => {
   let resetService: SiteApiResetService
   let adminAuth: string
   let siteId: string
+  let columnData: IAddColumnApiRequest
   let payload: ICustomDataApiRequest
 
   beforeAll(() => {
@@ -34,9 +36,10 @@ describe('Add Column', () => {
     siteId = '6d2c8359-6094-402c-bcbb-37202fd7c336'
     await resetService.reset()
 
+    columnData = mockAddColumnPayload1()
     payload = {
       action: CustomDataAction.AddColumn,
-      data: mockAddColumnPayload1(),
+      data: columnData,
     }
   })
 
@@ -138,7 +141,48 @@ describe('Add Column', () => {
     await verifyAddInvalidRow()
   })
 
+  it('when column name includes dash and underscore', async () => {
+    payload = {
+      action: CustomDataAction.AddColumn,
+      data: mockAddColumnPayload1('test-col_1'),
+    }
+
+    await api
+      .post(testEndpoint(siteId))
+      .set('Authorization', adminAuth)
+      .send(payload)
+      .expect(200)
+  })
+
   describe('when request is not valid', () => {
+    it('when table_name is invalid', async () => {
+      columnData.table_name = 'a'
+
+      await api
+        .post(testEndpoint(siteId))
+        .set('Authorization', adminAuth)
+        .send(payload)
+        .expect(400, {
+          code: 'CustomTableNameInvalid',
+          message: 'Restricted table name',
+          status: 400,
+        })
+    })
+
+    it('when column name is invalid', async () => {
+      columnData.column['a'] = columnData.column['phone']
+
+      await api
+        .post(testEndpoint(siteId))
+        .set('Authorization', adminAuth)
+        .send(payload)
+        .expect(400, {
+          code: 'CustomColumnNameInvalid',
+          message: 'Invalid column name: a',
+          status: 400,
+        })
+    })
+
     it('when user is not authorized', () => {
       const ownerAuth = ownerAuthHeader('ecee2f88-024b-467b-81ec-bf92b06c86e1')
 

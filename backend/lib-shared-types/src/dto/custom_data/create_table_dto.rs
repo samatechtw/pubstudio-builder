@@ -7,7 +7,6 @@ use validator::Validate;
 #[derive(Deserialize, Validate)]
 #[serde(deny_unknown_fields)]
 pub struct CreateTable {
-    #[validate(length(min = 1, max = 100))]
     pub table_name: String,
     pub columns: HashMap<String, ColumnInfo>,
 }

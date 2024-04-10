@@ -12,6 +12,10 @@ pub enum DbOp {
     Or,
 }
 
+pub fn quote(sql: &str) -> String {
+    format!("\"{sql}\"")
+}
+
 /// Appends " <op>" if count is greater than 0
 pub fn append_op<'a, DB: Database>(
     mut query: QueryBuilder<'a, DB>,
@@ -175,13 +179,14 @@ pub fn append_column_info_to_query<'a, DB: Database>(
 ) -> QueryBuilder<'a, DB> {
     for (column_name, column_info) in columns.iter() {
         let column_type = column_info.data_type.to_string();
+        let quoted_column = quote(&column_name);
 
         match action_type {
             Action::CreateTable => {
-                query.push(format!(", {}", column_name));
+                query.push(format!(", {}", quoted_column));
             }
             Action::AddColumn => {
-                query.push(column_name);
+                query.push(quoted_column);
             }
             _ => {}
         }

@@ -2,7 +2,7 @@ use std::borrow::Cow::Borrowed;
 use std::{collections::BTreeMap, sync::Arc};
 
 use axum::async_trait;
-use lib_shared_site_api::db::util::{append_column_info_to_query, append_or_eq};
+use lib_shared_site_api::db::util::{append_column_info_to_query, append_or_eq, quote};
 use lib_shared_site_api::db::{
     db_error::{map_sqlx_err, DbError},
     db_result::list_result,
@@ -137,7 +137,7 @@ impl CustomDataRepoTrait for CustomDataRepo {
         let table_name = dto.table_name;
 
         let mut query: QueryBuilder<'_, Sqlite> = QueryBuilder::new("CREATE TABLE ");
-        query.push(table_name);
+        query.push(quote(&table_name));
         query.push(" (id INTEGER PRIMARY KEY NOT NULL");
 
         let mut query = append_column_info_to_query(query, Action::CreateTable, &dto.columns);
@@ -167,7 +167,7 @@ impl CustomDataRepoTrait for CustomDataRepo {
                 column_names.push_str(", ");
                 column_values.push_str(", ");
             }
-            column_names.push_str(k);
+            column_names.push_str(&quote(k));
             column_values.push_str(&format!("'{}'", v));
         }
 
@@ -266,7 +266,7 @@ impl CustomDataRepoTrait for CustomDataRepo {
             if !set_values.is_empty() {
                 set_values.push_str(", ");
             }
-            set_values.push_str(&format!("{} = '{}'", k, v));
+            set_values.push_str(&format!("{} = '{}'", quote(k), v));
         }
 
         query.push(set_values);
@@ -314,7 +314,8 @@ impl CustomDataRepoTrait for CustomDataRepo {
 
         sqlx::query(&format!(
             "ALTER TABLE {} DROP COLUMN {}",
-            table_name, column
+            table_name,
+            quote(&column)
         ))
         .execute(&pool)
         .await?;
@@ -333,7 +334,9 @@ impl CustomDataRepoTrait for CustomDataRepo {
 
         sqlx::query(&format!(
             "ALTER TABLE {} RENAME COLUMN {} TO {}",
-            table, old_column, new_column
+            table,
+            quote(old_column),
+            quote(new_column)
         ))
         .execute(&pool)
         .await?;

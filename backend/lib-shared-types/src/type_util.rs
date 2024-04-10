@@ -15,6 +15,7 @@ lazy_static! {
     pub static ref REGEX_SITE_NAME: Regex = Regex::new(r"^[a-zA-Z0-9 ]{2,50}$").unwrap();
     pub static ref REGEX_EMAIL: Regex =
         Regex::new(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$").unwrap();
+    pub static ref REGEX_TABLE_NAME: Regex = Regex::new(r"^[a-zA-Z][a-zA-Z0-9_-]{1,99}$").unwrap();
 }
 
 pub fn is_uuid(str: &str) -> bool {

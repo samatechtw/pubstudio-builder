@@ -1,8 +1,10 @@
-export const mockAddColumnPayload1 = () => {
+import { IAddColumnApiRequest } from '@pubstudio/shared/type-api-site-custom-data'
+
+export const mockAddColumnPayload1 = (column_name?: string): IAddColumnApiRequest => {
   return {
     table_name: 'contact_form',
     column: {
-      phone: {
+      [column_name ?? 'phone']: {
         data_type: 'TEXT',
         validation_rules: [
           {
