@@ -1,5 +1,6 @@
 import {
   CustomDataAction,
+  ICreateTableApiRequest,
   ICreateTableResponse,
   ICustomDataApiRequest,
   IListTablesResponse,
@@ -109,33 +110,16 @@ describe('Create Custom Table', () => {
       })
     })
 
-    it('when table_name is invalid', async () => {
-      payload.action = CustomDataAction.CreateTable
-      payload.data = mockCreateTablePayload('site_versions')
-
-      await api
-        .post(testEndpoint(siteId))
-        .set('Authorization', adminAuth)
-        .send(payload)
-        .expect(400, {
-          code: 'CustomTableNameInvalid',
-          message: 'Restricted table name',
-          status: 400,
-        })
-
-      payload.data = mockCreateTablePayload('custom_data_info')
-
-      await api
-        .post(testEndpoint(siteId))
-        .set('Authorization', adminAuth)
-        .send(payload)
-        .expect(400, {
-          code: 'CustomTableNameInvalid',
-          message: 'Restricted table name',
-          status: 400,
-        })
-
-      payload.data = mockCreateTablePayload('sqlite_table')
+    it.each([
+      '',
+      'a',
+      '123abc',
+      'a'.repeat(101),
+      'site_versions',
+      'custom_data_info',
+      'sqlite_table',
+    ])('when table_name is invalid', async (tableName: string) => {
+      payload.data = mockCreateTablePayload(tableName)
 
       await api
         .post(testEndpoint(siteId))
@@ -148,17 +132,33 @@ describe('Create Custom Table', () => {
         })
     })
 
-    it('when table_name is empty', async () => {
-      payload.data = mockCreateTablePayload('')
+    it('when column name is invalid', async () => {
+      const data = mockCreateTablePayload('contact_form')
+      data.columns['a'] = data.columns['name']
+      payload.data = data
 
       await api
         .post(testEndpoint(siteId))
         .set('Authorization', adminAuth)
         .send(payload)
         .expect(400, {
-          code: 'InvalidFormData',
-          message: 'Failed to validate request',
+          code: 'CustomColumnNameInvalid',
+          message: 'Invalid column name: a',
           status: 400,
+        })
+    })
+
+    it('when table_name is missing', async () => {
+      payload.data = mockCreateTablePayload(undefined)
+
+      await api
+        .post(testEndpoint(siteId))
+        .set('Authorization', adminAuth)
+        .send(payload)
+        .expect(500, {
+          code: 'None',
+          message: 'Failed to parse request data',
+          status: 500,
         })
     })
   })

@@ -5,7 +5,7 @@ use validator::Validate;
 
 use crate::api_context::ApiContext;
 
-use super::custom_data::parse_request_data;
+use super::{custom_data::parse_request_data, helpers::validate_table_name};
 
 /*
 {
@@ -24,6 +24,7 @@ pub async fn list_rows(
 ) -> Result<ListRowsResponse, ApiError> {
     let query: ListRowsQuery = parse_request_data(data)?;
     check_bad_form(query.validate())?;
+    validate_table_name(&query.table_name)?;
 
     let rows = context
         .custom_data_repo

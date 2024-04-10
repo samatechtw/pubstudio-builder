@@ -1,17 +1,17 @@
 use lib_shared_site_api::error::{api_error::ApiError, helpers::check_bad_form};
-use lib_shared_types::{
-    dto::custom_data::{
-        create_table_dto::{CreateTable, CreateTableResponse},
-        custom_data_info_dto::CustomDataInfoDto,
-    },
-    error::api_error::ApiErrorCode,
+use lib_shared_types::dto::custom_data::{
+    create_table_dto::{CreateTable, CreateTableResponse},
+    custom_data_info_dto::CustomDataInfoDto,
 };
 use serde_json::Value;
 use validator::Validate;
 
 use crate::api_context::ApiContext;
 
-use super::custom_data::parse_request_data;
+use super::{
+    custom_data::parse_request_data,
+    helpers::{validate_column_names, validate_table_name},
+};
 
 /*
 {
@@ -61,15 +61,8 @@ pub async fn create_custom_table_helper(
 ) -> Result<String, ApiError> {
     let dto: CreateTable = parse_request_data(data.clone())?;
     check_bad_form(dto.validate())?;
-
-    if dto.table_name == "site_versions"
-        || dto.table_name == "custom_data_info"
-        || dto.table_name.starts_with("sqlite_")
-    {
-        return Err(ApiError::bad_request()
-            .code(ApiErrorCode::CustomTableNameInvalid)
-            .message("Restricted table name".to_string()));
-    }
+    validate_table_name(&dto.table_name)?;
+    validate_column_names(dto.columns.keys())?;
 
     let metadata_dto = CustomDataInfoDto {
         name: dto.table_name.clone(),

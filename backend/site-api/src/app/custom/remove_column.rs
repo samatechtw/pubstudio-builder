@@ -10,7 +10,7 @@ use crate::api_context::ApiContext;
 
 use super::{
     custom_data::parse_request_data,
-    helpers::{get_column_info, save_column_info},
+    helpers::{get_column_info, save_column_info, validate_column_name, validate_table_name},
 };
 
 /*
@@ -29,6 +29,8 @@ pub async fn remove_column(
 ) -> Result<CustomDataInfoViewModel, ApiError> {
     let dto: RemoveColumn = parse_request_data(data)?;
     check_bad_form(dto.validate())?;
+    validate_table_name(&dto.table_name)?;
+    validate_column_name(&dto.column_name)?;
 
     let table = &dto.table_name.clone();
     let column_to_remove = dto.column_name.clone();

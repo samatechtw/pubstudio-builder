@@ -163,6 +163,48 @@ describe('Modify Column', () => {
   })
 
   describe('when request is not valid', () => {
+    it('when table_name is invalid', async () => {
+      modifyRequest.table_name = 'a'
+
+      await api
+        .post(testEndpoint(siteId))
+        .set('Authorization', adminAuth)
+        .send(payload)
+        .expect(400, {
+          code: 'CustomTableNameInvalid',
+          message: 'Restricted table name',
+          status: 400,
+        })
+    })
+
+    it('when old_column_name is invalid', async () => {
+      modifyRequest.old_column_name = 'a'
+
+      await api
+        .post(testEndpoint(siteId))
+        .set('Authorization', adminAuth)
+        .send(payload)
+        .expect(400, {
+          code: 'CustomColumnNameInvalid',
+          message: 'Invalid column name: a',
+          status: 400,
+        })
+    })
+
+    it('when new_column_name is invalid', async () => {
+      modifyRequest.new_column_name = 'a'
+
+      await api
+        .post(testEndpoint(siteId))
+        .set('Authorization', adminAuth)
+        .send(payload)
+        .expect(400, {
+          code: 'CustomColumnNameInvalid',
+          message: 'Invalid column name: a',
+          status: 400,
+        })
+    })
+
     it('when user is other owner', () => {
       const ownerAuth = ownerAuthHeader('3ba201ff-a8d8-42bb-84ef-8470e6d97f78')
 

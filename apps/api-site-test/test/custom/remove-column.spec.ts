@@ -1,6 +1,7 @@
 import {
   CustomDataAction,
   ICustomDataApiRequest,
+  IRemoveColumnApiRequest,
   IRemoveColumnApiResponse,
   IUpdateColumnApiResponse,
 } from '@pubstudio/shared/type-api-site-custom-data'
@@ -20,6 +21,7 @@ describe('Remove Column', () => {
   let siteId: string
   let removeCol: string
   let payload: ICustomDataApiRequest
+  let removeData: IRemoveColumnApiRequest
 
   beforeAll(() => {
     api = supertest(testConfig.get('apiUrl'))
@@ -32,12 +34,13 @@ describe('Remove Column', () => {
     await resetService.reset()
 
     removeCol = 'name'
+    removeData = {
+      table_name: 'contact_form',
+      column_name: removeCol,
+    }
     payload = {
       action: CustomDataAction.RemoveColumn,
-      data: {
-        table_name: 'contact_form',
-        column_name: removeCol,
-      },
+      data: removeData,
     }
   })
 
@@ -129,6 +132,34 @@ describe('Remove Column', () => {
   })
 
   describe('when request is not valid', () => {
+    it('when table_name is invalid', async () => {
+      removeData.table_name = 'a'
+
+      await api
+        .post(testEndpoint(siteId))
+        .set('Authorization', adminAuth)
+        .send(payload)
+        .expect(400, {
+          code: 'CustomTableNameInvalid',
+          message: 'Restricted table name',
+          status: 400,
+        })
+    })
+
+    it('when column names are invalid', async () => {
+      removeData.column_name = 'a'
+
+      await api
+        .post(testEndpoint(siteId))
+        .set('Authorization', adminAuth)
+        .send(payload)
+        .expect(400, {
+          code: 'CustomColumnNameInvalid',
+          message: 'Invalid column name: a',
+          status: 400,
+        })
+    })
+
     it('when user is not authorized', () => {
       const ownerAuth = ownerAuthHeader('ecee2f88-024b-467b-81ec-bf92b06c86e1')
 

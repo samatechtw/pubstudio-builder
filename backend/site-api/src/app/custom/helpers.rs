@@ -8,11 +8,51 @@ use lib_shared_types::{
     },
     entity::site_api::site_custom_data_info_entity::CustomDataInfoEntity,
     error::api_error::ApiErrorCode,
-    type_util::is_email,
+    type_util::{is_email, REGEX_TABLE_NAME},
 };
 use serde_json::Value;
 
 use crate::api_context::ApiContext;
+
+pub fn validate_table_name(table: &str) -> Result<(), ApiError> {
+    if !REGEX_TABLE_NAME.is_match(table)
+        || table == "site_versions"
+        || table == "custom_data_info"
+        || table.starts_with("sqlite_")
+    {
+        return Err(ApiError::bad_request()
+            .code(ApiErrorCode::CustomTableNameInvalid)
+            .message("Restricted table name"));
+    }
+
+    Ok(())
+}
+
+pub fn validate_column_name(name: &str) -> Result<(), ApiError> {
+    if !REGEX_TABLE_NAME.is_match(name) {
+        return Err(ApiError::bad_request()
+            .code(ApiErrorCode::CustomColumnNameInvalid)
+            .message(format!("Invalid column name: {}", name)));
+    }
+    Ok(())
+}
+
+pub fn validate_column_names<'a, I>(names: I) -> Result<(), ApiError>
+where
+    I: IntoIterator<Item = &'a String>,
+{
+    let bad_name = names.into_iter().find(|name| {
+        let key: &str = Into::<&String>::into(*name);
+        !REGEX_TABLE_NAME.is_match(key)
+    });
+
+    if let Some(name) = bad_name {
+        return Err(ApiError::bad_request()
+            .code(ApiErrorCode::CustomColumnNameInvalid)
+            .message(format!("Invalid column name: {}", name)));
+    }
+    Ok(())
+}
 
 pub async fn validate_row_data(
     context: &ApiContext,
