@@ -10,7 +10,7 @@ use crate::api_context::ApiContext;
 
 use super::{
     custom_data::parse_request_data,
-    helpers::{get_column_info, save_column_info},
+    helpers::{get_column_info, save_column_info, validate_column_names, validate_table_name},
 };
 
 /*
@@ -39,6 +39,8 @@ pub async fn add_column(
 ) -> Result<CustomDataInfoViewModel, ApiError> {
     let dto: AddColumn = parse_request_data(data.clone())?;
     check_bad_form(dto.validate())?;
+    validate_table_name(&dto.table_name)?;
+    validate_column_names(dto.column.keys())?;
 
     let table = &dto.table_name.clone();
     let new_column = dto.column.clone();

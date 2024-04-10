@@ -5,7 +5,10 @@ use validator::Validate;
 
 use crate::api_context::ApiContext;
 
-use super::{custom_data::parse_request_data, helpers::validate_row_data};
+use super::{
+    custom_data::parse_request_data,
+    helpers::{validate_column_names, validate_row_data, validate_table_name},
+};
 
 /*
 {
@@ -23,6 +26,8 @@ use super::{custom_data::parse_request_data, helpers::validate_row_data};
 pub async fn add_row(context: &ApiContext, site_id: &String, data: Value) -> Result<(), ApiError> {
     let dto: AddRow = parse_request_data(data)?;
     check_bad_form(dto.validate())?;
+    validate_table_name(&dto.table_name)?;
+    validate_column_names(dto.row.keys())?;
 
     // Validate data by checking columns in custom_data_info
     validate_row_data(context, site_id, &dto.table_name, &dto.row).await?;

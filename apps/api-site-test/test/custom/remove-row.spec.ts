@@ -20,6 +20,7 @@ describe('Add Row', () => {
   let adminAuth: string
   let siteId: string
   let payload: ICustomDataApiRequest
+  let removeData: IRemoveRowApiRequest
 
   beforeAll(() => {
     api = supertest(testConfig.get('apiUrl'))
@@ -31,7 +32,7 @@ describe('Add Row', () => {
     siteId = '6d2c8359-6094-402c-bcbb-37202fd7c336'
     await resetService.reset()
 
-    const removeData: IRemoveRowApiRequest = { table_name: 'contact_form', row_id: '1' }
+    removeData = { table_name: 'contact_form', row_id: '1' }
     payload = {
       action: CustomDataAction.RemoveRow,
       data: removeData,
@@ -87,6 +88,28 @@ describe('Add Row', () => {
   })
 
   describe('when request is not valid', () => {
+    it('when table_name is invalid', async () => {
+      removeData.table_name = 'a'
+
+      await api
+        .post(testEndpoint(siteId))
+        .set('Authorization', adminAuth)
+        .send(payload)
+        .expect(400, {
+          code: 'CustomTableNameInvalid',
+          message: 'Restricted table name',
+          status: 400,
+        })
+    })
+
+    it('when adding a row with a duplicate unique constraint', async () => {
+      await api
+        .post(testEndpoint(siteId))
+        .set('Authorization', adminAuth)
+        .send(payload)
+        .expect(204)
+    })
+
     it('when user is other owner', () => {
       const ownerAuth = ownerAuthHeader('0c069253-e45d-487c-b7c0-cbe467c33a10')
 

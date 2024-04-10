@@ -43,6 +43,7 @@ pub enum ApiErrorCode {
     SubdomainTaken,
     CustomTableNameExists,
     CustomTableNameInvalid,
+    CustomColumnNameInvalid,
     CustomDataRequired,
     CustomDataInvalidColumn,
     CustomDataInvalidEmail,

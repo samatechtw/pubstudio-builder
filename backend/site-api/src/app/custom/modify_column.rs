@@ -14,7 +14,10 @@ use crate::{
     app::custom::helpers::{get_column_info, save_column_info},
 };
 
-use super::custom_data::parse_request_data;
+use super::{
+    custom_data::parse_request_data,
+    helpers::{validate_column_name, validate_table_name},
+};
 
 /*
 {
@@ -33,6 +36,9 @@ pub async fn modify_column(
 ) -> Result<CustomDataInfoViewModel, ApiError> {
     let dto: ModifyColumn = parse_request_data(data)?;
     check_bad_form(dto.validate())?;
+    validate_table_name(&dto.table_name)?;
+    validate_column_name(&dto.old_column_name)?;
+
     if dto.new_column_name.is_none() && dto.new_column_info.is_none() {
         return Err(ApiError::bad_request()
             .code(ApiErrorCode::InvalidFormData)
@@ -44,6 +50,8 @@ pub async fn modify_column(
     let new_column = dto.new_column_name.clone();
 
     if let Some(new_column_name) = dto.new_column_name {
+        validate_column_name(&new_column_name)?;
+
         context
             .custom_data_repo
             .modify_column(site_id, &table, &old_column, &new_column_name)

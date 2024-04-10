@@ -5,7 +5,7 @@ use validator::Validate;
 
 use crate::api_context::ApiContext;
 
-use super::custom_data::parse_request_data;
+use super::{custom_data::parse_request_data, helpers::validate_table_name};
 
 /*
 {
@@ -23,6 +23,7 @@ pub async fn remove_row(
 ) -> Result<(), ApiError> {
     let dto: RemoveRow = parse_request_data(data)?;
     check_bad_form(dto.validate())?;
+    validate_table_name(&dto.table_name)?;
 
     context
         .custom_data_repo
