@@ -7,6 +7,10 @@ export type IBehaviorResult = unknown
 export type IBehaviorCustomArgs = Record<string, unknown>
 
 export interface IBehaviorHelpers {
+  requireArgs(
+    args: IBehaviorCustomArgs | undefined,
+    argNames: string[],
+  ): Record<string, string>
   getComponent(site: ISite, componentId: string): IComponent | undefined
   getValue(componentId: string, defaultVal?: string): string | undefined
   setContent(component: IComponent | undefined, content: string | undefined): void
@@ -19,11 +23,13 @@ export interface IBehaviorHelpers {
     prop: Css,
     value: string,
   ): string | undefined
+  addRow(table: string, row: Record<string, string>): Promise<void>
 }
 
 export interface IBehaviorContext {
   site: ISite
   component: IComponent
+  event?: Event
 }
 
 export type IResolvedBehavior = (

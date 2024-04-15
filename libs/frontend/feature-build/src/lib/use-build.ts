@@ -172,6 +172,10 @@ export interface IUseBuild {
   addComponentMixin: (mixinId: string) => void
   removeComponentMixin: (mixinId: string) => void
   replaceComponentMixin: (oldMixinId: string, newMixinId: string) => void
+  addComponentEventData: (
+    component: IComponent,
+    newEvent: IComponentEvent,
+  ) => ISetComponentEventData
   addComponentEvent: (component: IComponent, newEvent: IComponentEvent) => void
   addSelectedComponentEvent: (newEvent: IComponentEvent) => void
   removeSelectedComponentEvent: (name: string) => void
@@ -655,13 +659,21 @@ export const useBuild = (): IUseBuild => {
     )
   }
 
-  const addComponentEvent = (component: IComponent, newEvent: IComponentEvent) => {
+  const addComponentEventData = (
+    component: IComponent,
+    newEvent: IComponentEvent,
+  ): ISetComponentEventData => {
     const oldEvent = component.events?.[newEvent.name]
     const data: ISetComponentEventData = {
       componentId: component.id,
       oldEvent,
       newEvent,
     }
+    return data
+  }
+
+  const addComponentEvent = (component: IComponent, newEvent: IComponentEvent) => {
+    const data = addComponentEventData(component, newEvent)
     pushCommand(site.value, CommandType.SetComponentEvent, data)
   }
 
@@ -1288,6 +1300,7 @@ export const useBuild = (): IUseBuild => {
     addComponentMixin,
     removeComponentMixin,
     replaceComponentMixin,
+    addComponentEventData,
     addComponentEvent,
     addSelectedComponentEvent,
     updateSelectedComponentEvent,

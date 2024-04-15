@@ -22,7 +22,7 @@ import {
   IStoredSiteDirty,
   SiteSaveState,
 } from '@pubstudio/shared/type-site'
-import { plainResponseInterceptors } from '@pubstudio/shared/util-fetch-api'
+import { plainResponseInterceptors } from '@pubstudio/shared/util-web-site-api'
 import { computed, inject, ref } from 'vue'
 import { SiteSaveAlert, siteSaveAlert } from './site-save-alert'
 

@@ -230,21 +230,86 @@ export const contactFormBehavior: IBehavior = {
   id: contactFormBehaviorId,
   name: 'Contact Form Submit',
   args: {
-    tableId: {
-      name: 'tableId',
+    tableName: {
+      name: 'tableName',
       type: ComponentArgPrimitive.String,
-      help: 'The ID of the API table linked to the contact form.',
+      help: 'The name of the API table linked to the contact form.',
+    },
+    emailId: {
+      name: 'emailId',
+      type: ComponentArgPrimitive.String,
+      help: 'The ID of the email input component',
+    },
+    messageId: {
+      name: 'messageId',
+      type: ComponentArgPrimitive.String,
+      help: 'The ID of the message input component',
+    },
+    nameId: {
+      name: 'nameId',
+      type: ComponentArgPrimitive.String,
+      help: 'The ID of the contact name input component (optional)',
+    },
+    errorId: {
+      name: 'errorId',
+      type: ComponentArgPrimitive.String,
+      help: 'The ID of the error component',
+    },
+    apiEmailField: {
+      name: 'apiEmailField',
+      type: ComponentArgPrimitive.String,
+      help: 'The column to store the contact email in the API table',
+    },
+    apiMessageField: {
+      name: 'apiMessageField',
+      type: ComponentArgPrimitive.String,
+      help: 'The column to store the message in the API table',
+    },
+    apiNameField: {
+      name: 'apiNameField',
+      type: ComponentArgPrimitive.String,
+      help: 'The column to store the contact name in the API table (optional)',
     },
   },
-  builtin: (
-    _helpers: IBehaviorHelpers,
-    _behaviorContext: IBehaviorContext,
+  builtin: async (
+    helpers: IBehaviorHelpers,
+    behaviorContext: IBehaviorContext,
     args?: IBehaviorCustomArgs,
   ) => {
-    if (args?.tableId) {
-      // TODO -- submit contact request to API
+    const { site, event } = behaviorContext
+    event?.preventDefault()
+    const { error: argError, ...resolvedArgs } = helpers.requireArgs(args, [
+      'tableName',
+      'emailId',
+      'messageId',
+      'errorId',
+      'apiEmailField',
+      'apiMessageField',
+    ])
+    const errorCmp = helpers.getComponent(site, resolvedArgs.errorId)
+    if (argError) {
+      console.warn(argError)
+      helpers.setContent(errorCmp, 'Unknown form error')
     } else {
-      console.warn('Missing tableId arg')
+      let name: string | undefined
+      const email = helpers.getValue(resolvedArgs.emailId)
+      const message = helpers.getValue(resolvedArgs.messageId)
+      if (args?.nameId) {
+        name = helpers.getValue(args.nameId as string)
+      }
+      try {
+        const row: Record<string, string> = {
+          [resolvedArgs.apiEmailField]: email ?? '',
+          [resolvedArgs.apiMessageField]: message ?? '',
+        }
+        if (args?.apiNameField && name) {
+          row[args?.apiNameField as string] = name
+        }
+        await helpers.addRow(resolvedArgs.tableName, row)
+      } catch (e) {
+        console.error(e)
+        helpers.setContent(errorCmp, 'Failed to save, please try again later')
+      }
     }
   },
 }

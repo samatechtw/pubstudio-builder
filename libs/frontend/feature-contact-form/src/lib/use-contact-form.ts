@@ -29,7 +29,7 @@ export interface IContactFormFeature {
   loadCustomTables: () => Promise<void>
   showContactFormWalkthrough: (formId: string | undefined) => Promise<void>
   createContactTable: (tableName: string, hasName: boolean) => Promise<void>
-  linkContactTable: (tableId: string) => Promise<void>
+  linkContactTable: (tableName: string) => Promise<void>
 }
 
 const isContactTable = (table: ICustomTableViewModel): boolean => {
@@ -80,14 +80,17 @@ export const useContactForm = (): IContactFormFeature => {
     }
   }
 
-  const setupContactForm = (tableId: string, hasName: boolean) => {
+  const setupContactForm = (tableName: string, hasName: boolean) => {
     const { context } = site.value
-    const { addComponentEvent } = useBuild()
+    const { addComponentEventData } = useBuild()
     const formId = site.value.editor?.contactFormWalkthrough?.formId
     if (context && formId) {
       const form = resolveComponent(context, formId)?.children?.[0]
       if (form) {
         const nameInput = form.children?.[1]?.children?.[1]
+        const emailInput = form.children?.[1]?.children?.[0]
+        const messageInput = form.children?.[2]
+        const error = form.children?.[3]
         // Remove name input if not included in table
         if (!hasName && nameInput) {
           const removeName = makeRemoveComponentData(site.value, nameInput)
@@ -100,9 +103,27 @@ export const useContactForm = (): IContactFormFeature => {
         const submitEvent: IComponentEvent = {
           name: ComponentEventType.Submit,
           eventParams: {},
-          behaviors: [{ behaviorId: contactFormBehaviorId, args: { tableId: tableId } }],
+          behaviors: [
+            {
+              behaviorId: contactFormBehaviorId,
+              args: {
+                tableName,
+                emailId: emailInput?.id ?? '',
+                messageId: messageInput?.id ?? '',
+                nameId: nameInput?.id ?? '',
+                errorId: error?.id ?? '',
+                apiEmailField: 'email',
+                apiMessageField: 'message',
+                apiNameField: hasName ? 'name' : '',
+              },
+            },
+          ],
         }
-        addComponentEvent(form, submitEvent)
+        const addEvent = addComponentEventData(form, submitEvent)
+        appendLastCommand(site.value, {
+          type: CommandType.SetComponentEvent,
+          data: addEvent,
+        })
       }
     }
   }
@@ -139,7 +160,7 @@ export const useContactForm = (): IContactFormFeature => {
     }
     try {
       const table = await api.createTable(tablePayload)
-      setupContactForm(table.id, hasName)
+      setupContactForm(table.name, hasName)
     } catch (e) {
       console.log('Failed to setup form:', e)
       throw parseApiErrorKey(toApiError(e))
@@ -148,14 +169,14 @@ export const useContactForm = (): IContactFormFeature => {
 
   // Links a contact table or throws an error key
   // Checks if the linked table has a `name` column, and updates the contact form
-  const linkContactTable = async (tableId: string) => {
-    const table = contactTables.value.find((table) => table.id === tableId)
+  const linkContactTable = async (tableName: string) => {
+    const table = contactTables.value.find((table) => table.name === tableName)
     if (table) {
       const hasName = Object.keys(table.columns).some(
         (name) => name.toLowerCase() === 'name',
       )
       try {
-        setupContactForm(tableId, hasName)
+        setupContactForm(tableName, hasName)
       } catch (e) {
         console.log('Failed to link form:', e)
         throw parseApiErrorKey(toApiError(e))

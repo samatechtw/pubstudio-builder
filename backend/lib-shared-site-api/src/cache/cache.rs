@@ -57,6 +57,7 @@ pub fn site_to_value(site: &SiteEntity) -> Result<Value, serde_json::Error> {
     let pages_json = serde_json::to_string(&filtered_json)?;
     let filtered_pages = serde_json::to_string(&pages_json)?;
     let response = GetCurrentSiteResponse {
+        id: site.id.to_string(),
         name: site.name.clone(),
         version: site.version.clone(),
         context: site.context.clone(),

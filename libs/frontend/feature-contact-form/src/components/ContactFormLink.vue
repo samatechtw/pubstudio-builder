@@ -8,11 +8,9 @@
     </div>
     <div class="link-table">
       <PSMultiselect
-        :value="tableId"
-        :options="tables ?? []"
+        :value="tableName"
+        :options="(tables ?? []).map((t) => t.name)"
         :placeholder="t('custom_data.table_name')"
-        valueKey="id"
-        labelKey="name"
         class="link-dropdown"
         @select="select"
       />
@@ -21,7 +19,7 @@
       <PSButton
         :text="t('confirm')"
         secondary
-        :disabled="!tableId"
+        :disabled="!tableName"
         class="confirm-button"
         @click="linkTable"
       />
@@ -33,7 +31,6 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
-import { ICustomTableViewModel } from '@pubstudio/shared/type-api-site-custom-data'
 import { setContactFormWalkthrough } from '@pubstudio/frontend/data-access-command'
 import { PSButton, PSMultiselect } from '@pubstudio/frontend/ui-widgets'
 import { ContactFormWalkthroughState } from '@pubstudio/shared/type-site'
@@ -44,10 +41,10 @@ const { t } = useI18n()
 const { tables, linkContactTable } = useContactForm()
 const { editor } = useBuild()
 
-const tableId = ref()
+const tableName = ref()
 
-const select = (item: ICustomTableViewModel | undefined) => {
-  tableId.value = item?.id
+const select = (name: string | undefined) => {
+  tableName.value = name
 }
 
 const goBack = () => {
@@ -55,8 +52,8 @@ const goBack = () => {
 }
 
 const linkTable = async () => {
-  if (tableId.value) {
-    await linkContactTable(tableId.value)
+  if (tableName.value) {
+    await linkContactTable(tableName.value)
     setContactFormWalkthrough(editor.value, undefined)
   }
 }

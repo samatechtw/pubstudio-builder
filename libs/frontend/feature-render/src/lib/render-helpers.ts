@@ -11,8 +11,8 @@ export const computeEvents = (site: ISite, component: IComponent): IEventCollect
   for (const event of Object.values(component.events ?? {})) {
     const nativeEventName = NativeEvents[event.name]
 
-    const eventHandler = (_e: Event | undefined) => {
-      triggerEventBehaviors(event.behaviors, site, component)
+    const eventHandler = (e: Event | undefined) => {
+      triggerEventBehaviors(event.behaviors, site, component, e)
     }
 
     if (nativeEventName) {

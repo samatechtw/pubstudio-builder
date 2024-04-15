@@ -86,6 +86,11 @@ export const computeBuilderStyleProps = (
       e.preventDefault()
     }
   }
+  if (component.tag === Tag.Form) {
+    builderProps['onSubmit'] = (e: Event) => {
+      e.preventDefault()
+    }
+  }
   if (component.tag === Tag.Input || component.tag === Tag.Textarea) {
     builderProps['onMousedown'] = (e: MouseEvent) => {
       e.preventDefault()
@@ -106,7 +111,7 @@ export const computeBuilderStyleProps = (
       if (display !== 'none') {
         extraChildren = [
           h(LinkTooltip, {
-            link: data.attrs.href ?? '',
+            link: (data.attrs.href ?? '') as string,
             componentId: component.id,
             mode: LinkTooltipMode.Component,
           }),
@@ -278,7 +283,8 @@ export const computePropsContent = (
   const props = {
     ...data.attrs,
     ...builderStyleProps?.builderProps,
-    ...events.native,
+    // TODO -- should all native events really be disabled in the builder?
+    // ...events.native,
     class: data.mixins.concat(component.id, builderStyleProps?.builderClass ?? []),
     style: builderStyleProps?.builderStyle,
     id: component.id,
