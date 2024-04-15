@@ -10,6 +10,7 @@ pub struct GetCurrentSiteQuery {
 
 #[derive(Serialize, Deserialize)]
 pub struct GetCurrentSiteResponse {
+    pub id: String,
     pub name: String,
     pub version: String,
     pub context: String,
@@ -20,6 +21,7 @@ pub struct GetCurrentSiteResponse {
 
 pub fn to_api_response(site: &SiteEntity) -> GetCurrentSiteResponse {
     GetCurrentSiteResponse {
+        id: site.id.to_string(),
         name: site.name.clone(),
         version: site.version.clone(),
         context: site.context.clone(),

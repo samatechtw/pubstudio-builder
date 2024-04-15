@@ -14,6 +14,7 @@ pub struct CreateTable {
 #[derive(Serialize, Deserialize)]
 pub struct CreateTableResponse {
     pub id: String,
+    pub name: String,
 }
 
 #[derive(Deserialize, Serialize, Validate, Debug, Clone)]

@@ -5,7 +5,7 @@ import {
   IUpdateLocalSiteApiRequest,
   IUpdateLocalSiteApiResponse,
 } from '@pubstudio/shared/type-api-local-site'
-import { plainResponseInterceptors } from '@pubstudio/shared/util-fetch-api'
+import { plainResponseInterceptors } from '@pubstudio/shared/util-web-site-api'
 import { RequestParams } from '@sampullman/fetch-api'
 
 export interface IApiLocalSite {

@@ -7,7 +7,7 @@ import {
   ISiteStore,
   SiteSaveState,
 } from '@pubstudio/shared/type-site'
-import { plainResponseInterceptors } from '@pubstudio/shared/util-fetch-api'
+import { plainResponseInterceptors } from '@pubstudio/shared/util-web-site-api'
 import { computed, ComputedRef, Ref, ref } from 'vue'
 
 // This file is here, instead of frontend/feature-site-source, to decouple the `site`

@@ -1,5 +1,5 @@
 import { ref } from 'vue'
-import { SiteApi } from './api'
+import { SiteApi } from './site-api'
 
 export const rootSiteApi = new SiteApi({
   baseUrl: '',

@@ -1,14 +1,35 @@
 import { DEFAULT_BREAKPOINT_ID } from '@pubstudio/frontend/util-ids'
 import {
+  CustomDataAction,
+  IAddRowApiRequest,
+  ICustomDataApiRequest,
+} from '@pubstudio/shared/type-api-site-custom-data'
+import {
   ComponentArgPrimitive,
   Css,
+  IBehaviorCustomArgs,
   IBehaviorHelpers,
   IComponent,
   IComponentEventBehavior,
   IComponentState,
   ISite,
 } from '@pubstudio/shared/type-site'
+import { rootSiteApi } from '@pubstudio/shared/util-web-site-api'
 import { resolveComponent } from './resolve-component'
+
+export const requireArgs = (
+  args: IBehaviorCustomArgs | undefined,
+  argNames: string[],
+): Record<string, string> => {
+  const result: Record<string, string> = {}
+  for (const name of argNames) {
+    if (!args?.[name]) {
+      return { error: `Arg "${name}" is required` }
+    }
+    result[name] = args[name] as string
+  }
+  return result
+}
 
 export const getComponent = (
   site: ISite,
@@ -84,12 +105,29 @@ export const getEventBehavior = (
   return behaviors
 }
 
+const addRow = async (table: string, row: Record<string, string>) => {
+  const addRow: IAddRowApiRequest = {
+    table_name: table,
+    row,
+  }
+  const payload: ICustomDataApiRequest = {
+    action: CustomDataAction.AddRow,
+    data: addRow,
+  }
+  await rootSiteApi.authOptRequest({
+    url: `api/sites/${rootSiteApi.siteId.value}/custom_data`,
+    method: 'POST',
+    data: payload,
+  })
+}
+
 export const argArray = <T extends ComponentArgPrimitive>(arr: unknown): T[] => {
   const arrayStr = arr as string | undefined
   return (arrayStr ?? '').split(',') as T[]
 }
 
 export const behaviorHelpers: IBehaviorHelpers = {
+  requireArgs,
   getComponent,
   setState,
   setContent,
@@ -98,4 +136,5 @@ export const behaviorHelpers: IBehaviorHelpers = {
   getEventBehavior,
   getCustomStyle,
   setCustomStyle,
+  addRow,
 }

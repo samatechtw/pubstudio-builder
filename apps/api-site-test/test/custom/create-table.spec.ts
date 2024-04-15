@@ -1,6 +1,5 @@
 import {
   CustomDataAction,
-  ICreateTableApiRequest,
   ICreateTableResponse,
   ICustomDataApiRequest,
   IListTablesResponse,
@@ -68,6 +67,7 @@ describe('Create Custom Table', () => {
     const body: ICreateTableResponse = res.body
 
     expect(body.id).toEqual('2')
+    expect(body.name).toEqual('custom_table')
 
     // Verify
     await verifyTable()

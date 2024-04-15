@@ -49,16 +49,14 @@ pub async fn create_table(
     site_id: &String,
     data: Value,
 ) -> Result<CreateTableResponse, ApiError> {
-    let id: String = create_custom_table_helper(context, site_id, data).await?;
-
-    Ok(CreateTableResponse { id })
+    Ok(create_custom_table_helper(context, site_id, data).await?)
 }
 
 pub async fn create_custom_table_helper(
     context: &ApiContext,
     site_id: &String,
     data: Value,
-) -> Result<String, ApiError> {
+) -> Result<CreateTableResponse, ApiError> {
     let dto: CreateTable = parse_request_data(data.clone())?;
     check_bad_form(dto.validate())?;
     validate_table_name(&dto.table_name)?;
@@ -82,5 +80,8 @@ pub async fn create_custom_table_helper(
         .await
         .map_err(|e| ApiError::internal_error().message(e))?;
 
-    Ok(result.id.to_string())
+    Ok(CreateTableResponse {
+        name: result.name,
+        id: result.id.to_string(),
+    })
 }
