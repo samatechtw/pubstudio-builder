@@ -113,6 +113,9 @@
       "@pubstudio/shared/util-format": ["libs/shared/util-format/src/index.ts"],
       "@pubstudio/shared/util-parse": ["libs/shared/util-parse/src/index.ts"],
       "@pubstudio/shared/util-test-reset": ["libs/shared/util-test-reset/src/index.ts"],
+      "@pubstudio/shared/util-web-site-api": [
+        "libs/shared/util-web-site-api/src/index.ts"
+      ],
       "@pubstudio/frontend/data-access-api": [
         "libs/frontend/data-access-api/src/index.ts"
       ],

@@ -23,12 +23,12 @@ import {
 } from '@pubstudio/frontend/feature-render'
 import { RenderMode } from '@pubstudio/frontend/util-render'
 import { unstoreSite } from '@pubstudio/frontend/util-site-deserialize'
+import { rootSiteApi } from '@pubstudio/shared/util-web-site-api'
 import { ISite } from '@pubstudio/shared/type-site'
 import { IGetSiteApiResponse } from '@pubstudio/shared/type-api-site-sites'
 import ErrorMessage from './components/ErrorMessage.vue'
 import PSSpinner from './components/PSSpinner.vue'
 import NotFound from './components/NotFound.vue'
-import { rootSiteApi } from './web-site-api'
 
 const API_URL = '___SITE_API_URL___'
 
@@ -46,6 +46,7 @@ const getSite = async (url: string): Promise<ISite | undefined> => {
     ignoreBaseUrl: true,
   })
   const serialized = data as IGetSiteApiResponse
+  rootSiteApi.siteId.value = serialized.id
   return unstoreSite({
     name: serialized.name,
     version: serialized.version,
@@ -87,6 +88,7 @@ const getUserSite = async () => {
       if (p) {
         url += `?p=${p}`
       }
+      rootSiteApi.baseUrl = host
     }
     const userSite = await getSite(url)
     return userSite

@@ -1,5 +1,5 @@
 import { DEFAULT_BREAKPOINT_ID, textId, textStyleId } from '@pubstudio/frontend/util-ids'
-import { IComponent, IStyle, Tag } from '@pubstudio/shared/type-site'
+import { IBreakpointStyles, IComponent, IStyle, Tag } from '@pubstudio/shared/type-site'
 
 export const textStyle: IStyle = {
   id: textStyleId,
@@ -16,13 +16,21 @@ export const textStyle: IStyle = {
   },
 }
 
-export const text: IComponent = {
-  id: textId,
-  name: 'Text',
-  tag: Tag.Div,
-  content: 'text content',
-  style: {
-    custom: {},
-    mixins: [textStyle.id],
-  },
+export const makeText = (
+  name?: string,
+  content?: string,
+  style?: IBreakpointStyles,
+): IComponent => {
+  return {
+    id: textId,
+    name: name ?? 'Text',
+    tag: Tag.Div,
+    content: content ?? 'text content',
+    style: {
+      custom: style ?? {},
+      mixins: [textStyle.id],
+    },
+  }
 }
+
+export const text = makeText()

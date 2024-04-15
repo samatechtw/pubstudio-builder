@@ -12,8 +12,15 @@ import {
   textareaStyleId,
   verticalStyleId,
 } from '@pubstudio/frontend/util-ids'
-import { ComponentArgPrimitive, IComponentInput, Tag } from '@pubstudio/shared/type-site'
+import {
+  ComponentArgPrimitive,
+  IBreakpointStyles,
+  IComponentInput,
+  IRawStyle,
+  Tag,
+} from '@pubstudio/shared/type-site'
 import { makeH2 } from './builtin-h'
+import { makeText } from './builtin-text'
 
 const makeInput = (name: string, text: string): IComponentInput => {
   return {
@@ -22,6 +29,14 @@ const makeInput = (name: string, text: string): IComponentInput => {
     attr: true,
     default: '',
     is: text,
+  }
+}
+
+const defaultStyle = (raw: IRawStyle): IBreakpointStyles => {
+  return {
+    [DEFAULT_BREAKPOINT_ID]: {
+      default: raw,
+    },
   }
 }
 
@@ -62,15 +77,15 @@ export const contactForm = {
       name: 'ContactForm',
       tag: Tag.Form,
       children: [
-        makeH2('ContactFormTitle', '<div class="pm-p">Get in touch.</div>', {
-          [DEFAULT_BREAKPOINT_ID]: {
-            default: {
-              display: 'flex',
-              'align-items': 'center',
-              'justify-content': 'center',
-            },
-          },
-        }),
+        makeH2(
+          'ContactFormTitle',
+          '<div class="pm-p">Get in touch.</div>',
+          defaultStyle({
+            display: 'flex',
+            'align-items': 'center',
+            'justify-content': 'center',
+          }),
+        ),
         {
           id: containerHorizontalId,
           name: 'ContainerHorizontal',
@@ -176,6 +191,18 @@ export const contactForm = {
             },
           },
         },
+        makeText(
+          'ContactFormError',
+          'Contact form error',
+          defaultStyle({
+            display: 'flex',
+            margin: '16px 0px 16px 0px',
+            color: '${color-error}',
+            'justify-content': 'center',
+            opacity: '0',
+            transition: 'opacity 0.25s ease',
+          }),
+        ),
         {
           id: buttonId,
           name: 'Submit',
@@ -185,7 +212,7 @@ export const contactForm = {
             custom: {
               [DEFAULT_BREAKPOINT_ID]: {
                 default: {
-                  margin: '32px 0px 0px 0px',
+                  margin: '0px 0px 0px 0px',
                   'background-color': '${color-primary}',
                   'border-radius': '0px',
                   color: 'white',

@@ -52,6 +52,7 @@ describe('Get Current Site', () => {
         .expect(200)
 
       const body1: IGetSiteApiResponse = r1.body
+      expect(body1.id).toEqual('1')
       expect(body1.context).toEqual(JSON.stringify(newData1))
 
       // Create a draft
