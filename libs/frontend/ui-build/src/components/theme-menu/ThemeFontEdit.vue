@@ -51,26 +51,25 @@
         class="cancel-button"
         :text="t('cancel')"
         :secondary="true"
-        @click.stop="clearEditingState"
+        @click.stop="resetThemeMenuFonts"
       />
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
+import { computed } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { ThemeFontSource } from '@pubstudio/shared/type-site'
 import { ErrorMessage, PSButton } from '@pubstudio/frontend/ui-widgets'
-import { useThemeMenuFonts } from '@pubstudio/frontend/feature-build'
+import { useThemeMenuFonts, resetThemeMenuFonts } from '@pubstudio/frontend/feature-build'
 import FontSourceSelect from './FontSourceSelect.vue'
 import WebSafeFontSelect from './WebSafeFontSelect.vue'
 import GoogleFontSelect from './GoogleFontSelect.vue'
-import { computed } from 'vue'
 
 const { t } = useI18n()
 
-const { editingFont, selectedGoogleFonts, fontError, clearEditingState, saveFont } =
-  useThemeMenuFonts()
+const { editingFont, selectedGoogleFonts, fontError, saveFont } = useThemeMenuFonts()
 
 const isNativeFont = computed(() => editingFont.source === ThemeFontSource.Native)
 

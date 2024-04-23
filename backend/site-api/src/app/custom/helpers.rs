@@ -81,6 +81,7 @@ pub async fn validate_row_data(
     let mut unique_entries = Vec::<(String, String)>::new();
     for (k, info) in column_info {
         let val = values.get(&k).map(|k| k as &str);
+
         for rule in info.validation_rules.iter() {
             match rule.rule_type {
                 RuleType::Email => {
@@ -88,7 +89,7 @@ pub async fn validate_row_data(
                         if !is_email(v) {
                             return Err(ApiError::bad_request()
                                 .code(ApiErrorCode::CustomDataInvalidEmail)
-                                .message(format!("{} is not a valid email", v)));
+                                .message("Invalid email"));
                         }
                     }
                 }
@@ -103,7 +104,7 @@ pub async fn validate_row_data(
                         if v.len() < min {
                             return Err(ApiError::bad_request()
                                 .code(ApiErrorCode::CustomDataMinLengthFail)
-                                .message(format!("{} length must be greater than {}", k, min)));
+                                .message(format!("{} must be at least {} characters", k, min)));
                         }
                     }
                 }
@@ -113,7 +114,7 @@ pub async fn validate_row_data(
                         if v.len() > max {
                             return Err(ApiError::bad_request()
                                 .code(ApiErrorCode::CustomDataMaxLengthFail)
-                                .message(format!("{} length must be less than {}", k, max)));
+                                .message(format!("{} must be less than {} characters", k, max)));
                         }
                     }
                 }

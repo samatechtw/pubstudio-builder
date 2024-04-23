@@ -50,11 +50,13 @@ import { ref, computed } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { PSButton, ConfirmModal } from '@pubstudio/frontend/ui-widgets'
 import { useBuild, usePageMenu } from '@pubstudio/frontend/feature-build'
+import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import MenuRow from '../MenuRow.vue'
 
 const { t } = useI18n()
 const { pages, setEditingPage, removePage } = usePageMenu()
-const { site, editor, activePage, setHomePage } = useBuild()
+const { site, activePage } = useSiteSource()
+const { editor, setHomePage } = useBuild()
 
 const showConfirmSetHomePage = ref(false)
 const showConfirmRemove = ref(false)

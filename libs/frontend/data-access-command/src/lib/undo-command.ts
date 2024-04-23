@@ -29,6 +29,7 @@ import { undoSetPageHead } from './page/set-page-head'
 import { undoAddStyleMixin } from './style/add-style-mixin'
 import { undoEditStyleMixin } from './style/edit-style-mixin'
 import { undoRemoveStyleMixin } from './style/remove-style-mixin'
+import { undoSetGlobalStyle } from './style/set-global-style'
 import { undoSetMixinEntry } from './style/set-mixin-entry'
 import { undoAddThemeFont } from './theme-font/add-theme-font'
 import { undoEditThemeFont } from './theme-font/edit-theme-font'
@@ -80,6 +81,7 @@ export const undoCommand = (site: ISite, command: ICommand) => {
     [CommandType.MoveComponent]: undoMoveComponent,
     [CommandType.SetDefaultsHead]: undoSetDefaultsHead,
     [CommandType.SetBreakpoint]: undoSetBreakpoint,
+    [CommandType.SetGlobalStyle]: undoSetGlobalStyle,
     [CommandType.UpdateUi]: undoUpdateUi,
   }[command.type]
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

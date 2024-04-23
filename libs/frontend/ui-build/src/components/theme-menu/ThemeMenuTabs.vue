@@ -55,10 +55,8 @@ const closeThemeMenu = () => {
 <style lang="postcss" scoped>
 @import '@theme/css/mixins.postcss';
 
-.theme-menu-tabs {
-  .theme-tab-content {
-    margin-top: 16px;
-  }
+.theme-tab-content {
+  margin-top: 16px;
 }
 .theme-close {
   @mixin size 18px;

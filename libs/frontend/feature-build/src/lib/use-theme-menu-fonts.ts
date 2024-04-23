@@ -10,7 +10,6 @@ export interface IUseThemeMenuFontFeature {
   selectedGoogleFonts: Ref<Set<string>>
   fontError: Ref<string | undefined>
   fonts: ComputedRef<IThemeFont[]>
-  clearEditingState: () => void
   newFont: () => void
   setEditingFont: (font: IThemeFont) => void
   saveFont: () => void
@@ -28,7 +27,7 @@ const selectedGoogleFonts = ref(new Set<string>())
 const editingFontSource = reactive<IThemeFont>(emptyFont())
 const fontError = ref<string | undefined>()
 
-export const resetThemeMenu = () => {
+export const resetThemeMenuFonts = () => {
   editing.value = false
   Object.assign(editingFont, emptyFont())
   Object.assign(editingFontSource, emptyFont())
@@ -42,13 +41,6 @@ export const useThemeMenuFonts = (): IUseThemeMenuFontFeature => {
   const fonts = computed(() => {
     return Object.values(site.value.context.theme.fonts)
   })
-
-  const clearEditingState = () => {
-    Object.assign(editingFont, emptyFont())
-    Object.assign(editingFontSource, emptyFont())
-    fontError.value = undefined
-    editing.value = false
-  }
 
   const newFont = () => {
     Object.assign(editingFont, emptyFont())
@@ -88,7 +80,7 @@ export const useThemeMenuFonts = (): IUseThemeMenuFontFeature => {
     } else {
       addThemeFont(editingFont.source, editingFont.name, editingFont.fallback)
     }
-    clearEditingState()
+    resetThemeMenuFonts()
   }
 
   return {
@@ -97,7 +89,6 @@ export const useThemeMenuFonts = (): IUseThemeMenuFontFeature => {
     selectedGoogleFonts,
     fontError,
     fonts,
-    clearEditingState,
     newFont,
     setEditingFont,
     saveFont,

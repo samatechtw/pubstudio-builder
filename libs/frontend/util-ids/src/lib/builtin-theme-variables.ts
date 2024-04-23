@@ -19,6 +19,7 @@ export const builtinThemeVariables = {
   'color-border': '#8b8b8b',
   'color-button-hover': '#b7c8dc',
   'color-error': '#ef4444',
+  'color-success': '#009879',
   'font-title': 'Helvetica, sans-serif',
   'font-text': 'Georgia, sans-serif',
 }

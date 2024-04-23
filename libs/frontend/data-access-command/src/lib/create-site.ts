@@ -50,6 +50,7 @@ export const createSite = (_namespace: string): ISite => {
     namespace,
     nextId: 0,
     components: {},
+    globalStyles: {},
     styles: {},
     behaviors: {},
     theme: {

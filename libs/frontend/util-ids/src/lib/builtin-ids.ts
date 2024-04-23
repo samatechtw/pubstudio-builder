@@ -8,6 +8,7 @@ export const noBehaviorId = behaviorId(defaultContext.namespace, 'none')
 export const toggleHiddenId = behaviorId(defaultContext.namespace, 'toggleHidden')
 export const setHiddenId = behaviorId(defaultContext.namespace, 'setHidden')
 export const navMenuBehaviorId = behaviorId(defaultContext.namespace, 'navChildren')
+export const setupLoaderBehaviorId = behaviorId(defaultContext.namespace, 'setupLoader')
 export const navItemBehaviorId = behaviorId(defaultContext.namespace, 'navItem')
 export const homeLinkBehaviorId = behaviorId(defaultContext.namespace, 'homeLink')
 
@@ -81,3 +82,12 @@ export const textareaId = componentId(defaultContext.namespace, 'textarea')
 // Advanced
 export const contactFormId = componentId(defaultContext.namespace, 'contactform')
 export const contactFormBehaviorId = behaviorId(defaultContext.namespace, 'contactform')
+export const clearErrorBehaviorId = behaviorId(
+  defaultContext.namespace,
+  'contactformclearerror',
+)
+export const loadingId = componentId(defaultContext.namespace, 'loading')
+export const loadingStyleId = styleId(defaultContext.namespace, 'loading')
+export const loadingDotStyleId = styleId(defaultContext.namespace, 'loadingdot')
+// Placeholder for children of builtin components that aren't used independently
+export const tempChildId = componentId(defaultContext.namespace, 'tempchild')

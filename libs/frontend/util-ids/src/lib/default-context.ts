@@ -4,6 +4,7 @@ export const defaultContext: ISiteContext = {
   namespace: 'global',
   nextId: 0,
   components: {},
+  globalStyles: {},
   styles: {},
   behaviors: {},
   theme: {

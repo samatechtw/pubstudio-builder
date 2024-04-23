@@ -6,7 +6,6 @@ import { setActivePage } from './set-active-page'
 // Switch to the corresponding page and scroll to the given component.
 export const scrollToComponent = (site: ISite, component: IComponent) => {
   const { editor } = site
-
   // Check for the type of `document` here because unit tests are run in Node environment
   // where `document` is not available. `document !== undefined` is not viable here because
   // that'll lead to "ReferenceError: window is not defined" error in Node environment.
@@ -53,7 +52,11 @@ export const scrollToComponentTreeItem = (component: IComponent) => {
 
 const findComponentPage = (site: ISite, component: IComponent): IPage | undefined => {
   let root = component
-  while (root.parent) {
+  // Failsafe for infinite iteration. This should never happen, but avoids breaking the site if
+  // a bug causes a component's parent to be itself
+  const searched = new Set<string>()
+  while (root.parent && !searched.has(root.id)) {
+    searched.add(root.id)
     root = root.parent
   }
   return Object.values(site.pages).find((page) => page.root.id === root.id)

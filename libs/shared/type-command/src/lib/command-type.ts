@@ -42,5 +42,6 @@ export enum CommandType {
   SetPageHead = 'setPH',
   SetBreakpoint = 'setBP',
   SetTranslations = 'setT',
+  SetGlobalStyle = 'setGS',
   UpdateUi = 'uUi',
 }

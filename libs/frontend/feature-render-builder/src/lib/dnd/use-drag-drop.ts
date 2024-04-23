@@ -1,11 +1,10 @@
 import { setBuildSubmenu } from '@pubstudio/frontend/data-access-command'
-import { useBuild } from '@pubstudio/frontend/feature-build'
+import { addBuiltinComponent, useBuild } from '@pubstudio/frontend/feature-build'
 import { activeBreakpoint } from '@pubstudio/frontend/feature-site-source'
 import { resolveComponent } from '@pubstudio/frontend/util-builtin'
 import { resolvedComponentStyle } from '@pubstudio/frontend/util-component'
 import { isDynamicComponent } from '@pubstudio/frontend/util-ids'
 import { runtimeContext } from '@pubstudio/frontend/util-runtime'
-import { IAddComponentData } from '@pubstudio/shared/type-command-data'
 import {
   BuildSubmenu,
   Css,
@@ -35,12 +34,16 @@ export interface IUseDragDropData {
   droppedFile: Ref<IDroppedFile | undefined>
 }
 
+export interface IDropComponentData {
+  id: string
+}
+
 export interface IUseDragDropProps {
   site: ISite
   componentId: string | undefined
   getParentId: () => string | undefined
   getComponentIndex: () => number
-  addData?: IAddComponentData
+  addData?: IDropComponentData
   // A parent of the target component is being dragged
   isParent?: boolean
   verticalOnly?: boolean
@@ -99,7 +102,7 @@ export const useDragDrop = (props: IUseDragDropProps): IUseDragDrop => {
     dragend: dragendOption,
     drop: dropOption,
   } = props
-  const { moveComponent, moveAbsoluteComponent, addBuiltinComponentData } = useBuild()
+  const { moveComponent, moveAbsoluteComponent } = useBuild()
   const hovering = ref(false)
 
   const elementRef: Ref<HTMLElement | undefined> = ref()
@@ -306,8 +309,8 @@ export const useDragDrop = (props: IUseDragDropProps): IUseDragDrop => {
       if (dragSource.value.addData) {
         const addParentId = dndState.value?.hoverSelf ? componentId : getParentId()
         if (addParentId) {
-          addBuiltinComponentData({
-            ...dragSource.value.addData,
+          addBuiltinComponent(site, {
+            id: dragSource.value.addData.id,
             parentId: addParentId,
             parentIndex: dropProps.value.destinationIndex,
           })

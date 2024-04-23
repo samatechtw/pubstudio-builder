@@ -6,6 +6,7 @@ export enum Css {
   AlignItems = 'align-items',
   AlignSelf = 'align-self',
   Animation = 'animation',
+  AnimationDelay = 'animation-delay',
   AspectRatio = 'aspect-ratio',
   Background = 'background',
   BackgroundColor = 'background-color',

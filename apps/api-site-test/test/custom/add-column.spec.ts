@@ -64,7 +64,7 @@ describe('Add Column', () => {
       .send(payload)
       .expect({
         code: 'CustomDataMaxLengthFail',
-        message: 'phone length must be less than 10',
+        message: 'phone must be less than 10 characters',
         status: 400,
       })
   }

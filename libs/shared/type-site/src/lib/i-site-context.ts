@@ -1,6 +1,6 @@
 import { IBreakpoint } from './i-breakpoint'
 import { IBehavior, IComponent } from './i-component'
-import { IStyle } from './i-style'
+import { IGlobalStyle, IStyle } from './i-style'
 import { ITheme } from './i-theme'
 
 export type ITranslations = Record<string, string>
@@ -9,6 +9,7 @@ export interface ISiteContext {
   namespace: string
   nextId: number
   components: Record<string, IComponent>
+  globalStyles: Record<string, IGlobalStyle>
   styles: Record<string, IStyle>
   behaviors: Record<string, IBehavior>
   theme: ITheme

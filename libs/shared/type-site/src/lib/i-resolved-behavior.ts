@@ -15,7 +15,7 @@ export interface IBehaviorHelpers {
   getValue(componentId: string, defaultVal?: string): string | undefined
   setContent(component: IComponent | undefined, content: string | undefined): void
   setState(component: IComponent | undefined, field: string, value: IComponentState): void
-  setInputIs(component: IComponent, name: string, value: string): void
+  setInputIs(component: IComponent | undefined, name: string, value: unknown): void
   getEventBehavior(component: IComponent, behaviorId: string): IComponentEventBehavior[]
   setCustomStyle(component: IComponent | undefined, prop: Css, value: string): void
   getCustomStyle(
@@ -23,6 +23,7 @@ export interface IBehaviorHelpers {
     prop: Css,
     value: string,
   ): string | undefined
+  setLoading(component: IComponent | undefined, loading: boolean): void
   addRow(table: string, row: Record<string, string>): Promise<void>
 }
 

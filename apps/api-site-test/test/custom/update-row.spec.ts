@@ -191,7 +191,7 @@ describe('Update Row', () => {
         .send(payload)
         .expect({
           code: 'CustomDataMinLengthFail',
-          message: 'age length must be greater than 1',
+          message: 'age must be at least 1 characters',
           status: 400,
         })
 
@@ -203,7 +203,7 @@ describe('Update Row', () => {
         .send(payload)
         .expect({
           code: 'CustomDataMaxLengthFail',
-          message: 'age length must be less than 3',
+          message: 'age must be less than 3 characters',
           status: 400,
         })
     })
@@ -218,7 +218,7 @@ describe('Update Row', () => {
         .send(payload)
         .expect({
           code: 'CustomDataInvalidEmail',
-          message: `${invalidEmail} is not a valid email`,
+          message: 'Invalid email',
           status: 400,
         })
     })

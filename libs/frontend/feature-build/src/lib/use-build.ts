@@ -19,7 +19,6 @@ import {
   resolveStyle,
 } from '@pubstudio/frontend/util-builtin'
 import {
-  makeAddBuiltinComponentData,
   makeEditComponentData,
   makeRemoveComponentData,
   makeSetInputData,
@@ -87,7 +86,6 @@ import {
   IEditorContext,
   IHeadObject,
   IHeadTag,
-  IPage,
   IPageHeadTag,
   IPageMetadata,
   IRawStylesWithSource,
@@ -128,9 +126,9 @@ export const buildContentWindowId = 'build-content-window'
 export const buildContentWindowInnerId = 'build-content-window-inner'
 
 export interface IUseBuild {
-  activePage: Ref<IPage | undefined>
   site: Ref<ISite>
   siteError: Ref<string | undefined>
+  // TODO -- move to useSiteSource
   editor: ComputedRef<IEditorContext | undefined>
   currentPseudoClass: ComputedRef<CssPseudoClass>
   selectedComponentFlattenedStyles: ComputedRef<IRawStylesWithSource>
@@ -143,8 +141,6 @@ export interface IUseBuild {
   duplicateComponent: () => void
   pasteComponent: (copiedComponentId: string, parent: IComponent) => void
   replacePageRoot: (copiedComponentId: string, pageRoute: string) => void
-  addBuiltinComponent: (id: string, parentId?: string) => string | undefined
-  addBuiltinComponentData: (data: IAddComponentData) => void
   editSelectedComponent: (fields: IEditComponentFields) => void
   editComponent: (component: IComponent, fields: IEditComponentFields) => void
   getSelectedComponent: () => IComponent
@@ -240,16 +236,13 @@ export interface IUseBuild {
 const commandAlert = uiAlert<CommandType | undefined>(ref())
 
 export const useBuild = (): IUseBuild => {
-  const { site, siteError, siteStore, replaceSite: replaceSiteSource } = useSiteSource()
-
-  const activePage = computed(() => {
-    const route = site.value.editor?.active
-    if (!route) {
-      return undefined
-    }
-    const pages = Object.values(site.value.pages)
-    return pages.find((page) => page.route === route)
-  })
+  const {
+    site,
+    activePage,
+    siteError,
+    siteStore,
+    replaceSite: replaceSiteSource,
+  } = useSiteSource()
 
   const editor = computed(() => {
     return site.value.editor
@@ -331,80 +324,8 @@ export const useBuild = (): IUseBuild => {
     pushCommand(site.value, CommandType.AddComponent, addData)
   }
 
-  // Get builtin mixins from a component & children that have not
-  // been added to the site
-  const getMissingMixins = (componentId: string | undefined): string[] => {
-    const builtinComponent = resolveComponent(site.value.context, componentId)
-    if (!builtinComponent) {
-      return []
-    }
-    // Iterate component/children and get mixins
-    const stack = [builtinComponent]
-    let mixins: string[] = []
-    while (stack.length > 0) {
-      const cmp = stack.pop()
-      if (cmp?.style.mixins) {
-        mixins = [...mixins, ...cmp.style.mixins]
-      }
-      if (cmp?.children) {
-        stack.push(...cmp.children)
-      }
-    }
-    return mixins
-  }
-
   const addComponentData = (data: IAddComponentData) => {
     pushCommand(site.value, CommandType.AddComponent, data)
-  }
-
-  const addBuiltinComponentData = (data: IAddComponentData) => {
-    const mixins = getMissingMixins(data.sourceId)
-    pushCommandAndAddMissingMixins(CommandType.AddComponent, data, mixins)
-  }
-
-  const addBuiltinComponent = (id: string, parentId?: string): string | undefined => {
-    if (!activePage.value) {
-      return
-    }
-    let parent: IComponent | undefined
-    if (parentId) {
-      parent = resolveComponent(site.value.context, parentId)
-    }
-    parent = parent ?? site.value.editor?.selectedComponent ?? activePage.value.root
-
-    const data = makeAddBuiltinComponentData(
-      site.value,
-      id,
-      parent,
-      site.value.editor?.selectedComponent?.id,
-    )
-    if (!data) {
-      return
-    }
-    addBuiltinComponentData(data)
-    return data.id
-  }
-
-  const pushCommandAndAddMissingMixins = <Data>(
-    type: CommandType,
-    data: Data,
-    builtinMixinIds: string[] | undefined,
-  ) => {
-    const commands: ICommand[] = [{ type, data }]
-
-    builtinMixinIds?.forEach((mixinId) => {
-      const builtinStyle = builtinStyles[mixinId]
-      const alreadyExists = !!resolveStyle(site.value.context, mixinId)
-      if (!alreadyExists) {
-        const addMixinData: IAddStyleMixinData = structuredClone(builtinStyle)
-        commands.push({
-          type: CommandType.AddStyleMixin,
-          data: addMixinData,
-        })
-      }
-    })
-
-    pushCommand(site.value, CommandType.Group, { commands } as ICommandGroupData)
   }
 
   const editComponent = (
@@ -1274,7 +1195,6 @@ export const useBuild = (): IUseBuild => {
     editor,
     currentPseudoClass,
     selectedComponentFlattenedStyles,
-    activePage,
     commandAlert,
     clearSiteError,
     resetSite,
@@ -1284,8 +1204,6 @@ export const useBuild = (): IUseBuild => {
     duplicateComponent,
     pasteComponent,
     replacePageRoot,
-    addBuiltinComponent,
-    addBuiltinComponentData,
     editComponent,
     editSelectedComponent,
     getSelectedComponent,

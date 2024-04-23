@@ -24,6 +24,7 @@ export const mockSerializedSite: ISerializedSite = {
     componentMenuCollapses: {},
     componentsHidden: {},
     componentTab: {},
+    styleTab: undefined,
     selectedThemeColors: [],
     builderWidth: 1080,
     builderScale: 1,
@@ -32,6 +33,7 @@ export const mockSerializedSite: ISerializedSite = {
   context: {
     namespace: 'test',
     nextId: 2,
+    globalStyles: {},
     styles: {
       'global-s-0': {
         id: 'global-s-0',

@@ -24,7 +24,7 @@ import {
   useReusableStyleMenu,
   useMixinMenuUi,
 } from '@pubstudio/frontend/feature-build'
-import EditMenuTitle from './EditMenuTitle.vue'
+import EditMenuTitle from '../EditMenuTitle.vue'
 
 const { t } = useI18n()
 

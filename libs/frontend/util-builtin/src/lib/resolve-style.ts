@@ -21,6 +21,7 @@ import { captionedImageStyle, imageStyle } from './components/builtin-image'
 import { inputStyle } from './components/builtin-input'
 import { linkStyle } from './components/builtin-link'
 import { listItemStyle, listStyle } from './components/builtin-list'
+import { loadingDotStyle, loadingStyle } from './components/builtin-loading'
 import { navMenuItemStyle, navMenuStyle } from './components/builtin-nav-menu'
 import { svgStyle } from './components/builtin-svg'
 import { textStyle } from './components/builtin-text'
@@ -47,6 +48,8 @@ export const builtinStyles: Record<string, IStyle> = {
   [footerStyle.id]: footerStyle,
   [inputStyle.id]: inputStyle,
   [textareaStyle.id]: textareaStyle,
+  [loadingStyle.id]: loadingStyle,
+  [loadingDotStyle.id]: loadingDotStyle,
   [listStyle.id]: listStyle,
   [listItemStyle.id]: listItemStyle,
   [dividerHorizontalStyle.id]: dividerHorizontalStyle,

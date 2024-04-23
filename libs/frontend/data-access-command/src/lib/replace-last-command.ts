@@ -19,7 +19,7 @@ export const replaceLastCommand = (site: ISite, command: ICommand, save?: boolea
 }
 
 // Replace the last command with a Group, and append a command to it
-export const appendLastCommand = (site: ISite, command: ICommand) => {
+export const appendLastCommand = (site: ISite, command: ICommand, save?: boolean) => {
   const lastCmd = getLastCommand(site)
   if (lastCmd) {
     let newCmd: ICommand
@@ -39,6 +39,9 @@ export const appendLastCommand = (site: ISite, command: ICommand) => {
     const history = site.history
     applyCommand(site, command)
     history.back[history.back.length - 1] = newCmd
+    if (save ?? true) {
+      site.editor?.store?.save(site)
+    }
   }
 }
 
