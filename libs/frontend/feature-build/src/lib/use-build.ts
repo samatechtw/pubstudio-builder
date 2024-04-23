@@ -13,11 +13,7 @@ import {
   descSortedBreakpoints,
 } from '@pubstudio/frontend/feature-site-source'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
-import {
-  builtinStyles,
-  resolveComponent,
-  resolveStyle,
-} from '@pubstudio/frontend/util-builtin'
+import { resolveComponent } from '@pubstudio/frontend/util-builtin'
 import {
   makeEditComponentData,
   makeRemoveComponentData,
@@ -99,6 +95,7 @@ import {
   WebSafeFont,
 } from '@pubstudio/shared/type-site'
 import { computed, ComputedRef, Ref, ref, toRaw } from 'vue'
+import { pushCommandAndAddMissingMixins } from './add-builtin/add-builtin-component'
 import {
   IRemoveStyleEntry,
   removeComponentCustomStyleCommand,
@@ -542,7 +539,9 @@ export const useBuild = (): IUseBuild => {
       componentId: selected.id,
       mixinId,
     }
-    pushCommandAndAddMissingMixins(CommandType.AddComponentMixin, data, [mixinId])
+    pushCommandAndAddMissingMixins(site.value, CommandType.AddComponentMixin, data, [
+      mixinId,
+    ])
   }
 
   const removeComponentMixin = (mixinId: string) => {
@@ -574,6 +573,7 @@ export const useBuild = (): IUseBuild => {
       newMixinId,
     }
     pushCommandAndAddMissingMixins(
+      site.value,
       CommandType.ReplaceComponentMixin,
       replaceComponentMixinData,
       [newMixinId],
