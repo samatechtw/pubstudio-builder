@@ -19,7 +19,7 @@ import {
 import { applyAddStyleMixin } from './add-style-mixin'
 import { applySetMixinEntry, undoSetMixinEntry } from './set-mixin-entry'
 
-describe('Set Component Custom Style', () => {
+describe('Set Mixin Entry', () => {
   let siteString: string
   let site: ISite
   let pseudoStyle: IPseudoStyle

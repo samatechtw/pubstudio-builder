@@ -143,6 +143,13 @@ export const getLivePageStyle = (context: ISiteContext, page: IPage): IQueryStyl
   return sortedQueryStyle
 }
 
+export const getGlobalStyle = (context: ISiteContext): string => {
+  return Object.values(context.globalStyles ?? {}).reduce(
+    (prev, cur) => prev + cur.style,
+    '',
+  )
+}
+
 const sortQueryStyle = (queryStyle: IQueryStyle): IQueryStyle => {
   return Object.entries(queryStyle).reduce((result, [breakpointId, rawStyleRecord]) => {
     result[breakpointId] = sortRawStyleRecord(rawStyleRecord)

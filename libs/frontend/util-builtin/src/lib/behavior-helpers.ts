@@ -66,8 +66,12 @@ export const getValue = (componentId: string): string | undefined => {
   return el?.value
 }
 
-export const setInputIs = (component: IComponent, name: string, value: unknown) => {
-  if (component.inputs?.[name]) {
+export const setInputIs = (
+  component: IComponent | undefined,
+  name: string,
+  value: unknown,
+) => {
+  if (component?.inputs?.[name]) {
     component.inputs[name].is = value
   }
 }
@@ -77,8 +81,12 @@ export const setCustomStyle = (
   prop: Css,
   value: string,
 ) => {
-  if (component?.style.custom[DEFAULT_BREAKPOINT_ID].default) {
+  if (component?.style.custom[DEFAULT_BREAKPOINT_ID]?.default) {
     component.style.custom[DEFAULT_BREAKPOINT_ID].default[prop] = value
+  } else if (component?.style.custom[DEFAULT_BREAKPOINT_ID]) {
+    component.style.custom[DEFAULT_BREAKPOINT_ID].default = { [prop]: value }
+  } else if (component?.style.custom) {
+    component.style.custom[DEFAULT_BREAKPOINT_ID] = { default: { [prop]: value } }
   }
 }
 
@@ -103,6 +111,13 @@ export const getEventBehavior = (
     }
   }
   return behaviors
+}
+
+export const setLoading = (component: IComponent | undefined, loading: boolean) => {
+  const content = component?.children?.[0]
+  const loader = component?.children?.[1]
+  setState(loader, 'hide', !loading)
+  setCustomStyle(content, Css.Opacity, loading ? '0' : '1')
 }
 
 const addRow = async (table: string, row: Record<string, string>) => {
@@ -136,5 +151,6 @@ export const behaviorHelpers: IBehaviorHelpers = {
   getEventBehavior,
   getCustomStyle,
   setCustomStyle,
+  setLoading,
   addRow,
 }

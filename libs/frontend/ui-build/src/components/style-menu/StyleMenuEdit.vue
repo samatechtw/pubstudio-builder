@@ -48,9 +48,9 @@ import {
   editStylesCancelEdit,
   isEditingStyles,
 } from '@pubstudio/frontend/data-access-command'
-import EditMenuTitle from './EditMenuTitle.vue'
-import MenuRowEdit from './MenuRowEdit.vue'
-import StyleRow from './StyleRow.vue'
+import EditMenuTitle from '../EditMenuTitle.vue'
+import MenuRowEdit from '../MenuRowEdit.vue'
+import StyleRow from '../StyleRow.vue'
 
 const { t } = useI18n()
 

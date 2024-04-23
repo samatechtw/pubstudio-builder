@@ -8,7 +8,7 @@ import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { parseApiErrorKey, PSApi, toApiError } from '@pubstudio/frontend/util-api'
 import { resolveComponent } from '@pubstudio/frontend/util-builtin'
 import { makeRemoveComponentData } from '@pubstudio/frontend/util-command-data'
-import { contactFormBehaviorId } from '@pubstudio/frontend/util-ids'
+import { clearErrorBehaviorId, contactFormBehaviorId } from '@pubstudio/frontend/util-ids'
 import {
   ICreateTableApiRequest,
   ICustomTableViewModel,
@@ -17,6 +17,7 @@ import { CommandType } from '@pubstudio/shared/type-command'
 import {
   ComponentEventType,
   ContactFormWalkthroughState,
+  IComponent,
   IComponentEvent,
 } from '@pubstudio/shared/type-site'
 import { Ref, ref } from 'vue'
@@ -80,9 +81,18 @@ export const useContactForm = (): IContactFormFeature => {
     }
   }
 
+  const appendEvent = (form: IComponent, event: IComponentEvent, save?: boolean) => {
+    const { addComponentEventData } = useBuild()
+    const addEvent = addComponentEventData(form, event)
+    const command = {
+      type: CommandType.SetComponentEvent,
+      data: addEvent,
+    }
+    appendLastCommand(site.value, command, save)
+  }
+
   const setupContactForm = (tableName: string, hasName: boolean) => {
     const { context } = site.value
-    const { addComponentEventData } = useBuild()
     const formId = site.value.editor?.contactFormWalkthrough?.formId
     if (context && formId) {
       const form = resolveComponent(context, formId)?.children?.[0]
@@ -119,11 +129,28 @@ export const useContactForm = (): IContactFormFeature => {
             },
           ],
         }
-        const addEvent = addComponentEventData(form, submitEvent)
-        appendLastCommand(site.value, {
-          type: CommandType.SetComponentEvent,
-          data: addEvent,
-        })
+        appendEvent(form, submitEvent, false)
+
+        // Add form input error reset behavior
+        const inputEvent: IComponentEvent = {
+          name: ComponentEventType.Input,
+          eventParams: {},
+          behaviors: [
+            {
+              behaviorId: clearErrorBehaviorId,
+              args: {
+                errorId: error?.id ?? '',
+              },
+            },
+          ],
+        }
+        if (nameInput) {
+          appendEvent(nameInput, inputEvent, false)
+        }
+        if (emailInput && messageInput) {
+          appendEvent(emailInput, inputEvent, false)
+          appendEvent(messageInput, inputEvent, true)
+        }
       }
     }
   }
@@ -138,11 +165,16 @@ export const useContactForm = (): IContactFormFeature => {
       columns: {
         email: {
           data_type: 'TEXT',
-          validation_rules: [{ rule_type: 'Email' }, { rule_type: 'Unique' }],
+          validation_rules: [
+            { rule_type: 'Required' },
+            { rule_type: 'Email' },
+            { rule_type: 'Unique' },
+          ],
         },
         message: {
           data_type: 'TEXT',
           validation_rules: [
+            { rule_type: 'Required' },
             { rule_type: 'MinLength', parameter: 5 },
             { rule_type: 'MaxLength', parameter: 800 },
           ],

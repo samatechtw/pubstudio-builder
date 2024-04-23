@@ -40,8 +40,10 @@ import {
   setSelectedComponent,
 } from '@pubstudio/frontend/data-access-command'
 import { useRenderBuilder } from '@pubstudio/frontend/feature-render-builder'
+import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 
-const { site, activePage, editor } = useBuild()
+const { site, activePage } = useSiteSource()
+const { editor } = useBuild()
 
 const {
   ReusableStyle,

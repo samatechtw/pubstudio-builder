@@ -193,7 +193,6 @@ pub fn append_column_info_to_query<'a, DB: Database>(
 
         query.push(" ");
         query.push(column_type);
-        query.push(" NOT NULL");
 
         match action_type {
             Action::AddColumn => {

@@ -52,7 +52,7 @@
 <script lang="ts" setup>
 import { computed, ref, toRefs } from 'vue'
 import { useDragDrop } from '@pubstudio/frontend/feature-render-builder'
-import { useBuild } from '@pubstudio/frontend/feature-build'
+import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { addAssetData } from '@pubstudio/frontend/util-command-data'
 import {
   Check,
@@ -71,7 +71,7 @@ import AssetCardInfoBottom from './AssetCardInfoBottom.vue'
 import { ISiteAssetListItem, useSiteAssets } from '../lib/use-site-assets'
 
 const { updateAsset, loading } = useSiteAssets()
-const { activePage, site } = useBuild()
+const { site, activePage } = useSiteSource()
 
 const props = defineProps<{
   asset: ISiteAssetListItem

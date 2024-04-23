@@ -3,6 +3,7 @@ import {
   IComponentEditorEvents,
   IComponentEvents,
   IComponentInputs,
+  IComponentState,
   IComponentStyle,
   ISerializedComponent,
   Tag,
@@ -27,6 +28,7 @@ export interface IAddComponentData {
   // Source to copy props from
   sourceId?: string
   style?: IComponentStyle
+  state?: Record<string, IComponentState>
   inputs?: IComponentInputs
   events?: IComponentEvents
   editorEvents?: IComponentEditorEvents

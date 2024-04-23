@@ -1,5 +1,5 @@
-import { IAddComponentData } from '@pubstudio/shared/type-command-data'
 import { XYCoord } from './row-layout'
+import { IDropComponentData } from './use-drag-drop'
 
 export enum BuilderDndType {
   Component = 'c',
@@ -11,7 +11,7 @@ export interface IDraggedComponent {
   // left/top offset from element when clicked
   clickOffset: XYCoord
   index: number
-  addData?: IAddComponentData
+  addData?: IDropComponentData
 }
 
 export interface IDragProps {

@@ -31,9 +31,11 @@ import { EditorDropdown } from '@pubstudio/shared/type-site'
 import { useBuild, usePageMenu } from '@pubstudio/frontend/feature-build'
 import { setEditorDropdown } from '@pubstudio/frontend/data-access-command'
 import { IMultiselectOption, IMultiselectObj } from '@pubstudio/frontend/type-ui-widgets'
+import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 
 const { t } = useI18n()
-const { site, editor, changePage, activePage } = useBuild()
+const { site, activePage } = useSiteSource()
+const { editor, changePage } = useBuild()
 const { newPage } = usePageMenu()
 
 const pageOptions = computed(() =>

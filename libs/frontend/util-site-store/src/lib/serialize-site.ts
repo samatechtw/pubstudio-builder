@@ -50,6 +50,8 @@ export const serializeEditor = (
         editBehavior: editor.editBehavior,
         translations: editor.translations,
         themeTab: editor.themeTab,
+        styleTab: editor.styleTab,
+        editGlobalStyle: editor.editGlobalStyle,
         componentTab: editor.componentTab,
         mode: editor.mode,
         showComponentTree: editor.showComponentTree,
@@ -77,6 +79,7 @@ export const serializeSiteContext = (context: ISiteContext): ISerializedSiteCont
     breakpoints: context.breakpoints,
     i18n: context.i18n,
     activeI18n: context.activeI18n,
+    globalStyles: context.globalStyles,
   }
 }
 

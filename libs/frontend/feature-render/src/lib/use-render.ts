@@ -23,6 +23,7 @@ import { Link, Meta, Script, useHead } from '@unhead/vue'
 import { Component, computed, ComputedRef, defineComponent, h, Ref } from 'vue'
 import {
   getBuildPageStyle,
+  getGlobalStyle,
   getLivePageStyle,
   getRootBackgroundStyle,
 } from './get-page-style'
@@ -91,9 +92,11 @@ export const useRender = (options: IUseRenderOptions): IUseRender => {
   const livePageComponentStyle = computed(() => {
     let styleContent = ''
     if (activePage.value && site.value) {
+      const globalStyle = getGlobalStyle(site.value.context)
       const htmlStyle = getRootBackgroundStyle(site.value.context, activePage.value)
       const pageStyle = getLivePageStyle(site.value.context, activePage.value)
       styleContent =
+        globalStyle +
         queryStyleToString(site.value.context, htmlStyle) +
         queryStyleToString(site.value.context, pageStyle)
     }

@@ -29,6 +29,7 @@ import { applySetPageHead } from './page/set-page-head'
 import { applyAddStyleMixin } from './style/add-style-mixin'
 import { applyEditStyleMixin } from './style/edit-style-mixin'
 import { applyRemoveStyleMixin } from './style/remove-style-mixin'
+import { applySetGlobalStyle } from './style/set-global-style'
 import { applySetMixinEntry } from './style/set-mixin-entry'
 import { applyAddThemeFont } from './theme-font/add-theme-font'
 import { applyEditThemeFont } from './theme-font/edit-theme-font'
@@ -80,6 +81,7 @@ export const applyCommand = (site: ISite, command: ICommand): ICommand => {
     [CommandType.MoveComponent]: applyMoveComponent,
     [CommandType.SetDefaultsHead]: applySetDefaultsHead,
     [CommandType.SetBreakpoint]: applySetBreakpoint,
+    [CommandType.SetGlobalStyle]: applySetGlobalStyle,
     [CommandType.UpdateUi]: applyUpdateUi,
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

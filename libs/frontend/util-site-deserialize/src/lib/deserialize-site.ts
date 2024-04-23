@@ -32,6 +32,8 @@ export const deserializeEditor = (
         editBehavior: serializedEditor.editBehavior,
         translations: serializedEditor.translations,
         themeTab: serializedEditor.themeTab,
+        styleTab: serializedEditor.styleTab,
+        editGlobalStyle: serializedEditor.editGlobalStyle,
         componentTab: serializedEditor.componentTab ?? {},
         mode: serializedEditor.mode,
         showComponentTree: serializedEditor.showComponentTree,
@@ -123,6 +125,8 @@ export const deserializedHelper = (serialized: ISerializedSite): ISite => {
     // Added 231105
     i18n: context.i18n ?? {},
     activeI18n: context.activeI18n,
+    // Added 240417
+    globalStyles: context.globalStyles ?? {},
   }
   const site: ISite = {
     context: siteContext,

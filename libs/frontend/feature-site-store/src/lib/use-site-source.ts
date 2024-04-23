@@ -2,6 +2,7 @@ import { site } from '@pubstudio/frontend/feature-site-source'
 import { PSApi } from '@pubstudio/frontend/util-api'
 import { IUpdateSiteApiResponse } from '@pubstudio/shared/type-api-site-sites'
 import {
+  IPage,
   ISite,
   ISiteRestore,
   ISiteStore,
@@ -9,12 +10,14 @@ import {
 } from '@pubstudio/shared/type-site'
 import { plainResponseInterceptors } from '@pubstudio/shared/util-web-site-api'
 import { computed, ComputedRef, Ref, ref } from 'vue'
+import { getActivePage } from './get-active-page'
 
 // This file is here, instead of frontend/feature-site-source, to decouple the `site`
 // instance from the dependencies required by this lib.
 
 export interface IUseSiteSource {
   site: Ref<ISite>
+  activePage: Ref<IPage | undefined>
   siteError: Ref<string | undefined>
   apiSiteId: Ref<string | undefined>
   apiSite: PSApi | undefined
@@ -43,6 +46,10 @@ const isSaving = computed(() => {
   // TODO -- figure out how to avoid nested ComputedRef in `siteStore` Ref
   const saveState = siteStore.value.saveState as unknown as SiteSaveState
   return saveState === SiteSaveState.Saving || saveState === SiteSaveState.SavingEditor
+})
+
+const activePage = computed(() => {
+  return getActivePage(site.value)
 })
 
 export const useSiteSource = (): IUseSiteSource => {
@@ -114,6 +121,7 @@ export const useSiteSource = (): IUseSiteSource => {
     siteStore,
     isSaving,
     site,
+    activePage,
     siteError,
   }
 }
