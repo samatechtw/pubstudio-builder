@@ -46,6 +46,11 @@ export enum ThemeTab {
   Meta = 'meta',
 }
 
+export enum StyleTab {
+  Reusable = 'reusable',
+  Global = 'global',
+}
+
 export enum ComponentTabState {
   EditEvent = 'editEvent',
   EditInput = 'editInput',
@@ -73,6 +78,12 @@ export interface IEditBehavior extends Omit<IBehavior, 'id'> {
 
 export interface IEditSvg {
   content: string
+}
+
+export interface IEditGlobalStyle {
+  oldName: string | undefined
+  newName: string
+  style: string
 }
 
 export interface IContactFormWalkthrough {
@@ -133,6 +144,10 @@ export interface IEditorContext {
   translations?: boolean
   // Active theme tab
   themeTab?: ThemeTab
+  // Active style tab
+  styleTab?: StyleTab
+  // Editing data for global style
+  editGlobalStyle?: IEditGlobalStyle
   componentTab: {
     // Internal tab state
     state?: ComponentTabState

@@ -186,10 +186,6 @@ export const computeBuilderStyleProps = (
     ])
   }
 
-  if (site.editor?.componentsHidden[component.id]) {
-    builderStyle.opacity = '0'
-  }
-
   if (editor?.debugBounding) {
     builderStyle.border = '1.5px dashed #999'
   }
@@ -205,6 +201,11 @@ export const computeBuilderStyleProps = (
   // Set pointer-events to auto so that components are always clickable in the builder
   // even if pointer-events: none; is set on the components.
   builderStyle['pointer-events'] = 'auto'
+
+  if (site.editor?.componentsHidden[component.id]) {
+    builderStyle.opacity = '0'
+    builderStyle['pointer-events'] = 'none'
+  }
 
   return { builderStyle, builderProps, builderClass, extraChildren }
 }

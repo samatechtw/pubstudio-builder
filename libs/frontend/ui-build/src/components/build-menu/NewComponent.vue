@@ -19,10 +19,9 @@
 
 <script lang="ts" setup>
 import { toRefs } from 'vue'
-import { useBuild } from '@pubstudio/frontend/feature-build'
+import { addBuiltinComponent } from '@pubstudio/frontend/feature-build'
 import { useDragDrop } from '@pubstudio/frontend/feature-render-builder'
-import { makeAddBuiltinComponentData } from '@pubstudio/frontend/util-command-data'
-import { IComponent } from '@pubstudio/shared/type-site'
+import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 
 const props = defineProps<{
   text: string
@@ -36,10 +35,10 @@ const emit = defineEmits<{
 
 const { builtinComponentId } = toRefs(props)
 
-const { site, editor, activePage, addBuiltinComponent } = useBuild()
+const { site } = useSiteSource()
 
 const clickAddComponent = () => {
-  const componentId = addBuiltinComponent(builtinComponentId.value)
+  const componentId = addBuiltinComponent(site.value, { id: builtinComponentId.value })
   emit('add', componentId)
 }
 
@@ -50,12 +49,7 @@ const { dndState, elementRef, dragstart, drag, dragenter, dragover, dragleave, d
     getParentId: () => undefined,
     getComponentIndex: () => 0,
     isParent: false,
-    addData: makeAddBuiltinComponentData(
-      site.value,
-      builtinComponentId.value,
-      activePage.value?.root as IComponent,
-      editor.value?.selectedComponent?.id,
-    ),
+    addData: { id: builtinComponentId.value },
   })
 </script>
 

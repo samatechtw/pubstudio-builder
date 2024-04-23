@@ -1,6 +1,4 @@
 import {
-  buttonId,
-  buttonStyleId,
   contactFormId,
   containerHorizontalId,
   containerVerticalId,
@@ -15,22 +13,13 @@ import {
 import {
   ComponentArgPrimitive,
   IBreakpointStyles,
-  IComponentInput,
   IRawStyle,
   Tag,
 } from '@pubstudio/shared/type-site'
+import { makeButton } from './builtin-button'
 import { makeH2 } from './builtin-h'
 import { makeText } from './builtin-text'
-
-const makeInput = (name: string, text: string): IComponentInput => {
-  return {
-    type: ComponentArgPrimitive.String,
-    name: 'placeholder',
-    attr: true,
-    default: '',
-    is: text,
-  }
-}
+import { makeInput } from './helpers'
 
 const defaultStyle = (raw: IRawStyle): IBreakpointStyles => {
   return {
@@ -200,38 +189,26 @@ export const contactForm = {
             color: '${color-error}',
             'justify-content': 'center',
             opacity: '0',
+            'font-size': '14px',
+            'min-height': '18px',
             transition: 'opacity 0.25s ease',
           }),
         ),
-        {
-          id: buttonId,
+        makeButton({
           name: 'Submit',
-          tag: Tag.Button,
           content: '<div class="pm-p">Submit</div>',
           style: {
-            custom: {
-              [DEFAULT_BREAKPOINT_ID]: {
-                default: {
-                  margin: '0px 0px 0px 0px',
-                  'background-color': '${color-primary}',
-                  'border-radius': '0px',
-                  color: 'white',
-                  'font-size': '18px',
-                },
+            [DEFAULT_BREAKPOINT_ID]: {
+              default: {
+                margin: '0px 0px 0px 0px',
+                'border-radius': '0px',
+                color: 'white',
+                'font-size': '18px',
               },
             },
-            mixins: [buttonStyleId],
           },
-          inputs: {
-            type: {
-              name: 'type',
-              type: ComponentArgPrimitive.String,
-              default: 'submit',
-              attr: true,
-              is: 'submit',
-            },
-          },
-        },
+          events: {},
+        }),
       ],
       style: {
         custom: {

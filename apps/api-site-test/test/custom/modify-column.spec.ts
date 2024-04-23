@@ -156,7 +156,7 @@ describe('Modify Column', () => {
         .send(addRow)
         .expect({
           code: 'CustomDataMinLengthFail',
-          message: 'NEW_NAME length must be greater than 2',
+          message: 'NEW_NAME must be at least 2 characters',
           status: 400,
         })
     })

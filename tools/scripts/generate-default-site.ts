@@ -1,5 +1,5 @@
 import { createSite } from '@pubstudio/frontend/data-access-command'
-import { useBuild } from '@pubstudio/frontend/feature-build'
+import { addBuiltinComponent, useBuild } from '@pubstudio/frontend/feature-build'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { containerVertical, h1 } from '@pubstudio/frontend/util-builtin'
 import { DEFAULT_BREAKPOINT_ID } from '@pubstudio/frontend/util-ids'
@@ -40,15 +40,10 @@ const { initializeSite, site } = useSiteSource()
 await initializeSite({ store: makeMockStore(), siteId: undefined })
 site.value = createSite('__namespace__')
 
-const {
-  addBuiltinComponent,
-  setCustomStyle,
-  getSelectedComponent,
-  editSelectedComponent,
-} = useBuild()
+const { setCustomStyle, getSelectedComponent, editSelectedComponent } = useBuild()
 const selectedComponent = getSelectedComponent()
 
-addBuiltinComponent(containerVertical.id)
+addBuiltinComponent(site.value, { id: containerVertical.id })
 setCustomStyle(
   selectedComponent,
   {
@@ -64,7 +59,7 @@ setCustomStyle(
     value: '100%',
   },
 )
-addBuiltinComponent(h1.id)
+addBuiltinComponent(site.value, { id: h1.id })
 editSelectedComponent({ content: 'My Site' })
 setCustomStyle(selectedComponent, undefined, {
   pseudoClass: CssPseudoClass.Default,

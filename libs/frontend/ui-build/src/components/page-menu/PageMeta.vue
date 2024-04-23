@@ -20,13 +20,14 @@ import { computed } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { IHeadTagStr, IPageHeadTag } from '@pubstudio/shared/type-site'
 import { useBuild } from '@pubstudio/frontend/feature-build'
+import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import ThemeMetaFavicon from '../theme-menu/ThemeMetaFavicon.vue'
 import ThemeMetaHead from '../theme-menu/ThemeMetaHead.vue'
 import { IThemeMetaEditData } from '../theme-menu/i-theme-meta-edit-data'
 
 const { t } = useI18n()
-const { activePage, setPageFavicon, addPageHead, setPageHead, removePageHead } =
-  useBuild()
+const { activePage } = useSiteSource()
+const { setPageFavicon, addPageHead, setPageHead, removePageHead } = useBuild()
 
 const setFavicon = (newFavicon: string | undefined) => {
   if (activePage.value) {

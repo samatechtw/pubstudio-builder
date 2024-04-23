@@ -2,6 +2,7 @@ import { redoCommand, undoLastCommand } from '@pubstudio/frontend/data-access-co
 import { initializeSiteStore } from '@pubstudio/frontend/feature-site-store-init'
 import { h1 } from '@pubstudio/frontend/util-builtin'
 import { stringifySite } from '@pubstudio/frontend/util-site-store'
+import { addBuiltinComponent } from './add-builtin/add-builtin-component'
 import { IUseBuild, useBuild } from './use-build'
 
 describe('Use Build', () => {
@@ -16,7 +17,7 @@ describe('Use Build', () => {
   it('add a builtin component, redo, and undo', () => {
     expect(build.site.value.context.nextId).toEqual(1)
 
-    build.addBuiltinComponent(h1.id)
+    addBuiltinComponent(build.site.value, { id: h1.id })
 
     expect(build.site.value.context.nextId).toEqual(2)
 

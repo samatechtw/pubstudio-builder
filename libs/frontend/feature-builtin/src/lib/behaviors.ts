@@ -1,38 +1,25 @@
-import { mergeLastCommand } from '@pubstudio/frontend/data-access-command'
 import {
-  builtinStyles,
-  defaultNavMenuItemInputs,
   registerBuiltinBehavior,
   resolveComponent,
-  resolveStyle,
 } from '@pubstudio/frontend/util-builtin'
 import {
-  makeAddBuiltinComponentData,
-  makeEditComponentData,
-  makeRemoveComponentData,
-  makeSetInputData,
-} from '@pubstudio/frontend/util-command-data'
-import {
+  clearErrorBehaviorId,
   contactFormBehaviorId,
   homeLinkBehaviorId,
-  navItemBehaviorId,
-  navMenuBehaviorId,
-  navMenuItemId,
-  navMenuItemStyleId,
   noBehaviorId,
   setHiddenId,
   toggleHiddenId,
 } from '@pubstudio/frontend/util-ids'
-import { CommandType, ICommand } from '@pubstudio/shared/type-command'
-import { IAddStyleMixinData } from '@pubstudio/shared/type-command-data'
+import { findComponent } from '@pubstudio/frontend/util-render'
 import {
   ComponentArgPrimitive,
+  Css,
   IBehavior,
   IBehaviorContext,
   IBehaviorCustomArgs,
   IBehaviorHelpers,
   IComponent,
-  ISite,
+  Tag,
 } from '@pubstudio/shared/type-site'
 
 export const noBehavior: IBehavior = {
@@ -116,115 +103,30 @@ export const homeLinkBehavior: IBehavior = {
 }
 registerBuiltinBehavior(homeLinkBehavior)
 
-const syncNavMenu = (site: ISite, cmp: IComponent) => {
-  const { pages } = site
-  const syncedChildren = (cmp.children ?? []).filter((c) => !!c.inputs?.sync?.is)
-  const childCount = syncedChildren.length ?? 0
-  const routes = Object.keys(pages)
-
-  const commands: ICommand[] = []
-  if (routes.length === childCount) {
-    // Page edited
-    for (const child of syncedChildren) {
-      const route = child.inputs?.href?.is as string
-      const content = child.inputs?.name?.is as string
-      let page = pages[route]
-      // Page route changed
-      if (!page) {
-        const childRoutes = syncedChildren.map((c) => c.inputs?.href?.is)
-        const newRoute = routes.find((r) => !childRoutes.includes(r))
-        if (newRoute) {
-          page = pages[newRoute]
-          const hrefData = makeSetInputData(child, 'href', {
-            is: newRoute,
-          })
-          commands.push({ type: CommandType.SetComponentInput, data: hrefData })
-        }
-      }
-      // Page name changed
-      if (page && page.name !== content) {
-        const setInputData = makeSetInputData(child, 'name', {
-          is: page.name,
-        })
-        const editComponentData = makeEditComponentData(child, {
-          content: page.name,
-        })
-        commands.push({ type: CommandType.SetComponentInput, data: setInputData })
-        commands.push({ type: CommandType.EditComponent, data: editComponentData })
-      }
-    }
-  } else if (routes.length > childCount) {
-    // Page added
-    const childHrefs = syncedChildren.map((c) => c.inputs?.href?.is)
-    for (const route of routes) {
-      if (!childHrefs.includes(route)) {
-        const addData = makeAddBuiltinComponentData(site, navMenuItemId, cmp, undefined)
-        if (addData) {
-          addData.inputs = defaultNavMenuItemInputs(route, pages[route].name, true)
-          addData.content = pages[route].name
-          commands.push({ type: CommandType.AddComponent, data: addData })
-          const builtinStyle = builtinStyles[navMenuItemStyleId]
-          const alreadyExists = resolveStyle(site.context, navMenuItemStyleId)
-          if (builtinStyle && !alreadyExists) {
-            const addMixinData: IAddStyleMixinData = structuredClone(builtinStyle)
-            commands.push({ type: CommandType.AddStyleMixin, data: addMixinData })
-          }
-        }
-      }
-    }
-  } else {
-    // Page removed
-    for (const child of syncedChildren) {
-      const sync = child.inputs?.sync?.is
-      const route = child.inputs?.href?.is as string
-      if (sync && route && !pages[route]) {
-        const removeData = makeRemoveComponentData(site, child)
-        commands.push({ type: CommandType.RemoveComponent, data: removeData })
-      }
-    }
-  }
-  mergeLastCommand(site, commands)
-}
-
-export const navItemBehavior: IBehavior = {
-  id: navItemBehaviorId,
-  name: 'Sync Nav Menu Item',
-  builtin: (
-    _helpers: IBehaviorHelpers,
-    behaviorContext: IBehaviorContext,
-    _args?: IBehaviorCustomArgs,
-  ) => {
-    const { site } = behaviorContext
-    const cmp = behaviorContext.component
-    if (cmp.parent) {
-      syncNavMenu(site, cmp.parent)
-    }
-  },
-}
-registerBuiltinBehavior(navItemBehavior)
-
-export const navMenuBehavior: IBehavior = {
-  id: navMenuBehaviorId,
-  name: 'Sync Nav Menu',
+export const clearFormErrorBehavior: IBehavior = {
+  id: clearErrorBehaviorId,
+  name: 'Clear Error',
   args: {
-    IncludeHome: {
-      name: 'IncludeHome',
-      type: ComponentArgPrimitive.Boolean,
-      default: true,
-      help: '',
+    errorId: {
+      name: 'errorId',
+      type: ComponentArgPrimitive.String,
+      help: 'The ID of the error component',
     },
   },
-  builtin: (
+  builtin: async (
     helpers: IBehaviorHelpers,
     behaviorContext: IBehaviorContext,
-    _args?: IBehaviorCustomArgs,
+    args?: IBehaviorCustomArgs,
   ) => {
     const { site } = behaviorContext
-    const cmp = behaviorContext.component
-    syncNavMenu(site, cmp)
+    if (args?.errorId) {
+      const errorCmp = helpers.getComponent(site, args.errorId as string)
+      helpers.setContent(errorCmp, '')
+      helpers.setCustomStyle(errorCmp, Css.Opacity, '0')
+    }
   },
 }
-registerBuiltinBehavior(navMenuBehavior)
+registerBuiltinBehavior(clearFormErrorBehavior)
 
 export const contactFormBehavior: IBehavior = {
   id: contactFormBehaviorId,
@@ -276,7 +178,7 @@ export const contactFormBehavior: IBehavior = {
     behaviorContext: IBehaviorContext,
     args?: IBehaviorCustomArgs,
   ) => {
-    const { site, event } = behaviorContext
+    const { site, event, component } = behaviorContext
     event?.preventDefault()
     const { error: argError, ...resolvedArgs } = helpers.requireArgs(args, [
       'tableName',
@@ -297,7 +199,9 @@ export const contactFormBehavior: IBehavior = {
       if (args?.nameId) {
         name = helpers.getValue(args.nameId as string)
       }
+      const button = findComponent(component, (cmp) => cmp.tag === Tag.Button)
       try {
+        helpers.setLoading(button, true)
         const row: Record<string, string> = {
           [resolvedArgs.apiEmailField]: email ?? '',
           [resolvedArgs.apiMessageField]: message ?? '',
@@ -306,10 +210,22 @@ export const contactFormBehavior: IBehavior = {
           row[args?.apiNameField as string] = name
         }
         await helpers.addRow(resolvedArgs.tableName, row)
-      } catch (e) {
+        helpers.setCustomStyle(errorCmp, Css.Opacity, '1')
+        helpers.setCustomStyle(errorCmp, Css.Color, '${color-success}')
+        helpers.setContent(errorCmp, 'Contact request sent!')
+      } catch (err) {
+        const e = err as Record<string, string>
         console.error(e)
-        helpers.setContent(errorCmp, 'Failed to save, please try again later')
+        let error: string
+        if (e.code === 'CustomDataUniqueFail') {
+          error = 'Contact request already submitted'
+        } else {
+          error = e.message ?? 'Unknown error, try again later'
+        }
+        helpers.setContent(errorCmp, error)
+        helpers.setCustomStyle(errorCmp, Css.Opacity, '1')
       }
+      helpers.setLoading(button, false)
     }
   },
 }

@@ -37,7 +37,7 @@ pub struct ValidationRule {
     pub parameter: Option<i32>,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, PartialEq, Serialize, Deserialize, Clone)]
 pub enum RuleType {
     Unique,
     Email,

@@ -14,8 +14,10 @@ import { computed } from 'vue'
 import { useBuild } from '@pubstudio/frontend/feature-build'
 import ComponentTreeItem from './ComponentTreeItem.vue'
 import { IComponent } from '@pubstudio/shared/type-site'
+import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 
-const { editor, activePage } = useBuild()
+const { activePage } = useSiteSource()
+const { editor } = useBuild()
 
 const root = computed(() => activePage.value?.root)
 

@@ -1,6 +1,11 @@
 // Parsed version of ICustomDataInfoViewModel
 
-export type ICustomTableColumnRuleType = 'Unique' | 'Email' | 'MinLength' | 'MaxLength'
+export type ICustomTableColumnRuleType =
+  | 'Unique'
+  | 'Required'
+  | 'Email'
+  | 'MinLength'
+  | 'MaxLength'
 
 export interface ICustomTableColumnRule {
   parameter?: number

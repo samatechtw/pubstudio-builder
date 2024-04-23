@@ -8,13 +8,13 @@
     </div>
     <div class="contact-form-init">
       <div class="button-wrap">
-        <div class="link-table button" @click="linkTable">
-          {{ t('custom_data.link') }}
+        <div class="create-table button" @click="createTable">
+          {{ t('custom_data.create') }}
         </div>
       </div>
       <div class="button-wrap">
-        <div class="create-table button" @click="createTable">
-          {{ t('custom_data.create') }}
+        <div class="link-table button" @click="linkTable">
+          {{ t('custom_data.link') }}
         </div>
       </div>
     </div>

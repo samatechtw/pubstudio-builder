@@ -16,8 +16,18 @@ import { setSelectedComponent } from '../set-selected-component'
 
 export const addComponentHelper = (site: ISite, data: IAddComponentData): IComponent => {
   const context = site.context
-  const { name, tag, content, parentId, events, inputs, parentIndex, sourceId, style } =
-    data
+  const {
+    name,
+    tag,
+    content,
+    state,
+    parentId,
+    events,
+    inputs,
+    parentIndex,
+    sourceId,
+    style,
+  } = data
   const id = nextComponentId(context)
   data.id = id
   const parent = resolveComponent(context, parentId)
@@ -27,6 +37,7 @@ export const addComponentHelper = (site: ISite, data: IAddComponentData): ICompo
     parent,
     tag,
     content,
+    state,
     children: undefined,
     inputs,
     events,
@@ -59,6 +70,7 @@ export const addComponentHelper = (site: ISite, data: IAddComponentData): ICompo
         content: child.content,
         parentId: id,
         sourceId: child.id,
+        state: child.state,
         children: child.children,
         inputs: clone(child.inputs),
         style: clone(child.style),
@@ -76,6 +88,7 @@ export const addComponentHelper = (site: ISite, data: IAddComponentData): ICompo
           content: child.content,
           parentId: id,
           sourceId: child.id,
+          state: clone(child.state),
           inputs: clone(child.inputs),
           style: clone(child.style),
         })

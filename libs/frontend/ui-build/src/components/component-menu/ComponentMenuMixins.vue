@@ -1,7 +1,7 @@
 <template>
   <div class="component-menu-mixins">
     <div class="wrap">
-      <EditMenuTitle :title="t('style.reusable')" @add="addMixin" />
+      <EditMenuTitle :title="t('style.reusable_styles')" @add="addMixin" />
       <div v-if="showNewMixin" class="mixin new-mixin">
         <MixinSelect
           ref="newMixinRef"

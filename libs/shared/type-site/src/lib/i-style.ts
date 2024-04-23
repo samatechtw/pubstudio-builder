@@ -1,6 +1,10 @@
 import { Css } from './enum-css'
 import { CssPseudoClass } from './enum-css-pseudo-class'
 
+export interface IGlobalStyle {
+  style: string
+}
+
 export interface IStyleEntry {
   pseudoClass: CssPseudoClass
   property: Css

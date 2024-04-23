@@ -1,3 +1,5 @@
+import { resolveComponent } from '@pubstudio/frontend/util-builtin'
+import { iterateComponent } from '@pubstudio/frontend/util-render'
 import { runtimeContext } from '@pubstudio/frontend/util-runtime'
 import {
   BuildSubmenu,
@@ -9,9 +11,12 @@ import {
   EditorMode,
   IComponent,
   IEditBehavior,
+  IEditGlobalStyle,
   IEditingMixinData,
   IEditorContext,
   IEditSvg,
+  ISite,
+  StyleTab,
   ThemeTab,
 } from '@pubstudio/shared/type-site'
 
@@ -172,6 +177,44 @@ export const setThemeTab = (editor: IEditorContext | undefined, tab: ThemeTab) =
   }
 }
 
+export const setStyleTab = (editor: IEditorContext | undefined, tab: StyleTab) => {
+  if (editor && tab !== editor.styleTab) {
+    editor.styleTab = tab
+    editor.store?.saveEditor(editor)
+  }
+}
+
+export const setEditGlobalStyle = (
+  editor: IEditorContext | undefined,
+  globalStyle: Partial<IEditGlobalStyle> | undefined,
+) => {
+  if (editor && globalStyle !== editor.editGlobalStyle) {
+    if (globalStyle) {
+      const { oldName, newName, style } = globalStyle
+      if (editor.editGlobalStyle) {
+        if (newName !== undefined) {
+          editor.editGlobalStyle.newName = newName
+        }
+        if (oldName !== undefined) {
+          editor.editGlobalStyle.oldName = oldName
+        }
+        if (style !== undefined) {
+          editor.editGlobalStyle.style = style
+        }
+      } else {
+        editor.editGlobalStyle = {
+          oldName: oldName,
+          newName: newName ?? '',
+          style: style ?? '',
+        }
+      }
+    } else {
+      editor.editGlobalStyle = undefined
+    }
+    editor.store?.saveEditor(editor)
+  }
+}
+
 export const setDebugBounding = (editor: IEditorContext | undefined, enable: boolean) => {
   if (editor) {
     editor.debugBounding = enable
@@ -182,14 +225,28 @@ export const setDebugBounding = (editor: IEditorContext | undefined, enable: boo
 export const toggleComponentHidden = (
   editor: IEditorContext | undefined,
   componentId: string,
+  setHidden?: boolean,
 ) => {
   if (editor) {
-    if (editor.componentsHidden[componentId]) {
+    const show =
+      setHidden === undefined ? editor.componentsHidden[componentId] : !setHidden
+    if (show) {
       delete editor.componentsHidden[componentId]
     } else {
       editor.componentsHidden[componentId] = true
     }
   }
+}
+
+export const toggleComponentTreeHidden = (
+  site: ISite,
+  componentId: string | undefined,
+  setHidden?: boolean,
+) => {
+  const cmp = resolveComponent(site.context, componentId)
+  iterateComponent(cmp, (component) => {
+    toggleComponentHidden(site.editor, component.id, setHidden)
+  })
 }
 
 export const getComponentTreeItemId = (component: IComponent) => `cti-${component.id}`
