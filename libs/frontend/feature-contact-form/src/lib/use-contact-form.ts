@@ -3,6 +3,7 @@ import {
   appendLastCommand,
   setContactFormWalkthrough,
 } from '@pubstudio/frontend/data-access-command'
+import { store } from '@pubstudio/frontend/data-access-web-store'
 import { useBuild } from '@pubstudio/frontend/feature-build'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { parseApiErrorKey, PSApi, toApiError } from '@pubstudio/frontend/util-api'
@@ -27,9 +28,17 @@ export interface IContactFormFeature {
   tables: Ref<ICustomTableViewModel[] | undefined>
   loadingTables: Ref<boolean>
   contactTables: Ref<ICustomTableViewModel[]>
+  tableName: Ref<string>
+  hasName: Ref<boolean>
+  recipients: Ref<[number, string][]>
+  recipientKey: Ref<number>
   loadCustomTables: () => Promise<void>
   showContactFormWalkthrough: (formId: string | undefined) => Promise<void>
-  createContactTable: (tableName: string, hasName: boolean) => Promise<void>
+  createContactTable: (
+    tableName: string,
+    recipients: string[],
+    hasName: boolean,
+  ) => Promise<void>
   linkContactTable: (tableName: string) => Promise<void>
 }
 
@@ -37,9 +46,22 @@ const isContactTable = (table: ICustomTableViewModel): boolean => {
   return Object.keys(table.columns).some((name) => name.toLowerCase() === 'email')
 }
 
+const resetContactTables = () => {
+  tables.value = undefined
+  contactTables.value = []
+  tableName.value = ''
+  hasName.value = false
+  recipientKey.value = 0
+  recipients.value = [[recipientKey.value, store.user.email.value ?? '']]
+}
+
 const tables = ref<ICustomTableViewModel[] | undefined>()
 const contactTables = ref<ICustomTableViewModel[]>([])
 const loadingTables = ref(false)
+const tableName = ref('')
+const hasName = ref(false)
+const recipients = ref<[number, string][]>([])
+const recipientKey = ref(0)
 
 export const useContactForm = (): IContactFormFeature => {
   const { apiSite, site, apiSiteId } = useSiteSource()
@@ -47,13 +69,15 @@ export const useContactForm = (): IContactFormFeature => {
   const api = useCustomDataApi(apiSite as PSApi, apiSiteId.value as string)
 
   const loadCustomTables = async () => {
+    resetContactTables()
     loadingTables.value = true
     try {
       const data = await api.listTables({})
       tables.value = data.results.map((table) => ({
         id: table.id,
         name: table.name,
-        columns: JSON.parse(table.columns),
+        columns: table.columns,
+        events: table.events,
       }))
       contactTables.value = tables.value?.filter(isContactTable) ?? []
     } catch (e) {
@@ -156,7 +180,11 @@ export const useContactForm = (): IContactFormFeature => {
   }
 
   // Creates a contact table or throws an error key
-  const createContactTable = async (tableName: string, hasName: boolean) => {
+  const createContactTable = async (
+    tableName: string,
+    recipients: string[],
+    hasName: boolean,
+  ) => {
     if (tableName.length < 2 || tableName.length > 100) {
       throw 'errors.table_name'
     }
@@ -180,6 +208,13 @@ export const useContactForm = (): IContactFormFeature => {
           ],
         },
       },
+      events: [
+        {
+          event_type: 'EmailRow',
+          trigger: 'AddRow',
+          options: { recipients },
+        },
+      ],
     }
     if (hasName) {
       tablePayload.columns.name = {
@@ -221,6 +256,10 @@ export const useContactForm = (): IContactFormFeature => {
     tables,
     contactTables,
     loadingTables,
+    tableName,
+    hasName,
+    recipientKey,
+    recipients,
     loadCustomTables,
     showContactFormWalkthrough,
     createContactTable,

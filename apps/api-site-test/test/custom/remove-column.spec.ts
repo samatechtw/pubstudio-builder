@@ -78,7 +78,7 @@ describe('Remove Column', () => {
 
     expect(body.id).toEqual('1')
     expect(body.name).toEqual('contact_form')
-    expect(body.columns.includes(removeCol)).toBe(false)
+    expect(body.columns[removeCol]).toBe(undefined)
 
     await verifyRemoveColumn()
   })
@@ -97,7 +97,7 @@ describe('Remove Column', () => {
 
     expect(body.id).toEqual('1')
     expect(body.name).toEqual('contact_form')
-    expect(body.columns.includes(removeCol)).toBe(false)
+    expect(body.columns[removeCol]).toBe(undefined)
 
     await verifyRemoveColumn()
   })
@@ -113,7 +113,7 @@ describe('Remove Column', () => {
       .post(testEndpoint(siteId))
       .set('Authorization', adminAuth)
       .send(addPayload)
-      .expect(204)
+      .expect(200)
 
     // Remove Column
     const res = await api
@@ -126,7 +126,7 @@ describe('Remove Column', () => {
 
     expect(body.id).toEqual('1')
     expect(body.name).toEqual('contact_form')
-    expect(body.columns.includes(removeCol)).toBe(false)
+    expect(body.columns[removeCol]).toBe(undefined)
 
     await verifyRemoveColumn()
   })

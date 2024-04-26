@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use validator::Validate;
 
 #[derive(Deserialize, Validate, Debug)]
@@ -8,4 +8,9 @@ use validator::Validate;
 pub struct AddRow {
     pub table_name: String,
     pub row: HashMap<String, String>,
+}
+
+#[derive(Serialize)]
+pub struct AddRowResponse {
+    pub events: i32,
 }

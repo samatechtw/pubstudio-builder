@@ -64,7 +64,7 @@ describe('List Rows', () => {
       .post(testEndpoint(siteId))
       .set('Authorization', adminAuth)
       .send(addPayload)
-      .expect(204)
+      .expect(200)
 
     // Verify
     const res1 = await api
@@ -91,7 +91,7 @@ describe('List Rows', () => {
       .post(testEndpoint(siteId))
       .set('Authorization', ownerAuth)
       .send(addPayload1)
-      .expect(204)
+      .expect(200)
 
     const addPayload2 = {
       action: CustomDataAction.AddRow,
@@ -102,7 +102,7 @@ describe('List Rows', () => {
       .post(testEndpoint(siteId))
       .set('Authorization', ownerAuth)
       .send(addPayload2)
-      .expect(204)
+      .expect(200)
 
     const addPayload3 = {
       action: CustomDataAction.AddRow,
@@ -113,7 +113,7 @@ describe('List Rows', () => {
       .post(testEndpoint(siteId))
       .set('Authorization', ownerAuth)
       .send(addPayload3)
-      .expect(204)
+      .expect(200)
 
     // List
     payload.data = mockListRowsPayload('contact_form', 2, 3)

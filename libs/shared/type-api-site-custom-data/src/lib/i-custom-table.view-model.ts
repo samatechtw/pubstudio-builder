@@ -1,5 +1,3 @@
-// Parsed version of ICustomDataInfoViewModel
-
 export type ICustomTableColumnRuleType =
   | 'Unique'
   | 'Required'
@@ -20,8 +18,18 @@ export interface ICustomTableColumn {
 
 export type ICustomTableColumns = Record<string, ICustomTableColumn>
 
+export interface ICustomTableEvent {
+  event_type: ICustomTableEventType
+  trigger: ICustomTableEventTrigger
+  options: unknown
+}
+
+export type ICustomTableEventType = 'EmailRow'
+export type ICustomTableEventTrigger = 'AddRow'
+
 export interface ICustomTableViewModel {
   id: string
   name: string
-  columns: ICustomTableColumn[]
+  columns: ICustomTableColumns
+  events: ICustomTableEvent[]
 }

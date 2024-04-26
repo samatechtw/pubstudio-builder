@@ -7,4 +7,5 @@ pub mod cache;
 pub mod clients;
 pub mod db;
 pub mod layer;
+pub mod mail;
 pub mod validator;

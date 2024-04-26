@@ -1,6 +1,6 @@
-import { ICustomDataInfoViewModel } from './i-custom-data-info.view-model'
+import { ICustomTableViewModel } from './i-custom-table.view-model'
 
 export interface IListTablesResponse {
   total: number
-  results: ICustomDataInfoViewModel[]
+  results: ICustomTableViewModel[]
 }

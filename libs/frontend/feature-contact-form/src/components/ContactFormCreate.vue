@@ -1,20 +1,20 @@
 <template>
-  <div class="create-wrap">
-    <div class="create-title">
+  <div class="create-wrap contact-form-wrap">
+    <div class="contact-form-title">
       {{ t('custom_data.create') }}
     </div>
-    <div class="create-text">
+    <div class="contact-form-text">
       {{ t('custom_data.create_text') }}
     </div>
     <div class="create-table">
-      <div class="table-name-row row">
+      <div class="contact-form-row">
         <PSInput
           v-model="tableName"
           :label="t('custom_data.table_name')"
           class="name-input"
         />
       </div>
-      <div class="name-toggle-row row">
+      <div class="contact-form-row">
         <Checkbox
           :item="{
             label: t('custom_data.show_name'),
@@ -26,12 +26,12 @@
       </div>
     </div>
     <ErrorMessage :error="error && t(error)" class="create-table-error" />
-    <div class="contact-actions">
+    <div class="contact-form-actions">
       <PSButton
-        :text="t('confirm')"
+        :text="t('next')"
         secondary
         class="confirm-button"
-        @click="createTable"
+        @click="goRecipients"
       />
       <PSButton
         v-if="contactTables.length"
@@ -52,27 +52,19 @@ import { Checkbox, ErrorMessage, PSButton, PSInput } from '@pubstudio/frontend/u
 import { useBuild } from '@pubstudio/frontend/feature-build'
 import { useContactForm } from '../lib/use-contact-form'
 
-const { createContactTable, contactTables } = useContactForm()
+const { contactTables, hasName, tableName } = useContactForm()
 const { editor } = useBuild()
 
 const { t } = useI18n()
 
-const tableName = ref('')
-const hasName = ref(false)
 const error = ref()
 
 const goBack = () => {
   setContactFormWalkthrough(editor.value, ContactFormWalkthroughState.Init)
 }
 
-const createTable = async () => {
-  try {
-    error.value = undefined
-    await createContactTable(tableName.value, hasName.value)
-    setContactFormWalkthrough(editor.value, undefined)
-  } catch (e) {
-    error.value = e as string
-  }
+const goRecipients = async () => {
+  setContactFormWalkthrough(editor.value, ContactFormWalkthroughState.Recipients)
 }
 </script>
 
@@ -80,20 +72,7 @@ const createTable = async () => {
 @import '@theme/css/mixins.postcss';
 
 .create-wrap {
-  @mixin flex-col;
-  width: 100%;
-  height: 100%;
-  color: black;
   justify-content: space-between;
-}
-.create-text {
-  @mixin title-thin 18px;
-  margin-top: 24px;
-  text-align: center;
-}
-.create-title {
-  @mixin title 22px;
-  text-align: center;
 }
 .create-table {
   @mixin flex-col;
@@ -106,17 +85,6 @@ const createTable = async () => {
   :deep(.ps-input) {
     width: 100%;
   }
-}
-.row {
-  display: flex;
-  margin-top: 8px;
-  width: 100%;
-  justify-content: center;
-}
-.contact-actions {
-  display: flex;
-  justify-content: center;
-  margin-top: 24px;
 }
 .back-button {
   margin-left: 16px;

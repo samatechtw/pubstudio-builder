@@ -1,6 +1,7 @@
 import {
   CustomDataAction,
   IAddRowApiRequest,
+  IAddRowApiResponse,
   ICustomDataApiRequest,
 } from '@pubstudio/shared/type-api-site-custom-data'
 import { SiteApiResetService } from '@pubstudio/shared/util-test-reset'
@@ -44,36 +45,48 @@ describe('Add Row', () => {
   })
 
   it('add row when requester is admin', async () => {
-    await api
+    const res = await api
       .post(testEndpoint(siteId))
       .set('Authorization', adminAuth)
       .send(payload)
-      .expect(204)
+      .expect(200)
+
+    const body: IAddRowApiResponse = res.body
+    expect(body.events).toEqual(1)
   })
 
   it('add row when requester is owner', async () => {
     const ownerId = '903b3c28-deaa-45dc-a43f-511fe965d34e'
     const ownerAuth = ownerAuthHeader(ownerId)
 
-    await api
+    const res = await api
       .post(testEndpoint(siteId))
       .set('Authorization', ownerAuth)
       .send(payload)
-      .expect(204)
+      .expect(200)
+
+    const body: IAddRowApiResponse = res.body
+    expect(body.events).toEqual(1)
   })
 
   it('add row when user is other owner', async () => {
     const ownerAuth = ownerAuthHeader('0c069253-e45d-487c-b7c0-cbe467c33a10')
 
-    await api
+    const res = await api
       .post(testEndpoint(siteId))
       .set('Authorization', ownerAuth)
       .send(payload)
-      .expect(204)
+      .expect(200)
+
+    const body: IAddRowApiResponse = res.body
+    expect(body.events).toEqual(1)
   })
 
   it('add row when requester is anonymous', async () => {
-    await api.post(testEndpoint(siteId)).send(payload).expect(204)
+    const res = await api.post(testEndpoint(siteId)).send(payload).expect(200)
+
+    const body: IAddRowApiResponse = res.body
+    expect(body.events).toEqual(1)
   })
 
   describe('when request is not valid', () => {
@@ -82,7 +95,7 @@ describe('Add Row', () => {
         .post(testEndpoint(siteId))
         .set('Authorization', adminAuth)
         .send(payload)
-        .expect(204)
+        .expect(200)
 
       payload.data = mockAddInvalidRow1()
 

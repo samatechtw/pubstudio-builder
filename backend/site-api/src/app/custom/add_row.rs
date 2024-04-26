@@ -1,5 +1,5 @@
 use lib_shared_site_api::error::{api_error::ApiError, helpers::check_bad_form};
-use lib_shared_types::dto::custom_data::add_row_dto::AddRow;
+use lib_shared_types::dto::custom_data::add_row_dto::{AddRow, AddRowResponse};
 use serde_json::Value;
 use validator::Validate;
 
@@ -7,7 +7,9 @@ use crate::api_context::ApiContext;
 
 use super::{
     custom_data::parse_request_data,
-    helpers::{validate_column_names, validate_row_data, validate_table_name},
+    helpers::{parse_event_info, validate_column_names, validate_table_name},
+    trigger_table_events::trigger_add_row,
+    validate_row_data::validate_row_data,
 };
 
 /*
@@ -23,20 +25,29 @@ use super::{
   }
 }
 */
-pub async fn add_row(context: &ApiContext, site_id: &String, data: Value) -> Result<(), ApiError> {
+pub async fn add_row(
+    context: &ApiContext,
+    site_id: &String,
+    data: Value,
+) -> Result<AddRowResponse, ApiError> {
     let dto: AddRow = parse_request_data(data)?;
     check_bad_form(dto.validate())?;
     validate_table_name(&dto.table_name)?;
     validate_column_names(dto.row.keys())?;
 
     // Validate data by checking columns in custom_data_info
-    validate_row_data(context, site_id, &dto.table_name, &dto.row).await?;
+    let table = validate_row_data(context, site_id, &dto.table_name, &dto.row).await?;
 
-    context
+    // Save row to database
+    let row = context
         .custom_data_repo
         .add_row(site_id, dto)
         .await
         .map_err(|e| ApiError::internal_error().message(e))?;
 
-    Ok(())
+    // Trigger AddRow table events
+    let events = parse_event_info(&table.events)?;
+    let triggered = trigger_add_row(context, &table.name, events, row).await?;
+
+    Ok(AddRowResponse { events: triggered })
 }

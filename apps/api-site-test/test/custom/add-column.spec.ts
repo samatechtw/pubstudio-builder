@@ -51,7 +51,7 @@ describe('Add Column', () => {
       .post(testEndpoint(siteId))
       .set('Authorization', adminAuth)
       .send(payload)
-      .expect(204)
+      .expect(200)
   }
 
   const verifyAddInvalidRow = async () => {
@@ -80,7 +80,7 @@ describe('Add Column', () => {
 
     expect(body.id).toEqual('1')
     expect(body.name).toEqual('contact_form')
-    expect(body.columns).toContain('phone')
+    expect(body.columns['phone']).toBeDefined()
 
     await verifyAddRow()
     await verifyAddInvalidRow()
@@ -100,7 +100,7 @@ describe('Add Column', () => {
 
     expect(body.id).toEqual('1')
     expect(body.name).toEqual('contact_form')
-    expect(body.columns).toContain('phone')
+    expect(body.columns['phone']).toBeDefined()
 
     await verifyAddRow()
     await verifyAddInvalidRow()
@@ -117,7 +117,7 @@ describe('Add Column', () => {
       .post(testEndpoint(siteId))
       .set('Authorization', adminAuth)
       .send(payload)
-      .expect(204)
+      .expect(200)
 
     // Add Column
     payload = {
@@ -135,7 +135,7 @@ describe('Add Column', () => {
 
     expect(body.id).toEqual('1')
     expect(body.name).toEqual('contact_form')
-    expect(body.columns).toContain('phone')
+    expect(body.columns['phone']).toBeDefined()
 
     await verifyAddRow()
     await verifyAddInvalidRow()

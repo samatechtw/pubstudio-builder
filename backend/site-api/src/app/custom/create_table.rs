@@ -65,6 +65,7 @@ pub async fn create_custom_table_helper(
     let metadata_dto = CustomDataInfoDto {
         name: dto.table_name.clone(),
         columns: data["columns"].clone(),
+        events: data["events"].clone(),
     };
 
     context

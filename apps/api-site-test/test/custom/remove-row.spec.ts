@@ -46,7 +46,7 @@ describe('Add Row', () => {
         action: CustomDataAction.AddRow,
         data: mockAddRowPayload1(),
       })
-      .expect(204)
+      .expect(200)
   })
 
   const verifyRemoved = async () => {
@@ -102,7 +102,7 @@ describe('Add Row', () => {
         })
     })
 
-    it('when adding a row with a duplicate unique constraint', async () => {
+    it('when removing a row with a duplicate unique constraint', async () => {
       await api
         .post(testEndpoint(siteId))
         .set('Authorization', adminAuth)

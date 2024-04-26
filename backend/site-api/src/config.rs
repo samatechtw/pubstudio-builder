@@ -42,4 +42,8 @@ pub struct Config {
     /// S3 secret key
     #[clap(long, env = "S3_SECRET_ACCESS_KEY")]
     pub s3_secret_access_key: String,
+
+    /// API key for sending email via SendGrid
+    #[clap(long, env = "SENDGRID_API_KEY")]
+    pub sendgrid_api_key: String,
 }
