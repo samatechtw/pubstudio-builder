@@ -8,4 +8,6 @@ pub mod list_tables;
 pub mod modify_column;
 pub mod remove_column;
 pub mod remove_row;
+pub mod trigger_table_events;
 pub mod update_row;
+pub mod validate_row_data;

@@ -12,6 +12,9 @@
       <ContactFormInit v-else-if="state === ContactFormWalkthroughState.Init" />
       <ContactFormLink v-else-if="state === ContactFormWalkthroughState.LinkTable" />
       <ContactFormCreate v-else-if="state === ContactFormWalkthroughState.CreateTable" />
+      <ContactFormRecipients
+        v-else-if="state === ContactFormWalkthroughState.Recipients"
+      />
     </Transition>
   </Modal>
 </template>
@@ -25,10 +28,11 @@ import { ContactFormWalkthroughState } from '@pubstudio/shared/type-site'
 import ContactFormInit from './ContactFormInit.vue'
 import ContactFormLink from './ContactFormLink.vue'
 import ContactFormCreate from './ContactFormCreate.vue'
+import ContactFormRecipients from './ContactFormRecipients.vue'
 import { useContactForm } from '../lib/use-contact-form'
 
 const { editor } = useBuild()
-const { loadingTables, tables, loadCustomTables } = useContactForm()
+const { loadingTables, loadCustomTables } = useContactForm()
 
 const state = computed(() => editor.value?.contactFormWalkthrough?.state)
 
@@ -37,7 +41,7 @@ const hideModal = () => {
 }
 
 onMounted(async () => {
-  if (state.value && !tables.value) {
+  if (state.value) {
     await loadCustomTables()
   }
 })
@@ -45,6 +49,34 @@ onMounted(async () => {
 
 <style lang="postcss">
 @import '@theme/css/mixins.postcss';
+
+.contact-form-wrap {
+  @mixin flex-col;
+  width: 100%;
+  height: 100%;
+  color: black;
+}
+.contact-form-row {
+  display: flex;
+  margin-top: 8px;
+  width: 100%;
+  justify-content: center;
+}
+.contact-form-text {
+  @mixin title-thin 18px;
+  margin-top: 24px;
+  text-align: center;
+}
+.contact-form-title {
+  @mixin title 22px;
+  text-align: center;
+}
+.contact-form-actions {
+  display: flex;
+  justify-content: center;
+  padding-top: 24px;
+  margin-top: auto;
+}
 
 .contact-walkthrough {
   .modal-inner {

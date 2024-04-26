@@ -43,6 +43,7 @@ SITE_ADMIN_PUBLIC_KEY   | Public key for authorizing Admin/Owner requests
 S3_URL                  | Optional URL for S3 object storage
 S3_ACCESS_KEY_ID        | Optional key ID for signing S3 requests
 S3_SECRET_ACCESS_KEY    | Optional secret key for signing S3 requests
+SENDGRID_API_KEY        | Optional secret key for sending mail via Sendgrid
 
 ## Run
 

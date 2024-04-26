@@ -53,8 +53,10 @@ describe('Create Custom Table', () => {
 
     expect(body2.results[0].id).toEqual('1')
     expect(body2.results[0].name).toEqual('contact_form')
+    expect(body2.results[0].events).toHaveLength(1)
     expect(body2.results[1].id).toEqual('2')
     expect(body2.results[1].name).toEqual(tableName)
+    expect(body2.results[1].events).toEqual([])
   }
 
   it('creates table when requester is admin', async () => {

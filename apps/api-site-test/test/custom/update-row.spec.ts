@@ -53,7 +53,7 @@ describe('Update Row', () => {
         action: CustomDataAction.AddRow,
         data: mockAddRowPayload1(),
       })
-      .expect(204)
+      .expect(200)
   })
 
   it('update row when requester is admin', async () => {
@@ -167,7 +167,7 @@ describe('Update Row', () => {
           action: CustomDataAction.AddRow,
           data: mockAddRowPayload2(),
         })
-        .expect(204)
+        .expect(200)
 
       payload.data = mockUpdateInvalidRow1()
 

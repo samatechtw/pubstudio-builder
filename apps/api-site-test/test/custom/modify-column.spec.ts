@@ -61,10 +61,10 @@ describe('Modify Column', () => {
     expect(body.id).toEqual('1')
     expect(body.name).toEqual('contact_form')
     if (modifyRequest.new_column_name) {
-      expect(body.columns.includes(modifyRequest.old_column_name)).toBe(false)
-      expect(body.columns.includes(modifyRequest.new_column_name)).toBe(true)
+      expect(body.columns[modifyRequest.old_column_name]).toBe(undefined)
+      expect(body.columns[modifyRequest.new_column_name]).toBeDefined()
     } else {
-      expect(body.columns.includes(modifyRequest.old_column_name)).toBe(true)
+      expect(body.columns[modifyRequest.old_column_name]).toBeDefined()
     }
 
     // Add a row with the new info
@@ -77,7 +77,7 @@ describe('Modify Column', () => {
       .post(testEndpoint(siteId))
       .set('Authorization', adminAuth)
       .send(addRow)
-      .expect(204)
+      .expect(200)
   }
 
   it('modify column name when requester is admin', async () => {

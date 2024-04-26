@@ -3,11 +3,12 @@ use lib_shared_types::dto::custom_data::update_row_dto::{UpdateRow, UpdateRowRes
 use serde_json::Value;
 use validator::Validate;
 
-use crate::{api_context::ApiContext, app::custom::helpers::validate_row_data};
+use crate::api_context::ApiContext;
 
 use super::{
     custom_data::parse_request_data,
     helpers::{validate_column_names, validate_table_name},
+    validate_row_data::validate_row_data,
 };
 
 /*

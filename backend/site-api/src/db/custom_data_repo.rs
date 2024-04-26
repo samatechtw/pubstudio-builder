@@ -11,6 +11,7 @@ use lib_shared_types::dto::custom_data::add_column_dto::AddColumn;
 use lib_shared_types::dto::custom_data::custom_data_dto::Action;
 use lib_shared_types::dto::custom_data::remove_column_dto::RemoveColumn;
 use lib_shared_types::dto::custom_data::remove_row_dto::RemoveRow;
+use lib_shared_types::dto::custom_data::CustomDataRow;
 use lib_shared_types::dto::custom_data::{
     add_row_dto::AddRow,
     create_table_dto::CreateTable,
@@ -28,7 +29,7 @@ pub trait CustomDataRepoTrait {
     fn site_db_url(&self, id: &str) -> String;
     async fn get_db_pool(&self, id: &str) -> Result<SqlitePool, DbError>;
     async fn create_table(&self, id: &str, dto: CreateTable) -> Result<(), DbError>;
-    async fn add_row(&self, id: &str, dto: AddRow) -> Result<(), DbError>;
+    async fn add_row(&self, id: &str, dto: AddRow) -> Result<CustomDataRow, DbError>;
     async fn remove_row(&self, id: &str, dto: RemoveRow) -> Result<(), DbError>;
     async fn verify_unique(
         &self,
@@ -151,7 +152,7 @@ impl CustomDataRepoTrait for CustomDataRepo {
         Ok(())
     }
 
-    async fn add_row(&self, id: &str, dto: AddRow) -> Result<(), DbError> {
+    async fn add_row(&self, id: &str, dto: AddRow) -> Result<CustomDataRow, DbError> {
         let pool = self.get_db_pool(id).await?;
 
         let table_name = dto.table_name;
@@ -172,17 +173,18 @@ impl CustomDataRepoTrait for CustomDataRepo {
         }
 
         query.push(format!(" ({})", column_names));
-        query.push(format!(" VALUES ({})", column_values));
+        query.push(format!(" VALUES ({}) RETURNING *", column_values));
 
         println!("SQL Query: {}", query.sql());
 
-        query
+        let row = query
             .build()
-            .execute(&pool)
+            .try_map(map_to_key_value)
+            .fetch_one(&pool)
             .await
             .map_err(map_custom_data_sqlx_err)?;
 
-        Ok(())
+        Ok(row)
     }
 
     async fn remove_row(&self, id: &str, dto: RemoveRow) -> Result<(), DbError> {

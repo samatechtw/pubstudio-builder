@@ -1,7 +1,7 @@
-use std::collections::BTreeMap;
-
 use serde::{Deserialize, Serialize};
 use validator::Validate;
+
+use super::CustomDataRow;
 
 #[derive(Deserialize, Validate)]
 #[serde(deny_unknown_fields)]
@@ -18,7 +18,7 @@ pub struct ListRowsQuery {
 #[derive(Deserialize, Serialize, Debug)]
 pub struct ListRowsResponse {
     pub total: i64,
-    pub results: Vec<BTreeMap<String, String>>,
+    pub results: Vec<CustomDataRow>,
 }
 
 fn default_from() -> i32 {
