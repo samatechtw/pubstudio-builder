@@ -23,6 +23,7 @@ export interface IUseSiteSource {
   apiSite: PSApi | undefined
   siteStore: Ref<ISiteStore>
   isSaving: ComputedRef<boolean>
+  isSiteApi: ComputedRef<boolean>
   initializeSite: (options: IInitializeSiteOptions) => Promise<string | undefined>
   checkOutdated: () => Promise<void>
   syncUpdateKey: (updateBody: IUpdateSiteApiResponse) => void
@@ -50,6 +51,11 @@ const isSaving = computed(() => {
 
 const activePage = computed(() => {
   return getActivePage(site.value)
+})
+
+const isSiteApi = computed(() => {
+  const siteId = apiSiteId.value
+  return !!siteId && siteId !== 'scratch' && siteId !== 'identity'
 })
 
 export const useSiteSource = (): IUseSiteSource => {
@@ -120,6 +126,7 @@ export const useSiteSource = (): IUseSiteSource => {
     apiSiteId,
     siteStore,
     isSaving,
+    isSiteApi,
     site,
     activePage,
     siteError,
