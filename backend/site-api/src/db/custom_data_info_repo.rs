@@ -4,10 +4,11 @@ use axum::async_trait;
 use lib_shared_site_api::db::{db_error::DbError, db_result::list_result};
 use lib_shared_types::{
     dto::custom_data::{
-        custom_data_info_dto::CustomDataInfoDto, list_tables_query::ListTablesQuery,
+        custom_data_info_dto::{CustomDataInfoDto, CustomDataUpdateColumns},
+        list_tables_query::ListTablesQuery,
     },
     entity::site_api::site_custom_data_info_entity::{
-        CustomDataInfoEntity, CustomDataInfoEntityResult,
+        CustomDataInfoEntity, CustomDataInfoEntityList,
     },
 };
 use sqlx::{sqlite::SqliteRow, Error, Row, SqlitePool};
@@ -25,17 +26,17 @@ pub trait CustomDataInfoRepoTrait {
         id: &str,
         dto: CustomDataInfoDto,
     ) -> Result<CustomDataInfoEntity, DbError>;
-    async fn update_info(
+    async fn update_columns(
         &self,
         id: &str,
-        dto: CustomDataInfoDto,
+        dto: CustomDataUpdateColumns,
     ) -> Result<CustomDataInfoEntity, DbError>;
     async fn list_tables(
         &self,
         id: &str,
         query: ListTablesQuery,
-    ) -> Result<CustomDataInfoEntityResult, DbError>;
-    async fn get_columns_from_table(&self, id: &str, table_name: &str) -> Result<String, DbError>;
+    ) -> Result<CustomDataInfoEntityList, DbError>;
+    async fn get_table(&self, id: &str, table_name: &str) -> Result<CustomDataInfoEntity, DbError>;
 }
 
 pub struct CustomDataInfoRepo {
@@ -54,6 +55,7 @@ fn map_to_custom_data_info_entity(row: SqliteRow) -> Result<CustomDataInfoEntity
         id: row.try_get("id")?,
         name: row.try_get("name")?,
         columns: row.try_get("columns")?,
+        events: row.try_get("events")?,
     })
 }
 
@@ -78,13 +80,14 @@ impl CustomDataInfoRepoTrait for CustomDataInfoRepo {
 
         let result: CustomDataInfoEntity = sqlx::query(
             r#"
-          INSERT INTO custom_data_info(name, columns)
-          VALUES (?1, ?2)
-          RETURNING id, name, columns
+          INSERT INTO custom_data_info(name, columns, events)
+          VALUES (?1, ?2, ?3)
+          RETURNING id, name, columns, events
         "#,
         )
         .bind(dto.name)
         .bind(dto.columns)
+        .bind(dto.events)
         .try_map(map_to_custom_data_info_entity)
         .fetch_one(&pool)
         .await?;
@@ -92,10 +95,10 @@ impl CustomDataInfoRepoTrait for CustomDataInfoRepo {
         Ok(result)
     }
 
-    async fn update_info(
+    async fn update_columns(
         &self,
         id: &str,
-        dto: CustomDataInfoDto,
+        dto: CustomDataUpdateColumns,
     ) -> Result<CustomDataInfoEntity, DbError> {
         let pool = self.get_db_pool(id).await?;
 
@@ -104,7 +107,7 @@ impl CustomDataInfoRepoTrait for CustomDataInfoRepo {
           UPDATE custom_data_info
           SET columns = ?1
           WHERE name = ?2
-          RETURNING id, name, columns
+          RETURNING id, name, columns, events
         "#,
         )
         .bind(dto.columns)
@@ -120,7 +123,7 @@ impl CustomDataInfoRepoTrait for CustomDataInfoRepo {
         &self,
         id: &str,
         query: ListTablesQuery,
-    ) -> Result<CustomDataInfoEntityResult, DbError> {
+    ) -> Result<CustomDataInfoEntityList, DbError> {
         let pool = self.get_db_pool(id).await?;
 
         let result = sqlx::query(
@@ -139,21 +142,21 @@ impl CustomDataInfoRepoTrait for CustomDataInfoRepo {
 
         let (results, total) = list_result(result);
 
-        Ok(CustomDataInfoEntityResult { total, results })
+        Ok(CustomDataInfoEntityList { total, results })
     }
 
-    async fn get_columns_from_table(&self, id: &str, table_name: &str) -> Result<String, DbError> {
+    async fn get_table(&self, id: &str, table_name: &str) -> Result<CustomDataInfoEntity, DbError> {
         let pool = self.get_db_pool(id).await?;
 
         let columns = sqlx::query(
             r#"
-            SELECT columns
+            SELECT *
             FROM custom_data_info
             WHERE name = ?1
         "#,
         )
         .bind(table_name)
-        .try_map(|r: SqliteRow| r.try_get("columns"))
+        .try_map(map_to_custom_data_info_entity)
         .fetch_one(&pool)
         .await?;
 

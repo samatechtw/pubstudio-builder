@@ -50,12 +50,9 @@ pub async fn custom_data(
             Ok((StatusCode::CREATED, Json(response).into_response()))
         }
         Action::AddRow => {
-            add_row(&context, &id, dto.data).await?;
+            let response = add_row(&context, &id, dto.data).await?;
 
-            Ok((
-                StatusCode::NO_CONTENT,
-                StatusCode::NO_CONTENT.into_response(),
-            ))
+            Ok((StatusCode::OK, Json(response).into_response()))
         }
         Action::RemoveRow => {
             remove_row(&context, &id, dto.data).await?;

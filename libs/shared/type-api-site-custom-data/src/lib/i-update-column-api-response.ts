@@ -1,3 +1,3 @@
-import { ICustomDataInfoViewModel } from './i-custom-data-info.view-model'
+import { ICustomTableViewModel } from './i-custom-table.view-model'
 
-export interface IUpdateColumnApiResponse extends ICustomDataInfoViewModel {}
+export interface IUpdateColumnApiResponse extends ICustomTableViewModel {}

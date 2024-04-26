@@ -1,9 +1,9 @@
 <template>
-  <div class="link-wrap">
+  <div class="contact-form-wrap">
     <div class="link-title">
       {{ t('custom_data.link') }}
     </div>
-    <div class="link-text">
+    <div class="contact-form-text">
       {{ t('custom_data.link_text') }}
     </div>
     <div class="link-table">
@@ -62,24 +62,13 @@ const linkTable = async () => {
 <style lang="postcss" scoped>
 @import '@theme/css/mixins.postcss';
 
-.link-wrap {
-  @mixin flex-col;
-  width: 100%;
-  height: 100%;
-  color: black;
-}
-.link-text {
-  @mixin title-thin 18px;
-  margin-top: 32px;
-  text-align: center;
-}
 .link-title {
   @mixin title 22px;
   text-align: center;
 }
 .link-table {
   display: flex;
-  margin-top: 24px;
+  margin-top: 48px;
   justify-content: center;
 }
 .link-dropdown {

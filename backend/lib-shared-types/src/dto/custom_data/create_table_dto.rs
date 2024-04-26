@@ -4,11 +4,14 @@ use serde::{Deserialize, Serialize};
 use strum::{Display, EnumString};
 use validator::Validate;
 
+use super::custom_event_dto::EventInfo;
+
 #[derive(Deserialize, Validate)]
 #[serde(deny_unknown_fields)]
 pub struct CreateTable {
     pub table_name: String,
     pub columns: HashMap<String, ColumnInfo>,
+    pub events: Vec<EventInfo>,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -27,7 +30,7 @@ pub struct ColumnInfo {
 #[derive(Debug, Serialize, Deserialize, Clone, Copy, EnumString, Display)]
 pub enum DataType {
     TEXT,
-    // Add more types if needed
+    // Add more types here
 }
 
 #[derive(Deserialize, Serialize, Validate, Debug, Clone)]
