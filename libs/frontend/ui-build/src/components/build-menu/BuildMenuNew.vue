@@ -83,6 +83,7 @@
         :builtinComponentId="dividerVertical.id"
       />
       <NewComponent
+        v-if="isSiteApi"
         class="new-divider-vertical"
         :text="t('build.contact_form')"
         :builtinComponentId="contactForm.id"
@@ -126,9 +127,11 @@ import {
   useContactForm,
 } from '@pubstudio/frontend/feature-contact-form'
 import NewComponent from './NewComponent.vue'
+import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 
 const { t } = useI18n()
 const { showContactFormWalkthrough } = useContactForm()
+const { isSiteApi } = useSiteSource()
 </script>
 
 <style lang="postcss" scoped>
