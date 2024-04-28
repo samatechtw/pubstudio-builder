@@ -92,7 +92,7 @@ pub async fn send_mails(
     }
 
     let personalizations: Vec<serde_json::Value> =
-        recipients.iter().map(|r| json!({"to": r})).collect();
+        recipients.iter().map(|r| json!({"to": [r]})).collect();
 
     let body = json!(
         {
