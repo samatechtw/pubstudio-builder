@@ -4,14 +4,14 @@
       {{ property }}
     </div>
     <div v-if="editing" class="edit">
-      <Checkbox
+      <PSToggle
         v-if="argType === ComponentArgPrimitive.Boolean"
-        :item="{
-          label: '',
-          checked: ['true', true].includes(newValue),
-        }"
-        class="input-boolean"
-        @checked="newValue = $event.toString()"
+        :on="newValue?.toString() === 'true'"
+        :onText="t('true')"
+        :offText="t('false')"
+        small
+        class="is-toggle"
+        @toggle="newValue = $event.toString()"
       />
       <PSInput
         v-else
@@ -30,9 +30,13 @@
       <div class="value-preview" :class="{ error }">
         {{ value }}
       </div>
-      <Edit class="edit-icon" @click="edit" />
+      <Edit class="edit-icon edit-is" @click="edit" />
       <slot />
-      <Settings v-if="showEditInput" class="edit-icon" @click="emit('editInput')" />
+      <Settings
+        v-if="showEditInput"
+        class="edit-icon edit-input"
+        @click="emit('editInput')"
+      />
     </template>
   </div>
 </template>
@@ -40,7 +44,7 @@
 <script lang="ts" setup>
 import { computed, ref, toRefs } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
-import { Check, Checkbox, Edit, PSInput } from '@pubstudio/frontend/ui-widgets'
+import { Check, Edit, PSInput, PSToggle } from '@pubstudio/frontend/ui-widgets'
 import { IDatalistOption } from '@pubstudio/frontend/type-ui-widgets'
 import { Settings } from '@pubstudio/frontend/ui-widgets'
 import { ComponentArgType, ComponentArgPrimitive, Tag } from '@pubstudio/shared/type-site'

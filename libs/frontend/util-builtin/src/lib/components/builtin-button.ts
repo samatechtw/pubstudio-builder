@@ -70,7 +70,7 @@ export const makeButton = (options?: IMakeButtonOptions): IComponent => {
         is: 'submit',
       },
       disabled: {
-        name: 'type',
+        name: 'disabled',
         type: ComponentArgPrimitive.Boolean,
         default: false,
         attr: true,

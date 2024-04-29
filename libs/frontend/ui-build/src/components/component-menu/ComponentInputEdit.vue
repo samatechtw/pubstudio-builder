@@ -30,13 +30,30 @@
     </MenuRow>
     <MenuRow
       :label="t('default')"
-      :value="newInput.default"
+      :value="newInput.default?.toString()"
       :forceEdit="true"
       :focusInput="false"
       :immediateUpdate="true"
-      :placeholder="t('value')"
-      @update="newInput.default = $event"
-    />
+    >
+      <template #input>
+        <PSToggle
+          v-if="newInput.type === ComponentArgPrimitive.Boolean"
+          :on="newInput.default?.toString() === 'true'"
+          :onText="t('true')"
+          :offText="t('false')"
+          small
+          class="default-toggle"
+          @toggle="newInput.default = $event"
+        />
+        <PSInput
+          v-else
+          :modelValue="newInput.default?.toString()"
+          class="default-text"
+          :placeholder="t('value')"
+          @update:modelValue="newInput.default = $event"
+        />
+      </template>
+    </MenuRow>
     <div class="input-attr">
       <Checkbox
         :item="{ label: t('build.is_attr'), checked: newInput.attr }"
@@ -85,7 +102,9 @@ import {
   ErrorMessage,
   InfoBubble,
   PSButton,
+  PSToggle,
   PSMultiselect,
+  PSInput,
 } from '@pubstudio/frontend/ui-widgets'
 import MenuRow from '../MenuRow.vue'
 

@@ -1,5 +1,5 @@
 <template>
-  <div class="ps-toggle" :class="{ on }" @click="emit('toggle', !on)">
+  <div class="ps-toggle" :class="{ on, small }" @click="emit('toggle', !on)">
     <div class="indicator"></div>
     <div class="text on">
       {{ onText ?? t('on') }}
@@ -20,6 +20,7 @@ withDefaults(
     on: boolean
     onText?: string
     offText?: string
+    small?: boolean
   }>(),
   {
     onText: undefined,
@@ -37,6 +38,7 @@ const emit = defineEmits<{
 
 .ps-toggle {
   @mixin flex-row;
+  @mixin title 14px;
   position: relative;
   width: 72px;
   height: 36px;
@@ -47,9 +49,8 @@ const emit = defineEmits<{
   padding: 0 6px;
   user-select: none;
   .indicator {
+    @mixin size 28px;
     position: absolute;
-    height: 28px;
-    width: 28px;
     border-radius: 50%;
     background-color: white;
     left: 4px;
@@ -63,7 +64,6 @@ const emit = defineEmits<{
   .text {
     position: relative;
     @mixin flex-center;
-    @mixin title 14px;
     color: black;
     width: 50%;
     transition: opacity 0.2s ease;
@@ -79,6 +79,22 @@ const emit = defineEmits<{
     }
     .on {
       opacity: 1;
+    }
+  }
+  &.small {
+    width: 68px;
+    height: 30px;
+    border-radius: 18px;
+    padding: 0 8px;
+    font-size: 12px;
+    .indicator {
+      @mixin size 22px;
+      left: 4px;
+    }
+    &.on {
+      .indicator {
+        left: 42px;
+      }
     }
   }
 }
