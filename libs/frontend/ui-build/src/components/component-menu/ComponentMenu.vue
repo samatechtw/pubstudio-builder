@@ -8,14 +8,7 @@
       @remove="removeInput($event)"
       @cancel="setEditedInput(undefined)"
     />
-    <ComponentEventEdit
-      v-else-if="isEditingEvent"
-      :editedEvent="editedEvent"
-      :usedEvents="usedEvents"
-      @save="upsertEvent"
-      @remove="removeEvent"
-      @cancel="setEditedEvent(undefined)"
-    />
+    <ComponentEventEdit v-else-if="isEditingEvent" :component="component" />
     <template v-else>
       <ComponentTabInfo :component="component" />
       <ToolbarText :show="showTextStyle" />
@@ -69,7 +62,7 @@ import { computed, toRefs } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { PSButton, InfoBubble } from '@pubstudio/frontend/ui-widgets'
 import { prosemirrorEditing } from '@pubstudio/frontend/util-edit-text'
-import { IComponent } from '@pubstudio/shared/type-site'
+import { ComponentTabState, IComponent } from '@pubstudio/shared/type-site'
 import { noBehaviorId } from '@pubstudio/frontend/util-ids'
 import { serializeComponent } from '@pubstudio/frontend/util-site-store'
 import { useHUD } from '@pubstudio/frontend/util-ui-alert'
@@ -112,13 +105,11 @@ const {
   setInputIs,
 } = useEditComponentInput()
 
-const { isEditingEvent, editedEvent, setEditedEvent, upsertEvent, removeEvent } =
-  useEditComponentEvent()
+const { setEditedEvent } = useEditComponentEvent()
 
-// The name of used events in this component
-const usedEvents = computed(
-  () => new Set<string>(Object.keys(component.value.events ?? {})),
-)
+const isEditingEvent = computed(() => {
+  return editor.value?.componentTab?.state === ComponentTabState.EditEvent
+})
 
 const debugComponent = () => {
   if (editor.value?.selectedComponent) {
