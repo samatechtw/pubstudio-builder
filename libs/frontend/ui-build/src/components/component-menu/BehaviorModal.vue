@@ -41,7 +41,7 @@
           class="save-button"
           :text="t('save')"
           :secondary="true"
-          @click.stop="set"
+          @click.stop="saveBehavior"
         />
         <PSButton
           v-if="behavior?.id"
@@ -70,7 +70,7 @@ import { EditorView } from 'prosemirror-view'
 import { Modal, PSButton } from '@pubstudio/frontend/ui-widgets'
 import { setOrCreate } from '@pubstudio/shared/type-utils'
 import { nextBehaviorId } from '@pubstudio/frontend/util-ids'
-import { IBehaviorArg, IEditBehavior } from '@pubstudio/shared/type-site'
+import { IBehavior, IBehaviorArg, IEditBehavior } from '@pubstudio/shared/type-site'
 import MenuRow from '../MenuRow.vue'
 import BehaviorArgs from './BehaviorArgs.vue'
 import { useBuild, createCodeEditorView } from '@pubstudio/frontend/feature-build'
@@ -84,6 +84,10 @@ const { site, editor, setBehavior, removeBehavior, setBehaviorArg } = useBuild()
 
 const newBehavior = ref<IEditBehavior>({ name: '', code: '' })
 let saveStateTimer: ReturnType<typeof setInterval> | undefined
+
+const emit = defineEmits<{
+  (e: 'saved', behavior: IBehavior): void
+}>()
 
 const behavior = computed(() => {
   return editor.value?.editBehavior
@@ -174,13 +178,15 @@ watch(behaviorCodeEditor, (domElement) => {
   }
 })
 
-const set = () => {
-  setBehavior({
+const saveBehavior = () => {
+  const behavior = {
     id: newBehavior.value.id ?? nextBehaviorId(site.value.context),
     name: newBehavior.value.name,
     code: newBehavior.value.code,
     args: newBehavior.value.args,
-  })
+  }
+  setBehavior(behavior)
+  emit('saved', behavior)
   clearBehavior()
 }
 

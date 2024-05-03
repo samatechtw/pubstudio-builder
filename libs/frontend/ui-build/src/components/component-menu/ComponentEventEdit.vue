@@ -90,114 +90,66 @@
         class="delete-button"
         :text="t('delete')"
         :secondary="true"
-        @click.stop="emit('remove', editedEvent?.name as string)"
+        @click.stop="removeEvent(editedEvent?.name as string)"
       />
       <PSButton
         class="cancel-button"
         :text="t('cancel')"
         :secondary="true"
-        @click.stop="emit('cancel')"
+        @click.stop="setEditedEvent(undefined)"
       />
     </div>
-    <BehaviorModal />
+    <BehaviorModal @saved="setOrAddBehavior" />
   </div>
 </template>
 
-<script lang="ts">
-import { computed } from 'vue'
+<script lang="ts" setup>
+import { computed, ref, toRefs } from 'vue'
+import { useI18n } from 'petite-vue-i18n'
+import {
+  IResolvedComponentEvent,
+  IResolvedComponentEventBehavior,
+  editOrNewEvent,
+  useBuild,
+  useEditComponentEvent,
+} from '@pubstudio/frontend/feature-build'
+import {
+  Checkbox,
+  ErrorMessage,
+  PSButton,
+  PSMultiselect,
+  Plus,
+} from '@pubstudio/frontend/ui-widgets'
+import { builtinBehaviors } from '@pubstudio/frontend/util-builtin'
+import { noBehavior } from '@pubstudio/frontend/feature-builtin'
+import { setEditBehavior } from '@pubstudio/frontend/data-access-command'
 import {
   ComponentArgPrimitive,
   ComponentEventType,
   ComponentEventTypeValues,
   IBehavior,
+  IComponent,
   IComponentEvent,
-  IComponentEventBehavior,
 } from '@pubstudio/shared/type-site'
-import { Checkbox, Plus } from '@pubstudio/frontend/ui-widgets'
-import { useBuild } from '@pubstudio/frontend/feature-build'
-import { setEditBehavior } from '@pubstudio/frontend/data-access-command'
+import MenuRow from '../MenuRow.vue'
+import { IUpdateComponentArgPayload } from '../component-arg/i-update-component-arg-payload'
 import EditMenuTitle from '../EditMenuTitle.vue'
 import EventBehaviorRow from './EventBehaviorRow.vue'
-import { IUpdateComponentArgPayload } from '../component-arg/i-update-component-arg-payload'
 import BehaviorModal from './BehaviorModal.vue'
 
-export interface IResolvedComponentEvent extends Omit<IComponentEvent, 'behaviors'> {
-  behaviors: IResolvedComponentEventBehavior[]
-}
-
-export interface IResolvedComponentEventBehavior
-  extends Omit<IComponentEventBehavior, 'behaviorId'> {
-  behavior: IBehavior
-}
-
+const { t } = useI18n()
 const { site, editor } = useBuild()
 
-export const defaultEvent = (): IResolvedComponentEvent => ({
-  name: ComponentEventType.Click,
-  behaviors: [
-    {
-      behavior: noBehavior,
-    },
-  ],
-})
-
-const editOrNewEvent = (
-  editedEvent: IComponentEvent | undefined,
-): IResolvedComponentEvent => {
-  if (!editedEvent) {
-    return defaultEvent()
-  }
-
-  // We can't reuse `resolvedBehavior` here because of race condition.
-  const eventBehaviors: IResolvedComponentEventBehavior[] = []
-
-  editedEvent.behaviors.forEach((eventBehavior) => {
-    const behavior = resolveBehavior(site.value.context, eventBehavior.behaviorId)
-    if (behavior) {
-      eventBehaviors.push({
-        args: eventBehavior.args,
-        behavior,
-      })
-    }
-  })
-
-  return {
-    name: editedEvent.name,
-    eventParams: editedEvent.eventParams ? { ...editedEvent.eventParams } : undefined,
-    behaviors: eventBehaviors,
-  }
-}
-</script>
-
-<script lang="ts" setup>
-import { ref, toRefs } from 'vue'
-import { useI18n } from 'petite-vue-i18n'
-import { ErrorMessage, PSButton, PSMultiselect } from '@pubstudio/frontend/ui-widgets'
-import { resolveBehavior } from '@pubstudio/frontend/util-builtin'
-import { builtinBehaviors } from '@pubstudio/frontend/util-builtin'
-import { noBehavior } from '@pubstudio/frontend/feature-builtin'
-import MenuRow from '../MenuRow.vue'
-
-const { t } = useI18n()
-
-const props = withDefaults(
-  defineProps<{
-    editedEvent: IComponentEvent | undefined
-    usedEvents: Set<string>
-  }>(),
-  {
-    editedEvent: undefined,
-  },
-)
-const { editedEvent, usedEvents } = toRefs(props)
-
-const emit = defineEmits<{
-  (e: 'save', event: IComponentEvent, oldEventName?: string): void
-  (e: 'remove', name: string): void
-  (e: 'cancel'): void
+const props = defineProps<{
+  component: IComponent
 }>()
+const { component } = toRefs(props)
 
-const newEvent = ref<IResolvedComponentEvent>(editOrNewEvent(editedEvent.value))
+const { editedEvent, upsertEvent, removeEvent, setEditedEvent } = useEditComponentEvent()
+
+const newEvent = ref<IResolvedComponentEvent>(
+  editOrNewEvent(site.value, editedEvent.value),
+)
 const inputError = ref()
 
 const addEventBehavior = () => {
@@ -205,6 +157,11 @@ const addEventBehavior = () => {
     behavior: noBehavior,
   })
 }
+
+// The name of used events in this component
+const usedEvents = computed(
+  () => new Set<string>(Object.keys(component.value.events ?? {})),
+)
 
 const updateEventName = (name: ComponentEventType | undefined) => {
   if (name) {
@@ -311,6 +268,20 @@ const validateEvent = (): boolean => {
   return true
 }
 
+const setOrAddBehavior = (behavior: IBehavior) => {
+  if (!behavior) {
+    return
+  }
+  const overrideBehavior = newEvent.value.behaviors.find(
+    (b) => b.behavior.id === noBehavior.id,
+  )
+  if (overrideBehavior) {
+    overrideBehavior.behavior = behavior
+  } else {
+    newEvent.value.behaviors.push({ behavior })
+  }
+}
+
 const resolvedComponentEventToEvent = (): IComponentEvent => ({
   name: newEvent.value.name,
   eventParams: newEvent.value.eventParams,
@@ -325,7 +296,8 @@ const save = () => {
   if (!validateEvent()) {
     return
   }
-  emit('save', resolvedComponentEventToEvent(), editedEvent.value?.name)
+  const event = resolvedComponentEventToEvent()
+  upsertEvent(event, editedEvent.value?.name)
 }
 </script>
 
