@@ -175,10 +175,11 @@ export const BuilderDndComponent = defineComponent({
         RenderMode.Build,
         dndState.value,
       )
+      const { id, tag } = component.value
       const { editView, selectedComponent } = site.value.editor ?? {}
       const isRoot = !component.value.parent
       const editViewFocus = editView?.hasFocus()
-      const childrenEditViewMounted = !!editView?.dom.closest(`#${component.value.id}`)
+      const childrenEditViewMounted = !!editView?.dom.closest(`#${id}`)
       const droppableDndProps = {
         onDragenter: dnd.dragenter,
         onDragover: dnd.dragover,
@@ -195,9 +196,15 @@ export const BuilderDndComponent = defineComponent({
         dndProps = { onDragend: dnd.dragend }
       } else if (isRoot) {
         dndProps = droppableDndProps
+      } else if (tag === Tag.Input || tag === Tag.Textarea) {
+        dndProps = {
+          draggable: true,
+          onDragstart: dnd.dragstart,
+          onDrag: dnd.drag,
+        }
       } else {
         dndProps = {
-          draggable: !editView || selectedComponent?.id !== component.value.id,
+          draggable: !editView || selectedComponent?.id !== id,
           onDragstart: dnd.dragstart,
           onDrag: dnd.drag,
           ...droppableDndProps,
@@ -215,7 +222,6 @@ export const BuilderDndComponent = defineComponent({
         tabindex: '-1',
       } as Record<string, unknown>
 
-      const tag = component.value.tag
       const componentClass = (propsContent.props.class ?? []) as string[]
 
       // Img can't contain divs, so add a wrapper for the hover UI
