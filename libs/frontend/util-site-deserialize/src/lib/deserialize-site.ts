@@ -50,6 +50,8 @@ export const deserializeEditor = (
         componentMenuCollapses: serializedEditor.componentMenuCollapses ?? {},
         // Added 240320
         contactFormWalkthrough: serializedEditor.contactFormWalkthrough,
+        // Added 240504
+        mailingListWalkthrough: serializedEditor.mailingListWalkthrough,
       }
     : undefined
 

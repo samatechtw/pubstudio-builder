@@ -1,20 +1,20 @@
 <template>
-  <div class="create-wrap contact-form-wrap">
-    <div class="contact-form-title">
+  <div class="create-wrap walkthrough-wrap">
+    <div class="walkthrough-title">
       {{ t('custom_data.create') }}
     </div>
-    <div class="contact-form-text">
+    <div class="walkthrough-text">
       {{ t('custom_data.create_text') }}
     </div>
     <div class="create-table">
-      <div class="contact-form-row">
+      <div class="walkthrough-row">
         <PSInput
           v-model="tableName"
           :label="t('custom_data.table_name')"
           class="name-input"
         />
       </div>
-      <div class="contact-form-row">
+      <div class="walkthrough-row">
         <Checkbox
           :item="{
             label: t('custom_data.show_name'),
@@ -26,7 +26,7 @@
       </div>
     </div>
     <ErrorMessage :error="error && t(error)" class="create-table-error" />
-    <div class="contact-form-actions">
+    <div class="walkthrough-actions">
       <PSButton
         :text="t('next')"
         secondary

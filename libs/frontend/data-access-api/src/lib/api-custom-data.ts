@@ -1,4 +1,5 @@
 import { PSApi } from '@pubstudio/frontend/util-api'
+import { IApiCustomData } from '@pubstudio/shared/type-api-interfaces'
 import {
   CustomDataAction,
   ICreateTableApiRequest,
@@ -8,11 +9,6 @@ import {
   IListTablesResponse,
 } from '@pubstudio/shared/type-api-site-custom-data'
 import { RequestParams } from '@sampullman/fetch-api'
-
-export interface IApiCustomData {
-  createTable(payload: ICreateTableApiRequest): Promise<ICreateTableResponse>
-  listTables(query: IListTablesApiQuery): Promise<IListTablesResponse>
-}
 
 export const useCustomDataApi = (api: PSApi, siteId: string): IApiCustomData => {
   const listTables = async (query: IListTablesApiQuery): Promise<IListTablesResponse> => {

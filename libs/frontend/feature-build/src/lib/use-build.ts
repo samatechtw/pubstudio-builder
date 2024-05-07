@@ -15,6 +15,7 @@ import {
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { resolveComponent } from '@pubstudio/frontend/util-builtin'
 import {
+  addComponentEventData,
   makeEditComponentData,
   makeRemoveComponentData,
   makeSetInputData,
@@ -578,19 +579,6 @@ export const useBuild = (): IUseBuild => {
       replaceComponentMixinData,
       [newMixinId],
     )
-  }
-
-  const addComponentEventData = (
-    component: IComponent,
-    newEvent: IComponentEvent,
-  ): ISetComponentEventData => {
-    const oldEvent = component.events?.[newEvent.name]
-    const data: ISetComponentEventData = {
-      componentId: component.id,
-      oldEvent,
-      newEvent,
-    }
-    return data
   }
 
   const addComponentEvent = (component: IComponent, newEvent: IComponentEvent) => {

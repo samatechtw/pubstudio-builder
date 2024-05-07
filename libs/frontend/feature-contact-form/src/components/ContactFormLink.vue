@@ -1,9 +1,9 @@
 <template>
-  <div class="contact-form-wrap">
+  <div class="walkthrough-wrap">
     <div class="link-title">
       {{ t('custom_data.link') }}
     </div>
-    <div class="contact-form-text">
+    <div class="walkthrough-text">
       {{ t('custom_data.link_text') }}
     </div>
     <div class="link-table">
@@ -15,7 +15,7 @@
         @select="select"
       />
     </div>
-    <div class="contact-actions">
+    <div class="walkthrough-actions">
       <PSButton
         :text="t('confirm')"
         secondary

@@ -1,4 +1,5 @@
 import { PSApi } from '@pubstudio/frontend/util-api'
+import { IApiLocalSite } from '@pubstudio/shared/type-api-interfaces'
 import {
   IGetLocalSiteApiRequest,
   IGetLocalSiteApiResponse,
@@ -7,24 +8,6 @@ import {
 } from '@pubstudio/shared/type-api-local-site'
 import { plainResponseInterceptors } from '@pubstudio/shared/util-web-site-api'
 import { RequestParams } from '@sampullman/fetch-api'
-
-export interface IApiLocalSite {
-  updateLocalSite: (
-    id: string,
-    data: IUpdateLocalSiteApiRequest,
-    keepalive?: boolean,
-  ) => Promise<IUpdateLocalSiteApiResponse>
-  // Wrapper for API compatibility with site-api `getSiteVersion`
-  getLocalSiteVersion(
-    siteId: string,
-    versionId: string,
-    query?: IGetLocalSiteApiRequest,
-  ): Promise<IGetLocalSiteApiResponse | undefined>
-  getLocalSite(
-    siteId: string,
-    query?: IGetLocalSiteApiRequest,
-  ): Promise<IGetLocalSiteApiResponse | undefined>
-}
 
 export const useLocalSiteApi = (_api: PSApi): IApiLocalSite => {
   // TODO -- this is a workaround to avoid parsing Site updated_at so we can use it

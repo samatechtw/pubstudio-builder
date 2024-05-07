@@ -1,16 +1,16 @@
 <template>
-  <div class="contact-form-wrap recipients-wrap">
-    <div class="contact-form-title">
+  <div class="walkthrough-wrap recipients-wrap">
+    <div class="walkthrough-title">
       {{ t('custom_data.recipients') }}
     </div>
-    <div class="contact-form-text">
+    <div class="walkthrough-text">
       {{ t('custom_data.recipients_text') }}
     </div>
     <div class="recipients">
       <div
         v-for="(recipient, index) in recipients"
         :key="recipient[0]"
-        class="recipient contact-form-row"
+        class="recipient walkthrough-row"
       >
         <PSInput
           :modelValue="recipient[1]"
@@ -28,7 +28,7 @@
     </div>
     <Plus v-if="recipients.length < 10" class="recipient-add" @click="addRecipient" />
     <ErrorMessage :error="error && t(error)" class="create-table-error" />
-    <div class="contact-form-actions">
+    <div class="walkthrough-actions">
       <PSButton
         :text="t('confirm')"
         secondary

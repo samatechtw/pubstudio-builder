@@ -134,6 +134,20 @@ describe('Create Custom Table', () => {
         })
     })
 
+    it('when table already exists', async () => {
+      payload.data = mockCreateTablePayload('contact_form')
+
+      await api
+        .post(testEndpoint(siteId))
+        .set('Authorization', adminAuth)
+        .send(payload)
+        .expect(400, {
+          code: 'CustomTableNameExists',
+          message: 'Table already exists',
+          status: 400,
+        })
+    })
+
     it('when column name is invalid', async () => {
       const data = mockCreateTablePayload('contact_form')
       data.columns['a'] = data.columns['name']

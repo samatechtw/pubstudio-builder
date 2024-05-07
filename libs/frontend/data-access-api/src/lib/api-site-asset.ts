@@ -1,5 +1,6 @@
 import { PSApi } from '@pubstudio/frontend/util-api'
 import { IMAGE_API_KEY, IMAGE_API_URL } from '@pubstudio/frontend/util-config'
+import { IApiSiteAsset, IOptimizationParams } from '@pubstudio/shared/type-api-interfaces'
 import {
   ICreatePlatformSiteAssetRequest,
   ICreatePlatformSiteAssetResponse,
@@ -14,41 +15,10 @@ import {
 import { sleep } from '@pubstudio/shared/util-core'
 import { RequestParams } from '@sampullman/fetch-api'
 import {
-  EnumFileFormat,
   ICreateJobApiResponse,
   IGetJobApiResponse,
-  IImageJobConfig,
   ProcessJobStatusEnum,
 } from '@samatech/image-api-types'
-
-export interface IOptimizationParams extends IImageJobConfig {
-  url: string
-  file: File
-  inputFormat: EnumFileFormat
-  outputFormat: EnumFileFormat
-  timeout?: number
-}
-
-export interface IApiSiteAsset {
-  createSiteAsset: (
-    data: ICreatePlatformSiteAssetRequest,
-  ) => Promise<ICreatePlatformSiteAssetResponse>
-  replaceSiteAsset: (
-    id: string,
-    data: IReplacePlatformSiteAssetRequest,
-  ) => Promise<IReplacePlatformSiteAssetResponse>
-  verifySiteAsset: (id: string) => Promise<IVerifyPlatformSiteAssetResponse>
-  updateSiteAsset: (
-    id: string,
-    payload: IUpdatePlatformSiteAssetRequest,
-  ) => Promise<IUpdatePlatformSiteAssetResponse>
-  listSiteAssets: (
-    params: IListPlatformSiteAssetsRequest,
-  ) => Promise<IListPlatformSiteAssetsResponse>
-  deleteSiteAsset: (id: string) => Promise<void>
-  uploadFileWithSignedUrl(url: string, file: File): Promise<Response>
-  uploadOptimizedFileWithSignedUrl(params: IOptimizationParams): Promise<void>
-}
 
 export const useSiteAssetApi = (api: PSApi): IApiSiteAsset => {
   const createSiteAsset = async (

@@ -84,13 +84,21 @@
       />
       <NewComponent
         v-if="isSiteApi"
-        class="new-divider-vertical"
+        class="new-contact-form"
         :text="t('build.contact_form')"
         :builtinComponentId="contactForm.id"
         @add="showContactFormWalkthrough"
       />
+      <NewComponent
+        v-if="isSiteApi"
+        class="new-mailing-list"
+        :text="t('build.mailing_list')"
+        :builtinComponentId="mailingList.id"
+        @add="showMailingListWalkthrough"
+      />
     </div>
     <ContactFormWalkthroughModal />
+    <MailingListWalkthroughModal />
   </div>
 </template>
 
@@ -121,16 +129,22 @@ import {
   dividerVertical,
   dividerHorizontal,
   contactForm,
+  mailingList,
 } from '@pubstudio/frontend/util-builtin'
 import {
   ContactFormWalkthroughModal,
   useContactForm,
 } from '@pubstudio/frontend/feature-contact-form'
+import {
+  MailingListWalkthroughModal,
+  useMailingListForm,
+} from '@pubstudio/frontend/feature-mailing-list-form'
 import NewComponent from './NewComponent.vue'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 
 const { t } = useI18n()
 const { showContactFormWalkthrough } = useContactForm()
+const { showMailingListWalkthrough } = useMailingListForm()
 const { isSiteApi } = useSiteSource()
 </script>
 

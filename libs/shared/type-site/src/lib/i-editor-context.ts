@@ -1,7 +1,10 @@
 import { EditorView } from 'prosemirror-view'
-import { ContactFormWalkthroughState } from './enum-contact-form-state'
 import { CssPseudoClass } from './enum-css-pseudo-class'
 import { CssUnit } from './enum-css-unit'
+import {
+  ContactFormWalkthroughState,
+  MailingListWalkthroughState,
+} from './enum-walkthrough-state'
 import { IBehavior, IComponent, IComponentEvent } from './i-component'
 import { ISerializedComponent } from './i-serialized-site'
 import { ISiteStore } from './i-site-store'
@@ -88,6 +91,11 @@ export interface IEditGlobalStyle {
 
 export interface IContactFormWalkthrough {
   state: ContactFormWalkthroughState
+  formId: string
+}
+
+export interface IMailingListWalkthrough {
+  state: MailingListWalkthroughState
   formId: string
 }
 
@@ -183,4 +191,6 @@ export interface IEditorContext {
   templatesShown?: boolean
   // State of contact form walkthrough modal
   contactFormWalkthrough?: IContactFormWalkthrough
+  // State of mailing list walkthrough modal
+  mailingListWalkthrough?: IMailingListWalkthrough
 }

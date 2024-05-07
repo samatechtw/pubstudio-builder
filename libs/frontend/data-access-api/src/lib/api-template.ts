@@ -1,4 +1,5 @@
 import { PSApi } from '@pubstudio/frontend/util-api'
+import { IApiTemplate } from '@pubstudio/shared/type-api-interfaces'
 import {
   ICreatePlatformTemplateRequest,
   ICreatePlatformTemplateResponse,
@@ -9,21 +10,6 @@ import {
   IUpdatePlatformTemplateResponse,
 } from '@pubstudio/shared/type-api-platform-template'
 import { RequestParams } from '@sampullman/fetch-api'
-
-export interface IApiTemplate {
-  getTemplate(templateId: string): Promise<IGetPlatformTemplateResponse>
-  createTemplate(
-    payload: ICreatePlatformTemplateRequest,
-  ): Promise<ICreatePlatformTemplateResponse>
-  updateTemplate(
-    templateId: string,
-    payload: IUpdatePlatformTemplateRequest,
-  ): Promise<IUpdatePlatformTemplateResponse>
-  deleteTemplate(templateId: string): Promise<void>
-  listTemplates(
-    query: IListPlatformTemplatesRequest,
-  ): Promise<IListPlatformTemplatesResponse>
-}
 
 export const useTemplateApi = (api: PSApi): IApiTemplate => {
   const getTemplate = async (

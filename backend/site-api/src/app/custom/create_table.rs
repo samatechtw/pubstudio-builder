@@ -10,7 +10,7 @@ use crate::api_context::ApiContext;
 
 use super::{
     custom_data::parse_request_data,
-    helpers::{validate_column_names, validate_table_name},
+    helpers::{validate_column_names, validate_table_available, validate_table_name},
 };
 
 /*
@@ -61,6 +61,7 @@ pub async fn create_custom_table_helper(
     check_bad_form(dto.validate())?;
     validate_table_name(&dto.table_name)?;
     validate_column_names(dto.columns.keys())?;
+    validate_table_available(context, site_id, &dto.table_name).await?;
 
     let metadata_dto = CustomDataInfoDto {
         name: dto.table_name.clone(),

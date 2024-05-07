@@ -4,3 +4,9 @@ export enum ContactFormWalkthroughState {
   LinkTable = 'linkTable',
   Recipients = 'recipients',
 }
+
+export enum MailingListWalkthroughState {
+  Init = 'init',
+  CreateTable = 'createTable',
+  LinkTable = 'linkTable',
+}

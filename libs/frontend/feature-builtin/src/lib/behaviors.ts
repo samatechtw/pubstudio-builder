@@ -6,6 +6,7 @@ import {
   clearErrorBehaviorId,
   contactFormBehaviorId,
   homeLinkBehaviorId,
+  mailingListBehaviorId,
   noBehaviorId,
   setHiddenId,
   toggleHiddenId,
@@ -230,3 +231,92 @@ export const contactFormBehavior: IBehavior = {
   },
 }
 registerBuiltinBehavior(contactFormBehavior)
+
+export const mailingListBehavior: IBehavior = {
+  id: mailingListBehaviorId,
+  name: 'Mailing List Submit',
+  args: {
+    tableName: {
+      name: 'tableName',
+      type: ComponentArgPrimitive.String,
+      help: 'The name of the API table linked to the mailing list.',
+    },
+    emailId: {
+      name: 'emailId',
+      type: ComponentArgPrimitive.String,
+      help: 'The ID of the email input component',
+    },
+    nameId: {
+      name: 'nameId',
+      type: ComponentArgPrimitive.String,
+      help: 'The ID of the mailing list name input component (optional)',
+    },
+    errorId: {
+      name: 'errorId',
+      type: ComponentArgPrimitive.String,
+      help: 'The ID of the error component',
+    },
+    apiEmailField: {
+      name: 'apiEmailField',
+      type: ComponentArgPrimitive.String,
+      help: 'The column to store the email in the API table',
+    },
+    apiNameField: {
+      name: 'apiNameField',
+      type: ComponentArgPrimitive.String,
+      help: 'The column to store the contact name in the API table (optional)',
+    },
+  },
+  builtin: async (
+    helpers: IBehaviorHelpers,
+    behaviorContext: IBehaviorContext,
+    args?: IBehaviorCustomArgs,
+  ) => {
+    const { site, event, component } = behaviorContext
+    event?.preventDefault()
+    const { error: argError, ...resolvedArgs } = helpers.requireArgs(args, [
+      'tableName',
+      'emailId',
+      'errorId',
+      'apiEmailField',
+    ])
+    const errorCmp = helpers.getComponent(site, resolvedArgs.errorId)
+    if (argError) {
+      console.warn(argError)
+      helpers.setContent(errorCmp, 'Unknown form error')
+    } else {
+      let name: string | undefined
+      const email = helpers.getValue(resolvedArgs.emailId)
+      if (args?.nameId) {
+        name = helpers.getValue(args.nameId as string)
+      }
+      const button = findComponent(component, (cmp) => cmp.tag === Tag.Button)
+      try {
+        helpers.setLoading(button, true)
+        const row: Record<string, string> = {
+          [resolvedArgs.apiEmailField]: email ?? '',
+        }
+        if (args?.apiNameField && name) {
+          row[args?.apiNameField as string] = name
+        }
+        await helpers.addRow(resolvedArgs.tableName, row)
+        helpers.setCustomStyle(errorCmp, Css.Opacity, '1')
+        helpers.setCustomStyle(errorCmp, Css.Color, '${color-success}')
+        helpers.setContent(errorCmp, 'Subscribed!')
+      } catch (err) {
+        const e = err as Record<string, string>
+        console.error(e)
+        let error: string
+        if (e.code === 'CustomDataUniqueFail') {
+          error = 'You are already subscribed!'
+        } else {
+          error = e.message ?? 'Unknown error, try again later'
+        }
+        helpers.setContent(errorCmp, error)
+        helpers.setCustomStyle(errorCmp, Css.Opacity, '1')
+      }
+      helpers.setLoading(button, false)
+    }
+  },
+}
+registerBuiltinBehavior(mailingListBehavior)
