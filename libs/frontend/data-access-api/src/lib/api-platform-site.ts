@@ -1,4 +1,5 @@
 import { PSApi } from '@pubstudio/frontend/util-api'
+import { IApiPlatformSite } from '@pubstudio/shared/type-api-interfaces'
 import {
   ICreatePlatformSiteRequest,
   ICreatePlatformSiteResponse,
@@ -10,18 +11,6 @@ import {
   IUpdatePlatformSiteRequest,
 } from '@pubstudio/shared/type-api-platform-site'
 import { RequestParams } from '@sampullman/fetch-api'
-
-export interface IApiPlatformSite {
-  createSite: (data: ICreatePlatformSiteRequest) => Promise<ICreatePlatformSiteResponse>
-  updateSite: (
-    id: string,
-    data: IUpdatePlatformSiteRequest,
-  ) => Promise<IUpdatePlatformSiteApiResponse>
-  publishSite: (id: string, data: IPublishPlatformSiteRequest) => Promise<void>
-  listSites: (params: IListPlatformSitesRequest) => Promise<IListPlatformSitesResponse>
-  getSite(siteId: string): Promise<IGetPlatformSiteApiResponse>
-  deleteSite(siteId: string): Promise<void>
-}
 
 export const usePlatformSiteApi = (api: PSApi): IApiPlatformSite => {
   const createSite = async (

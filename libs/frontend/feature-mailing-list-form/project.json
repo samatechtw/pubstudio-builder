@@ -1,0 +1,25 @@
+{
+  "name": "frontend-feature-mailing-list-form",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/frontend/feature-mailing-list-form/src",
+  "projectType": "library",
+  "targets": {
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/frontend/feature-mailing-list-form/**/*.ts"],
+        "eslintConfig": "libs/frontend/feature-mailing-list-form/.eslintrc.cjs"
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/libs/frontend/feature-mailing-list-form"],
+      "options": {
+        "jestConfig": "libs/frontend/feature-mailing-list-form/jest.config.ts",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": ["scope:frontend", "type:feature"]
+}

@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use lib_shared_site_api::error::api_error::ApiError;
+use lib_shared_site_api::{db::db_error::DbError, error::api_error::ApiError};
 use lib_shared_types::{
     dto::custom_data::{
         create_table_dto::ColumnInfo, custom_data_info_dto::CustomDataUpdateColumns,
@@ -26,6 +26,29 @@ pub fn validate_table_name(table: &str) -> Result<(), ApiError> {
     }
 
     Ok(())
+}
+
+pub async fn validate_table_available(
+    context: &ApiContext,
+    site_id: &str,
+    table: &str,
+) -> Result<(), ApiError> {
+    let result = context
+        .custom_data_info_repo
+        .get_table(site_id, table)
+        .await;
+    let err = match result {
+        Ok(_) => ApiError::bad_request()
+            .code(ApiErrorCode::CustomTableNameExists)
+            .message("Table already exists"),
+        Err(e) => match e {
+            DbError::SqlxError(sqlx::Error::RowNotFound) => {
+                return Ok(());
+            }
+            _ => ApiError::internal_error().message(format!("Validation error: {:?}", e)),
+        },
+    };
+    Err(err)
 }
 
 pub fn validate_column_name(name: &str) -> Result<(), ApiError> {

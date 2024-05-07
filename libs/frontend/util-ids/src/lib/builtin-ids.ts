@@ -82,6 +82,8 @@ export const textareaId = componentId(defaultContext.namespace, 'textarea')
 // Advanced
 export const contactFormId = componentId(defaultContext.namespace, 'contactform')
 export const contactFormBehaviorId = behaviorId(defaultContext.namespace, 'contactform')
+export const mailingListId = componentId(defaultContext.namespace, 'mailinglist')
+export const mailingListBehaviorId = behaviorId(defaultContext.namespace, 'mailinglist')
 export const clearErrorBehaviorId = behaviorId(
   defaultContext.namespace,
   'contactformclearerror',

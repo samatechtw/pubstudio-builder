@@ -48,51 +48,5 @@ onMounted(async () => {
 </script>
 
 <style lang="postcss">
-@import '@theme/css/mixins.postcss';
-
-.contact-form-wrap {
-  @mixin flex-col;
-  width: 100%;
-  height: 100%;
-  color: black;
-}
-.contact-form-row {
-  display: flex;
-  margin-top: 8px;
-  width: 100%;
-  justify-content: center;
-}
-.contact-form-text {
-  @mixin title-thin 18px;
-  margin-top: 24px;
-  text-align: center;
-}
-.contact-form-title {
-  @mixin title 22px;
-  text-align: center;
-}
-.contact-form-actions {
-  display: flex;
-  justify-content: center;
-  padding-top: 24px;
-  margin-top: auto;
-}
-
-.contact-walkthrough {
-  .modal-inner {
-    min-height: 360px;
-    height: 360px;
-  }
-  .loading-wrap {
-    @mixin flex-center;
-    height: 100%;
-  }
-  .fade-leave-to {
-    top: 0;
-    left: 0;
-    padding: 32px 24px 24px;
-    width: 100%;
-    height: 100%;
-  }
-}
+@import '@theme/css/components/walkthrough.postcss';
 </style>

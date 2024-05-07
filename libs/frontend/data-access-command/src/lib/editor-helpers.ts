@@ -10,12 +10,15 @@ import {
   EditorDropdown,
   EditorMode,
   IComponent,
+  IContactFormWalkthrough,
   IEditBehavior,
   IEditGlobalStyle,
   IEditingMixinData,
   IEditorContext,
   IEditSvg,
+  IMailingListWalkthrough,
   ISite,
+  MailingListWalkthroughState,
   StyleTab,
   ThemeTab,
 } from '@pubstudio/shared/type-site'
@@ -328,23 +331,42 @@ export const setCssPseudoClass = (
   }
 }
 
+const setWalkthroughState = <T extends IContactFormWalkthrough | IMailingListWalkthrough>(
+  editor: IEditorContext | undefined,
+  walkthroughKey: 'contactFormWalkthrough' | 'mailingListWalkthrough',
+  state: ContactFormWalkthroughState | MailingListWalkthroughState | undefined,
+  formId?: string,
+) => {
+  if (editor) {
+    const walkthrough = editor[walkthroughKey] as T | undefined
+    if (walkthrough) {
+      if (state) {
+        walkthrough.state = state
+      } else {
+        editor[walkthroughKey] = undefined
+      }
+    } else if (state && formId) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      editor[walkthroughKey] = { state, formId } as any
+    }
+    editor.store?.saveEditor(editor)
+  }
+}
+
 export const setContactFormWalkthrough = (
   editor: IEditorContext | undefined,
   state: ContactFormWalkthroughState | undefined,
   formId?: string,
 ) => {
-  if (editor) {
-    if (editor?.contactFormWalkthrough) {
-      if (state) {
-        editor.contactFormWalkthrough.state = state
-      } else {
-        editor.contactFormWalkthrough = undefined
-      }
-    } else if (state && formId) {
-      editor.contactFormWalkthrough = { state, formId }
-    }
-    editor.store?.saveEditor(editor)
-  }
+  setWalkthroughState(editor, 'contactFormWalkthrough', state, formId)
+}
+
+export const setMailingListWalkthrough = (
+  editor: IEditorContext | undefined,
+  state: MailingListWalkthroughState | undefined,
+  formId?: string,
+) => {
+  setWalkthroughState(editor, 'mailingListWalkthrough', state, formId)
 }
 
 export const setTemplatesShown = (editor: IEditorContext | undefined, shown: boolean) => {

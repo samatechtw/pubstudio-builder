@@ -42,8 +42,14 @@
       "@pubstudio/frontend/feature-contact-form": [
         "libs/frontend/feature-contact-form/src/index.ts"
       ],
+      "@pubstudio/frontend/feature-mailing-list-form": [
+        "libs/frontend/feature-mailing-list-form/src/index.ts"
+      ],
       "@pubstudio/frontend/feature-template": [
         "libs/frontend/feature-template/src/index.ts"
+      ],
+      "@pubstudio/frontend/feature-walkthrough": [
+        "libs/frontend/feature-walkthrough/src/index.ts"
       ],
       "@pubstudio/frontend/type-ui-widgets": [
         "libs/frontend/type-ui-widgets/src/index.ts"
@@ -75,6 +81,9 @@
         "libs/frontend/util-vite-config/src/index.ts"
       ],
       "@pubstudio/shared/type-api": ["libs/shared/type-api/src/index.ts"],
+      "@pubstudio/shared/type-api-interfaces": [
+        "libs/shared/type-api-interfaces/src/index.ts"
+      ],
       "@pubstudio/shared/type-api-local-site": [
         "libs/shared/type-api-local-site/src/index.ts"
       ],

@@ -65,6 +65,7 @@ export const serializeEditor = (
         templatesShown: editor.templatesShown,
         componentMenuCollapses: editor.componentMenuCollapses,
         contactFormWalkthrough: editor.contactFormWalkthrough,
+        mailingListWalkthrough: editor.mailingListWalkthrough,
       }
     : undefined
 }

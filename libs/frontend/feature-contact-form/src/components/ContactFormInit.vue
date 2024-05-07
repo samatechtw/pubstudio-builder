@@ -6,7 +6,7 @@
     <div class="init-text">
       {{ t('custom_data.init') }}
     </div>
-    <div class="contact-form-init">
+    <div class="walkthrough-init">
       <div class="button-wrap">
         <div class="create-table button" @click="createTable">
           {{ t('custom_data.create') }}
@@ -49,7 +49,7 @@ const createTable = () => {
   height: 100%;
   color: black;
 }
-.contact-form-init {
+.walkthrough-init {
   @mixin flex-center;
   flex-grow: 1;
   color: white;

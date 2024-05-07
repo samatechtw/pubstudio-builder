@@ -1,15 +1,16 @@
-import { IApiCustomData, useCustomDataApi } from '@pubstudio/frontend/data-access-api'
+import { useCustomDataApi } from '@pubstudio/frontend/data-access-api'
 import {
   appendLastCommand,
   setContactFormWalkthrough,
 } from '@pubstudio/frontend/data-access-command'
 import { store } from '@pubstudio/frontend/data-access-web-store'
-import { useBuild } from '@pubstudio/frontend/feature-build'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
+import { appendEvent, loadCustomTables } from '@pubstudio/frontend/feature-walkthrough'
 import { parseApiErrorKey, PSApi, toApiError } from '@pubstudio/frontend/util-api'
 import { resolveComponent } from '@pubstudio/frontend/util-builtin'
 import { makeRemoveComponentData } from '@pubstudio/frontend/util-command-data'
 import { clearErrorBehaviorId, contactFormBehaviorId } from '@pubstudio/frontend/util-ids'
+import { IApiCustomData } from '@pubstudio/shared/type-api-interfaces'
 import {
   ICreateTableApiRequest,
   ICustomTableViewModel,
@@ -18,7 +19,6 @@ import { CommandType } from '@pubstudio/shared/type-command'
 import {
   ComponentEventType,
   ContactFormWalkthroughState,
-  IComponent,
   IComponentEvent,
 } from '@pubstudio/shared/type-site'
 import { Ref, ref } from 'vue'
@@ -32,7 +32,7 @@ export interface IContactFormFeature {
   hasName: Ref<boolean>
   recipients: Ref<[number, string][]>
   recipientKey: Ref<number>
-  loadCustomTables: () => Promise<void>
+  loadContactFormTables: () => Promise<void>
   showContactFormWalkthrough: (formId: string | undefined) => Promise<void>
   createContactTable: (
     tableName: string,
@@ -68,22 +68,10 @@ export const useContactForm = (): IContactFormFeature => {
 
   const api = useCustomDataApi(apiSite as PSApi, apiSiteId.value as string)
 
-  const loadCustomTables = async () => {
+  const loadContactFormTables = async () => {
     resetContactTables()
-    loadingTables.value = true
-    try {
-      const data = await api.listTables({})
-      tables.value = data.results.map((table) => ({
-        id: table.id,
-        name: table.name,
-        columns: table.columns,
-        events: table.events,
-      }))
-      contactTables.value = tables.value?.filter(isContactTable) ?? []
-    } catch (e) {
-      console.log('List tables error:', e)
-    }
-    loadingTables.value = false
+    await loadCustomTables({ api, tables, loadingTables })
+    contactTables.value = tables.value?.filter(isContactTable) ?? []
   }
 
   const showContactFormWalkthrough = async (formId: string | undefined) => {
@@ -95,7 +83,7 @@ export const useContactForm = (): IContactFormFeature => {
         ContactFormWalkthroughState.Init,
         formId,
       )
-      await loadCustomTables()
+      await loadContactFormTables()
       if (!contactTables.value.length) {
         setContactFormWalkthrough(
           site.value.editor,
@@ -103,16 +91,6 @@ export const useContactForm = (): IContactFormFeature => {
         )
       }
     }
-  }
-
-  const appendEvent = (form: IComponent, event: IComponentEvent, save?: boolean) => {
-    const { addComponentEventData } = useBuild()
-    const addEvent = addComponentEventData(form, event)
-    const command = {
-      type: CommandType.SetComponentEvent,
-      data: addEvent,
-    }
-    appendLastCommand(site.value, command, save)
   }
 
   const setupContactForm = (tableName: string, hasName: boolean) => {
@@ -153,7 +131,7 @@ export const useContactForm = (): IContactFormFeature => {
             },
           ],
         }
-        appendEvent(form, submitEvent, false)
+        appendEvent(site.value, form, submitEvent, false)
 
         // Add form input error reset behavior
         const inputEvent: IComponentEvent = {
@@ -169,11 +147,11 @@ export const useContactForm = (): IContactFormFeature => {
           ],
         }
         if (nameInput) {
-          appendEvent(nameInput, inputEvent, false)
+          appendEvent(site.value, nameInput, inputEvent, false)
         }
         if (emailInput && messageInput) {
-          appendEvent(emailInput, inputEvent, false)
-          appendEvent(messageInput, inputEvent, true)
+          appendEvent(site.value, emailInput, inputEvent, false)
+          appendEvent(site.value, messageInput, inputEvent, true)
         }
       }
     }
@@ -260,7 +238,7 @@ export const useContactForm = (): IContactFormFeature => {
     hasName,
     recipientKey,
     recipients,
-    loadCustomTables,
+    loadContactFormTables,
     showContactFormWalkthrough,
     createContactTable,
     linkContactTable,

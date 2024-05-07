@@ -11,6 +11,7 @@ import { captionedImage, image } from './builtin-image'
 import { input } from './builtin-input'
 import { link } from './builtin-link'
 import { ol, ul } from './builtin-list'
+import { mailingList } from './builtin-mailing-list'
 import { navMenu, navMenuItem } from './builtin-nav-menu'
 import { svg } from './builtin-svg'
 import { text } from './builtin-text'
@@ -46,4 +47,5 @@ export const builtinComponents: Record<string, ISerializedComponent> = {
   [dividerVertical.id]: dividerVertical,
   [dividerHorizontal.id]: dividerHorizontal,
   [contactForm.id]: contactForm,
+  [mailingList.id]: mailingList,
 }
