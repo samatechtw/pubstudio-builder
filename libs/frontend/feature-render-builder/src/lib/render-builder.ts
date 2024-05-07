@@ -92,9 +92,7 @@ export const computeBuilderStyleProps = (
     }
   }
   if (component.tag === Tag.Input || component.tag === Tag.Textarea) {
-    builderProps['onMousedown'] = (e: MouseEvent) => {
-      e.preventDefault()
-    }
+    builderProps['readonly'] = true
     builderStyle['cursor'] = 'default'
   }
   if (selected) {
@@ -244,7 +242,11 @@ export const computePropsContent = (
       content.push(
         h('div', { class: 'component-content-container', innerHTML: component.content }),
       )
-    } else if (isSelected) {
+    } else if (
+      isSelected &&
+      component.tag !== Tag.Input &&
+      component.tag !== Tag.Textarea
+    ) {
       content.push(h(ProseMirrorEditor, { component, editor }))
     } else {
       content.push(
@@ -254,7 +256,10 @@ export const computePropsContent = (
         }),
       )
     }
-  } else if (component.tag !== Tag.Img && component.tag !== Tag.Svg && !hasChildren) {
+  } else if (
+    ![Tag.Img, Tag.Svg, Tag.Input, Tag.Textarea].includes(component.tag) &&
+    !hasChildren
+  ) {
     if (isSelected) {
       content.push(h(ProseMirrorEditor, { component, editor }))
       if (component.tag === Tag.A) {
