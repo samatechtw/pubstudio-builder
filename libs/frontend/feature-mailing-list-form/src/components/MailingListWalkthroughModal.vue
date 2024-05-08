@@ -2,12 +2,12 @@
   <Modal
     :show="!!editor?.mailingListWalkthrough"
     :cancelByClickingOutside="false"
-    cls="mailing-walkthrough"
+    cls="walkthrough"
     @cancel="hideModal"
   >
     <Transition name="fade">
       <div v-if="loadingTables" class="loading-wrap">
-        <PSSpinner :scale="3" color="#2a17d6" />
+        <Spinner :size="18" color="#2a17d6" />
       </div>
       <MailingListInit v-else-if="state === MailingListWalkthroughState.Init" />
       <MailingListLink v-else-if="state === MailingListWalkthroughState.LinkTable" />
@@ -19,7 +19,7 @@
 <script lang="ts" setup>
 import { computed, onMounted } from 'vue'
 import { useBuild } from '@pubstudio/frontend/feature-build'
-import { Modal, PSSpinner } from '@pubstudio/frontend/ui-widgets'
+import { Modal, Spinner } from '@pubstudio/frontend/ui-widgets'
 import { setMailingListWalkthrough } from '@pubstudio/frontend/data-access-command'
 import { MailingListWalkthroughState } from '@pubstudio/shared/type-site'
 import MailingListInit from './MailingListInit.vue'

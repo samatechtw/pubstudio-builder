@@ -1,7 +1,7 @@
 <template>
   <div class="app">
     <div id="scroll-container" class="app-content">
-      <PSSpinner v-if="loading" class="app-spinner" :scale="5" color="#2a17d6" />
+      <Spinner v-if="loading" class="app-spinner" />
       <ErrorMessage v-else-if="error" class="app-error" :error="error" />
       <template v-else>
         <ReusableStyle />
@@ -27,7 +27,7 @@ import { rootSiteApi } from '@pubstudio/shared/util-web-site-api'
 import { ISite } from '@pubstudio/shared/type-site'
 import { IGetSiteApiResponse } from '@pubstudio/shared/type-api-site-sites'
 import ErrorMessage from './components/ErrorMessage.vue'
-import PSSpinner from './components/PSSpinner.vue'
+import Spinner from './components/Spinner.vue'
 import NotFound from './components/NotFound.vue'
 
 const API_URL = '___SITE_API_URL___'

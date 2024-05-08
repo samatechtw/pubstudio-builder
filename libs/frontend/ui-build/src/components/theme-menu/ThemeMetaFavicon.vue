@@ -29,7 +29,7 @@
       <div class="favicon-image" @click="setUploadingFavicon">
         <img v-if="favicon" :src="favicon" />
         <div class="image-overlay" :class="{ force: !favicon }">
-          <PSSpinner v-if="loadingSites" />
+          <Spinner v-if="loadingSites" />
           <Plus v-else class="upload" />
         </div>
       </div>
@@ -63,8 +63,8 @@ import {
   Edit,
   Minus,
   PSInput,
-  PSSpinner,
   Plus,
+  Spinner,
 } from '@pubstudio/frontend/ui-widgets'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { IUploadFileResult } from '@pubstudio/frontend/feature-site-assets'

@@ -7,9 +7,9 @@
       {{ t('template.save_text') }}
     </div>
     <div class="save-data-wrap">
-      <PSSpinner
+      <Spinner
         v-if="listLoading"
-        :scale="4"
+        :size="20"
         color="#2a17d6"
         class="save-template-spinner"
       />
@@ -73,9 +73,9 @@ import { ICreatePlatformTemplateRequest } from '@pubstudio/shared/type-api-platf
 import Modal from './Modal.vue'
 import PSInput from '../form/PSInput.vue'
 import PSButton from '../form/PSButton.vue'
-import PSSpinner from '../PSSpinner.vue'
 import PSMultiselect from '../form/PSMultiselect.vue'
 import ErrorMessage from '../ErrorMessage.vue'
+import Spinner from '../Spinner.vue'
 
 const { t } = useI18n()
 const {

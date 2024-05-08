@@ -5,7 +5,7 @@
     @click="click"
   >
     <div v-if="animate" class="p-button-animate">
-      <PSSpinner class="ps-button-spinner" />
+      <Spinner class="ps-button-spinner" />
     </div>
     <div v-else class="button-text">
       <slot name="leading-icon" />
@@ -26,7 +26,7 @@ export type ButtonSize = 'small' | 'medium' | 'large' | 'full'
 
 <script lang="ts" setup>
 import { toRefs } from 'vue'
-import PSSpinner from '../PSSpinner.vue'
+import Spinner from '../Spinner.vue'
 
 const emit = defineEmits(['click'])
 
@@ -100,16 +100,11 @@ const click = (e: Event) => {
   }
 
   .p-button-animate {
+    position: absolute;
+    display: flex;
+    justify-content: center;
     width: 100%;
     height: 100%;
-    position: absolute;
-    .ps-button-spinner {
-      position: absolute;
-      left: 0;
-      top: 0;
-      right: 0;
-      bottom: 0;
-    }
   }
 }
 </style>

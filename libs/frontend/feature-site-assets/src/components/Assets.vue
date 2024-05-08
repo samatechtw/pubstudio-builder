@@ -13,7 +13,7 @@
     </div>
     <AssetFilters :sites="sites" @updateFilter="updateFilter" />
     <div v-if="loadingAssets" class="assets-spinner">
-      <PSSpinner :scale="5" color="#2a17d6" />
+      <Spinner :size="24" color="#2a17d6" />
     </div>
     <div v-else class="asset-list">
       <div v-if="assets?.length === 0" class="assets-empty">
@@ -54,7 +54,7 @@
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
-import { InfoBubble, PSSpinner, UsageProgress } from '@pubstudio/frontend/ui-widgets'
+import { InfoBubble, Spinner, UsageProgress } from '@pubstudio/frontend/ui-widgets'
 import { useSites } from '@pubstudio/frontend/feature-sites'
 import { IListPlatformSiteAssetsRequest } from '@pubstudio/shared/type-api-platform-site-asset'
 import CreateAssetModal from './CreateAssetModal.vue'
@@ -145,11 +145,9 @@ onMounted(async () => {
   }
 }
 .assets-spinner {
+  display: flex;
+  justify-content: center;
   min-height: 200px;
-  margin-top: 80px;
-  :deep(.ps-spinner) {
-    min-height: 100px;
-  }
 }
 
 .asset-list {
