@@ -50,7 +50,7 @@
     </div>
     <div class="assets-wrap">
       <div v-if="loading" class="assets-spinner-wrap">
-        <PSSpinner class="assets-spinner" :scale="2" color="#2a17d6" />
+        <Spinner class="assets-spinner" :size="16" color="#2a17d6" />
       </div>
       <div v-else-if="!siteAssets?.length" class="no-asset">
         {{ t('build.no_matching_results') }}
@@ -93,7 +93,7 @@ import {
   PSButton,
   PSInput,
   PSMultiselect,
-  PSSpinner,
+  Spinner,
 } from '@pubstudio/frontend/ui-widgets'
 import { ISiteViewModel } from '@pubstudio/shared/type-api-platform-site'
 import { useSites } from '@pubstudio/frontend/feature-sites'

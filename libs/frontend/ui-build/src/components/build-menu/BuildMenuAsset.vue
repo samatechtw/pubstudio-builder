@@ -33,7 +33,7 @@
         :style="{ 'z-index': (assets?.length ?? 1) - index }"
         @update="updateAssetList"
       />
-      <PSSpinner v-if="loadingAssets" class="assets-spinner" :scale="2" color="#2a17d6" />
+      <Spinner v-if="loadingAssets" class="assets-spinner" :size="14" color="#2a17d6" />
       <div v-else-if="assets?.length === 0" class="assets-empty">
         {{ t('assets.no_assets') }}
       </div>
@@ -44,7 +44,7 @@
 <script lang="ts" setup>
 import { onMounted, ref, watch } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
-import { PSButton, PSSpinner, Plus } from '@pubstudio/frontend/ui-widgets'
+import { PSButton, Plus, Spinner } from '@pubstudio/frontend/ui-widgets'
 import { useSiteAssets, AssetCard } from '@pubstudio/frontend/feature-site-assets'
 import { store } from '@pubstudio/frontend/data-access-web-store'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
@@ -158,6 +158,8 @@ const dropUploadImage = (e: Event) => {
 .assets-spinner {
   display: flex;
   align-items: center;
+  justify-content: center;
   min-height: 80px;
+  width: 100%;
 }
 </style>
