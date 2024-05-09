@@ -15,6 +15,10 @@ pub struct Config {
     #[clap(long, env = "EXEC_ENV")]
     pub exec_env: ExecEnv,
 
+    /// The web URL where the site builder/platform is hosted
+    #[clap(long, env = "PLATFORM_WEB_URL")]
+    pub platform_web_url: String,
+
     /// The sqlite connection URL
     #[clap(long, env = "DATABASE_URL")]
     pub database_url: String,

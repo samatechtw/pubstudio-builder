@@ -54,7 +54,7 @@ pub enum SiteType {
 
 impl SiteType {
     pub fn get_bandwidth_allowance(&self, exec_env: ExecEnv) -> u64 {
-        let allowance = if exec_env == ExecEnv::Dev || exec_env == ExecEnv::Ci {
+        if exec_env == ExecEnv::Dev || exec_env == ExecEnv::Ci {
             match self {
                 // Reduced bandwidth for testing
                 SiteType::Free => 5000,
@@ -69,9 +69,26 @@ impl SiteType {
                 SiteType::Paid2 => 1 * TB,
                 SiteType::Paid3 => 3 * TB,
             }
+        }
+    }
+    pub fn get_custom_data_allowance(&self, exec_env: ExecEnv) -> i64 {
+        let allowance = if exec_env == ExecEnv::Dev || exec_env == ExecEnv::Ci {
+            match self {
+                // Reduced allowance for testing
+                SiteType::Free => 0,
+                SiteType::Paid1 => 40000,
+                SiteType::Paid2 => 20 * MB,
+                SiteType::Paid3 => 100 * MB,
+            }
+        } else {
+            match self {
+                SiteType::Free => 0,
+                SiteType::Paid1 => 5 * MB,
+                SiteType::Paid2 => 20 * MB,
+                SiteType::Paid3 => 100 * MB,
+            }
         };
-
-        allowance as u64
+        allowance as i64
     }
     pub fn get_capacity(&self) -> i32 {
         match self {

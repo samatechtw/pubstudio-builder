@@ -202,6 +202,7 @@ jobs:
           # Except SITE_API_HOST, which is unique to each server
           build-args: |
             "EXEC_ENV=prod"
+            "PLATFORM_WEB_URL=https://pubstud.io"
             "DATABASE_URL=sqlite:site-api/db/metadata/sites_metadata.db"
             "SITE_API_PORT=3100"
             "SITE_API_HOST=0.0.0.0"

@@ -77,6 +77,29 @@ where
     Ok(())
 }
 
+pub async fn validate_custom_data_allowance(
+    context: &ApiContext,
+    site_id: &str,
+) -> Result<(), ApiError> {
+    let meta = context
+        .metadata_repo
+        .get_site_metadata(site_id)
+        .await
+        .map_err(|e| {
+            ApiError::internal_error().message(format!("Failed to get site metadata: {}", e))
+        })?;
+    let allowance = meta
+        .site_type
+        .get_custom_data_allowance(context.config.exec_env);
+
+    if meta.custom_data_usage > allowance {
+        return Err(ApiError::bad_request()
+            .code(ApiErrorCode::CustomDataUsageExceeded)
+            .message("Custom data usage limit exceeded"));
+    }
+    Ok(())
+}
+
 pub fn parse_column_info(
     columns: &serde_json::Value,
 ) -> Result<HashMap<String, ColumnInfo>, ApiError> {

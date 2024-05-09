@@ -44,7 +44,7 @@ pub async fn update_site_metadata(
     if dto.disabled.is_some() || dto.site_type.is_some() {
         let metadata = context
             .metadata_repo
-            .update_site_metadata(&mut tx, &id, &dto)
+            .update_site_metadata_with_tx(&mut tx, &id, &dto.clone().into())
             .await
             .map_err(|e| {
                 ApiError::internal_error().message(format!("Failed to update site: {}", e))

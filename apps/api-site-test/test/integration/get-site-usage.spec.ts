@@ -1,3 +1,4 @@
+import { MB } from '@pubstudio/shared/type-api-platform-site-asset'
 import {
   ICreateSiteApiResponse,
   IGetSiteUsageApiResponse,
@@ -45,6 +46,8 @@ describe('Get Site Usage', () => {
       expect(body1.request_count).toEqual(1)
       expect(body1.request_error_count).toEqual(0)
       expect(body1.site_size).toEqual(body1.total_bandwidth)
+      expect(body1.custom_data_usage).toEqual(0)
+      expect(body1.custom_data_allowance).toEqual(20 * MB)
       expect(body1.last_updated).toMatch(new RegExp(commonRegex.date))
 
       // Successful site request
@@ -59,6 +62,8 @@ describe('Get Site Usage', () => {
       const body2: IGetSiteUsageApiResponse = res2.body
       expect(body2.request_count).toEqual(2)
       expect(body2.request_error_count).toEqual(0)
+      expect(body2.custom_data_usage).toEqual(0)
+      expect(body2.custom_data_allowance).toEqual(20 * MB)
       expect(body2.total_bandwidth).toEqual(body2.site_size * 2)
     })
 
@@ -125,6 +130,8 @@ describe('Get Site Usage', () => {
       const body1: IGetSiteUsageApiResponse = res1.body
       expect(body1.request_count).toEqual(1)
       expect(body1.request_error_count).toEqual(0)
+      expect(body1.custom_data_usage).toEqual(0)
+      expect(body1.custom_data_allowance).toEqual(0)
       expect(body1.site_size).toEqual(body1.total_bandwidth)
 
       // Update a site
@@ -146,6 +153,8 @@ describe('Get Site Usage', () => {
       expect(body2.site_size).toEqual(siteSize)
       expect(body2.request_count).toEqual(2)
       expect(body2.request_error_count).toEqual(0)
+      expect(body2.custom_data_usage).toEqual(0)
+      expect(body2.custom_data_allowance).toEqual(0)
       expect(body2.total_bandwidth).toEqual(siteSize * 2)
     })
   })

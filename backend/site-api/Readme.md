@@ -36,6 +36,7 @@ Environment variables are used to configure the `site-api` deployment. See the `
 Name                    | Description
 ----------------------- | ----------------------------
 EXEC_ENV                | Execution environment: dev, ci, stg, prod
+PLATFORM_WEB_URL        | URL used for linking to sites (e.g. in notification emails)
 DATABASE_URL            | URL of the site metadata SQLite database
 SITE_API_HOST           | API host address
 SITE_API_PORT           | Port the API listens on

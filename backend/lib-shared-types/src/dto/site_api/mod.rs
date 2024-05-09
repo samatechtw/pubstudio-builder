@@ -7,6 +7,7 @@ pub mod publish_site_dto;
 pub mod reset_all_dto;
 pub mod site_info_viewmodel;
 pub mod site_metadata_viewmodel;
+pub mod site_usage_viewmodel;
 pub mod site_viewmodel;
 pub mod update_metadata_dto;
 pub mod update_site_dto;

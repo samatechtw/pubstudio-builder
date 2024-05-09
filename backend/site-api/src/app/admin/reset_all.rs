@@ -2,19 +2,12 @@ use axum::extract::State;
 use lib_shared_site_api::{
     db::{
         db_error::DbError,
-        sites_seed_data::{
-            make_namespace, make_site_context, make_site_editor, make_site_history,
-            make_site_pages, sites_seed_data, SITE_SEED_CONTACT_TABLE, SITE_SEED_DEFAULTS,
-            SITE_SEED_VERSION,
-        },
+        sites_seed_data::{sites_seed_data, SITE_SEED_CONTACT_TABLE},
     },
     error::api_error::ApiError,
-    util::{domains::merge_domains, json_extractor::PsJson},
+    util::json_extractor::PsJson,
 };
-use lib_shared_types::{
-    dto::site_api::{create_site_dto::CreateSiteDto, reset_all_dto::ResetAllDto},
-    shared::core::ExecEnv,
-};
+use lib_shared_types::{dto::site_api::reset_all_dto::ResetAllDto, shared::core::ExecEnv};
 
 use crate::{
     api_context::ApiContext,
@@ -62,33 +55,11 @@ pub async fn reset_all(
     context.cache.site_data_cache.run_pending_tasks().await;
 
     // Seed new sites
-    let seed_data = sites_seed_data();
+    let seed_data = sites_seed_data(context.config.exec_env);
     for site_id in dto.seeds.into_iter() {
         match seed_data.iter().find(|s| s.id.to_string() == site_id) {
             Some(data) => {
-                let namespace = make_namespace(&data.name);
-                create_site_helper(
-                    &context,
-                    CreateSiteDto {
-                        id: site_id.clone(),
-                        owner_id: data.owner_id.to_string(),
-                        name: data.name.clone(),
-                        version: SITE_SEED_VERSION.into(),
-                        context: make_site_context(&namespace).into(),
-                        defaults: SITE_SEED_DEFAULTS.into(),
-                        editor: make_site_editor(&namespace).into(),
-                        history: make_site_history(&namespace).into(),
-                        pages: make_site_pages(&namespace).into(),
-                        published: data.published.clone(),
-                        domains: merge_domains(
-                            data.custom_domains.clone(),
-                            &data.subdomain,
-                            &format!("{}.pubstud.io", context.config.exec_env),
-                        ),
-                        site_type: data.site_type.clone(),
-                    },
-                )
-                .await?;
+                create_site_helper(&context, data).await?;
 
                 create_custom_table_helper(
                     &context,

@@ -138,10 +138,14 @@ fn api_router(context: &ApiContext) -> Router<ApiContext> {
                 .route_layer(from_fn_with_state(context.clone(), auth_admin_owner)),
         )
         .route(
-            "/actions/persist-cache",
-            get(usage::persist_cache::persist_cache),
+            "/actions/persist-usage",
+            get(usage::persist_usage::persist_usage),
         )
-        .route("/actions/reset-cache", get(usage::reset_cache::reset_cache))
+        .route(
+            "/actions/reset-cache",
+            get(usage::reset_cache::reset_cache
+                .layer(from_fn_with_state(context.clone(), auth_admin))),
+        )
         .route("/*path", get(handler_400)) // Handle unknown routes under /api
 }
 
