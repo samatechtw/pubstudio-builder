@@ -37,6 +37,7 @@ pub trait CustomDataInfoRepoTrait {
         query: ListTablesQuery,
     ) -> Result<CustomDataInfoEntityList, DbError>;
     async fn get_table(&self, id: &str, table_name: &str) -> Result<CustomDataInfoEntity, DbError>;
+    async fn get_custom_tables_size(&self, id: &str) -> Result<i64, DbError>;
 }
 
 pub struct CustomDataInfoRepo {
@@ -161,5 +162,39 @@ impl CustomDataInfoRepoTrait for CustomDataInfoRepo {
         .await?;
 
         Ok(columns)
+    }
+
+    async fn get_custom_tables_size(&self, id: &str) -> Result<i64, DbError> {
+        let pool = self.get_db_pool(id).await?;
+
+        let row = sqlx::query(
+            r#"
+            SELECT
+                SUM(total_bytes) AS size
+            FROM (
+                SELECT
+                    name,
+                    (page_count * page_size) AS total_bytes
+                FROM
+                    pragma_page_size
+                JOIN
+                    pragma_page_count ON 1 = 1
+                JOIN
+                    sqlite_master ON type = 'table'
+                WHERE
+                    name NOT LIKE 'sqlite_%'
+                AND
+                    name != 'site_versions'
+                AND
+                    name != 'custom_data_info'
+                AND
+                    name != '_sqlx_migrations'
+            );
+            "#,
+        )
+        .fetch_one(&pool)
+        .await?;
+
+        Ok(row.try_get("size")?)
     }
 }

@@ -39,6 +39,7 @@ These instructions result in the backend running on port `3100`, and the demo fr
 ```bash
 docker run -p 3100:3100 \
   -e EXEC_ENV='dev' \
+  -e PLATFORM_WEB_URL='http://127.0.0.1:3000' \
   -e DATABASE_URL='sqlite:site-api/db/metadata/sites_metadata.db' \
   -e SITE_API_HOST='0.0.0.0' \
   -e SITE_API_PORT='3100' \

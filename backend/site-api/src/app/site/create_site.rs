@@ -16,7 +16,7 @@ fn to_api_response(site_id: String) -> Json<CreateSiteResponse> {
 
 pub async fn create_site_helper(
     context: &ApiContext,
-    dto: CreateSiteDto,
+    dto: &CreateSiteDto,
 ) -> Result<String, ApiError> {
     let site_type = dto.site_type.clone();
 
@@ -34,7 +34,7 @@ pub async fn create_site_helper(
     // Create and run migrations on a new site database
     let site = context
         .site_repo
-        .create_site(dto)
+        .create_site(dto.clone())
         .await
         .map_err(|e| ApiError::internal_error().message(e))?;
 
@@ -64,7 +64,7 @@ pub async fn create_site(
 ) -> Result<(StatusCode, Json<CreateSiteResponse>), ApiError> {
     check_bad_form(dto.validate())?;
 
-    let site_id = create_site_helper(&context, dto).await?;
+    let site_id = create_site_helper(&context, &dto).await?;
 
     Ok((StatusCode::CREATED, to_api_response(site_id)))
 }

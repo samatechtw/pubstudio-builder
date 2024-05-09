@@ -7,7 +7,10 @@ use crate::api_context::ApiContext;
 
 use super::{
     custom_data::parse_request_data,
-    helpers::{parse_event_info, validate_column_names, validate_table_name},
+    helpers::{
+        parse_event_info, validate_column_names, validate_custom_data_allowance,
+        validate_table_name,
+    },
     trigger_table_events::trigger_add_row,
     validate_row_data::validate_row_data,
 };
@@ -34,6 +37,9 @@ pub async fn add_row(
     check_bad_form(dto.validate())?;
     validate_table_name(&dto.table_name)?;
     validate_column_names(dto.row.keys())?;
+
+    // Check if site's custom_data_allowance is already exceeded
+    validate_custom_data_allowance(context, site_id).await?;
 
     // Validate data by checking columns in custom_data_info
     let table = validate_row_data(context, site_id, &dto.table_name, &dto.row).await?;

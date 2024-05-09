@@ -1,10 +1,8 @@
 use axum::async_trait;
 use lib_shared_site_api::db::{db_error::DbError, util::append_comma};
 use lib_shared_types::{
-    dto::site_api::{
-        create_metadata_dto::CreateSiteMetadataDto, update_metadata_dto::UpdateSiteMetadataDto,
-    },
-    entity::site_api::site_metadata_entity::SiteMetadataEntity,
+    dto::site_api::create_metadata_dto::CreateSiteMetadataDto,
+    entity::site_api::site_metadata_entity::{SiteMetadataEntity, UpdateSiteMetadataEntity},
     shared::site::SiteType,
 };
 use sqlx::{sqlite::SqliteRow, Error, QueryBuilder, Row, Sqlite, SqlitePool, Transaction};
@@ -12,10 +10,13 @@ use std::sync::Arc;
 
 pub type DynSitesMetadataRepo = Arc<dyn SitesMetadataRepoTrait + Send + Sync>;
 
+#[derive(Debug)]
 pub struct SiteMetadataResult {
     pub owner_id: String,
+    pub owner_email: String,
     pub site_type: SiteType,
     pub disabled: bool,
+    pub custom_data_usage: i64,
 }
 
 #[async_trait]
@@ -26,9 +27,14 @@ pub trait SitesMetadataRepoTrait {
     async fn create_site(&self, dto: CreateSiteMetadataDto) -> Result<String, Error>;
     async fn update_site_metadata(
         &self,
+        id: &str,
+        dto: &UpdateSiteMetadataEntity,
+    ) -> Result<SiteMetadataResult, DbError>;
+    async fn update_site_metadata_with_tx(
+        &self,
         tx: &mut Transaction<'_, Sqlite>,
         id: &str,
-        dto: &UpdateSiteMetadataDto,
+        dto: &UpdateSiteMetadataEntity,
     ) -> Result<SiteMetadataResult, DbError>;
     async fn list_sites(&self) -> Result<Vec<SiteMetadataEntity>, Error>;
     async fn delete_site(&self, id: &str) -> Result<(), Error>;
@@ -52,17 +58,21 @@ fn row_to_site_metadata(row: SqliteRow) -> Result<SiteMetadataEntity, Error> {
         id: row.try_get("id")?,
         location: row.try_get("location")?,
         owner_id: row.try_get("owner_id")?,
+        owner_email: row.try_get("owner_email")?,
         domains: domains.split(",").map(|d| d.to_string()).collect(),
         site_type: row.try_get("site_type")?,
         disabled: row.try_get("disabled")?,
+        custom_data_usage: row.try_get("custom_data_usage")?,
     })
 }
 
 fn to_metadata_cache(row: SqliteRow) -> Result<SiteMetadataResult, Error> {
     Ok(SiteMetadataResult {
         owner_id: row.try_get("owner_id")?,
+        owner_email: row.try_get("owner_email")?,
         site_type: row.try_get("site_type")?,
         disabled: row.try_get("disabled")?,
+        custom_data_usage: row.try_get("custom_data_usage")?,
     })
 }
 
@@ -80,7 +90,8 @@ impl SitesMetadataRepoTrait for SitesMetadataRepo {
     async fn get_site_metadata(&self, site_id: &str) -> Result<SiteMetadataEntity, Error> {
         let site: SiteMetadataEntity = sqlx::query(
             r#"
-        SELECT s.id, s.location, s.owner_id, s.site_type, s.disabled, GROUP_CONCAT(d.domain) as domains
+        SELECT s.id, s.location, s.owner_id, s.owner_email, s.site_type, s.disabled, s.custom_data_usage,
+            GROUP_CONCAT(d.domain) as domains
         FROM sites s
         LEFT OUTER JOIN domains d ON d.site_id = s.id
         WHERE s.id = ?1
@@ -96,7 +107,8 @@ impl SitesMetadataRepoTrait for SitesMetadataRepo {
     async fn list_sites(&self) -> Result<Vec<SiteMetadataEntity>, Error> {
         let sites: Vec<SiteMetadataEntity> = sqlx::query(
             r#"
-        SELECT s.id, s.location, s.owner_id, s.site_type, s.disabled, GROUP_CONCAT(d.domain) as domains
+        SELECT s.id, s.location, s.owner_id, s.owner_email, s.site_type, s.disabled, s.custom_data_usage,
+            GROUP_CONCAT(d.domain) as domains
         FROM sites s
         LEFT OUTER JOIN domains d ON d.site_id = s.id
         GROUP BY d.site_id
@@ -115,14 +127,15 @@ impl SitesMetadataRepoTrait for SitesMetadataRepo {
 
         let site_id = sqlx::query_scalar(
             r#"
-          INSERT INTO sites(id, location, owner_id, site_type)
-          VALUES (?1, ?2, ?3, ?4)
+          INSERT INTO sites(id, location, owner_id, owner_email, site_type)
+          VALUES (?1, ?2, ?3, ?4, ?5)
           RETURNING id
         "#,
         )
         .bind(&id)
         .bind(db_location)
         .bind(dto.owner_id)
+        .bind(dto.owner_email)
         .bind(dto.site_type.to_string())
         .fetch_one(self.get_db_pool())
         .await?;
@@ -139,17 +152,20 @@ impl SitesMetadataRepoTrait for SitesMetadataRepo {
         Ok(site_id)
     }
 
-    async fn update_site_metadata(
+    async fn update_site_metadata_with_tx(
         &self,
         tx: &mut Transaction<'_, Sqlite>,
         id: &str,
-        dto: &UpdateSiteMetadataDto,
+        dto: &UpdateSiteMetadataEntity,
     ) -> Result<SiteMetadataResult, DbError> {
         let query = QueryBuilder::new("UPDATE sites SET");
         let count = 0;
 
         let (query, count) = append_comma(query, "site_type", dto.site_type, count);
-        let (mut query, count) = append_comma(query, "disabled", dto.disabled, count);
+        let (query, count) = append_comma(query, "owner_email", dto.owner_email.clone(), count);
+        let (query, count) = append_comma(query, "disabled", dto.disabled, count);
+        let (mut query, count) =
+            append_comma(query, "custom_data_usage", dto.custom_data_usage, count);
 
         if count == 0 {
             return Err(DbError::NoUpdate);
@@ -165,6 +181,17 @@ impl SitesMetadataRepoTrait for SitesMetadataRepo {
             .fetch_one(tx)
             .await
             .map_err(|e| DbError::Query(e.to_string()))?)
+    }
+
+    async fn update_site_metadata(
+        &self,
+        id: &str,
+        dto: &UpdateSiteMetadataEntity,
+    ) -> Result<SiteMetadataResult, DbError> {
+        let mut tx = self.start_transaction().await?;
+        let result = self.update_site_metadata_with_tx(&mut tx, id, dto).await;
+        tx.commit().await?;
+        result
     }
 
     async fn delete_site(&self, id: &str) -> Result<(), Error> {

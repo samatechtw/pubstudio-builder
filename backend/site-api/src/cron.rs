@@ -4,7 +4,7 @@ use crate::{
     api_context::ApiContext,
     app::{
         backup::backup_sites::backup_sites_helper,
-        usage::helpers::{persist_cache_helper, reset_cache_helper},
+        usage::helpers::{persist_usage_helper, reset_cache_helper},
     },
 };
 
@@ -19,10 +19,11 @@ pub fn setup_cron_jobs(context: &ApiContext) {
         backup_sites_helper(job_context.clone())
     }));
 
-    // Set up site usage cron
+    // Set up site and custom data usage cron
+    // persist every day at midnight: "0 0 0 * * *"
     let job_context_clone = context.clone();
     scheduler.add(Job::new("0 0 0 * * *", move || {
-        persist_cache_helper(job_context_clone.clone())
+        persist_usage_helper(job_context_clone.clone())
     }));
 
     // Monthly reset site usage cron
