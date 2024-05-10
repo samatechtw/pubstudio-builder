@@ -60,7 +60,10 @@ const emitUpdate = () => {
 }
 
 const updateBasis = (basis: string) => {
-  handleInput(basis)
+  const newChars = handleInput(basis)
+  if (newChars === '%') {
+    selectUnit({ ...parsedSize.value, unit: '%' })
+  }
   emitUpdate()
 }
 

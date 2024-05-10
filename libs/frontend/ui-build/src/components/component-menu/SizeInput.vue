@@ -65,7 +65,10 @@ const update = () => {
 }
 
 const updateValue = (e: Event) => {
-  handleInput((e.target as HTMLInputElement)?.value)
+  const newChars = handleInput((e.target as HTMLInputElement)?.value)
+  if (newChars === '%') {
+    selectUnit({ ...parsedSize.value, unit: '%' })
+  }
   update()
 }
 

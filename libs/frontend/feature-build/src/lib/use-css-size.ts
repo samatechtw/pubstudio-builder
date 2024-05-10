@@ -17,7 +17,7 @@ export interface IUseCssSize {
   inputKeydown: (e: KeyboardEvent) => void
   parseSize: () => void
   updatedSize: () => string | undefined
-  handleInput: (newValue: string) => void
+  handleInput: (newValue: string) => string
   setInputValue: (val: string) => void
 }
 
@@ -49,17 +49,18 @@ export const useCssSize = (params: IUseCssSizeProps): IUseCssSize => {
     return parsedSize.value.value
   })
 
-  const handleInput = (newValue: string) => {
+  const handleInput = (newValue: string): string => {
     invalid.value = false
     const newChars = newValue.slice(parsedSize.value.value.length)
     if (newChars && !/^(\d|\.)*$/.test(newChars)) {
       setInputValue(parsedSize.value.value)
-      return
+    } else {
+      parsedSize.value.value = newValue
+      if (newValue && parsedSize.value.unit === '-') {
+        parsedSize.value.unit = defaultUnit
+      }
     }
-    parsedSize.value.value = newValue
-    if (newValue && parsedSize.value.unit === '-') {
-      parsedSize.value.unit = defaultUnit
-    }
+    return newChars
   }
 
   const setInputValue = (val: string) => {
