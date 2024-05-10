@@ -79,9 +79,7 @@ export const useSiteSource = (): IUseSiteSource => {
   ): Promise<string | undefined> => {
     const { siteId, store, userToken } = options
     apiSiteId.value = siteId
-    siteStore.value = {
-      ...store,
-    }
+    siteStore.value = store
 
     const serverAddress = await siteStore.value.initialize()
     if (serverAddress) {
