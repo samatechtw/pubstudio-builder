@@ -9,13 +9,13 @@ use validator::Validate;
 #[derive(Debug, Clone, Deserialize, Serialize, Validate)]
 #[serde(deny_unknown_fields)]
 pub struct CreateSiteDto {
-    #[validate(regex = "REGEX_UUID")]
+    #[validate(regex(path = "*REGEX_UUID"))]
     pub id: String,
-    #[validate(regex = "REGEX_UUID")]
+    #[validate(regex(path = "*REGEX_UUID"))]
     pub owner_id: String,
     #[validate(email)]
     pub owner_email: String,
-    #[validate(regex = "REGEX_SITE_NAME")]
+    #[validate(regex(path = "*REGEX_SITE_NAME"))]
     pub name: String,
     pub version: String,
     pub context: serde_json::Value,

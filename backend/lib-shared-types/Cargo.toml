@@ -10,12 +10,12 @@ name = "lib_shared_types"
 path = "src/lib.rs"
 
 [dependencies]
-chrono = { version = "0.4.34", features = ["serde"] }
+chrono = { version = "0.4.38", features = ["serde"] }
 lazy_static = "1.4.0"
-regex = "1.8.3"
-serde = { version = "1.0.196", features = ["derive"] }
-serde_json = "1.0.113"
+regex = "1.10.4"
+serde = { version = "1.0.201", features = ["derive"] }
+serde_json = "1.0.117"
 sqlx = { version = "0.6.3", features = ["runtime-tokio-rustls", "time", "uuid", "chrono"] }
-strum = { version = "0.26.1", features = ["derive"] }
-thiserror = "1.0.57"
-validator = { version = "0.16.1", features = ["derive"] }
+strum = { version = "0.26.2", features = ["derive"] }
+thiserror = "1.0.60"
+validator = { version = "0.18.1", features = ["derive"] }
