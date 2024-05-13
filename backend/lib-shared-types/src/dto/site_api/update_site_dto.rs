@@ -7,7 +7,7 @@ use validator::Validate;
 #[derive(Serialize, Deserialize, Validate, Clone, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct UpdateSiteDto {
-    #[validate(regex = "REGEX_SITE_NAME")]
+    #[validate(regex(path = "*REGEX_SITE_NAME"))]
     pub name: Option<String>,
     pub version: Option<String>,
     pub context: Option<serde_json::Value>,
@@ -16,7 +16,7 @@ pub struct UpdateSiteDto {
     pub history: Option<serde_json::Value>,
     pub pages: Option<serde_json::Value>,
     pub disabled: Option<bool>,
-    #[validate(regex = "REGEX_DATE")]
+    #[validate(regex(path = "*REGEX_DATE"))]
     pub update_key: Option<String>,
     pub enable_preview: Option<bool>,
 }
