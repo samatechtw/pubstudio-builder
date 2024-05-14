@@ -1,9 +1,9 @@
 import { ISetPageHeadData } from '@pubstudio/shared/type-command-data'
 import {
   IHeadObject,
-  IPageHeadTag,
   IPageHead,
   IPageHeadObject,
+  IPageHeadTag,
   ISite,
 } from '@pubstudio/shared/type-site'
 
@@ -42,7 +42,8 @@ const setHeadField = (
     if (tag === 'title') {
       page.head.title = newValue as string
     } else {
-      ;(page.head[tag] as IPageHeadObject[])[index] = newValue as IHeadObject
+      const tagObj = page.head[tag] as IPageHeadObject[]
+      tagObj[index] = newValue as IHeadObject
     }
   }
 }

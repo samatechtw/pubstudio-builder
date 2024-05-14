@@ -5,7 +5,6 @@ import {
   IBreakpoint,
   IBreakpointStylesWithSource,
   IEditorContext,
-  IRawStyleWithSource,
   IRawStylesWithSource,
   StyleSourceType,
 } from '@pubstudio/shared/type-site'
@@ -24,11 +23,11 @@ export const computeFlattenedStyles = (
     breakpointStyles[DEFAULT_BREAKPOINT_ID]?.[CssPseudoClass.Default] ?? {}
 
   Object.entries(defaultStyle).forEach(([css, source]) => {
-    result[css as Css] = { ...source }
+    const styleWithSource = { ...source }
     if (includePseudoClass) {
-      ;(result[css as Css] as IRawStyleWithSource).sourcePseudoClass =
-        CssPseudoClass.Default
+      styleWithSource.sourcePseudoClass = CssPseudoClass.Default
     }
+    result[css as Css] = styleWithSource
   })
 
   const currentPseudoClass = editor?.cssPseudoClass ?? CssPseudoClass.Default
@@ -62,11 +61,11 @@ export const computeFlattenedStyles = (
         source.sourceType === StyleSourceType.Custom ||
         result[key]?.sourceType !== StyleSourceType.Custom
       ) {
-        result[key] = { ...source }
+        const styleWithSource = { ...source }
         if (includePseudoClass) {
-          ;(result[css as Css] as IRawStyleWithSource).sourcePseudoClass =
-            currentPseudoClass
+          styleWithSource.sourcePseudoClass = currentPseudoClass
         }
+        result[key] = styleWithSource
       }
     })
 

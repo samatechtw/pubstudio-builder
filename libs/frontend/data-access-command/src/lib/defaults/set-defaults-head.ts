@@ -30,7 +30,8 @@ const setHeadField = (
   if (tag === 'base') {
     site.defaults.head.base = newValue as IHeadBase
   } else {
-    ;(site.defaults.head[tag as keyof IHead] as IPageHeadObject[])[index] = newValue
+    const tagObj = site.defaults.head[tag as keyof IHead] as IPageHeadObject[]
+    tagObj[index] = newValue
   }
 }
 

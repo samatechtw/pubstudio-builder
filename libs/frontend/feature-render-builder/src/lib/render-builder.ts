@@ -235,7 +235,9 @@ export const computePropsContent = (
 
   if (hasChildren) {
     content.push(
-      ...component.children!.map((child, index) => renderComponent(site, child, index)),
+      ...(component.children?.map((child, index) =>
+        renderComponent(site, child, index),
+      ) ?? []),
     )
   } else if (component.content) {
     if (component.tag === Tag.Svg) {
