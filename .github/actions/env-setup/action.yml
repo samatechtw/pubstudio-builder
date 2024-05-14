@@ -4,11 +4,11 @@ runs:
   using: 'composite'
   steps:
     - name: Setup PNPM
-      uses: pnpm/action-setup@v2.4.0
+      uses: pnpm/action-setup@v4
       with:
-        version: 8.7.0
+        version: 9.1.1
     - name: Set up NodeJS v20
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
         node-version: 20
         registry-url: 'https://registry.npmjs.org'
