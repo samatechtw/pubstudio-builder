@@ -27,6 +27,8 @@ use tokio::sync::RwLock;
 
 #[tokio::main]
 async fn main() {
+    sqlx::any::install_default_drivers();
+
     // Allows running from workspace root, or crate directory
     let manifest_dir = std::env::var("CARGO_MANIFEST_DIR").unwrap_or(".".into());
     let _ = dotenvy::from_path(format!("{manifest_dir}/.env"));
