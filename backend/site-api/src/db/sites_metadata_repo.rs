@@ -5,7 +5,9 @@ use lib_shared_types::{
     entity::site_api::site_metadata_entity::{SiteMetadataEntity, UpdateSiteMetadataEntity},
     shared::site::SiteType,
 };
-use sqlx::{sqlite::SqliteRow, Error, QueryBuilder, Row, Sqlite, SqlitePool, Transaction};
+use sqlx::{
+    sqlite::SqliteRow, Error, Executor, QueryBuilder, Row, Sqlite, SqlitePool, Transaction,
+};
 use std::sync::Arc;
 
 pub type DynSitesMetadataRepo = Arc<dyn SitesMetadataRepoTrait + Send + Sync>;
@@ -74,6 +76,21 @@ fn to_metadata_cache(row: SqliteRow) -> Result<SiteMetadataResult, Error> {
         disabled: row.try_get("disabled")?,
         custom_data_usage: row.try_get("custom_data_usage")?,
     })
+}
+
+async fn update_metadata_helper<'a, E>(
+    executor: E,
+    mut query: QueryBuilder<'_, Sqlite>,
+) -> Result<SiteMetadataResult, DbError>
+where
+    E: Executor<'a, Database = Sqlite>,
+{
+    Ok(query
+        .build()
+        .try_map(to_metadata_cache)
+        .fetch_one(executor)
+        .await
+        .map_err(|e| DbError::Query(e.to_string()))?)
 }
 
 #[async_trait]
@@ -175,12 +192,7 @@ impl SitesMetadataRepoTrait for SitesMetadataRepo {
         query.push_bind(id);
         query.push(" RETURNING *");
 
-        Ok(query
-            .build()
-            .try_map(to_metadata_cache)
-            .fetch_one(tx)
-            .await
-            .map_err(|e| DbError::Query(e.to_string()))?)
+        update_metadata_helper(tx.as_mut(), query).await
     }
 
     async fn update_site_metadata(
@@ -219,7 +231,7 @@ impl SitesMetadataRepoTrait for SitesMetadataRepo {
         "#,
         )
         .bind(id)
-        .execute(&mut *tx)
+        .execute(tx.as_mut())
         .await?;
 
         let mut query: QueryBuilder<'_, Sqlite> =
@@ -236,7 +248,7 @@ impl SitesMetadataRepoTrait for SitesMetadataRepo {
                 query.push("),");
             }
         }
-        query.build().execute(&mut *tx).await?;
+        query.build().execute(tx.as_mut()).await?;
 
         Ok(())
     }
