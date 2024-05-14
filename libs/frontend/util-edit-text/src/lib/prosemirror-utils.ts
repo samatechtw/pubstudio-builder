@@ -9,8 +9,10 @@ const posWithoutSpaces = (range: SelectionRange) => {
   let to = $to.pos
   const start = $from.nodeAfter
   const end = $to.nodeBefore
+  /* eslint-disable @typescript-eslint/no-non-null-assertion */
   const spaceStart = start && start.isText ? /^\s*/.exec(start.text!)![0].length : 0
   const spaceEnd = end && end.isText ? /\s*$/.exec(end.text!)![0].length : 0
+  /* eslint-enable @typescript-eslint/no-non-null-assertion */
   if (from + spaceStart < to) {
     from += spaceStart
     to -= spaceEnd
@@ -28,7 +30,7 @@ export const isMarkInSelection = (view: EditorView, mark: MarkType): boolean => 
     return !!mark.isInSet(view.state.storedMarks || $cursor.marks())
   } else {
     return ranges.some((r) => {
-      let some: boolean = false
+      let some = false
       view.state.doc.nodesBetween(r.$from.pos, r.$to.pos, (node) => {
         if (some) return false
         some = !!mark.isInSet(node.marks)

@@ -3,7 +3,7 @@ interface INormalizedUrl {
   isExternal: boolean
 }
 
-export const hrefToUrl = (href: string, pathname: string = '/'): INormalizedUrl => {
+export const hrefToUrl = (href: string, pathname = '/'): INormalizedUrl => {
   // URL class expects href to starts with either http or https, so we have to
   // generate a url that starts with http or https based on the given href.
   let finalUrl = ''

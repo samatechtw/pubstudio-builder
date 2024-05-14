@@ -57,7 +57,9 @@ export const useLocalStore = (storeName?: StoreKey): ISiteStore => {
     }
     return restored
   }
-  const setUpdateKey = (_key: string | undefined) => {}
+  const setUpdateKey = (_key: string | undefined) => {
+    // No update key used in local store
+  }
 
   return {
     siteId,

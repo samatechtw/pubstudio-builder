@@ -44,11 +44,12 @@ describe('Set Behavior Arg', () => {
     }
 
     // Add a behavior
+    const newBehavior = { id: nextBehaviorId(site.context), name: 'text', code: '{}' }
     const data: ISetBehaviorData = {
-      newBehavior: { id: nextBehaviorId(site.context), name: 'text', code: '{}' },
+      newBehavior,
     }
     applySetBehavior(site, data)
-    behavior = resolveBehavior(site.context, data.newBehavior!.id) as IBehavior
+    behavior = resolveBehavior(site.context, newBehavior.id) as IBehavior
   })
 
   it('should add behavior arg and undo', () => {

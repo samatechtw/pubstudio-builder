@@ -95,7 +95,9 @@ export const ProseMirrorEditor = defineComponent({
         // Used for setting selection text size
         const selPlugin: Plugin = new Plugin({
           state: {
-            init() {},
+            init() {
+              // No initialization
+            },
             apply(tr, _state) {
               if (tr.getMeta('selDeco')) {
                 const sel = tr.selection as TextSelection

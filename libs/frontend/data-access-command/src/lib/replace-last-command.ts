@@ -29,12 +29,11 @@ export const appendLastCommand = (site: ISite, command: ICommand, save?: boolean
       const newData: ICommandGroupData = { commands: [lastCmd] }
       newCmd = { type: CommandType.Group, data: newData }
     }
+    const newCommands = (newCmd.data as ICommandGroupData).commands
     if (command.type === CommandType.Group) {
-      ;(newCmd.data as ICommandGroupData).commands.push(
-        ...(command.data as ICommandGroupData).commands,
-      )
+      newCommands.push(...(command.data as ICommandGroupData).commands)
     } else {
-      ;(newCmd.data as ICommandGroupData).commands.push(command)
+      newCommands.push(command)
     }
     const history = site.history
     applyCommand(site, command)
