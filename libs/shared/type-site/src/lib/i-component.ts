@@ -111,8 +111,6 @@ export interface IComponent {
   parent?: IComponent
   // DOM children
   children?: IComponent[]
-  // Whether the component shows in the reusable menu
-  isReusable?: boolean
   // ID of reusable component to inherit properties from
   reusableSourceId?: string
   // Input values

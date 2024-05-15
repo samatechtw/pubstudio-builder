@@ -1,7 +1,7 @@
 import { setBuildSubmenu } from '@pubstudio/frontend/data-access-command'
 import {
   addBuiltinComponent,
-  addReusableComponentData,
+  addReusableComponent,
   useBuild,
 } from '@pubstudio/frontend/feature-build'
 import { activeBreakpoint } from '@pubstudio/frontend/feature-site-source'
@@ -316,7 +316,7 @@ export const useDragDrop = (props: IUseDragDropProps): IUseDragDrop => {
             })
             return
           } else if (addDataType === DraggedComponentAddDataType.ReusableComponent) {
-            addReusableComponentData(site, {
+            addReusableComponent(site, {
               id: dragSource.value.addData.id,
               parentId: addParentId,
               parentIndex: dropProps.value.destinationIndex,

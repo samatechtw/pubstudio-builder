@@ -148,14 +148,19 @@ const showTextStyle = computed(() => {
   )
 })
 
+const isReusable = (id: string) => {
+  return editor.value?.reusableComponentIds.has(id)
+}
+
 const showToReusableComponent = computed(() => {
-  const { reusableSourceId, isReusable } = component.value
+  const { reusableSourceId, id } = component.value
   let parent: IComponent | undefined = component.value
-  if (!parent || reusableSourceId || isReusable) {
+
+  if (!parent || reusableSourceId || isReusable(id)) {
     return false
   }
   while (parent) {
-    if (parent.isReusable || parent.reusableSourceId) return false
+    if (parent.reusableSourceId || isReusable(parent.id)) return false
     parent = parent.parent
   }
   return true

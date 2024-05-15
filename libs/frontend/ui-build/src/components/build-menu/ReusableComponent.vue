@@ -23,13 +23,10 @@ import {
   DraggedComponentAddDataType,
   useDragDrop,
 } from '@pubstudio/frontend/feature-render-builder'
-import {
-  makeAddComponentFromReusableData,
-  selectAddParent,
-} from '@pubstudio/frontend/util-command-data'
+import { makeAddReusableComponentData } from '@pubstudio/frontend/util-command-data'
 import { IComponent } from '@pubstudio/shared/type-site'
-import { clone } from '@pubstudio/frontend/util-component'
 import { runtimeContext } from '@pubstudio/frontend/util-runtime'
+import { getActivePage } from '@pubstudio/frontend/feature-site-store'
 
 const props = defineProps<{
   reusableComponent: IComponent
@@ -37,7 +34,7 @@ const props = defineProps<{
 
 const { reusableComponent } = toRefs(props)
 
-const { site, editor, activePage, addComponentData } = useBuild()
+const { site, editor, addComponentData } = useBuild()
 
 const text = computed(() => {
   const { id, name } = reusableComponent.value
@@ -50,10 +47,12 @@ const text = computed(() => {
 
 const addReusableComponent = () => {
   const { selectedComponent } = editor.value ?? {}
-  const data = makeAddComponentFromReusableData(
+  const activePage = getActivePage(site.value)
+
+  const data = makeAddReusableComponentData(
     site.value,
     reusableComponent.value.id,
-    selectedComponent ?? (activePage.value?.root as IComponent),
+    selectedComponent ?? (activePage?.root as IComponent),
     selectedComponent?.id,
   )
   if (data) {
@@ -68,17 +67,8 @@ const { dndState, elementRef, dragstart, drag, dragend } = useDragDrop({
   getComponentIndex: () => 0,
   isParent: false,
   addData: {
+    id: reusableComponent.value.id,
     type: DraggedComponentAddDataType.ReusableComponent,
-    name: reusableComponent.value.name,
-    tag: reusableComponent.value.tag,
-    content: reusableComponent.value.content,
-    ...selectAddParent(activePage.value?.root as IComponent, undefined),
-    sourceId: undefined,
-    reusableComponentId: reusableComponent.value.id,
-    inputs: clone(reusableComponent.value.inputs),
-    events: clone(reusableComponent.value.events),
-    editorEvents: clone(reusableComponent.value.editorEvents),
-    selectedComponentId: editor.value?.selectedComponent?.id,
   },
 })
 
