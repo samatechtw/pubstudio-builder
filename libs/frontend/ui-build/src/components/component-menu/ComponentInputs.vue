@@ -45,7 +45,7 @@
 </template>
 
 <script lang="ts">
-import { resolveComponent } from '@pubstudio/frontend/util-builtin'
+import { resolveComponent } from '@pubstudio/frontend/util-resolve'
 import { IComponent, IComponentInput, ISite } from '@pubstudio/shared/type-site'
 import { omit } from '@pubstudio/frontend/util-component'
 import { resolveInput } from '@pubstudio/frontend/feature-render'

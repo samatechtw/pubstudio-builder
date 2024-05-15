@@ -20,7 +20,7 @@ import { computed } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { useBuild } from '@pubstudio/frontend/feature-build'
 import ReusableComponent from './ReusableComponent.vue'
-import { resolveComponent } from '@pubstudio/frontend/util-builtin'
+import { resolveComponent } from '@pubstudio/frontend/util-resolve'
 import { IComponent } from '@pubstudio/shared/type-site'
 
 const { t } = useI18n()

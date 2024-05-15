@@ -10,7 +10,7 @@
           :placeholder="t('theme.favicon_url')"
           class="favicon-url-input"
           @keydown.enter="updateFavicon(newFavicon)"
-          @keyup.esc="$event.srcElement.blur()"
+          @keyup.esc="($event.target as HTMLInputElement)?.blur()"
         />
         <Check class="item-save" @click="updateFavicon(newFavicon)" />
       </div>

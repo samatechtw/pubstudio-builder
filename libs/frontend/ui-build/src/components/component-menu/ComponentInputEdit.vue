@@ -51,6 +51,7 @@
           class="default-text"
           :placeholder="t('value')"
           @update:modelValue="newInput.default = $event"
+          @keyup.esc="($event.target as HTMLInputElement)?.blur()"
         />
       </template>
     </MenuRow>

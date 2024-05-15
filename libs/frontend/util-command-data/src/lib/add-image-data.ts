@@ -10,7 +10,6 @@ export const makeAddImageData = (
   assetUrl: string,
 ): IAddComponentData | undefined => {
   const addData = makeAddBuiltinComponentData(
-    site,
     image.id,
     parent,
     site.editor?.selectedComponent?.id,

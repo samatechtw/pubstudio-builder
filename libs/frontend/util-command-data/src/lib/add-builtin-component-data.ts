@@ -1,12 +1,11 @@
 import { getBuiltinComponent } from '@pubstudio/frontend/util-builtin'
 import { clone } from '@pubstudio/frontend/util-component'
 import { IAddComponentData } from '@pubstudio/shared/type-command-data'
-import { IComponent, ISite } from '@pubstudio/shared/type-site'
+import { IComponent } from '@pubstudio/shared/type-site'
 import { selectAddParent } from './select-add-parent'
 
 // Generate new component data from a builtin component
 export const makeAddBuiltinComponentData = (
-  site: ISite,
   builtinComponentId: string,
   parent: IComponent,
   selectedComponentId: string | undefined,

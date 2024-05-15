@@ -5,7 +5,7 @@ import {
   makeAddBuiltinComponentData,
   makeAddReusableComponentData,
 } from '@pubstudio/frontend/util-command-data'
-import { resolveComponent } from '@pubstudio/frontend/util-resolve'
+import { resolveComponent, resolveStyle } from '@pubstudio/frontend/util-resolve'
 import { CommandType, ICommand } from '@pubstudio/shared/type-command'
 import {
   IAddComponentData,
@@ -95,12 +95,7 @@ export const addBuiltinComponent = (
   options: IAddComponentOptions,
 ): string | undefined => {
   const data = addComponentToParent(site, options, (parent) =>
-    makeAddBuiltinComponentData(
-      site,
-      options.id,
-      parent,
-      site.editor?.selectedComponent?.id,
-    ),
+    makeAddBuiltinComponentData(options.id, parent, site.editor?.selectedComponent?.id),
   )
   if (data) {
     addBuiltinComponentData(site, data)
