@@ -1,5 +1,4 @@
-import { resolveComponent } from '@pubstudio/frontend/util-builtin'
-import { isDynamicComponent } from '@pubstudio/frontend/util-ids'
+import { resolveComponent } from '@pubstudio/frontend/util-resolve'
 import { IAddReusableComponentData } from '@pubstudio/shared/type-command-data'
 import { ISite } from '@pubstudio/shared/type-site'
 
@@ -11,7 +10,7 @@ export const addReusableComponentHelper = (
   if (editor) {
     data.componentIds.forEach((componentId) => {
       const component = resolveComponent(context, componentId)
-      if (component && !isDynamicComponent(component.id)) {
+      if (component) {
         editor.reusableComponentIds.add(component.id)
       }
     })

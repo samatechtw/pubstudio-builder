@@ -16,7 +16,6 @@ export const makeAddLinkData = (
   props?: IMakeAddLinkDataProps,
 ): IAddComponentData | undefined => {
   const addData = makeAddBuiltinComponentData(
-    site,
     link.id,
     parent,
     site.editor?.selectedComponent?.id,

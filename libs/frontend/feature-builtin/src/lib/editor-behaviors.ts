@@ -75,7 +75,7 @@ const syncNavMenu = (site: ISite, cmp: IComponent) => {
     const childHrefs = syncedChildren.map((c) => c.inputs?.href?.is)
     for (const route of routes) {
       if (!childHrefs.includes(route)) {
-        const addData = makeAddBuiltinComponentData(site, navMenuItemId, cmp, undefined)
+        const addData = makeAddBuiltinComponentData(navMenuItemId, cmp, undefined)
         if (addData) {
           addData.inputs = defaultNavMenuItemInputs(route, pages[route].name, true)
           addData.content = pages[route].name

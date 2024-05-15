@@ -13,7 +13,7 @@
 </template>
 
 <script lang="ts">
-import { resolveComponent } from '@pubstudio/frontend/util-builtin'
+import { resolveComponent } from '@pubstudio/frontend/util-resolve'
 import { IComponent, IComponentEvent, ISite } from '@pubstudio/shared/type-site'
 
 interface IComponentEventWithSource extends IComponentEvent {

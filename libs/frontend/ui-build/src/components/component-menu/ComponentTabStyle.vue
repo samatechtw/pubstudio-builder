@@ -12,7 +12,7 @@
 <script lang="ts" setup>
 import { computed, toRefs } from 'vue'
 import { IComponent } from '@pubstudio/shared/type-site'
-import { resolveComponent } from '@pubstudio/frontend/util-builtin'
+import { resolveComponent } from '@pubstudio/frontend/util-resolve'
 import { useBuild } from '@pubstudio/frontend/feature-build'
 import ComponentMenuMixins from './ComponentMenuMixins.vue'
 import ComponentChildStyles from './ComponentChildStyles.vue'

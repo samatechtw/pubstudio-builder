@@ -8,7 +8,7 @@
       class="item"
       :placeholder="placeholder"
       @update:modelValue="emit('update:modelValue', $event)"
-      @keyup.esc="$event.srcElement.blur()"
+      @keyup.esc="($event.target as HTMLInputElement)?.blur()"
     />
   </div>
 </template>

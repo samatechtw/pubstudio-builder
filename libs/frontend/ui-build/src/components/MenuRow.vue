@@ -11,7 +11,7 @@
         :placeholder="placeholder"
         @update:modelValue="immediateSetValue"
         @keydown.enter="setValue"
-        @keyup.esc="$event.srcElement.blur()"
+        @keyup.esc="($event.target as HTMLInputElement)?.blur()"
       />
     </slot>
     <div

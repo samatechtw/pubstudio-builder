@@ -16,7 +16,7 @@
           :draggable="true"
           @dragstart.stop.prevent
           @keyup.enter="updateLink"
-          @keyup.esc="$event.srcElement.blur()"
+          @keyup.esc="($event.target as HTMLInputElement)?.blur()"
         />
         <PSInput
           ref="linkInput"
@@ -27,7 +27,7 @@
           :draggable="true"
           @dragstart.stop.prevent
           @keyup.enter="updateLink"
-          @keyup.esc="$event.srcElement.blur()"
+          @keyup.esc="($event.target as HTMLInputElement)?.blur()"
         />
       </div>
       <div v-else-if="internalLink" class="link-view" @click="gotoPage">

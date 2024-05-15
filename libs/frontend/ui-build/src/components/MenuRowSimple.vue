@@ -10,7 +10,7 @@
       class="item"
       :placeholder="placeholder"
       @keydown.enter="setValue"
-      @keyup.esc="$event.srcElement.blur()"
+      @keyup.esc="($event.target as HTMLInputElement)?.blur()"
     />
     <div v-else class="item edit-item" @click="editValue">
       {{ value || '' }}

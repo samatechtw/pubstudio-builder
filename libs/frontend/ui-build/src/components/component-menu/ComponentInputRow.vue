@@ -22,7 +22,7 @@
         :datalist="datalist"
         :isError="!inputValid"
         @keydown.enter="updateValue"
-        @keyup.esc="$event.srcElement?.blur()"
+        @keyup.esc="($event.target as HTMLInputElement)?.blur()"
       />
       <Check class="item-save" color="#009879" @click="updateValue" />
     </div>
