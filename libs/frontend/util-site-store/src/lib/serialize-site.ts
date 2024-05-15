@@ -26,7 +26,6 @@ export const serializeComponent = (component: IComponent): ISerializedComponent 
     inputs: component.inputs,
     events: component.events,
     editorEvents: component.editorEvents,
-    isReusable: component.isReusable,
     reusableSourceId: component.reusableSourceId,
   }
 }
@@ -44,6 +43,7 @@ export const serializeEditor = (
   return editor
     ? {
         selectedComponentId: editor.selectedComponent?.id,
+        reusableComponentIds: Array.from(editor.reusableComponentIds),
         active: editor.active,
         editorEvents: editor.editorEvents,
         debugBounding: editor.debugBounding,

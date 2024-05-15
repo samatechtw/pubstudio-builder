@@ -67,7 +67,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { ref, unref } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { useBuild, useHistory } from '@pubstudio/frontend/feature-build'
 import {
@@ -116,7 +116,7 @@ const toggleComponentTree = () => {
 }
 
 const forceSave = async () => {
-  if (siteStore.value.saveState !== SiteSaveState.Saved) {
+  if (unref(siteStore.value.saveState) !== SiteSaveState.Saved) {
     await siteStore.value.save(site.value, {
       immediate: true,
       ignoreUpdateKey: true,

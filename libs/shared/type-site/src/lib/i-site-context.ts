@@ -1,6 +1,5 @@
 import { IBreakpoint } from './i-breakpoint'
 import { IBehavior, IComponent } from './i-component'
-import { IReusableComponent } from './i-reusable-component'
 import { IGlobalStyle, IStyle } from './i-style'
 import { ITheme } from './i-theme'
 
@@ -11,7 +10,6 @@ export interface ISiteContext {
   nextId: number
   components: Record<string, IComponent>
   globalStyles: Record<string, IGlobalStyle>
-  reusableComponents: Record<string, IReusableComponent>
   styles: Record<string, IStyle>
   behaviors: Record<string, IBehavior>
   theme: ITheme

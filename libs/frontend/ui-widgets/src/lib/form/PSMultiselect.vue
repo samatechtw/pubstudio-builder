@@ -371,6 +371,8 @@ defineExpose({ multiselectRef, toggleDropdown })
 }
 .disabled {
   opacity: 0.6;
+  cursor: initial;
+  user-select: none;
 }
 .search {
   height: 100%;

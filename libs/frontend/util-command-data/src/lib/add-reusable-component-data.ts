@@ -4,7 +4,7 @@ import { IComponent, ISite } from '@pubstudio/shared/type-site'
 import { selectAddParent } from './select-add-parent'
 
 // Generate new component data from a reusable component
-export const makeAddComponentFromReusableData = (
+export const makeAddReusableComponentData = (
   site: ISite,
   reusableComponentId: string,
   parent: IComponent,

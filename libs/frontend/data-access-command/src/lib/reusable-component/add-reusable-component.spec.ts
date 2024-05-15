@@ -28,22 +28,19 @@ describe('Add Reusable Component', () => {
 
   it('should make component reusable and undo', () => {
     // Assert component is not reusable
-    expect(component.isReusable).toBeUndefined()
     expect(site.editor?.reusableComponentIds.has(component.id)).toBe(false)
 
     // Set to reusable
     const data: IAddReusableComponentData = {
-      componentId: component.id,
+      componentIds: [component.id],
     }
     applyAddReusableComponent(site, data)
     // Assert component is reusable
-    expect(component.isReusable).toBe(true)
     expect(site.editor?.reusableComponentIds.has(component.id)).toBe(true)
 
     undoAddReusableComponent(site, data)
 
     // Assert component is not reusable
-    expect(component.isReusable).toBeUndefined()
     expect(site.editor?.reusableComponentIds.has(component.id)).toBe(false)
   })
 })

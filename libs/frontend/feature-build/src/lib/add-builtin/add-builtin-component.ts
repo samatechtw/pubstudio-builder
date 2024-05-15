@@ -1,8 +1,11 @@
 import { pushCommand } from '@pubstudio/frontend/data-access-command'
 import { getActivePage } from '@pubstudio/frontend/feature-site-store'
 import { builtinStyles, getBuiltinComponent } from '@pubstudio/frontend/util-builtin'
-import { makeAddBuiltinComponentData } from '@pubstudio/frontend/util-command-data'
-import { resolveComponent, resolveStyle } from '@pubstudio/frontend/util-resolve'
+import {
+  makeAddBuiltinComponentData,
+  makeAddReusableComponentData,
+} from '@pubstudio/frontend/util-command-data'
+import { resolveComponent } from '@pubstudio/frontend/util-resolve'
 import { CommandType, ICommand } from '@pubstudio/shared/type-command'
 import {
   IAddComponentData,
@@ -33,6 +36,12 @@ const getMissingMixins = (componentId: string | undefined): string[] => {
   return mixins
 }
 
+export interface IAddComponentOptions {
+  id: string
+  parentId?: string
+  parentIndex?: number
+}
+
 export const addBuiltinComponentData = (site: ISite, data: IAddComponentData) => {
   const mixins = getMissingMixins(data.sourceId)
   pushCommandAndAddMissingMixins(site, CommandType.AddComponent, data, mixins)
@@ -42,21 +51,16 @@ export const addReusableComponentData = (site: ISite, data: IAddComponentData) =
   pushCommand(site, CommandType.AddComponent, data)
 }
 
-export interface IAddBuiltinComponentOptions {
-  id: string
-  parentId?: string
-  parentIndex?: number
-}
-
-export const addBuiltinComponent = (
+const addComponentToParent = (
   site: ISite,
-  options: IAddBuiltinComponentOptions,
-): string | undefined => {
+  options: IAddComponentOptions,
+  addData: (parent: IComponent) => IAddComponentData | undefined,
+): IAddComponentData | undefined => {
   const activePage = getActivePage(site)
   if (!activePage) {
     return
   }
-  const { id, parentId, parentIndex } = options
+  const { parentId, parentIndex } = options
 
   let parent: IComponent | undefined
   if (parentId) {
@@ -64,21 +68,44 @@ export const addBuiltinComponent = (
   }
   parent = parent ?? site.editor?.selectedComponent ?? activePage.root
 
-  const data = makeAddBuiltinComponentData(
-    site,
-    id,
-    parent,
-    site.editor?.selectedComponent?.id,
-  )
-  if (!data) {
-    return
-  }
-  if (parentIndex) {
+  const data = addData(parent)
+  if (data && parentIndex) {
     data.parentIndex = parentIndex
   }
-  addBuiltinComponentData(site, data)
+  return data
+}
 
-  return data.id
+export const addReusableComponent = (site: ISite, options: IAddComponentOptions) => {
+  const data = addComponentToParent(site, options, (parent) =>
+    makeAddReusableComponentData(
+      site,
+      options.id,
+      parent,
+      site.editor?.selectedComponent?.id,
+    ),
+  )
+  if (data) {
+    addReusableComponentData(site, data)
+  }
+  return data?.id
+}
+
+export const addBuiltinComponent = (
+  site: ISite,
+  options: IAddComponentOptions,
+): string | undefined => {
+  const data = addComponentToParent(site, options, (parent) =>
+    makeAddBuiltinComponentData(
+      site,
+      options.id,
+      parent,
+      site.editor?.selectedComponent?.id,
+    ),
+  )
+  if (data) {
+    addBuiltinComponentData(site, data)
+  }
+  return data?.id
 }
 
 export const pushCommandAndAddMissingMixins = <Data>(

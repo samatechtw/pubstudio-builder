@@ -20,6 +20,7 @@ export interface ISerializedEditorContext
   > {
   selectedComponentId?: string
   selectedThemeColors: string[]
+  reusableComponentIds: string[]
 }
 
 export interface ISerializedPage extends Omit<IPage, 'root'> {

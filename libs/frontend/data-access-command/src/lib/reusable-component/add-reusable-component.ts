@@ -13,7 +13,6 @@ export const addReusableComponentHelper = (
       const component = resolveComponent(context, componentId)
       if (component && !isDynamicComponent(component.id)) {
         editor.reusableComponentIds.add(component.id)
-        component.isReusable = true
       }
     })
   }
@@ -35,7 +34,6 @@ export const deleteReusableComponentWithIds = (
     const reusableCmp = resolveComponent(context, componentId)
     if (reusableCmp && editor) {
       editor.reusableComponentIds.delete(reusableCmp.id)
-      delete reusableCmp.isReusable
     }
   })
 }
