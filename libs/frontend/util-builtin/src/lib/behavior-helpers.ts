@@ -120,6 +120,21 @@ export const setLoading = (component: IComponent | undefined, loading: boolean) 
   setCustomStyle(content, Css.Opacity, loading ? '0' : '1')
 }
 
+const setError = (errorCmp: IComponent | undefined, error: unknown): string => {
+  const e = error as Record<string, string>
+  console.error(e)
+  let errorMsg: string
+  if (e.code === 'CustomDataUniqueFail') {
+    errorMsg = 'You are already subscribed!'
+  } else {
+    errorMsg = e.message ?? 'Unknown error, try again later'
+  }
+  setContent(errorCmp, errorMsg)
+  setCustomStyle(errorCmp, Css.Opacity, '1')
+  setCustomStyle(errorCmp, Css.Color, '${color-error}')
+  return errorMsg
+}
+
 const addRow = async (table: string, row: Record<string, string>) => {
   const addRow: IAddRowApiRequest = {
     table_name: table,
@@ -152,5 +167,6 @@ export const behaviorHelpers: IBehaviorHelpers = {
   getCustomStyle,
   setCustomStyle,
   setLoading,
+  setError,
   addRow,
 }
