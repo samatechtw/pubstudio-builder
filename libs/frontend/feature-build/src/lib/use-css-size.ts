@@ -11,7 +11,7 @@ export interface IUseCssSize {
   isAuto: ComputedRef<boolean>
   currentValue: ComputedRef<string>
   invalid: Ref<boolean>
-  inputRef: Ref<HTMLElement | null>
+  inputRef: Ref<HTMLInputElement | null>
   unitRef: Ref<HTMLElement | null>
   clickInputWrap: () => void
   inputKeydown: (e: KeyboardEvent) => void
