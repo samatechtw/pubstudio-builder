@@ -214,17 +214,8 @@ export const contactFormBehavior: IBehavior = {
         helpers.setCustomStyle(errorCmp, Css.Opacity, '1')
         helpers.setCustomStyle(errorCmp, Css.Color, '${color-success}')
         helpers.setContent(errorCmp, 'Contact request sent!')
-      } catch (err) {
-        const e = err as Record<string, string>
-        console.error(e)
-        let error: string
-        if (e.code === 'CustomDataUniqueFail') {
-          error = 'Contact request already submitted'
-        } else {
-          error = e.message ?? 'Unknown error, try again later'
-        }
-        helpers.setContent(errorCmp, error)
-        helpers.setCustomStyle(errorCmp, Css.Opacity, '1')
+      } catch (e) {
+        helpers.setError(errorCmp, e)
       }
       helpers.setLoading(button, false)
     }
@@ -303,17 +294,8 @@ export const mailingListBehavior: IBehavior = {
         helpers.setCustomStyle(errorCmp, Css.Opacity, '1')
         helpers.setCustomStyle(errorCmp, Css.Color, '${color-success}')
         helpers.setContent(errorCmp, 'Subscribed!')
-      } catch (err) {
-        const e = err as Record<string, string>
-        console.error(e)
-        let error: string
-        if (e.code === 'CustomDataUniqueFail') {
-          error = 'You are already subscribed!'
-        } else {
-          error = e.message ?? 'Unknown error, try again later'
-        }
-        helpers.setContent(errorCmp, error)
-        helpers.setCustomStyle(errorCmp, Css.Opacity, '1')
+      } catch (e) {
+        helpers.setError(errorCmp, e)
       }
       helpers.setLoading(button, false)
     }

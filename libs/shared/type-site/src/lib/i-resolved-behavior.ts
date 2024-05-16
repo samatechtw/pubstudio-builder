@@ -23,6 +23,7 @@ export interface IBehaviorHelpers {
     prop: Css,
     value: string,
   ): string | undefined
+  setError(errorCmp: IComponent | undefined, error: unknown): string
   setLoading(component: IComponent | undefined, loading: boolean): void
   addRow(table: string, row: Record<string, string>): Promise<void>
 }
