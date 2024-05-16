@@ -11,7 +11,7 @@
         :name="`input${uid}`"
         @input="updateValue"
         @keydown="inputKeydown"
-        @keyup.enter="update"
+        @keyup.enter="pressEnter"
         @keyup.esc="inputRef?.blur()"
       />
     </div>
@@ -56,6 +56,15 @@ const {
 } = useCssSize({
   getSize,
 })
+
+const pressEnter = () => {
+  // If the value is empty and the unit isn't standalone, delete the style
+  const { unit, value } = parsedSize.value
+  if (unit === '-' || (!value && unit !== 'auto')) {
+    emit('update', undefined)
+    inputRef.value?.blur()
+  }
+}
 
 const update = () => {
   const sizeStr = updatedSize()
