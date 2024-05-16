@@ -89,7 +89,7 @@ export const contactForm = {
                   [DEFAULT_BREAKPOINT_ID]: {
                     default: {
                       border: '1px solid #4F4F4F',
-                      margin: '24px 6px 0px 0px',
+                      margin: '24px 0px 0px 0px',
                       flex: '1 1 0',
                     },
                   },
@@ -115,7 +115,7 @@ export const contactForm = {
                 custom: {
                   [DEFAULT_BREAKPOINT_ID]: {
                     default: {
-                      margin: '24px 0px 0px 6px',
+                      margin: '24px 0px 0px 12px',
                       border: '1px solid #4F4F4F',
                       flex: '1 1 0',
                     },

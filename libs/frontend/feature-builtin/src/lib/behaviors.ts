@@ -215,7 +215,9 @@ export const contactFormBehavior: IBehavior = {
         helpers.setCustomStyle(errorCmp, Css.Color, '${color-success}')
         helpers.setContent(errorCmp, 'Contact request sent!')
       } catch (e) {
-        helpers.setError(errorCmp, e)
+        helpers.setError(errorCmp, e, {
+          CustomDataUniqueFail: 'Contact request already submitted',
+        })
       }
       helpers.setLoading(button, false)
     }
@@ -295,7 +297,9 @@ export const mailingListBehavior: IBehavior = {
         helpers.setCustomStyle(errorCmp, Css.Color, '${color-success}')
         helpers.setContent(errorCmp, 'Subscribed!')
       } catch (e) {
-        helpers.setError(errorCmp, e)
+        helpers.setError(errorCmp, e, {
+          CustomDataUniqueFail: "You're already subscribed!",
+        })
       }
       helpers.setLoading(button, false)
     }

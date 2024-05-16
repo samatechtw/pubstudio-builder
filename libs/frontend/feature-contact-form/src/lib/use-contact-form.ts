@@ -43,7 +43,10 @@ export interface IContactFormFeature {
 }
 
 const isContactTable = (table: ICustomTableViewModel): boolean => {
-  return Object.keys(table.columns).some((name) => name.toLowerCase() === 'email')
+  const columns = Object.keys(table.columns)
+  const hasEmail = columns.some((name) => name.toLowerCase() === 'email')
+  const hasMessage = columns.some((name) => name.toLowerCase() === 'message')
+  return hasEmail && hasMessage
 }
 
 const resetContactTables = () => {

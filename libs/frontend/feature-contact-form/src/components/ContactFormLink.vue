@@ -9,7 +9,7 @@
     <div class="link-table">
       <PSMultiselect
         :value="tableName"
-        :options="(tables ?? []).map((t) => t.name)"
+        :options="contactTables.map((t) => t.name)"
         :placeholder="t('custom_data.table_name')"
         class="link-dropdown"
         @select="select"
@@ -38,7 +38,7 @@ import { useBuild } from '@pubstudio/frontend/feature-build'
 import { useContactForm } from '../lib/use-contact-form'
 
 const { t } = useI18n()
-const { tables, linkContactTable } = useContactForm()
+const { contactTables, linkContactTable } = useContactForm()
 const { editor } = useBuild()
 
 const tableName = ref()
