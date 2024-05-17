@@ -241,8 +241,8 @@ jobs:
       - name: Install dependencies
         run: |
           npm install -g semantic-release@23
-          npm install -g @semantic-release/changelog
-          npm install -g conventional-changelog-conventionalcommits
+          npm install -g @semantic-release/changelog@6
+          npm install -g conventional-changelog-conventionalcommits@7
       - name: Release
         env:
           # Default GITHUB_TOKEN is OK as long as there no workflows triggered
