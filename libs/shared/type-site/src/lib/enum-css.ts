@@ -77,6 +77,7 @@ export enum Css {
   TextDecoration = 'text-decoration',
   TextOverflow = 'text-overflow',
   TextShadow = 'text-shadow',
+  TextTransform = 'text-transform',
   Top = 'top',
   Transform = 'transform',
   TransformOrigin = 'transform-origin',

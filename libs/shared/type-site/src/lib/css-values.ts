@@ -28,6 +28,7 @@ export const cssValues = new Map<Css, string[]>([
   [Css.ScrollBehavior, ['auto', 'smooth']],
   [Css.TextAlign, ['start', 'end', 'justify', 'center']],
   [Css.TextOverflow, ['clip', 'ellipsis']],
+  [Css.TextTransform, ['capitalize', 'uppercase', 'lowercase', 'none', 'full-width']],
   [Css.UserSelect, ['all', 'auto', 'none', 'text']],
   [Css.Visibility, ['hidden', 'visible']],
   [Css.WebkitBackgroundClip, ['border-box', 'padding-box', 'content-box', 'text']],

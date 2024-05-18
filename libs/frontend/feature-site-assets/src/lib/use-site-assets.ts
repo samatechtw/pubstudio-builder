@@ -16,7 +16,7 @@ import { IUploadFileResult, useAssets } from './upload-asset'
 
 export interface ISiteAssetsFeature {
   api: IApiSiteAsset
-  assets: Ref<ISiteAssetListItem[] | undefined>
+  assets: Ref<ISiteAssetViewModel[] | undefined>
   loading: Ref<boolean>
   usage: Ref<number | undefined>
   updateKey: Ref<number>
@@ -32,14 +32,14 @@ export interface ISiteAssetsFeature {
   updateAsset: (
     id: string,
     payload: IUpdatePlatformSiteAssetRequest,
-  ) => Promise<ISiteAssetListItem | undefined>
+  ) => Promise<ISiteAssetViewModel | undefined>
   verifyAsset: (id: string) => Promise<IVerifyPlatformSiteAssetResponse>
   listAssets: (params: IListPlatformSiteAssetsRequest) => Promise<void>
-  updateAssetList: (newAsset: ISiteAssetListItem) => void
+  updateAssetList: (newAsset: ISiteAssetViewModel) => void
   deleteAsset: (id: string) => Promise<void>
 }
 
-const assets = ref<ISiteAssetListItem[]>()
+const assets = ref<ISiteAssetViewModel[]>()
 const updateKey = ref(0)
 
 export const useSiteAssets = (): ISiteAssetsFeature => {
@@ -74,7 +74,7 @@ export const useSiteAssets = (): ISiteAssetsFeature => {
   const updateAsset = async (
     id: string,
     payload: IUpdatePlatformSiteAssetRequest,
-  ): Promise<ISiteAssetListItem | undefined> => {
+  ): Promise<ISiteAssetViewModel | undefined> => {
     loading.value = true
     try {
       const updated = await api.updateSiteAsset(id, payload)
@@ -99,7 +99,7 @@ export const useSiteAssets = (): ISiteAssetsFeature => {
     loading.value = false
   }
 
-  const updateAssetList = (newAsset: ISiteAssetListItem): void => {
+  const updateAssetList = (newAsset: ISiteAssetViewModel): void => {
     let usageDiff = 0
     if (assets.value) {
       const assetIndex = assets.value.findIndex((asset) => asset.id === newAsset.id)
