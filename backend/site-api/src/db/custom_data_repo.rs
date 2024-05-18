@@ -155,25 +155,23 @@ impl CustomDataRepoTrait for CustomDataRepo {
     async fn add_row(&self, id: &str, dto: AddRow) -> Result<CustomDataRow, DbError> {
         let pool = self.get_db_pool(id).await?;
 
-        let table_name = dto.table_name;
+        let table_name = quote(&dto.table_name);
+        let mut query = QueryBuilder::new(format!("INSERT INTO {} (", table_name));
 
-        let mut query = QueryBuilder::new("INSERT INTO ");
-        query.push(table_name);
-
-        let mut column_names = String::new();
-        let mut column_values = String::new();
-
-        for (k, v) in dto.row.iter() {
-            if !column_names.is_empty() {
-                column_names.push_str(", ");
-                column_values.push_str(", ");
+        for (index, key) in dto.row.keys().enumerate() {
+            if index != 0 {
+                query.push(", ");
             }
-            column_names.push_str(&quote(k));
-            column_values.push_str(&format!("'{}'", v));
+            query.push(key);
         }
-
-        query.push(format!(" ({})", column_names));
-        query.push(format!(" VALUES ({}) RETURNING *", column_values));
+        query.push(") VALUES (");
+        for (index, value) in dto.row.values().enumerate() {
+            if index != 0 {
+                query.push(", ");
+            }
+            query.push_bind(value);
+        }
+        query.push(") RETURNING *");
 
         println!("SQL Query: {}", query.sql());
 
