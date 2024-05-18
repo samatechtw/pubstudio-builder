@@ -1,6 +1,7 @@
-import { IApiSiteAsset, useSiteAssetApi } from '@pubstudio/frontend/data-access-api'
+import { useSiteAssetApi } from '@pubstudio/frontend/data-access-api'
 import { ApiInjectionKey } from '@pubstudio/frontend/data-access-injection'
 import { PSApi } from '@pubstudio/frontend/util-api'
+import { IApiSiteAsset } from '@pubstudio/shared/type-api-interfaces'
 import {
   ICreatePlatformSiteAssetRequest,
   IListPlatformSiteAssetsRequest,
@@ -12,10 +13,6 @@ import {
 import { sleep } from '@pubstudio/shared/util-core'
 import { inject, Ref, ref } from 'vue'
 import { IUploadFileResult, useAssets } from './upload-asset'
-
-export interface ISiteAssetListItem extends ISiteAssetViewModel {
-  version: number
-}
 
 export interface ISiteAssetsFeature {
   api: IApiSiteAsset
