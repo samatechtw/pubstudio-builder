@@ -4,12 +4,7 @@
       <div v-if="asset.content_type === AssetContentType.Pdf" class="pdf-preview">
         <img :src="PdfPreview" />
       </div>
-      <PSAsset
-        v-else
-        :asset="assetUrl"
-        :canPlayVideo="false"
-        :contentHash="asset.version"
-      />
+      <PSAsset v-else :asset="assetUrl" :canPlayVideo="false" :contentHash="asset.size" />
     </div>
     <div class="asset-info">
       <div v-if="showEdit" class="asset-name-edit">
@@ -65,20 +60,23 @@ import {
 } from '@pubstudio/frontend/ui-widgets'
 import { urlFromAsset } from '@pubstudio/frontend/util-asset'
 import { Keys, useKeyListener } from '@pubstudio/frontend/util-key-listener'
-import { AssetContentType } from '@pubstudio/shared/type-api-platform-site-asset'
+import {
+  AssetContentType,
+  ISiteAssetViewModel,
+} from '@pubstudio/shared/type-api-platform-site-asset'
 import PdfPreview from '@frontend-assets/icon/pdf.png'
 import AssetCardInfoBottom from './AssetCardInfoBottom.vue'
-import { ISiteAssetListItem, useSiteAssets } from '../lib/use-site-assets'
+import { useSiteAssets } from '../lib/use-site-assets'
 
 const { updateAsset, loading } = useSiteAssets()
 const { site, activePage } = useSiteSource()
 
 const props = defineProps<{
-  asset: ISiteAssetListItem
+  asset: ISiteAssetViewModel
   small?: boolean
 }>()
 const emit = defineEmits<{
-  (e: 'update', asset: ISiteAssetListItem): void
+  (e: 'update', asset: ISiteAssetViewModel): void
   (e: 'delete'): void
   (e: 'preview', assetUrl: string): void
   (e: 'replace'): void

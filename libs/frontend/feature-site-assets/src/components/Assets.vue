@@ -56,11 +56,14 @@ import { ref, onMounted } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { InfoBubble, Spinner, UsageProgress } from '@pubstudio/frontend/ui-widgets'
 import { useSites } from '@pubstudio/frontend/feature-sites'
-import { IListPlatformSiteAssetsRequest } from '@pubstudio/shared/type-api-platform-site-asset'
+import {
+  IListPlatformSiteAssetsRequest,
+  ISiteAssetViewModel,
+} from '@pubstudio/shared/type-api-platform-site-asset'
 import CreateAssetModal from './CreateAssetModal.vue'
 import DeleteAssetModal from './DeleteAssetModal.vue'
 import AssetCard from './AssetCard.vue'
-import { useSiteAssets, ISiteAssetListItem } from '../lib/use-site-assets'
+import { useSiteAssets } from '../lib/use-site-assets'
 import AssetsHeader from './AssetsHeader.vue'
 import AssetFilters from './AssetFilters.vue'
 import PreviewAssetModal from './PreviewAssetModal.vue'
@@ -79,14 +82,14 @@ const { listSites, sites, usageAllowance, loading: loadingSites } = useSites()
 const showCreateModal = ref(false)
 const deletedAssetId = ref<string>()
 const previewAssetUrl = ref<string>()
-const updateAsset = ref<ISiteAssetListItem | undefined>()
+const updateAsset = ref<ISiteAssetViewModel | undefined>()
 
 const showCreate = () => {
   updateAsset.value = undefined
   showCreateModal.value = true
 }
 
-const showReplace = (asset: ISiteAssetListItem) => {
+const showReplace = (asset: ISiteAssetViewModel) => {
   showCreateModal.value = true
   updateAsset.value = asset
 }
@@ -105,10 +108,7 @@ const removeDeletedAsset = () => {
 }
 
 const uploadComplete = (asset: IUploadFileResult) => {
-  updateAssetList({
-    ...asset,
-    version: (updateAsset.value?.version ?? 0) + 1,
-  })
+  updateAssetList(asset)
   updateAsset.value = undefined
   showCreateModal.value = false
 }
