@@ -56,8 +56,26 @@ describe('Add Row', () => {
   })
 
   it('add row when requester is owner', async () => {
-    const ownerId = '903b3c28-deaa-45dc-a43f-511fe965d34e'
-    const ownerAuth = ownerAuthHeader(ownerId)
+    const ownerAuth = ownerAuthHeader('903b3c28-deaa-45dc-a43f-511fe965d34e')
+
+    const res = await api
+      .post(testEndpoint(siteId))
+      .set('Authorization', ownerAuth)
+      .send(payload)
+      .expect(200)
+
+    const body: IAddRowApiResponse = res.body
+    expect(body.events).toEqual(1)
+  })
+
+  // Test for issue: https://github.com/samatechtw/pubstudio-builder/issues/431
+  // All user data should be escaped before hitting the database
+  it('add row with arbitrary string data', async () => {
+    const ownerAuth = ownerAuthHeader('903b3c28-deaa-45dc-a43f-511fe965d34e')
+    const data = mockAddRowPayload1()
+    data.row.name = "123abc+1'ABC'\"()`<>!@#$%^&*[]{}?/"
+    data.row.email = 'testemail+2@gmail.com'
+    payload.data = data
 
     const res = await api
       .post(testEndpoint(siteId))

@@ -1,5 +1,11 @@
-use lib_shared_site_api::error::{api_error::ApiError, helpers::check_bad_form};
-use lib_shared_types::dto::custom_data::add_row_dto::{AddRow, AddRowResponse};
+use lib_shared_site_api::{
+    db::db_error::DbError,
+    error::{api_error::ApiError, helpers::check_bad_form},
+};
+use lib_shared_types::{
+    dto::custom_data::add_row_dto::{AddRow, AddRowResponse},
+    error::api_error::ApiErrorCode,
+};
 use serde_json::Value;
 use validator::Validate;
 
@@ -49,7 +55,12 @@ pub async fn add_row(
         .custom_data_repo
         .add_row(site_id, dto)
         .await
-        .map_err(|e| ApiError::internal_error().message(e))?;
+        .map_err(|e| match e {
+            DbError::EntityNotFound() => {
+                ApiError::bad_request().code(ApiErrorCode::CustomTableNotFound)
+            }
+            _ => ApiError::internal_error().message(e),
+        })?;
 
     // Trigger AddRow table events
     let events = parse_event_info(&table.events)?;
