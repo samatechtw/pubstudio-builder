@@ -6,22 +6,22 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-lib-shared-site-api = { path = "../lib-shared-site-api" }
-lib-shared-types = { path = "../lib-shared-types" }
-axum = "0.7.5"
+lib-shared-site-api = { workspace = true }
+lib-shared-types = { workspace = true }
+axum = { workspace = true }
 axum-extra = "0.9.3"
-axum-macros = "0.4.1"
-clap = { version = "4.5.4", features = ["derive", "env"] }
-const_format = "0.2.32"
-serde = { version = "1.0.201", features = ["derive"] }
-serde_json = "1.0.117"
+axum-macros = { workspace = true }
+clap = { workspace = true }
+const_format = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
 sqlx = { version = "0.7.4", features = ["runtime-tokio-rustls", "any", "postgres", "sqlite", "migrate", "chrono"] }
 tokio = { version = "1.36.0", features = ["full"] }
 tower = { version = "0.4.13", features = ["timeout"] }
 tower-http = { version = "0.5.2", features = ["trace", "cors", "fs"] }
-tracing = "0.1.40"
-validator = { version = "0.18.1", features = ["derive"] }
-chrono = { version = "0.4.38", features = ["serde"] }
-uuid = { version = "1.8.0", features = ["serde", "v4"] }
-dotenvy = "0.15.7"
-tokio-cron = "0.1.2"
+tracing = { workspace = true }
+validator = { workspace = true }
+chrono = { workspace = true }
+uuid = { workspace = true }
+dotenvy = { workspace = true }
+tokio-cron = { workspace = true }
