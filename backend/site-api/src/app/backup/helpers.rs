@@ -1,3 +1,5 @@
+use std::fs;
+
 use lib_shared_site_api::{clients::s3_client::S3Client, error::api_error::ApiError};
 use lib_shared_types::shared::core::ExecEnv;
 use tracing::error;
@@ -20,6 +22,20 @@ pub async fn delete_backup_from_r2(env: ExecEnv, s3_client: &S3Client, backup_ur
             false
         }
     }
+}
+
+pub async fn get_backup_from_r2(
+    env: ExecEnv,
+    s3_client: &S3Client,
+    backup_url: &str,
+) -> Result<Vec<u8>, ApiError> {
+    // Get the backup file from R2
+    if env == ExecEnv::Ci || env == ExecEnv::Dev {
+        // In dev and ci environments, use a pre-set backup for testing
+        let backup_file_path = "db/sites/backups/backup_test_dev_ci.db";
+        return fs::read(backup_file_path).map_err(|e| ApiError::internal_error().message(e));
+    }
+    s3_client.get_backup(backup_url).await
 }
 
 pub fn check_s3_config(config: &Config) -> Result<(), ApiError> {

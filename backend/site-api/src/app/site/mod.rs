@@ -1,4 +1,5 @@
 pub mod create_site;
+pub mod create_site_from_backup;
 pub mod delete_site;
 pub mod get_current_site;
 pub mod get_site_domains;

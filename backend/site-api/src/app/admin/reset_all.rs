@@ -59,7 +59,7 @@ pub async fn reset_all(
     for site_id in dto.seeds.into_iter() {
         match seed_data.iter().find(|s| s.id.to_string() == site_id) {
             Some(data) => {
-                create_site_helper(&context, data).await?;
+                create_site_helper(&context, data.clone()).await?;
 
                 create_custom_table_helper(
                     &context,

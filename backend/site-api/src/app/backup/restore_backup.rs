@@ -1,35 +1,29 @@
-use std::fs;
-
 use axum::{
     extract::{Path, State},
     Extension,
 };
 use lib_shared_site_api::error::api_error::ApiError;
-use lib_shared_types::shared::{core::ExecEnv, user::RequestUser};
+use lib_shared_types::shared::user::RequestUser;
 
 use crate::{api_context::ApiContext, middleware::auth::verify_site_owner};
 
-use super::{backup_sites::backup_site, helpers::check_s3_config};
+use super::{
+    backup_sites::backup_site,
+    helpers::{check_s3_config, get_backup_from_r2},
+};
 
 pub async fn restore_backup_helper(
     context: &ApiContext,
     site_id: &str,
     backup_url: &str,
 ) -> Result<(), ApiError> {
-    // Get the backup file from R2
-    let backup_data = match context.config.exec_env {
-        ExecEnv::Prod | ExecEnv::Stg => context.s3_client.get_backup(backup_url).await?,
-        _ => {
-            // In dev and ci environments, use a pre-set backup for testing
-            let backup_file_path = "db/sites/backups/backup_test_dev_ci.db";
-            fs::read(backup_file_path).map_err(|e| ApiError::internal_error().message(e))?
-        }
-    };
+    let backup_data =
+        get_backup_from_r2(context.config.exec_env, &context.s3_client, backup_url).await?;
 
     // Import backup
     context
         .site_repo
-        .import_backup(site_id, backup_data)
+        .replace_from_backup(site_id, backup_data)
         .await
         .map_err(|e| ApiError::internal_error().message(e))?;
 

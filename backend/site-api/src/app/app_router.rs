@@ -67,6 +67,10 @@ fn api_router(context: &ApiContext) -> Router<ApiContext> {
                 .route_layer(from_fn_with_state(context.clone(), auth_admin)),
         )
         .route(
+            "/sites/actions/create_from_backup",
+            post(site::create_site_from_backup::create_site_from_backup),
+        )
+        .route(
             "/sites/validate_domain",
             get(site::validate_domain::validate_domain),
         )

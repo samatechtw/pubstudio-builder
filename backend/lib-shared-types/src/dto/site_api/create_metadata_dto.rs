@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::shared::site::SiteType;
 
-use super::create_site_dto::CreateSiteDto;
+use super::{create_site_dto::CreateSiteDto, create_site_from_backup_dto::CreateSiteFromBackupDto};
 
 #[derive(Deserialize, Serialize)]
 pub struct CreateSiteMetadataDto {
@@ -13,12 +13,26 @@ pub struct CreateSiteMetadataDto {
     pub site_type: SiteType,
 }
 
-pub fn to_metadata_dto(dto: &CreateSiteDto) -> CreateSiteMetadataDto {
-    CreateSiteMetadataDto {
-        site_id: dto.id.clone(),
-        owner_id: dto.owner_id.clone(),
-        owner_email: dto.owner_email.clone(),
-        domains: dto.domains.clone(),
-        site_type: dto.site_type,
+impl From<&CreateSiteDto> for CreateSiteMetadataDto {
+    fn from(value: &CreateSiteDto) -> Self {
+        CreateSiteMetadataDto {
+            site_id: value.id.clone(),
+            owner_id: value.owner_id.clone(),
+            owner_email: value.owner_email.clone(),
+            domains: value.domains.clone(),
+            site_type: value.site_type,
+        }
+    }
+}
+
+impl From<&CreateSiteFromBackupDto> for CreateSiteMetadataDto {
+    fn from(value: &CreateSiteFromBackupDto) -> Self {
+        CreateSiteMetadataDto {
+            site_id: value.site_id.clone(),
+            owner_id: value.owner_id.clone(),
+            owner_email: value.owner_email.clone(),
+            domains: value.domains.clone(),
+            site_type: value.site_type,
+        }
     }
 }

@@ -72,7 +72,8 @@ pub trait SiteRepoTrait {
     async fn publish_site(&self, id: &str) -> Result<SiteEntity, DbError>;
     async fn publish_all_versions(&self, id: &str, published: bool) -> Result<(), DbError>;
     async fn export_backup(&self, id: &str) -> Result<Vec<u8>, DbError>;
-    async fn import_backup(&self, id: &str, backup_data: Vec<u8>) -> Result<(), DbError>;
+    async fn create_from_backup(&self, id: &str, backup_data: Vec<u8>) -> Result<(), DbError>;
+    async fn replace_from_backup(&self, id: &str, backup_data: Vec<u8>) -> Result<(), DbError>;
 }
 
 pub struct SiteRepo {
@@ -448,10 +449,7 @@ impl SiteRepoTrait for SiteRepo {
         Ok(file_content)
     }
 
-    async fn import_backup(&self, id: &str, backup_data: Vec<u8>) -> Result<(), DbError> {
-        // Close the current DB connection/pool
-        self.db_pool_manager.remove_db_pool(id).await?;
-
+    async fn create_from_backup(&self, id: &str, backup_data: Vec<u8>) -> Result<(), DbError> {
         // Replace the database file
         let backup_file = format!("db/sites/site_{}.db", id);
         let mut file = File::create(&backup_file).map_err(|e| DbError::FileError(e.to_string()))?;
@@ -469,6 +467,14 @@ impl SiteRepoTrait for SiteRepo {
 
         // Run migrations in case a new one was added since the snapshot was saved
         Ok(self.migrate_db(&pool).await?)
+    }
+
+    async fn replace_from_backup(&self, id: &str, backup_data: Vec<u8>) -> Result<(), DbError> {
+        // Close the current DB connection/pool
+        self.db_pool_manager.remove_db_pool(id).await?;
+
+        // Replace the site database
+        self.create_from_backup(id, backup_data).await
     }
 }
 

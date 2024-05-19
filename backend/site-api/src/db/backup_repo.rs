@@ -1,6 +1,6 @@
 use axum::async_trait;
 use chrono::{DateTime, Utc};
-use lib_shared_types::entity::site_api::backup_entity::BackupEntity;
+use lib_shared_types::entity::site_api::backup_entity::{BackupEntity, CreateBackupEntityResult};
 use sqlx::{sqlite::SqliteRow, Error, Row, SqlitePool};
 use std::sync::Arc;
 use uuid::Uuid;
@@ -12,12 +12,6 @@ pub struct BackupEntityProps {
     pub url: String,
     // Manually insert created_at to match S3 object key, which is created first
     pub created_at: DateTime<Utc>,
-}
-
-pub struct CreateBackupEntityResult {
-    pub id: u32,
-    pub site_id: String,
-    pub count: u32,
 }
 
 #[async_trait]
@@ -55,6 +49,7 @@ fn row_to_create_result(row: SqliteRow) -> Result<CreateBackupEntityResult, Erro
     Ok(CreateBackupEntityResult {
         id: row.try_get("id")?,
         site_id: row.try_get("site_id")?,
+        url: row.try_get("url")?,
         count: row.try_get("count")?,
     })
 }
@@ -111,7 +106,7 @@ impl BackupRepoTrait for BackupRepo {
             r#"
           INSERT INTO backups(site_id, url, created_at)
           VALUES (?1, ?2, ?3)
-          RETURNING id, site_id, (SELECT COUNT(*) FROM backups where site_id = ?1) as count
+          RETURNING id, site_id, url, (SELECT COUNT(*) FROM backups where site_id = ?1) as count
         "#,
         )
         .bind(props.site_id.to_string())
