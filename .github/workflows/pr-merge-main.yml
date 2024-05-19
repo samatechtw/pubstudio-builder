@@ -150,6 +150,65 @@ jobs:
           if-no-files-found: error
           retention-days: 1
 
+  build-docker-site-api-ci:
+    needs: [pre_job, build-backend, repo-metadata]
+    if: ${{ needs.pre_job.outputs.should_skip != 'true' }}
+    name: Site API CI Image
+    runs-on: ubuntu-22.04
+    env:
+      APP_NAME: site-api
+      BRANCH_NAME: main
+    steps:
+      - name: Checkout code into workspace directory
+        uses: actions/checkout@v4
+      - name: Download amd64 binary
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-binaries-x86_64-unknown-linux-gnu
+          path: ./backend/target/linux/amd64/release/${{env.APP_NAME}}
+      - name: Download web-site bundle
+        uses: actions/download-artifact@v4
+        with:
+          name: web-site-bundle
+          path: ./dist/apps/web-site/index.html
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{github.actor}}
+          password: ${{secrets.GITHUB_TOKEN}}
+      - name: Build and push prod docker image
+        id: docker_build
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{env.WORKSPACE_ROOT}}
+          # Include non-secret args so we don't need them in the site-api server env
+          # Except SITE_API_HOST, which is unique to each server
+          build-args: |
+            "EXEC_ENV=ci"
+            "PLATFORM_WEB_URL=http://127.0.0.1:3000"
+            "DATABASE_URL=sqlite:site-api/db/metadata/sites_metadata.db"
+            "SITE_API_PORT=3100"
+            "SITE_API_HOST=0.0.0.0"
+            "SITE_ADMIN_PUBLIC_KEY=LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUlJQ0lqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FnOEFNSUlDQ2dLQ0FnRUF6Mis4bklTVmpubmFqNXlCVkRObgo4amhRVVFOeUlLYTUyUEIraG5DSWVCYVFaaHJVVkRWRXJESWU0MEx5ekF1WmRwaWNUY0RUSTRwTjE5RFZtQjcyClNpMXlDYldpTHp5azduUkMrVlVUNllvbXE1YWlCRG8rMDZ2dUVpbmZmTmhlODMwY0RCRGd1OC9XcWliTi92M2kKeDdiNkhkWGczSHNNSFRHRjVFM3dEU005ZTdzTzVJWCt0eTFsV3lRb1EydmZ6SDRxbkZJVmM2Z3lCRkE1Wmk0cwptSnQ2bkFsTnZrVHNYYzdhb3ZRYlArY1VrM2dmWFgyZjU2U0RrVDBMM3VLUDdiTDNaWERiRGNzTm5zbGxwR1F5Cms4Q3JwK0ZLZzgzUjV2bzg0Z3hFVCtROVA3amtEVS9XZUFPZmxNZm1idnc4aUNrRFQ0TnI3RGM2d2FWanZ2V3AKYUJsOEFzaEhHbURjZURLZ2NPRFk4WWVGREZGMENzbEtSTWFya20velU0ZjZrQ0Vza3hNRy9ZUE9ucXpoL1B6bAphUlJHekpDakFWZDU1ejJYdHZWUTROUnB3eGtLMk1NQlNYS1BuQ3Fnd3JsUWlPazBYeVhjVHhKcmZBc2hldDV0Cm9selZKdklkU3RieG02dUlBUmI4cUlVZG1HVVRLdEVaV3BTUzdBVitneUVZQ1pJVER2amNlZUs5bmFjaTF3Y04KM1hvV3RzZDZPMzJxc1BRcjc0dzU2R2xvbC96OFVhZjM5Z2hNUjFiajdYa0FST0E0NzNyWlcwMVJQcFdrQjZ4KwpTeUFqRms1YTc2aCtsRjlKWVhOR3p3TFk5dytlVUZNRjB5MEVOOGNWNFhVOXRod1ZweU1EZHpwVjlxeVJ2SC9SClN2dURKVFBzbUF4WnBNUSs5cFJId3FjQ0F3RUFBUT09Ci0tLS0tRU5EIFBVQkxJQyBLRVktLS0tLQ=="
+            "S3_URL=https://da7c8f85bc450afcae564b1d7ae16d4e.r2.cloudflarestorage.com"
+            "S3_ACCESS_KEY_ID=866e86eed58870d56aa4312f894a73cc"
+            "S3_SECRET_ACCESS_KEY=ci"
+            "SENDGRID_API_KEY=ci"
+            "SLACK_WEBHOOK_INFO_URL=ci"
+            "SLACK_WEBHOOK_ERROR_URL=ci"
+            "LAST_COMMIT_SHA=${{needs.repo-metadata.outputs.sha8}}"
+            "RELEASE_VERSION=${{needs.repo-metadata.outputs.next_version}}"
+          push: true
+          file: ${{env.WORKSPACE_ROOT}}/backend/${{env.APP_NAME}}/Dockerfile
+          target: ci
+          platforms: linux/amd64
+          tags: |
+            ${{needs.repo-metadata.outputs.repo_slug}}/ci/${{env.APP_NAME}}:${{env.BRANCH_NAME}}-${{needs.repo-metadata.outputs.sha8}}-${{github.run_number}}
+            ${{needs.repo-metadata.outputs.repo_slug}}/ci/${{env.APP_NAME}}:latest
+
   build-docker-site-api-stg:
     needs: [pre_job, build-backend, repo-metadata]
     if: ${{ needs.pre_job.outputs.should_skip != 'true' }}
