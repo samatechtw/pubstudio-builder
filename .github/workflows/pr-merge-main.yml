@@ -203,7 +203,7 @@ jobs:
             "RELEASE_VERSION=${{needs.repo-metadata.outputs.next_version}}"
           push: true
           file: ${{env.WORKSPACE_ROOT}}/backend/${{env.APP_NAME}}/Dockerfile
-          target: ci
+          target: stg
           platforms: linux/amd64
           tags: |
             ${{needs.repo-metadata.outputs.repo_slug}}/ci/${{env.APP_NAME}}:${{env.BRANCH_NAME}}-${{needs.repo-metadata.outputs.sha8}}-${{github.run_number}}
