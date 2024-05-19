@@ -129,7 +129,6 @@ const { type, name, placeholder, maxLength, modelValue, required, datalistId } =
 
 const inputRef = ref<HTMLInputElement>()
 
-// TODO: consider adding an interface for the exposed value?
 defineExpose({ inputRef })
 
 const requiredStar = ` *`

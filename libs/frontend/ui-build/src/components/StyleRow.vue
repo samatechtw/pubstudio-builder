@@ -127,7 +127,7 @@ const emit = defineEmits<{
   (e: 'remove'): void
 }>()
 
-const valueInputRef = ref()
+const valueInputRef = ref<InstanceType<typeof PSInput> | undefined>()
 const valueSelectRef = ref()
 const showSelectAssetModal = ref(false)
 
@@ -184,7 +184,7 @@ const focusValue = async () => {
   } else {
     // TODO -- look into why nextTick isn't enough here
     setTimeout(() => {
-      valueInputRef.value?.inputRef.focus()
+      valueInputRef.value?.inputRef?.focus()
     }, 1)
   }
 }
