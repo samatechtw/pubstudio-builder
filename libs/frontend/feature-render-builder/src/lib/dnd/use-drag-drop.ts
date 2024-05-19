@@ -3,7 +3,6 @@ import { addBuiltinComponent, useBuild } from '@pubstudio/frontend/feature-build
 import { activeBreakpoint } from '@pubstudio/frontend/feature-site-source'
 import { resolveComponent } from '@pubstudio/frontend/util-builtin'
 import { resolvedComponentStyle } from '@pubstudio/frontend/util-component'
-import { isDynamicComponent } from '@pubstudio/frontend/util-ids'
 import { runtimeContext } from '@pubstudio/frontend/util-runtime'
 import {
   BuildSubmenu,
@@ -69,16 +68,6 @@ export const defaultDropProps = (): IDropProps => {
     destinationIndex: -1,
     parentIsRow: false,
   }
-}
-
-// Searches up the component tree for the first non-dynamic component
-// Dynamic components cannot be dragged at this time
-export const findNonDynamic = (component: IComponent): IComponent | undefined => {
-  let target: IComponent | undefined = component
-  while (target && isDynamicComponent(target.id)) {
-    target = target.parent
-  }
-  return target
 }
 
 // Useful for using DragDrop state without needing the callbacks

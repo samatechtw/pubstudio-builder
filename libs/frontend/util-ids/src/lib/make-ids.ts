@@ -20,18 +20,6 @@ export const latestComponentId = (context: ISiteContext): string => {
   return `${context.namespace}-c-${context.nextId - 1}`
 }
 
-export const dynamicComponentId = (
-  namespace: string,
-  parentId: string,
-  index: string | number,
-): string => {
-  return `${namespace}-dc-${parentId}_${index}`
-}
-
-export const isDynamicComponent = (componentId: string): boolean => {
-  return componentId.includes('-dc-')
-}
-
 export const componentId = (namespace: string, id: string): string => {
   return `${namespace}-c-${id}`
 }
