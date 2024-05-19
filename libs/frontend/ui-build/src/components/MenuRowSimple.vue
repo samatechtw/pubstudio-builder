@@ -49,14 +49,14 @@ const emit = defineEmits<{
 }>()
 
 const newValue = ref(value.value)
-const newValueRef = ref()
+const newValueRef = ref<InstanceType<typeof PSInput> | undefined>()
 
 const editValue = async () => {
   if (editable.value) {
     emit('edit')
     newValue.value = value.value ?? ''
     await nextTick()
-    newValueRef.value?.inputRef.focus()
+    newValueRef.value?.inputRef?.focus()
   }
 }
 

@@ -85,7 +85,7 @@ const emit = defineEmits<{
 }>()
 
 const newValue = ref(value.value)
-const valueInputRef = ref()
+const valueInputRef = ref<InstanceType<typeof PSInput> | undefined>()
 
 const editing = computed(() => {
   return editor.value?.componentTab.editInputValue === property.value
@@ -96,7 +96,7 @@ const inputValid = computed(() => validateComponentArg(argType.value, newValue.v
 const edit = async () => {
   setComponentEditInputValue(editor.value, property.value)
   newValue.value = value.value
-  valueInputRef.value?.inputRef.focus()
+  valueInputRef.value?.inputRef?.focus()
 }
 
 const updateValue = () => {

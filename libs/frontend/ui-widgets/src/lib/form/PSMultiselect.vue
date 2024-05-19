@@ -195,7 +195,7 @@ const {
 
 const search = ref('')
 const searchActive = ref(false)
-const searchRef = ref()
+const searchRef = ref<InstanceType<typeof PSInput> | undefined>()
 const searchIndex = ref(0)
 
 const multiselectRef = ref()
@@ -325,7 +325,7 @@ const toggleDropdown = async () => {
     searchActive.value = true
     searchIndex.value = 0
     await nextTick()
-    searchRef.value?.inputRef.focus()
+    searchRef.value?.inputRef?.focus()
   } else {
     searchActive.value = false
   }

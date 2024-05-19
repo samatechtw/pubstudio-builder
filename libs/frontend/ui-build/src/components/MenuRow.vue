@@ -74,7 +74,7 @@ const emit = defineEmits<{
 }>()
 
 const newValue = ref()
-const newValueRef = ref()
+const newValueRef = ref<InstanceType<typeof PSInput> | undefined>()
 const editing = ref(false)
 
 const editValue = async () => {
@@ -82,7 +82,7 @@ const editValue = async () => {
     editing.value = true
     newValue.value = value.value ?? ''
     await nextTick()
-    newValueRef.value?.inputRef.focus()
+    newValueRef.value?.inputRef?.focus()
   }
 }
 
@@ -106,7 +106,7 @@ onMounted(async () => {
     await nextTick()
     newValue.value = value.value ?? ''
     if (focusInput.value) {
-      newValueRef.value?.inputRef.focus()
+      newValueRef.value?.inputRef?.focus()
     }
   }
 })
