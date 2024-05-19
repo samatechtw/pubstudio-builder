@@ -68,7 +68,7 @@
 import { computed, toRefs } from 'vue'
 import { Caret } from '@pubstudio/frontend/ui-widgets'
 import { IComponent } from '@pubstudio/shared/type-site'
-import { useDragDrop, findNonDynamic } from '@pubstudio/frontend/feature-render-builder'
+import { useDragDrop } from '@pubstudio/frontend/feature-render-builder'
 import { useBuild } from '@pubstudio/frontend/feature-build'
 import {
   collapseComponentTreeItem,
@@ -91,8 +91,7 @@ const { component, level, componentIndex } = toRefs(props)
 
 const { site, editor } = useBuild()
 
-const nonDynamicComponent = computed(() => findNonDynamic(component.value))
-const canDrag = computed(() => !!nonDynamicComponent.value?.parent)
+const canDrag = computed(() => !!component.value?.parent)
 
 const mouseEnter = () => {
   runtimeContext.hoveredComponentIdInComponentTree.value = component.value.id
@@ -117,7 +116,7 @@ const {
   componentId: component.value.id,
   getParentId: () => component.value.parent?.id,
   getComponentIndex: () => componentIndex.value,
-  isParent: component.value.id !== nonDynamicComponent.value?.id,
+  isParent: false,
   verticalOnly: true,
   getDraggedElement: () => document.getElementById(treeItemId.value),
 })

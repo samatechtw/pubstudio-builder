@@ -53,11 +53,10 @@ export const computeAttrsInputsMixins = (
   }
   // Add attrs and inputs from default `inputs`
   for (const [key, input] of Object.entries(c.inputs ?? {})) {
-    if (!inputs[key]) {
-      inputs[key] = resolveInput(input.is ?? input.default)
-    }
     if (input.attr && !attrs[key]) {
       attrs[key] = resolveInput(inputs[key] ?? input.default)
+    } else if (!inputs[key]) {
+      inputs[key] = resolveInput(input.is ?? input.default)
     }
   }
   // Add role

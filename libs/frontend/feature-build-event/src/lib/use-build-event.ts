@@ -16,7 +16,6 @@ import { activeBreakpoint } from '@pubstudio/frontend/feature-site-source'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { resolveComponent } from '@pubstudio/frontend/util-builtin'
 import { resolvedComponentStyle } from '@pubstudio/frontend/util-component'
-import { isDynamicComponent } from '@pubstudio/frontend/util-ids'
 import { Keys } from '@pubstudio/frontend/util-key-listener'
 import { runtimeContext } from '@pubstudio/frontend/util-runtime'
 import {
@@ -122,14 +121,6 @@ export const useBuildEvent = () => {
         const component = site.value.context.components[componentId]
         if (component) {
           selectComponent(site.value, component)
-        } else if (target.parentElement && isDynamicComponent(target.id)) {
-          // TODO -- this is fragile, it's probably better to add dynamic components to the
-          // Site's `context.components`
-          const index = parseInt(target.id.split('_').pop() ?? '')
-          const parent = site.value.context.components[target.parentElement.id]
-          if (parent.children?.[index]) {
-            selectComponent(site.value, parent.children[index])
-          }
         }
       }
     }

@@ -4,7 +4,7 @@ import {
   detachComponent,
   detachOverrides,
 } from '@pubstudio/frontend/util-component'
-import { isDynamicComponent, nextComponentId } from '@pubstudio/frontend/util-ids'
+import { nextComponentId } from '@pubstudio/frontend/util-ids'
 import { triggerEventBehaviors } from '@pubstudio/frontend/util-runtime'
 import { IAddComponentData } from '@pubstudio/shared/type-command-data'
 import { IComponent, ISite } from '@pubstudio/shared/type-site'
@@ -79,20 +79,16 @@ export const addComponentHelper = (site: ISite, data: IAddComponentData): ICompo
   } else if (sourceComponent?.children) {
     // Add defaults from builtin component
     for (const child of sourceComponent.children) {
-      if (isDynamicComponent(child.id)) {
-        console.log('Skip adding dynamic component', child.id)
-      } else {
-        addComponentHelper(site, {
-          name: child.name,
-          tag: child.tag,
-          content: child.content,
-          parentId: id,
-          sourceId: child.id,
-          state: clone(child.state),
-          inputs: clone(child.inputs),
-          style: clone(child.style),
-        })
-      }
+      addComponentHelper(site, {
+        name: child.name,
+        tag: child.tag,
+        content: child.content,
+        parentId: id,
+        sourceId: child.id,
+        state: clone(child.state),
+        inputs: clone(child.inputs),
+        style: clone(child.style),
+      })
     }
   }
 

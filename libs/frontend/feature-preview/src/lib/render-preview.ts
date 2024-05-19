@@ -26,7 +26,6 @@ export const computePropsContent = (
   component: IComponent,
   renderMode: RenderMode,
 ): IPropsContent => {
-  // TODO -- handle inputs
   const data = computeAttrsInputsMixins(site.context, component, { renderMode })
   const events = computeEvents(site, component)
 

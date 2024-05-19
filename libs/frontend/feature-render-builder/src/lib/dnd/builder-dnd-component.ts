@@ -24,7 +24,7 @@ import {
   VNode,
 } from 'vue'
 import { computePropsContent } from '../render-builder'
-import { findNonDynamic, useDragDrop } from './use-drag-drop'
+import { useDragDrop } from './use-drag-drop'
 
 export interface IDndComponentProps {
   site: ISite
@@ -135,7 +135,7 @@ export const BuilderDndComponent = defineComponent({
     registerCustomEvents(component.value, custom, root, false)
 
     const dndRef = computed(() => {
-      const dragCmp = findNonDynamic(component.value)
+      const dragCmp = component.value
       const componentIndex =
         component.value.parent?.children?.findIndex((c) => c.id === component.value.id) ??
         0
