@@ -19,6 +19,18 @@ export interface IComputeAttrsInputsMixinsOptions {
   editor?: IEditorContext
 }
 
+export const resolveInput = (
+  context: ISiteContext,
+  value: unknown,
+  resolveTheme = true,
+): unknown => {
+  if (resolveTheme && typeof value === 'string') {
+    return resolveThemeVariables(context, value, false) ?? value
+  } else {
+    return value
+  }
+}
+
 // Compute component attributes/props, inputs, and mixins
 // TODO -- return correct input/attr type instead of `unknown`
 export const computeAttrsInputsMixins = (
@@ -29,7 +41,6 @@ export const computeAttrsInputsMixins = (
   const { renderMode, resolveTheme = true, editor } = options
 
   const c: IComponent = component
-  const inputs: Record<string, unknown> = {}
   const attrs: Record<string, unknown> = {}
   const mixins: string[] = []
 
@@ -39,24 +50,14 @@ export const computeAttrsInputsMixins = (
       mixins.push(pseudoClassToCssClass(cssPseudoClass))
     }
   }
-
-  const resolveInput = (value: unknown): unknown => {
-    if (resolveTheme && typeof value === 'string') {
-      return resolveThemeVariables(context, value, false) ?? value
-    } else {
-      return value
-    }
-  }
   // Collect mixins
   if (c.style.mixins) {
     mixins.push(...c.style.mixins)
   }
   // Add attrs and inputs from default `inputs`
   for (const [key, input] of Object.entries(c.inputs ?? {})) {
-    if (input.attr && !attrs[key]) {
-      attrs[key] = resolveInput(inputs[key] ?? input.default)
-    } else if (!inputs[key]) {
-      inputs[key] = resolveInput(input.is ?? input.default)
+    if (input.attr) {
+      attrs[key] = resolveInput(context, input.is ?? input.default, resolveTheme)
     }
   }
   // Add role
@@ -68,5 +69,5 @@ export const computeAttrsInputsMixins = (
     attrs.href = attrs.href?.toString()
   }
 
-  return { attrs, inputs, mixins }
+  return { attrs, mixins }
 }

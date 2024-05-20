@@ -220,7 +220,6 @@ export const computePropsContent = (
   renderMode: RenderMode,
   dndState?: IDndState,
 ): IPropsBuildContent => {
-  // TODO -- handle inputs
   const data = computeAttrsInputsMixins(site.context, component, {
     renderMode,
     editor: site.editor,
