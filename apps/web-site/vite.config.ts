@@ -44,7 +44,10 @@ export default defineConfig({
       'shared/type-api-site-custom-data',
     ]),
   },
-  build: appConfigBuild,
+  build: {
+    ...appConfigBuild,
+    minify: 'esbuild',
+  },
   server: appConfigServer,
   publicDir: resolve('./src/public'),
   optimizeDeps: {
