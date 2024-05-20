@@ -1,28 +1,20 @@
 import {
-  activeBreakpoint,
-  descSortedBreakpoints,
-} from '@pubstudio/frontend/feature-site-source'
-import { findStyles } from '@pubstudio/frontend/util-component'
-import {
   createQueryStyle,
   queryStyleToString,
-  rawStyleRecordToString,
   rawStyleToResolvedStyle,
   renderGoogleFontsLink,
   RenderMode,
   themeToCssVars,
 } from '@pubstudio/frontend/util-render'
 import {
-  Css,
   CssPseudoClass,
   IPage,
   ISite,
   ThemeFontSource,
 } from '@pubstudio/shared/type-site'
 import { Link, Meta, Script, useHead } from '@unhead/vue'
-import { Component, computed, ComputedRef, defineComponent, h, Ref } from 'vue'
+import { Component, computed, defineComponent, h, Ref } from 'vue'
 import {
-  getBuildPageStyle,
   getGlobalStyle,
   getLivePageStyle,
   getRootBackgroundStyle,
@@ -34,7 +26,6 @@ export interface IUseRender {
   ComponentStyle: ReturnType<typeof defineComponent>
   GoogleFontLink: ReturnType<typeof defineComponent>
   PageContent: ReturnType<typeof defineComponent>
-  rootComponentMinHeight: ComputedRef<string>
 }
 
 export interface IUseRenderOptions {
@@ -42,11 +33,10 @@ export interface IUseRenderOptions {
   activePage: Ref<IPage | undefined>
   renderMode: RenderMode
   notFoundComponent: Component
-  unhead: boolean
 }
 
 export const useRender = (options: IUseRenderOptions): IUseRender => {
-  const { site, activePage, notFoundComponent, renderMode, unhead } = options
+  const { site, activePage, notFoundComponent, renderMode } = options
 
   const reusableStyle = computed(() => {
     let styleContent = ''
@@ -80,15 +70,6 @@ export const useRender = (options: IUseRenderOptions): IUseRender => {
     },
   })
 
-  const buildPageComponentStyle = computed(() => {
-    let styleContent = ''
-    if (activePage.value && site.value) {
-      const pageStyle = getBuildPageStyle(site.value, activePage.value)
-      styleContent = rawStyleRecordToString(pageStyle, site.value.context)
-    }
-    return h('style', styleContent)
-  })
-
   const livePageComponentStyle = computed(() => {
     let styleContent = ''
     if (activePage.value && site.value) {
@@ -105,11 +86,7 @@ export const useRender = (options: IUseRenderOptions): IUseRender => {
 
   const ComponentStyle = defineComponent({
     render() {
-      if (renderMode === RenderMode.Build) {
-        return buildPageComponentStyle.value
-      } else {
-        return livePageComponentStyle.value
-      }
+      return livePageComponentStyle.value
     },
   })
 
@@ -156,66 +133,41 @@ export const useRender = (options: IUseRenderOptions): IUseRender => {
     return pageName
   })
 
-  if (unhead) {
-    const headData = computed(() => {
-      const link = [
-        ...(site.value?.defaults.head.link ?? []),
-        ...(activePage.value?.head.link ?? []),
-      ].map((l) => (l.rel === 'icon' ? { ...l, key: 'favicon' } : l))
+  const headData = computed(() => {
+    const link = [
+      ...(site.value?.defaults.head.link ?? []),
+      ...(activePage.value?.head.link ?? []),
+    ].map((l) => (l.rel === 'icon' ? { ...l, key: 'favicon' } : l))
 
-      const activePageTitle = activePage.value?.head.title || activePageName
+    const activePageTitle = activePage.value?.head.title || activePageName
 
-      return {
-        title: activePageTitle,
-        meta: [
-          {
-            name: 'og:title',
-            content: activePageTitle,
-          },
-          {
-            name: 'twitter:title',
-            content: activePageTitle,
-          },
-          ...((site.value?.defaults.head.meta ?? []) as Meta[]),
-          ...((activePage.value?.head.meta ?? []) as Meta[]),
-        ],
-        link: link as Link[],
-        script: [
-          ...((site.value?.defaults.head.script ?? []) as Script[]),
-          ...((activePage.value?.head.script ?? []) as Script[]),
-        ],
-      }
-    })
-    useHead(headData)
-  }
-
-  const rootComponentStyle = computed(() => {
-    if (!activePage.value || !site.value || renderMode === RenderMode.Release) {
-      return undefined
-    }
-    return findStyles(
-      [Css.Height],
-      site.value,
-      activePage.value.root,
-      descSortedBreakpoints.value,
-      activeBreakpoint.value,
-    )
-  })
-
-  const rootComponentMinHeight = computed(() => {
-    const { height } = rootComponentStyle.value ?? {}
-    if (!height || height === '100%') {
-      return '100%'
-    } else {
-      return 'auto'
+    return {
+      title: activePageTitle,
+      meta: [
+        {
+          name: 'og:title',
+          content: activePageTitle,
+        },
+        {
+          name: 'twitter:title',
+          content: activePageTitle,
+        },
+        ...((site.value?.defaults.head.meta ?? []) as Meta[]),
+        ...((activePage.value?.head.meta ?? []) as Meta[]),
+      ],
+      link: link as Link[],
+      script: [
+        ...((site.value?.defaults.head.script ?? []) as Script[]),
+        ...((activePage.value?.head.script ?? []) as Script[]),
+      ],
     }
   })
+  useHead(headData)
 
   return {
     ReusableStyle,
     ComponentStyle,
     GoogleFontLink,
     PageContent,
-    rootComponentMinHeight,
   }
 }

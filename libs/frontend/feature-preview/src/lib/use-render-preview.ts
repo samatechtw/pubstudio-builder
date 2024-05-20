@@ -4,12 +4,19 @@ import {
   useRender,
 } from '@pubstudio/frontend/feature-render'
 import { NotFound } from '@pubstudio/frontend/ui-widgets'
+import {
+  IUseRenderBuilderUtil,
+  useRenderBuilderUtil,
+} from '@pubstudio/frontend/util-render-builder'
 import { computed, defineComponent, h } from 'vue'
 import { renderPage } from './render-preview'
 
-export const useRenderPreview = (options: IUseRenderOptions): IUseRender => {
+export const useRenderPreview = (
+  options: IUseRenderOptions,
+): IUseRender & IUseRenderBuilderUtil => {
   const { site, activePage, renderMode } = options
   const render = useRender(options)
+  const renderUtil = useRenderBuilderUtil({ site, activePage })
 
   const getPageContent = () => {
     if (!site.value || !activePage.value) {
@@ -30,6 +37,7 @@ export const useRenderPreview = (options: IUseRenderOptions): IUseRender => {
 
   return {
     ...render,
+    ...renderUtil,
     PageContent,
   }
 }

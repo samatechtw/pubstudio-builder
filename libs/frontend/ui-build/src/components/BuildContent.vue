@@ -20,9 +20,7 @@
 <script lang="ts" setup>
 import { computed, onMounted, onUnmounted, ref, StyleValue } from 'vue'
 import { runtimeContext } from '@pubstudio/frontend/util-runtime'
-import { RenderMode } from '@pubstudio/frontend/util-render'
 import { debounce } from '@pubstudio/shared/util-debounce'
-import { NotFound } from '@pubstudio/frontend/ui-widgets'
 import { Css, IRawStyle } from '@pubstudio/shared/type-site'
 import { findStyles } from '@pubstudio/frontend/util-component'
 import {
@@ -54,9 +52,6 @@ const {
 } = useRenderBuilder({
   site,
   activePage,
-  renderMode: RenderMode.Build,
-  notFoundComponent: NotFound,
-  unhead: false,
 })
 
 const contentWindowRef = ref<HTMLDivElement>()
