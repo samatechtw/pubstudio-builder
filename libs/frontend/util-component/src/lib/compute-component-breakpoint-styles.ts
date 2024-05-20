@@ -1,4 +1,4 @@
-import { resolveStyle } from '@pubstudio/frontend/util-builtin'
+import { resolveStyle } from '@pubstudio/frontend/util-resolve'
 import {
   Css,
   CssPseudoClass,

@@ -1,4 +1,4 @@
-import { resolveStyle } from '@pubstudio/frontend/util-builtin'
+import { resolveStyle } from '@pubstudio/frontend/util-resolve'
 import { CommandType, ICommand } from '@pubstudio/shared/type-command'
 import { IEditStyleMixinData } from '@pubstudio/shared/type-command-data'
 import { ISite } from '@pubstudio/shared/type-site'

@@ -92,7 +92,7 @@ import {
 } from '@pubstudio/frontend/ui-widgets'
 import { useBuild, getLinkDatalistOptions } from '@pubstudio/frontend/feature-build'
 import { useTooltip } from '@pubstudio/frontend/util-tooltip'
-import { resolveComponent } from '@pubstudio/frontend/util-builtin'
+import { resolveComponent } from '@pubstudio/frontend/util-resolve'
 import { ComponentArgPrimitive } from '@pubstudio/shared/type-site'
 import { createLinkNode, schemaText } from '@pubstudio/frontend/util-edit-text'
 import { LinkTooltipMode } from '../lib/enum-link-tooltip-mode'

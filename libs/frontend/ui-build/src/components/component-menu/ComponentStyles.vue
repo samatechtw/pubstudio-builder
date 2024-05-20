@@ -36,7 +36,7 @@
 <script lang="ts" setup>
 import { computed, ref } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
-import { resolveThemeVariables } from '@pubstudio/frontend/util-builtin'
+import { resolveThemeVariables } from '@pubstudio/frontend/util-resolve'
 import {
   ComponentMenuCollapsible,
   Css,

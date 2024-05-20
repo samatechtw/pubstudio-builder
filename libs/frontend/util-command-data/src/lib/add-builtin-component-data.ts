@@ -1,4 +1,4 @@
-import { resolveComponent } from '@pubstudio/frontend/util-builtin'
+import { getBuiltinComponent } from '@pubstudio/frontend/util-builtin'
 import { IAddComponentData } from '@pubstudio/shared/type-command-data'
 import { IComponent, ISite } from '@pubstudio/shared/type-site'
 import { selectAddParent } from './select-add-parent'
@@ -10,7 +10,7 @@ export const makeAddBuiltinComponentData = (
   parent: IComponent,
   selectedComponentId: string | undefined,
 ): IAddComponentData | undefined => {
-  const builtinComponent = resolveComponent(site.context, builtinComponentId)
+  const builtinComponent = getBuiltinComponent(builtinComponentId)
   if (!builtinComponent) {
     return undefined
   }

@@ -1,8 +1,5 @@
-import {
-  defaultImageInputs,
-  defaultLinkInputs,
-  resolveComponent,
-} from '@pubstudio/frontend/util-builtin'
+import { defaultImageInputs, defaultLinkInputs } from '@pubstudio/frontend/util-builtin'
+import { resolveComponent } from '@pubstudio/frontend/util-resolve'
 import {
   IEditComponentData,
   IEditComponentFields,

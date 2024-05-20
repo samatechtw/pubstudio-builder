@@ -53,7 +53,7 @@ import {
   useThemeMenuVariables,
 } from '@pubstudio/frontend/feature-build'
 import { IThemeVariable } from '@pubstudio/shared/type-site'
-import { resolveThemeVariables } from '@pubstudio/frontend/util-builtin'
+import { resolveThemeVariables } from '@pubstudio/frontend/util-resolve'
 import ThemeVariableList from './ThemeVariableList.vue'
 import { isColor } from '@pubstudio/frontend/util-doc'
 import { builtinThemeVariables } from '@pubstudio/frontend/util-ids'

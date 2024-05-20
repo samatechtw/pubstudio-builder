@@ -3,20 +3,20 @@ import {
   IUseRenderOptions,
   useRender,
 } from '@pubstudio/frontend/feature-render'
-import { NotFound } from '@pubstudio/frontend/ui-widgets'
 import {
-  IUseRenderBuilderUtil,
-  useRenderBuilderUtil,
-} from '@pubstudio/frontend/util-render-builder'
+  IUseRenderBuilderHelper,
+  useRenderBuilderHelper,
+} from '@pubstudio/frontend/feature-render-helpers'
+import { NotFound } from '@pubstudio/frontend/ui-widgets'
 import { computed, defineComponent, h } from 'vue'
 import { renderPage } from './render-preview'
 
 export const useRenderPreview = (
   options: IUseRenderOptions,
-): IUseRender & IUseRenderBuilderUtil => {
+): IUseRender & IUseRenderBuilderHelper => {
   const { site, activePage, renderMode } = options
   const render = useRender(options)
-  const renderUtil = useRenderBuilderUtil({ site, activePage })
+  const renderUtil = useRenderBuilderHelper({ site, activePage })
 
   const getPageContent = () => {
     if (!site.value || !activePage.value) {

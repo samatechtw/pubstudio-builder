@@ -1,4 +1,4 @@
-import { resolveComponent } from '@pubstudio/frontend/util-builtin'
+import { resolveComponent } from '@pubstudio/frontend/util-resolve'
 import { ICloseMixinMenuParams } from '@pubstudio/shared/type-command-data'
 import { EditorMode, ISite } from '@pubstudio/shared/type-site'
 import { editStylesCancelEdit, setEditingMixin } from '../edit-styles-data'

@@ -1,5 +1,5 @@
-import { builtinBehaviors, resolveComponent } from '@pubstudio/frontend/util-builtin'
 import { DEFAULT_BREAKPOINT_ID, noBehaviorId } from '@pubstudio/frontend/util-ids'
+import { builtinBehaviors, resolveComponent } from '@pubstudio/frontend/util-resolve'
 import { deserializeSite } from '@pubstudio/frontend/util-site-deserialize'
 import { serializeComponent, stringifySite } from '@pubstudio/frontend/util-site-store'
 import {

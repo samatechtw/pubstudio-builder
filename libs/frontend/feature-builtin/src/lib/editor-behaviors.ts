@@ -3,12 +3,7 @@ import {
   mergeLastCommand,
   toggleComponentTreeHidden,
 } from '@pubstudio/frontend/data-access-command'
-import {
-  builtinStyles,
-  defaultNavMenuItemInputs,
-  registerBuiltinBehavior,
-  resolveStyle,
-} from '@pubstudio/frontend/util-builtin'
+import { builtinStyles, defaultNavMenuItemInputs } from '@pubstudio/frontend/util-builtin'
 import {
   makeAddBuiltinComponentData,
   makeEditComponentData,
@@ -22,6 +17,7 @@ import {
   navMenuItemStyleId,
   setupLoaderBehaviorId,
 } from '@pubstudio/frontend/util-ids'
+import { registerBuiltinBehavior, resolveStyle } from '@pubstudio/frontend/util-resolve'
 import { CommandType, ICommand } from '@pubstudio/shared/type-command'
 import {
   IAddStyleMixinData,

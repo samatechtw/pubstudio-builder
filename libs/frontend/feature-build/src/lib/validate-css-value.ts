@@ -1,4 +1,4 @@
-import { resolveThemeVariables } from '@pubstudio/frontend/util-builtin'
+import { resolveThemeVariables } from '@pubstudio/frontend/util-resolve'
 import { Css, ISiteContext } from '@pubstudio/shared/type-site'
 
 export const validateCssValue = (

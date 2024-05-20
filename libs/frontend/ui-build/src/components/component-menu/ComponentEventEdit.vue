@@ -120,7 +120,7 @@ import {
   PSMultiselect,
   Plus,
 } from '@pubstudio/frontend/ui-widgets'
-import { builtinBehaviors } from '@pubstudio/frontend/util-builtin'
+import { builtinBehaviors } from '@pubstudio/frontend/util-resolve'
 import { noBehavior } from '@pubstudio/frontend/feature-builtin'
 import { setEditBehavior } from '@pubstudio/frontend/data-access-command'
 import {

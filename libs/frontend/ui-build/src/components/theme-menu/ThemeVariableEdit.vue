@@ -83,7 +83,7 @@ import {
 import MenuRow from '../MenuRow.vue'
 import { ColorPicker, IPickerColor } from '@pubstudio/frontend/feature-color-picker'
 import { colorToCssValue } from '@pubstudio/frontend/feature-color-picker'
-import { resolveThemeVariables } from '@pubstudio/frontend/util-builtin'
+import { resolveThemeVariables } from '@pubstudio/frontend/util-resolve'
 import { IThemedGradient } from '@pubstudio/frontend/util-gradient'
 import { useClickaway } from '@pubstudio/frontend/util-clickaway'
 import ThemeVariableFont from './ThemeVariableFont.vue'

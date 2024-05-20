@@ -1,5 +1,5 @@
-import { builtinBehaviors } from '@pubstudio/frontend/util-builtin'
 import { noBehaviorId } from '@pubstudio/frontend/util-ids'
+import { builtinBehaviors } from '@pubstudio/frontend/util-resolve'
 import { mockSerializedComponent } from '@pubstudio/frontend/util-test-mock'
 import { IAddComponentData } from '@pubstudio/shared/type-command-data'
 import {

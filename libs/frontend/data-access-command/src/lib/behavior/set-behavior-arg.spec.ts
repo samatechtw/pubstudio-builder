@@ -1,5 +1,5 @@
-import { resolveBehavior } from '@pubstudio/frontend/util-builtin'
 import { nextBehaviorId } from '@pubstudio/frontend/util-ids'
+import { resolveBehavior } from '@pubstudio/frontend/util-resolve'
 import { deserializeSite } from '@pubstudio/frontend/util-site-deserialize'
 import { mockSerializedSite } from '@pubstudio/frontend/util-test-mock'
 import {

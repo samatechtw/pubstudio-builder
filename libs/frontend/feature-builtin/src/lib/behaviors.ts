@@ -1,8 +1,4 @@
 import {
-  registerBuiltinBehavior,
-  resolveComponent,
-} from '@pubstudio/frontend/util-builtin'
-import {
   clearErrorBehaviorId,
   contactFormBehaviorId,
   homeLinkBehaviorId,
@@ -12,6 +8,10 @@ import {
   toggleHiddenId,
 } from '@pubstudio/frontend/util-ids'
 import { findComponent } from '@pubstudio/frontend/util-render'
+import {
+  registerBuiltinBehavior,
+  resolveComponent,
+} from '@pubstudio/frontend/util-resolve'
 import {
   ComponentArgPrimitive,
   Css,

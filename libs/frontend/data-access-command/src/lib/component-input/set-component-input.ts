@@ -1,4 +1,4 @@
-import { resolveComponent } from '@pubstudio/frontend/util-builtin'
+import { resolveComponent } from '@pubstudio/frontend/util-resolve'
 import { ISetComponentInputData } from '@pubstudio/shared/type-command-data'
 import { IComponent, IComponentInput, ISite } from '@pubstudio/shared/type-site'
 import { setSelectedComponent } from '../set-selected-component'

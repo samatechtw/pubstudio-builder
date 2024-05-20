@@ -14,9 +14,9 @@ import {
 } from '@pubstudio/frontend/feature-build'
 import { activeBreakpoint } from '@pubstudio/frontend/feature-site-source'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
-import { resolveComponent } from '@pubstudio/frontend/util-builtin'
 import { resolvedComponentStyle } from '@pubstudio/frontend/util-component'
 import { Keys } from '@pubstudio/frontend/util-key-listener'
+import { resolveComponent } from '@pubstudio/frontend/util-resolve'
 import { runtimeContext } from '@pubstudio/frontend/util-runtime'
 import {
   BuildSubmenu,

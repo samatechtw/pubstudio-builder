@@ -182,9 +182,10 @@
       "@pubstudio/frontend/util-edit-text": ["libs/frontend/util-edit-text/src/index.ts"],
       "@pubstudio/frontend/util-ids": ["libs/frontend/util-ids/src/index.ts"],
       "@pubstudio/frontend/util-render": ["libs/frontend/util-render/src/index.ts"],
-      "@pubstudio/frontend/util-render-builder": [
-        "libs/frontend/util-render-builder/src/index.ts"
+      "@pubstudio/frontend/feature-render-helpers": [
+        "libs/frontend/feature-render-helpers/src/index.ts"
       ],
+      "@pubstudio/frontend/util-resolve": ["libs/frontend/util-resolve/src/index.ts"],
       "@pubstudio/frontend/util-runtime": ["libs/frontend/util-runtime/src/index.ts"],
       "@pubstudio/frontend/util-site": ["libs/frontend/util-site/src/index.ts"],
       "@pubstudio/frontend/util-site-deserialize": [

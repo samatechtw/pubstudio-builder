@@ -1,10 +1,10 @@
-import { resolveComponent } from '@pubstudio/frontend/util-builtin'
 import {
   clone,
   detachComponent,
   detachOverrides,
 } from '@pubstudio/frontend/util-component'
 import { nextComponentId } from '@pubstudio/frontend/util-ids'
+import { resolveComponent } from '@pubstudio/frontend/util-resolve'
 import { triggerEventBehaviors } from '@pubstudio/frontend/util-runtime'
 import { IAddComponentData } from '@pubstudio/shared/type-command-data'
 import { IComponent, ISite } from '@pubstudio/shared/type-site'

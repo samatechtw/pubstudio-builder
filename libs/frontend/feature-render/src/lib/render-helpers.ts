@@ -1,4 +1,4 @@
-import { NativeEvents } from '@pubstudio/frontend/util-builtin'
+import { NativeEvents } from '@pubstudio/frontend/util-resolve'
 import { triggerEventBehaviors } from '@pubstudio/frontend/util-runtime'
 import { IComponent, IEventCollection, ISite } from '@pubstudio/shared/type-site'
 

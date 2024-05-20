@@ -1,5 +1,5 @@
-import { resolveThemeVariables } from '@pubstudio/frontend/util-builtin'
 import { RenderMode } from '@pubstudio/frontend/util-render'
+import { resolveThemeVariables } from '@pubstudio/frontend/util-resolve'
 import {
   CssPseudoClass,
   IComponent,
