@@ -51,8 +51,7 @@ import {
   IComponentInput,
   Tag,
 } from '@pubstudio/shared/type-site'
-import { RenderMode } from '@pubstudio/frontend/util-render'
-import { computeAttrsInputsMixins } from '@pubstudio/frontend/feature-render'
+import { resolveInput } from '@pubstudio/frontend/feature-render'
 import { Assets } from '@pubstudio/frontend/ui-widgets'
 import { SelectAssetModal } from '@pubstudio/frontend/feature-site-assets'
 import { urlFromAsset } from '@pubstudio/frontend/util-asset'
@@ -94,10 +93,10 @@ const getArgType = (property: string): ComponentArgType => {
 }
 
 const inputArray = computed(() => {
-  const { inputs } = computeAttrsInputsMixins(site.value.context, component.value, {
-    renderMode: RenderMode.Build,
-    resolveTheme: false,
-  })
+  const inputs: Record<string, unknown> = {}
+  for (const [key, input] of Object.entries(component.value.inputs ?? {})) {
+    inputs[key] = resolveInput(site.value.context, input.is ?? input.default, false)
+  }
   return Object.entries(inputs).sort((entryA, entryB) =>
     entryA[0].localeCompare(entryB[0]),
   )
