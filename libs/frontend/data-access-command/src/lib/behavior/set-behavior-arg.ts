@@ -1,4 +1,4 @@
-import { resolveBehavior } from '@pubstudio/frontend/util-builtin'
+import { resolveBehavior } from '@pubstudio/frontend/util-resolve'
 import { ISetBehaviorArgData } from '@pubstudio/shared/type-command-data'
 import { IBehavior, IBehaviorArg, ISite } from '@pubstudio/shared/type-site'
 

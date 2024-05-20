@@ -1,4 +1,4 @@
-import { resolveComponent } from '@pubstudio/frontend/util-builtin'
+import { resolveComponent } from '@pubstudio/frontend/util-resolve'
 import { IChangePageData } from '@pubstudio/shared/type-command-data'
 import { ISite } from '@pubstudio/shared/type-site'
 import { setSelectedComponent } from '../set-selected-component'

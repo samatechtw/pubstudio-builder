@@ -1,8 +1,5 @@
-import {
-  horizontalStyle,
-  resolveComponent,
-  verticalStyle,
-} from '@pubstudio/frontend/util-builtin'
+import { horizontalStyle, verticalStyle } from '@pubstudio/frontend/util-builtin'
+import { resolveComponent } from '@pubstudio/frontend/util-resolve'
 import { deserializeSite } from '@pubstudio/frontend/util-site-deserialize'
 import {
   mockAddComponentData,

@@ -1,4 +1,4 @@
-import { resolveComponent } from '@pubstudio/frontend/util-builtin'
+import { resolveComponent } from '@pubstudio/frontend/util-resolve'
 import { CommandType, ICommand } from '@pubstudio/shared/type-command'
 import { ISetComponentOverrideStyleData } from '@pubstudio/shared/type-command-data'
 import { IComponent, ISite, IStyleEntry } from '@pubstudio/shared/type-site'

@@ -1,8 +1,8 @@
 import { setBuildSubmenu } from '@pubstudio/frontend/data-access-command'
 import { addBuiltinComponent, useBuild } from '@pubstudio/frontend/feature-build'
 import { activeBreakpoint } from '@pubstudio/frontend/feature-site-source'
-import { resolveComponent } from '@pubstudio/frontend/util-builtin'
 import { resolvedComponentStyle } from '@pubstudio/frontend/util-component'
+import { resolveComponent } from '@pubstudio/frontend/util-resolve'
 import { runtimeContext } from '@pubstudio/frontend/util-runtime'
 import {
   BuildSubmenu,

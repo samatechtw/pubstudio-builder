@@ -49,7 +49,7 @@
 
 <script lang="ts" setup>
 import { InfoBubble } from '@pubstudio/frontend/ui-widgets'
-import { behaviorHelpers } from '@pubstudio/frontend/util-builtin'
+import { behaviorHelpers } from '@pubstudio/frontend/util-resolve'
 import { useI18n } from 'petite-vue-i18n'
 
 const { t } = useI18n()

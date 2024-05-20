@@ -1,7 +1,7 @@
 import { applyAddComponent } from '@pubstudio/frontend/data-access-command'
 import { initializeSiteStore } from '@pubstudio/frontend/feature-site-store-init'
-import { resolveComponent } from '@pubstudio/frontend/util-builtin'
 import { DEFAULT_BREAKPOINT_ID } from '@pubstudio/frontend/util-ids'
+import { resolveComponent } from '@pubstudio/frontend/util-resolve'
 import {
   mockAddComponentData,
   mockSerializedComponent,

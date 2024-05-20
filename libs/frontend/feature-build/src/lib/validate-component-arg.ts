@@ -1,4 +1,4 @@
-import { themeVariableSyntaxRegex } from '@pubstudio/frontend/util-builtin'
+import { themeVariableSyntaxRegex } from '@pubstudio/frontend/util-resolve'
 import { ComponentArgPrimitive, ComponentArgType } from '@pubstudio/shared/type-site'
 
 export const validateComponentArg = (

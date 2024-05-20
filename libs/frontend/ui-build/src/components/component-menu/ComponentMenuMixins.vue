@@ -31,7 +31,7 @@
 import { computed, ref, toRefs } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { IStyle } from '@pubstudio/shared/type-site'
-import { resolveStyle } from '@pubstudio/frontend/util-builtin'
+import { resolveStyle } from '@pubstudio/frontend/util-resolve'
 import { builtinStyles } from '@pubstudio/frontend/util-builtin'
 import { useBuild, useMixinMenuUi } from '@pubstudio/frontend/feature-build'
 import EditMenuTitle from '../EditMenuTitle.vue'

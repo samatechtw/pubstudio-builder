@@ -2,7 +2,7 @@ import {
   behaviorHelpers,
   resolveBehavior,
   resolveBehaviorFunction,
-} from '@pubstudio/frontend/util-builtin'
+} from '@pubstudio/frontend/util-resolve'
 import {
   IBehaviorContext,
   IComponent,

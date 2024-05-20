@@ -1,4 +1,4 @@
-import { resolveComponent } from '@pubstudio/frontend/util-builtin'
+import { resolveComponent } from '@pubstudio/frontend/util-resolve'
 import { ISiteContext } from '@pubstudio/shared/type-site'
 
 export interface IComponentMixinData {

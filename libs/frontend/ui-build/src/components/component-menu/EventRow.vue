@@ -17,7 +17,7 @@ import { computed, toRefs } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { IComponentEvent } from '@pubstudio/shared/type-site'
 import { Settings } from '@pubstudio/frontend/ui-widgets'
-import { resolveBehavior } from '@pubstudio/frontend/util-builtin'
+import { resolveBehavior } from '@pubstudio/frontend/util-resolve'
 import { useBuild } from '@pubstudio/frontend/feature-build'
 
 const { t } = useI18n()

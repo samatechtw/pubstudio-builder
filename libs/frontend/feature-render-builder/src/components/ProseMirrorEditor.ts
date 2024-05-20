@@ -11,7 +11,6 @@ import {
   descSortedBreakpoints,
 } from '@pubstudio/frontend/feature-site-source'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
-import { resolveThemeVariables } from '@pubstudio/frontend/util-builtin'
 import { findStyles } from '@pubstudio/frontend/util-component'
 import {
   firstMarkInSelection,
@@ -21,6 +20,7 @@ import {
   setOrRemoveStyleMark,
 } from '@pubstudio/frontend/util-edit-text'
 import { isTextGradient } from '@pubstudio/frontend/util-gradient'
+import { resolveThemeVariables } from '@pubstudio/frontend/util-resolve'
 import { Css, IComponent, IEditorContext } from '@pubstudio/shared/type-site'
 import { EditorState, Plugin, TextSelection, Transaction } from 'prosemirror-state'
 import { Decoration, DecorationSet } from 'prosemirror-view'

@@ -1,16 +1,16 @@
 /* eslint-disable vue/one-component-per-file */
 import { useThemeMenuFonts } from '@pubstudio/frontend/feature-build'
 import { getBuildPageStyle, IUseRender } from '@pubstudio/frontend/feature-render'
+import {
+  IUseRenderBuilderHelper,
+  useRenderBuilderHelper,
+} from '@pubstudio/frontend/feature-render-helpers'
 import { NotFound } from '@pubstudio/frontend/ui-widgets'
 import {
   rawStyleRecordToString,
   renderGoogleFontsLink,
   themeToCssVars,
 } from '@pubstudio/frontend/util-render'
-import {
-  IUseRenderBuilderUtil,
-  useRenderBuilderUtil,
-} from '@pubstudio/frontend/util-render-builder'
 import { IPage, ISite, ThemeFontSource } from '@pubstudio/shared/type-site'
 import { computed, defineComponent, h, Ref } from 'vue'
 import { computeBuilderReusableStyles } from './compute-builder-reusable-styles'
@@ -23,10 +23,10 @@ export interface IUseRenderBuilderOptions {
 
 export const useRenderBuilder = (
   options: IUseRenderBuilderOptions,
-): IUseRender & IUseRenderBuilderUtil => {
+): IUseRender & IUseRenderBuilderHelper => {
   const { site, activePage } = options
   const { selectedGoogleFonts } = useThemeMenuFonts()
-  const renderUtil = useRenderBuilderUtil(options)
+  const renderUtil = useRenderBuilderHelper(options)
 
   const reusableStyle = computed(() => {
     let styleContent = ''

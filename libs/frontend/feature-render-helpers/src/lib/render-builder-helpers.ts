@@ -6,16 +6,16 @@ import { findStyles } from '@pubstudio/frontend/util-component'
 import { Css, IPage, ISite } from '@pubstudio/shared/type-site'
 import { computed, Ref } from 'vue'
 
-export interface IUseRenderBuilderUtilOptions {
+export interface IUseRenderBuilderHelperOptions {
   site: Ref<ISite | undefined>
   activePage: Ref<IPage | undefined>
 }
 
-export interface IUseRenderBuilderUtil {
+export interface IUseRenderBuilderHelper {
   rootComponentMinHeight: Ref<string>
 }
 
-export const useRenderBuilderUtil = (options: IUseRenderBuilderUtilOptions) => {
+export const useRenderBuilderHelper = (options: IUseRenderBuilderHelperOptions) => {
   const { site, activePage } = options
 
   const rootComponentStyle = computed(() => {

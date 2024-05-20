@@ -1,5 +1,5 @@
-import { resolveComponent } from '@pubstudio/frontend/util-builtin'
 import { mergeArr, mergePseudoStyle } from '@pubstudio/frontend/util-component'
+import { resolveComponent } from '@pubstudio/frontend/util-resolve'
 import { CommandType, ICommand } from '@pubstudio/shared/type-command'
 import { IMergeComponentStyleData } from '@pubstudio/shared/type-command-data'
 import { ISite } from '@pubstudio/shared/type-site'

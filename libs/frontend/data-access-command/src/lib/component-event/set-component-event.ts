@@ -1,4 +1,4 @@
-import { resolveComponent } from '@pubstudio/frontend/util-builtin'
+import { resolveComponent } from '@pubstudio/frontend/util-resolve'
 import { triggerEventBehaviors } from '@pubstudio/frontend/util-runtime'
 import { ISetComponentEventData } from '@pubstudio/shared/type-command-data'
 import {

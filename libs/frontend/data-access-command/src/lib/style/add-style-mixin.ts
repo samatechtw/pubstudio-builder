@@ -1,5 +1,5 @@
-import { resolveStyle } from '@pubstudio/frontend/util-builtin'
 import { latestStyleId, nextStyleId } from '@pubstudio/frontend/util-ids'
+import { resolveStyle } from '@pubstudio/frontend/util-resolve'
 import { CommandType, ICommand } from '@pubstudio/shared/type-command'
 import { IAddStyleMixinData } from '@pubstudio/shared/type-command-data'
 import { ISite, IStyle } from '@pubstudio/shared/type-site'

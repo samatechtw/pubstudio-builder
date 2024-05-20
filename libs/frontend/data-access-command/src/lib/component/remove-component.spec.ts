@@ -1,6 +1,6 @@
-import { builtinBehaviors, resolveComponent } from '@pubstudio/frontend/util-builtin'
 import { makeRemoveComponentData } from '@pubstudio/frontend/util-command-data'
 import { noBehaviorId } from '@pubstudio/frontend/util-ids'
+import { builtinBehaviors, resolveComponent } from '@pubstudio/frontend/util-resolve'
 import { deserializeSite } from '@pubstudio/frontend/util-site-deserialize'
 import { stringifySite } from '@pubstudio/frontend/util-site-store'
 import {

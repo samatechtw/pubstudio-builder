@@ -13,7 +13,6 @@ import {
   descSortedBreakpoints,
 } from '@pubstudio/frontend/feature-site-source'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
-import { resolveComponent } from '@pubstudio/frontend/util-builtin'
 import {
   addComponentEventData,
   makeEditComponentData,
@@ -28,6 +27,7 @@ import {
   flattenedComponentStyle,
 } from '@pubstudio/frontend/util-component'
 import { DEFAULT_BREAKPOINT_ID, styleId } from '@pubstudio/frontend/util-ids'
+import { resolveComponent } from '@pubstudio/frontend/util-resolve'
 import { serializePage } from '@pubstudio/frontend/util-site-store'
 import { uiAlert } from '@pubstudio/frontend/util-ui-alert'
 import { CommandType, ICommand } from '@pubstudio/shared/type-command'

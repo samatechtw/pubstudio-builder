@@ -5,7 +5,6 @@ import {
 } from '@pubstudio/frontend/data-access-command'
 import { activeBreakpoint } from '@pubstudio/frontend/feature-site-source'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
-import { resolveThemeVariables } from '@pubstudio/frontend/util-builtin'
 import {
   firstMarkInSelection,
   isMarkInSelection,
@@ -15,6 +14,7 @@ import {
   setOrRemoveStyleMark,
   toggleMark,
 } from '@pubstudio/frontend/util-edit-text'
+import { resolveThemeVariables } from '@pubstudio/frontend/util-resolve'
 import { CommandType, ICommand } from '@pubstudio/shared/type-command'
 import {
   ICommandGroupData,

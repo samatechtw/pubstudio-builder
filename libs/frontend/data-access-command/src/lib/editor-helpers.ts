@@ -1,5 +1,5 @@
-import { resolveComponent } from '@pubstudio/frontend/util-builtin'
 import { iterateComponent } from '@pubstudio/frontend/util-render'
+import { resolveComponent } from '@pubstudio/frontend/util-resolve'
 import { runtimeContext } from '@pubstudio/frontend/util-runtime'
 import {
   BuildSubmenu,

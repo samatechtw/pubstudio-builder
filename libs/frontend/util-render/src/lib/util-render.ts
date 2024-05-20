@@ -1,5 +1,5 @@
-import { resolveThemeVariables } from '@pubstudio/frontend/util-builtin'
 import { DEFAULT_BREAKPOINT_ID } from '@pubstudio/frontend/util-ids'
+import { resolveThemeVariables } from '@pubstudio/frontend/util-resolve'
 import {
   Css,
   IBreakpoint,

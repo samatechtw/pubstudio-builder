@@ -1,6 +1,6 @@
-import { resolveThemeVariables } from '@pubstudio/frontend/util-builtin'
 import { isColor } from '@pubstudio/frontend/util-doc'
 import { builtinThemeVariables } from '@pubstudio/frontend/util-ids'
+import { resolveThemeVariables } from '@pubstudio/frontend/util-resolve'
 import { IThemeVariable } from '@pubstudio/shared/type-site'
 import { computed, ComputedRef } from 'vue'
 import { useBuild } from './use-build'

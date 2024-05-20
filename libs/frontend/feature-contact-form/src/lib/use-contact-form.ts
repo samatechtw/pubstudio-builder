@@ -7,9 +7,9 @@ import { store } from '@pubstudio/frontend/data-access-web-store'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { appendEvent, loadCustomTables } from '@pubstudio/frontend/feature-walkthrough'
 import { parseApiErrorKey, PSApi, toApiError } from '@pubstudio/frontend/util-api'
-import { resolveComponent } from '@pubstudio/frontend/util-builtin'
 import { makeRemoveComponentData } from '@pubstudio/frontend/util-command-data'
 import { clearErrorBehaviorId, contactFormBehaviorId } from '@pubstudio/frontend/util-ids'
+import { resolveComponent } from '@pubstudio/frontend/util-resolve'
 import { IApiCustomData } from '@pubstudio/shared/type-api-interfaces'
 import {
   ICreateTableApiRequest,

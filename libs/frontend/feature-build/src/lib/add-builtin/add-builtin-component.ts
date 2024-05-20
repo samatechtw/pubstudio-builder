@@ -1,26 +1,20 @@
 import { pushCommand } from '@pubstudio/frontend/data-access-command'
 import { getActivePage } from '@pubstudio/frontend/feature-site-store'
-import {
-  builtinStyles,
-  resolveComponent,
-  resolveStyle,
-} from '@pubstudio/frontend/util-builtin'
+import { builtinStyles, getBuiltinComponent } from '@pubstudio/frontend/util-builtin'
 import { makeAddBuiltinComponentData } from '@pubstudio/frontend/util-command-data'
+import { resolveComponent, resolveStyle } from '@pubstudio/frontend/util-resolve'
 import { CommandType, ICommand } from '@pubstudio/shared/type-command'
 import {
   IAddComponentData,
   IAddStyleMixinData,
   ICommandGroupData,
 } from '@pubstudio/shared/type-command-data'
-import { IComponent, ISite, ISiteContext } from '@pubstudio/shared/type-site'
+import { IComponent, ISite } from '@pubstudio/shared/type-site'
 
 // Get builtin mixins from a component & children that have not
 // been added to the site
-const getMissingMixins = (
-  context: ISiteContext,
-  componentId: string | undefined,
-): string[] => {
-  const builtinComponent = resolveComponent(context, componentId)
+const getMissingMixins = (componentId: string | undefined): string[] => {
+  const builtinComponent = getBuiltinComponent(componentId)
   if (!builtinComponent) {
     return []
   }
@@ -40,7 +34,7 @@ const getMissingMixins = (
 }
 
 export const addBuiltinComponentData = (site: ISite, data: IAddComponentData) => {
-  const mixins = getMissingMixins(site.context, data.sourceId)
+  const mixins = getMissingMixins(data.sourceId)
   pushCommandAndAddMissingMixins(site, CommandType.AddComponent, data, mixins)
 }
 
