@@ -46,7 +46,7 @@ export default defineConfig({
   },
   build: {
     ...appConfigBuild,
-    minify: 'esbuild',
+    cssMinify: 'lightningcss',
   },
   server: appConfigServer,
   publicDir: resolve('./src/public'),

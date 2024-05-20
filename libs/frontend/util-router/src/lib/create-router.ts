@@ -143,20 +143,18 @@ export const createRouter = <M = Record<string, unknown>>(
 
       // Make sure route name and route path are unique
       if (routeWithSameName) {
-        throw new Error(`Route with name ${route.name} already exists`)
+        throw new Error(`Named route exists: ${route.name}`)
       } else if (usedRegex.has(mergedPathRegex.source)) {
-        throw new Error(
-          `Route that could also be matched with path ${mergedPath} already exists`,
-        )
+        throw new Error(`Already matched route path: ${mergedPath}`)
       } else if (mergedPath === '/' && parentRoute) {
-        throw new Error('Default route cannot be a child of any other route')
+        throw new Error('Default route cannot be a child')
       } else if (route.isNotFoundRoute) {
         if (parentRoute) {
-          throw new Error('Not found route cannot be a child of any other route')
+          throw new Error('Not found cannot be a child')
         } else if (route.children?.length) {
-          throw new Error('Not found route cannot have any child routes')
+          throw new Error('Not found cannot have children')
         } else if (notFoundRoute) {
-          throw new Error(`Not found route already exists (name: ${notFoundRoute.name})`)
+          throw new Error(`Not found route exists: ${notFoundRoute.name}`)
         }
       }
 
