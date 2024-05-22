@@ -11,25 +11,28 @@ export const computeBuilderReusableStyles = (site: ISite): IRawStyleRecord => {
   const accumulatedBreakpointIds = getActiveBreakpointIds()
 
   // Compute styles in default pseudo class
-  Object.entries(site.context.styles).forEach(([styleId, style]) => {
-    accumulatedBreakpointIds.forEach((breakpointId) => {
-      const bpStyle = style.breakpoints[breakpointId]
-      const rawStyle = bpStyle?.[CssPseudoClass.Default] ?? {}
-      const cls = `.${styleId}`
-      const currentStyle = result[cls] ?? {}
-      result[cls] = { ...currentStyle, ...rawStyle }
-
-      // Compute styles in the current pseudo class
-      if (currentPseudoClass !== CssPseudoClass.Default) {
-        const rawStyle = bpStyle?.[currentPseudoClass] ?? {}
-        const pseudoClassName = pseudoClassToCssClass(currentPseudoClass)
-
-        const cls = `.${styleId}.${pseudoClassName}`
+  for (const styleId of site.context.styleOrder) {
+    const style = site.context.styles[styleId]
+    if (style) {
+      accumulatedBreakpointIds.forEach((breakpointId) => {
+        const bpStyle = style.breakpoints[breakpointId]
+        const rawStyle = bpStyle?.[CssPseudoClass.Default] ?? {}
+        const cls = `.${styleId}`
         const currentStyle = result[cls] ?? {}
         result[cls] = { ...currentStyle, ...rawStyle }
-      }
-    })
-  })
+
+        // Compute styles in the current pseudo class
+        if (currentPseudoClass !== CssPseudoClass.Default) {
+          const rawStyle = bpStyle?.[currentPseudoClass] ?? {}
+          const pseudoClassName = pseudoClassToCssClass(currentPseudoClass)
+
+          const cls = `.${styleId}.${pseudoClassName}`
+          const currentStyle = result[cls] ?? {}
+          result[cls] = { ...currentStyle, ...rawStyle }
+        }
+      })
+    }
+  }
 
   return result
 }

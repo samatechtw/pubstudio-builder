@@ -53,6 +53,7 @@ export const createSite = (_namespace: string): ISite => {
     components: {},
     globalStyles: {},
     styles: {},
+    styleOrder: [],
     behaviors: {},
     theme: {
       variables: {

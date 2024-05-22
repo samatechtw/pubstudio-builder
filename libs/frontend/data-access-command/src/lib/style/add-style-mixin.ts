@@ -18,6 +18,7 @@ export const applyAddStyleMixin = (site: ISite, data: IAddStyleMixinData): strin
     breakpoints,
   }
   context.styles[styleId] = newStyle
+  context.styleOrder.push(styleId)
   return styleId
 }
 
@@ -25,6 +26,7 @@ export const undoAddStyleMixin = (site: ISite, data: IAddStyleMixinData) => {
   const context = site.context
   const { id: builtinId } = data
   const styleId = builtinId ?? latestStyleId(context)
+  context.styleOrder = context.styleOrder.filter((id) => id !== styleId)
   const style = resolveStyle(context, styleId)
   if (style) {
     delete context.styles[styleId]

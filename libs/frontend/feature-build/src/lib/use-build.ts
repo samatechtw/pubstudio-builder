@@ -67,6 +67,7 @@ import {
   ISetDefaultsHeadData,
   ISetHomePageData,
   ISetPageHeadData,
+  IUpdateMixinOrderData,
   IUpdateUiData,
   IUpdateUiParams,
   UiAction,
@@ -167,6 +168,7 @@ export interface IUseBuild {
   addComponentMixin: (mixinId: string) => void
   removeComponentMixin: (mixinId: string) => void
   replaceComponentMixin: (oldMixinId: string, newMixinId: string) => void
+  updateMixinOrder: (pos: number, newPos: number) => void
   addComponentEventData: (
     component: IComponent,
     newEvent: IComponentEvent,
@@ -581,6 +583,11 @@ export const useBuild = (): IUseBuild => {
       replaceComponentMixinData,
       [newMixinId],
     )
+  }
+
+  const updateMixinOrder = (pos: number, newPos: number) => {
+    const data: IUpdateMixinOrderData = { pos, newPos }
+    pushCommand(site.value, CommandType.UpdateMixinOrder, data)
   }
 
   const addComponentEvent = (component: IComponent, newEvent: IComponentEvent) => {
@@ -1224,6 +1231,7 @@ export const useBuild = (): IUseBuild => {
     addComponentMixin,
     removeComponentMixin,
     replaceComponentMixin,
+    updateMixinOrder,
     addComponentEventData,
     addComponentEvent,
     addSelectedComponentEvent,

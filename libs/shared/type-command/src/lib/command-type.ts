@@ -23,6 +23,7 @@ export enum CommandType {
   SetBehaviorArg = 'setBA',
   AddStyleMixin = 'addS',
   EditStyleMixin = 'editS',
+  UpdateMixinOrder = 'uSO',
   RemoveStyleMixin = 'rmS',
   SetMixinEntry = 'setME',
   AddThemeVariable = 'addTV',

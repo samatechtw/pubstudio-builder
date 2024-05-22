@@ -46,18 +46,19 @@ export const useRender = (options: IUseRenderOptions): IUseRender => {
 
       const queryStyle = createQueryStyle(site.value.context)
 
-      Object.entries(site.value.context.styles).forEach(([mixinId, style]) => {
-        Object.entries(style.breakpoints).forEach(([breakpointId, pseudoStyle]) => {
+      for (const mixinId of site.value.context.styleOrder) {
+        const style = site.value.context.styles[mixinId]
+        Object.entries(style?.breakpoints ?? {}).forEach(([bpId, pseudoStyle]) => {
           Object.entries(pseudoStyle).forEach(([pseudoClass, rawStyle]) => {
             const pseudoValue = pseudoClass === CssPseudoClass.Default ? '' : pseudoClass
             const resolvedStyle = rawStyleToResolvedStyle(
               (site.value as ISite).context,
               rawStyle,
             )
-            queryStyle[breakpointId][`.${mixinId}${pseudoValue}`] = resolvedStyle
+            queryStyle[bpId][`.${mixinId}${pseudoValue}`] = resolvedStyle
           })
         })
-      })
+      }
 
       styleContent += queryStyleToString(site.value.context, queryStyle)
     }

@@ -77,6 +77,7 @@ export const serializeSiteContext = (context: ISiteContext): ISerializedSiteCont
     namespace: context.namespace,
     nextId: context.nextId,
     styles: context.styles,
+    styleOrder: context.styleOrder,
     behaviors: context.behaviors,
     theme: context.theme,
     breakpoints: context.breakpoints,
