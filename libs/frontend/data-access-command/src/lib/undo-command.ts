@@ -32,6 +32,7 @@ import { undoEditStyleMixin } from './style/edit-style-mixin'
 import { undoRemoveStyleMixin } from './style/remove-style-mixin'
 import { undoSetGlobalStyle } from './style/set-global-style'
 import { undoSetMixinEntry } from './style/set-mixin-entry'
+import { undoUpdateMixinOrder } from './style/update-mixin-order'
 import { undoAddThemeFont } from './theme-font/add-theme-font'
 import { undoEditThemeFont } from './theme-font/edit-theme-font'
 import { undoRemoveThemeFont } from './theme-font/remove-theme-font'
@@ -65,6 +66,7 @@ export const undoCommand = (site: ISite, command: ICommand) => {
     [CommandType.AddStyleMixin]: undoAddStyleMixin,
     [CommandType.EditStyleMixin]: undoEditStyleMixin,
     [CommandType.RemoveStyleMixin]: undoRemoveStyleMixin,
+    [CommandType.UpdateMixinOrder]: undoUpdateMixinOrder,
     [CommandType.SetMixinEntry]: undoSetMixinEntry,
     [CommandType.SetTranslations]: undoSetTranslations,
     [CommandType.AddThemeVariable]: undoAddThemeVariable,

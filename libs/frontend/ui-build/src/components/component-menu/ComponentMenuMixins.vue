@@ -31,17 +31,18 @@
 <script lang="ts" setup>
 import { computed, ref, toRefs } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
-import { resolveStyle } from '@pubstudio/frontend/util-resolve'
+import { resolveComponent, resolveStyle } from '@pubstudio/frontend/util-resolve'
 import { builtinStyles } from '@pubstudio/frontend/util-builtin'
 import { useBuild, useMixinMenuUi } from '@pubstudio/frontend/feature-build'
+import { IComponent } from '@pubstudio/shared/type-site'
 import EditMenuTitle from '../EditMenuTitle.vue'
 import MixinSelect from './MixinSelect.vue'
 import { IComponentMixin, IResolvedComponentMixin } from './i-component-mixin'
 
 const props = defineProps<{
-  mixins: IComponentMixin[]
+  component: IComponent
 }>()
-const { mixins } = toRefs(props)
+const { component } = toRefs(props)
 
 const { t } = useI18n()
 const {
@@ -70,9 +71,56 @@ const mixinOptions = computed(() => {
   }))
 })
 
+const mixins = computed(() => {
+  // Keep track of used mixins so that mixins with the same id
+  // will only be displayed once.
+  // Key: mixinId, value: sourceReusableComponentId
+  const mixinSources = new Map<string, string | undefined>()
+
+  const reusableCmp = resolveComponent(
+    site.value.context,
+    component.value.reusableSourceId,
+  )
+
+  if (reusableCmp) {
+    // Append mixins from reusable component
+    reusableCmp.style.mixins?.forEach((mixinId) => {
+      mixinSources.set(mixinId, reusableCmp.id)
+    })
+  }
+
+  // Append mixins from component
+  component.value.style.mixins?.forEach((mixinId) => {
+    mixinSources.set(mixinId, undefined)
+  })
+
+  const mixins: IComponentMixin[] = Array.from(mixinSources).map(
+    ([mixinId, sourceReusableComponentId]) => ({
+      id: mixinId,
+      sourceReusableComponentId,
+    }),
+  )
+
+  return mixins
+})
+
+const mixinCompare = (a: IComponentMixin, b: IComponentMixin): number => {
+  const order = site.value.context.styleOrder
+  const indexA = order.indexOf(a.id)
+  const indexB = order.indexOf(b.id)
+  if (indexA === -1) {
+    return -1
+  } else if (indexB === -1) {
+    return 1
+  }
+  return indexA - indexB
+}
+
 const resolvedMixins = computed(() => {
   const resolvedMixins: IResolvedComponentMixin[] = []
-  for (const mixin of mixins.value) {
+  const sortedMixins = [...mixins.value].sort(mixinCompare)
+  console.log(site.value.context.styleOrder, sortedMixins)
+  for (const mixin of sortedMixins) {
     const style = resolveStyle(site.value.context, mixin.id)
     if (style) {
       resolvedMixins.push({

@@ -125,6 +125,8 @@ export const deserializedHelper = (serialized: ISerializedSite): ISite => {
     components,
     behaviors: context.behaviors,
     styles: context.styles,
+    // Added 240521
+    styleOrder: context.styleOrder ?? Object.keys(context.styles),
     theme: context.theme,
     breakpoints: context.breakpoints,
     // Added 231105

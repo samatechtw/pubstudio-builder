@@ -11,6 +11,7 @@ export interface ISiteContext {
   components: Record<string, IComponent>
   globalStyles: Record<string, IGlobalStyle>
   styles: Record<string, IStyle>
+  styleOrder: string[]
   behaviors: Record<string, IBehavior>
   theme: ITheme
   breakpoints: Record<string, IBreakpoint>

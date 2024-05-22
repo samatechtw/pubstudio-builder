@@ -49,6 +49,7 @@ export const mockSerializedSite: ISerializedSite = {
         },
       },
     },
+    styleOrder: ['global-s-0'],
     behaviors: {},
     theme: {
       variables: {

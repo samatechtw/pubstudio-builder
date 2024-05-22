@@ -47,15 +47,30 @@ describe('Add Style Mixin', () => {
         [DEFAULT_BREAKPOINT_ID]: pseudoStyle,
       },
     })
+    // Style should be last in styleOrder (highest precedence)
+    const order = site.context.styleOrder
+    expect(order.length).toEqual(2)
+    expect(order[order.length - 1]).toEqual(newMixinId)
   })
 
   it('should undo add style mixin', () => {
     // Add style and mixin undo
     const data = mockAddStyleMixinData(styleName, pseudoStyle)
     applyAddStyleMixin(site, data)
+    // Get style ID for verification
+    const styleIds = Object.keys(site.context.styles)
+    const defaultMixinId = Object.keys(site.context.styles)[0]
+    const newMixinId = styleIds.find((id) => id !== defaultMixinId) ?? ''
+
     undoAddStyleMixin(site, data)
 
     // Assert there's one mixin in site context
     expect(Object.keys(site.context.styles)).toHaveLength(1)
+    expect(site.context.styles[newMixinId]).toBeUndefined()
+
+    // Assert style removed from styleOrder
+    const order = site.context.styleOrder
+    expect(order.length).toEqual(1)
+    expect(order.includes(newMixinId)).toBe(false)
   })
 })

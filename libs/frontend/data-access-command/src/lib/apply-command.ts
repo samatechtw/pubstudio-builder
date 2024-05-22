@@ -32,6 +32,7 @@ import { applyEditStyleMixin } from './style/edit-style-mixin'
 import { applyRemoveStyleMixin } from './style/remove-style-mixin'
 import { applySetGlobalStyle } from './style/set-global-style'
 import { applySetMixinEntry } from './style/set-mixin-entry'
+import { applyUpdateMixinOrder } from './style/update-mixin-order'
 import { applyAddThemeFont } from './theme-font/add-theme-font'
 import { applyEditThemeFont } from './theme-font/edit-theme-font'
 import { applyRemoveThemeFont } from './theme-font/remove-theme-font'
@@ -66,6 +67,7 @@ export const applyCommand = (site: ISite, command: ICommand): ICommand => {
     [CommandType.AddStyleMixin]: applyAddStyleMixin,
     [CommandType.EditStyleMixin]: applyEditStyleMixin,
     [CommandType.RemoveStyleMixin]: applyRemoveStyleMixin,
+    [CommandType.UpdateMixinOrder]: applyUpdateMixinOrder,
     [CommandType.SetMixinEntry]: applySetMixinEntry,
     [CommandType.AddThemeVariable]: applyAddThemeVariable,
     [CommandType.EditThemeVariable]: applyEditThemeVariable,

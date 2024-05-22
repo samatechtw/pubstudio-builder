@@ -50,22 +50,62 @@ describe('Remove Style Mixin', () => {
     expect(styleToBeRemoved.id in site.context.styles).toEqual(true)
 
     // Remove style mixin
-    const data = mockRemoveStyleMixinData(styleToBeRemoved)
+    const data = mockRemoveStyleMixinData({ ...styleToBeRemoved })
     applyRemoveStyleMixin(site, data)
 
     // Assert style mixin is removed
     expect(Object.keys(site.context.styles)).toHaveLength(totalStylesCount - 1)
     expect(styleToBeRemoved.id in site.context.styles).toEqual(false)
+    expect(site.context.styleOrder.includes(styleToBeRemoved.id)).toBe(false)
   })
 
   it('should undo remove style mixin', () => {
     // Remove style mixin and undo
-    const data = mockRemoveStyleMixinData(styleToBeRemoved)
+    const data = mockRemoveStyleMixinData({ ...styleToBeRemoved })
     applyRemoveStyleMixin(site, data)
     undoRemoveStyleMixin(site, data)
 
     // Assert style mixin still exists
     expect(Object.keys(site.context.styles)).toHaveLength(totalStylesCount)
     expect(site.context.styles[styleToBeRemoved.id]).toEqual(styleToBeRemoved)
+    expect(site.context.styleOrder.includes(styleToBeRemoved.id)).toBe(true)
+  })
+
+  it('remove and undo should result in the same style order', () => {
+    // Remove 3rd style
+    styleToBeRemoved =
+      site.context.styles[site.context.styleOrder[site.context.styleOrder.length - 1]]
+
+    // Add another style for testing
+    applyAddStyleMixin(site, {
+      name: 'third-style',
+      breakpoints: { [DEFAULT_BREAKPOINT_ID]: {} },
+    })
+    // Assert expected style precedence
+    expect(site.context.styleOrder.indexOf(styleToBeRemoved.id)).toEqual(2)
+
+    // Remove style mixin and undo
+    const data = mockRemoveStyleMixinData({ ...styleToBeRemoved })
+    applyRemoveStyleMixin(site, data)
+    undoRemoveStyleMixin(site, data)
+
+    // Assert expected style precedence
+    expect(site.context.styleOrder.indexOf(styleToBeRemoved.id)).toEqual(2)
+
+    // Remove first two styles and check order
+    // Get style ID for verification
+    const mixin1 = site.context.styles[site.context.styleOrder[0]]
+    const mixin2 = site.context.styles[site.context.styleOrder[1]]
+    const data1 = mockRemoveStyleMixinData({ ...mixin1 })
+    const data2 = mockRemoveStyleMixinData({ ...mixin2 })
+    applyRemoveStyleMixin(site, data1)
+    applyRemoveStyleMixin(site, data2)
+    expect(site.context.styleOrder.indexOf(styleToBeRemoved.id)).toEqual(0)
+    expect(site.context.styleOrder.includes(mixin1.id)).toBe(false)
+    expect(site.context.styleOrder.includes(mixin2.id)).toBe(false)
+    undoRemoveStyleMixin(site, data2)
+
+    // Verify order
+    expect(site.context.styleOrder.indexOf(mixin2.id)).toEqual(0)
   })
 })

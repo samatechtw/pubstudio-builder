@@ -6,6 +6,7 @@ export const defaultContext: ISiteContext = {
   components: {},
   globalStyles: {},
   styles: {},
+  styleOrder: [],
   behaviors: {},
   theme: {
     variables: {},
