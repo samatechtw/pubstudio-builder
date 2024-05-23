@@ -30,6 +30,7 @@ export const mockSerializedSite: ISerializedSite = {
     builderScale: 1,
     cssPseudoClass: CssPseudoClass.Default,
     reusableComponentIds: [],
+    reusableChildIds: [],
   },
   context: {
     namespace: 'test',

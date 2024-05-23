@@ -25,6 +25,7 @@ export const deserializeEditor = (
     ? {
         selectedComponent: selectedId ? context.components[selectedId] : undefined,
         reusableComponentIds: new Set(serializedEditor.reusableComponentIds ?? []),
+        reusableChildIds: new Set(serializedEditor.reusableChildIds ?? []),
         active: serializedEditor.active,
         editorEvents: serializedEditor.editorEvents ?? {},
         debugBounding: serializedEditor.debugBounding,
@@ -82,7 +83,7 @@ export const deserializePages = (
 ): IDeserializePagesResult => {
   const pages: Record<string, IPage> = {}
   const components: Record<string, IComponent> = {}
-  // First, generate the component cache width empty parent/children
+  // First, generate the component cache with empty parent/children
   for (const [name, page] of Object.entries(serializedPages)) {
     // Set up the page with root
     const root = deserializeComponent(page.root)

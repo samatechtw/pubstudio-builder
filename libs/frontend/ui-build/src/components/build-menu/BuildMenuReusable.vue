@@ -30,13 +30,9 @@ const { site } = useBuild()
 const topLevelReusableComponents = computed<IComponent[]>(() => {
   const { context, editor } = site.value
   const ids = editor?.reusableComponentIds.values() ?? []
-  return (
-    Array.from(ids)
-      .map((id) => resolveComponent(context, id))
-      // Every component except for the root has a parent component.
-      // That means the `parent.parent` of a top reusable component will always be empty.
-      .filter((cmp) => !!cmp && cmp.parent && !cmp.parent.parent) as IComponent[]
-  )
+  return Array.from(ids)
+    .map((id) => resolveComponent(context, id))
+    .filter((cmp) => !!cmp) as IComponent[]
 })
 </script>
 

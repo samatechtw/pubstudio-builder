@@ -1,3 +1,4 @@
+import { iterateComponent } from '@pubstudio/frontend/util-render'
 import { resolveComponent } from '@pubstudio/frontend/util-resolve'
 import { IAddReusableComponentData } from '@pubstudio/shared/type-command-data'
 import { ISite } from '@pubstudio/shared/type-site'
@@ -7,12 +8,11 @@ export const addReusableComponentHelper = (
   data: IAddReusableComponentData,
 ) => {
   const { context, editor } = site
-  if (editor) {
-    data.componentIds.forEach((componentId) => {
-      const component = resolveComponent(context, componentId)
-      if (component) {
-        editor.reusableComponentIds.add(component.id)
-      }
+  const component = resolveComponent(context, data.componentId)
+  if (editor && component) {
+    editor.reusableComponentIds.add(component.id)
+    iterateComponent(component.children, (child) => {
+      editor.reusableChildIds.add(child.id)
     })
   }
 }
@@ -24,23 +24,21 @@ export const applyAddReusableComponent = (
   addReusableComponentHelper(site, data)
 }
 
-export const deleteReusableComponentWithIds = (
-  site: ISite,
-  reusableComponentIds: string[],
-) => {
+export const deleteReusableComponentWithIds = (site: ISite, componentId: string) => {
   const { context, editor } = site
-  reusableComponentIds.forEach((componentId) => {
-    const reusableCmp = resolveComponent(context, componentId)
-    if (reusableCmp && editor) {
-      editor.reusableComponentIds.delete(reusableCmp.id)
-    }
-  })
+  const component = resolveComponent(context, componentId)
+  if (editor && component) {
+    editor.reusableComponentIds.delete(component.id)
+    iterateComponent(component.children, (child) => {
+      editor.reusableChildIds.delete(child.id)
+    })
+  }
 }
 
 export const undoAddReusableComponent = (
   site: ISite,
   data: IAddReusableComponentData,
 ) => {
-  const { componentIds } = data
-  deleteReusableComponentWithIds(site, componentIds)
+  const { componentId } = data
+  deleteReusableComponentWithIds(site, componentId)
 }

@@ -89,9 +89,11 @@ export const addComponentHelper = (site: ISite, data: IAddComponentData): ICompo
       content: undefined,
       children: component.children,
       // Only overridden inputs will be added to a reusable instance.
-      inputs: {},
+      inputs: undefined,
       // Only overridden events will be added to a reusable instance.
-      events: {},
+      events: undefined,
+      // Initial state copied to instance
+      state: clone(reusableCmp.state),
       editorEvents: clone(reusableCmp.editorEvents),
       style: { custom: {} },
       reusableSourceId: reusableCmp.id,

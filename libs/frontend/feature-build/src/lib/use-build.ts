@@ -1187,17 +1187,8 @@ export const useBuild = (): IUseBuild => {
   }
 
   const addReusableComponent = (component: IComponent) => {
-    const componentIds: string[] = []
-
-    const recurse = (cmp: IComponent) => {
-      componentIds.push(cmp.id)
-      cmp.children?.forEach(recurse)
-    }
-
-    recurse(component)
-
     const data: IAddReusableComponentData = {
-      componentIds,
+      componentId: component.id,
     }
     pushCommand(site.value, CommandType.AddReusableComponent, data)
   }

@@ -33,14 +33,14 @@ import { BuilderDndComponent } from './dnd/builder-dnd-component'
 import { LinkTooltipMode } from './enum-link-tooltip-mode'
 
 // Style and props for a component rendered in the builder
-export interface IBuilderStyleProps {
+interface IBuilderStyleProps {
   builderStyle: IRawStyle | undefined
   builderProps: Record<string, unknown> | undefined
   extraChildren: VNode[] | undefined
   builderClass: string[]
 }
 
-export const computeBuilderStyleProps = (
+const computeBuilderStyleProps = (
   site: ISite,
   component: IComponent,
   data: IAttrsInputsMixins,
@@ -118,7 +118,7 @@ export const computeBuilderStyleProps = (
           }),
         ]
         data.mixins.push('__link')
-        data.attrs.href = 'javascript:'
+        builderAttrs.href = 'javascript:'
         forceRelative()
       }
     }
@@ -293,6 +293,11 @@ export const computePropsContent = (
       )
     }
   }
+
+  // TODO -- improve efficiency by avoiding unnecessary input/attr computation
+  // in computeAttrsInputsMixins
+  // Ignore HTML attrs in builder
+  data.attrs = {}
 
   let builderStyleProps: IBuilderStyleProps | undefined = undefined
   if (editor?.active) {
