@@ -1,9 +1,9 @@
 <template>
-  <div class="build-dnd-overlay build-dnd-overlay-hover" :style="hoverOverlayStyle" />
   <div
     class="build-dnd-overlay build-dnd-overlay-selection"
     :style="selectionOverlayStyle"
   />
+  <div class="build-dnd-overlay build-dnd-overlay-hover" :style="hoverOverlayStyle" />
 </template>
 
 <script lang="ts" setup>
@@ -58,7 +58,7 @@ const hoverOverlayStyle = computed(() => {
       if (hoverSelf) {
         overlayWidth = elementWidth
         overlayHeight = elementHeight
-        overlayBorder = `1.5px solid ${selfOutlineColor}`
+        overlayBorder = `2px solid ${selfOutlineColor}`
       } else if (hoverCmpParentIsRow) {
         if (hoverLeft) {
           overlayWidth = outlineThickness

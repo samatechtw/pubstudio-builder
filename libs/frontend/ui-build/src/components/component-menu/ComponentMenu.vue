@@ -149,7 +149,9 @@ const showTextStyle = computed(() => {
 })
 
 const isReusable = (id: string) => {
-  return editor.value?.reusableComponentIds.has(id)
+  return (
+    editor.value?.reusableComponentIds.has(id) || editor.value?.reusableChildIds.has(id)
+  )
 }
 
 const showToReusableComponent = computed(() => {

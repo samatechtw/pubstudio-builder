@@ -44,6 +44,7 @@ export const serializeEditor = (
     ? {
         selectedComponentId: editor.selectedComponent?.id,
         reusableComponentIds: Array.from(editor.reusableComponentIds),
+        reusableChildIds: Array.from(editor.reusableChildIds),
         active: editor.active,
         editorEvents: editor.editorEvents,
         debugBounding: editor.debugBounding,

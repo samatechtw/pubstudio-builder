@@ -119,7 +119,6 @@ const mixinCompare = (a: IComponentMixin, b: IComponentMixin): number => {
 const resolvedMixins = computed(() => {
   const resolvedMixins: IResolvedComponentMixin[] = []
   const sortedMixins = [...mixins.value].sort(mixinCompare)
-  console.log(site.value.context.styleOrder, sortedMixins)
   for (const mixin of sortedMixins) {
     const style = resolveStyle(site.value.context, mixin.id)
     if (style) {
