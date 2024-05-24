@@ -22,7 +22,7 @@ import {
 import { renderPage } from './render'
 
 export interface IUseRender {
-  ReusableStyle: ReturnType<typeof defineComponent>
+  Mixins: ReturnType<typeof defineComponent>
   ComponentStyle: ReturnType<typeof defineComponent>
   GoogleFontLink: ReturnType<typeof defineComponent>
   PageContent: ReturnType<typeof defineComponent>
@@ -38,7 +38,7 @@ export interface IUseRenderOptions {
 export const useRender = (options: IUseRenderOptions): IUseRender => {
   const { site, activePage, notFoundComponent, renderMode } = options
 
-  const reusableStyle = computed(() => {
+  const mixinStyle = computed(() => {
     let styleContent = ''
     if (site.value) {
       // Add theme colors as CSS variables for use in ProseMirror editor
@@ -65,9 +65,9 @@ export const useRender = (options: IUseRenderOptions): IUseRender => {
     return h('style', styleContent)
   })
 
-  const ReusableStyle = defineComponent({
+  const Mixins = defineComponent({
     render() {
-      return reusableStyle.value
+      return mixinStyle.value
     },
   })
 
@@ -166,7 +166,7 @@ export const useRender = (options: IUseRenderOptions): IUseRender => {
   useHead(headData)
 
   return {
-    ReusableStyle,
+    Mixins,
     ComponentStyle,
     GoogleFontLink,
     PageContent,

@@ -2,7 +2,7 @@
   <div class="preview-content">
     <Spinner v-if="loading" class="preview-spinner" :size="40" color="#2a17d6" />
     <template v-else>
-      <ReusableStyle />
+      <Mixins />
       <ComponentStyle />
       <GoogleFontLink />
       <PageContent />
@@ -33,19 +33,13 @@ const props = withDefaults(
 )
 const { renderMode, activePage } = toRefs(props)
 
-const {
-  ReusableStyle,
-  ComponentStyle,
-  GoogleFontLink,
-  PageContent,
-  rootComponentMinHeight,
-} = useRenderPreview({
-  site,
-  activePage,
-  renderMode: renderMode.value,
-  notFoundComponent: NotFound,
-  unhead: true,
-})
+const { Mixins, ComponentStyle, GoogleFontLink, PageContent, rootComponentMinHeight } =
+  useRenderPreview({
+    site,
+    activePage,
+    renderMode: renderMode.value,
+    notFoundComponent: NotFound,
+  })
 </script>
 
 <style lang="postcss">

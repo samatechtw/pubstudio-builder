@@ -171,7 +171,6 @@ export const useBuildEvent = () => {
     ) {
       runtimeContext.resetComponentTreeItemRenameData()
     }
-
     runtimeContext.rightMenuFocused.value = false
 
     if (isRenderer(target)) {

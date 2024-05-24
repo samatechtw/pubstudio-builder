@@ -47,7 +47,7 @@ import {
 import { IconTooltipDelay, ScaleIn } from '@pubstudio/frontend/ui-widgets'
 import {
   useBuild,
-  useReusableStyleMenu,
+  useMixinMenu,
   useEditComponentStyles,
 } from '@pubstudio/frontend/feature-build'
 import {
@@ -59,7 +59,7 @@ import EditMenuTitle from '../EditMenuTitle.vue'
 
 const { t } = useI18n()
 const { site, editor, currentPseudoClass, selectedComponentFlattenedStyles } = useBuild()
-const { newStyle } = useReusableStyleMenu()
+const { newStyle } = useMixinMenu()
 const {
   styleEntries,
   editStyle,

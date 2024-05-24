@@ -13,7 +13,7 @@ The following is a minimal Site representation in serialized JSON form, with com
   // TBD
   "defaults": {
     // Default document metadata
-    "head": {}
+    "head": {},
   },
   // Record of pages, keyed by name
   "pages": {
@@ -39,10 +39,10 @@ The following is a minimal Site representation in serialized JSON form, with com
           // Custom style attributes, highest priority
           "custom": {
             "width": "100%",
-            "height": "100%"
+            "height": "100%",
           },
-          // Reusable styles, second priority
-          "mixins": ["global-s-0"]
+          // Mixins, second priority
+          "mixins": ["global-s-0"],
         },
         // Component children
         "children": [
@@ -57,13 +57,13 @@ The following is a minimal Site representation in serialized JSON form, with com
             "style": {
               "custom": {
                 "width": "100px",
-                "height": "100px"
-              }
-            }
-          }
-        ]
-      }
-    }
+                "height": "100px",
+              },
+            },
+          },
+        ],
+      },
+    },
   },
   // Site metadata and builder state
   "context": {
@@ -71,7 +71,7 @@ The following is a minimal Site representation in serialized JSON form, with com
     "namespace": "test",
     // The next unused namespace ID for components/styles
     "nextId": 2,
-    // Reusable styles
+    // Mixins
     "styles": {},
     // Component cache
     // TODO -- this should not be part of the serialized context
@@ -81,7 +81,7 @@ The following is a minimal Site representation in serialized JSON form, with com
       },
       "test-c-1": {
         // ...
-      }
+      },
     },
     // Site builder context
     "editor": {
@@ -92,8 +92,8 @@ The following is a minimal Site representation in serialized JSON form, with com
       // Builder debug bounding box display
       "debugBounding": false,
       // Active context menu
-      "mode": "none"
-    }
+      "mode": "none",
+    },
   },
   // Command history, used for undo and snapshots
   "history": {
@@ -107,14 +107,14 @@ The following is a minimal Site representation in serialized JSON form, with com
           "style": {
             "custom": {
               "width": "100px",
-              "height": "100px"
-            }
-          }
-        }
-      }
+              "height": "100px",
+            },
+          },
+        },
+      },
     ],
     // Undo history, used to redo commands
-    "forward": []
-  }
+    "forward": [],
+  },
 }
 ```
