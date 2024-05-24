@@ -10,12 +10,12 @@
 </template>
 
 <script lang="ts" setup>
-import { useGlobalStyles, useReusableStyleMenu } from '@pubstudio/frontend/feature-build'
+import { useGlobalStyles, useMixinMenu } from '@pubstudio/frontend/feature-build'
 import StyleMenuEdit from './StyleMenuEdit.vue'
 import GlobalStyleEdit from './GlobalStyleEdit.vue'
 import StyleMenuTabs from './StyleMenuTabs.vue'
 
-const { isEditingMixin } = useReusableStyleMenu()
+const { isEditingMixin } = useMixinMenu()
 const { editGlobalStyle } = useGlobalStyles()
 </script>
 

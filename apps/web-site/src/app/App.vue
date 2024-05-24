@@ -4,7 +4,7 @@
       <Spinner v-if="loading" class="app-spinner" />
       <ErrorMessage v-else-if="error" class="app-error" :error="error" />
       <template v-else>
-        <ReusableStyle />
+        <Mixins />
         <ComponentStyle />
         <GoogleFontLink />
         <router-view class="app-router-view" />
@@ -61,12 +61,11 @@ const activePage = computed(() => {
   return page ?? notFoundPage.value
 })
 
-const { ReusableStyle, ComponentStyle, GoogleFontLink, PageContent } = useRender({
+const { Mixins, ComponentStyle, GoogleFontLink, PageContent } = useRender({
   site,
   activePage,
   renderMode: RenderMode.Release,
   notFoundComponent: NotFound,
-  unhead: true,
 })
 
 const loading = ref(true)

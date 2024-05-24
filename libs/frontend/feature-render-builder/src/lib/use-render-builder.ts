@@ -13,7 +13,7 @@ import {
 } from '@pubstudio/frontend/util-render'
 import { IPage, ISite, ThemeFontSource } from '@pubstudio/shared/type-site'
 import { computed, defineComponent, h, Ref } from 'vue'
-import { computeBuilderReusableStyles } from './compute-builder-reusable-styles'
+import { computeBuilderMixins } from './compute-builder-mixins'
 import { renderPage } from './render-builder'
 
 export interface IUseRenderBuilderOptions {
@@ -28,21 +28,21 @@ export const useRenderBuilder = (
   const { selectedGoogleFonts } = useThemeMenuFonts()
   const renderUtil = useRenderBuilderHelper(options)
 
-  const reusableStyle = computed(() => {
+  const mixinStyle = computed(() => {
     let styleContent = ''
     if (site.value) {
       // Add theme colors as CSS variables for use in ProseMirror editor
       styleContent = themeToCssVars(site.value.context.theme)
 
-      const rawStyleRecord = computeBuilderReusableStyles(site.value)
+      const rawStyleRecord = computeBuilderMixins(site.value)
       styleContent += rawStyleRecordToString(rawStyleRecord, site.value.context)
     }
     return h('style', styleContent)
   })
 
-  const ReusableStyle = defineComponent({
+  const Mixins = defineComponent({
     render() {
-      return reusableStyle.value
+      return mixinStyle.value
     },
   })
 
@@ -102,7 +102,7 @@ export const useRenderBuilder = (
   return {
     ...renderUtil,
     ComponentStyle,
-    ReusableStyle,
+    Mixins,
     PageContent,
     GoogleFontLink,
   }

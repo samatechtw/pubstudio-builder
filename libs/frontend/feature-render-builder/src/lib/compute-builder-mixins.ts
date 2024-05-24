@@ -3,7 +3,7 @@ import { getActiveBreakpointIds } from '@pubstudio/frontend/feature-site-source'
 import { IRawStyleRecord } from '@pubstudio/frontend/util-render'
 import { CssPseudoClass, ISite } from '@pubstudio/shared/type-site'
 
-export const computeBuilderReusableStyles = (site: ISite): IRawStyleRecord => {
+export const computeBuilderMixins = (site: ISite): IRawStyleRecord => {
   const result: IRawStyleRecord = {}
 
   // Compute styles in the current pseudo class

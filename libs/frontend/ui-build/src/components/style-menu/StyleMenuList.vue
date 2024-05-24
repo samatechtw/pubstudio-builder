@@ -37,16 +37,12 @@
 import { computed, ref } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { DragVertical, Minus } from '@pubstudio/frontend/ui-widgets'
-import {
-  useBuild,
-  useReusableStyleMenu,
-  useMixinMenuUi,
-} from '@pubstudio/frontend/feature-build'
+import { useBuild, useMixinMenu, useMixinMenuUi } from '@pubstudio/frontend/feature-build'
 import EditMenuTitle from '../EditMenuTitle.vue'
 
 const { t } = useI18n()
 
-const { newStyle } = useReusableStyleMenu()
+const { newStyle } = useMixinMenu()
 const { deleteStyle, updateMixinOrder, site } = useBuild()
 
 const { openMixinMenu } = useMixinMenuUi()

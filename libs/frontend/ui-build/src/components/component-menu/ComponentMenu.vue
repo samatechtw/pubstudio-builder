@@ -83,7 +83,7 @@ import {
   useBuild,
   useEditComponentInput,
   useEditComponentEvent,
-  useReusableStyleMenu,
+  useMixinMenu,
 } from '@pubstudio/frontend/feature-build'
 import { setBuildSubmenu } from '@pubstudio/frontend/data-access-command'
 import ComponentInputEdit from './ComponentInputEdit.vue'
@@ -97,7 +97,7 @@ import ToolbarText from '../toolbar/ToolbarText.vue'
 
 const { t } = useI18n()
 const { editor, replacePageRoot, addReusableComponent } = useBuild()
-const { isEditingMixin } = useReusableStyleMenu()
+const { isEditingMixin } = useMixinMenu()
 const { addHUD } = useHUD()
 
 const props = defineProps<{

@@ -7,7 +7,7 @@
         :style="innerStyle"
         @click="selectRoot"
       >
-        <ReusableStyle />
+        <Mixins />
         <ComponentStyle />
         <GoogleFontLink />
         <PageContent />
@@ -43,16 +43,11 @@ import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 const { site, activePage } = useSiteSource()
 const { editor } = useBuild()
 
-const {
-  ReusableStyle,
-  ComponentStyle,
-  GoogleFontLink,
-  PageContent,
-  rootComponentMinHeight,
-} = useRenderBuilder({
-  site,
-  activePage,
-})
+const { Mixins, ComponentStyle, GoogleFontLink, PageContent, rootComponentMinHeight } =
+  useRenderBuilder({
+    site,
+    activePage,
+  })
 
 const contentWindowRef = ref<HTMLDivElement>()
 

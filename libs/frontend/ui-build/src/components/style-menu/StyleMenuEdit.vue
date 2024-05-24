@@ -43,7 +43,7 @@
 import { computed, onUnmounted } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { ErrorMessage, PSButton } from '@pubstudio/frontend/ui-widgets'
-import { useBuild, useReusableStyleMenu } from '@pubstudio/frontend/feature-build'
+import { useBuild, useMixinMenu } from '@pubstudio/frontend/feature-build'
 import {
   editStylesCancelEdit,
   isEditingStyles,
@@ -68,7 +68,7 @@ const {
   removeStyle,
   setProperty,
   setValue,
-} = useReusableStyleMenu()
+} = useMixinMenu()
 
 const { site, currentPseudoClass } = useBuild()
 

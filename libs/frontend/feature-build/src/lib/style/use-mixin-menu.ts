@@ -64,7 +64,7 @@ const editingStyle = computed<IStyle | undefined>(() => {
   return undefined
 })
 
-export const useReusableStyleMenu = (): IUseStyleMenuFeature => {
+export const useMixinMenu = (): IUseStyleMenuFeature => {
   const { t } = useI18n()
   const { site, editor, currentPseudoClass, addStyle, convertComponentStyle } = useBuild()
   const { closeMixinMenu } = useMixinMenuUi()
@@ -249,7 +249,7 @@ export const useReusableStyleMenu = (): IUseStyleMenuFeature => {
   }
 
   // Override saveStyle and deleteStyle
-  // We don't want to close the reusable styles menu after saving a style.
+  // We don't want to close the mixin menu after saving a style.
   const saveStyle = (prop: Css) => {
     editStyles.value.delete(prop)
   }
