@@ -32,7 +32,7 @@ describe('Add Reusable Component', () => {
 
   it('should make component reusable and undo', () => {
     // Assert component is not reusable
-    expect(site.editor?.reusableComponentIds.has(component.id)).toBe(false)
+    expect(site.context?.reusableComponentIds.has(component.id)).toBe(false)
 
     // Set to reusable
     const data: IAddReusableComponentData = {
@@ -40,19 +40,19 @@ describe('Add Reusable Component', () => {
     }
     applyAddReusableComponent(site, data)
     // Assert component is reusable
-    expect(site.editor?.reusableComponentIds.has(component.id)).toBe(true)
+    expect(site.context?.reusableComponentIds.has(component.id)).toBe(true)
     const children = component.children ?? []
     expect(children).toHaveLength(2)
     for (const child of children) {
-      expect(site.editor?.reusableChildIds.has(child.id)).toBe(true)
+      expect(site.context?.reusableChildIds.has(child.id)).toBe(true)
     }
 
     undoAddReusableComponent(site, data)
 
     // Assert component is not reusable
-    expect(site.editor?.reusableComponentIds.has(component.id)).toBe(false)
+    expect(site.context?.reusableComponentIds.has(component.id)).toBe(false)
     for (const child of children) {
-      expect(site.editor?.reusableChildIds.has(child.id)).toBe(false)
+      expect(site.context?.reusableChildIds.has(child.id)).toBe(false)
     }
   })
 })

@@ -7,12 +7,12 @@ export const addReusableComponentHelper = (
   site: ISite,
   data: IAddReusableComponentData,
 ) => {
-  const { context, editor } = site
+  const { context } = site
   const component = resolveComponent(context, data.componentId)
-  if (editor && component) {
-    editor.reusableComponentIds.add(component.id)
+  if (component) {
+    context.reusableComponentIds.add(component.id)
     iterateComponent(component.children, (child) => {
-      editor.reusableChildIds.add(child.id)
+      context.reusableChildIds.add(child.id)
     })
   }
 }
@@ -25,12 +25,12 @@ export const applyAddReusableComponent = (
 }
 
 export const deleteReusableComponentWithIds = (site: ISite, componentId: string) => {
-  const { context, editor } = site
+  const { context } = site
   const component = resolveComponent(context, componentId)
-  if (editor && component) {
-    editor.reusableComponentIds.delete(component.id)
+  if (component) {
+    context.reusableComponentIds.delete(component.id)
     iterateComponent(component.children, (child) => {
-      editor.reusableChildIds.delete(child.id)
+      context.reusableChildIds.delete(child.id)
     })
   }
 }

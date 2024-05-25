@@ -29,8 +29,6 @@ export const mockSerializedSite: ISerializedSite = {
     builderWidth: 1080,
     builderScale: 1,
     cssPseudoClass: CssPseudoClass.Default,
-    reusableComponentIds: [],
-    reusableChildIds: [],
   },
   context: {
     namespace: 'test',
@@ -50,6 +48,8 @@ export const mockSerializedSite: ISerializedSite = {
         },
       },
     },
+    reusableComponentIds: [],
+    reusableChildIds: [],
     styleOrder: ['global-s-0'],
     behaviors: {},
     theme: {

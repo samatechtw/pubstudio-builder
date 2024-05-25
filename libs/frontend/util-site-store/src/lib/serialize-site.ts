@@ -43,8 +43,6 @@ export const serializeEditor = (
   return editor
     ? {
         selectedComponentId: editor.selectedComponent?.id,
-        reusableComponentIds: Array.from(editor.reusableComponentIds),
-        reusableChildIds: Array.from(editor.reusableChildIds),
         active: editor.active,
         editorEvents: editor.editorEvents,
         debugBounding: editor.debugBounding,
@@ -79,6 +77,8 @@ export const serializeSiteContext = (context: ISiteContext): ISerializedSiteCont
     nextId: context.nextId,
     styles: context.styles,
     styleOrder: context.styleOrder,
+    reusableComponentIds: Array.from(context.reusableComponentIds),
+    reusableChildIds: Array.from(context.reusableChildIds),
     behaviors: context.behaviors,
     theme: context.theme,
     breakpoints: context.breakpoints,

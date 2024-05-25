@@ -130,8 +130,6 @@ export interface IEditorContext {
   copiedComponent?: ISerializedComponent
   hoveredComponent?: IComponent
   selectedComponent?: IComponent
-  reusableComponentIds: Set<string>
-  reusableChildIds: Set<string>
   // ProseMirror EditView object
   editView?: EditorView
   resizeData?: IResizeData

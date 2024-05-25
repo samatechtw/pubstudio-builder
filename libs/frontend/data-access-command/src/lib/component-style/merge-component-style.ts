@@ -1,8 +1,8 @@
-import { mergeArr, mergePseudoStyle } from '@pubstudio/frontend/util-component'
+import { mergeArr } from '@pubstudio/frontend/util-component'
 import { resolveComponent } from '@pubstudio/frontend/util-resolve'
 import { CommandType, ICommand } from '@pubstudio/shared/type-command'
 import { IMergeComponentStyleData } from '@pubstudio/shared/type-command-data'
-import { ISite } from '@pubstudio/shared/type-site'
+import { IPseudoStyle, ISite } from '@pubstudio/shared/type-site'
 import { toRaw } from 'vue'
 import { setSelectedComponent } from '../set-selected-component'
 
@@ -44,4 +44,20 @@ export const undoMergeComponentStyle = (site: ISite, data: IMergeComponentStyleD
     // Select edited component for undo
     setSelectedComponent(site, component)
   }
+}
+
+// Custom styles should be merged and de-duplicated with existing ones; new styles take precedence.
+const mergePseudoStyle = (
+  oldStyle: IPseudoStyle,
+  newStyle: IPseudoStyle,
+): IPseudoStyle => {
+  const mergedStyle = structuredClone(oldStyle)
+  for (const key in newStyle) {
+    const castedKey = key as keyof IPseudoStyle
+    mergedStyle[castedKey] = {
+      ...mergedStyle[castedKey],
+      ...newStyle[castedKey],
+    }
+  }
+  return mergedStyle
 }

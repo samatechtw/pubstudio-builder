@@ -11,20 +11,16 @@ export interface ISerializedSite extends Omit<ISite, 'context' | 'pages' | 'edit
   editor?: ISerializedEditorContext
 }
 
-export interface ISerializedSiteContext extends Omit<ISiteContext, 'components'> {}
-
-export interface ISerializedEditorContext
-  extends Omit<
-    IEditorContext,
-    | 'selectedComponent'
-    | 'selectedThemeColors'
-    | 'reusableComponentIds'
-    | 'reusableChildIds'
-  > {
-  selectedComponentId?: string
-  selectedThemeColors: string[]
+export interface ISerializedSiteContext
+  extends Omit<ISiteContext, 'components' | 'reusableComponentIds' | 'reusableChildIds'> {
   reusableComponentIds: string[]
   reusableChildIds: string[]
+}
+
+export interface ISerializedEditorContext
+  extends Omit<IEditorContext, 'selectedComponent' | 'selectedThemeColors'> {
+  selectedComponentId?: string
+  selectedThemeColors: string[]
 }
 
 export interface ISerializedPage extends Omit<IPage, 'root'> {

@@ -1,6 +1,6 @@
 /* eslint-disable vue/one-component-per-file */
 import { useThemeMenuFonts } from '@pubstudio/frontend/feature-build'
-import { getBuildPageStyle, IUseRender } from '@pubstudio/frontend/feature-render'
+import { IUseRender } from '@pubstudio/frontend/feature-render'
 import {
   IUseRenderBuilderHelper,
   useRenderBuilderHelper,
@@ -14,6 +14,7 @@ import {
 import { IPage, ISite, ThemeFontSource } from '@pubstudio/shared/type-site'
 import { computed, defineComponent, h, Ref } from 'vue'
 import { computeBuilderMixins } from './compute-builder-mixins'
+import { getBuildPageStyle } from './get-build-page-style'
 import { renderPage } from './render-builder'
 
 export interface IUseRenderBuilderOptions {
@@ -80,16 +81,27 @@ export const useRenderBuilder = (
 
   const buildPageComponentStyle = computed(() => {
     let styleContent = ''
+    let reusableContent = ''
     if (activePage.value && site.value) {
       const pageStyle = getBuildPageStyle(site.value, activePage.value)
-      styleContent = rawStyleRecordToString(pageStyle, site.value.context)
+      reusableContent = rawStyleRecordToString(pageStyle.reusable, site.value.context)
+      styleContent = rawStyleRecordToString(pageStyle.component, site.value.context)
     }
-    return h('style', styleContent)
+    return {
+      component: h('style', styleContent),
+      reusable: h('style', reusableContent),
+    }
+  })
+
+  const ReusableStyle = defineComponent({
+    render() {
+      return buildPageComponentStyle.value.reusable
+    },
   })
 
   const ComponentStyle = defineComponent({
     render() {
-      return buildPageComponentStyle.value
+      return buildPageComponentStyle.value.component
     },
   })
 
@@ -101,6 +113,7 @@ export const useRenderBuilder = (
 
   return {
     ...renderUtil,
+    ReusableStyle,
     ComponentStyle,
     Mixins,
     PageContent,

@@ -1,17 +1,13 @@
 import {
   createQueryStyle,
+  iterateMixin,
   queryStyleToString,
   rawStyleToResolvedStyle,
   renderGoogleFontsLink,
   RenderMode,
   themeToCssVars,
 } from '@pubstudio/frontend/util-render'
-import {
-  CssPseudoClass,
-  IPage,
-  ISite,
-  ThemeFontSource,
-} from '@pubstudio/shared/type-site'
+import { IPage, ISite, ThemeFontSource } from '@pubstudio/shared/type-site'
 import { Link, Meta, Script, useHead } from '@unhead/vue'
 import { Component, computed, defineComponent, h, Ref } from 'vue'
 import {
@@ -22,6 +18,7 @@ import {
 import { renderPage } from './render'
 
 export interface IUseRender {
+  ReusableStyle: ReturnType<typeof defineComponent>
   Mixins: ReturnType<typeof defineComponent>
   ComponentStyle: ReturnType<typeof defineComponent>
   GoogleFontLink: ReturnType<typeof defineComponent>
@@ -29,7 +26,7 @@ export interface IUseRender {
 }
 
 export interface IUseRenderOptions {
-  site: Ref<ISite | undefined>
+  site: Ref<ISite>
   activePage: Ref<IPage | undefined>
   renderMode: RenderMode
   notFoundComponent: Component
@@ -47,16 +44,9 @@ export const useRender = (options: IUseRenderOptions): IUseRender => {
       const queryStyle = createQueryStyle(site.value.context)
 
       for (const mixinId of site.value.context.styleOrder) {
-        const style = site.value.context.styles[mixinId]
-        Object.entries(style?.breakpoints ?? {}).forEach(([bpId, pseudoStyle]) => {
-          Object.entries(pseudoStyle).forEach(([pseudoClass, rawStyle]) => {
-            const pseudoValue = pseudoClass === CssPseudoClass.Default ? '' : pseudoClass
-            const resolvedStyle = rawStyleToResolvedStyle(
-              (site.value as ISite).context,
-              rawStyle,
-            )
-            queryStyle[bpId][`.${mixinId}${pseudoValue}`] = resolvedStyle
-          })
+        iterateMixin(site.value.context, mixinId, (bpId, pseudoClass, rawStyle) => {
+          const resolvedStyle = rawStyleToResolvedStyle(site.value.context, rawStyle)
+          queryStyle[bpId][`.${mixinId}${pseudoClass}`] = resolvedStyle
         })
       }
 
@@ -73,21 +63,33 @@ export const useRender = (options: IUseRenderOptions): IUseRender => {
 
   const livePageComponentStyle = computed(() => {
     let styleContent = ''
-    if (activePage.value && site.value) {
-      const globalStyle = getGlobalStyle(site.value.context)
-      const htmlStyle = getRootBackgroundStyle(site.value.context, activePage.value)
-      const pageStyle = getLivePageStyle(site.value.context, activePage.value)
-      styleContent =
+    let reusableContent = ''
+    const context = site.value?.context
+    if (activePage.value && context) {
+      const globalStyle = getGlobalStyle(context)
+      const htmlStyle = getRootBackgroundStyle(context, activePage.value)
+      const pageStyle = getLivePageStyle(context, activePage.value)
+      reusableContent =
         globalStyle +
-        queryStyleToString(site.value.context, htmlStyle) +
-        queryStyleToString(site.value.context, pageStyle)
+        queryStyleToString(context, htmlStyle) +
+        queryStyleToString(context, pageStyle.reusable)
+      styleContent = queryStyleToString(context, pageStyle.component)
     }
-    return h('style', styleContent)
+    return {
+      component: h('style', styleContent),
+      reusable: h('style', reusableContent),
+    }
+  })
+
+  const ReusableStyle = defineComponent({
+    render() {
+      return livePageComponentStyle.value.reusable
+    },
   })
 
   const ComponentStyle = defineComponent({
     render() {
-      return livePageComponentStyle.value
+      return livePageComponentStyle.value.component
     },
   })
 
@@ -109,7 +111,7 @@ export const useRender = (options: IUseRenderOptions): IUseRender => {
       !site.value ||
       !activePage.value ||
       // Private pages are only visible in build mode
-      (!activePage.value.public && renderMode !== RenderMode.Build)
+      !activePage.value.public
     ) {
       return h(notFoundComponent)
     }
@@ -166,6 +168,7 @@ export const useRender = (options: IUseRenderOptions): IUseRender => {
   useHead(headData)
 
   return {
+    ReusableStyle,
     Mixins,
     ComponentStyle,
     GoogleFontLink,

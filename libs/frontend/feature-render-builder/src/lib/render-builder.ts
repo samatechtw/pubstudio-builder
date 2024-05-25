@@ -313,11 +313,7 @@ export const computePropsContent = (
     ...builderStyleProps?.builderProps,
     // TODO -- should all native events really be disabled in the builder?
     // ...events.native,
-    class: data.mixins.concat(
-      component.id,
-      component.reusableSourceId ?? [],
-      builderStyleProps?.builderClass ?? [],
-    ),
+    class: data.mixins.concat(component.id, builderStyleProps?.builderClass ?? []),
     style: builderStyleProps?.builderStyle,
     id: component.id,
   }

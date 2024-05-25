@@ -8,3 +8,8 @@ export type IRawStyleRecord = {
 export type IQueryStyle = {
   [breakpointId: string]: IRawStyleRecord
 }
+
+export interface IResolvedPageStyle {
+  reusable: IQueryStyle
+  component: IQueryStyle
+}

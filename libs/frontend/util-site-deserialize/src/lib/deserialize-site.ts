@@ -24,8 +24,6 @@ export const deserializeEditor = (
   const editor = serializedEditor
     ? {
         selectedComponent: selectedId ? context.components[selectedId] : undefined,
-        reusableComponentIds: new Set(serializedEditor.reusableComponentIds ?? []),
-        reusableChildIds: new Set(serializedEditor.reusableChildIds ?? []),
         active: serializedEditor.active,
         editorEvents: serializedEditor.editorEvents ?? {},
         debugBounding: serializedEditor.debugBounding,
@@ -129,6 +127,8 @@ export const deserializedHelper = (serialized: ISerializedSite): ISite => {
     // Added 240521
     styleOrder: context.styleOrder ?? Object.keys(context.styles),
     theme: context.theme,
+    reusableComponentIds: new Set(context.reusableComponentIds ?? []),
+    reusableChildIds: new Set(context.reusableChildIds ?? []),
     breakpoints: context.breakpoints,
     // Added 231105
     i18n: context.i18n ?? {},
