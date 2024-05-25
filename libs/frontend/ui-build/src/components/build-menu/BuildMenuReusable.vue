@@ -28,8 +28,8 @@ const { t } = useI18n()
 const { site } = useBuild()
 
 const topLevelReusableComponents = computed<IComponent[]>(() => {
-  const { context, editor } = site.value
-  const ids = editor?.reusableComponentIds.values() ?? []
+  const { context } = site.value
+  const ids = context?.reusableComponentIds.values() ?? []
   return Array.from(ids)
     .map((id) => resolveComponent(context, id))
     .filter((cmp) => !!cmp) as IComponent[]

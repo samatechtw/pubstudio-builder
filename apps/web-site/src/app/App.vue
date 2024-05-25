@@ -4,6 +4,7 @@
       <Spinner v-if="loading" class="app-spinner" />
       <ErrorMessage v-else-if="error" class="app-error" :error="error" />
       <template v-else>
+        <ReusableStyle />
         <Mixins />
         <ComponentStyle />
         <GoogleFontLink />
@@ -14,7 +15,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, onMounted } from 'vue'
+import { computed, ref, onMounted, Ref } from 'vue'
 import { useRoute, useRouter } from '@pubstudio/frontend/util-router'
 import {
   setupRoutes,
@@ -61,8 +62,8 @@ const activePage = computed(() => {
   return page ?? notFoundPage.value
 })
 
-const { Mixins, ComponentStyle, GoogleFontLink, PageContent } = useRender({
-  site,
+const { ReusableStyle, Mixins, ComponentStyle, GoogleFontLink, PageContent } = useRender({
+  site: site as Ref<ISite>,
   activePage,
   renderMode: RenderMode.Release,
   notFoundComponent: NotFound,

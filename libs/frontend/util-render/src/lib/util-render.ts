@@ -2,7 +2,9 @@ import { DEFAULT_BREAKPOINT_ID } from '@pubstudio/frontend/util-ids'
 import { resolveThemeVariables } from '@pubstudio/frontend/util-resolve'
 import {
   Css,
+  CssPseudoClass,
   IBreakpoint,
+  IComponent,
   IRawStyle,
   IRawStylesWithSource,
   ISiteContext,
@@ -85,9 +87,9 @@ const getMediaQuery = (breakpoint: IBreakpoint): string => {
 
 export const rawStyleToResolvedStyle = (
   context: ISiteContext,
-  rawStyleWithSource: IRawStyle,
+  rawStyle: IRawStyle,
 ): IRawStyle => {
-  return Object.entries(rawStyleWithSource)
+  return Object.entries(rawStyle)
     .sort((a, b) => b[0].localeCompare(a[0]))
     .reduce((result, [css, value]) => {
       result[css as Css] = resolveThemeVariables(context, value)
@@ -114,4 +116,33 @@ export const themeToCssVars = (theme: ITheme): string => {
     })
     .join('')
   return `:root{${themeVars}}`
+}
+
+export const sortMixinIds = (context: ISiteContext, component: IComponent): string[] => {
+  return (component.style.mixins ?? []).sort((a, b) => {
+    const indexA = context.styleOrder.indexOf(a)
+    const indexB = context.styleOrder.indexOf(b)
+    if (indexA === -1) {
+      return 1
+    } else if (indexB === -1) {
+      return -1
+    }
+    return indexB - indexA
+  })
+}
+
+export type MixinIterFn = (
+  breakpointId: string,
+  pseudoClass: string,
+  rawStyle: IRawStyle,
+) => void
+
+export const iterateMixin = (context: ISiteContext, mixinId: string, fn: MixinIterFn) => {
+  const mixin = context.styles[mixinId]
+  Object.entries(mixin.breakpoints ?? {}).forEach(([bpId, pseudoStyle]) => {
+    Object.entries(pseudoStyle).forEach(([pseudoClass, rawStyle]) => {
+      const pseudoValue = pseudoClass === CssPseudoClass.Default ? '' : pseudoClass
+      fn(bpId, pseudoValue, rawStyle)
+    })
+  })
 }

@@ -113,6 +113,13 @@ const mixinCompare = (a: IComponentMixin, b: IComponentMixin): number => {
   } else if (indexB === -1) {
     return 1
   }
+  if (a.sourceReusableComponentId && b.sourceReusableComponentId) {
+    return indexA - indexB
+  } else if (a.sourceReusableComponentId) {
+    return -1
+  } else if (b.sourceReusableComponentId) {
+    return 1
+  }
   return indexA - indexB
 }
 

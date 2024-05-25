@@ -7,6 +7,8 @@ export const defaultContext: ISiteContext = {
   globalStyles: {},
   styles: {},
   styleOrder: [],
+  reusableComponentIds: new Set(),
+  reusableChildIds: new Set(),
   behaviors: {},
   theme: {
     variables: {},

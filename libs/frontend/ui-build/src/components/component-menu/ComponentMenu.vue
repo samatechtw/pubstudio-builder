@@ -96,7 +96,7 @@ import ToolbarContainer from '../toolbar/ToolbarContainer.vue'
 import ToolbarText from '../toolbar/ToolbarText.vue'
 
 const { t } = useI18n()
-const { editor, replacePageRoot, addReusableComponent } = useBuild()
+const { site, editor, replacePageRoot, addReusableComponent } = useBuild()
 const { isEditingMixin } = useMixinMenu()
 const { addHUD } = useHUD()
 
@@ -149,9 +149,8 @@ const showTextStyle = computed(() => {
 })
 
 const isReusable = (id: string) => {
-  return (
-    editor.value?.reusableComponentIds.has(id) || editor.value?.reusableChildIds.has(id)
-  )
+  const context = site.value.context
+  return context.reusableComponentIds.has(id) || context.reusableChildIds.has(id)
 }
 
 const showToReusableComponent = computed(() => {

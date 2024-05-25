@@ -40,13 +40,19 @@ export const computeAttrsInputsMixins = (
 ): IAttrsInputsMixins => {
   const { renderMode, resolveTheme = true, editor } = options
 
+  const isReusable =
+    context.reusableComponentIds.has(component.id) ||
+    context.reusableChildIds.has(component.id)
+
   const c: IComponent = component
   let r: IComponent | undefined = undefined
-  if (component.reusableSourceId) {
-    r = resolveComponent(context, c.reusableSourceId)
-  }
   const attrs: Record<string, unknown> = {}
   const mixins: string[] = []
+
+  if (component.reusableSourceId) {
+    r = resolveComponent(context, c.reusableSourceId)
+    mixins.push(component.reusableSourceId)
+  }
   const content = c.content ?? r?.content
 
   if (editor) {
@@ -55,12 +61,9 @@ export const computeAttrsInputsMixins = (
       mixins.push(pseudoClassToCssClass(cssPseudoClass))
     }
   }
-  // Collect mixins
-  if (c.style.mixins) {
+  // Reusable component mixins are merged into component style
+  if (!isReusable && c.style.mixins) {
     mixins.push(...c.style.mixins)
-  }
-  if (r?.style.mixins) {
-    mixins.push(...r.style.mixins)
   }
 
   if (r?.inputs) {
