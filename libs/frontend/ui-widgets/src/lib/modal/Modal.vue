@@ -14,6 +14,7 @@
 <script lang="ts" setup>
 import { onMounted, onUnmounted, ref, toRefs, watch } from 'vue'
 import { setCancelNextEsc } from '@pubstudio/frontend/feature-build-event'
+import { useHotkeyControl } from '@pubstudio/frontend/feature-build-event'
 import ModalClose from './ModalClose.vue'
 
 const props = withDefaults(
@@ -38,6 +39,7 @@ const { show, cancelByClickingOutside, escapeEvent, cancelWithEscape } = toRefs(
 const emit = defineEmits<{
   (e: 'cancel'): void
 }>()
+const { setHotkeysDisabled } = useHotkeyControl()
 
 const listenersActive = ref(false)
 
@@ -72,6 +74,7 @@ const modalSetup = (show: boolean) => {
     document.removeEventListener(escapeEvent.value, escape)
     document.body.classList.remove('noscroll')
   }
+  setHotkeysDisabled(show)
   listenersActive.value = show
 }
 
