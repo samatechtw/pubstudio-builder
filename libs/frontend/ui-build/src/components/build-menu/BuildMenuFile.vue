@@ -1,6 +1,6 @@
 <template>
   <div class="file-menu">
-    <BuildMenuIconText :text="t('file.export')" @click="showExport = true">
+    <BuildMenuIconText :text="t('file.export')" @click="setShowExportModal(true)">
       <Export></Export>
     </BuildMenuIconText>
     <SimpleFileUpload id="import" class="import" @selectFile="importSite">
@@ -30,8 +30,8 @@
       :site="site"
       :show="showExport"
       :defaultFileName="defaultFileName"
-      @confirmExport="showExport = false"
-      @cancel="showExport = false"
+      @confirmExport="setShowExportModal(false)"
+      @cancel="setShowExportModal(false)"
     />
     <AlertModal
       :show="!!parseError"
@@ -127,6 +127,12 @@ const importSite = async (file: File) => {
 const showTemplateModal = () => {
   storedTemplate.value = serializeSite(site.value)
 }
+
+const setShowExportModal = (show: boolean) => {
+  showExport.value = show
+}
+
+const setShowImportModal = (show: boolean) => {}
 
 const resetConfirmed = () => {
   resetSite()

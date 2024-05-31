@@ -91,6 +91,17 @@ const isResizeDiv = (el: HTMLElement | undefined | null): boolean => {
 }
 
 let mouseDownOnTextEditableComponent = false
+let manualDisableHotkeys = false
+
+export const useHotkeyControl = () => {
+  // Hotkeys are normally disabled based on editor state (e.g. modal showing)
+  // This is a manual control for when it can't be inferred from editor state
+  const setHotkeysDisabled = (disabled: boolean) => {
+    manualDisableHotkeys = disabled
+  }
+
+  return { setHotkeysDisabled }
+}
 
 export const useBuildEvent = () => {
   const {
@@ -249,7 +260,7 @@ export const useBuildEvent = () => {
   const pressHotkey = (e: KeyboardEvent, hotkeyFn: (e: KeyboardEvent) => void) => {
     // Don't activate hotkey if an input/textarea has focus, or a modal is active
     // TODO -- is there a general way to make sure another element doesn't have focus?
-    if (hotkeysDisabled(e, editor.value)) {
+    if (manualDisableHotkeys || hotkeysDisabled(e)) {
       return
     }
     hotkeyFn(e)

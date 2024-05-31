@@ -48,7 +48,7 @@
     <ToolbarItem
       :tooltip="t('toolbar.bug_title')"
       class="bounding"
-      @click="showBugReportModal = true"
+      @click="setShowBugReportModal(true)"
     >
       <Bug />
     </ToolbarItem>
@@ -62,7 +62,7 @@
     <ToolbarItem :tooltip="t(`toolbar.save.${siteStore.saveState}`)">
       <div class="save-state" :class="siteStore.saveState" @click="forceSave" />
     </ToolbarItem>
-    <BugReportModal :show="showBugReportModal" @cancel="showBugReportModal = false" />
+    <BugReportModal :show="showBugReportModal" @cancel="setShowBugReportModal(false)" />
   </div>
 </template>
 
@@ -113,6 +113,10 @@ const toggleComponentTree = () => {
     const show = !!editor.value.showComponentTree
     setShowComponentTree(editor.value, !show)
   }
+}
+
+const setShowBugReportModal = (show: boolean) => {
+  showBugReportModal.value = show
 }
 
 const forceSave = async () => {

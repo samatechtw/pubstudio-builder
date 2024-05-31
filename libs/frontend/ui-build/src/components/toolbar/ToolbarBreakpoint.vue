@@ -11,7 +11,7 @@
     <EditBreakpointModal
       :show="showEditModal"
       @save="saveBreakpoints"
-      @cancel="showEditModal = false"
+      @cancel="setShowEditModal(false)"
     />
   </div>
 </template>
@@ -38,7 +38,7 @@ const showEditModal = ref(false)
 const openEditBreakpointMenu = () => {
   // Open edit breakpoints modal
   initBreakpoints()
-  showEditModal.value = true
+  setShowEditModal(true)
 }
 
 const saveBreakpoints = (newBreakpoints: IBreakpoint[]) => {
@@ -46,7 +46,11 @@ const saveBreakpoints = (newBreakpoints: IBreakpoint[]) => {
     newBreakpoints.map((breakpoint) => [breakpoint.id, breakpoint]),
   )
   setBreakpoint(breakpointRecord)
-  showEditModal.value = false
+  setShowEditModal(false)
+}
+
+const setShowEditModal = (show: boolean) => {
+  showEditModal.value = show
 }
 </script>
 
