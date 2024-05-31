@@ -20,7 +20,7 @@ export interface IRouter<M> {
    * For example, `/users/1/cart-items/2` will resolve to a route with path
    * `/users/:userId`, including a children route with path `/cart-items/:itemId`, if present.
    */
-  resolve: (
+  resolvePath: (
     resolvedPath: string,
     options?: IResolveRouteOptions,
   ) => IResolvedRoute<M> | undefined

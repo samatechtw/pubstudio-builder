@@ -17,7 +17,6 @@ pub async fn get_site_usage(
     State(context): State<ApiContext>,
 ) -> Result<Json<SiteUsageViewModel>, ApiError> {
     verify_site_owner(&context, &user, &site_id).await?;
-
     let usage = context.cache.get_usage(&site_id).await?;
 
     let site_metadata = context

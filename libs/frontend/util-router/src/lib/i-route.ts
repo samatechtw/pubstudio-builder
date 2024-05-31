@@ -4,6 +4,7 @@ import { ILocationParts } from './i-location-parts'
 export interface IRoute<M> {
   name: string
   path: string
+  alias?: string
   meta?: M
 }
 

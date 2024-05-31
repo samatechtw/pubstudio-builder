@@ -139,7 +139,10 @@ export const createRouter = <M = Record<string, unknown>>(
       // Merge route path with parent path
       const mergedPath = mergePath(cumulativePath, route.path)
       const mergedPathRegex = computePathRegex(mergedPath)
-      const routeWithSameName = routesMap.get(route.name)
+      let routeWithSameName = undefined
+      if (route.name) {
+        routeWithSameName = routesMap.get(route.name)
+      }
 
       // Make sure route name and route path are unique
       if (routeWithSameName) {
@@ -161,6 +164,7 @@ export const createRouter = <M = Record<string, unknown>>(
       return {
         name: route.name,
         path: route.path,
+        alias: route.alias,
         meta: route.meta,
         // Use `markRaw` here to get rid of "Vue received a Component which was made a reactive object" warning.
         component: markRaw(route.component),
@@ -223,7 +227,7 @@ export const createRouter = <M = Record<string, unknown>>(
         throw new Error(`No route with name ${name}`)
       }
     } else {
-      const resolvedRoute = resolve(path as string)
+      const resolvedRoute = resolvePath(path as string)
       // When navigating by path, it's okay that both the target route and not found route
       // don't exist. In this case, nothing will be displayed in router-view.
       if (resolvedRoute) {
@@ -288,7 +292,22 @@ export const createRouter = <M = Record<string, unknown>>(
     }
   }
 
-  const resolve = (
+  const resolvedRoute = (
+    route: IRouteWithPathRegex<M>,
+    resolvedPath: string,
+    parent?: IResolvedRoute<M>,
+  ): IResolvedRoute<M> => {
+    const matchedParentRoutes = parent ? [...parent.matchedParentRoutes, parent] : []
+    return {
+      ...route,
+      ...computeLocationParts(route, resolvedPath),
+      path: route.alias ?? route.path,
+      resolvedPath,
+      matchedParentRoutes,
+    }
+  }
+
+  const resolvePath = (
     resolvedPath: string,
     options?: IResolveRouteOptions,
   ): IResolvedRoute<M> | undefined => {
@@ -310,12 +329,7 @@ export const createRouter = <M = Record<string, unknown>>(
     }
 
     if (rootRoute) {
-      const resolvedRootRoute: IResolvedRoute<M> = {
-        ...rootRoute,
-        ...computeLocationParts(rootRoute, resolvedPath),
-        resolvedPath,
-        matchedParentRoutes: [],
-      }
+      const resolvedRootRoute = resolvedRoute(rootRoute, resolvedPath)
       deepestMatchedRoute = resolvedRootRoute
 
       // Declare recurse function
@@ -327,15 +341,9 @@ export const createRouter = <M = Record<string, unknown>>(
           child.mergedPathRegex.test(resolvedPath),
         )
         if (firstMatch) {
-          const resolvedChildRoute: IResolvedRoute<M> = {
-            ...firstMatch,
-            ...computeLocationParts(firstMatch, resolvedPath),
-            resolvedPath,
-            matchedParentRoutes: [...resolvedParent.matchedParentRoutes, resolvedParent],
-          }
-          deepestMatchedRoute = resolvedChildRoute
+          deepestMatchedRoute = resolvedRoute(firstMatch, resolvedPath, resolvedParent)
 
-          recurse(firstMatch, resolvedChildRoute)
+          recurse(firstMatch, deepestMatchedRoute)
         }
       }
 
@@ -391,7 +399,7 @@ export const createRouter = <M = Record<string, unknown>>(
     push,
     replace,
     go,
-    resolve,
+    resolvePath,
     findRouteByName,
     computeResolvedPath,
     overwriteRouteComponent,
@@ -401,7 +409,7 @@ export const createRouter = <M = Record<string, unknown>>(
 
   const recomputeMatchedRoutes = (isPush: boolean) => {
     const path = getCurrentPath()
-    const newRoute = resolve(path, {
+    const newRoute = resolvePath(path, {
       matchNotFoundRoute: true,
     })
 

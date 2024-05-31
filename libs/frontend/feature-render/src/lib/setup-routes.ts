@@ -12,21 +12,23 @@ export const setupRoutes = (
   userSite: ISite,
   PageContent: ReturnType<typeof defineComponent>,
 ) => {
-  let homePageName = ''
-
   const pageMap = new Map<string, IPage>()
 
   Object.values(userSite.pages).forEach((page) => {
-    if (userSite.defaults.homePage === page.route) {
-      homePageName = page.name
-    }
-
     if (page.route === '/not-found') {
       router.overwriteRouteComponent('NotFound', PageContent)
     } else {
       router.addRoute({
         path: page.route,
         name: page.name,
+        component: PageContent,
+      })
+    }
+    if (userSite.defaults.homePage === page.route) {
+      router.addRoute({
+        name: '__HOME__',
+        path: '/',
+        alias: '/home',
         component: PageContent,
       })
     }
@@ -43,14 +45,6 @@ export const setupRoutes = (
     const locationParts = computeLocationParts(route, currentPath)
     router.replace({
       name: currentPage.name,
-      ...locationParts,
-    })
-  } else if (pathname === '/') {
-    // Automatically navigate users to default page if current route is '/'
-    const homeRoute = router.findRouteByName(homePageName) as IRouteWithPathRegex<unknown>
-    const locationParts = computeLocationParts(homeRoute, currentPath)
-    router.replace({
-      name: homePageName,
       ...locationParts,
     })
   } else {
