@@ -145,7 +145,10 @@ const forceSave = async () => {
 :deep(.ps-input),
 :deep(.multiselect),
 :deep(.ps-multiselect) {
-  height: calc($style-toolbar-height - 2px);
+  height: calc($site-toolbar-height - 2px);
+}
+:deep(.ps-multiselect .dropdown) {
+  z-index: $z-index-site-toolbar;
 }
 .toolbar-section {
   display: flex;

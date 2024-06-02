@@ -29,7 +29,6 @@ export interface IUseSiteVersion {
 
 export interface IUseSiteVersionOptions {
   siteId: string | undefined
-  rootApi: PSApi
 }
 
 const versions = ref<ISiteInfoViewModel[]>([])

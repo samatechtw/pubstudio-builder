@@ -395,6 +395,7 @@ export const useBuild = (): IUseBuild => {
       tag: copiedComponent.tag,
       content: copiedComponent.content,
       sourceId: copiedComponent.id,
+      reusableComponentId: copiedComponent.reusableSourceId,
       name: copiedComponent.name,
       ...selectAddParent(parent, activePage.value?.root.id),
     }

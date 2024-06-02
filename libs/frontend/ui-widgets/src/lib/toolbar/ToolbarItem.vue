@@ -75,7 +75,7 @@ defineExpose({ itemRef })
 @import '@theme/css/mixins.postcss';
 
 .toolbar-item {
-  @mixin size $style-toolbar-height;
+  @mixin size $site-toolbar-height;
   @mixin flex-center;
   position: relative;
   outline: none;
