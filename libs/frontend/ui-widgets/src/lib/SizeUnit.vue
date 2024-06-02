@@ -89,7 +89,6 @@ defineExpose({ toggleMenu, opened })
   align-items: center;
   margin-left: 2px;
   color: $color-primary;
-  z-index: $z-index-toolbar-dropdown2;
 }
 .size-unit {
   cursor: pointer;
@@ -106,5 +105,6 @@ defineExpose({ toggleMenu, opened })
 .unit-dropdown {
   width: auto;
   cursor: pointer;
+  z-index: $z-index-toolbar-dropdown3;
 }
 </style>

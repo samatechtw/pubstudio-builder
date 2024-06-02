@@ -17,9 +17,6 @@
           <div class="font-source">
             {{ t(`theme.${font.source}`) }}
           </div>
-          <div v-if="font.fallback" class="font-fallback">
-            {{ t(`theme.fallback_to`, { fallback: font.fallback }) }}
-          </div>
         </div>
         <Minus class="item-delete" @click="removeFont(font)" />
       </div>
@@ -71,6 +68,7 @@ const removeFont = (font: IThemeFont) => {
   }
 }
 .theme-fonts {
+  width: 100%;
   margin-top: 4px;
 }
 .font-entry {
@@ -94,12 +92,8 @@ const removeFont = (font: IThemeFont) => {
   color: $grey-500;
   margin-left: 16px;
 }
-.font-fallback {
-  @mixin title-normal 13px;
-  color: $grey-500;
-  margin: 0 auto 0 16px;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.item-delete {
+  margin-left: auto;
 }
 .theme-fonts-empty {
   @mixin title-medium 15px;

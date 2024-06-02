@@ -96,9 +96,10 @@ export const addComponentHelper = (site: ISite, data: IAddComponentData): ICompo
       state: clone(reusableCmp.state),
       editorEvents: clone(reusableCmp.editorEvents),
       style: { custom: {} },
-      reusableSourceId: reusableCmp.id,
     }
   }
+  // Allow both sourceId and reusableComponentId for copy/paste of reusable instances
+  component.reusableSourceId = reusableComponentId
 
   let parentNewChildren = parent?.children ? [...parent.children] : undefined
 
