@@ -1,95 +1,95 @@
 // Pre-define builtin IDs to avoid circular reference
 
-import { defaultContext } from './default-context'
+import { globalContext } from './global-context'
 import { behaviorId, componentId, nextStyleId, styleId } from './make-ids'
 
 // Public behaviors
-export const noBehaviorId = behaviorId(defaultContext.namespace, 'none')
-export const toggleHiddenId = behaviorId(defaultContext.namespace, 'toggleHidden')
-export const setHiddenId = behaviorId(defaultContext.namespace, 'setHidden')
-export const navMenuBehaviorId = behaviorId(defaultContext.namespace, 'navChildren')
-export const setupLoaderBehaviorId = behaviorId(defaultContext.namespace, 'setupLoader')
-export const navItemBehaviorId = behaviorId(defaultContext.namespace, 'navItem')
-export const homeLinkBehaviorId = behaviorId(defaultContext.namespace, 'homeLink')
+export const noBehaviorId = behaviorId(globalContext.namespace, 'none')
+export const toggleHiddenId = behaviorId(globalContext.namespace, 'toggleHidden')
+export const setHiddenId = behaviorId(globalContext.namespace, 'setHidden')
+export const navMenuBehaviorId = behaviorId(globalContext.namespace, 'navChildren')
+export const setupLoaderBehaviorId = behaviorId(globalContext.namespace, 'setupLoader')
+export const navItemBehaviorId = behaviorId(globalContext.namespace, 'navItem')
+export const homeLinkBehaviorId = behaviorId(globalContext.namespace, 'homeLink')
 
 // Builtin components and styles
-export const buttonStyleId = nextStyleId(defaultContext)
-export const buttonId = componentId(defaultContext.namespace, 'button')
-export const horizontalStyleId = nextStyleId(defaultContext)
+export const buttonStyleId = nextStyleId(globalContext)
+export const buttonId = componentId(globalContext.namespace, 'button')
+export const horizontalStyleId = nextStyleId(globalContext)
 export const containerHorizontalId = componentId(
-  defaultContext.namespace,
+  globalContext.namespace,
   'containerHorizontal',
 )
-export const verticalStyleId = nextStyleId(defaultContext)
+export const verticalStyleId = nextStyleId(globalContext)
 export const containerVerticalId = componentId(
-  defaultContext.namespace,
+  globalContext.namespace,
   'containerVertical',
 )
-export const footerStyleId = nextStyleId(defaultContext)
-export const footerId = componentId(defaultContext.namespace, 'footer')
-export const navMenuStyleId = nextStyleId(defaultContext)
-export const navMenuItemStyleId = nextStyleId(defaultContext)
-export const navMenuId = componentId(defaultContext.namespace, 'navmenu')
-export const navMenuItemId = componentId(defaultContext.namespace, 'navmenuitem')
-export const imageStyleId = nextStyleId(defaultContext)
-export const imageId = componentId(defaultContext.namespace, 'image')
-export const linkStyleId = nextStyleId(defaultContext)
-export const linkId = componentId(defaultContext.namespace, 'link')
-export const textStyleId = nextStyleId(defaultContext)
-export const textId = componentId(defaultContext.namespace, 'text')
-export const h1StyleId = nextStyleId(defaultContext)
-export const h1Id = componentId(defaultContext.namespace, 'h1')
-export const h2StyleId = nextStyleId(defaultContext)
-export const h2Id = componentId(defaultContext.namespace, 'h2')
-export const h3StyleId = nextStyleId(defaultContext)
-export const h3Id = componentId(defaultContext.namespace, 'h3')
-export const h4StyleId = nextStyleId(defaultContext)
-export const h4Id = componentId(defaultContext.namespace, 'h4')
-export const h5StyleId = nextStyleId(defaultContext)
-export const h5Id = componentId(defaultContext.namespace, 'h5')
-export const h6StyleId = nextStyleId(defaultContext)
-export const h6Id = componentId(defaultContext.namespace, 'h6')
-export const svgStyleId = nextStyleId(defaultContext)
-export const svgId = componentId(defaultContext.namespace, 'svg')
-export const listStyleId = nextStyleId(defaultContext)
-export const listItemStyleId = nextStyleId(defaultContext)
-export const ulId = componentId(defaultContext.namespace, 'ul')
-export const ollId = componentId(defaultContext.namespace, 'ol')
-export const liId = componentId(defaultContext.namespace, 'li')
-export const dividerVerticalStyleId = nextStyleId(defaultContext)
-export const dividerVerticalId = componentId(defaultContext.namespace, 'dividerVertical')
-export const dividerHorizontalStyleId = nextStyleId(defaultContext)
+export const footerStyleId = nextStyleId(globalContext)
+export const footerId = componentId(globalContext.namespace, 'footer')
+export const navMenuStyleId = nextStyleId(globalContext)
+export const navMenuItemStyleId = nextStyleId(globalContext)
+export const navMenuId = componentId(globalContext.namespace, 'navmenu')
+export const navMenuItemId = componentId(globalContext.namespace, 'navmenuitem')
+export const imageStyleId = nextStyleId(globalContext)
+export const imageId = componentId(globalContext.namespace, 'image')
+export const linkStyleId = nextStyleId(globalContext)
+export const linkId = componentId(globalContext.namespace, 'link')
+export const textStyleId = nextStyleId(globalContext)
+export const textId = componentId(globalContext.namespace, 'text')
+export const h1StyleId = nextStyleId(globalContext)
+export const h1Id = componentId(globalContext.namespace, 'h1')
+export const h2StyleId = nextStyleId(globalContext)
+export const h2Id = componentId(globalContext.namespace, 'h2')
+export const h3StyleId = nextStyleId(globalContext)
+export const h3Id = componentId(globalContext.namespace, 'h3')
+export const h4StyleId = nextStyleId(globalContext)
+export const h4Id = componentId(globalContext.namespace, 'h4')
+export const h5StyleId = nextStyleId(globalContext)
+export const h5Id = componentId(globalContext.namespace, 'h5')
+export const h6StyleId = nextStyleId(globalContext)
+export const h6Id = componentId(globalContext.namespace, 'h6')
+export const svgStyleId = nextStyleId(globalContext)
+export const svgId = componentId(globalContext.namespace, 'svg')
+export const listStyleId = nextStyleId(globalContext)
+export const listItemStyleId = nextStyleId(globalContext)
+export const ulId = componentId(globalContext.namespace, 'ul')
+export const ollId = componentId(globalContext.namespace, 'ol')
+export const liId = componentId(globalContext.namespace, 'li')
+export const dividerVerticalStyleId = nextStyleId(globalContext)
+export const dividerVerticalId = componentId(globalContext.namespace, 'dividerVertical')
+export const dividerHorizontalStyleId = nextStyleId(globalContext)
 export const dividerHorizontalId = componentId(
-  defaultContext.namespace,
+  globalContext.namespace,
   'dividerHorizontal',
 )
-export const captionedImageStyleId = styleId(defaultContext.namespace, 'captionedImage')
-export const captionedImageId = componentId(defaultContext.namespace, 'captionedImage')
+export const captionedImageStyleId = styleId(globalContext.namespace, 'captionedImage')
+export const captionedImageId = componentId(globalContext.namespace, 'captionedImage')
 
 // Form
-export const inputStyleId = nextStyleId(defaultContext)
-export const inputId = componentId(defaultContext.namespace, 'input')
+export const inputStyleId = nextStyleId(globalContext)
+export const inputId = componentId(globalContext.namespace, 'input')
 
-export const headerStyleId = nextStyleId(defaultContext)
-export const headerId = componentId(defaultContext.namespace, 'header')
-export const headerLogoId = componentId(defaultContext.namespace, 'headerLogo')
-export const headerLogoLinkId = componentId(defaultContext.namespace, 'headerLogoLink')
-export const headerNavMenuId = componentId(defaultContext.namespace, 'headerNavMenu')
+export const headerStyleId = nextStyleId(globalContext)
+export const headerId = componentId(globalContext.namespace, 'header')
+export const headerLogoId = componentId(globalContext.namespace, 'headerLogo')
+export const headerLogoLinkId = componentId(globalContext.namespace, 'headerLogoLink')
+export const headerNavMenuId = componentId(globalContext.namespace, 'headerNavMenu')
 
-export const textareaStyleId = nextStyleId(defaultContext)
-export const textareaId = componentId(defaultContext.namespace, 'textarea')
+export const textareaStyleId = nextStyleId(globalContext)
+export const textareaId = componentId(globalContext.namespace, 'textarea')
 
 // Advanced
-export const contactFormId = componentId(defaultContext.namespace, 'contactform')
-export const contactFormBehaviorId = behaviorId(defaultContext.namespace, 'contactform')
-export const mailingListId = componentId(defaultContext.namespace, 'mailinglist')
-export const mailingListBehaviorId = behaviorId(defaultContext.namespace, 'mailinglist')
+export const contactFormId = componentId(globalContext.namespace, 'contactform')
+export const contactFormBehaviorId = behaviorId(globalContext.namespace, 'contactform')
+export const mailingListId = componentId(globalContext.namespace, 'mailinglist')
+export const mailingListBehaviorId = behaviorId(globalContext.namespace, 'mailinglist')
 export const clearErrorBehaviorId = behaviorId(
-  defaultContext.namespace,
+  globalContext.namespace,
   'contactformclearerror',
 )
-export const loadingId = componentId(defaultContext.namespace, 'loading')
-export const loadingStyleId = styleId(defaultContext.namespace, 'loading')
-export const loadingDotStyleId = styleId(defaultContext.namespace, 'loadingdot')
+export const loadingId = componentId(globalContext.namespace, 'loading')
+export const loadingStyleId = styleId(globalContext.namespace, 'loading')
+export const loadingDotStyleId = styleId(globalContext.namespace, 'loadingdot')
 // Placeholder for children of builtin components that aren't used independently
-export const tempChildId = componentId(defaultContext.namespace, 'tempchild')
+export const tempChildId = componentId(globalContext.namespace, 'tempchild')

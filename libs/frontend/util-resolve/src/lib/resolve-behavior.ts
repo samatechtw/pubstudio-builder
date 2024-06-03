@@ -1,4 +1,4 @@
-import { defaultContext } from '@pubstudio/frontend/util-ids'
+import { globalContext } from '@pubstudio/frontend/util-ids'
 import {
   ComponentEventType,
   IBehavior,
@@ -47,7 +47,7 @@ export const resolveBehavior = (
   let behavior: IBehavior | undefined
   if (behaviorId.startsWith(context.namespace)) {
     behavior = context.behaviors[behaviorId]
-  } else if (behaviorId.startsWith(defaultContext.namespace)) {
+  } else if (behaviorId.startsWith(globalContext.namespace)) {
     // Builtins are native code and don't need to be eval'd
     return builtinBehaviors[behaviorId]
   } else {

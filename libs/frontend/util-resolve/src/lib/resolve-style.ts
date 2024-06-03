@@ -1,4 +1,4 @@
-import { defaultContext } from '@pubstudio/frontend/util-ids'
+import { globalContext } from '@pubstudio/frontend/util-ids'
 import { ISiteContext, IStyle } from '@pubstudio/shared/type-site'
 
 export const resolveStyle = (
@@ -8,7 +8,7 @@ export const resolveStyle = (
   let style: IStyle | undefined
   if (
     styleId.startsWith(context.namespace) ||
-    styleId.startsWith(defaultContext.namespace)
+    styleId.startsWith(globalContext.namespace)
   ) {
     style = context.styles[styleId]
   } else {
