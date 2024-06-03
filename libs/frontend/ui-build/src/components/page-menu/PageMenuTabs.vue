@@ -21,7 +21,7 @@ import PageMeta from './PageMeta.vue'
 import PageMenuView from './PageMenuView.vue'
 
 enum PageTab {
-  Info = 'build.info',
+  Info = 'info',
   Meta = 'theme.meta',
 }
 

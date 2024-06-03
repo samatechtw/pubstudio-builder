@@ -127,6 +127,8 @@ export const addComponentHelper = (site: ISite, data: IAddComponentData): ICompo
         state: child.state,
         children: child.children,
         inputs: clone(child.inputs),
+        events: clone(child.events),
+        editorEvents: clone(child.editorEvents),
         style: clone(child.style),
       })
     }
@@ -198,9 +200,12 @@ export const deleteComponentWithId = (site: ISite, componentId?: string): number
     removeEditorEvents(site, component)
 
     // Delete component tree expand state
-    const { componentTreeExpandedItems } = editor ?? {}
+    const { componentTreeExpandedItems, componentsHidden } = editor ?? {}
     if (componentTreeExpandedItems) {
       delete componentTreeExpandedItems[component.id]
+    }
+    if (componentsHidden) {
+      delete componentsHidden[component.id]
     }
   }
   return deleteCount

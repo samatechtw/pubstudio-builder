@@ -2,6 +2,7 @@ import {
   builtinThemeVariables,
   DEFAULT_BREAKPOINT_ID,
 } from '@pubstudio/frontend/util-ids'
+import { SiteType } from '@pubstudio/shared/type-api-platform-site'
 import {
   ComponentMenuCollapsible,
   CssPseudoClass,

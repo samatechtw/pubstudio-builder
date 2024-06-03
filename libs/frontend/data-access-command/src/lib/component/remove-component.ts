@@ -30,10 +30,13 @@ export const applyRemoveComponent = (site: ISite, data: IRemoveComponentData) =>
       }
     }
 
-    // Remove component tree expand state
-    const { componentTreeExpandedItems } = site.editor ?? {}
+    // Remove component tree hide and expand state
+    const { componentTreeExpandedItems, componentsHidden } = site.editor ?? {}
     if (componentTreeExpandedItems) {
       delete componentTreeExpandedItems[component.id]
+    }
+    if (componentsHidden) {
+      delete componentsHidden[component.id]
     }
 
     // Clear editor events

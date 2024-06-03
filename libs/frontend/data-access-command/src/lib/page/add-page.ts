@@ -47,9 +47,12 @@ export const undoAddPage = (site: ISite, data: IAddPageData) => {
   context.nextId -= deleteCount
 
   // Remove component tree expand state
-  const { componentTreeExpandedItems } = site.editor ?? {}
+  const { componentTreeExpandedItems, componentsHidden } = site.editor ?? {}
   if (componentTreeExpandedItems) {
     delete componentTreeExpandedItems[rootId]
+  }
+  if (componentsHidden) {
+    delete componentsHidden[rootId]
   }
 
   // Trigger page change event
