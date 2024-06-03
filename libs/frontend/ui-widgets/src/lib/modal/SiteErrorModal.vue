@@ -62,7 +62,7 @@ import {
   Modal,
   PSButton,
 } from '@pubstudio/frontend/ui-widgets'
-import { defaultExportedFileName } from '@pubstudio/frontend/util-site-store'
+import { defaultExportedFileName } from '@pubstudio/frontend/util-doc-site'
 
 const { t } = useI18n()
 

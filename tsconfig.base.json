@@ -60,6 +60,7 @@
       "@pubstudio/frontend/util-clickaway": ["libs/frontend/util-clickaway/src/index.ts"],
       "@pubstudio/frontend/util-config": ["libs/frontend/util-config/src/index.ts"],
       "@pubstudio/frontend/util-doc": ["libs/frontend/util-doc/src/index.ts"],
+      "@pubstudio/frontend/util-doc-site": ["libs/frontend/util-doc-site/src/index.ts"],
       "@pubstudio/frontend/util-dropdown": ["libs/frontend/util-dropdown/src/index.ts"],
       "@pubstudio/frontend/util-i18n": ["libs/frontend/util-i18n/src/index.ts"],
       "@pubstudio/frontend/util-fields": ["libs/frontend/util-fields/src/index.ts"],

@@ -1,5 +1,5 @@
+import { validateSite } from '@pubstudio/frontend/util-doc-site'
 import { unstoreSite } from '@pubstudio/frontend/util-site-deserialize'
-import { validateSite } from '@pubstudio/frontend/util-site-store'
 import { ISiteRestore, IStoredSite } from '@pubstudio/shared/type-site'
 import { createSite } from './create-site'
 
