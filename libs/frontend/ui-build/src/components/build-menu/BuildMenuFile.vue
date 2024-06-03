@@ -71,10 +71,7 @@ import {
   Templates,
 } from '@pubstudio/frontend/ui-widgets'
 import { serializeSite } from '@pubstudio/frontend/util-site-store'
-import {
-  defaultExportedFileName,
-  validateSite,
-} from '@pubstudio/frontend/util-site-store'
+import { defaultExportedFileName, validateSite } from '@pubstudio/frontend/util-doc-site'
 import { loadFile } from '@pubstudio/frontend/util-doc'
 import {
   deserializeSite,

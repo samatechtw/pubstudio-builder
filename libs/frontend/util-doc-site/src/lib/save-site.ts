@@ -1,7 +1,7 @@
 import { saveFile } from '@pubstudio/frontend/util-doc'
+import { stringifySite } from '@pubstudio/frontend/util-site-store'
 import { ISite } from '@pubstudio/shared/type-site'
 import { format } from 'date-fns/format'
-import { stringifySite } from './serialize-site'
 
 export const saveSite = (site: ISite | undefined, fileName: string) => {
   if (site) {

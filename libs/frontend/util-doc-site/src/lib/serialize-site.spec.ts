@@ -1,7 +1,7 @@
 import { deserializeSite } from '@pubstudio/frontend/util-site-deserialize'
+import { stringifySite } from '@pubstudio/frontend/util-site-store'
 import { mockSerializedSite } from '@pubstudio/frontend/util-test-mock'
 import { ISite } from '@pubstudio/shared/type-site'
-import { stringifySite } from './serialize-site'
 import { validateSite } from './validate-site'
 
 jest.mock('@pubstudio/frontend/util-config', () => ({ SITE_FORMAT_VERSION: '0.1' }))
