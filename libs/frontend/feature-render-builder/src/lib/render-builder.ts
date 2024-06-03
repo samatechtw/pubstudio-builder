@@ -297,7 +297,8 @@ export const computePropsContent = (
   // TODO -- improve efficiency by avoiding unnecessary input/attr computation
   // in computeAttrsInputsMixins
   // Ignore HTML attrs in builder
-  data.attrs = {}
+  const placeholder = data.attrs.placeholder
+  data.attrs = placeholder ? { placeholder } : {}
 
   let builderStyleProps: IBuilderStyleProps | undefined = undefined
   if (editor?.active) {

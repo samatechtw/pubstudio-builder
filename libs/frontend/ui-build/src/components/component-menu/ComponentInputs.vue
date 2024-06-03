@@ -133,7 +133,10 @@ const mergedInputs = computed(() => computeComponentInputs(site.value, component
 
 const inputArray = computed(() => {
   const inputs: Record<string, unknown> = {}
-  for (const [key, input] of Object.entries(component.value.inputs ?? {})) {
+  const cmp = component.value
+  const reusable = resolveComponent(site.value.context, cmp.reusableSourceId)
+
+  for (const [key, input] of Object.entries({ ...cmp.inputs, ...reusable?.inputs })) {
     inputs[key] = resolveInput(site.value.context, input.is ?? input.default, false)
   }
   return Object.entries(inputs).sort((entryA, entryB) =>

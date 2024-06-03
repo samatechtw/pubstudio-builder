@@ -84,8 +84,13 @@ export const computeAttrsInputsMixins = (
   }
 
   // Add role
-  if (!attrs.role && c.role) {
-    attrs.role = c.role
+  if (!attrs.role) {
+    if (r?.role) {
+      attrs.role = r.role
+    }
+    if (c.role) {
+      attrs.role = c.role
+    }
   }
 
   if (component.tag === Tag.A && attrs.href && renderMode === RenderMode.Release) {

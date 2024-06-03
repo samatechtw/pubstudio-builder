@@ -10,9 +10,9 @@ export const hotkeysDisabled = (e: KeyboardEvent) => {
     setCancelNextEsc(false)
     return true
   }
-  return (
-    e.target instanceof HTMLInputElement ||
-    e.target instanceof HTMLTextAreaElement ||
-    (e.target instanceof HTMLElement && e.target.classList.contains('ProseMirror'))
-  )
+  if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+    // Key events on readonly inputs should still trigger editor events
+    return !e.target.hasAttribute('readonly')
+  }
+  return e.target instanceof HTMLElement && e.target.classList.contains('ProseMirror')
 }
