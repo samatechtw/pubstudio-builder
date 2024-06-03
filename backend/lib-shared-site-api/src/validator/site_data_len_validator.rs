@@ -1,48 +1,20 @@
-use lib_shared_types::{
-    constants::{KB, MB},
-    error::api_error::ApiErrorCode,
-    shared::site::SiteType,
-};
+use lib_shared_types::{error::api_error::ApiErrorCode, shared::site::SiteType};
 
 use crate::error::api_error::ApiError;
 
 pub struct SiteDataValidator {
-    max_context_length: u64,
-    max_history_length: u64,
-    max_pages_length: u64,
+    site_type: SiteType,
 }
 
 impl SiteDataValidator {
     pub fn new(site_type: SiteType) -> Self {
-        // TODO: Determine max_length based on site_type
-        match site_type {
-            SiteType::Free => Self {
-                max_context_length: 100 * KB,
-                max_history_length: 100 * KB,
-                max_pages_length: 500 * KB,
-            },
-            SiteType::Paid1 => Self {
-                max_context_length: 200 * KB,
-                max_history_length: 200 * KB,
-                max_pages_length: 1 * MB,
-            },
-            SiteType::Paid2 => Self {
-                max_context_length: 500 * KB,
-                max_history_length: 500 * KB,
-                max_pages_length: 10 * MB,
-            },
-            SiteType::Paid3 => Self {
-                max_context_length: 1 * MB,
-                max_history_length: 1 * MB,
-                max_pages_length: 50 * MB,
-            },
-        }
+        Self { site_type }
     }
 
     pub fn validate_context(&self, context: &serde_json::Value) -> Result<(), ApiError> {
         self.validate_field_length(
             context,
-            self.max_context_length,
+            self.site_type.get_max_context_length(),
             "Context length exceeds limit",
         )?;
 
@@ -52,7 +24,7 @@ impl SiteDataValidator {
     pub fn validate_history(&self, history: &serde_json::Value) -> Result<(), ApiError> {
         self.validate_field_length(
             history,
-            self.max_history_length,
+            self.site_type.get_max_history_length(),
             "History length exceeds limit",
         )?;
 
@@ -60,7 +32,11 @@ impl SiteDataValidator {
     }
 
     pub fn validate_pages(&self, pages: &serde_json::Value) -> Result<(), ApiError> {
-        self.validate_field_length(pages, self.max_pages_length, "Site data exceeds limit")?;
+        self.validate_field_length(
+            pages,
+            self.site_type.get_max_pages_length(),
+            "Site data exceeds limit",
+        )?;
         Ok(())
     }
 

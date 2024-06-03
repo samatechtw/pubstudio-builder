@@ -1,9 +1,8 @@
 use std::{borrow::Borrow, future::Future};
 
 use lib_shared_types::{
-    dto::site_api::{
-        get_current_site_dto::GetCurrentSiteResponse, site_usage_viewmodel::SiteUsageViewModel,
-    },
+    cache::site_usage_data::SiteUsageData,
+    dto::site_api::get_current_site_dto::GetCurrentSiteResponse,
     entity::site_api::{site_entity::SiteEntity, site_usage_entity::SiteUsageEntity},
     shared::{core::ExecEnv, js_date::JsDate, site::SiteType},
 };
@@ -12,35 +11,6 @@ use serde::Serialize;
 use serde_json::{Map, Value};
 
 use crate::error::api_error::ApiError;
-
-#[derive(Debug, Clone, Serialize)]
-pub struct SiteUsageData {
-    pub site_size: u64,
-    pub request_count: u64,
-    pub request_error_count: u64,
-    pub total_bandwidth: u64,
-    pub bandwidth_allowance: u64,
-    pub last_updated: JsDate,
-}
-
-impl SiteUsageData {
-    pub fn to_viewmodel(
-        self,
-        custom_data_usage: i64,
-        custom_data_allowance: i64,
-    ) -> SiteUsageViewModel {
-        SiteUsageViewModel {
-            site_size: self.site_size,
-            request_count: self.request_count,
-            request_error_count: self.request_error_count,
-            total_bandwidth: self.total_bandwidth,
-            bandwidth_allowance: self.bandwidth_allowance,
-            custom_data_usage,
-            custom_data_allowance,
-            last_updated: self.last_updated,
-        }
-    }
-}
 
 #[derive(Debug, Clone, Serialize)]
 pub struct SiteMetadata {

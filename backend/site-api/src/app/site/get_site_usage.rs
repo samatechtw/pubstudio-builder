@@ -5,7 +5,8 @@ use axum::{
 use axum_macros::debug_handler;
 use lib_shared_site_api::error::api_error::ApiError;
 use lib_shared_types::{
-    dto::site_api::site_usage_viewmodel::SiteUsageViewModel, shared::user::RequestUser,
+    dto::site_api::site_usage_viewmodel::{from_usage_data, SiteUsageViewModel},
+    shared::user::RequestUser,
 };
 
 use crate::{api_context::ApiContext, middleware::auth::verify_site_owner};
@@ -25,12 +26,12 @@ pub async fn get_site_usage(
         .await
         .map_err(|_| ApiError::not_found())?;
 
-    return Ok(Json(
-        usage.to_viewmodel(
-            site_metadata.custom_data_usage,
-            site_metadata
-                .site_type
-                .get_custom_data_allowance(context.config.exec_env),
-        ),
-    ));
+    return Ok(Json(from_usage_data(
+        usage,
+        site_metadata.site_type,
+        site_metadata.custom_data_usage,
+        site_metadata
+            .site_type
+            .get_custom_data_allowance(context.config.exec_env),
+    )));
 }

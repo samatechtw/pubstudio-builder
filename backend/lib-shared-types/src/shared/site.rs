@@ -2,7 +2,7 @@ use chrono::{DateTime, Days, Months, Utc};
 use serde::{Deserialize, Serialize};
 use strum::{Display, EnumIter, EnumString};
 
-use crate::constants::{GB, MB, TB};
+use crate::constants::{GB, KB, MB, TB};
 
 use super::core::ExecEnv;
 
@@ -53,6 +53,30 @@ pub enum SiteType {
 }
 
 impl SiteType {
+    pub fn get_max_context_length(&self) -> u64 {
+        match self {
+            SiteType::Free => 100 * KB,
+            SiteType::Paid1 => 200 * KB,
+            SiteType::Paid2 => 500 * KB,
+            SiteType::Paid3 => 1 * MB,
+        }
+    }
+    pub fn get_max_history_length(&self) -> u64 {
+        match self {
+            SiteType::Free => 100 * KB,
+            SiteType::Paid1 => 200 * KB,
+            SiteType::Paid2 => 500 * KB,
+            SiteType::Paid3 => 1 * MB,
+        }
+    }
+    pub fn get_max_pages_length(&self) -> u64 {
+        match self {
+            SiteType::Free => 500 * KB,
+            SiteType::Paid1 => 1 * MB,
+            SiteType::Paid2 => 10 * MB,
+            SiteType::Paid3 => 50 * MB,
+        }
+    }
     pub fn get_bandwidth_allowance(&self, exec_env: ExecEnv) -> u64 {
         if exec_env == ExecEnv::Dev || exec_env == ExecEnv::Ci {
             match self {

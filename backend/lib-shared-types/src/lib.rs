@@ -1,3 +1,4 @@
+pub mod cache;
 pub mod constants;
 pub mod dto;
 pub mod entity;
