@@ -29,7 +29,7 @@
     <ToolbarBreakpoint class="toolbar-breakpoint" />
     <ToolbarVersion />
     <ToolbarPseudoClass class="toolbar-pseudo-class" />
-    <ToolbarBuilderWidth class="toolbar-builder-width" />
+    <ToolbarBuilderWidth />
     <ToolbarItem
       :tooltip="isSaving ? t('build.preview_saving') : t('build.preview')"
       :disabled="isSaving"
