@@ -2,7 +2,8 @@ import { setBuildSubmenu } from '@pubstudio/frontend/data-access-command'
 import {
   addBuiltinComponent,
   addReusableComponent,
-  useBuild,
+  moveAbsoluteComponent,
+  moveComponent,
 } from '@pubstudio/frontend/feature-build'
 import { activeBreakpoint } from '@pubstudio/frontend/feature-site-source'
 import { resolvedComponentStyle } from '@pubstudio/frontend/util-component'
@@ -99,7 +100,6 @@ export const useDragDrop = (props: IUseDragDropProps): IUseDragDrop => {
     dragend: dragendOption,
     drop: dropOption,
   } = props
-  const { moveComponent, moveAbsoluteComponent } = useBuild()
   const hovering = ref(false)
 
   const elementRef: Ref<HTMLElement | undefined> = ref()
@@ -167,8 +167,8 @@ export const useDragDrop = (props: IUseDragDropProps): IUseDragDrop => {
       // Workaround for Chrome calling `dragend` immediately after `dragstart`
       setTimeout(() => {
         const clickOffset: XYCoord = {
-          x: e.clientX - (bound?.left ?? 0),
-          y: e.clientY - (bound?.top ?? 0),
+          x: e.clientX,
+          y: e.clientY,
         }
         dragSource.value = {
           componentId,
@@ -331,14 +331,14 @@ export const useDragDrop = (props: IUseDragDropProps): IUseDragDrop => {
         droppedSameParent() &&
         position === 'absolute'
       ) {
-        const bounds = parent.getBoundingClientRect()
-        const left = `${e.clientX - bounds.left - clickOffset.x}px`
-        const top = `${e.clientY - bounds.top - clickOffset.y}px`
-        moveAbsoluteComponent(sourceComponent, left, top)
+        const left = e.clientX - clickOffset.x
+        const top = e.clientY - clickOffset.y
+        const el = getDraggedElement?.(e) ?? document.getElementById(componentId)
+        moveAbsoluteComponent(site, el, sourceComponent, left, top)
       } else if (component && canDrop()) {
         const drop = onDrop(component, dragSource.value, dropProps.value)
         if (drop) {
-          moveComponent(drop.from, drop.to)
+          moveComponent(site, drop.from, drop.to)
         }
       }
     }

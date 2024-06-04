@@ -117,6 +117,7 @@ const updateBuilderScale = () => {
 
 .builder-width-wrap {
   white-space: nowrap;
+  z-index: $z-index-site-toolbar;
   .toolbar-item {
     width: auto;
   }

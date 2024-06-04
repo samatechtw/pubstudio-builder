@@ -1,4 +1,5 @@
 export * from './lib/command-wrap/global-style'
+export * from './lib/command-wrap/move-component'
 export * from './lib/add-builtin/add-builtin-component'
 export * from './lib/use-build'
 export * from './lib/use-history'

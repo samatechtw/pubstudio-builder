@@ -41,14 +41,12 @@ import {
   IAddThemeVariableData,
   IChangePageData,
   ICommandGroupData,
-  IComponentPosition,
   IEditComponentData,
   IEditComponentFields,
   IEditPageData,
   IEditThemeFontData,
   IEditThemeVariableData,
   IMergeComponentStyleData,
-  IMoveComponentData,
   INewTranslations,
   IRemoveComponentMixinData,
   IRemoveComponentOverrideStyleData,
@@ -210,8 +208,6 @@ export interface IUseBuild {
   setHomePage: (route: string) => void
   deleteSelected: () => void
   selectComponentParent: () => void
-  moveComponent: (from: IComponentPosition, to: IComponentPosition) => void
-  moveAbsoluteComponent: (component: IComponent, left: string, top: string) => void
   addDefaultsHead: (tag: IHeadTag, value: IHeadObject) => void
   setDefaultsHead: (tag: IHeadTag, index: number, value: IHeadObject) => void
   removeDefaultsHead: (tag: IHeadTag, index: number) => void
@@ -979,57 +975,6 @@ export const useBuild = (): IUseBuild => {
     setSelectedComponent(site.value, parent)
   }
 
-  const moveComponent = (from: IComponentPosition, to: IComponentPosition) => {
-    const data: IMoveComponentData = {
-      from,
-      to,
-      selectedComponentId: editor.value?.selectedComponent?.id,
-    }
-    pushCommand(site.value, CommandType.MoveComponent, data)
-  }
-
-  const moveAbsoluteComponent = (component: IComponent, left: string, top: string) => {
-    const pseudoClass = CssPseudoClass.Default
-    const breakpointId = activeBreakpoint.value.id
-    const oldLeft = component.style.custom[breakpointId]?.[pseudoClass]?.left
-    const oldTop = component.style.custom[breakpointId]?.[pseudoClass]?.top
-    const data: ICommandGroupData = {
-      commands: [
-        {
-          type: CommandType.SetComponentCustomStyle,
-          data: {
-            componentId: component.id,
-            breakpointId,
-            oldStyle: oldLeft
-              ? { pseudoClass, property: Css.Left, value: oldLeft }
-              : undefined,
-            newStyle: { pseudoClass, property: Css.Left, value: left },
-          },
-        },
-        {
-          type: CommandType.SetComponentCustomStyle,
-          data: {
-            componentId: component.id,
-            breakpointId,
-            oldStyle: oldTop
-              ? {
-                  pseudoClass,
-                  property: Css.Top,
-                  value: oldTop,
-                }
-              : undefined,
-            newStyle: {
-              pseudoClass,
-              property: Css.Top,
-              value: top,
-            },
-          },
-        },
-      ],
-    }
-    pushCommand(site.value, CommandType.Group, data)
-  }
-
   const setFavicon = (newFavicon: string | undefined) => {
     const index =
       site.value.defaults.head.link?.findIndex((link) => link.rel === 'icon') ?? 0
@@ -1254,8 +1199,6 @@ export const useBuild = (): IUseBuild => {
     removePage,
     changePage,
     setHomePage,
-    moveComponent,
-    moveAbsoluteComponent,
     setFavicon,
     addDefaultsHead,
     setDefaultsHead,
