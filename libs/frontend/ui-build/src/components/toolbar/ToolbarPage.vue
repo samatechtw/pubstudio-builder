@@ -72,7 +72,6 @@ onMounted(() => {
 
 .page-multiselect {
   width: 80px;
-  z-index: 2000;
   .add-page {
     background-color: $blue-100;
   }

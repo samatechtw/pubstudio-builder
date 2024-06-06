@@ -88,7 +88,7 @@ const treeStyles = computed(() => {
   transition: width 0.2s;
   border-right: 1px solid $border-widget;
   &.visible {
-    width: 200px;
+    width: $left-menu-width;
   }
 }
 .component-tree {

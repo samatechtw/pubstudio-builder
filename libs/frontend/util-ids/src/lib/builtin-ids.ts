@@ -7,7 +7,15 @@ import { behaviorId, componentId, nextStyleId, styleId } from './make-ids'
 export const noBehaviorId = behaviorId(globalContext.namespace, 'none')
 export const toggleHiddenId = behaviorId(globalContext.namespace, 'toggleHidden')
 export const setHiddenId = behaviorId(globalContext.namespace, 'setHidden')
-export const navMenuBehaviorId = behaviorId(globalContext.namespace, 'navChildren')
+export const navMenuAddBehaviorId = behaviorId(globalContext.namespace, 'navAddChildren')
+export const navMenuChangeBehaviorId = behaviorId(
+  globalContext.namespace,
+  'navChangeChildren',
+)
+export const navMenuRemoveBehaviorId = behaviorId(
+  globalContext.namespace,
+  'navRemoveChildren',
+)
 export const setupLoaderBehaviorId = behaviorId(globalContext.namespace, 'setupLoader')
 export const navItemBehaviorId = behaviorId(globalContext.namespace, 'navItem')
 export const homeLinkBehaviorId = behaviorId(globalContext.namespace, 'homeLink')

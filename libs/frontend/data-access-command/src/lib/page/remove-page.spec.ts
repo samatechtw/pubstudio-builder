@@ -92,7 +92,7 @@ describe('Remove Page', () => {
       oldBehavior,
       componentData,
       mock: noBehaviorMock,
-    } = setupMockBehavior(site, [EditorEventName.OnPageChange])
+    } = setupMockBehavior(site, [EditorEventName.OnPageRemove])
     applyAddComponent(site, componentData)
 
     const removedPage = site.pages[pageToBeRemoved]

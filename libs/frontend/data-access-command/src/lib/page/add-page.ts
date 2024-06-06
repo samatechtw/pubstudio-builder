@@ -27,7 +27,7 @@ export const applyAddPage = (site: ISite, data: IAddPageData) => {
   }
 
   // Trigger page change event
-  triggerEditorEvent(site, EditorEventName.OnPageChange)
+  triggerEditorEvent(site, EditorEventName.OnPageAdd)
 
   // Set active page and selected component
   setActivePage(site.editor, metadata.route)
@@ -54,9 +54,6 @@ export const undoAddPage = (site: ISite, data: IAddPageData) => {
   if (componentsHidden) {
     delete componentsHidden[rootId]
   }
-
-  // Trigger page change event
-  triggerEditorEvent(site, EditorEventName.OnPageChange)
 
   // Set active page and selected component
   setActivePage(site.editor, activePageRoute)

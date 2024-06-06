@@ -118,7 +118,7 @@ const computeBuilderStyleProps = (
           }),
         ]
         data.mixins.push('__link')
-        builderAttrs.href = 'javascript:'
+        builderProps.href = 'javascript:'
         forceRelative()
       }
     }

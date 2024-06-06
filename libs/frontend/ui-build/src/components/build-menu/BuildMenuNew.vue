@@ -154,7 +154,7 @@ const { isSiteApi } = useSiteSource()
 .new-menu {
   @mixin flex-row;
   height: 100%;
-  width: 200px;
+  width: $left-menu-width;
   padding-top: 12px;
   background-color: $blue-100;
   overflow: auto;

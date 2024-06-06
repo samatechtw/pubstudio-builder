@@ -64,6 +64,8 @@ export enum ComponentTabState {
 }
 
 export enum EditorEventName {
+  OnPageAdd = 'OnPageAdd',
+  OnPageRemove = 'OnPageRemove',
   OnPageChange = 'OnPageChange',
   OnIsInputChange = 'OnIsInputChange',
   OnSelfAdded = 'OnSelfAdded',
