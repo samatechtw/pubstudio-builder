@@ -2,10 +2,12 @@ import {
   DEFAULT_BREAKPOINT_ID,
   horizontalStyleId,
   navItemBehaviorId,
-  navMenuBehaviorId,
+  navMenuAddBehaviorId,
+  navMenuChangeBehaviorId,
   navMenuId,
   navMenuItemId,
   navMenuItemStyleId,
+  navMenuRemoveBehaviorId,
   navMenuStyleId,
 } from '@pubstudio/frontend/util-ids'
 import { EditorEventName, IComponent, IStyle, Tag } from '@pubstudio/shared/type-site'
@@ -17,7 +19,7 @@ export const navMenuStyle: IStyle = {
   breakpoints: {
     [DEFAULT_BREAKPOINT_ID]: {
       default: {
-        height: '100%',
+        height: '64px',
         'font-size': '22px',
         'align-items': 'center',
         color: '${color-primary}',
@@ -53,11 +55,19 @@ export const makeNavMenu = (): IComponent => {
     editorEvents: {
       [EditorEventName.OnSelfAdded]: {
         name: EditorEventName.OnSelfAdded,
-        behaviors: [{ behaviorId: navMenuBehaviorId }],
+        behaviors: [{ behaviorId: navMenuAddBehaviorId }],
+      },
+      [EditorEventName.OnPageAdd]: {
+        name: EditorEventName.OnPageChange,
+        behaviors: [{ behaviorId: navMenuAddBehaviorId }],
+      },
+      [EditorEventName.OnPageRemove]: {
+        name: EditorEventName.OnPageChange,
+        behaviors: [{ behaviorId: navMenuRemoveBehaviorId }],
       },
       [EditorEventName.OnPageChange]: {
         name: EditorEventName.OnPageChange,
-        behaviors: [{ behaviorId: navMenuBehaviorId }],
+        behaviors: [{ behaviorId: navMenuChangeBehaviorId }],
       },
     },
   }

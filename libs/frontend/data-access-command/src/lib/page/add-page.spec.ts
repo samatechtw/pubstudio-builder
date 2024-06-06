@@ -120,12 +120,12 @@ describe('Add Page', () => {
     expect(site.editor?.componentTreeExpandedItems?.[newPageRootId]).toBeUndefined()
   })
 
-  it('should trigger page change editor event', () => {
+  it('should trigger page add editor event', () => {
     const {
       oldBehavior,
       componentData,
       mock: noBehaviorMock,
-    } = setupMockBehavior(site, [EditorEventName.OnPageChange])
+    } = setupMockBehavior(site, [EditorEventName.OnPageAdd])
     applyAddComponent(site, componentData)
 
     // Add page and assert builtin behavior called

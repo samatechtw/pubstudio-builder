@@ -53,7 +53,7 @@ const behaviors = computed(() => {
 .behavior-menu {
   @mixin flex-col;
   height: 100%;
-  width: 200px;
+  width: $left-menu-width;
   padding-top: 24px;
   background-color: $blue-100;
   align-items: center;

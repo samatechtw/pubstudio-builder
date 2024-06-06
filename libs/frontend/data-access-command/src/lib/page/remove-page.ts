@@ -24,12 +24,13 @@ export const applyRemovePage = (site: ISite, data: IRemovePageData) => {
   replaceSite(unstoreSite(storeSite(site)) as ISite)
 
   // Trigger page change event
-  triggerEditorEvent(site, EditorEventName.OnPageChange)
+  triggerEditorEvent(site, EditorEventName.OnPageRemove)
 
   // Set active page to another one
   const nextActivePageRoute = pageRoutes.find((route) => route !== pageRoute) as string
-  setActivePage(site.editor, nextActivePageRoute)
+  console.log('NEXTROUTE', nextActivePageRoute)
   setSelectedComponent(site, undefined)
+  setActivePage(site.editor, nextActivePageRoute)
 }
 
 export const undoRemovePage = (site: ISite, data: IRemovePageData) => {
@@ -42,11 +43,9 @@ export const undoRemovePage = (site: ISite, data: IRemovePageData) => {
     site.context.components[componentId] = component
   })
 
-  // Trigger page change event
-  triggerEditorEvent(site, EditorEventName.OnPageChange)
-
   // Set active page and selected component back
   const prevSelectedComponent = site.context.components[selectedComponentId ?? '']
+  console.log('UNDO', pageRoute, prevSelectedComponent?.id)
   setActivePage(site.editor, pageRoute)
   setSelectedComponent(site, prevSelectedComponent)
 }

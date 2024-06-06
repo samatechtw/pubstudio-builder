@@ -110,7 +110,7 @@ const dropUploadImage = (e: Event) => {
   @mixin flex-col;
   position: relative;
   height: 100%;
-  width: 200px;
+  width: $left-menu-width;
   padding-top: 24px;
   background-color: $blue-100;
   align-items: center;

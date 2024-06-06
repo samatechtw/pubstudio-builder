@@ -42,7 +42,7 @@ const topLevelReusableComponents = computed<IComponent[]>(() => {
 .reusable-menu {
   @mixin flex-col;
   height: 100%;
-  width: 200px;
+  width: $left-menu-width;
   padding: 24px 0 16px;
   background-color: $blue-100;
   overflow: auto;
