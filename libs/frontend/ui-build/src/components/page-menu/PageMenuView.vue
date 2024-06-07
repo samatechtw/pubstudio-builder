@@ -1,10 +1,10 @@
 <template>
   <div class="page-menu-view">
-    <MenuRow :label="t('name')" :value="activePage?.name" :editable="false" />
-    <MenuRow :label="t('build.route')" :value="activePage?.route" :editable="false" />
+    <MenuRow :label="t('name')" :value="page?.name" :editable="false" />
+    <MenuRow :label="t('build.route')" :value="route" :editable="false" />
     <MenuRow
       :label="t('build.public')"
-      :value="activePage?.public ? t('yes') : t('no')"
+      :value="page?.public ? t('yes') : t('no')"
       :editable="false"
     />
     <MenuRow :label="t('build.home_page')" :editable="false">
@@ -55,28 +55,28 @@ import MenuRow from '../MenuRow.vue'
 
 const { t } = useI18n()
 const { pages, setEditingPage, removePage } = usePageMenu()
-const { site, activePage } = useSiteSource()
+const { site } = useSiteSource()
 const { editor, setHomePage } = useBuild()
 
 const showConfirmSetHomePage = ref(false)
 const showConfirmRemove = ref(false)
 
 const removable = computed(() => pages.value.length > 1)
+const route = computed(() => editor.value?.editPageRoute)
+const page = computed(() => (route.value ? site.value.pages[route.value] : undefined))
 
-const isHomePage = computed(
-  () => site.value.defaults.homePage === activePage.value?.route,
-)
+const isHomePage = computed(() => site.value.defaults.homePage === route.value)
 
 const setAsHomePage = () => {
-  if (activePage.value) {
-    setHomePage(activePage.value.route)
+  if (route.value) {
+    setHomePage(route.value)
     showConfirmSetHomePage.value = false
   }
 }
 
 const edit = () => {
-  if (activePage.value) {
-    setEditingPage(activePage.value.route)
+  if (route.value) {
+    setEditingPage(route.value)
   }
 }
 

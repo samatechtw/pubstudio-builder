@@ -69,7 +69,7 @@
         class="cancel-button"
         :text="t('cancel')"
         :secondary="true"
-        @click.stop="clearEditingState"
+        @click.stop="resetPageMenu"
       />
     </div>
   </div>
@@ -86,12 +86,11 @@ import {
   InfoBubble,
   PSMultiselect,
 } from '@pubstudio/frontend/ui-widgets'
-import { usePageMenu } from '@pubstudio/frontend/feature-build'
+import { usePageMenu, resetPageMenu } from '@pubstudio/frontend/feature-build'
 
 const { t } = useI18n()
 
-const { pageError, editingPage, pageOptions, isNew, savePage, clearEditingState } =
-  usePageMenu()
+const { pageError, editingPage, pageOptions, isNew, savePage } = usePageMenu()
 
 const publicCheckboxData = computed(() => ({
   checked: editingPage.public,

@@ -12,15 +12,12 @@ export interface IUseHistory {
 }
 
 export const useHistory = (): IUseHistory => {
-  const { site, activePage } = useSiteSource()
+  const { site } = useSiteSource()
   const { commandAlert } = useBuild()
   const canRedo = computed(() => !!site.value.history.forward.length)
   const canUndo = computed(() => !!site.value.history.back.length)
 
   const undo = (uiAlert = false) => {
-    if (!activePage.value) {
-      return
-    }
     if (uiAlert) {
       commandAlert.value = CommandType.Undo
     }
@@ -28,9 +25,6 @@ export const useHistory = (): IUseHistory => {
   }
 
   const redo = (uiAlert = false) => {
-    if (!activePage.value) {
-      return
-    }
     if (uiAlert) {
       commandAlert.value = CommandType.Redo
     }

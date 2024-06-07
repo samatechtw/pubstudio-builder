@@ -10,6 +10,7 @@ import {
 } from '@pubstudio/frontend/util-test-mock'
 import { EditorEventName, IEditorContext, ISite } from '@pubstudio/shared/type-site'
 import { applyAddComponent } from '../component/add-component'
+import { toggleComponentHidden } from '../editor-helpers'
 import { applyAddPage } from './add-page'
 import { applyRemovePage, undoRemovePage } from './remove-page'
 
@@ -47,6 +48,8 @@ describe('Remove Page', () => {
     expect(removedPage).not.toBeUndefined()
     expect(site.context.components[removedPage.root.id]).not.toBeUndefined()
 
+    toggleComponentHidden(site.editor, removedPage.root.id, true)
+
     // Remove page
     const data = mockRemovePageData(
       pageToBeRemoved,
@@ -64,6 +67,9 @@ describe('Remove Page', () => {
     // Assert root component is removed
     expect(newSite.context.components[removedPage.root.id]).toBeUndefined()
     expect(Object.keys(newSite.context.components)).toHaveLength(componentCount - 1)
+    // Assert editor state cleaned up
+    expect(site.editor?.componentTreeExpandedItems?.[removedPage.root.id]).toBe(undefined)
+    expect(site.editor?.componentsHidden?.[removedPage.root.id]).toBe(undefined)
   })
 
   it('should undo remove page', () => {
@@ -106,9 +112,9 @@ describe('Remove Page', () => {
     applyRemovePage(site, data)
     expect(noBehaviorMock).toHaveBeenCalledTimes(1)
 
-    // Undo remove page and assert behavior is called again
+    // Undo remove page
     undoRemovePage(site, data)
-    expect(noBehaviorMock).toHaveBeenCalledTimes(2)
+    expect(noBehaviorMock).toHaveBeenCalledTimes(1)
 
     // Restore behavior
     builtinBehaviors[noBehaviorId] = oldBehavior

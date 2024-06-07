@@ -2,7 +2,6 @@ import {
   builtinThemeVariables,
   DEFAULT_BREAKPOINT_ID,
 } from '@pubstudio/frontend/util-ids'
-import { SiteType } from '@pubstudio/shared/type-api-platform-site'
 import {
   ComponentMenuCollapsible,
   CssPseudoClass,
@@ -22,6 +21,7 @@ export const createEditorContext = (homePage: IPage): IEditorContext => {
     editorEvents: {},
     debugBounding: false,
     mode: EditorMode.None,
+    editPageRoute: undefined,
     showComponentTree: true,
     componentTab: {},
     componentTreeExpandedItems: {

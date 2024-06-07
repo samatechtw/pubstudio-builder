@@ -13,7 +13,7 @@
       :disabled="!canUndo"
       :alert="commandAlert === CommandType.Undo"
       class="toolbar-undo"
-      @click="undo()"
+      @click="historyAction($event, undo)"
     >
       <Undo />
     </ToolbarItem>
@@ -21,7 +21,7 @@
       :tooltip="t('toolbar.redo')"
       :disabled="!canRedo"
       :alert="commandAlert === CommandType.Redo"
-      @click="redo()"
+      @click="historyAction($event, redo)"
     >
       <Redo />
     </ToolbarItem>
@@ -91,7 +91,7 @@ import ToolbarBuilderWidth from './ToolbarBuilderWidth.vue'
 import ToolbarBreakpoint from './ToolbarBreakpoint.vue'
 import BugReportModal from './BugReportModal.vue'
 import ToolbarVersion from './ToolbarVersion.vue'
-import { SiteSaveState } from '@pubstudio/shared/type-site'
+import { BuildSubmenu, SiteSaveState } from '@pubstudio/shared/type-site'
 
 defineProps<{
   hideSettings?: boolean
@@ -117,6 +117,14 @@ const toggleComponentTree = () => {
 
 const setShowBugReportModal = (show: boolean) => {
   showBugReportModal.value = show
+}
+
+const historyAction = (e: Event, action: () => void) => {
+  if (editor.value?.buildSubmenu === BuildSubmenu.History) {
+    e.preventDefault()
+    e.stopPropagation()
+  }
+  action()
 }
 
 const forceSave = async () => {

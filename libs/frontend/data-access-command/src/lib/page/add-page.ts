@@ -37,6 +37,7 @@ export const applyAddPage = (site: ISite, data: IAddPageData) => {
 export const undoAddPage = (site: ISite, data: IAddPageData) => {
   const context = site.context
   const { metadata, activePageRoute, selectedComponentId } = data
+
   const prevSelectedComponent = context.components[selectedComponentId ?? '']
 
   // Remove page and root component
@@ -45,15 +46,6 @@ export const undoAddPage = (site: ISite, data: IAddPageData) => {
 
   const deleteCount = deleteComponentWithId(site, rootId)
   context.nextId -= deleteCount
-
-  // Remove component tree expand state
-  const { componentTreeExpandedItems, componentsHidden } = site.editor ?? {}
-  if (componentTreeExpandedItems) {
-    delete componentTreeExpandedItems[rootId]
-  }
-  if (componentsHidden) {
-    delete componentsHidden[rootId]
-  }
 
   // Set active page and selected component
   setActivePage(site.editor, activePageRoute)

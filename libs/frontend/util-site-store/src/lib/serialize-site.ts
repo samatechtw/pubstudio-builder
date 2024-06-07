@@ -55,6 +55,7 @@ export const serializeEditor = (
         editGlobalStyle: editor.editGlobalStyle,
         componentTab: editor.componentTab,
         mode: editor.mode,
+        editPageRoute: editor.editPageRoute,
         showComponentTree: editor.showComponentTree,
         componentTreeExpandedItems: editor.componentTreeExpandedItems,
         componentsHidden: editor.componentsHidden,
