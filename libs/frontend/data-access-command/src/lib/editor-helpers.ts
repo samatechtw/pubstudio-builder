@@ -52,6 +52,16 @@ export const toggleEditorMenu = (
   }
 }
 
+export const setEditPage = (
+  editor: IEditorContext | undefined,
+  route: string | undefined,
+) => {
+  if (editor) {
+    editor.editPageRoute = route
+    toggleEditorMenu(editor, EditorMode.Page, route !== undefined)
+  }
+}
+
 export const setBuildSubmenu = (
   editor: IEditorContext | undefined,
   submenu: BuildSubmenu | undefined,

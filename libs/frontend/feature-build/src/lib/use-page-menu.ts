@@ -1,4 +1,4 @@
-import { toggleEditorMenu } from '@pubstudio/frontend/data-access-command'
+import { setEditPage, toggleEditorMenu } from '@pubstudio/frontend/data-access-command'
 import { IMultiselectOptions } from '@pubstudio/frontend/type-ui-widgets'
 import { EditorMode, IPage, IPageMetadata } from '@pubstudio/shared/type-site'
 import { useI18n } from 'petite-vue-i18n'
@@ -12,7 +12,6 @@ export interface IUsePageMenuFeature {
   pages: ComputedRef<IPage[]>
   isNew: ComputedRef<boolean>
   pageOptions: ComputedRef<IMultiselectOptions>
-  clearEditingState: () => void
   newPage: () => void
   setEditingPage: (name: string) => void
   savePage: () => void
@@ -68,15 +67,8 @@ export const usePageMenu = (): IUsePageMenuFeature => {
     return Object.values(site.value?.pages ?? {})
   })
 
-  const clearEditingState = () => {
-    Object.assign(editingPage, emptyPage())
-    Object.assign(editingPageSource, emptyPage())
-    pageError.value = getDefaultError()
-    editing.value = false
-  }
-
   const newPage = () => {
-    toggleEditorMenu(editor.value, EditorMode.Page, true)
+    setEditPage(editor.value, '')
     Object.assign(editingPage, emptyPage())
     Object.assign(editingPageSource, emptyPage())
     editing.value = true
@@ -147,7 +139,7 @@ export const usePageMenu = (): IUsePageMenuFeature => {
         editPage(getMetadataCopy(editingPageSource), newPage)
       }
     }
-    clearEditingState()
+    resetPageMenu()
   }
 
   const removePage = (name: string) => {
@@ -161,7 +153,6 @@ export const usePageMenu = (): IUsePageMenuFeature => {
     pages,
     isNew,
     pageOptions,
-    clearEditingState,
     newPage,
     setEditingPage,
     savePage,

@@ -143,6 +143,8 @@ export interface IEditorContext {
   debugBounding: boolean
   // Determines active menu
   mode: EditorMode
+  // Active editing page route
+  editPageRoute?: string
   // Active Build submenu
   buildSubmenu?: BuildSubmenu
   // Editor active dropdown menu

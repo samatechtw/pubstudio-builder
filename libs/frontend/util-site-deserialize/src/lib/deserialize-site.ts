@@ -36,6 +36,8 @@ export const deserializeEditor = (
         editGlobalStyle: serializedEditor.editGlobalStyle,
         componentTab: serializedEditor.componentTab ?? {},
         mode: serializedEditor.mode,
+        // Added 240607
+        editPageRoute: serializedEditor.editPageRoute,
         showComponentTree: serializedEditor.showComponentTree,
         componentTreeExpandedItems: serializedEditor.componentTreeExpandedItems,
         // Added 231125

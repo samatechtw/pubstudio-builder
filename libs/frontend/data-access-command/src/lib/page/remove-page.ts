@@ -1,10 +1,9 @@
-// eslint-disable-next-line @nrwl/nx/enforce-module-boundaries
-import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
-import { deserializePages, unstoreSite } from '@pubstudio/frontend/util-site-deserialize'
-import { storeSite } from '@pubstudio/frontend/util-site-store'
+import { iteratePage } from '@pubstudio/frontend/util-render'
+import { deserializePages } from '@pubstudio/frontend/util-site-deserialize'
 import { IRemovePageData } from '@pubstudio/shared/type-command-data'
 import { EditorEventName, ISite } from '@pubstudio/shared/type-site'
 import { triggerEditorEvent } from '../editor-event-handlers'
+import { setEditPage } from '../editor-helpers'
 import { setActivePage } from '../set-active-page'
 import { setSelectedComponent } from '../set-selected-component'
 
@@ -16,21 +15,24 @@ export const applyRemovePage = (site: ISite, data: IRemovePageData) => {
     throw new Error('Cannot remove page when page count is less than 2')
   }
 
+  // Clear editor state
+  iteratePage(site.pages[pageRoute], (component) => {
+    delete site.editor?.componentTreeExpandedItems[component.id]
+    delete site.editor?.componentsHidden[component.id]
+  })
+
   // Remove page
   delete site.pages[pageRoute]
-
-  // Serialize and deserialize site to clean up everything
-  const { replaceSite } = useSiteSource()
-  replaceSite(unstoreSite(storeSite(site)) as ISite)
 
   // Trigger page change event
   triggerEditorEvent(site, EditorEventName.OnPageRemove)
 
   // Set active page to another one
   const nextActivePageRoute = pageRoutes.find((route) => route !== pageRoute) as string
-  console.log('NEXTROUTE', nextActivePageRoute)
   setSelectedComponent(site, undefined)
-  setActivePage(site.editor, nextActivePageRoute)
+  setActivePage(site.editor, nextActivePageRoute, true)
+  // Close page menu
+  setEditPage(site.editor, undefined)
 }
 
 export const undoRemovePage = (site: ISite, data: IRemovePageData) => {
@@ -45,7 +47,6 @@ export const undoRemovePage = (site: ISite, data: IRemovePageData) => {
 
   // Set active page and selected component back
   const prevSelectedComponent = site.context.components[selectedComponentId ?? '']
-  console.log('UNDO', pageRoute, prevSelectedComponent?.id)
   setActivePage(site.editor, pageRoute)
   setSelectedComponent(site, prevSelectedComponent)
 }

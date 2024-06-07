@@ -10,6 +10,7 @@ import {
   ISite,
 } from '@pubstudio/shared/type-site'
 import { applyAddComponent } from '../component/add-component'
+import { toggleComponentHidden } from '../editor-helpers'
 import { applyAddPage, undoAddPage } from './add-page'
 
 describe('Add Page', () => {
@@ -108,6 +109,8 @@ describe('Add Page', () => {
     )
 
     const newPageRootId = site.pages[newPageMetadata.route].root.id
+    toggleComponentHidden(site.editor, newPageRootId, true)
+
     undoAddPage(site, data)
 
     // Assert new page does not exist
@@ -118,6 +121,7 @@ describe('Add Page', () => {
 
     // Assert component tree expand state is removed
     expect(site.editor?.componentTreeExpandedItems?.[newPageRootId]).toBeUndefined()
+    expect(site.editor?.componentsHidden?.[newPageRootId]).toBeUndefined()
   })
 
   it('should trigger page add editor event', () => {
@@ -133,9 +137,9 @@ describe('Add Page', () => {
     applyAddPage(site, data)
     expect(noBehaviorMock).toHaveBeenCalledTimes(1)
 
-    // Undo add page and assert behavior is called again
+    // Undo add page
     undoAddPage(site, data)
-    expect(noBehaviorMock).toHaveBeenCalledTimes(2)
+    expect(noBehaviorMock).toHaveBeenCalledTimes(1)
 
     // Restore behavior
     builtinBehaviors[noBehaviorId] = oldBehavior

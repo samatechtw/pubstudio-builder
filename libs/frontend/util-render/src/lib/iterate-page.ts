@@ -3,8 +3,10 @@ import { IComponent, IPage } from '@pubstudio/shared/type-site'
 export type ComponentIterFn = (component: IComponent) => void
 export type ComponentFindFn = (component: IComponent) => boolean
 
-export const iteratePage = (page: IPage, fn: ComponentIterFn) => {
-  iterateComponent(page.root, fn)
+export const iteratePage = (page: IPage | undefined, fn: ComponentIterFn) => {
+  if (page) {
+    iterateComponent(page.root, fn)
+  }
 }
 
 export const iterateComponent = (

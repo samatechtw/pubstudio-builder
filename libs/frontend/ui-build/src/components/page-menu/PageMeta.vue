@@ -5,8 +5,8 @@
     </div>
     <ThemeMetaFavicon :favicon="favicon" @setFavicon="setFavicon" />
     <ThemeMetaHead
-      v-if="activePage"
-      :head="activePage.head"
+      v-if="page"
+      :head="page.head"
       :includeTitle="true"
       @add="add"
       @set="set"
@@ -26,36 +26,39 @@ import ThemeMetaHead from '../theme-menu/ThemeMetaHead.vue'
 import { IThemeMetaEditData } from '../theme-menu/i-theme-meta-edit-data'
 
 const { t } = useI18n()
-const { activePage } = useSiteSource()
+const { site } = useSiteSource()
 const { setPageFavicon, addPageHead, setPageHead, removePageHead } = useBuild()
 
+const route = computed(() => site.value.editor?.editPageRoute)
+const page = computed(() => (route.value ? site.value.pages[route.value] : undefined))
+
 const setFavicon = (newFavicon: string | undefined) => {
-  if (activePage.value) {
-    setPageFavicon(activePage.value.route, newFavicon)
+  if (route.value) {
+    setPageFavicon(route.value, newFavicon)
   }
 }
 const add = (data: IThemeMetaEditData) => {
-  if (activePage.value) {
+  if (route.value) {
     const { tag, meta } = data
-    addPageHead(activePage.value.route, tag as IPageHeadTag, meta)
+    addPageHead(route.value, tag as IPageHeadTag, meta)
   }
 }
 
 const set = (data: IThemeMetaEditData) => {
-  if (activePage.value) {
+  if (route.value) {
     const { tag, index, meta } = data
-    setPageHead(activePage.value.route, tag as IPageHeadTag, index, meta)
+    setPageHead(route.value, tag as IPageHeadTag, index, meta)
   }
 }
 
 const remove = (tag: IHeadTagStr, index: number) => {
-  if (activePage.value) {
-    removePageHead(activePage.value.route, tag as IPageHeadTag, index)
+  if (route.value) {
+    removePageHead(route.value, tag as IPageHeadTag, index)
   }
 }
 
 const favicon = computed(() => {
-  const link = activePage.value?.head.link?.find((link) => link.rel === 'icon')
+  const link = page.value?.head.link?.find((link) => link.rel === 'icon')
   return link?.href
 })
 </script>

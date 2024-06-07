@@ -100,7 +100,6 @@ const navMenuChangePage = (site: ISite, cmp: IComponent) => {
       }
     }
     // Page name changed
-    console.log('SYNC', child)
     if (page && page.name !== content) {
       const setInputData = makeSetInputData(child, 'name', {
         is: page.name,
