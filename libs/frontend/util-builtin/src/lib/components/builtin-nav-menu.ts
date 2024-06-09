@@ -58,11 +58,11 @@ export const makeNavMenu = (): IComponent => {
         behaviors: [{ behaviorId: navMenuAddBehaviorId }],
       },
       [EditorEventName.OnPageAdd]: {
-        name: EditorEventName.OnPageChange,
+        name: EditorEventName.OnPageAdd,
         behaviors: [{ behaviorId: navMenuAddBehaviorId }],
       },
       [EditorEventName.OnPageRemove]: {
-        name: EditorEventName.OnPageChange,
+        name: EditorEventName.OnPageRemove,
         behaviors: [{ behaviorId: navMenuRemoveBehaviorId }],
       },
       [EditorEventName.OnPageChange]: {

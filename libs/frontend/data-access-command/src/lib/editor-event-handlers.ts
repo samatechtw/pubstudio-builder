@@ -30,7 +30,7 @@ export const registerEditorEvent = (
 ) => {
   const { editor } = site
   if (editor) {
-    if (!editor.editorEvents[eventName]) {
+    if (!editor.editorEvents[component.id]) {
       editor.editorEvents[component.id] = {}
     }
     const event: IEditorEvent = { name: eventName, behaviors }

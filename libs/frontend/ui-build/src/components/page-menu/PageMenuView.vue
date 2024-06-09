@@ -81,7 +81,9 @@ const edit = () => {
 }
 
 const removeCurrentPage = () => {
-  removePage(editor.value?.active as string)
+  if (route.value) {
+    removePage(route.value)
+  }
   showConfirmRemove.value = false
 }
 </script>
