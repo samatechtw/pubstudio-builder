@@ -7,6 +7,7 @@ export const mockSetHomePageData = (
   const data: ISetHomePageData = {
     oldRoute,
     newRoute,
+    oldPos: 0,
   }
   return data
 }

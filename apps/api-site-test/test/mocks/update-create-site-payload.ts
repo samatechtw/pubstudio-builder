@@ -8,4 +8,5 @@ export const mockUpdateSitePayload = (): IUpdateSiteApiRequest => ({
   editor: '{"some":"json2"}',
   history: '{"some":"json2"}',
   pages: '{"some":"json2"}',
+  pageOrder: '["some2"]',
 })

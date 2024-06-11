@@ -12,6 +12,8 @@ pub struct SiteViewModel {
     pub editor: String,
     pub history: String,
     pub pages: String,
+    #[serde(rename = "pageOrder")]
+    pub page_order: String,
     pub created_at: JsDate,
     pub content_updated_at: i64,
     pub updated_at: JsDate,
@@ -29,6 +31,7 @@ pub fn to_api_response(site_entity: SiteEntity) -> SiteViewModel {
         history: site_entity.history,
         editor: site_entity.editor,
         pages: site_entity.pages,
+        page_order: site_entity.page_order,
         created_at: JsDate {
             timestamp: site_entity.created_at,
         },

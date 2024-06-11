@@ -59,6 +59,7 @@ export const useLocalSiteApi = (_api: PSApi): IApiLocalSite => {
       editor: JSON.parse(serialized.editor),
       history: JSON.parse(serialized.history),
       pages: JSON.parse(serialized.pages),
+      pageOrder: JSON.parse(serialized.pageOrder),
       published: serialized.published,
       subdomain: serialized.subdomain,
       disabled: serialized.disabled,

@@ -11,5 +11,6 @@ export interface ITemplateViewModel {
   context: string
   defaults: string
   pages: string
+  pageOrder: string
   created_at: Date
 }

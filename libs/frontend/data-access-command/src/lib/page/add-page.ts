@@ -17,6 +17,7 @@ export const applyAddPage = (site: ISite, data: IAddPageData) => {
   }
 
   // Add page
+  site.pageOrder.push(metadata.route)
   site.pages[metadata.route] = createPage(metadata, pageRoot)
   context.components[pageRoot.id] = pageRoot
 
@@ -43,6 +44,7 @@ export const undoAddPage = (site: ISite, data: IAddPageData) => {
   // Remove page and root component
   const rootId = site.pages[metadata.route].root.id
   delete site.pages[metadata.route]
+  site.pageOrder = site.pageOrder.filter((route) => route !== metadata.route)
 
   const deleteCount = deleteComponentWithId(site, rootId)
   context.nextId -= deleteCount

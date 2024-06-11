@@ -34,7 +34,7 @@ use super::site_db_pool_manager::DbPoolManager;
 
 pub type DynSiteRepo = Arc<dyn SiteRepoTrait + Send + Sync>;
 
-const SITE_COLUMNS: &str = r#"id, name, version, context, defaults, editor, history, pages, created_at, updated_at, content_updated_at, published, preview_id"#;
+const SITE_COLUMNS: &str = r#"id, name, version, context, defaults, editor, history, pages, page_order, created_at, updated_at, content_updated_at, published, preview_id"#;
 const SITE_INFO_COLUMNS: &str = r#"id, name, updated_at, published"#;
 
 #[async_trait]
@@ -99,8 +99,8 @@ impl SiteRepoTrait for SiteRepo {
         // Insert site info into sites table
         let site_response = sqlx::query(formatcp!(
             r#"
-            INSERT INTO site_versions(name, version, context, defaults, editor, history, pages, published, content_updated_at)
-            VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)
+            INSERT INTO site_versions(name, version, context, defaults, editor, history, pages, page_order, published, content_updated_at)
+            VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?9)
             RETURNING {}
         "#,
             SITE_COLUMNS
@@ -112,6 +112,7 @@ impl SiteRepoTrait for SiteRepo {
         .bind(req.editor)
         .bind(req.history)
         .bind(req.pages)
+        .bind(req.page_order)
         .bind(req.published)
         .bind(Utc::now().timestamp_millis())
         .try_map(map_to_site_entity)
@@ -204,6 +205,8 @@ impl SiteRepoTrait for SiteRepo {
         let (query, update_count) = append_comma(query, "editor", req.dto.editor, update_count);
         let (query, update_count) = append_comma(query, "history", req.dto.history, update_count);
         let (query, update_count) = append_comma(query, "pages", req.dto.pages, update_count);
+        let (query, update_count) =
+            append_comma(query, "page_order", req.dto.page_order, update_count);
         let (query, update_count) = append_comma(
             query,
             "content_updated_at",
@@ -488,6 +491,7 @@ fn map_to_site_entity(row: SqliteRow) -> Result<SiteEntity, Error> {
         editor: row.try_get("editor")?,
         history: row.try_get("history")?,
         pages: row.try_get("pages")?,
+        page_order: row.try_get("page_order")?,
         created_at: row.try_get("created_at")?,
         updated_at: row.try_get("updated_at")?,
         content_updated_at: row.try_get("content_updated_at")?,

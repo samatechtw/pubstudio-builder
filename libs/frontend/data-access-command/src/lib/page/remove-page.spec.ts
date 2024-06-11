@@ -1,7 +1,7 @@
 import { noBehaviorId } from '@pubstudio/frontend/util-ids'
 import { builtinBehaviors } from '@pubstudio/frontend/util-resolve'
 import { deserializeSite } from '@pubstudio/frontend/util-site-deserialize'
-import { serializePage, stringifySite } from '@pubstudio/frontend/util-site-store'
+import { stringifySite } from '@pubstudio/frontend/util-site-store'
 import { setupMockBehavior } from '@pubstudio/frontend/util-test'
 import {
   mockAddPageData,
@@ -51,16 +51,13 @@ describe('Remove Page', () => {
     toggleComponentHidden(site.editor, removedPage.root.id, true)
 
     // Remove page
-    const data = mockRemovePageData(
-      pageToBeRemoved,
-      serializePage(removedPage),
-      site.editor?.selectedComponent?.id,
-    )
+    const data = mockRemovePageData(site, pageToBeRemoved)
     applyRemovePage(site, data)
 
     // Assert page is removed
     expect(site.pages[pageToBeRemoved]).toBeUndefined()
     expect(Object.keys(site.pages)).toHaveLength(pageCount - 1)
+    expect(site.pageOrder.includes(pageToBeRemoved)).toBe(false)
 
     // Manually serialize/deserialize site, to mimic saving/restoring from local storage
     const newSite = deserializeSite(stringifySite(site)) as ISite
@@ -76,17 +73,15 @@ describe('Remove Page', () => {
     const removedPage = site.pages[pageToBeRemoved]
 
     // Remove page and undo
-    const data = mockRemovePageData(
-      pageToBeRemoved,
-      serializePage(removedPage),
-      site.editor?.selectedComponent?.id,
-    )
+    const data = mockRemovePageData(site, pageToBeRemoved)
     applyRemovePage(site, data)
     undoRemovePage(site, data)
 
     // Assert page exists
     expect(Object.keys(site.pages)).toHaveLength(pageCount)
     expect(site.pages[pageToBeRemoved]).toMatchObject(removedPage)
+    // Page is in original order
+    expect(site.pageOrder[data.orderIndex]).toEqual(pageToBeRemoved)
 
     // Assert root component exists
     expect(Object.keys(site.context.components)).toHaveLength(componentCount)
@@ -101,14 +96,8 @@ describe('Remove Page', () => {
     } = setupMockBehavior(site, [EditorEventName.OnPageRemove])
     applyAddComponent(site, componentData)
 
-    const removedPage = site.pages[pageToBeRemoved]
-
     // Remove page and assert builtin behavior called
-    const data = mockRemovePageData(
-      pageToBeRemoved,
-      serializePage(removedPage),
-      site.editor?.selectedComponent?.id,
-    )
+    const data = mockRemovePageData(site, pageToBeRemoved)
     applyRemovePage(site, data)
     expect(noBehaviorMock).toHaveBeenCalledTimes(1)
 

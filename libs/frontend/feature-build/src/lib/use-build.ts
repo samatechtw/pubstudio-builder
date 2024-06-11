@@ -203,6 +203,7 @@ export interface IUseBuild {
   deleteThemeFont: (font: IThemeFont) => void
   addPage: (page: IPageMetadata, copyFrom?: string) => void
   editPage: (oldPage: IPageMetadata, newPage: IPageMetadata) => void
+  updatePageOrder: (pos: number, newPos: number) => void
   removePage: (route: string) => void
   changePage: (route: string) => void
   setHomePage: (route: string) => void
@@ -921,6 +922,11 @@ export const useBuild = (): IUseBuild => {
     pushCommand(site.value, CommandType.EditPage, data)
   }
 
+  const updatePageOrder = (pos: number, newPos: number) => {
+    const data: IEditPageData = { order: { pos, newPos } }
+    pushCommand(site.value, CommandType.EditPage, data)
+  }
+
   const removePage = (route: string) => {
     const { editor } = site.value
     if (editor) {
@@ -928,6 +934,7 @@ export const useBuild = (): IUseBuild => {
       if (removedPage) {
         const data: IRemovePageData = {
           pageRoute: route,
+          orderIndex: site.value.pageOrder.indexOf(route),
           serializedPage: serializePage(removedPage),
           selectedComponentId: editor.selectedComponent?.id,
         }
@@ -953,6 +960,7 @@ export const useBuild = (): IUseBuild => {
     const data: ISetHomePageData = {
       oldRoute: site.value.defaults.homePage,
       newRoute: route,
+      oldPos: site.value.pageOrder.indexOf(route),
     }
     pushCommand(site.value, CommandType.SetHomePage, data)
   }
@@ -1196,6 +1204,7 @@ export const useBuild = (): IUseBuild => {
     deleteThemeFont,
     addPage,
     editPage,
+    updatePageOrder,
     removePage,
     changePage,
     setHomePage,

@@ -2,10 +2,20 @@ import { noBehaviorId } from '@pubstudio/frontend/util-ids'
 import { builtinBehaviors } from '@pubstudio/frontend/util-resolve'
 import { deserializeSite } from '@pubstudio/frontend/util-site-deserialize'
 import { setupMockBehavior } from '@pubstudio/frontend/util-test'
-import { mockEditPageData, mockSerializedSite } from '@pubstudio/frontend/util-test-mock'
+import {
+  mockAddPageData,
+  mockEditPageData,
+  mockSerializedSite,
+} from '@pubstudio/frontend/util-test-mock'
 import { IEditPageData } from '@pubstudio/shared/type-command-data'
-import { EditorEventName, IPageMetadata, ISite } from '@pubstudio/shared/type-site'
+import {
+  EditorEventName,
+  IEditorContext,
+  IPageMetadata,
+  ISite,
+} from '@pubstudio/shared/type-site'
 import { applyAddComponent } from '../component/add-component'
+import { applyAddPage } from './add-page'
 import { applyEditPage, undoEditPage } from './edit-page'
 
 describe('Edit Page', () => {
@@ -76,7 +86,7 @@ describe('Edit Page', () => {
       })
     })
 
-    it('updates home page in site defaults when changing home page route', () => {
+    it('updates home page in site defaults and page order when changing home page route', () => {
       // Assert target page is the home page before editing
       const pageBefore = site.pages[pageToBeEdited]
       expect(site.defaults.homePage).toEqual(pageToBeEdited)
@@ -93,6 +103,9 @@ describe('Edit Page', () => {
 
       // Assert site defaults is updated
       expect(site.defaults.homePage).toEqual(newMetadata.route)
+      // Assert pageOrder is updated
+      expect(site.pageOrder.includes(pageBefore.route)).toBe(false)
+      expect(site.pageOrder.includes(newMetadata.route)).toBe(true)
     })
   })
 
@@ -147,6 +160,77 @@ describe('Edit Page', () => {
       expect(site.pages[pageToBeEdited]).toMatchObject(pageMetadataBefore)
       expect(Object.keys(site.pages)).toHaveLength(pageCount)
       expect(Object.keys(site.context.components)).toHaveLength(componentCount)
+    })
+
+    it('should change order and undo', () => {
+      // Add a page so we can change order
+      const addMetadata = {
+        name: 'New Page',
+        public: true,
+        route: '/new-page',
+        head: {},
+      }
+      const data = mockAddPageData(addMetadata, site.editor as IEditorContext)
+      applyAddPage(site, data)
+      pageCount = Object.keys(site.pages).length
+      componentCount = Object.keys(site.context.components).length
+
+      // Set order
+      const pos = 1
+      const switchedPage = Object.keys(site.pages)[0]
+      pageToBeEdited = Object.keys(site.pages)[pos]
+      editData = { order: { pos, newPos: 0 } }
+
+      applyEditPage(site, editData)
+      // Order updated
+      expect(site.pageOrder[0]).toEqual(pageToBeEdited)
+      expect(site.pageOrder[1]).toEqual(switchedPage)
+
+      undoEditPage(site, editData)
+
+      // Assert page is not updated
+      expect(site.pages[pageToBeEdited]).toMatchObject(addMetadata)
+      expect(Object.keys(site.pages)).toHaveLength(pageCount)
+      expect(Object.keys(site.context.components)).toHaveLength(componentCount)
+      // Order is reverted
+      expect(site.pageOrder[1]).toEqual(pageToBeEdited)
+      expect(site.pageOrder[0]).toEqual(switchedPage)
+    })
+
+    it('should change order and metadata and undo', () => {
+      // Add a page so we can change order
+      const addMetadata = {
+        name: 'New Page',
+        public: true,
+        route: '/new-page',
+        head: {},
+      }
+      const data = mockAddPageData(addMetadata, site.editor as IEditorContext)
+      applyAddPage(site, data)
+      pageCount = Object.keys(site.pages).length
+      componentCount = Object.keys(site.context.components).length
+
+      // Set order and metadata
+      const pos = 1
+      const switchedPage = Object.keys(site.pages)[0]
+      pageToBeEdited = Object.keys(site.pages)[pos]
+      editData.order = { pos, newPos: 0 }
+
+      applyEditPage(site, editData)
+      // Order and metadata updated
+      expect(site.pageOrder[0]).toEqual(pageToBeEdited)
+      expect(site.pageOrder[1]).toEqual(newMetadata.route)
+      expect(site.pages[newMetadata.route]).toMatchObject(newMetadata)
+
+      undoEditPage(site, editData)
+
+      // Assert page is not updated
+      expect(site.pages[pageToBeEdited]).toMatchObject(addMetadata)
+      expect(Object.keys(site.pages)).toHaveLength(pageCount)
+      expect(Object.keys(site.context.components)).toHaveLength(componentCount)
+      // Order is reverted
+      expect(site.pageOrder[1]).toEqual(pageToBeEdited)
+      expect(site.pageOrder[0]).toEqual(switchedPage)
     })
 
     it('should trigger page change editor event', () => {

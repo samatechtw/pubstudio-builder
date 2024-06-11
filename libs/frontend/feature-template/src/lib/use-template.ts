@@ -111,7 +111,8 @@ export const useTemplate = (): ITemplateFeature => {
         defaults: JSON.parse(template.defaults),
         editor: serializeEditor(createEditorContext(homePage)),
         history: { back: [], forward: [] },
-        pages: JSON.parse(template.pages),
+        pages,
+        pageOrder: JSON.parse(template.pageOrder ?? null) || Object.keys(pages),
       }
     }
   }

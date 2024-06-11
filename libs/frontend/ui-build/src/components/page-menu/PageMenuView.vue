@@ -1,7 +1,7 @@
 <template>
   <div class="page-menu-view">
     <MenuRow :label="t('name')" :value="page?.name" :editable="false" />
-    <MenuRow :label="t('build.route')" :value="route" :editable="false" />
+    <MenuRow :label="t('build.route')" :value="route" :editable="false" class="route" />
     <MenuRow
       :label="t('build.public')"
       :value="page?.public ? t('yes') : t('no')"
@@ -105,5 +105,9 @@ const removeCurrentPage = () => {
 }
 :deep(.edit-item) {
   color: $grey-500;
+}
+.route :deep(.edit-item) {
+  @mixin truncate;
+  display: block;
 }
 </style>

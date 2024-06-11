@@ -12,6 +12,7 @@ export const mockCreateSitePayload = (): ICreateSiteApiRequest => ({
   editor: '{"some":"stringified_json"}',
   history: '{"some":"stringified_json"}',
   pages: '{"some":"stringified_json"}',
+  pageOrder: '["some"]',
   domains: ['test-subdomain'],
   site_type: 'Free',
 })

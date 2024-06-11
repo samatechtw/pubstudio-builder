@@ -158,7 +158,7 @@ registerBuiltinBehavior(navItemBehavior)
 
 const navMenuAddPageBehavior: IBehavior = {
   id: navMenuAddBehaviorId,
-  name: 'Sync Nav Menu',
+  name: 'NavMenu Add Page',
   args: {
     IncludeHome: {
       name: 'IncludeHome',
@@ -181,15 +181,7 @@ registerBuiltinBehavior(navMenuAddPageBehavior)
 
 const navMenuRemovePageBehavior: IBehavior = {
   id: navMenuRemoveBehaviorId,
-  name: 'Sync Nav Menu',
-  args: {
-    IncludeHome: {
-      name: 'IncludeHome',
-      type: ComponentArgPrimitive.Boolean,
-      default: true,
-      help: '',
-    },
-  },
+  name: 'NavMenu Remove Page',
   builtin: (
     _helpers: IBehaviorHelpers,
     behaviorContext: IBehaviorContext,
@@ -204,15 +196,7 @@ registerBuiltinBehavior(navMenuRemovePageBehavior)
 
 const navMenuChangePageBehavior: IBehavior = {
   id: navMenuChangeBehaviorId,
-  name: 'Sync Nav Menu',
-  args: {
-    IncludeHome: {
-      name: 'IncludeHome',
-      type: ComponentArgPrimitive.Boolean,
-      default: true,
-      help: '',
-    },
-  },
+  name: 'NavMenu Update Page',
   builtin: (
     _helpers: IBehaviorHelpers,
     behaviorContext: IBehaviorContext,

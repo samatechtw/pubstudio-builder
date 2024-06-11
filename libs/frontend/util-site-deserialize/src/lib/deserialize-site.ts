@@ -144,6 +144,7 @@ export const deserializedHelper = (serialized: ISerializedSite): ISite => {
     version: serialized.version,
     defaults,
     pages,
+    pageOrder: serialized.pageOrder ?? Object.keys(pages),
     editor: deserializeEditor(siteContext, editor),
     history: { back: history?.back ?? [], forward: history?.forward ?? [] },
     updated_at: serialized.updated_at,
@@ -167,16 +168,19 @@ export const deserializeSite = (serializedSite: string): ISite | undefined => {
 export const storedToSerializedSite = (
   stored: IStoredSite,
 ): ISerializedSite | undefined => {
-  const { name, version, defaults, context, pages, editor, history } = stored
-  if (!(name && version && defaults && context && pages)) {
+  const { name, version, defaults, context, editor, history } = stored
+  if (!(name && version && defaults && context && stored.pages)) {
     return undefined
   }
+  const pages = JSON.parse(stored.pages)
+  const pageOrder = stored.pageOrder ? JSON.parse(stored.pageOrder) : Object.keys(pages)
   const serialized: ISerializedSite = {
     name,
     version,
     defaults: JSON.parse(defaults),
     context: JSON.parse(context),
-    pages: JSON.parse(pages),
+    pages,
+    pageOrder,
     editor: editor ? JSON.parse(editor) : undefined,
     history: history
       ? JSON.parse(history)

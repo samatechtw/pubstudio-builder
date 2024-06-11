@@ -34,11 +34,12 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { DragVertical, Minus } from '@pubstudio/frontend/ui-widgets'
 import { useBuild, useMixinMenu, useMixinMenuUi } from '@pubstudio/frontend/feature-build'
 import EditMenuTitle from '../EditMenuTitle.vue'
+import { useListDrag } from '@pubstudio/frontend/util-doc'
 
 const { t } = useI18n()
 
@@ -47,90 +48,29 @@ const { deleteStyle, updateMixinOrder, site } = useBuild()
 
 const { openMixinMenu } = useMixinMenuUi()
 
-const STYLE_LIST_INDEX = 'text/style-id'
-const draggingIndex = ref<number>()
-const newPos = ref<number>()
+const {
+  newPos,
+  dragListPreview,
+  dragstart,
+  drag,
+  dragenter,
+  dragover,
+  dragleave,
+  drop,
+  dragend,
+} = useListDrag({
+  dataIdentifier: 'text/style-id',
+  getDragElement: (e) => (e.target as HTMLElement).parentElement,
+  onDrop: (_e, dragIndex, targetIndex) => updateMixinOrder(dragIndex, targetIndex),
+})
 
 const styles = computed(() => {
   const ordered =
     site.value.context?.styleOrder
       .map((styleId) => site.value?.context.styles?.[styleId])
       .filter((id) => !!id) ?? []
-  if (draggingIndex.value !== undefined && newPos.value !== undefined) {
-    const dragged = ordered.splice(draggingIndex.value, 1)
-    if (dragged[0]) {
-      ordered.splice(newPos.value, 0, dragged[0])
-    }
-  }
-  return ordered
+  return dragListPreview(ordered)
 })
-
-const dragstart = (e: DragEvent, index: number) => {
-  e.stopPropagation()
-  newPos.value = undefined
-  if (e.dataTransfer) {
-    const el = (e.target as HTMLElement).parentElement
-    const bound = el?.getBoundingClientRect()
-    // Workaround for Chrome calling `dragend` immediately after `dragstart`
-    setTimeout(() => {
-      draggingIndex.value = index
-    }, 1)
-    e.dataTransfer.setData(STYLE_LIST_INDEX, index.toString())
-    e.dataTransfer.effectAllowed = 'move'
-    // Set the drag image to the list parent
-    if (el) {
-      e.dataTransfer.setDragImage(
-        el,
-        e.clientX - (bound?.left ?? 0),
-        e.clientY - (bound?.top ?? 0),
-      )
-    }
-  }
-}
-
-const drag = (e: DragEvent) => {
-  e.stopPropagation()
-  e.preventDefault()
-  // Drag updates in `dragover`
-}
-
-const dragenter = (e: DragEvent, index: number) => {
-  e.stopPropagation()
-  e.preventDefault()
-  if (e.dataTransfer) {
-    newPos.value = index
-  }
-}
-
-const dragover = (e: DragEvent) => {
-  e.stopPropagation()
-  e.preventDefault()
-  if (e.dataTransfer) {
-    const isStyle = e.dataTransfer.types.includes(STYLE_LIST_INDEX)
-    if (isStyle) {
-      e.preventDefault()
-    }
-  }
-}
-
-const dragleave = (e: DragEvent) => {
-  e.stopPropagation()
-}
-
-const drop = (e: DragEvent, index: number) => {
-  e.stopPropagation()
-  if (draggingIndex.value !== undefined) {
-    updateMixinOrder(draggingIndex.value, index)
-  }
-  newPos.value = undefined
-  draggingIndex.value = undefined
-}
-
-const dragend = (e: DragEvent) => {
-  e.stopPropagation()
-  newPos.value = undefined
-  draggingIndex.value = undefined
-}
 </script>
 
 <style lang="postcss" scoped>

@@ -9,6 +9,7 @@ export interface ICreateSiteApiRequest {
   editor: string
   history: string
   pages: string
+  pageOrder: string
   published: boolean
   domains: string[]
   site_type: string

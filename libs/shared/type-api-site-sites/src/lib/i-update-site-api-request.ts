@@ -6,6 +6,7 @@ export interface IUpdateSiteApiRequest {
   editor?: string
   history?: string
   pages?: string
+  pageOrder?: string
   update_key?: string
   enable_preview?: boolean
 }

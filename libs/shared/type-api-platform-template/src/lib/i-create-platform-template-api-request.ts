@@ -18,4 +18,5 @@ export interface ICreatePlatformTemplateRequest {
   context: ISerializedSiteContext
   defaults: ISiteDefaults
   pages: ISitePages
+  pageOrder: string[]
 }

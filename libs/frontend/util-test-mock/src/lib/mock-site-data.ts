@@ -151,4 +151,5 @@ export const mockSerializedSite: ISerializedSite = {
       },
     },
   },
+  pageOrder: ['/home'],
 }

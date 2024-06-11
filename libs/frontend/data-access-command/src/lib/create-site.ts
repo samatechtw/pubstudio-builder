@@ -114,6 +114,7 @@ export const createSite = (_namespace: string): ISite => {
     pages: {
       [homePageMetadata.route]: homePage,
     },
+    pageOrder: [homePage.route],
     history: { back: [], forward: [] },
     editor,
   }

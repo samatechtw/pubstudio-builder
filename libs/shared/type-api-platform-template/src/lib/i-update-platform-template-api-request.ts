@@ -16,4 +16,5 @@ export interface IUpdatePlatformTemplateRequest {
   context?: ISerializedSiteContext
   defaults?: ISiteDefaults
   pages?: ISitePages
+  pageOrder?: string[]
 }

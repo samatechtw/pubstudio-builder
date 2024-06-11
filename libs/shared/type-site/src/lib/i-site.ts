@@ -23,6 +23,7 @@ export interface ISite {
     forward: ICommand[]
   }
   pages: Record<string, IPage>
+  pageOrder: string[]
   updated_at?: string
   content_updated_at?: number
   preview_id?: string
