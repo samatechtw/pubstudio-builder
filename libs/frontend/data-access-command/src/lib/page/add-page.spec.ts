@@ -56,6 +56,9 @@ describe('Add Page', () => {
 
     // Assert component tree expand state is added
     expect(site.editor?.componentTreeExpandedItems?.[newPage.root.id]).toEqual(true)
+
+    // Assert page is last in order
+    expect(site.pageOrder[site.pageOrder.length - 1]).toEqual(newPageMetadata.route)
   })
 
   it('should undo add page', () => {
@@ -73,6 +76,9 @@ describe('Add Page', () => {
 
     // Assert component tree expand state is removed
     expect(site.editor?.componentTreeExpandedItems?.[newPageRootId]).toBeUndefined()
+
+    // Assert page is removed from order
+    expect(site.pageOrder.includes(newPageMetadata.route)).toBe(false)
   })
 
   it('should have the same root id after redo', () => {

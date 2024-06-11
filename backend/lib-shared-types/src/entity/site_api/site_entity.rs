@@ -11,6 +11,7 @@ pub struct SiteEntity {
     pub editor: String,
     pub history: String,
     pub pages: String,
+    pub page_order: String,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
     pub content_updated_at: i64,

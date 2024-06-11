@@ -48,6 +48,7 @@ describe('Update Site', () => {
     expect(JSON.parse(body.defaults)).toEqual(payload.defaults)
     expect(JSON.parse(body.editor)).toEqual(payload.editor)
     expect(JSON.parse(body.history)).toEqual(payload.history)
+    expect(JSON.parse(body.pageOrder)).toEqual(payload.pageOrder)
     expect(JSON.parse(body.pages)).toEqual(payload.pages)
   })
 
@@ -67,6 +68,7 @@ describe('Update Site', () => {
     expect(JSON.parse(body.editor)).toEqual(payload.editor)
     expect(JSON.parse(body.history)).toEqual(payload.history)
     expect(JSON.parse(body.pages)).toEqual(payload.pages)
+    expect(JSON.parse(body.pageOrder)).toEqual(payload.pageOrder)
   })
 
   it('updates site when update_key matches the saved content_updated_at', async () => {
@@ -93,6 +95,7 @@ describe('Update Site', () => {
     expect(JSON.parse(body.editor)).toEqual(payload.editor)
     expect(JSON.parse(body.history)).toEqual(payload.history)
     expect(JSON.parse(body.pages)).toEqual(payload.pages)
+    expect(JSON.parse(body.pageOrder)).toEqual(payload.pageOrder)
   })
 
   it('sets and un-sets preview link using enable_preview', async () => {

@@ -4,6 +4,7 @@ export interface IStoredSite {
   defaults: string | null
   context: string | null
   pages: string | null
+  pageOrder: string | null
   editor?: string | null
   history?: string | null
   updated_at?: string | null

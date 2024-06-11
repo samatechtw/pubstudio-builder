@@ -1,6 +1,6 @@
-import { setEditPage, toggleEditorMenu } from '@pubstudio/frontend/data-access-command'
+import { setEditPage } from '@pubstudio/frontend/data-access-command'
 import { IMultiselectOptions } from '@pubstudio/frontend/type-ui-widgets'
-import { EditorMode, IPage, IPageMetadata } from '@pubstudio/shared/type-site'
+import { IPage, IPageMetadata } from '@pubstudio/shared/type-site'
 import { useI18n } from 'petite-vue-i18n'
 import { computed, ComputedRef, reactive, Ref, ref, UnwrapNestedRefs } from 'vue'
 import { useBuild } from './use-build'

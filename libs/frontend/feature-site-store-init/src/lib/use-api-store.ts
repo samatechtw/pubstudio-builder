@@ -61,6 +61,7 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
     defaults: false,
     context: false,
     pages: false,
+    pageOrder: false,
     editor: false,
     history: false,
   })

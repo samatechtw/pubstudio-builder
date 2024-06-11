@@ -1,14 +1,12 @@
+import { serializePage } from '@pubstudio/frontend/util-site-store'
 import { IRemovePageData } from '@pubstudio/shared/type-command-data'
-import { ISerializedPage } from '@pubstudio/shared/type-site'
+import { ISite } from '@pubstudio/shared/type-site'
 
-export const mockRemovePageData = (
-  pageRoute: string,
-  serializedPage: ISerializedPage,
-  selectedComponentId: string | undefined,
-): IRemovePageData => {
+export const mockRemovePageData = (site: ISite, pageRoute: string): IRemovePageData => {
   return {
     pageRoute,
-    serializedPage,
-    selectedComponentId,
+    serializedPage: serializePage(site.pages[pageRoute]),
+    selectedComponentId: site.editor?.selectedComponent?.id,
+    orderIndex: site.pageOrder.indexOf(pageRoute),
   }
 }

@@ -23,6 +23,7 @@ export const applyRemovePage = (site: ISite, data: IRemovePageData) => {
 
   // Remove page
   delete site.pages[pageRoute]
+  site.pageOrder = site.pageOrder.filter((route) => route !== pageRoute)
 
   // Trigger page change event
   triggerEditorEvent(site, EditorEventName.OnPageRemove)
@@ -36,7 +37,7 @@ export const applyRemovePage = (site: ISite, data: IRemovePageData) => {
 }
 
 export const undoRemovePage = (site: ISite, data: IRemovePageData) => {
-  const { pageRoute, serializedPage, selectedComponentId } = data
+  const { pageRoute, orderIndex, serializedPage, selectedComponentId } = data
 
   // Add back page and components
   const { pages, components } = deserializePages({ [pageRoute]: serializedPage })
@@ -44,6 +45,7 @@ export const undoRemovePage = (site: ISite, data: IRemovePageData) => {
   Object.entries(components).forEach(([componentId, component]) => {
     site.context.components[componentId] = component
   })
+  site.pageOrder.splice(orderIndex, 0, pageRoute)
 
   // Set active page and selected component back
   const prevSelectedComponent = site.context.components[selectedComponentId ?? '']

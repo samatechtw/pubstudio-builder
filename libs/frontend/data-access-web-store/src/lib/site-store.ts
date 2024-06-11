@@ -45,6 +45,7 @@ export const siteModule = useModule<
     defaults: null,
     context: null,
     pages: null,
+    pageOrder: null,
     history: null,
     editor: null,
   }),

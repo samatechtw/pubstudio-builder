@@ -23,6 +23,8 @@ pub struct CreateSiteDto {
     pub editor: serde_json::Value,
     pub history: serde_json::Value,
     pub pages: serde_json::Value,
+    #[serde(rename = "pageOrder")]
+    pub page_order: serde_json::Value,
     pub published: bool,
     pub domains: Vec<String>,
     pub site_type: SiteType,

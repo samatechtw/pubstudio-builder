@@ -17,6 +17,7 @@ export const scratchSiteModule = useModule<
     defaults: null,
     context: null,
     pages: null,
+    pageOrder: null,
     history: null,
     editor: null,
   }),

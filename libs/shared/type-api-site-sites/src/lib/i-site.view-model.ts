@@ -7,6 +7,7 @@ export interface ISiteViewModel {
   editor: string
   history: string
   pages: string
+  pageOrder: string
   published: boolean
   disabled?: boolean
   updated_at: Date

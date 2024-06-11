@@ -101,6 +101,7 @@ export const serializeSite = (site: ISite): ISerializedSite => {
     context: serializeSiteContext(context),
     defaults: site.defaults,
     pages,
+    pageOrder: site.pageOrder,
     editor: serializeEditor(site.editor),
     history,
   }
@@ -115,6 +116,7 @@ export const storeSite = (site: ISite): IStoredSite => {
     defaults: JSON.stringify(serialized.defaults),
     context: JSON.stringify(serialized.context),
     pages: JSON.stringify(serialized.pages),
+    pageOrder: JSON.stringify(serialized.pageOrder),
     editor: JSON.stringify(serialized.editor),
     history: JSON.stringify(serialized.history),
     updated_at: serialized.updated_at,
