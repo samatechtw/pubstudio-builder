@@ -166,6 +166,8 @@ export interface IEditorContext {
     state?: ComponentTabState
     // Name of editing event
     editEvent?: string
+    // Name of editing editor event
+    editEditorEvent?: EditorEventName
     // Name of editing input
     editInput?: string
     // Name of editing input value

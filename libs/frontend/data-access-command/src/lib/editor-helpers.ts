@@ -8,6 +8,7 @@ import {
   ContactFormWalkthroughState,
   CssPseudoClass,
   EditorDropdown,
+  EditorEventName,
   EditorMode,
   IComponent,
   IContactFormWalkthrough,
@@ -127,6 +128,20 @@ export const setComponentEditEvent = (
     const changed = setComponentTabState(editor, state, false)
     if (changed) {
       editor.componentTab.editEvent = eventName
+      editor.store?.saveEditor(editor)
+    }
+  }
+}
+
+export const setComponentEditEditorEvent = (
+  editor: IEditorContext | undefined,
+  eventName: EditorEventName | undefined,
+) => {
+  const state = eventName === undefined ? undefined : ComponentTabState.EditEvent
+  if (editor) {
+    const changed = setComponentTabState(editor, state, false)
+    if (changed) {
+      editor.componentTab.editEditorEvent = eventName
       editor.store?.saveEditor(editor)
     }
   }

@@ -14,6 +14,7 @@ import {
 } from '@pubstudio/frontend/feature-site-source'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import {
+  addComponentEditorEventData,
   addComponentEventData,
   makeEditComponentData,
   makeRemoveComponentData,
@@ -73,6 +74,7 @@ import {
 import {
   Css,
   CssPseudoClass,
+  EditorEventName,
   IBehavior,
   IBehaviorArg,
   IBreakpoint,
@@ -81,6 +83,7 @@ import {
   IComponentEvent,
   IComponentInput,
   IEditorContext,
+  IEditorEvent,
   IHeadObject,
   IHeadTag,
   IPageHeadTag,
@@ -171,10 +174,15 @@ export interface IUseBuild {
     component: IComponent,
     newEvent: IComponentEvent,
   ) => ISetComponentEventData
-  addComponentEvent: (component: IComponent, newEvent: IComponentEvent) => void
   addSelectedComponentEvent: (newEvent: IComponentEvent) => void
   removeSelectedComponentEvent: (name: string) => void
   updateSelectedComponentEvent: (oldEventName: string, newEvent: IComponentEvent) => void
+  addSelectedComponentEditorEvent: (newEvent: IEditorEvent) => void
+  removeSelectedComponentEditorEvent: (name: string) => void
+  updateSelectedComponentEditorEvent: (
+    oldEventName: string,
+    newEvent: IEditorEvent,
+  ) => void
   addOrUpdateComponentInput: (property: string, payload: Partial<IComponentInput>) => void
   removeComponentInput: (name: string) => void
   setSelectedIsInput: (prop: string, newValue: unknown) => void
@@ -588,17 +596,13 @@ export const useBuild = (): IUseBuild => {
     pushCommand(site.value, CommandType.UpdateMixinOrder, data)
   }
 
-  const addComponentEvent = (component: IComponent, newEvent: IComponentEvent) => {
-    const data = addComponentEventData(component, newEvent)
-    pushCommand(site.value, CommandType.SetComponentEvent, data)
-  }
-
   const addSelectedComponentEvent = (newEvent: IComponentEvent) => {
     const selected = site.value.editor?.selectedComponent
     if (!selected) {
       return
     }
-    addComponentEvent(selected, newEvent)
+    const data = addComponentEventData(selected, newEvent)
+    pushCommand(site.value, CommandType.SetComponentEvent, data)
   }
 
   const updateSelectedComponentEvent = (
@@ -619,7 +623,7 @@ export const useBuild = (): IUseBuild => {
     pushCommand(site.value, CommandType.SetComponentEvent, data)
   }
 
-  const removeSelectedComponentEvent = (name: string) => {
+  const removeSelectedComponentEditorEvent = (name: string) => {
     const selected = site.value.editor?.selectedComponent
     const oldEvent = selected?.events?.[name]
     if (!selected) {
@@ -631,6 +635,47 @@ export const useBuild = (): IUseBuild => {
       newEvent: undefined,
     }
     pushCommand(site.value, CommandType.SetComponentEvent, data)
+  }
+
+  const addSelectedComponentEditorEvent = (newEvent: IEditorEvent) => {
+    const selected = site.value.editor?.selectedComponent
+    if (!selected) {
+      return
+    }
+    const data = addComponentEditorEventData(selected, newEvent)
+    pushCommand(site.value, CommandType.SetComponentEditorEvent, data)
+  }
+
+  const updateSelectedComponentEditorEvent = (
+    oldEventName: string,
+    newEvent: IEditorEvent,
+  ) => {
+    // TODO -- don't update if event is unchanged
+    const selected = site.value.editor?.selectedComponent
+    const oldEvent = selected?.editorEvents?.[oldEventName as EditorEventName]
+    if (!selected) {
+      return
+    }
+    const data: ISetComponentEventData = {
+      componentId: selected.id,
+      oldEvent,
+      newEvent,
+    }
+    pushCommand(site.value, CommandType.SetComponentEditorEvent, data)
+  }
+
+  const removeSelectedComponentEvent = (name: string) => {
+    const selected = site.value.editor?.selectedComponent
+    const oldEvent = selected?.editorEvents?.[name as EditorEventName]
+    if (!selected) {
+      return
+    }
+    const data: ISetComponentEventData = {
+      componentId: selected.id,
+      oldEvent,
+      newEvent: undefined,
+    }
+    pushCommand(site.value, CommandType.SetComponentEditorEvent, data)
   }
 
   const addOrUpdateComponentInput = (
@@ -1178,10 +1223,12 @@ export const useBuild = (): IUseBuild => {
     replaceComponentMixin,
     updateMixinOrder,
     addComponentEventData,
-    addComponentEvent,
     addSelectedComponentEvent,
     updateSelectedComponentEvent,
     removeSelectedComponentEvent,
+    addSelectedComponentEditorEvent,
+    updateSelectedComponentEditorEvent,
+    removeSelectedComponentEditorEvent,
     addOrUpdateComponentInput,
     removeComponentInput,
     setSelectedIsInput,

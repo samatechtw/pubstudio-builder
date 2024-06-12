@@ -4,6 +4,7 @@ import { applySetBehavior } from './behavior/set-behavior'
 import { applySetBehaviorArg } from './behavior/set-behavior-arg'
 import { applySetBreakpoint } from './breakpoint/set-breakpoint'
 import { applySetComponentCustomStyle } from './component-custom-style/set-component-custom-style'
+import { applySetComponentEditorEvent } from './component-event/set-component-editor-event'
 import { applySetComponentEvent } from './component-event/set-component-event'
 import { applySetComponentInput } from './component-input/set-component-input'
 import { applyAddComponentMixin } from './component-mixin/add-component-mixin'
@@ -61,6 +62,7 @@ export const applyCommand = (site: ISite, command: ICommand): ICommand => {
     [CommandType.ReplaceComponentMixin]: applyReplaceComponentMixin,
     [CommandType.SetComponentInput]: applySetComponentInput,
     [CommandType.SetComponentEvent]: applySetComponentEvent,
+    [CommandType.SetComponentEditorEvent]: applySetComponentEditorEvent,
     [CommandType.SetBehavior]: applySetBehavior,
     [CommandType.SetBehaviorArg]: applySetBehaviorArg,
     [CommandType.SetTranslations]: applySetTranslations,

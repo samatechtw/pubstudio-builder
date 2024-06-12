@@ -1,14 +1,12 @@
 <template>
-  <div class="event-row menu-row">
+  <div class="event-row">
     <div class="label">
       {{ event.name }}
     </div>
-    <div class="item">
-      <div class="value-preview">
-        {{ resolvedBehaviorNames }}
-      </div>
-      <Settings class="edit-item" @click="emit('edit')" />
+    <div class="value-preview">
+      {{ resolvedBehaviorNames }}
     </div>
+    <Settings class="edit-item" @click="emit('edit')" />
   </div>
 </template>
 
@@ -53,28 +51,21 @@ const resolvedBehaviorNames = computed(() => {
   align-items: center;
   flex-wrap: nowrap;
   width: 100%;
-  font-size: 14px;
+  font-size: 13px;
+  padding: 4px 0 3px;
 }
 
 .label {
-  width: 50%;
-  padding-left: 16px;
+  padding-left: 6px;
 }
-
-.item {
-  width: 50%;
-  display: flex;
-  align-items: center;
+.value-preview {
+  @mixin truncate;
   margin-left: auto;
-  .value-preview {
-    @mixin truncate;
-    margin-left: auto;
-    margin-right: 8px;
-    color: $grey-500;
-  }
-  .edit-item {
-    width: 20px;
-    flex-shrink: 0;
-  }
+  margin-right: 8px;
+  color: $grey-500;
+}
+.edit-item {
+  width: 20px;
+  flex-shrink: 0;
 }
 </style>

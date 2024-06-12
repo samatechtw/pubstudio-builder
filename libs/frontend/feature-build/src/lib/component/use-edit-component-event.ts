@@ -1,68 +1,24 @@
 import { setComponentEditEvent } from '@pubstudio/frontend/data-access-command'
 import { noBehavior } from '@pubstudio/frontend/feature-builtin'
-import { resolveBehavior, resolveComponent } from '@pubstudio/frontend/util-resolve'
+import { resolveComponent } from '@pubstudio/frontend/util-resolve'
 import {
   ComponentEventType,
-  IBehavior,
+  ComponentEventTypeValues,
   IComponentEvent,
-  IComponentEventBehavior,
   ISite,
 } from '@pubstudio/shared/type-site'
-import { computed, ComputedRef } from 'vue'
-import { useBuild } from './use-build'
+import { computed } from 'vue'
+import { useBuild } from '../use-build'
+import {
+  editEventResolvedBehaviors,
+  IResolvedComponentEvent,
+  IUseEditComponentEventFeature,
+} from './edit-component-event-common'
 
-export interface IUseEditComponentEventFeature {
-  editedEvent: ComputedRef<IComponentEvent | undefined>
-  setEditedEvent: (event: IComponentEvent | undefined) => void
-  upsertEvent: (event: IComponentEvent, oldEventName?: string) => void
-  removeEvent: (name: string) => void
-}
-
-export interface IResolvedComponentEventBehavior
-  extends Omit<IComponentEventBehavior, 'behaviorId'> {
-  behavior: IBehavior
-}
-
-export interface IResolvedComponentEvent extends Omit<IComponentEvent, 'behaviors'> {
-  behaviors: IResolvedComponentEventBehavior[]
-}
-
-const defaultEvent = (): IResolvedComponentEvent => ({
+export const defaultEvent = (): IResolvedComponentEvent => ({
   name: ComponentEventType.Click,
-  behaviors: [
-    {
-      behavior: noBehavior,
-    },
-  ],
+  behaviors: [{ behavior: noBehavior }],
 })
-
-export const editOrNewEvent = (
-  site: ISite,
-  editedEvent: IComponentEvent | undefined,
-): IResolvedComponentEvent => {
-  if (!editedEvent) {
-    return defaultEvent()
-  }
-
-  // We can't reuse `resolvedBehavior` here because of race condition.
-  const eventBehaviors: IResolvedComponentEventBehavior[] = []
-
-  editedEvent.behaviors.forEach((eventBehavior) => {
-    const behavior = resolveBehavior(site.context, eventBehavior.behaviorId)
-    if (behavior) {
-      eventBehaviors.push({
-        args: eventBehavior.args,
-        behavior,
-      })
-    }
-  })
-
-  return {
-    name: editedEvent.name,
-    eventParams: editedEvent.eventParams ? { ...editedEvent.eventParams } : undefined,
-    behaviors: eventBehaviors,
-  }
-}
 
 export const useEditComponentEvent = (): IUseEditComponentEventFeature => {
   const {
@@ -92,6 +48,16 @@ export const useEditComponentEvent = (): IUseEditComponentEventFeature => {
     return undefined
   })
 
+  const editOrNewEvent = (
+    site: ISite,
+    editedEvent: IComponentEvent | undefined,
+  ): IResolvedComponentEvent => {
+    if (!editedEvent) {
+      return defaultEvent()
+    }
+    return editEventResolvedBehaviors(site, editedEvent)
+  }
+
   const setEditedEvent = (event: IComponentEvent | undefined) => {
     setComponentEditEvent(editor.value, event?.name)
   }
@@ -119,6 +85,8 @@ export const useEditComponentEvent = (): IUseEditComponentEventFeature => {
 
   return {
     editedEvent,
+    EventValues: ComponentEventTypeValues,
+    editOrNewEvent,
     setEditedEvent,
     upsertEvent,
     removeEvent,

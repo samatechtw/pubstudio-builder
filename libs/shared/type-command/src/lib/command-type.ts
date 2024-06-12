@@ -19,6 +19,7 @@ export enum CommandType {
   ReplaceComponentMixin = 'repCm',
   SetComponentInput = 'setCI',
   SetComponentEvent = 'setCE',
+  SetComponentEditorEvent = 'setCEE',
   SetBehavior = 'setB',
   SetBehaviorArg = 'setBA',
   AddStyleMixin = 'addS',

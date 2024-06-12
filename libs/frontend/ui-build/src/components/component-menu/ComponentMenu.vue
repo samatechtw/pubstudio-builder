@@ -23,16 +23,8 @@
         @showEditInput="setEditedInput($event)"
         @removeInput="removeInput($event)"
       />
-      <ComponentEvents
-        :component="component"
-        @new="
-          setEditedEvent({
-            name: '',
-            behaviors: [{ behaviorId: noBehaviorId }],
-          })
-        "
-        @edit="setEditedEvent($event)"
-      />
+      <ComponentEvents :component="component" />
+      <ComponentEditorEvents :component="component" />
       <div class="actions">
         <PSButton
           v-if="isDev"
@@ -72,7 +64,6 @@ import { useI18n } from 'petite-vue-i18n'
 import { PSButton, InfoBubble } from '@pubstudio/frontend/ui-widgets'
 import { prosemirrorEditing } from '@pubstudio/frontend/util-edit-text'
 import { BuildSubmenu, ComponentTabState, IComponent } from '@pubstudio/shared/type-site'
-import { noBehaviorId } from '@pubstudio/frontend/util-ids'
 import { serializeComponent } from '@pubstudio/frontend/util-site-store'
 import { useHUD } from '@pubstudio/frontend/util-ui-alert'
 import { isDev } from '@pubstudio/frontend/util-config'
@@ -82,13 +73,13 @@ import ComponentTabStyle from './ComponentTabStyle.vue'
 import {
   useBuild,
   useEditComponentInput,
-  useEditComponentEvent,
   useMixinMenu,
 } from '@pubstudio/frontend/feature-build'
 import { setBuildSubmenu } from '@pubstudio/frontend/data-access-command'
 import ComponentInputEdit from './ComponentInputEdit.vue'
 import ComponentInputs from './ComponentInputs.vue'
 import ComponentEvents from './ComponentEvents.vue'
+import ComponentEditorEvents from './ComponentEditorEvents.vue'
 import ComponentEventEdit from './ComponentEventEdit.vue'
 import StyleMenuEdit from '../style-menu/StyleMenuEdit.vue'
 import ComponentFlex from './ComponentFlex.vue'
@@ -108,8 +99,6 @@ const { component } = toRefs(props)
 
 const { isEditingInput, editedInput, setEditedInput, upsertInput, removeInput } =
   useEditComponentInput()
-
-const { setEditedEvent } = useEditComponentEvent()
 
 const isEditingEvent = computed(() => {
   return editor.value?.componentTab?.state === ComponentTabState.EditEvent
