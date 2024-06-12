@@ -1,13 +1,20 @@
 <template>
   <div class="component-events">
-    <EditMenuTitle :title="t('build.events')" @add="emit('new')" />
+    <EditMenuTitle
+      :title="t('build.events')"
+      @add="
+        setEditedEvent({
+          name: '',
+          behaviors: [{ behaviorId: noBehaviorId }],
+        })
+      "
+    />
     <EventRow
       v-for="entry in events"
       :key="entry.name"
       :event="entry"
       class="menu-row"
-      @edit="emit('edit', entry)"
-      @reset="emit('reset', entry.name)"
+      @edit="setEditedEvent(entry)"
     />
   </div>
 </template>
@@ -15,6 +22,7 @@
 <script lang="ts">
 import { resolveComponent } from '@pubstudio/frontend/util-resolve'
 import { IComponent, IComponentEvent, ISite } from '@pubstudio/shared/type-site'
+import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 
 interface IComponentEventWithSource extends IComponentEvent {
   source: ComponentEventSource
@@ -31,7 +39,7 @@ const computeComponentEvents = (
 ): Record<string, IComponentEventWithSource> => {
   const mergedEvents: Record<string, IComponentEventWithSource> = {}
 
-  // Append reusable component inputs
+  // Append reusable component events
   const reusableCmp = resolveComponent(site.context, component.reusableSourceId)
   if (reusableCmp) {
     Object.entries(reusableCmp.events ?? {}).forEach(([key, event]) => {
@@ -42,7 +50,7 @@ const computeComponentEvents = (
     })
   }
 
-  // Append custom inputs
+  // Append custom events
   Object.entries(component.events ?? {}).forEach(([key, event]) => {
     mergedEvents[key] = {
       ...event,
@@ -57,23 +65,19 @@ const computeComponentEvents = (
 <script lang="ts" setup>
 import { computed, toRefs } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
+import { useEditComponentEvent } from '@pubstudio/frontend/feature-build'
+import { noBehaviorId } from '@pubstudio/frontend/util-ids'
 import EditMenuTitle from '../EditMenuTitle.vue'
 import EventRow from './EventRow.vue'
-import { useBuild } from '@pubstudio/frontend/feature-build'
 
 const props = defineProps<{
   component: IComponent
 }>()
 const { component } = toRefs(props)
 
-const emit = defineEmits<{
-  (e: 'new'): void
-  (e: 'edit', event: IComponentEvent): void
-}>()
-
 const { t } = useI18n()
-
-const { site } = useBuild()
+const { site } = useSiteSource()
+const { setEditedEvent } = useEditComponentEvent()
 
 const events = computed(() =>
   Object.values(computeComponentEvents(site.value, component.value)),

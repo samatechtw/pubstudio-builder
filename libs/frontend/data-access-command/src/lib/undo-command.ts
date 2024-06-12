@@ -4,6 +4,7 @@ import { undoSetBehavior } from './behavior/set-behavior'
 import { undoSetBehaviorArg } from './behavior/set-behavior-arg'
 import { undoSetBreakpoint } from './breakpoint/set-breakpoint'
 import { undoSetComponentCustomStyle } from './component-custom-style/set-component-custom-style'
+import { undoSetComponentEditorEvent } from './component-event/set-component-editor-event'
 import { undoSetComponentEvent } from './component-event/set-component-event'
 import { undoSetComponentInput } from './component-input/set-component-input'
 import { undoAddComponentMixin } from './component-mixin/add-component-mixin'
@@ -61,6 +62,7 @@ export const undoCommand = (site: ISite, command: ICommand) => {
     [CommandType.ReplaceComponentMixin]: undoReplaceComponentMixin,
     [CommandType.SetComponentInput]: undoSetComponentInput,
     [CommandType.SetComponentEvent]: undoSetComponentEvent,
+    [CommandType.SetComponentEditorEvent]: undoSetComponentEditorEvent,
     [CommandType.SetBehavior]: undoSetBehavior,
     [CommandType.SetBehaviorArg]: undoSetBehaviorArg,
     [CommandType.AddStyleMixin]: undoAddStyleMixin,

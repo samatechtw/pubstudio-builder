@@ -1,7 +1,7 @@
 import { setComponentEditInput } from '@pubstudio/frontend/data-access-command'
 import { ComponentTabState, IComponentInput } from '@pubstudio/shared/type-site'
 import { computed, ComputedRef } from 'vue'
-import { useBuild } from './use-build'
+import { useBuild } from '../use-build'
 
 export interface IInputUpdate {
   property: string

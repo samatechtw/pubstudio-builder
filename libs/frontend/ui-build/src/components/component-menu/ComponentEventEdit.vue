@@ -13,7 +13,7 @@
           :value="newEvent.name"
           class="event-type"
           :placeholder="t('build.event_type')"
-          :options="ComponentEventTypeValues"
+          :options="EventValues"
           :clearable="false"
           @select="updateEventName"
           @keydown.enter="save"
@@ -109,8 +109,8 @@ import { useI18n } from 'petite-vue-i18n'
 import {
   IResolvedComponentEvent,
   IResolvedComponentEventBehavior,
-  editOrNewEvent,
   useBuild,
+  useEditComponentEditorEvent,
   useEditComponentEvent,
 } from '@pubstudio/frontend/feature-build'
 import {
@@ -126,7 +126,6 @@ import { setEditBehavior } from '@pubstudio/frontend/data-access-command'
 import {
   ComponentArgPrimitive,
   ComponentEventType,
-  ComponentEventTypeValues,
   IBehavior,
   IComponent,
   IComponentEvent,
@@ -145,7 +144,17 @@ const props = defineProps<{
 }>()
 const { component } = toRefs(props)
 
-const { editedEvent, upsertEvent, removeEvent, setEditedEvent } = useEditComponentEvent()
+const {
+  editedEvent,
+  EventValues,
+  editOrNewEvent,
+  upsertEvent,
+  removeEvent,
+  setEditedEvent,
+} =
+  editor.value?.componentTab.editEvent !== undefined
+    ? useEditComponentEvent()
+    : useEditComponentEditorEvent()
 
 const newEvent = ref<IResolvedComponentEvent>(
   editOrNewEvent(site.value, editedEvent.value),
@@ -171,7 +180,7 @@ const usedEvents = computed(
   () => new Set<string>(Object.keys(component.value.events ?? {})),
 )
 
-const updateEventName = (name: ComponentEventType | undefined) => {
+const updateEventName = (name: string | undefined) => {
   if (name) {
     newEvent.value.name = name
   }
