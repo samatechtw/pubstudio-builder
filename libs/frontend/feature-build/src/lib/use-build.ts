@@ -5,9 +5,11 @@ import {
   pushCommand,
   pushCommandObject,
   pushOrReplaceCommand,
+  registerComponentEditorEvents,
   replaceLastCommand,
   setSelectedComponent,
 } from '@pubstudio/frontend/data-access-command'
+import '@pubstudio/frontend/feature-builtin-editor' // Ensure editor events loaded
 import {
   activeBreakpoint,
   descSortedBreakpoints,
@@ -293,6 +295,12 @@ export const useBuild = (): IUseBuild => {
   const replaceSite = (newSite: ISite) => {
     // Basic name sanitization
     newSite.name = newSite.name.replace(/[-_]/g, ' ')
+    // Generate editor events
+    // TODO -- is there a better place to put this? It must always be called
+    // when setting up a site in the builder, but isn't needed in live/preview mode
+    for (const component of Object.values(newSite.context.components)) {
+      registerComponentEditorEvents(newSite, component)
+    }
     replaceSiteSource(newSite)
     return siteStore.value.save(site.value, {
       immediate: true,

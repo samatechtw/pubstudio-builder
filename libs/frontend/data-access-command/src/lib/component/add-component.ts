@@ -43,7 +43,11 @@ const addChildrenHelper = (
   }
 }
 
-export const addComponentHelper = (site: ISite, data: IAddComponentData): IComponent => {
+export const addComponentHelper = (
+  site: ISite,
+  data: IAddComponentData,
+  isRedo?: boolean,
+): IComponent => {
   const context = site.context
   const {
     name,
@@ -154,17 +158,19 @@ export const addComponentHelper = (site: ISite, data: IAddComponentData): ICompo
   }
   // Register editor events
   const editorEvents = component.editorEvents
-  if (editorEvents) {
-    registerComponentEditorEvents(site, component, editorEvents)
-    if (editorEvents.OnSelfAdded) {
-      triggerEventBehaviors(editorEvents.OnSelfAdded.behaviors, site, component)
-    }
+  registerComponentEditorEvents(site, component)
+  if (!isRedo && editorEvents?.OnSelfAdded) {
+    triggerEventBehaviors(editorEvents.OnSelfAdded.behaviors, site, component)
   }
   return component
 }
 
-export const applyAddComponent = (site: ISite, data: IAddComponentData) => {
-  const component = addComponentHelper(site, data)
+export const applyAddComponent = (
+  site: ISite,
+  data: IAddComponentData,
+  isRedo?: boolean,
+) => {
+  const component = addComponentHelper(site, data, isRedo)
 
   // Select created component
   // Split helper function to enable creating components without a page

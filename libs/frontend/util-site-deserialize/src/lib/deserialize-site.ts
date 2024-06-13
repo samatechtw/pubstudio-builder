@@ -1,6 +1,7 @@
 import {
   IComponent,
   IEditorContext,
+  IEditorEvents,
   IPage,
   ISerializedComponent,
   ISerializedEditorContext,
@@ -14,6 +15,7 @@ import {
 interface IDeserializePagesResult {
   pages: Record<string, IPage>
   components: Record<string, IComponent>
+  editorEvents: IEditorEvents
 }
 
 export const deserializeEditor = (
@@ -25,7 +27,7 @@ export const deserializeEditor = (
     ? {
         selectedComponent: selectedId ? context.components[selectedId] : undefined,
         active: serializedEditor.active,
-        editorEvents: serializedEditor.editorEvents ?? {},
+        editorEvents: {},
         debugBounding: serializedEditor.debugBounding,
         buildSubmenu: serializedEditor.buildSubmenu,
         editorDropdown: serializedEditor.editorDropdown,
@@ -83,6 +85,7 @@ export const deserializePages = (
 ): IDeserializePagesResult => {
   const pages: Record<string, IPage> = {}
   const components: Record<string, IComponent> = {}
+  const editorEvents: IEditorEvents = {}
   // First, generate the component cache with empty parent/children
   for (const [name, page] of Object.entries(serializedPages)) {
     // Set up the page with root
@@ -114,7 +117,7 @@ export const deserializePages = (
       queue.push(...(cur.children ?? []))
     }
   }
-  return { pages, components }
+  return { pages, components, editorEvents }
 }
 
 export const deserializedHelper = (serialized: ISerializedSite): ISite => {

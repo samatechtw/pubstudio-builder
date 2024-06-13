@@ -18,7 +18,10 @@ export interface ISerializedSiteContext
 }
 
 export interface ISerializedEditorContext
-  extends Omit<IEditorContext, 'selectedComponent' | 'selectedThemeColors'> {
+  extends Omit<
+    IEditorContext,
+    'selectedComponent' | 'selectedThemeColors' | 'editorEvents'
+  > {
   selectedComponentId?: string
   selectedThemeColors: string[]
 }

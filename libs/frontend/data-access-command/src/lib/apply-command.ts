@@ -43,9 +43,16 @@ import { applyRemoveThemeVariable } from './theme-variable/remove-theme-variable
 import { applySetTranslations } from './translations/set-translations'
 import { applyUpdateUi } from './update-ui/update-ui'
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type ApplyFn = (site: ISite, data: any, isRedo?: boolean) => void
+
 // Applies a command to the current site context
-export const applyCommand = (site: ISite, command: ICommand): ICommand => {
-  const applyFunctions = {
+export const applyCommand = (
+  site: ISite,
+  command: ICommand,
+  isRedo = false,
+): ICommand => {
+  const applyFunctions: Record<CommandType, ApplyFn> = {
     [CommandType.Redo]: noop,
     [CommandType.Undo]: noop,
     [CommandType.Group]: applyCommandGroup,
@@ -91,6 +98,6 @@ export const applyCommand = (site: ISite, command: ICommand): ICommand => {
     [CommandType.AddReusableComponent]: applyAddReusableComponent,
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  applyFunctions[command.type](site, command.data as any)
+  applyFunctions[command.type](site, command.data as any, isRedo)
   return command
 }

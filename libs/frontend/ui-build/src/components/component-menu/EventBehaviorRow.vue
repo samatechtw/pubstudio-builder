@@ -11,7 +11,7 @@
           :searchable="true"
           :clearable="false"
           class="behavior"
-          @select="emit('update:behavior', $event)"
+          @select="emit('update:behavior', $event as unknown as IBehavior)"
           @click.stop
         />
       </div>
@@ -34,7 +34,7 @@
         v-for="arg in behaviorArgs"
         :key="arg.name"
         :arg="arg"
-        :value="eventBehavior.args?.[arg.name]"
+        :value="eventBehavior.args?.[arg.name] ?? arg.default"
         @update:arg="emit('update:customArg', $event)"
       />
     </div>
@@ -48,7 +48,7 @@ import { IBehavior } from '@pubstudio/shared/type-site'
 import { Edit, InfoBubble, Minus, PSMultiselect } from '@pubstudio/frontend/ui-widgets'
 import ComponentArgRow from '../component-arg/ComponentArgRow.vue'
 import { IUpdateComponentArgPayload } from '../component-arg/i-update-component-arg-payload'
-import { IResolvedComponentEventBehavior } from './ComponentEventEdit.vue'
+import { IResolvedComponentEventBehavior } from '@pubstudio/frontend/feature-build'
 
 const props = defineProps<{
   eventBehavior: IResolvedComponentEventBehavior

@@ -10,13 +10,7 @@ import {
   navMenuRemoveBehaviorId,
   navMenuStyleId,
 } from '@pubstudio/frontend/util-ids'
-import {
-  ComponentArgPrimitive,
-  EditorEventName,
-  IComponent,
-  IStyle,
-  Tag,
-} from '@pubstudio/shared/type-site'
+import { EditorEventName, IComponent, IStyle, Tag } from '@pubstudio/shared/type-site'
 import { defaultNavMenuItemInputs } from '../default-inputs'
 
 export const navMenuStyle: IStyle = {

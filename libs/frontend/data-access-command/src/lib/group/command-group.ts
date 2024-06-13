@@ -3,9 +3,13 @@ import { ISite } from '@pubstudio/shared/type-site'
 import { applyCommand } from '../apply-command'
 import { undoCommand } from '../undo-command'
 
-export const applyCommandGroup = (site: ISite, data: ICommandGroupData) => {
+export const applyCommandGroup = (
+  site: ISite,
+  data: ICommandGroupData,
+  isRedo?: boolean,
+) => {
   for (const command of data.commands) {
-    applyCommand(site, command)
+    applyCommand(site, command, isRedo)
   }
 }
 

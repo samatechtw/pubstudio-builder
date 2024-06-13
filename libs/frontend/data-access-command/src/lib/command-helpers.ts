@@ -1,4 +1,5 @@
 import { CommandType, ICommand } from '@pubstudio/shared/type-command'
+import { ICommandGroupData } from '@pubstudio/shared/type-command-data'
 import { ISite } from '@pubstudio/shared/type-site'
 import { applyCommand } from './apply-command'
 
@@ -12,11 +13,14 @@ export const mergeLastCommand = (site: ISite, commands: ICommand[]) => {
   }
   const last = getLastCommandHelper(site)
   if (last) {
-    // TODO -- if `last` is a group, append the new commands instead of creating another group
-    commands.unshift(last)
-    site.history.back[history.back.length - 1] = {
+    // If `last` is a group, append the new commands instead of creating another group
+    const mergedCommands =
+      last.type === CommandType.Group
+        ? [...(last.data as ICommandGroupData).commands, ...commands]
+        : [last, ...commands]
+    site.history.back[site.history.back.length - 1] = {
       type: CommandType.Group,
-      data: { commands },
+      data: { commands: mergedCommands },
     }
   } else {
     site.history.back.push({ type: CommandType.Group, data: { commands } })

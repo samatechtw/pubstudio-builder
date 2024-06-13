@@ -6,7 +6,7 @@ import { triggerEditorEvent } from '../editor-event-handlers'
 import { setActivePage } from '../set-active-page'
 import { setSelectedComponent } from '../set-selected-component'
 
-export const applyAddPage = (site: ISite, data: IAddPageData) => {
+export const applyAddPage = (site: ISite, data: IAddPageData, isRedo?: boolean) => {
   const context = site.context
   const { metadata, root } = data
   let pageRoot: IComponent
@@ -28,7 +28,9 @@ export const applyAddPage = (site: ISite, data: IAddPageData) => {
   }
 
   // Trigger page change event
-  triggerEditorEvent(site, EditorEventName.OnPageAdd)
+  if (!isRedo) {
+    triggerEditorEvent(site, EditorEventName.OnPageAdd)
+  }
 
   // Set active page and selected component
   setActivePage(site.editor, metadata.route)
