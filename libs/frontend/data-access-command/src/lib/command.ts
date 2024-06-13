@@ -11,8 +11,20 @@ import { getLastCommandHelper } from './command-helpers'
 import { optimizeCommandGroup } from './optimize-command-group'
 import { undoCommand } from './undo-command'
 
+export interface IPushCommandOptions {
+  // Command is the result of an undo/redo.
+  // Indicates side effects should not be triggered (e.g. editorEvents)
+  // Indicates redo history should not be cleared after executing the command
+  isRedo: boolean
+}
+
 // Helper for pushing a command to separate siteStore.save
-const pushCommandHelper = (site: ISite, command: ICommand, clearRedo = true) => {
+const pushCommandHelper = (
+  site: ISite,
+  command: ICommand,
+  options?: IPushCommandOptions,
+) => {
+  const isRedo = options?.isRedo
   const cmd = optimizeCommandGroup(command)
   const { editingMixinData } = site.editor ?? {}
 
@@ -33,14 +45,14 @@ const pushCommandHelper = (site: ISite, command: ICommand, clearRedo = true) => 
         },
       },
     }
-    applyCommand(site, closeMixinMenuCommand)
     site.history.back.push(closeMixinMenuCommand)
+    applyCommand(site, closeMixinMenuCommand)
   }
 
   if (cmd) {
-    applyCommand(site, cmd)
     site.history.back.push(cmd)
-    if (clearRedo) {
+    applyCommand(site, cmd, isRedo)
+    if (!isRedo) {
       site.history.forward = []
     }
   }
@@ -71,17 +83,16 @@ const shouldCloseMixinMenuForUser = (newCmd: ICommand | undefined): boolean => {
 }
 
 // Applies a command and pushes it to the history stack
-export const pushCommand = <Data>(
-  site: ISite,
-  type: CommandType,
-  data: Data,
-  clearRedo = true,
-) => {
-  pushCommandObject(site, { type, data }, clearRedo)
+export const pushCommand = <Data>(site: ISite, type: CommandType, data: Data) => {
+  pushCommandObject(site, { type, data })
 }
 
-export const pushCommandObject = (site: ISite, command: ICommand, clearRedo = true) => {
-  pushCommandHelper(site, command, clearRedo)
+export const pushCommandObject = (
+  site: ISite,
+  command: ICommand,
+  options?: IPushCommandOptions,
+) => {
+  pushCommandHelper(site, command, options)
   site.editor?.store?.save(site)
 }
 
@@ -115,7 +126,7 @@ export const undoN = (site: ISite, n: number) => {
 export const redoCommand = (site: ISite) => {
   const command = site.history.forward.pop()
   if (command) {
-    pushCommandObject(site, command, false)
+    pushCommandObject(site, command, { isRedo: true })
   }
 }
 
@@ -124,7 +135,7 @@ export const redoN = (site: ISite, n: number) => {
   for (let i = 0; i < n; i += 1) {
     const command = site.history.forward.pop()
     if (command) {
-      pushCommandHelper(site, command, false)
+      pushCommandHelper(site, command, { isRedo: true })
     }
   }
   site.editor?.store?.save(site)

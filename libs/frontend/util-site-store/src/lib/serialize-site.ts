@@ -44,7 +44,6 @@ export const serializeEditor = (
     ? {
         selectedComponentId: editor.selectedComponent?.id,
         active: editor.active,
-        editorEvents: editor.editorEvents,
         debugBounding: editor.debugBounding,
         buildSubmenu: editor.buildSubmenu,
         editorDropdown: editor.editorDropdown,

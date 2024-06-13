@@ -10,8 +10,16 @@ export const builtinBehaviors: Record<string, IBehavior> = {
   // Populated by '@pubstudio/frontend/feature-builtin' to avoid circular dependencies
 }
 
+export const builtinEditorBehaviors: Record<string, IBehavior> = {
+  // Populated by '@pubstudio/frontend/feature-builtin' to avoid circular dependencies
+}
+
 export const registerBuiltinBehavior = (behavior: IBehavior) => {
   builtinBehaviors[behavior.id] = behavior
+}
+
+export const registerEditorBehavior = (behavior: IBehavior) => {
+  builtinEditorBehaviors[behavior.id] = behavior
 }
 
 // Events triggered by Vue
@@ -49,7 +57,7 @@ export const resolveBehavior = (
     behavior = context.behaviors[behaviorId]
   } else if (behaviorId.startsWith(globalContext.namespace)) {
     // Builtins are native code and don't need to be eval'd
-    return builtinBehaviors[behaviorId]
+    return builtinBehaviors[behaviorId] ?? builtinEditorBehaviors[behaviorId]
   } else {
     // TODO -- resolve external namespaces
   }

@@ -135,6 +135,9 @@
       "@pubstudio/frontend/feature-builtin": [
         "libs/frontend/feature-builtin/src/index.ts"
       ],
+      "@pubstudio/frontend/feature-builtin-editor": [
+        "libs/frontend/feature-builtin-editor/src/index.ts"
+      ],
       "@pubstudio/frontend/feature-breakpoint": [
         "libs/frontend/feature-breakpoint/src/index.ts"
       ],

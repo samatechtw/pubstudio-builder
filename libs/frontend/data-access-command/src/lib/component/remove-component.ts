@@ -85,6 +85,7 @@ export const undoRemoveComponentHelper = (
     style: style ?? { custom: {} },
     inputs,
     events,
+    editorEvents,
   }
 
   if (!parent) {
@@ -106,11 +107,9 @@ export const undoRemoveComponentHelper = (
   }
 
   // Register editor events
-  if (editorEvents) {
-    registerComponentEditorEvents(site, component, editorEvents)
-    if (editorEvents.OnSelfAdded) {
-      triggerEventBehaviors(editorEvents.OnSelfAdded.behaviors, site, component)
-    }
+  registerComponentEditorEvents(site, component)
+  if (editorEvents?.OnSelfAdded) {
+    triggerEventBehaviors(editorEvents.OnSelfAdded.behaviors, site, component)
   }
 
   if (selectAfterUndo) {

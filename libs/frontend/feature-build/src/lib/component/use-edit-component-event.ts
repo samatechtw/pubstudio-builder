@@ -1,6 +1,6 @@
 import { setComponentEditEvent } from '@pubstudio/frontend/data-access-command'
 import { noBehavior } from '@pubstudio/frontend/feature-builtin'
-import { resolveComponent } from '@pubstudio/frontend/util-resolve'
+import { builtinBehaviors, resolveComponent } from '@pubstudio/frontend/util-resolve'
 import {
   ComponentEventType,
   ComponentEventTypeValues,
@@ -28,6 +28,14 @@ export const useEditComponentEvent = (): IUseEditComponentEventFeature => {
     updateSelectedComponentEvent,
     removeSelectedComponentEvent,
   } = useBuild()
+
+  // Builtin behaviors + custom behaviors
+  const behaviorOptions = computed(() => {
+    return [
+      ...Object.values(site.value.context.behaviors),
+      ...Object.values(builtinBehaviors),
+    ]
+  })
 
   const editedEvent = computed(() => {
     const name = editor.value?.componentTab.editEvent
@@ -85,6 +93,7 @@ export const useEditComponentEvent = (): IUseEditComponentEventFeature => {
 
   return {
     editedEvent,
+    behaviorOptions,
     EventValues: ComponentEventTypeValues,
     editOrNewEvent,
     setEditedEvent,

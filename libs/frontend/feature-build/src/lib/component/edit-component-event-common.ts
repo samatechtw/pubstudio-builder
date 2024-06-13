@@ -11,6 +11,7 @@ import { ComputedRef } from 'vue'
 export interface IUseEditComponentEventFeature {
   editedEvent: ComputedRef<IEditorEvent | undefined>
   EventValues: string[]
+  behaviorOptions: ComputedRef<IBehavior[]>
   editOrNewEvent: (
     site: ISite,
     editedEvent: IComponentEvent | undefined,

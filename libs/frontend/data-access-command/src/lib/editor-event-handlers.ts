@@ -3,19 +3,14 @@ import { triggerEventBehaviors } from '@pubstudio/frontend/util-runtime'
 import {
   EditorEventName,
   IComponent,
-  IComponentEditorEvents,
   IComponentEventBehavior,
   IEditorEvent,
   ISite,
 } from '@pubstudio/shared/type-site'
 
 // Register all of a component's editor events
-export const registerComponentEditorEvents = (
-  site: ISite,
-  component: IComponent,
-  events: IComponentEditorEvents,
-) => {
-  for (const [name, editorEvent] of Object.entries(events)) {
+export const registerComponentEditorEvents = (site: ISite, component: IComponent) => {
+  for (const [name, editorEvent] of Object.entries(component.editorEvents ?? {})) {
     const eventName = name as EditorEventName
     registerEditorEvent(site, component, eventName, editorEvent.behaviors)
   }

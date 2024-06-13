@@ -19,7 +19,7 @@ import {
   navMenuRemoveBehaviorId,
   setupLoaderBehaviorId,
 } from '@pubstudio/frontend/util-ids'
-import { registerBuiltinBehavior, resolveStyle } from '@pubstudio/frontend/util-resolve'
+import { registerEditorBehavior, resolveStyle } from '@pubstudio/frontend/util-resolve'
 import { CommandType, ICommand } from '@pubstudio/shared/type-command'
 import {
   IAddStyleMixinData,
@@ -154,7 +154,7 @@ export const navItemBehavior: IBehavior = {
     }
   },
 }
-registerBuiltinBehavior(navItemBehavior)
+registerEditorBehavior(navItemBehavior)
 
 const navMenuAddPageBehavior: IBehavior = {
   id: navMenuAddBehaviorId,
@@ -177,7 +177,7 @@ const navMenuAddPageBehavior: IBehavior = {
     navMenuAddPage(site, cmp)
   },
 }
-registerBuiltinBehavior(navMenuAddPageBehavior)
+registerEditorBehavior(navMenuAddPageBehavior)
 
 const navMenuRemovePageBehavior: IBehavior = {
   id: navMenuRemoveBehaviorId,
@@ -192,7 +192,7 @@ const navMenuRemovePageBehavior: IBehavior = {
     navMenuRemovePage(site, cmp)
   },
 }
-registerBuiltinBehavior(navMenuRemovePageBehavior)
+registerEditorBehavior(navMenuRemovePageBehavior)
 
 const navMenuChangePageBehavior: IBehavior = {
   id: navMenuChangeBehaviorId,
@@ -207,7 +207,7 @@ const navMenuChangePageBehavior: IBehavior = {
     navMenuChangePage(site, cmp)
   },
 }
-registerBuiltinBehavior(navMenuChangePageBehavior)
+registerEditorBehavior(navMenuChangePageBehavior)
 
 export const setupLoaderBehavior: IBehavior = {
   id: setupLoaderBehaviorId,
@@ -252,4 +252,4 @@ export const setupLoaderBehavior: IBehavior = {
     }
   },
 }
-registerBuiltinBehavior(setupLoaderBehavior)
+registerEditorBehavior(setupLoaderBehavior)

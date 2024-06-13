@@ -120,7 +120,6 @@ import {
   PSMultiselect,
   Plus,
 } from '@pubstudio/frontend/ui-widgets'
-import { builtinBehaviors } from '@pubstudio/frontend/util-resolve'
 import { noBehavior } from '@pubstudio/frontend/feature-builtin'
 import { setEditBehavior } from '@pubstudio/frontend/data-access-command'
 import {
@@ -146,6 +145,7 @@ const { component } = toRefs(props)
 
 const {
   editedEvent,
+  behaviorOptions,
   EventValues,
   editOrNewEvent,
   upsertEvent,
@@ -226,14 +226,6 @@ const setEventParam = (paramName: string, value: string | undefined) => {
     }
   }
 }
-
-// Builtin behaviors + custom behaviors
-const behaviorOptions = computed(() => {
-  return [
-    ...Object.values(site.value.context.behaviors),
-    ...Object.values(builtinBehaviors),
-  ]
-})
 
 const updateBehavior = (
   eventBehavior: IResolvedComponentEventBehavior,
