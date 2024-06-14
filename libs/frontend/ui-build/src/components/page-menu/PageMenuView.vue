@@ -19,7 +19,12 @@
       </template>
     </MenuRow>
     <div class="actions">
-      <PSButton :text="t('build.edit_page')" size="small" @click="edit" />
+      <PSButton
+        :text="t('build.edit_page')"
+        class="edit-button"
+        size="small"
+        @click="edit"
+      />
       <PSButton
         v-if="removable"
         class="remove-button"

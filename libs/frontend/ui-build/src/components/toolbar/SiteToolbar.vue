@@ -21,6 +21,7 @@
       :tooltip="t('toolbar.redo')"
       :disabled="!canRedo"
       :alert="commandAlert === CommandType.Redo"
+      class="toolbar-redo"
       @click="historyAction($event, redo)"
     >
       <Redo />
