@@ -49,7 +49,7 @@ describe('Modify Column', () => {
     return {
       table_name: 'contact_form',
       row: {
-        age: '18',
+        message: 'Hello again!',
         email: 'flora@samatech.com',
         [nameColumn]: nameValue ?? 'TEST',
       },

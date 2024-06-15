@@ -128,7 +128,7 @@ describe('Add Row', () => {
         })
     })
 
-    it('when adding a row with an invalid age length', async () => {
+    it('when adding a row with an invalid message length', async () => {
       payload.data = mockAddInvalidRow2()
 
       await api
@@ -137,7 +137,7 @@ describe('Add Row', () => {
         .send(payload)
         .expect({
           code: 'CustomDataMinLengthFail',
-          message: 'age must be at least 1 characters',
+          message: 'message must be at least 3 characters',
           status: 400,
         })
 
@@ -149,7 +149,7 @@ describe('Add Row', () => {
         .send(payload)
         .expect({
           code: 'CustomDataMaxLengthFail',
-          message: 'age must be less than 3 characters',
+          message: 'message must be less than 100 characters',
           status: 400,
         })
     })

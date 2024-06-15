@@ -66,7 +66,7 @@ describe('Update Row', () => {
     const body: IUpdateRowResponse = res.body
 
     expect(body.updated_row['name']).toEqual('Jessie')
-    expect(body.updated_row['age']).toEqual('19')
+    expect(body.updated_row['message']).toEqual('Hello there!')
     expect(body.updated_row['email']).toEqual('jjj@abc.com')
   })
 
@@ -85,7 +85,7 @@ describe('Update Row', () => {
     const body: IUpdateRowResponse = res.body
 
     expect(body.updated_row['name']).toEqual('Albert')
-    expect(body.updated_row['age']).toEqual('30')
+    expect(body.updated_row['message']).toEqual('Hello there!')
     expect(body.updated_row['email']).toEqual('john_test@abc.com')
   })
 
@@ -107,7 +107,7 @@ describe('Update Row', () => {
     it('when column name is invalid', async () => {
       updateData.new_row = {
         a: 'Jessie',
-        age: '19',
+        message: 'Test Jessie!',
         email: 'jjj@abc.com',
       }
 
@@ -182,7 +182,7 @@ describe('Update Row', () => {
         })
     })
 
-    it('when updating a row with an invalid age length', async () => {
+    it('when updating a row with an invalid message length', async () => {
       payload.data = mockUpdateInvalidRow2()
 
       await api
@@ -191,7 +191,7 @@ describe('Update Row', () => {
         .send(payload)
         .expect({
           code: 'CustomDataMinLengthFail',
-          message: 'age must be at least 1 characters',
+          message: 'message must be at least 3 characters',
           status: 400,
         })
 
@@ -203,7 +203,7 @@ describe('Update Row', () => {
         .send(payload)
         .expect({
           code: 'CustomDataMaxLengthFail',
-          message: 'age must be less than 3 characters',
+          message: 'message must be less than 100 characters',
           status: 400,
         })
     })

@@ -35,12 +35,7 @@
         class="confirm-button"
         @click="createTable"
       />
-      <PSButton
-        v-if="contactTables.length"
-        :text="t('back')"
-        class="back-button"
-        @click="goBack"
-      />
+      <PSButton :text="t('back')" class="back-button" @click="goBack" />
     </div>
   </div>
 </template>

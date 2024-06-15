@@ -18,7 +18,7 @@ use super::{
   "action": "RemoveColumn",
   "data": {
     "table_name": "contact_form",
-    "column_name": "age"
+    "column_name": "message"
   }
 }
 */

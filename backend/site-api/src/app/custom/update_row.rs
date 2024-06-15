@@ -18,7 +18,7 @@ use super::{
     "table_name": "contact_form",
     "row_id": 1,
     "new_row": {
-        "age": "36"
+        "message": "Test"
     }
   }
 }

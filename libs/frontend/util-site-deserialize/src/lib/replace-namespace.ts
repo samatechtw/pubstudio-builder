@@ -19,6 +19,7 @@ export const replaceNamespace = (site: ISite, namespace: string): ISite => {
   }
 
   context.namespace = namespace
+  context.styleOrder = context.styleOrder.map(updateId)
   // Update styles
   for (const [mixinId, mixin] of Object.entries(context.styles)) {
     const newId = updateId(mixinId)

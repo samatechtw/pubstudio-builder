@@ -5,7 +5,7 @@ export const mockAddRowPayload1 = (): IAddRowApiRequest => {
     table_name: 'contact_form',
     row: {
       name: 'John',
-      age: '30',
+      message: 'Hello there!',
       email: 'john_test@abc.com',
     },
   }
@@ -16,7 +16,7 @@ export const mockAddRowPayload2 = (): IAddRowApiRequest => {
     table_name: 'contact_form',
     row: {
       name: 'Andy',
-      age: '40',
+      message: 'Hello there!',
       email: 'andy123@gmail.com',
     },
   }
@@ -27,7 +27,7 @@ export const mockAddRowPayload3 = (): IAddRowApiRequest => {
     table_name: 'contact_form',
     row: {
       name: 'Flora',
-      age: '18',
+      message: 'Hello there!',
       email: 'flora@samatech.com',
     },
   }
@@ -38,7 +38,7 @@ export const mockAddRowPayload4 = (): IAddRowApiRequest => {
     table_name: 'contact_form',
     row: {
       name: 'Cindy',
-      age: '22',
+      message: 'Hello there!',
       email: 'ccc@hotmail.com',
       phone: '0987654321',
     },
@@ -50,7 +50,7 @@ export const mockAddInvalidRow1 = (): IAddRowApiRequest => {
     table_name: 'contact_form',
     row: {
       name: 'John',
-      age: '32',
+      message: 'Hello there!',
       email: 'john@samatech.com',
     },
   }
@@ -61,7 +61,7 @@ export const mockAddInvalidRow2 = (): IAddRowApiRequest => {
     table_name: 'contact_form',
     row: {
       name: 'Lily',
-      age: '',
+      message: '',
       email: 'lll@bbb.com',
     },
   }
@@ -72,7 +72,7 @@ export const mockAddInvalidRow3 = (): IAddRowApiRequest => {
     table_name: 'contact_form',
     row: {
       name: 'Eden',
-      age: '1000',
+      message: '1234567890'.repeat(11),
       email: 'eden@qqq.com',
     },
   }
@@ -83,7 +83,7 @@ export const mockAddInvalidRow4 = (email: string): IAddRowApiRequest => {
     table_name: 'contact_form',
     row: {
       name: 'Lisa',
-      age: '50',
+      message: 'Hello there!',
       email,
     },
   }
@@ -94,7 +94,7 @@ export const mockAddInvalidRow5 = (): IAddRowApiRequest => {
     table_name: 'contact_form',
     row: {
       name: 'Iris',
-      age: '40',
+      message: 'Hello there!',
       email: 'iris@lol.com',
       phone: '100000000000000',
     },
