@@ -11,11 +11,11 @@
     />
     <MenuRow :label="t('id')" :value="component.id" :copyValue="true" class="id" />
     <MenuRow
-      v-if="isReusableInstance"
-      :label="t('build.reusable_cmp_id')"
-      :value="component.reusableSourceId"
-      :info="reusableCmpInfo"
-      class="reusable-cmp-id"
+      v-if="isCustomInstance"
+      :label="t('build.custom_cmp_id')"
+      :value="component.customSourceId"
+      :info="customCmpInfo"
+      class="custom-cmp-id"
     />
     <MenuRowSimple
       :label="t('content')"
@@ -70,11 +70,11 @@ const contentInfo = computed(() => {
   return component.value.children?.length ? t('build.content_info') : undefined
 })
 
-const isReusableInstance = computed(() => !!component.value.reusableSourceId)
+const isCustomInstance = computed(() => !!component.value.customSourceId)
 
-const reusableCmpInfo = computed(() => {
-  const id = component.value.reusableSourceId
-  return id ? t('build.reusable_cmp_info', { id }) : undefined
+const customCmpInfo = computed(() => {
+  const id = component.value.customSourceId
+  return id ? t('build.custom_cmp_info', { id }) : undefined
 })
 
 const editingContent = computed(() => {

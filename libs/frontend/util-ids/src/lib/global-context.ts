@@ -8,8 +8,8 @@ export const makeContext = (namespace: string): ISiteContext => {
     globalStyles: {},
     styles: {},
     styleOrder: [],
-    reusableComponentIds: new Set(),
-    reusableChildIds: new Set(),
+    customComponentIds: new Set(),
+    customChildIds: new Set(),
     behaviors: {},
     theme: {
       variables: {},

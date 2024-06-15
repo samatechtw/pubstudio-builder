@@ -34,12 +34,12 @@
           @click="debugComponent"
         />
         <PSButton
-          v-if="showToReusableComponent"
-          class="to-reusable-button"
+          v-if="showToCustomComponent"
+          class="to-custom-button"
           size="small"
-          :text="t('build.to_reusable')"
+          :text="t('build.to_custom')"
           :secondary="true"
-          @click="toReusableComponent"
+          @click="toCustomComponent"
         />
         <div v-if="showPasteReplaceButton" className="paste-replace-wrap">
           <PSButton
@@ -87,7 +87,7 @@ import ToolbarContainer from '../toolbar/ToolbarContainer.vue'
 import ToolbarText from '../toolbar/ToolbarText.vue'
 
 const { t } = useI18n()
-const { site, editor, replacePageRoot, addReusableComponent } = useBuild()
+const { site, editor, replacePageRoot, addCustomComponent } = useBuild()
 const { isEditingMixin } = useMixinMenu()
 const { addHUD } = useHUD()
 
@@ -137,28 +137,28 @@ const showTextStyle = computed(() => {
   )
 })
 
-const isReusable = (id: string) => {
+const isCustom = (id: string) => {
   const context = site.value.context
-  return context.reusableComponentIds.has(id) || context.reusableChildIds.has(id)
+  return context.customComponentIds.has(id) || context.customChildIds.has(id)
 }
 
-const showToReusableComponent = computed(() => {
-  const { reusableSourceId, id } = component.value
+const showToCustomComponent = computed(() => {
+  const { customSourceId, id } = component.value
   let parent: IComponent | undefined = component.value
 
-  if (!parent || reusableSourceId || isReusable(id)) {
+  if (!parent || customSourceId || isCustom(id)) {
     return false
   }
   while (parent) {
-    if (parent.reusableSourceId || isReusable(parent.id)) return false
+    if (parent.customSourceId || isCustom(parent.id)) return false
     parent = parent.parent
   }
   return true
 })
 
-const toReusableComponent = () => {
-  addReusableComponent(component.value)
-  setBuildSubmenu(editor.value, BuildSubmenu.Reusable)
+const toCustomComponent = () => {
+  addCustomComponent(component.value)
+  setBuildSubmenu(editor.value, BuildSubmenu.Custom)
 }
 </script>
 
@@ -174,7 +174,7 @@ const toReusableComponent = () => {
   align-items: flex-end;
   margin-top: 24px;
   padding-left: 16px;
-  .to-reusable-button {
+  .to-custom-button {
     margin-left: 8px;
   }
 }

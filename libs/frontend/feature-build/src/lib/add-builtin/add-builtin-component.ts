@@ -3,7 +3,7 @@ import { getActivePage } from '@pubstudio/frontend/feature-site-store'
 import { builtinStyles, getBuiltinComponent } from '@pubstudio/frontend/util-builtin'
 import {
   makeAddBuiltinComponentData,
-  makeAddReusableComponentData,
+  makeAddCustomComponentData,
 } from '@pubstudio/frontend/util-command-data'
 import { resolveComponent, resolveStyle } from '@pubstudio/frontend/util-resolve'
 import { CommandType, ICommand } from '@pubstudio/shared/type-command'
@@ -47,7 +47,7 @@ export const addBuiltinComponentData = (site: ISite, data: IAddComponentData) =>
   pushCommandAndAddMissingMixins(site, CommandType.AddComponent, data, mixins)
 }
 
-export const addReusableComponentData = (site: ISite, data: IAddComponentData) => {
+export const addCustomComponentData = (site: ISite, data: IAddComponentData) => {
   pushCommand(site, CommandType.AddComponent, data)
 }
 
@@ -75,9 +75,9 @@ const addComponentToParent = (
   return data
 }
 
-export const addReusableComponent = (site: ISite, options: IAddComponentOptions) => {
+export const addCustomComponent = (site: ISite, options: IAddComponentOptions) => {
   const data = addComponentToParent(site, options, (parent) =>
-    makeAddReusableComponentData(
+    makeAddCustomComponentData(
       site,
       options.id,
       parent,
@@ -85,7 +85,7 @@ export const addReusableComponent = (site: ISite, options: IAddComponentOptions)
     ),
   )
   if (data) {
-    addReusableComponentData(site, data)
+    addCustomComponentData(site, data)
   }
   return data?.id
 }

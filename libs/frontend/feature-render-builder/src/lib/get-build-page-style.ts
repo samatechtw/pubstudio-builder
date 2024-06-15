@@ -5,7 +5,6 @@ import {
 import { getActiveBreakpointIds } from '@pubstudio/frontend/feature-site-source'
 import {
   IRawStyleRecord,
-  IResolvedPageStyle,
   iteratePage,
   sortMixinIds,
 } from '@pubstudio/frontend/util-render'
@@ -39,21 +38,21 @@ const computeMixinStyles = (
 
 interface IResolvedBuildPageStyle {
   component: IRawStyleRecord
-  reusable: IRawStyleRecord
+  custom: IRawStyleRecord
 }
 
 export const getBuildPageStyle = (site: ISite, page: IPage): IResolvedBuildPageStyle => {
   const pageStyle: IRawStyleRecord = {}
-  const reusableStyle: IRawStyleRecord = {}
+  const customStyle: IRawStyleRecord = {}
   const accumulatedBreakpointIds = getActiveBreakpointIds()
 
   const appendStyle = (component: IComponent) => {
-    const isReusable =
-      site.context.reusableComponentIds.has(component.id) ||
-      site.context.reusableChildIds.has(component.id)
+    const isCustom =
+      site.context.customComponentIds.has(component.id) ||
+      site.context.customChildIds.has(component.id)
     const currentPseudoClass = site.editor?.cssPseudoClass ?? CssPseudoClass.Default
 
-    const styleRecord = isReusable ? reusableStyle : pageStyle
+    const styleRecord = isCustom ? customStyle : pageStyle
 
     // Compute default styles
     accumulatedBreakpointIds.forEach((breakpointId) => {
@@ -71,7 +70,7 @@ export const getBuildPageStyle = (site: ISite, page: IPage): IResolvedBuildPageS
         styleRecord[pseudoCls] = { ...styleRecord[pseudoCls], ...rawStyle }
       }
 
-      if (isReusable) {
+      if (isCustom) {
         const reusableMixins = sortMixinIds(site.context, component)
         // Accumulate all mixin styles, following `context.styleOrder`
         for (const mixinId of reusableMixins) {
@@ -119,10 +118,10 @@ export const getBuildPageStyle = (site: ISite, page: IPage): IResolvedBuildPageS
   iteratePage(page, appendStyle)
 
   const sortedPageStyle = sortRawStyleRecord(pageStyle)
-  const sortedReusableStyle = sortRawStyleRecord(reusableStyle)
+  const sortedcustomStyle = sortRawStyleRecord(customStyle)
 
   return {
     component: sortedPageStyle,
-    reusable: sortedReusableStyle,
+    custom: sortedcustomStyle,
   }
 }

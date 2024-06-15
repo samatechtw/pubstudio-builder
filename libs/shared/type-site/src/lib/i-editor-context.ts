@@ -20,7 +20,7 @@ export enum EditorMode {
 export enum BuildSubmenu {
   Asset = 'asset',
   New = 'new',
-  Reusable = 'reusable',
+  Custom = 'custom',
   File = 'file',
   Page = 'page',
   Behavior = 'behavior',

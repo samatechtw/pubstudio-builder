@@ -105,14 +105,14 @@ export interface IComponent {
   // ARIA role
   role?: AriaRole
   // HTML content.
-  // This is also used to override reusable component content.
+  // This is also used to override custom component content.
   content?: string
   // DOM parent
   parent?: IComponent
   // DOM children
   children?: IComponent[]
-  // ID of reusable component to inherit properties from
-  reusableSourceId?: string
+  // ID of custom component to inherit properties from
+  customSourceId?: string
   // Input values
   style: IComponentStyle
   state?: Record<string, IComponentState>

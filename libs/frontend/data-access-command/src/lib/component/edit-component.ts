@@ -20,9 +20,9 @@ const addTagInputs = (
   fields: IEditComponentFields,
 ) => {
   const tag = fields.tag
-  const reusableCmp = resolveComponent(site.context, component.reusableSourceId)
+  const customCmp = resolveComponent(site.context, component.customSourceId)
   const mergedInputs = {
-    ...reusableCmp?.inputs,
+    ...customCmp?.inputs,
     ...component.inputs,
   }
   if (tag) {
@@ -53,9 +53,9 @@ const removeTagInputs = (
   fields: IEditComponentFields,
 ) => {
   const tag = fields.tag
-  const reusableCmp = resolveComponent(site.context, component.reusableSourceId)
+  const customCmp = resolveComponent(site.context, component.customSourceId)
   const mergedInputs = {
-    ...reusableCmp?.inputs,
+    ...customCmp?.inputs,
     ...component.inputs,
   }
   if (tag) {

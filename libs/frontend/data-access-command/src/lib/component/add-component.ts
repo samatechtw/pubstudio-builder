@@ -18,7 +18,7 @@ const addChildrenHelper = (
   site: ISite,
   parentId: string,
   children: IComponent[],
-  sourceField: 'sourceId' | 'reusableComponentId',
+  sourceField: 'sourceId' | 'customComponentId',
 ) => {
   for (const child of children) {
     if (sourceField === 'sourceId') {
@@ -37,7 +37,7 @@ const addChildrenHelper = (
         name: child.name,
         tag: child.tag,
         parentId,
-        reusableComponentId: child.id,
+        customComponentId: child.id,
       })
     }
   }
@@ -58,7 +58,7 @@ export const addComponentHelper = (
     events,
     inputs,
     parentIndex,
-    reusableComponentId,
+    customComponentId,
     sourceId,
     style,
   } = data
@@ -80,11 +80,11 @@ export const addComponentHelper = (
   }
 
   const sourceComponent = resolveComponent(context, sourceId)
-  const reusableCmp = resolveComponent(context, reusableComponentId)
+  const customCmp = resolveComponent(context, customComponentId)
 
   if (sourceComponent) {
     component = detachComponent(component, sourceComponent)
-  } else if (reusableCmp) {
+  } else if (customCmp) {
     component = {
       id,
       name: component.name,
@@ -92,18 +92,18 @@ export const addComponentHelper = (
       tag: component.tag,
       content: undefined,
       children: component.children,
-      // Only overridden inputs will be added to a reusable instance.
+      // Only overridden inputs will be added to a custom instance.
       inputs: undefined,
-      // Only overridden events will be added to a reusable instance.
+      // Only overridden events will be added to a custom instance.
       events: undefined,
       // Initial state copied to instance
-      state: clone(reusableCmp.state),
-      editorEvents: clone(reusableCmp.editorEvents),
+      state: clone(customCmp.state),
+      editorEvents: clone(customCmp.editorEvents),
       style: { custom: {} },
     }
   }
-  // Allow both sourceId and reusableComponentId for copy/paste of reusable instances
-  component.reusableSourceId = reusableComponentId
+  // Allow both sourceId and customComponentId for copy/paste of custom instances
+  component.customSourceId = customComponentId
 
   let parentNewChildren = parent?.children ? [...parent.children] : undefined
 
@@ -138,12 +138,12 @@ export const addComponentHelper = (
     }
   } else if (sourceComponent?.children) {
     addChildrenHelper(site, id, sourceComponent.children, 'sourceId')
-  } else if (reusableCmp?.children) {
-    addChildrenHelper(site, id, reusableCmp.children, 'reusableComponentId')
+  } else if (customCmp?.children) {
+    addChildrenHelper(site, id, customCmp.children, 'customComponentId')
   }
 
   // Update `parent.children` after `addChildrenHelper` to avoid infinite loop
-  // when a reusable component is inserted as a instance of itself.
+  // when a custom component is inserted as a instance of itself.
   if (parent) {
     parent.children = parentNewChildren
   }

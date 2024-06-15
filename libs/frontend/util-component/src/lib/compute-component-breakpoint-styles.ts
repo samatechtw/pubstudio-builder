@@ -25,26 +25,26 @@ export const computeComponentBreakpointStyles = (
 
   const customBreakpointStyles = computeCustomBreakpointStyles(component)
 
-  const reusableCmp = resolveComponent(context, component.reusableSourceId)
-  let reusableCmpMixinBpStyles: IBreakpointStylesWithSource = {}
-  let reusableCmpCustomBpStyles: IBreakpointStylesWithSource = {}
-  if (reusableCmp) {
-    reusableCmpMixinBpStyles = computeMixinBreakpointStyles(
+  const customCmp = resolveComponent(context, component.customSourceId)
+  let customCmpMixinBpStyles: IBreakpointStylesWithSource = {}
+  let customCmpCustomBpStyles: IBreakpointStylesWithSource = {}
+  if (customCmp) {
+    customCmpMixinBpStyles = computeMixinBreakpointStyles(
       context,
-      reusableCmp.style.mixins,
-      StyleSourceType.ReusableComponent,
-      reusableCmp.id,
+      customCmp.style.mixins,
+      StyleSourceType.CustomComponent,
+      customCmp.id,
     )
-    reusableCmpCustomBpStyles = computeCustomBreakpointStyles(
-      reusableCmp,
-      StyleSourceType.ReusableComponent,
+    customCmpCustomBpStyles = computeCustomBreakpointStyles(
+      customCmp,
+      StyleSourceType.CustomComponent,
     )
   }
 
-  // Priority: custom style > custom mixin > reusable component style > reusable component mixin
+  // Priority: custom style > mixin > custom component style > custom component mixin
   const mergedBreakpointStylesWithSource = mergeBreakpointStylesWithSource(
-    reusableCmpMixinBpStyles,
-    reusableCmpCustomBpStyles,
+    customCmpMixinBpStyles,
+    customCmpCustomBpStyles,
     mixinBreakpointStyles,
     customBreakpointStyles,
   )

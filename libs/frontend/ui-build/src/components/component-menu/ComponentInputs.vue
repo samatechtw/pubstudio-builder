@@ -2,7 +2,7 @@
   <div class="component-inputs">
     <EditMenuTitle
       :title="t('inputs')"
-      :showAdd="!isReusableInstance"
+      :showAdd="!isCustomInstance"
       @add="
         emit('showEditInput', {
           name: '',
@@ -21,8 +21,8 @@
       :argType="getArgType(input[0])"
       :tag="component.tag"
       :componentId="component.id"
-      :showEditInput="!isReusableInstance"
-      :showReset="mergedInputs[input[0]]?.source === ComponentInputSource.Custom"
+      :showEditInput="!isCustomInstance"
+      :showReset="mergedInputs[input[0]]?.source === ComponentInputSource.Self"
       :error="getError(input[0], input[1])"
       @editInput="emit('showEditInput', mergedInputs[input[0]])"
       @update="setInput(input[0], $event)"
@@ -55,8 +55,8 @@ interface IComponentInputWithSource extends IComponentInput {
 }
 
 enum ComponentInputSource {
-  Reusable,
   Custom,
+  Self,
 }
 
 const computeComponentInputs = (
@@ -65,13 +65,13 @@ const computeComponentInputs = (
 ): Record<string, IComponentInputWithSource> => {
   const mergedInputs: Record<string, IComponentInputWithSource> = {}
 
-  // Append reusable component inputs
-  const reusableCmp = resolveComponent(site.context, component.reusableSourceId)
-  if (reusableCmp) {
-    Object.entries(reusableCmp.inputs ?? {}).forEach(([key, input]) => {
+  // Append custom component inputs
+  const customCmp = resolveComponent(site.context, component.customSourceId)
+  if (customCmp) {
+    Object.entries(customCmp.inputs ?? {}).forEach(([key, input]) => {
       mergedInputs[key] = {
         ...input,
-        source: ComponentInputSource.Reusable,
+        source: ComponentInputSource.Custom,
       }
     })
   }
@@ -80,7 +80,7 @@ const computeComponentInputs = (
   Object.entries(component.inputs ?? {}).forEach(([key, input]) => {
     mergedInputs[key] = {
       ...input,
-      source: ComponentInputSource.Custom,
+      source: ComponentInputSource.Self,
     }
   })
 
@@ -134,9 +134,9 @@ const mergedInputs = computed(() => computeComponentInputs(site.value, component
 const inputArray = computed(() => {
   const inputs: Record<string, unknown> = {}
   const cmp = component.value
-  const reusable = resolveComponent(site.value.context, cmp.reusableSourceId)
+  const custom = resolveComponent(site.value.context, cmp.customSourceId)
 
-  for (const [key, input] of Object.entries({ ...cmp.inputs, ...reusable?.inputs })) {
+  for (const [key, input] of Object.entries({ ...cmp.inputs, ...custom?.inputs })) {
     inputs[key] = resolveInput(site.value.context, input.is ?? input.default, false)
   }
   return Object.entries(inputs).sort((entryA, entryB) =>
@@ -162,7 +162,7 @@ const onImageAssetSelected = (asset: ISiteAssetViewModel) => {
   setInput('src', urlFromAsset(asset))
 }
 
-const isReusableInstance = computed(() => !!component.value.reusableSourceId)
+const isCustomInstance = computed(() => !!component.value.customSourceId)
 </script>
 
 <style lang="postcss" scoped>

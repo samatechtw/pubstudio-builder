@@ -54,8 +54,8 @@ export const createSite = (_namespace: string): ISite => {
     globalStyles: {},
     styles: {},
     styleOrder: [],
-    reusableComponentIds: new Set<string>(),
-    reusableChildIds: new Set<string>(),
+    customComponentIds: new Set<string>(),
+    customChildIds: new Set<string>(),
     behaviors: {},
     theme: {
       variables: {

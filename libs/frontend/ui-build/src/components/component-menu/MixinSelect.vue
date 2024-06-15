@@ -44,12 +44,12 @@ const props = defineProps<{
   isNew?: boolean
   mixin?: IStyle | undefined
   mixinOptions: { label: string; value: string }[]
-  sourceReusableComponentId?: string
+  sourceCustomComponentId?: string
 }>()
 
-const { sourceReusableComponentId } = toRefs(props)
+const { sourceCustomComponentId } = toRefs(props)
 
-const isInherited = computed(() => !!sourceReusableComponentId.value)
+const isInherited = computed(() => !!sourceCustomComponentId.value)
 
 interface ISetMixinEmit {
   oldMixinId?: string
@@ -74,11 +74,10 @@ const flatten = () => {
 }
 
 const inheritedMessage = computed(() => {
-  if (sourceReusableComponentId.value) {
-    const sourceName =
-      site.value.context.components[sourceReusableComponentId.value]?.name
+  if (sourceCustomComponentId.value) {
+    const sourceName = site.value.context.components[sourceCustomComponentId.value]?.name
     return t('style.inherited_source', {
-      source: `${sourceName}#${sourceReusableComponentId.value}`,
+      source: `${sourceName}#${sourceCustomComponentId.value}`,
     })
   }
   return undefined

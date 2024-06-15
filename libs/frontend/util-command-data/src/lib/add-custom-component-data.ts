@@ -3,21 +3,21 @@ import { IAddComponentData } from '@pubstudio/shared/type-command-data'
 import { IComponent, ISite } from '@pubstudio/shared/type-site'
 import { selectAddParent } from './select-add-parent'
 
-// Generate new component data from a reusable component
-export const makeAddReusableComponentData = (
+// Generate new component data from a custom component
+export const makeAddCustomComponentData = (
   site: ISite,
-  reusableComponentId: string,
+  customComponentId: string,
   parent: IComponent,
   selectedComponentId: string | undefined,
 ): IAddComponentData | undefined => {
-  const reusableCmp = resolveComponent(site.context, reusableComponentId)
-  if (!reusableCmp) {
+  const customCmp = resolveComponent(site.context, customComponentId)
+  if (!customCmp) {
     return undefined
   }
   const data: IAddComponentData = {
-    tag: reusableCmp.tag,
+    tag: customCmp.tag,
     ...selectAddParent(parent, undefined),
-    reusableComponentId: reusableCmp.id,
+    customComponentId: customCmp.id,
     selectedComponentId,
   }
   return data

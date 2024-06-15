@@ -10,6 +10,6 @@ export type IQueryStyle = {
 }
 
 export interface IResolvedPageStyle {
-  reusable: IQueryStyle
+  custom: IQueryStyle
   component: IQueryStyle
 }

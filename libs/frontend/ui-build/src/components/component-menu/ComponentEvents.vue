@@ -29,8 +29,8 @@ interface IComponentEventWithSource extends IComponentEvent {
 }
 
 enum ComponentEventSource {
-  Reusable,
   Custom,
+  Self,
 }
 
 const computeComponentEvents = (
@@ -39,13 +39,13 @@ const computeComponentEvents = (
 ): Record<string, IComponentEventWithSource> => {
   const mergedEvents: Record<string, IComponentEventWithSource> = {}
 
-  // Append reusable component events
-  const reusableCmp = resolveComponent(site.context, component.reusableSourceId)
-  if (reusableCmp) {
-    Object.entries(reusableCmp.events ?? {}).forEach(([key, event]) => {
+  // Append custom component events
+  const customCmp = resolveComponent(site.context, component.customSourceId)
+  if (customCmp) {
+    Object.entries(customCmp.events ?? {}).forEach(([key, event]) => {
       mergedEvents[key] = {
         ...event,
-        source: ComponentEventSource.Reusable,
+        source: ComponentEventSource.Custom,
       }
     })
   }
@@ -54,7 +54,7 @@ const computeComponentEvents = (
   Object.entries(component.events ?? {}).forEach(([key, event]) => {
     mergedEvents[key] = {
       ...event,
-      source: ComponentEventSource.Custom,
+      source: ComponentEventSource.Self,
     }
   })
 

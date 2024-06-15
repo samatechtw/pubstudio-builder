@@ -12,9 +12,9 @@ export interface ISerializedSite extends Omit<ISite, 'context' | 'pages' | 'edit
 }
 
 export interface ISerializedSiteContext
-  extends Omit<ISiteContext, 'components' | 'reusableComponentIds' | 'reusableChildIds'> {
-  reusableComponentIds: string[]
-  reusableChildIds: string[]
+  extends Omit<ISiteContext, 'components' | 'customComponentIds' | 'customChildIds'> {
+  customComponentIds: string[]
+  customChildIds: string[]
 }
 
 export interface ISerializedEditorContext

@@ -67,7 +67,7 @@ export const computePseudoStyleWithSource = (
 
     Object.entries(customRawStyle).forEach(([css, value]) => {
       rawStyle[css as Css] = {
-        // TODO: add style source type for reusable component
+        // TODO: add style source type for custom component
         sourceType: overrideSourceType ?? StyleSourceType.Custom,
         sourceId: componentId,
         sourceBreakpointId: breakpointId,

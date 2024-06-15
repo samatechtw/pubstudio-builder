@@ -2,7 +2,7 @@ import { IAddComponentData } from '@pubstudio/shared/type-command-data'
 import { IComponent, Tag } from '@pubstudio/shared/type-site'
 
 // Determines which parent to add a new component to
-// If the selectedComponent has text content, is an image, or is a reusable instance, add to its parent instead
+// If the selectedComponent has text content, is an image, or is a custom instance, add to its parent instead
 export const selectAddParent = (
   selectedComponent: IComponent | undefined,
   fallbackId: string | undefined,
@@ -10,16 +10,16 @@ export const selectAddParent = (
   if (!selectedComponent) {
     return { parentId: fallbackId as string }
   }
-  const { tag, content, reusableSourceId } = selectedComponent
+  const { tag, content, customSourceId } = selectedComponent
   if (
     content ||
     tag === Tag.Img ||
     tag === Tag.Input ||
     tag === Tag.Textarea ||
     tag === Tag.Span ||
-    reusableSourceId
+    customSourceId
   ) {
-    const { parent, index } = findNonReusablePosition(
+    const { parent, index } = findNonCustomPosition(
       selectedComponent,
       selectedComponent.parent,
     )
@@ -34,28 +34,28 @@ export const selectAddParent = (
   return { parentId: selectedComponent?.id }
 }
 
-interface INonReusablePostion {
+interface INonCustomPostion {
   parent: IComponent | undefined
   index: number | undefined
 }
 
-// Forbid inserting and dropping a component on a reusable instance.
-const findNonReusablePosition = (
+// Forbid inserting and dropping a component on a custom instance.
+const findNonCustomPosition = (
   component: IComponent,
   parent: IComponent | undefined,
-): INonReusablePostion => {
+): INonCustomPostion => {
   if (!parent) {
     return {
       parent: undefined,
       index: undefined,
     }
-  } else if (!parent.reusableSourceId) {
+  } else if (!parent.customSourceId) {
     const index = parent.children?.findIndex((c) => c.id === component.id)
     return {
       parent,
       index,
     }
   } else {
-    return findNonReusablePosition(parent, parent.parent)
+    return findNonCustomPosition(parent, parent.parent)
   }
 }

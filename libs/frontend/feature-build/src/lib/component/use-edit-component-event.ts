@@ -41,13 +41,13 @@ export const useEditComponentEvent = (): IUseEditComponentEventFeature => {
     const name = editor.value?.componentTab.editEvent
     const { selectedComponent } = editor.value ?? {}
     if (name && selectedComponent) {
-      const reusableCmp = resolveComponent(
+      const customCmp = resolveComponent(
         site.value.context,
-        selectedComponent.reusableSourceId,
+        selectedComponent.customSourceId,
       )
 
       const mergedEvents = {
-        ...reusableCmp?.events,
+        ...customCmp?.events,
         ...selectedComponent.events,
       }
 

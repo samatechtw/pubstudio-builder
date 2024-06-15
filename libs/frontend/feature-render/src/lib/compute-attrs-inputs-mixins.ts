@@ -40,18 +40,18 @@ export const computeAttrsInputsMixins = (
 ): IAttrsInputsMixins => {
   const { renderMode, resolveTheme = true, editor } = options
 
-  const isReusable =
-    context.reusableComponentIds.has(component.id) ||
-    context.reusableChildIds.has(component.id)
+  const isCustom =
+    context.customComponentIds.has(component.id) ||
+    context.customChildIds.has(component.id)
 
   const c: IComponent = component
   let r: IComponent | undefined = undefined
   const attrs: Record<string, unknown> = {}
   const mixins: string[] = []
 
-  if (component.reusableSourceId) {
-    r = resolveComponent(context, c.reusableSourceId)
-    mixins.push(component.reusableSourceId)
+  if (component.customSourceId) {
+    r = resolveComponent(context, c.customSourceId)
+    mixins.push(component.customSourceId)
   }
   const content = c.content ?? r?.content
 
@@ -61,8 +61,8 @@ export const computeAttrsInputsMixins = (
       mixins.push(pseudoClassToCssClass(cssPseudoClass))
     }
   }
-  // Reusable component mixins are merged into component style
-  if (!isReusable && c.style.mixins) {
+  // Custom component mixins are merged into component style
+  if (!isCustom && c.style.mixins) {
     mixins.push(...c.style.mixins)
   }
 
@@ -75,7 +75,7 @@ export const computeAttrsInputsMixins = (
   }
 
   if (c.inputs) {
-    // If the component is a reusable instance, only the overridden inputs will be in `c.inputs`.
+    // If the component is a custom instance, only the overridden inputs will be in `c.inputs`.
     for (const [key, input] of Object.entries(c.inputs)) {
       if (input.attr) {
         attrs[key] = resolveInput(context, input.is ?? input.default, resolveTheme)
