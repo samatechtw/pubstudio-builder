@@ -9,11 +9,11 @@
         <BuildNew />
       </BuildMenuIcon>
       <BuildMenuIcon
-        id="build-reusable"
-        :text="t('build.reusable_components')"
-        @click="toggleSubMenu(BuildSubmenu.Reusable)"
+        id="build-custom"
+        :text="t('build.custom_components')"
+        @click="toggleSubMenu(BuildSubmenu.Custom)"
       >
-        <Reusable />
+        <Custom />
       </BuildMenuIcon>
       <BuildMenuIcon
         id="build-page"
@@ -101,7 +101,7 @@ import {
   Assets,
   BuildNew,
   Command,
-  Reusable,
+  Custom,
   Pages,
   Text,
 } from '@pubstudio/frontend/ui-widgets'
@@ -111,7 +111,7 @@ import { BuildSubmenu } from '@pubstudio/shared/type-site'
 import { dragSource } from '@pubstudio/frontend/feature-render-builder'
 import BuildMenuIcon from './BuildMenuIcon.vue'
 import BuildMenuNew from './BuildMenuNew.vue'
-import BuildMenuReusable from './BuildMenuReusable.vue'
+import BuildMenuCustom from './BuildMenuCustom.vue'
 import BuildMenuPage from './BuildMenuPage.vue'
 import BuildMenuFile from './BuildMenuFile.vue'
 import BuildMenuAsset from './BuildMenuAsset.vue'
@@ -132,7 +132,7 @@ const submenu = computed(() => {
   const menus = {
     [BuildSubmenu.Asset]: BuildMenuAsset,
     [BuildSubmenu.New]: BuildMenuNew,
-    [BuildSubmenu.Reusable]: BuildMenuReusable,
+    [BuildSubmenu.Custom]: BuildMenuCustom,
     [BuildSubmenu.Page]: BuildMenuPage,
     [BuildSubmenu.Behavior]: BuildMenuBehavior,
     [BuildSubmenu.History]: BuildMenuHistory,

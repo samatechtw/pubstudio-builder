@@ -18,7 +18,7 @@ import {
 import { renderPage } from './render'
 
 export interface IUseRender {
-  ReusableStyle: ReturnType<typeof defineComponent>
+  CustomStyle: ReturnType<typeof defineComponent>
   Mixins: ReturnType<typeof defineComponent>
   ComponentStyle: ReturnType<typeof defineComponent>
   GoogleFontLink: ReturnType<typeof defineComponent>
@@ -63,27 +63,27 @@ export const useRender = (options: IUseRenderOptions): IUseRender => {
 
   const livePageComponentStyle = computed(() => {
     let styleContent = ''
-    let reusableContent = ''
+    let customContent = ''
     const context = site.value?.context
     if (activePage.value && context) {
       const globalStyle = getGlobalStyle(context)
       const htmlStyle = getRootBackgroundStyle(context, activePage.value)
       const pageStyle = getLivePageStyle(context, activePage.value)
-      reusableContent =
+      customContent =
         globalStyle +
         queryStyleToString(context, htmlStyle) +
-        queryStyleToString(context, pageStyle.reusable)
+        queryStyleToString(context, pageStyle.custom)
       styleContent = queryStyleToString(context, pageStyle.component)
     }
     return {
       component: h('style', styleContent),
-      reusable: h('style', reusableContent),
+      custom: h('style', customContent),
     }
   })
 
-  const ReusableStyle = defineComponent({
+  const CustomStyle = defineComponent({
     render() {
-      return livePageComponentStyle.value.reusable
+      return livePageComponentStyle.value.custom
     },
   })
 
@@ -168,7 +168,7 @@ export const useRender = (options: IUseRenderOptions): IUseRender => {
   useHead(headData)
 
   return {
-    ReusableStyle,
+    CustomStyle,
     Mixins,
     ComponentStyle,
     GoogleFontLink,

@@ -51,7 +51,7 @@ export const getRootBackgroundStyle = (
   return queryStyle
 }
 
-const computeComponentReusableStyle = (
+const computeComponentcustomStyle = (
   context: ISiteContext,
   styles: IQueryStyle,
   component: IComponent,
@@ -79,12 +79,12 @@ export const getLivePageStyle = (
   page: IPage,
 ): IResolvedPageStyle => {
   const queryStyle = createQueryStyle(context)
-  const reusableStyle = createQueryStyle(context)
+  const customStyle = createQueryStyle(context)
 
   const appendStyle = (component: IComponent) => {
-    const isReusable =
-      context.reusableComponentIds.has(component.id) ||
-      context.reusableChildIds.has(component.id)
+    const isCustom =
+      context.customComponentIds.has(component.id) ||
+      context.customChildIds.has(component.id)
 
     for (const breakpointId in context.breakpoints) {
       const pseudoStyle = component.style.custom[breakpointId]
@@ -92,8 +92,8 @@ export const getLivePageStyle = (
         Object.entries(pseudoStyle).forEach(([pseudoClass, rawStyle]) => {
           const pseudoValue = pseudoClass === CssPseudoClass.Default ? '' : pseudoClass
           const selector = `.${component.id}${pseudoValue}`
-          if (isReusable) {
-            reusableStyle[breakpointId][selector] = rawStyle
+          if (isCustom) {
+            customStyle[breakpointId][selector] = rawStyle
           } else {
             const resolvedStyle = rawStyleToResolvedStyle(context, rawStyle)
             queryStyle[breakpointId][selector] = resolvedStyle
@@ -110,8 +110,8 @@ export const getLivePageStyle = (
                 pseudoClass === CssPseudoClass.Default ? '' : pseudoClass
               const cssSelector = `.${component.id}${pseudoValue} .${selector}`
 
-              if (isReusable) {
-                reusableStyle[breakpointId][cssSelector] = rawStyle
+              if (isCustom) {
+                customStyle[breakpointId][cssSelector] = rawStyle
               } else {
                 const resolvedStyle = rawStyleToResolvedStyle(context, rawStyle)
                 queryStyle[breakpointId][cssSelector] = resolvedStyle
@@ -121,26 +121,26 @@ export const getLivePageStyle = (
         })
       }
     }
-    if (isReusable) {
-      // Merge reusable component mixin styles
-      computeComponentReusableStyle(context, reusableStyle, component)
+    if (isCustom) {
+      // Merge custom component mixin styles
+      computeComponentcustomStyle(context, customStyle, component)
     }
   }
   iteratePage(page, appendStyle)
 
   // Resolve merged styles
-  for (const pseudoStyle of Object.values(reusableStyle)) {
+  for (const pseudoStyle of Object.values(customStyle)) {
     for (const [selector, rawStyle] of Object.entries(pseudoStyle)) {
       pseudoStyle[selector] = rawStyleToResolvedStyle(context, rawStyle)
     }
   }
 
   const sortedQueryStyle = sortQueryStyle(queryStyle)
-  const sortedReusableStyle = sortQueryStyle(reusableStyle)
+  const sortedcustomStyle = sortQueryStyle(customStyle)
 
   return {
     component: sortedQueryStyle,
-    reusable: sortedReusableStyle,
+    custom: sortedcustomStyle,
   }
 }
 

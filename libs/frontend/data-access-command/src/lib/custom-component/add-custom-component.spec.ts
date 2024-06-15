@@ -5,16 +5,13 @@ import { deserializeSite } from '@pubstudio/frontend/util-site-deserialize'
 import { mockSerializedSite } from '@pubstudio/frontend/util-test-mock'
 import {
   IAddComponentData,
-  IAddReusableComponentData,
+  IAddCustomComponentData,
 } from '@pubstudio/shared/type-command-data'
 import { IComponent, ISite } from '@pubstudio/shared/type-site'
 import { applyAddComponent } from '../component/add-component'
-import {
-  applyAddReusableComponent,
-  undoAddReusableComponent,
-} from './add-reusable-component'
+import { applyAddCustomComponent, undoAddCustomComponent } from './add-custom-component'
 
-describe('Add Reusable Component', () => {
+describe('Add Custom Component', () => {
   let siteString: string
   let site: ISite
   let component: IComponent
@@ -30,29 +27,29 @@ describe('Add Reusable Component', () => {
     component = resolveComponent(site.context, addCmp?.id) as IComponent
   })
 
-  it('should make component reusable and undo', () => {
-    // Assert component is not reusable
-    expect(site.context?.reusableComponentIds.has(component.id)).toBe(false)
+  it('should make component custom and undo', () => {
+    // Assert component is not custom
+    expect(site.context?.customComponentIds.has(component.id)).toBe(false)
 
-    // Set to reusable
-    const data: IAddReusableComponentData = {
+    // Set to custom
+    const data: IAddCustomComponentData = {
       componentId: component.id,
     }
-    applyAddReusableComponent(site, data)
-    // Assert component is reusable
-    expect(site.context?.reusableComponentIds.has(component.id)).toBe(true)
+    applyAddCustomComponent(site, data)
+    // Assert component is custom
+    expect(site.context?.customComponentIds.has(component.id)).toBe(true)
     const children = component.children ?? []
     expect(children).toHaveLength(2)
     for (const child of children) {
-      expect(site.context?.reusableChildIds.has(child.id)).toBe(true)
+      expect(site.context?.customChildIds.has(child.id)).toBe(true)
     }
 
-    undoAddReusableComponent(site, data)
+    undoAddCustomComponent(site, data)
 
-    // Assert component is not reusable
-    expect(site.context?.reusableComponentIds.has(component.id)).toBe(false)
+    // Assert component is not custom
+    expect(site.context?.customComponentIds.has(component.id)).toBe(false)
     for (const child of children) {
-      expect(site.context?.reusableChildIds.has(child.id)).toBe(false)
+      expect(site.context?.customChildIds.has(child.id)).toBe(false)
     }
   })
 })

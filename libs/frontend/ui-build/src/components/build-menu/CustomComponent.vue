@@ -1,13 +1,13 @@
 <template>
   <div
     ref="elementRef"
-    class="reusable-component"
+    class="custom-component"
     :class="{ dragging: dndState?.dragging }"
     :title="text"
     :draggable="true"
     @mouseenter.stop="mouseEnter"
     @mouseleave.stop="mouseLeave"
-    @click="addReusableComponent"
+    @click="addCustomComponent"
     @dragstart="dragstart"
     @dragend="dragend"
     @drag="drag"
@@ -23,21 +23,21 @@ import {
   DraggedComponentAddDataType,
   useDragDrop,
 } from '@pubstudio/frontend/feature-render-builder'
-import { makeAddReusableComponentData } from '@pubstudio/frontend/util-command-data'
+import { makeAddCustomComponentData } from '@pubstudio/frontend/util-command-data'
 import { IComponent } from '@pubstudio/shared/type-site'
 import { runtimeContext } from '@pubstudio/frontend/util-runtime'
 import { getActivePage } from '@pubstudio/frontend/feature-site-store'
 
 const props = defineProps<{
-  reusableComponent: IComponent
+  customComponent: IComponent
 }>()
 
-const { reusableComponent } = toRefs(props)
+const { customComponent } = toRefs(props)
 
 const { site, editor, addComponentData } = useBuild()
 
 const text = computed(() => {
-  const { id, name } = reusableComponent.value
+  const { id, name } = customComponent.value
   let value = id
   if (name && id !== name) {
     value += ` (${name})`
@@ -45,13 +45,13 @@ const text = computed(() => {
   return value
 })
 
-const addReusableComponent = () => {
+const addCustomComponent = () => {
   const { selectedComponent } = editor.value ?? {}
   const activePage = getActivePage(site.value)
 
-  const data = makeAddReusableComponentData(
+  const data = makeAddCustomComponentData(
     site.value,
-    reusableComponent.value.id,
+    customComponent.value.id,
     selectedComponent ?? (activePage?.root as IComponent),
     selectedComponent?.id,
   )
@@ -62,18 +62,18 @@ const addReusableComponent = () => {
 
 const { dndState, elementRef, dragstart, drag, dragend } = useDragDrop({
   site: site.value,
-  componentId: reusableComponent.value.id,
+  componentId: customComponent.value.id,
   getParentId: () => undefined,
   getComponentIndex: () => 0,
   isParent: false,
   addData: {
-    id: reusableComponent.value.id,
-    type: DraggedComponentAddDataType.ReusableComponent,
+    id: customComponent.value.id,
+    type: DraggedComponentAddDataType.CustomComponent,
   },
 })
 
 const mouseEnter = () => {
-  runtimeContext.hoveredComponentIdInComponentTree.value = reusableComponent.value.id
+  runtimeContext.hoveredComponentIdInComponentTree.value = customComponent.value.id
 }
 
 const mouseLeave = () => {
@@ -86,7 +86,7 @@ const mouseLeave = () => {
 
 $arrow-size: 10px;
 
-.reusable-component {
+.custom-component {
   @mixin title-medium 13px;
   width: 100%;
   display: block;

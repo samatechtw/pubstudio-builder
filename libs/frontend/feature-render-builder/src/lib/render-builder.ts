@@ -54,7 +54,7 @@ const computeBuilderStyleProps = (
   const builderClass: string[] = []
   let position: string | null | undefined = undefined
 
-  const cmp = resolveComponent(site.context, component.reusableSourceId) ?? component
+  const cmp = resolveComponent(site.context, component.customSourceId) ?? component
 
   // Cache the CSS position. Must be called before using `position`
   const getPosition = (): string | null => {
@@ -231,13 +231,13 @@ export const computePropsContent = (
 
   const { editor } = site
   const isSelected = editor?.selectedComponent?.id === component.id
-  const reusableCmp = resolveComponent(site.context, component.reusableSourceId)
+  const customCmp = resolveComponent(site.context, component.customSourceId)
 
-  const cmpContent = component.content ?? reusableCmp?.content
+  const cmpContent = component.content ?? customCmp?.content
 
   const content: IBuildContent = []
   const hasChildren = (component.children?.length ?? 0) > 0
-  const reusableCmpHasChildren = (reusableCmp?.children?.length ?? 0) > 0
+  const customCmpHasChildren = (customCmp?.children?.length ?? 0) > 0
 
   if (hasChildren) {
     content.push(
@@ -245,9 +245,9 @@ export const computePropsContent = (
         renderComponent(site, child, index),
       ) ?? []),
     )
-  } else if (reusableCmpHasChildren) {
+  } else if (customCmpHasChildren) {
     content.push(
-      ...(reusableCmp?.children?.map((child, index) =>
+      ...(customCmp?.children?.map((child, index) =>
         renderComponent(site, child, index),
       ) ?? []),
     )
@@ -274,7 +274,7 @@ export const computePropsContent = (
   } else if (
     ![Tag.Img, Tag.Svg, Tag.Input, Tag.Textarea].includes(component.tag) &&
     !hasChildren &&
-    !reusableCmpHasChildren
+    !customCmpHasChildren
   ) {
     if (isSelected) {
       const cmpWithDefaultContent: IComponent = { ...component, content: cmpContent }

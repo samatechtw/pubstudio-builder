@@ -2,7 +2,7 @@
   <div class="preview-content">
     <Spinner v-if="loading" class="preview-spinner" :size="40" color="#2a17d6" />
     <template v-else>
-      <ReusableStyle />
+      <CustomStyle />
       <Mixins />
       <ComponentStyle />
       <GoogleFontLink />
@@ -35,7 +35,7 @@ const props = withDefaults(
 const { renderMode, activePage } = toRefs(props)
 
 const {
-  ReusableStyle,
+  CustomStyle,
   Mixins,
   ComponentStyle,
   GoogleFontLink,

@@ -47,8 +47,8 @@ export const mockSerializedSite: ISerializedSite = {
         },
       },
     },
-    reusableComponentIds: [],
-    reusableChildIds: [],
+    customComponentIds: [],
+    customChildIds: [],
     styleOrder: ['global-s-0'],
     behaviors: {},
     theme: {

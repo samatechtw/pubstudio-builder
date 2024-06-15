@@ -7,7 +7,7 @@
         :style="innerStyle"
         @click="selectRoot"
       >
-        <ReusableStyle />
+        <CustomStyle />
         <Mixins />
         <ComponentStyle />
         <GoogleFontLink />
@@ -45,7 +45,7 @@ const { site, activePage } = useSiteSource()
 const { editor } = useBuild()
 
 const {
-  ReusableStyle,
+  CustomStyle,
   Mixins,
   ComponentStyle,
   GoogleFontLink,

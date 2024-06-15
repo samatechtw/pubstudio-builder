@@ -76,7 +76,7 @@ const deserializeComponent = (ser: ISerializedComponent): IComponent => {
     inputs: ser.inputs,
     events: ser.events,
     editorEvents: ser.editorEvents,
-    reusableSourceId: ser.reusableSourceId,
+    customSourceId: ser.customSourceId,
   }
 }
 
@@ -132,8 +132,8 @@ export const deserializedHelper = (serialized: ISerializedSite): ISite => {
     // Added 240521
     styleOrder: context.styleOrder ?? Object.keys(context.styles),
     theme: context.theme,
-    reusableComponentIds: new Set(context.reusableComponentIds ?? []),
-    reusableChildIds: new Set(context.reusableChildIds ?? []),
+    customComponentIds: new Set(context.customComponentIds ?? []),
+    customChildIds: new Set(context.customChildIds ?? []),
     breakpoints: context.breakpoints,
     // Added 231105
     i18n: context.i18n ?? {},

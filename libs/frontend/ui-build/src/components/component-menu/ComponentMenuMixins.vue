@@ -14,10 +14,10 @@
       </div>
       <MixinSelect
         v-for="mixin in resolvedMixins"
-        :key="`${mixin.id}-${mixin.sourceReusableComponentId}`"
+        :key="`${mixin.id}-${mixin.sourceCustomComponentId}`"
         :mixin="mixin.style"
         :mixinOptions="mixinOptions"
-        :sourceReusableComponentId="mixin.sourceReusableComponentId"
+        :sourceCustomComponentId="mixin.sourceCustomComponentId"
         class="mixin"
         @set="setMixin($event.oldMixinId, $event.newMixinId)"
         @edit="openMixinMenu($event, true)"
@@ -74,18 +74,15 @@ const mixinOptions = computed(() => {
 const mixins = computed(() => {
   // Keep track of used mixins so that mixins with the same id
   // will only be displayed once.
-  // Key: mixinId, value: sourceReusableComponentId
+  // Key: mixinId, value: sourceCustomComponentId
   const mixinSources = new Map<string, string | undefined>()
 
-  const reusableCmp = resolveComponent(
-    site.value.context,
-    component.value.reusableSourceId,
-  )
+  const customCmp = resolveComponent(site.value.context, component.value.customSourceId)
 
-  if (reusableCmp) {
-    // Append mixins from reusable component
-    reusableCmp.style.mixins?.forEach((mixinId) => {
-      mixinSources.set(mixinId, reusableCmp.id)
+  if (customCmp) {
+    // Append mixins from custom component
+    customCmp.style.mixins?.forEach((mixinId) => {
+      mixinSources.set(mixinId, customCmp.id)
     })
   }
 
@@ -95,9 +92,9 @@ const mixins = computed(() => {
   })
 
   const mixins: IComponentMixin[] = Array.from(mixinSources).map(
-    ([mixinId, sourceReusableComponentId]) => ({
+    ([mixinId, sourceCustomComponentId]) => ({
       id: mixinId,
-      sourceReusableComponentId,
+      sourceCustomComponentId,
     }),
   )
 
@@ -113,11 +110,11 @@ const mixinCompare = (a: IComponentMixin, b: IComponentMixin): number => {
   } else if (indexB === -1) {
     return 1
   }
-  if (a.sourceReusableComponentId && b.sourceReusableComponentId) {
+  if (a.sourceCustomComponentId && b.sourceCustomComponentId) {
     return indexA - indexB
-  } else if (a.sourceReusableComponentId) {
+  } else if (a.sourceCustomComponentId) {
     return -1
-  } else if (b.sourceReusableComponentId) {
+  } else if (b.sourceCustomComponentId) {
     return 1
   }
   return indexA - indexB

@@ -103,7 +103,7 @@ export const useEditComponentStyles = (): IUseEditStyles => {
       return t('style.inherited_source', {
         source: `${sourceName}#${entry.sourceId}`,
       })
-    } else if (entry.sourceType === StyleSourceType.ReusableComponent) {
+    } else if (entry.sourceType === StyleSourceType.CustomComponent) {
       const sourceName = site.value.context.components[entry.sourceId]?.name
       return t('style.inherited_source', {
         source: `${sourceName}#${entry.sourceId}`,

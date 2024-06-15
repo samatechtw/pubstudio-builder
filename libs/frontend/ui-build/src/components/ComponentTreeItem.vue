@@ -94,8 +94,8 @@ const { site, editor } = useBuild()
 const canDrag = computed(
   () =>
     !component.value.parent ||
-    // Prevent reusable instance children from being dragged.
-    !component.value.parent.reusableSourceId,
+    // Prevent custom instance children from being dragged.
+    !component.value.parent.customSourceId,
 )
 
 const mouseEnter = () => {

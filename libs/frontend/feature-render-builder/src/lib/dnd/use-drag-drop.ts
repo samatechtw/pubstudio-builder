@@ -1,7 +1,7 @@
 import { setBuildSubmenu } from '@pubstudio/frontend/data-access-command'
 import {
   addBuiltinComponent,
-  addReusableComponent,
+  addCustomComponent,
   moveAbsoluteComponent,
   moveComponent,
 } from '@pubstudio/frontend/feature-build'
@@ -148,7 +148,7 @@ export const useDragDrop = (props: IUseDragDropProps): IUseDragDrop => {
       !hoveredComponent ||
       (!draggedComponent && !srcIsFile) ||
       hoveredComponent.id === draggedComponent?.id ||
-      hoveredComponent.reusableSourceId
+      hoveredComponent.customSourceId
     ) {
       return false
     }
@@ -315,8 +315,8 @@ export const useDragDrop = (props: IUseDragDropProps): IUseDragDrop => {
               parentIndex: dropProps.value.destinationIndex,
             })
             return
-          } else if (addDataType === DraggedComponentAddDataType.ReusableComponent) {
-            addReusableComponent(site, {
+          } else if (addDataType === DraggedComponentAddDataType.CustomComponent) {
+            addCustomComponent(site, {
               id: dragSource.value.addData.id,
               parentId: addParentId,
               parentIndex: dropProps.value.destinationIndex,

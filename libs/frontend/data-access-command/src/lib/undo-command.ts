@@ -17,6 +17,7 @@ import { undoAddComponent } from './component/add-component'
 import { undoEditComponent } from './component/edit-component'
 import { undoRemoveComponent } from './component/remove-component'
 import { undoReplacePageRoot } from './component/replace-page-root'
+import { undoAddCustomComponent } from './custom-component/add-custom-component'
 import { undoSetDefaultsHead } from './defaults/set-defaults-head'
 import { undoCommandGroup } from './group/command-group'
 import { undoMoveComponent } from './move-component/move-component'
@@ -27,7 +28,6 @@ import { undoEditPage } from './page/edit-page'
 import { undoRemovePage } from './page/remove-page'
 import { undoSetHomePage } from './page/set-home-page'
 import { undoSetPageHead } from './page/set-page-head'
-import { undoAddReusableComponent } from './reusable-component/add-reusable-component'
 import { undoAddStyleMixin } from './style/add-style-mixin'
 import { undoEditStyleMixin } from './style/edit-style-mixin'
 import { undoRemoveStyleMixin } from './style/remove-style-mixin'
@@ -88,7 +88,7 @@ export const undoCommand = (site: ISite, command: ICommand) => {
     [CommandType.SetBreakpoint]: undoSetBreakpoint,
     [CommandType.SetGlobalStyle]: undoSetGlobalStyle,
     [CommandType.UpdateUi]: undoUpdateUi,
-    [CommandType.AddReusableComponent]: undoAddReusableComponent,
+    [CommandType.AddCustomComponent]: undoAddCustomComponent,
   }[command.type]
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   applyFunction(site, command.data as any)

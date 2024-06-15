@@ -37,8 +37,8 @@ import { CommandType, ICommand } from '@pubstudio/shared/type-command'
 import {
   IAddComponentData,
   IAddComponentMixinData,
+  IAddCustomComponentData,
   IAddPageData,
-  IAddReusableComponentData,
   IAddStyleMixinData,
   IAddThemeFontData,
   IAddThemeVariableData,
@@ -238,7 +238,7 @@ export interface IUseBuild {
     action: Action,
     params: IUpdateUiParams[Action],
   ) => void
-  addReusableComponent: (component: IComponent) => void
+  addCustomComponent: (component: IComponent) => void
 }
 
 // Briefly indicates active command
@@ -408,7 +408,7 @@ export const useBuild = (): IUseBuild => {
       tag: copiedComponent.tag,
       content: copiedComponent.content,
       sourceId: copiedComponent.id,
-      reusableComponentId: copiedComponent.reusableSourceId,
+      customComponentId: copiedComponent.customSourceId,
       name: copiedComponent.name,
       ...selectAddParent(parent, activePage.value?.root.id),
     }
@@ -1021,8 +1021,8 @@ export const useBuild = (): IUseBuild => {
   const deleteSelected = () => {
     const selected = site.value.editor?.selectedComponent
     const parent = selected?.parent
-    // Cannot delete root component and reusable instance children
-    if (!activePage.value || !selected || !parent || parent.reusableSourceId) {
+    // Cannot delete root component and custom instance children
+    if (!activePage.value || !selected || !parent || parent.customSourceId) {
       return
     }
     const data = makeRemoveComponentData(site.value, selected)
@@ -1193,11 +1193,11 @@ export const useBuild = (): IUseBuild => {
     pushCommand(site.value, CommandType.UpdateUi, data)
   }
 
-  const addReusableComponent = (component: IComponent) => {
-    const data: IAddReusableComponentData = {
+  const addCustomComponent = (component: IComponent) => {
+    const data: IAddCustomComponentData = {
       componentId: component.id,
     }
-    pushCommand(site.value, CommandType.AddReusableComponent, data)
+    pushCommand(site.value, CommandType.AddCustomComponent, data)
   }
 
   return {
@@ -1274,6 +1274,6 @@ export const useBuild = (): IUseBuild => {
     setBreakpoint,
     pushGroupCommands,
     updateUi,
-    addReusableComponent,
+    addCustomComponent,
   }
 }

@@ -81,21 +81,21 @@ export const useRenderBuilder = (
 
   const buildPageComponentStyle = computed(() => {
     let styleContent = ''
-    let reusableContent = ''
+    let customContent = ''
     if (activePage.value && site.value) {
       const pageStyle = getBuildPageStyle(site.value, activePage.value)
-      reusableContent = rawStyleRecordToString(pageStyle.reusable, site.value.context)
+      customContent = rawStyleRecordToString(pageStyle.custom, site.value.context)
       styleContent = rawStyleRecordToString(pageStyle.component, site.value.context)
     }
     return {
       component: h('style', styleContent),
-      reusable: h('style', reusableContent),
+      custom: h('style', customContent),
     }
   })
 
-  const ReusableStyle = defineComponent({
+  const CustomStyle = defineComponent({
     render() {
-      return buildPageComponentStyle.value.reusable
+      return buildPageComponentStyle.value.custom
     },
   })
 
@@ -113,7 +113,7 @@ export const useRenderBuilder = (
 
   return {
     ...renderUtil,
-    ReusableStyle,
+    CustomStyle,
     ComponentStyle,
     Mixins,
     PageContent,

@@ -12,8 +12,8 @@ export interface ISiteContext {
   globalStyles: Record<string, IGlobalStyle>
   styles: Record<string, IStyle>
   styleOrder: string[]
-  reusableComponentIds: Set<string>
-  reusableChildIds: Set<string>
+  customComponentIds: Set<string>
+  customChildIds: Set<string>
   behaviors: Record<string, IBehavior>
   theme: ITheme
   breakpoints: Record<string, IBreakpoint>

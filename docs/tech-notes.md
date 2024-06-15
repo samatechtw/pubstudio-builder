@@ -8,7 +8,7 @@ A Site can be built using the Builder, and either rendered dynamically with the 
 
 ### Site
 
-A Site is a collection of Pages and metadata that can be parsed and rendered to produce a functional website. A `SiteContext` includes state such as the latest incremental ID used for entities in the Site, the `namespace` used to uniquely identify entities across multiple sites, reusable components, and styles. The Context also stores Behaviors, theme, breakpoints, and translations used in the site.
+A Site is a collection of Pages and metadata that can be parsed and rendered to produce a functional website. A `SiteContext` includes state such as the latest incremental ID used for entities in the Site, the `namespace` used to uniquely identify entities across multiple sites, custom components, and styles. The Context also stores Behaviors, theme, breakpoints, and translations used in the site.
 
 A Site has one or more associated Pages.
 

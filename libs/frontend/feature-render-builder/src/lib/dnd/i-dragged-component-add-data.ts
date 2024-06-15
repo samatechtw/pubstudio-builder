@@ -1,6 +1,6 @@
 export enum DraggedComponentAddDataType {
   BuiltinComponent = 'builtin',
-  ReusableComponent = 'reusable',
+  CustomComponent = 'custom',
 }
 
 export interface IDraggedComponentAddData {

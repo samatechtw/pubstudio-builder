@@ -64,8 +64,8 @@ export const ProseMirrorEditor = defineComponent({
       if (component.content) {
         return component.content
       }
-      const reusable = resolveComponent(site.value.context, component.reusableSourceId)
-      return reusable?.content ?? defaultContent
+      const custom = resolveComponent(site.value.context, component.customSourceId)
+      return custom?.content ?? defaultContent
     }
 
     const markStrong = (state: EditorState, dispatch?: (tr: Transaction) => void) => {

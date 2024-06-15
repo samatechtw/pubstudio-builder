@@ -24,11 +24,11 @@ export const computeEvents = (site: ISite, component: IComponent): IEventCollect
     }
   }
 
-  const reusableCmp = resolveComponent(site.context, component.reusableSourceId)
+  const customCmp = resolveComponent(site.context, component.customSourceId)
 
-  // Append reusable source events
-  if (reusableCmp) {
-    appendEvents(reusableCmp)
+  // Append custom source events
+  if (customCmp) {
+    appendEvents(customCmp)
   }
 
   // Append component events

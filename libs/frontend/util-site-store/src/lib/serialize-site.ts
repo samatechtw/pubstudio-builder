@@ -26,7 +26,7 @@ export const serializeComponent = (component: IComponent): ISerializedComponent 
     inputs: component.inputs,
     events: component.events,
     editorEvents: component.editorEvents,
-    reusableSourceId: component.reusableSourceId,
+    customSourceId: component.customSourceId,
   }
 }
 
@@ -77,8 +77,8 @@ export const serializeSiteContext = (context: ISiteContext): ISerializedSiteCont
     nextId: context.nextId,
     styles: context.styles,
     styleOrder: context.styleOrder,
-    reusableComponentIds: Array.from(context.reusableComponentIds),
-    reusableChildIds: Array.from(context.reusableChildIds),
+    customComponentIds: Array.from(context.customComponentIds),
+    customChildIds: Array.from(context.customChildIds),
     behaviors: context.behaviors,
     theme: context.theme,
     breakpoints: context.breakpoints,

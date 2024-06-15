@@ -1,16 +1,16 @@
 <template>
-  <div class="reusable-menu">
+  <div class="custom-menu">
     <div class="title">
-      {{ t('build.reusable_components') }}
+      {{ t('build.custom_components') }}
     </div>
 
-    <div v-if="topLevelReusableComponents.length === 0" class="reusable-empty">
-      {{ t('build.reusable_empty') }}
+    <div v-if="topLevelCustomComponents.length === 0" class="custom-empty">
+      {{ t('build.custom_empty') }}
     </div>
-    <ReusableComponent
-      v-for="cmp in topLevelReusableComponents"
+    <CustomComponent
+      v-for="cmp in topLevelCustomComponents"
       :key="cmp.id"
-      :reusableComponent="cmp"
+      :customComponent="cmp"
     />
   </div>
 </template>
@@ -19,17 +19,17 @@
 import { computed } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { useBuild } from '@pubstudio/frontend/feature-build'
-import ReusableComponent from './ReusableComponent.vue'
 import { resolveComponent } from '@pubstudio/frontend/util-resolve'
 import { IComponent } from '@pubstudio/shared/type-site'
+import CustomComponent from './CustomComponent.vue'
 
 const { t } = useI18n()
 
 const { site } = useBuild()
 
-const topLevelReusableComponents = computed<IComponent[]>(() => {
+const topLevelCustomComponents = computed<IComponent[]>(() => {
   const { context } = site.value
-  const ids = context?.reusableComponentIds.values() ?? []
+  const ids = context?.customComponentIds.values() ?? []
   return Array.from(ids)
     .map((id) => resolveComponent(context, id))
     .filter((cmp) => !!cmp) as IComponent[]
@@ -39,7 +39,7 @@ const topLevelReusableComponents = computed<IComponent[]>(() => {
 <style lang="postcss" scoped>
 @import '@theme/css/mixins.postcss';
 
-.reusable-menu {
+.custom-menu {
   @mixin flex-col;
   height: 100%;
   width: $left-menu-width;
@@ -53,13 +53,13 @@ const topLevelReusableComponents = computed<IComponent[]>(() => {
   padding: 0 8px;
   margin-bottom: 8px;
 }
-.reusable-empty {
+.custom-empty {
   @mixin title-medium 15px;
   color: $grey-500;
   padding: 16px 4px 4px 16px;
 }
 
-.reusable-cmp {
+.custom-cmp {
   @mixin title-medium 13px;
   @mixin flex-row;
   align-items: center;
