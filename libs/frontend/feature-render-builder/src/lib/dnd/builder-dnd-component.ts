@@ -37,6 +37,7 @@ const renderImageHover = (
   component: IComponent,
   props: Record<string, unknown>,
   content: IContent,
+  dndProps: Record<string, unknown>,
 ): VNode => {
   const imgElement = document.getElementById(component.id)
 
@@ -87,6 +88,7 @@ const renderImageHover = (
 
   const img = h(component.tag as string, {
     ...props,
+    draggable: false,
     style: imgStyleProp,
   })
 
@@ -94,6 +96,8 @@ const renderImageHover = (
     'div',
     {
       'data-component-id': component.id,
+      // TODO -- is there a cleaner way to do this? Why doesn't draggable work on the img?
+      ...dndProps,
       style: {
         // Use inline-block to simulate the bottom space caused by the inline behavior of <img>.
         // See https://stackoverflow.com/a/5804278/19772349 for more information.
@@ -188,12 +192,12 @@ export const BuilderDndComponent = defineComponent({
         onDragend: dnd.dragend,
       }
 
-      // If ProseMirror editor is active, only allow dragend event to be fired.
+      // If ProseMirror editor is active and component has content, only allow dragend event to be fired.
       // If the component is root component, only allow hover&drop events to be fired.
       // Otherwise allow all drag, hover, and drop events to be fired.
       let dndProps: Record<string, unknown> = {}
       if ((!content && editViewFocus) || childrenEditViewMounted) {
-        dndProps = { onDragend: dnd.dragend }
+        dndProps = droppableDndProps
       } else if (isRoot) {
         dndProps = droppableDndProps
       } else if (tag === Tag.Input || tag === Tag.Textarea) {
@@ -231,7 +235,13 @@ export const BuilderDndComponent = defineComponent({
         // Don't render hover wrap if the image is currently being resized
         site.value.editor?.resizeData?.component.id !== component.value.id
       ) {
-        return renderImageHover(site.value, component.value, props, propsContent.content)
+        return renderImageHover(
+          site.value,
+          component.value,
+          props,
+          propsContent.content,
+          dndProps,
+        )
       } else if (tag === Tag.Svg) {
         return h(Tag.Div, props, propsContent.content)
       } else {

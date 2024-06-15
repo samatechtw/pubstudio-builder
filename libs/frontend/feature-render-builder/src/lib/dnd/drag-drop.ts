@@ -42,7 +42,6 @@ export const onDrag = (options: IOnDragOptions): IDropProps => {
     const haveSameParent = dragCmpParentId === hoverCmp.parent?.id
 
     const addNewComponentToRoot = hoverOnRoot && !!dragSrc?.addData
-
     if (
       !haveSameParent ||
       dragComponentIndex !== hoverCmpIndex ||
