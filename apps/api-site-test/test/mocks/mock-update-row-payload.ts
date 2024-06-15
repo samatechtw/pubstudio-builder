@@ -6,7 +6,7 @@ export const mockUpdateRowPayload1 = (): IUpdateRowApiRequest => {
     row_id: 1,
     new_row: {
       name: 'Jessie',
-      age: '19',
+      message: 'Hello there!',
       email: 'jjj@abc.com',
     },
   }
@@ -37,7 +37,7 @@ export const mockUpdateInvalidRow2 = (): IUpdateRowApiRequest => {
     table_name: 'contact_form',
     row_id: 1,
     new_row: {
-      age: '',
+      message: '',
     },
   }
 }
@@ -47,7 +47,7 @@ export const mockUpdateInvalidRow3 = (): IUpdateRowApiRequest => {
     table_name: 'contact_form',
     row_id: 1,
     new_row: {
-      age: '1000',
+      message: '1234567890'.repeat(11),
     },
   }
 }

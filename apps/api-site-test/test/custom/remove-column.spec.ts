@@ -50,7 +50,7 @@ describe('Remove Column', () => {
       data: {
         table_name: 'contact_form',
         row: {
-          age: '18',
+          message: 'HELLO',
           email: 'flora@samatech.com',
           name: 'TEST',
         },

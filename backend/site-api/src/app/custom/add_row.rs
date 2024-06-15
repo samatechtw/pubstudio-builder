@@ -28,7 +28,7 @@ use super::{
     "table_name": "contact_form",
     "row": {
       "name": "John",
-      "age": "30",
+      "message": "Hello there!",
       "email": "john_test@abc.com"
     }
   }

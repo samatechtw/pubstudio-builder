@@ -129,11 +129,11 @@ describe('List Rows', () => {
     expect(body.total).toEqual(3)
 
     expect(body.results[0]['name']).toEqual('Andy')
-    expect(body.results[0]['age']).toEqual('40')
+    expect(body.results[0]['message']).toEqual('Hello there!')
     expect(body.results[0]['email']).toEqual('andy123@gmail.com')
 
     expect(body.results[1]['name']).toEqual('Flora')
-    expect(body.results[1]['age']).toEqual('18')
+    expect(body.results[1]['message']).toEqual('Hello there!')
     expect(body.results[1]['email']).toEqual('flora@samatech.com')
   })
 
