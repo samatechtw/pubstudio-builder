@@ -85,6 +85,7 @@ import StyleMenuEdit from '../style-menu/StyleMenuEdit.vue'
 import ComponentFlex from './ComponentFlex.vue'
 import ToolbarContainer from '../toolbar/ToolbarContainer.vue'
 import ToolbarText from '../toolbar/ToolbarText.vue'
+import { canBecomeCustom } from '@pubstudio/frontend/util-component'
 
 const { t } = useI18n()
 const { site, editor, replacePageRoot, addCustomComponent } = useBuild()
@@ -137,23 +138,8 @@ const showTextStyle = computed(() => {
   )
 })
 
-const isCustom = (id: string) => {
-  const context = site.value.context
-  return context.customComponentIds.has(id) || context.customChildIds.has(id)
-}
-
 const showToCustomComponent = computed(() => {
-  const { customSourceId, id } = component.value
-  let parent: IComponent | undefined = component.value
-
-  if (!parent || customSourceId || isCustom(id)) {
-    return false
-  }
-  while (parent) {
-    if (parent.customSourceId || isCustom(parent.id)) return false
-    parent = parent.parent
-  }
-  return true
+  return canBecomeCustom(site.value.context, component.value.id)
 })
 
 const toCustomComponent = () => {

@@ -1,8 +1,4 @@
-import {
-  IComponentEvents,
-  IComponentInputs,
-  IComponentStyle,
-} from '@pubstudio/shared/type-site'
+import { IComponentEvents, IComponentInputs } from '@pubstudio/shared/type-site'
 
 export const mergeArr = <T>(
   arr1: T[] | undefined,
@@ -15,12 +11,6 @@ export const mergeArr = <T>(
     return [...arr1]
   }
   return arr2 ? [...arr2] : undefined
-}
-
-export const cloneRecord = <T>(
-  record: Record<string, T> | undefined,
-): Record<string, T> | undefined => {
-  return record ? { ...record } : undefined
 }
 
 // Merges two records, doing a deep copy of the first if it exists
@@ -41,13 +31,6 @@ export const mergeRecord2 = <T extends IComponentInputs | IComponentEvents>(
     }
   }
   return result
-}
-
-export const cloneStyle = (style: IComponentStyle): IComponentStyle => {
-  return {
-    custom: structuredClone(style.custom),
-    mixins: style.mixins ? [...style.mixins] : undefined,
-  }
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
