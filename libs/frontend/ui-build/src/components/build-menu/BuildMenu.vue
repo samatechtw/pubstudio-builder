@@ -11,6 +11,7 @@
       <BuildMenuIcon
         id="build-custom"
         :text="t('build.custom_components')"
+        @dragover="customDragover"
         @click="toggleSubMenu(BuildSubmenu.Custom)"
       >
         <Custom />
@@ -117,9 +118,10 @@ import BuildMenuFile from './BuildMenuFile.vue'
 import BuildMenuAsset from './BuildMenuAsset.vue'
 import BuildMenuBehavior from './BuildMenuBehavior.vue'
 import BuildMenuHistory from './BuildMenuHistory.vue'
+import { canBecomeCustom } from '@pubstudio/frontend/util-component'
 
 const { t } = useI18n()
-const { editor } = useBuild()
+const { site, editor } = useBuild()
 
 const emit = defineEmits<{
   (e: 'toggleStyleMenu', show?: boolean): void
@@ -149,6 +151,13 @@ const toggleTranslations = () => {
 const toggleSubMenu = (newSubmenu: BuildSubmenu) => {
   const submenu = editor.value?.buildSubmenu
   setBuildSubmenu(editor.value, submenu === newSubmenu ? undefined : newSubmenu)
+}
+
+const customDragover = (_e: DragEvent) => {
+  const { context } = site.value
+  if (canBecomeCustom(context, dragSource.value?.componentId)) {
+    setBuildSubmenu(editor.value, BuildSubmenu.Custom)
+  }
 }
 
 const showSubmenu = computed(() => {
