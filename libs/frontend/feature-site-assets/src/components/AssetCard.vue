@@ -48,7 +48,6 @@
 import { computed, ref, toRefs } from 'vue'
 import { useDragDrop } from '@pubstudio/frontend/feature-render-builder'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
-import { addAssetData } from '@pubstudio/frontend/util-command-data'
 import {
   Check,
   CopyText,
@@ -64,12 +63,13 @@ import {
   AssetContentType,
   ISiteAssetViewModel,
 } from '@pubstudio/shared/type-api-platform-site-asset'
+import { BuilderDragDataType } from '@pubstudio/frontend/type-builder'
 import PdfPreview from '@frontend-assets/icon/pdf.png'
 import AssetCardInfoBottom from './AssetCardInfoBottom.vue'
 import { useSiteAssets } from '../lib/use-site-assets'
 
 const { updateAsset, loading } = useSiteAssets()
-const { site, activePage } = useSiteSource()
+const { site } = useSiteSource()
 
 const props = defineProps<{
   asset: ISiteAssetViewModel
@@ -85,20 +85,22 @@ const emit = defineEmits<{
 const { asset, small } = toRefs(props)
 
 const dndProps = computed(() => {
-  if (!small.value || !activePage.value) {
+  if (!small.value) {
     return
   }
-  const addData = addAssetData(site.value, activePage.value, asset.value, assetUrl.value)
-  if (!addData) {
-    return undefined
+  let dragType: BuilderDragDataType
+  if (asset.value.content_type === AssetContentType.Pdf) {
+    dragType = BuilderDragDataType.LinkAsset
+  } else {
+    dragType = BuilderDragDataType.ImageAsset
   }
   const dnd = useDragDrop({
     site: site.value,
-    componentId: asset.value.id,
+    componentId: assetUrl.value,
     getParentId: () => undefined,
     getComponentIndex: () => 0,
     isParent: false,
-    addData,
+    addData: { id: assetUrl.value, type: dragType, content: asset.value.name },
   })
   return {
     draggable: true,

@@ -21,10 +21,8 @@
 import { toRefs } from 'vue'
 import { addBuiltinComponent } from '@pubstudio/frontend/feature-build'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
-import {
-  DraggedComponentAddDataType,
-  useDragDrop,
-} from '@pubstudio/frontend/feature-render-builder'
+import { useDragDrop } from '@pubstudio/frontend/feature-render-builder'
+import { BuilderDragDataType } from '@pubstudio/frontend/type-builder'
 
 const props = defineProps<{
   text: string
@@ -54,7 +52,7 @@ const { dndState, elementRef, dragstart, drag, dragenter, dragover, dragleave, d
     isParent: false,
     addData: {
       id: builtinComponentId.value,
-      type: DraggedComponentAddDataType.BuiltinComponent,
+      type: BuilderDragDataType.BuiltinComponent,
     },
   })
 </script>
@@ -67,14 +65,15 @@ $arrow-size: 10px;
 .new-component {
   @mixin title-medium 13px;
   @mixin flex-center;
+  line-height: 120%;
   text-align: center;
   width: 100%;
-  height: 64px;
+  height: 52px;
   color: $color-title;
   flex-shrink: 0;
   transition: color 0.2s;
   cursor: pointer;
-  padding: 6px 6px 4px 6px;
+  padding: 5px 6px 3px 6px;
   .caret {
     @mixin size 22px;
     visibility: hidden;

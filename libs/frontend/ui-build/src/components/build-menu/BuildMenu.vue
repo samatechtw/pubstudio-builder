@@ -110,6 +110,7 @@ import { Code, Theme, Style, File } from '@pubstudio/frontend/ui-widgets'
 import { TranslationsModal } from '@pubstudio/frontend/feature-site-translations'
 import { BuildSubmenu } from '@pubstudio/shared/type-site'
 import { dragSource } from '@pubstudio/frontend/feature-render-builder'
+import { canBecomeCustom } from '@pubstudio/frontend/util-component'
 import BuildMenuIcon from './BuildMenuIcon.vue'
 import BuildMenuNew from './BuildMenuNew.vue'
 import BuildMenuCustom from './BuildMenuCustom.vue'
@@ -118,7 +119,6 @@ import BuildMenuFile from './BuildMenuFile.vue'
 import BuildMenuAsset from './BuildMenuAsset.vue'
 import BuildMenuBehavior from './BuildMenuBehavior.vue'
 import BuildMenuHistory from './BuildMenuHistory.vue'
-import { canBecomeCustom } from '@pubstudio/frontend/util-component'
 
 const { t } = useI18n()
 const { site, editor } = useBuild()

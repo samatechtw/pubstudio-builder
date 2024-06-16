@@ -1,9 +1,12 @@
 import { pushCommand } from '@pubstudio/frontend/data-access-command'
 import { getActivePage } from '@pubstudio/frontend/feature-site-store'
+import { BuilderDragDataType } from '@pubstudio/frontend/type-builder'
 import { builtinStyles, getBuiltinComponent } from '@pubstudio/frontend/util-builtin'
 import {
   makeAddBuiltinComponentData,
   makeAddCustomComponentData,
+  makeAddImageData,
+  makeAddLinkData,
 } from '@pubstudio/frontend/util-command-data'
 import { resolveComponent, resolveStyle } from '@pubstudio/frontend/util-resolve'
 import { CommandType, ICommand } from '@pubstudio/shared/type-command'
@@ -40,6 +43,7 @@ export interface IAddComponentOptions {
   id: string
   parentId?: string
   parentIndex?: number
+  content?: string
 }
 
 export const addBuiltinComponentData = (site: ISite, data: IAddComponentData) => {
@@ -97,6 +101,28 @@ export const addBuiltinComponent = (
   const data = addComponentToParent(site, options, (parent) =>
     makeAddBuiltinComponentData(options.id, parent, site.editor?.selectedComponent?.id),
   )
+  if (data) {
+    addBuiltinComponentData(site, data)
+  }
+  return data?.id
+}
+
+export const addDroppedComponent = (
+  site: ISite,
+  dragType: BuilderDragDataType,
+  options: IAddComponentOptions,
+): string | undefined => {
+  const data = addComponentToParent(site, options, (parent) => {
+    if (dragType === BuilderDragDataType.LinkAsset) {
+      return makeAddLinkData(site, parent, {
+        src: options.id,
+        openInNewTab: true,
+        text: options.content ?? 'Link Text',
+      })
+    } else {
+      return makeAddImageData(site, parent, options.id)
+    }
+  })
   if (data) {
     addBuiltinComponentData(site, data)
   }

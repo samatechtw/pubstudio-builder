@@ -9,6 +9,7 @@ import { onMounted, ref, toRefs, watch } from 'vue'
 import { Edit } from '@pubstudio/frontend/ui-widgets'
 import { setEditSvg } from '@pubstudio/frontend/data-access-command'
 import { useBuild } from '@pubstudio/frontend/feature-build'
+import { computeComponentOffset } from '@pubstudio/frontend/util-builder'
 
 const { editor, site } = useBuild()
 const offsetTop = ref(-28)
@@ -25,14 +26,7 @@ const editSvg = () => {
 }
 
 const computeOffset = () => {
-  const editorWindow = document
-    .getElementById('build-content-window')
-    ?.getBoundingClientRect()
-  const component = document.getElementById(componentId.value)?.getBoundingClientRect()
-  if (editorWindow && component) {
-    const pushDown = component.top - editorWindow.top < 30
-    offsetTop.value = pushDown ? component.height - 20 : -28
-  }
+  offsetTop.value = computeComponentOffset(componentId.value) ?? offsetTop.value
 }
 
 watch(() => site.value.context.components?.[componentId.value], computeOffset, {
@@ -52,9 +46,8 @@ onMounted(() => {
   position: absolute;
   right: -28px;
   .edit-icon {
-    width: 26px;
-    height: 26px;
-    filter: drop-shadow(0px 0px 1.5px rgb(255 255 255 / 0.9));
+    @mixin size 26px;
+    filter: drop-shadow(0px 1px 6px rgb(255 255 255 / 0.9));
   }
 }
 </style>

@@ -1,4 +1,4 @@
-import { IDraggedComponentAddData } from './i-dragged-component-add-data'
+import { IDraggedComponentAddData } from '@pubstudio/frontend/type-builder'
 import { XYCoord } from './row-layout'
 
 export enum BuilderDndType {

@@ -242,8 +242,7 @@ const getProsemirrorLink = (): IProsemirrorLink | undefined => {
   if (state) {
     const { $anchor } = state.selection as TextSelection
     if ($anchor) {
-      const cursor = anchor
-      const pos = getLinkPosition(cursor)
+      const pos = getLinkPosition($anchor)
       return { state, pos }
     }
   }

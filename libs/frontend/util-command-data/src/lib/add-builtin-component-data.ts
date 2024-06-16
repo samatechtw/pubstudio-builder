@@ -7,7 +7,7 @@ import { selectAddParent } from './select-add-parent'
 // Generate new component data from a builtin component
 export const makeAddBuiltinComponentData = (
   builtinComponentId: string,
-  parent: IComponent,
+  parent: IComponent | undefined,
   selectedComponentId: string | undefined,
 ): IAddComponentData | undefined => {
   const builtinComponent = getBuiltinComponent(builtinComponentId)

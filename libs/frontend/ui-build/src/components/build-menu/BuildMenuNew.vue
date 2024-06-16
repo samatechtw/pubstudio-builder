@@ -21,6 +21,11 @@
         :text="t('build.captioned_image')"
         :builtinComponentId="captionedImage.id"
       />
+      <NewComponent
+        class="new-background-image"
+        :text="t('build.background_image')"
+        :builtinComponentId="backgroundImage.id"
+      />
       <NewComponent class="new-svg" :text="t('build.svg')" :builtinComponentId="svg.id" />
       <NewComponent
         class="new-link"
@@ -130,6 +135,7 @@ import {
   dividerHorizontal,
   contactForm,
   mailingList,
+  backgroundImage,
 } from '@pubstudio/frontend/util-builtin'
 import {
   ContactFormWalkthroughModal,

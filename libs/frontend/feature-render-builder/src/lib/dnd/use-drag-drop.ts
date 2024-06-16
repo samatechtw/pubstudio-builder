@@ -2,10 +2,15 @@ import { setBuildSubmenu } from '@pubstudio/frontend/data-access-command'
 import {
   addBuiltinComponent,
   addCustomComponent,
+  addDroppedComponent,
   moveAbsoluteComponent,
   moveComponent,
 } from '@pubstudio/frontend/feature-build'
 import { activeBreakpoint } from '@pubstudio/frontend/feature-site-source'
+import {
+  BuilderDragDataType,
+  IDraggedComponentAddData,
+} from '@pubstudio/frontend/type-builder'
 import { resolvedComponentStyle } from '@pubstudio/frontend/util-component'
 import { resolveComponent } from '@pubstudio/frontend/util-resolve'
 import { runtimeContext } from '@pubstudio/frontend/util-runtime'
@@ -19,10 +24,6 @@ import {
 import { computed, ComputedRef, Ref, ref } from 'vue'
 import { IDndState, IDraggedComponent, IDroppedFile, IDropProps } from './builder-dnd'
 import { onDrag, onDrop } from './drag-drop'
-import {
-  DraggedComponentAddDataType,
-  IDraggedComponentAddData,
-} from './i-dragged-component-add-data'
 import { XYCoord } from './row-layout'
 
 export interface IUseDragDrop {
@@ -308,18 +309,28 @@ export const useDragDrop = (props: IUseDragDropProps): IUseDragDrop => {
         const addParentId = dndState.value?.hoverSelf ? componentId : getParentId()
         if (addParentId) {
           const { type: addDataType } = dragSource.value.addData
-          if (addDataType === DraggedComponentAddDataType.BuiltinComponent) {
+          if (addDataType === BuilderDragDataType.BuiltinComponent) {
             addBuiltinComponent(site, {
               id: dragSource.value.addData.id,
               parentId: addParentId,
               parentIndex: dropProps.value.destinationIndex,
             })
             return
-          } else if (addDataType === DraggedComponentAddDataType.CustomComponent) {
+          } else if (addDataType === BuilderDragDataType.CustomComponent) {
             addCustomComponent(site, {
               id: dragSource.value.addData.id,
               parentId: addParentId,
               parentIndex: dropProps.value.destinationIndex,
+            })
+          } else if (
+            addDataType === BuilderDragDataType.ImageAsset ||
+            addDataType === BuilderDragDataType.LinkAsset
+          ) {
+            addDroppedComponent(site, addDataType, {
+              id: dragSource.value.addData.id,
+              parentId: addParentId,
+              parentIndex: dropProps.value.destinationIndex,
+              content: dragSource.value.addData.content,
             })
           } else {
             throw new Error(`UNKNOWN_ADD_DATA_TYPE_${addDataType}`)

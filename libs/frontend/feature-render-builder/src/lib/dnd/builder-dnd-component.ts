@@ -231,7 +231,7 @@ export const BuilderDndComponent = defineComponent({
       // Img can't contain divs, so add a wrapper for the hover UI
       if (
         tag === Tag.Img &&
-        componentClass.includes('hover') &&
+        (componentClass.includes('hover') || propsContent.content?.length) &&
         // Don't render hover wrap if the image is currently being resized
         site.value.editor?.resizeData?.component.id !== component.value.id
       ) {

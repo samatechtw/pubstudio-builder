@@ -19,14 +19,12 @@
 <script lang="ts" setup>
 import { computed, toRefs } from 'vue'
 import { useBuild } from '@pubstudio/frontend/feature-build'
-import {
-  DraggedComponentAddDataType,
-  useDragDrop,
-} from '@pubstudio/frontend/feature-render-builder'
+import { useDragDrop } from '@pubstudio/frontend/feature-render-builder'
 import { makeAddCustomComponentData } from '@pubstudio/frontend/util-command-data'
 import { IComponent } from '@pubstudio/shared/type-site'
 import { runtimeContext } from '@pubstudio/frontend/util-runtime'
 import { getActivePage } from '@pubstudio/frontend/feature-site-store'
+import { BuilderDragDataType } from '@pubstudio/frontend/type-builder'
 
 const props = defineProps<{
   customComponent: IComponent
@@ -68,7 +66,7 @@ const { dndState, elementRef, dragstart, drag, dragend } = useDragDrop({
   isParent: false,
   addData: {
     id: customComponent.value.id,
-    type: DraggedComponentAddDataType.CustomComponent,
+    type: BuilderDragDataType.CustomComponent,
   },
 })
 
