@@ -1,4 +1,6 @@
 import {
+  backgroundImageId,
+  backgroundImageStyleId,
   captionedImageId,
   captionedImageStyleId,
   DEFAULT_BREAKPOINT_ID,
@@ -98,4 +100,38 @@ export const captionedImage: IComponent = {
       },
     },
   ],
+}
+
+export const backgroundImageStyle: IStyle = {
+  id: backgroundImageStyleId,
+  name: 'BackgroundImageStyle',
+  breakpoints: {
+    [DEFAULT_BREAKPOINT_ID]: {
+      default: {
+        'background-position': 'center',
+        'background-repeat': 'no-repeat',
+        'background-size': 'cover',
+        width: '100%',
+        height: '100%',
+      },
+    },
+  },
+}
+export const backgroundImage: IComponent = {
+  id: backgroundImageId,
+  name: 'BackgroundImage',
+  tag: Tag.Div,
+  style: {
+    custom: {
+      [DEFAULT_BREAKPOINT_ID]: {
+        default: {
+          width: '400px',
+          height: '400px',
+          'background-color': '#E5E4F0',
+          'background-image': '',
+        },
+      },
+    },
+    mixins: [backgroundImageStyleId],
+  },
 }

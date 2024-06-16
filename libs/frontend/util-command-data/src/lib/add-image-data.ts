@@ -6,7 +6,7 @@ import { makeAddBuiltinComponentData } from './add-builtin-component-data'
 // Generate new image component data from a newly uploaded asset
 export const makeAddImageData = (
   site: ISite,
-  parent: IComponent,
+  parent: IComponent | undefined,
   assetUrl: string,
 ): IAddComponentData | undefined => {
   const addData = makeAddBuiltinComponentData(

@@ -12,7 +12,7 @@ export interface IMakeAddLinkDataProps {
 // Generate new link component data from an uploaded asset
 export const makeAddLinkData = (
   site: ISite,
-  parent: IComponent,
+  parent: IComponent | undefined,
   props?: IMakeAddLinkDataProps,
 ): IAddComponentData | undefined => {
   const addData = makeAddBuiltinComponentData(

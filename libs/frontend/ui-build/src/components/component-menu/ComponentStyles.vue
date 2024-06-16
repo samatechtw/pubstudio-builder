@@ -22,7 +22,6 @@
         :editing="isEditing(entry.property)"
         :omitEditProperties="nonInheritedProperties"
         :error="!resolveThemeVariables(site.context, entry.value)"
-        class="menu-row"
         @setProperty="setPropertyWrap(entry, $event)"
         @setValue="setValueWrap(entry, $event)"
         @edit="editStyle(entry.property)"

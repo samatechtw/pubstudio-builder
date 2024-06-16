@@ -28,7 +28,7 @@ import {
   activeBreakpoint,
   descSortedBreakpoints,
 } from '@pubstudio/frontend/feature-site-source'
-import BuildDndOverlay from './BuildDndOverlay.vue'
+import BuildDndOverlay from './overlay/BuildDndOverlay.vue'
 import {
   useBuild,
   buildContentWindowId,

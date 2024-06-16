@@ -1,80 +1,76 @@
 <template>
-  <div v-if="editing" class="style-row">
-    <div class="label" :class="{ 'edit-wrap': editWrap }">
-      <StyleProperty
-        :modelValue="style.property"
-        class="property-multiselect"
-        :openInitial="!style.property"
-        :omitEditProperties="omitEditProperties"
-        @update:modelValue="updateProperty"
-      />
-      <StyleValue
-        v-if="valueOptions"
-        ref="valueSelectRef"
-        :modelValue="style.value"
-        class="value-multiselect"
-        :options="valueOptions"
-        @keyup="checkEscape"
-        @update:modelValue="updateValue"
-      />
-      <PSInput
-        v-else
-        ref="valueInputRef"
-        :modelValue="style.value"
-        class="value-input"
-        :class="{ small: showAssetButton }"
-        :placeholder="t('value')"
-        :isError="!!valueErrorMessage"
-        @update:modelValue="updateValue"
-        @keydown.enter="saveStyle"
-        @keyup.esc="saveStyle"
-      />
+  <div class="style-row-wrap">
+    <div v-if="editing" class="style-row menu-row">
+      <div class="label" :class="{ 'edit-wrap': editWrap }">
+        <StyleProperty
+          :modelValue="style.property"
+          class="property-multiselect"
+          :openInitial="!style.property"
+          :omitEditProperties="omitEditProperties"
+          @update:modelValue="updateProperty"
+        />
+        <StyleValue
+          v-if="valueOptions"
+          ref="valueSelectRef"
+          :modelValue="style.value"
+          class="value-multiselect"
+          :options="valueOptions"
+          @keyup="checkEscape"
+          @update:modelValue="updateValue"
+        />
+        <PSInput
+          v-else
+          ref="valueInputRef"
+          :modelValue="style.value"
+          class="value-input"
+          :class="{ small: showAssetButton }"
+          :placeholder="t('value')"
+          :isError="!!valueErrorMessage"
+          @update:modelValue="updateValue"
+          @keydown.enter="saveStyle"
+          @keyup.esc="saveStyle"
+        />
+      </div>
+      <div class="item">
+        <Assets
+          v-if="showAssetButton"
+          class="edit-icon background-asset-icon"
+          @click="showSelectAssetModal = true"
+        />
+        <Check class="item-save" color="#009879" @click.stop="saveStyle" />
+        <Minus class="item-delete" @click.stop="removeStyle" />
+      </div>
     </div>
-    <div class="item">
+    <div v-else class="style menu-row">
+      <div class="label">
+        {{ propertyText }}
+      </div>
+      <div
+        class="value-preview"
+        :class="{ error, ['value-inherited']: style.inheritedFrom }"
+      >
+        {{ style?.value }}
+      </div>
       <Assets
         v-if="showAssetButton"
-        class="edit-icon backgound-asset-icon"
+        class="edit-icon background-asset-icon"
         @click="showSelectAssetModal = true"
       />
-      <Check class="item-save" color="#009879" @click.stop="saveStyle" />
-      <Minus class="item-delete" @click.stop="removeStyle" />
+      <Edit class="edit-icon" @click="edit" />
+      <Minus v-if="!style.inheritedFrom" class="item-delete" @click.stop="removeStyle" />
+      <InfoBubble
+        v-if="style.inheritedFrom"
+        class="inherited-from"
+        :message="style.inheritedFrom"
+      />
     </div>
     <SelectAssetModal
       :show="showSelectAssetModal"
       :initialSiteId="siteId"
-      :contentTypes="[AssetContentType.Jpeg, AssetContentType.Png, AssetContentType.Gif]"
+      :contentTypes="contentTypes"
       @cancel="showSelectAssetModal = false"
       @select="onBackgroundAssetSelected"
-    />
-  </div>
-  <div v-else class="style">
-    <div class="label">
-      {{ propertyText }}
-    </div>
-    <div
-      class="value-preview"
-      :class="{ error, ['value-inherited']: style.inheritedFrom }"
-    >
-      {{ style?.value }}
-    </div>
-    <Assets
-      v-if="showAssetButton"
-      class="edit-icon backgound-asset-icon"
-      @click="showSelectAssetModal = true"
-    />
-    <Edit class="edit-icon" @click="edit" />
-    <Minus v-if="!style.inheritedFrom" class="item-delete" @click.stop="removeStyle" />
-    <InfoBubble
-      v-if="style.inheritedFrom"
-      class="inherited-from"
-      :message="style.inheritedFrom"
-    />
-    <SelectAssetModal
-      :show="showSelectAssetModal"
-      :initialSiteId="siteId"
-      :contentTypes="[AssetContentType.Jpeg, AssetContentType.Png, AssetContentType.Gif]"
-      @cancel="showSelectAssetModal = false"
-      @select="onBackgroundAssetSelected"
+      @externalUrl="onBackgroundUrlSelected"
     />
   </div>
 </template>
@@ -97,18 +93,20 @@ import {
   cssValues,
   IInheritedStyleEntry,
 } from '@pubstudio/shared/type-site'
-import { useBuild, validateCssValue } from '@pubstudio/frontend/feature-build'
+import {
+  useBuild,
+  useSelectAsset,
+  validateCssValue,
+} from '@pubstudio/frontend/feature-build'
 import { Keys } from '@pubstudio/frontend/util-key-listener'
 import { SelectAssetModal } from '@pubstudio/frontend/feature-site-assets'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
-import {
-  AssetContentType,
-  ISiteAssetViewModel,
-} from '@pubstudio/shared/type-api-platform-site-asset'
+import { ISiteAssetViewModel } from '@pubstudio/shared/type-api-platform-site-asset'
 import { urlFromAsset } from '@pubstudio/frontend/util-asset'
 
 const { t } = useI18n()
 const { site } = useBuild()
+const { showSelectAssetModal, contentTypes } = useSelectAsset()
 
 const props = defineProps<{
   editing?: boolean
@@ -129,7 +127,6 @@ const emit = defineEmits<{
 
 const valueInputRef = ref<InstanceType<typeof PSInput> | undefined>()
 const valueSelectRef = ref()
-const showSelectAssetModal = ref(false)
 
 const valueOptions = computed(() => {
   const prop = style.value?.property
@@ -238,12 +235,16 @@ const removeStyle = () => {
 
 const onBackgroundAssetSelected = (asset: ISiteAssetViewModel) => {
   const assetUrl = urlFromAsset(asset)
+  onBackgroundUrlSelected(assetUrl)
+}
+
+const onBackgroundUrlSelected = (url: string) => {
   if (style.value.property === Css.Background) {
-    const newValue = replaceBackground(assetUrl)
+    const newValue = replaceBackground(url)
     updateValue(newValue)
     saveStyle()
   } else if (style.value.property === Css.BackgroundImage) {
-    updateValue(`url("${assetUrl}")`)
+    updateValue(`url("${url}")`)
     saveStyle()
   }
   showSelectAssetModal.value = false
@@ -284,8 +285,13 @@ onMounted(() => {
 <style lang="postcss" scoped>
 @import '@theme/css/mixins.postcss';
 
+.style-row-wrap {
+  display: flex;
+  width: 100%;
+}
 .style-row,
 .style {
+  display: flex;
   font-size: 14px;
   padding: 8px 0;
 }

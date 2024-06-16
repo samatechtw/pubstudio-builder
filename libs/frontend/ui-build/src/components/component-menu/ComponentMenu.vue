@@ -76,6 +76,7 @@ import {
   useMixinMenu,
 } from '@pubstudio/frontend/feature-build'
 import { setBuildSubmenu } from '@pubstudio/frontend/data-access-command'
+import { canBecomeCustom } from '@pubstudio/frontend/util-component'
 import ComponentInputEdit from './ComponentInputEdit.vue'
 import ComponentInputs from './ComponentInputs.vue'
 import ComponentEvents from './ComponentEvents.vue'
@@ -85,7 +86,6 @@ import StyleMenuEdit from '../style-menu/StyleMenuEdit.vue'
 import ComponentFlex from './ComponentFlex.vue'
 import ToolbarContainer from '../toolbar/ToolbarContainer.vue'
 import ToolbarText from '../toolbar/ToolbarText.vue'
-import { canBecomeCustom } from '@pubstudio/frontend/util-component'
 
 const { t } = useI18n()
 const { site, editor, replacePageRoot, addCustomComponent } = useBuild()

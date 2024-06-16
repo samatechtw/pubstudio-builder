@@ -1,10 +1,10 @@
 module.exports = {
-  displayName: 'frontend-util-builder',
+  displayName: 'frontend-type-builder',
   preset: '../../../jest.preset.ts',
   testEnvironment: 'node',
   transform: {
     '^.+\\.[tj]sx?$': ['ts-jest', { tsconfig: '<rootDir>/tsconfig.spec.json' }],
   },
-  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
-  coverageDirectory: '../../../coverage/libs/frontend/util-builder',
+  moduleFileExtensions: ['ts', 'js'],
+  coverageDirectory: '../../../coverage/libs/frontend/type-builder',
 }

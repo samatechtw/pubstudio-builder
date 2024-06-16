@@ -9,6 +9,24 @@
         @click="showCreateModal = true"
       />
     </div>
+    <div class="modal-text">
+      {{ t('build.asset_text') }}
+    </div>
+    <div class="asset-filter-row">
+      <PSInput
+        v-model="externalUrl"
+        name="external-url"
+        class="external-url"
+        :placeholder="t('assets.external_url')"
+      />
+      <PSButton
+        class="external-url-button"
+        size="medium"
+        :text="t('set')"
+        @click="setExternalUrl"
+      />
+    </div>
+    <div class="divider" />
     <div class="asset-filter-row">
       <PSMultiselect
         :value="filter.site_id"
@@ -20,15 +38,6 @@
         class="site-select"
         @select="updateSite"
       />
-      <PSInput
-        v-model="filter.search"
-        name="asset-name"
-        class="asset-name-input"
-        :placeholder="t('assets.name')"
-        @update:modelValue="updateSearch"
-      />
-    </div>
-    <div class="asset-filter-row">
       <PSMultiselect
         v-if="contentTypes?.length"
         :value="filter.content_type"
@@ -40,12 +49,12 @@
         class="asset-content-type"
         @select="updateContentType"
       />
-      <PSButton
-        class="select-button"
-        size="medium"
-        :text="t('build.select')"
-        :disabled="!selectedAsset"
-        @click="emitSelect"
+      <PSInput
+        v-model="filter.search"
+        name="asset-name"
+        class="asset-name-input"
+        :placeholder="t('assets.name')"
+        @update:modelValue="updateSearch"
       />
     </div>
     <div class="assets-wrap">
@@ -60,16 +69,14 @@
         v-else
         :key="asset.id"
         class="asset-item"
-        :class="{ 'asset-item-selected': selectedAsset?.id === asset.id }"
         :title="asset.name"
-        @click="selectedAsset = asset"
       >
         <img class="asset-image" :src="urlFromAsset(asset)" :alt="asset.name" />
         <div class="asset-name">
           {{ asset.name }}
         </div>
-        <div v-if="selectedAsset?.id === asset.id" class="asset-selected-mark">
-          <Check class="check-mark" color="#0ceabf" />
+        <div class="asset-hover" @click="emitSelect(asset)">
+          <PSButton class="select-button" size="medium" :text="t('build.select')" />
         </div>
       </div>
     </div>
@@ -88,7 +95,6 @@
 import { computed, inject, ref, toRefs, watch } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import {
-  Check,
   Modal,
   PSButton,
   PSInput,
@@ -133,6 +139,7 @@ const { show, initialSiteId } = toRefs(props)
 const emit = defineEmits<{
   (e: 'cancel'): void
   (e: 'select', asset: ISiteAssetViewModel): void
+  (e: 'externalUrl', url: string): void
 }>()
 
 const rootApi = inject(ApiInjectionKey) as PSApi
@@ -159,13 +166,17 @@ const defaultFilter = (): IListPlatformSiteAssetsRequest => {
 const loading = ref(false)
 const siteAssets = ref<ISiteAssetViewModel[]>()
 const filter = ref<IListPlatformSiteAssetsRequest>(defaultFilter())
-const selectedAsset = ref<ISiteAssetViewModel>()
 const showCreateModal = ref(false)
+const externalUrl = ref('')
 
 const resolvedSites = computed<ILocalOrApiSite[]>(() => [
   store.user.identity.value,
   ...(sites.value ?? []),
 ])
+
+const setExternalUrl = () => {
+  emit('externalUrl', externalUrl.value)
+}
 
 const updateSite = async (site: ILocalOrApiSite | undefined) => {
   filter.value.site_id = site?.id
@@ -189,12 +200,12 @@ const cancel = () => {
 
 const cleanup = () => {
   filter.value = defaultFilter()
-  selectedAsset.value = undefined
+  externalUrl.value = ''
 }
 
-const emitSelect = () => {
-  if (selectedAsset.value) {
-    emit('select', selectedAsset.value)
+const emitSelect = (asset: ISiteAssetViewModel) => {
+  if (asset) {
+    emit('select', asset)
   }
 }
 
@@ -228,18 +239,22 @@ watch(show, async (modalShown) => {
 })
 </script>
 
-<style lang="postcss" scoped>
+<style lang="postcss">
 @import '@theme/css/mixins.postcss';
 
 .select-asset-modal {
   .modal-inner {
-    width: 480px;
+    width: 640px;
     max-width: 95%;
+    min-height: 320px;
     max-height: 95%;
     overflow-y: scroll;
   }
   .modal-title {
-    margin: 12px 0 16px;
+    margin: 0 0 16px;
+  }
+  .modal-text {
+    margin-bottom: 16px;
   }
   .asset-filter-row {
     display: flex;
@@ -249,21 +264,37 @@ watch(show, async (modalShown) => {
   .site-select {
     width: 132px;
   }
+  .divider {
+    @mixin divider;
+    margin: 8px 0;
+  }
   .asset-content-type {
-    width: 132px;
+    width: 124px;
+    margin-left: 10px;
   }
   .asset-name-input {
     flex-grow: 1;
-    margin-left: 12px;
+    margin-left: 10px;
   }
   .create-button {
-    margin-left: auto;
+    margin: 0 36px 0 auto;
+    min-width: 88px;
+    padding: 0 16px;
   }
   .select-button {
-    margin-left: auto;
-    min-width: 80px;
-    width: 80px;
+    min-width: 56px;
+    height: 32px;
+    font-size: 12px;
+    padding: 0 10px;
     white-space: nowrap;
+  }
+  .external-url {
+    flex-grow: 1;
+  }
+  .external-url-button {
+    margin-left: 12px;
+    min-width: 60px;
+    padding: 0 12px;
   }
   .assets-spinner-wrap {
     @mixin flex-center;
@@ -283,16 +314,23 @@ watch(show, async (modalShown) => {
     max-height: 50vh;
     overflow: auto;
   }
+  .asset-hover {
+    @mixin overlay;
+    @mixin flex-center;
+    background-color: rgba($grey-500, 0.5);
+    opacity: 0;
+    transition: opacity 0.2s ease-in;
+  }
   .asset-item {
     position: relative;
-    width: calc((100% - 24px) / 3);
+    width: calc((100% - 24px) / 4);
     height: 100px;
     display: flex;
     flex-direction: column;
     border: 2px solid $grey-300;
     cursor: pointer;
-    &.asset-item-selected {
-      border-color: $green-500;
+    &:hover .asset-hover {
+      opacity: 1;
     }
   }
   .asset-image {
@@ -310,15 +348,7 @@ watch(show, async (modalShown) => {
     text-overflow: ellipsis;
     text-align: center;
     color: white;
-    background-color: $grey-500;
-  }
-  .asset-selected-mark {
-    position: absolute;
-    right: 0;
-    top: 0;
-    .check-mark {
-      @mixin size 24px;
-    }
+    background-color: rgba($grey-500, 0.65);
   }
 }
 </style>

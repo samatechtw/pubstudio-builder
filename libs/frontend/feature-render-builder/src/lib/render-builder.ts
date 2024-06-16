@@ -56,7 +56,7 @@ const computeBuilderStyleProps = (
 
   const cmp = resolveComponent(site.context, component.customSourceId) ?? component
 
-  // Cache the CSS position. Must be called before using `position`
+  // Cache CSS position. Must be called before using `position`
   const getPosition = (): string | null => {
     if (position !== undefined) {
       return position
@@ -121,8 +121,8 @@ const computeBuilderStyleProps = (
         builderProps.href = 'javascript:'
         forceRelative()
       }
-    }
-    if (component.tag === Tag.Ul || component.tag === Tag.Ol) {
+      // TODO -- move this to DndOverlay
+    } else if (component.tag === Tag.Ul || component.tag === Tag.Ol) {
       extraChildren = [h(ListAdd, { componentId: component.id })]
       forceRelative()
     } else if (component.tag === Tag.Svg) {

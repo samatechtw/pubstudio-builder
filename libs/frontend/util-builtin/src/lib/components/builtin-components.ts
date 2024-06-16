@@ -7,7 +7,7 @@ import { dividerHorizontal, dividerVertical } from './builtin-divider'
 import { footer } from './builtin-footer'
 import { h1, h2, h3, h4, h5, h6 } from './builtin-h'
 import { header, headerLogo, headerLogoLink, headerNavMenu } from './builtin-header'
-import { captionedImage, image } from './builtin-image'
+import { backgroundImage, captionedImage, image } from './builtin-image'
 import { input } from './builtin-input'
 import { link } from './builtin-link'
 import { ol, ul } from './builtin-list'
@@ -29,6 +29,7 @@ export const builtinComponents: Record<string, ISerializedComponent> = {
   [h6.id]: h6,
   [image.id]: image,
   [captionedImage.id]: captionedImage,
+  [backgroundImage.id]: backgroundImage,
   [svg.id]: svg,
   [link.id]: link,
   [button.id]: button,

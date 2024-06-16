@@ -21,6 +21,7 @@
     "strict": true,
     "strictPropertyInitialization": false,
     "paths": {
+      "@pubstudio/frontend/util-builder": ["libs/frontend/util-builder/src/index.ts"],
       "@pubstudio/frontend/util-builtin": ["libs/frontend/util-builtin/src/index.ts"],
       "@pubstudio/frontend/feature-render": ["libs/frontend/feature-render/src/index.ts"],
       "@frontend-assets/*": ["libs/frontend/ui-assets/src/*"],
@@ -51,6 +52,7 @@
       "@pubstudio/frontend/feature-walkthrough": [
         "libs/frontend/feature-walkthrough/src/index.ts"
       ],
+      "@pubstudio/frontend/type-builder": ["libs/frontend/type-builder/src/index.ts"],
       "@pubstudio/frontend/type-ui-widgets": [
         "libs/frontend/type-ui-widgets/src/index.ts"
       ],

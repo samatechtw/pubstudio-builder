@@ -73,6 +73,8 @@ export const dividerHorizontalId = componentId(
 )
 export const captionedImageStyleId = styleId(globalContext.namespace, 'captionedImage')
 export const captionedImageId = componentId(globalContext.namespace, 'captionedImage')
+export const backgroundImageStyleId = styleId(globalContext.namespace, 'backgroundImage')
+export const backgroundImageId = componentId(globalContext.namespace, 'backgroundImage')
 
 // Form
 export const inputStyleId = nextStyleId(globalContext)
