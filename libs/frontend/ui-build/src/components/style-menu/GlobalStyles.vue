@@ -4,7 +4,7 @@
       <div class="label">
         {{ t('style.global') }}
       </div>
-      <div class="item new-global-style" @click.stop="newGlobalStyle">
+      <div class="item new-global-style" @click.stop="newGlobalStyle(site)">
         <Plus class="item-add" />
       </div>
     </div>

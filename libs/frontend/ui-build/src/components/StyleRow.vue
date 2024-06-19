@@ -92,13 +92,13 @@ import {
   CssPseudoClass,
   cssValues,
   IInheritedStyleEntry,
+  Keys,
 } from '@pubstudio/shared/type-site'
 import {
   useBuild,
   useSelectAsset,
   validateCssValue,
 } from '@pubstudio/frontend/feature-build'
-import { Keys } from '@pubstudio/frontend/util-key-listener'
 import { SelectAssetModal } from '@pubstudio/frontend/feature-site-assets'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { ISiteAssetViewModel } from '@pubstudio/shared/type-api-platform-site-asset'

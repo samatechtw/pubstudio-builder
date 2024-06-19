@@ -23,7 +23,7 @@ export const useCopyPaste = (): IUseCopyPaste => {
   const pressCopy = (evt: KeyboardEvent) => {
     evt.stopImmediatePropagation()
     const component = editor.value?.selectedComponent
-    if (site.value.editor && component && (evt.ctrlKey || evt.metaKey)) {
+    if (site.value.editor && component) {
       site.value.editor.copiedComponent = serializeComponent(component)
       // TODO -- find a good way to handle translations without requiring library consumers
       // to use `vue-i18n`
@@ -58,7 +58,7 @@ export const useCopyPaste = (): IUseCopyPaste => {
     evt.stopImmediatePropagation()
     const { selectedComponent } = editor.value ?? {}
     const { copiedComponent } = site.value.editor ?? {}
-    if (selectedComponent && copiedComponent && (evt.ctrlKey || evt.metaKey)) {
+    if (selectedComponent && copiedComponent) {
       if (evt.shiftKey) {
         // Make sure we don't paste style to the same component
         if (selectedComponent.id !== copiedComponent.id) {

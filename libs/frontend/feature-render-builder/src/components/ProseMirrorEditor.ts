@@ -81,6 +81,15 @@ export const ProseMirrorEditor = defineComponent({
       return cmd(state, dispatch)
     }
 
+    const exitProsemirror = () => {
+      if (store.version.editingEnabled.value) {
+        siteStore.value.save(site.value)
+      }
+      editor.value.editView?.destroy()
+      editor.value.editView = undefined
+      return true
+    }
+
     const mountProseMirrorEditor = (
       editor: IEditorContext | undefined,
       container: HTMLElement | null | undefined,
@@ -132,7 +141,14 @@ export const ProseMirrorEditor = defineComponent({
           {
             content: getContent(selectedComponent, '<div class="pm-p"></div>'),
             plugins,
-            mapKeys: { 'Mod-b': markStrong, 'Mod-B': markStrong },
+            mapKeys: {
+              'Mod-b': markStrong,
+              'Mod-B': markStrong,
+              //Escape: exitProsemirror,
+              Escape: () => {
+                return false
+              },
+            },
           },
           container,
         )
@@ -198,11 +214,7 @@ export const ProseMirrorEditor = defineComponent({
     })
 
     onBeforeUnmount(() => {
-      if (store.version.editingEnabled.value) {
-        siteStore.value.save(site.value)
-      }
-      editor.value.editView?.destroy()
-      editor.value.editView = undefined
+      exitProsemirror()
     })
 
     watch(

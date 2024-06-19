@@ -1,6 +1,6 @@
 import { setEditPage } from '@pubstudio/frontend/data-access-command'
 import { IMultiselectOptions } from '@pubstudio/frontend/type-ui-widgets'
-import { IPage, IPageMetadata } from '@pubstudio/shared/type-site'
+import { IEditorContext, IPage, IPageMetadata, ISite } from '@pubstudio/shared/type-site'
 import { useI18n } from 'petite-vue-i18n'
 import { computed, ComputedRef, reactive, Ref, ref, UnwrapNestedRefs } from 'vue'
 import { useBuild } from './use-build'
@@ -12,8 +12,7 @@ export interface IUsePageMenuFeature {
   pages: ComputedRef<IPage[]>
   isNew: ComputedRef<boolean>
   pageOptions: ComputedRef<IMultiselectOptions>
-  newPage: () => void
-  setEditingPage: (name: string) => void
+  setEditingPage: (site: ISite, name: string) => void
   savePage: () => void
   removePage: (name: string) => void
 }
@@ -52,6 +51,22 @@ const getMetadataCopy = (page: IPage | IPageEdit): IPageMetadata => ({
   },
 })
 
+export const newPage = (editor: IEditorContext | undefined) => {
+  setEditPage(editor, '')
+  Object.assign(editingPage, emptyPage())
+  Object.assign(editingPageSource, emptyPage())
+  editing.value = true
+}
+
+export const setEditingPage = (site: ISite, route: string) => {
+  const page = site.pages[route]
+  if (page) {
+    Object.assign(editingPage, getMetadataCopy(page))
+    Object.assign(editingPageSource, getMetadataCopy(page))
+    editing.value = true
+  }
+}
+
 export const resetPageMenu = () => {
   editing.value = false
   Object.assign(editingPage, emptyPage())
@@ -61,27 +76,11 @@ export const resetPageMenu = () => {
 
 export const usePageMenu = (): IUsePageMenuFeature => {
   const { t } = useI18n()
-  const { site, editor, editPage, addPage, removePage: removePageBuild } = useBuild()
+  const { site, editPage, addPage, removePage: removePageBuild } = useBuild()
 
   const pages = computed(() => {
     return Object.values(site.value?.pages ?? {})
   })
-
-  const newPage = () => {
-    setEditPage(editor.value, '')
-    Object.assign(editingPage, emptyPage())
-    Object.assign(editingPageSource, emptyPage())
-    editing.value = true
-  }
-
-  const setEditingPage = (route: string) => {
-    const page = site.value.pages[route]
-    if (page) {
-      Object.assign(editingPage, getMetadataCopy(page))
-      Object.assign(editingPageSource, getMetadataCopy(page))
-      editing.value = true
-    }
-  }
 
   const validatePage = (): boolean => {
     pageError.value = getDefaultError()
@@ -153,7 +152,6 @@ export const usePageMenu = (): IUsePageMenuFeature => {
     pages,
     isNew,
     pageOptions,
-    newPage,
     setEditingPage,
     savePage,
     removePage,

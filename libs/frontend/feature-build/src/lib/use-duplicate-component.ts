@@ -17,8 +17,7 @@ export const useDuplicateComponent = (): IUseDuplicateComponet => {
     if (
       selectedComponent &&
       // Make sure selected component is not root component
-      selectedComponent.parent &&
-      (evt.ctrlKey || evt.metaKey)
+      selectedComponent.parent
     ) {
       duplicateSelectedComponent()
     }

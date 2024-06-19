@@ -22,6 +22,7 @@ import {
   IInheritedStyleEntry,
   IRawStylesWithSource,
   IRawStyleWithSource,
+  ISite,
   IStyle,
   IStyleEntry,
   StyleSourceType,
@@ -29,6 +30,7 @@ import {
 import { useI18n } from 'petite-vue-i18n'
 import { computed, ComputedRef, Ref, ref } from 'vue'
 import { editMixinEntryCommand, editStyleNameCommand } from '../build-command-helpers'
+import { addMixin, convertComponentStyle } from '../command-wrap/mixins'
 import { useBuild } from '../use-build'
 import {
   pushOrReplaceStyleCommand,
@@ -42,7 +44,7 @@ export interface IUseStyleMenuFeature extends IUseEditStyles {
   isEditingMixin: ComputedRef<boolean>
   editingStyle: ComputedRef<IStyle | undefined>
   styleError: Ref<string | undefined>
-  newStyle: (source?: IComponent) => void
+  newMixin: (site: ISite, source?: IComponent) => void
   setMixinName: (name: string) => void
   saveMixinStyles: () => void
 }
@@ -64,34 +66,36 @@ const editingStyle = computed<IStyle | undefined>(() => {
   return undefined
 })
 
+const isEditingMixin = computed(() => {
+  return !!editingStyle.value
+})
+
+export const newMixin = (site: ISite, source?: IComponent) => {
+  let mixinId: string | undefined
+  if (source) {
+    const name = `${source.name}_Style`
+    mixinId = convertComponentStyle(
+      site,
+      source.id,
+      name,
+      JSON.parse(JSON.stringify(source.style.custom)),
+    )
+  } else {
+    const id = styleId(site.context.namespace, site.context.nextId.toString())
+    const name = `Style_${id}`
+    const breakpoints: IBreakpointStyles = { default: {} }
+    addMixin(site, name, breakpoints)
+    mixinId = id
+  }
+  if (mixinId) {
+    setEditingMixin(site, mixinId, source?.id)
+  }
+}
+
 export const useMixinMenu = (): IUseStyleMenuFeature => {
   const { t } = useI18n()
-  const { site, editor, currentPseudoClass, addStyle, convertComponentStyle } = useBuild()
+  const { site, editor, currentPseudoClass } = useBuild()
   const { closeMixinMenu } = useMixinMenuUi()
-
-  const newStyle = (source?: IComponent) => {
-    let mixinId: string | undefined
-    if (source) {
-      const name = `${source.name}_Style`
-      mixinId = convertComponentStyle(
-        source.id,
-        name,
-        JSON.parse(JSON.stringify(source.style.custom)),
-      )
-    } else {
-      const id = styleId(
-        site.value.context.namespace,
-        site.value.context.nextId.toString(),
-      )
-      const name = `Style_${id}`
-      const breakpoints: IBreakpointStyles = { default: {} }
-      addStyle(name, breakpoints)
-      mixinId = id
-    }
-    if (mixinId) {
-      setEditingMixin(site.value, mixinId, source?.id)
-    }
-  }
 
   const styleEntries = computed(() => {
     // Compute breakpoint styles with source
@@ -199,10 +203,6 @@ export const useMixinMenu = (): IUseStyleMenuFeature => {
     closeMixinMenu()
   }
 
-  const isEditingMixin = computed(() => {
-    return !!editingStyle.value
-  })
-
   const setStyle = (
     oldStyle: IStyleEntry | undefined,
     newStyle: IStyleEntry | undefined,
@@ -286,7 +286,7 @@ export const useMixinMenu = (): IUseStyleMenuFeature => {
     removeStyle,
     editStyle,
     createStyle,
-    newStyle,
+    newMixin,
     setMixinName,
     saveMixinStyles,
   }

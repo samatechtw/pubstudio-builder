@@ -1,6 +1,6 @@
 import { setEditGlobalStyle } from '@pubstudio/frontend/data-access-command'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
-import { IEditGlobalStyle } from '@pubstudio/shared/type-site'
+import { IEditGlobalStyle, ISite } from '@pubstudio/shared/type-site'
 import { useI18n } from 'petite-vue-i18n'
 import { computed, ComputedRef, Ref, ref } from 'vue'
 import { addGlobalStyle, setGlobalStyle } from './command-wrap/global-style'
@@ -10,12 +10,20 @@ export interface IUseGlobalStylesFeature {
   globalStyleError: Ref<string | undefined>
   globalStyleNames: ComputedRef<Array<string>>
   resetEditGlobalStyles: () => void
-  newGlobalStyle: () => void
+  newGlobalStyle: (site: ISite) => void
   setEditingGlobalStyle: (name: string) => void
   saveGlobalStyle: () => void
 }
 
 const globalStyleError = ref<string | undefined>()
+
+export const newGlobalStyle = (site: ISite) => {
+  setEditGlobalStyle(site.editor, {
+    oldName: undefined,
+    newName: '',
+    style: '',
+  })
+}
 
 export const useGlobalStyles = (): IUseGlobalStylesFeature => {
   const { t } = useI18n()
@@ -32,14 +40,6 @@ export const useGlobalStyles = (): IUseGlobalStylesFeature => {
   const resetEditGlobalStyles = () => {
     setEditGlobalStyle(site.value.editor, undefined)
     globalStyleError.value = undefined
-  }
-
-  const newGlobalStyle = () => {
-    setEditGlobalStyle(site.value.editor, {
-      oldName: undefined,
-      newName: '',
-      style: '',
-    })
   }
 
   const setEditingGlobalStyle = (name: string) => {

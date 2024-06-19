@@ -81,7 +81,7 @@ const setAsHomePage = () => {
 
 const edit = () => {
   if (route.value) {
-    setEditingPage(route.value)
+    setEditingPage(site.value, route.value)
   }
 }
 

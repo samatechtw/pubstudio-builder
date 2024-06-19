@@ -5,6 +5,10 @@ export const setCancelNextEsc = (cancel: boolean) => {
   cancelNextEsc = cancel
 }
 
+export const prosemirrorActive = (e: KeyboardEvent): boolean => {
+  return e.target instanceof HTMLElement && e.target.classList.contains('ProseMirror')
+}
+
 export const hotkeysDisabled = (e: KeyboardEvent) => {
   if (cancelNextEsc) {
     setCancelNextEsc(false)
@@ -14,5 +18,5 @@ export const hotkeysDisabled = (e: KeyboardEvent) => {
     // Key events on readonly inputs should still trigger editor events
     return !e.target.hasAttribute('readonly')
   }
-  return e.target instanceof HTMLElement && e.target.classList.contains('ProseMirror')
+  return prosemirrorActive(e)
 }

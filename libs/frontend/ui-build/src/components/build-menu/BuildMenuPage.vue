@@ -44,17 +44,17 @@
 import { computed } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { setEditPage } from '@pubstudio/frontend/data-access-command'
-import { resetPageMenu, useBuild, usePageMenu } from '@pubstudio/frontend/feature-build'
+import { resetPageMenu, useBuild, newPage } from '@pubstudio/frontend/feature-build'
 import { setActivePage } from '@pubstudio/frontend/data-access-command'
 import { Plus, Caret, Edit, DragVertical } from '@pubstudio/frontend/ui-widgets'
 import { EditorMode } from '@pubstudio/shared/type-site'
 import { useListDrag } from '@pubstudio/frontend/util-doc'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
+import { getOrderedPages } from '@pubstudio/frontend/util-builder'
 
 const { t } = useI18n()
 const { site } = useSiteSource()
 const { editor, changePage, updatePageOrder } = useBuild()
-const { newPage } = usePageMenu()
 const {
   newPos,
   dragListPreview,
@@ -72,15 +72,12 @@ const {
 })
 
 const orderedPages = computed(() => {
-  const ordered =
-    site.value.pageOrder
-      .map((route) => site.value.pages[route])
-      .filter((route) => !!route) ?? []
+  const ordered = getOrderedPages(site.value)
   return dragListPreview(ordered)
 })
 
 const showCreatePage = () => {
-  newPage()
+  newPage(editor.value)
 }
 
 const switchPage = (route: string) => {

@@ -19,7 +19,7 @@
 <script lang="ts" setup>
 import { computed, ref, toRefs } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
-import { Keys } from '@pubstudio/frontend/util-key-listener'
+import { Keys } from '@pubstudio/shared/type-site'
 import { useDegreeKnob } from '../lib/use-degree-knob'
 import ColorPickerButton from './ColorPickerButton.vue'
 

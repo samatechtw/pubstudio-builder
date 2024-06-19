@@ -1,8 +1,8 @@
 import {
-  schemaCode,
   preserveWhiteSpacesDuringPaste,
+  schemaCode,
 } from '@pubstudio/frontend/util-edit-text'
-import { Keys } from '@pubstudio/frontend/util-key-listener'
+import { Keys } from '@pubstudio/shared/type-site'
 import hljs from 'highlight.js/lib/core'
 import { keymap } from 'prosemirror-keymap'
 import { Plugin } from 'prosemirror-state'

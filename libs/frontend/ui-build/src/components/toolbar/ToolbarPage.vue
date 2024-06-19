@@ -28,7 +28,7 @@ import { computed, onMounted } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { PSMultiselect } from '@pubstudio/frontend/ui-widgets'
 import { EditorDropdown } from '@pubstudio/shared/type-site'
-import { useBuild, usePageMenu } from '@pubstudio/frontend/feature-build'
+import { useBuild, newPage } from '@pubstudio/frontend/feature-build'
 import { setEditorDropdown } from '@pubstudio/frontend/data-access-command'
 import { IMultiselectOption, IMultiselectObj } from '@pubstudio/frontend/type-ui-widgets'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
@@ -36,7 +36,6 @@ import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 const { t } = useI18n()
 const { site, activePage } = useSiteSource()
 const { editor, changePage } = useBuild()
-const { newPage } = usePageMenu()
 
 const pageOptions = computed(() =>
   Object.values(site.value.pages)
@@ -48,7 +47,7 @@ const pageOptions = computed(() =>
 )
 
 const showNewPage = () => {
-  newPage()
+  newPage(editor.value)
 }
 
 const setActivePage = (option: IMultiselectOption | undefined) => {

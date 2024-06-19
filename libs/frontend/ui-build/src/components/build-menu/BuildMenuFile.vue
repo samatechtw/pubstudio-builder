@@ -18,7 +18,7 @@
     <BuildMenuIconText
       v-if="store.user.isAdmin?.value"
       :text="t('template.create')"
-      @click="showTemplateModal"
+      @click="showSaveTemplateModal(site)"
     >
       <Templates></Templates>
     </BuildMenuIconText>
@@ -70,15 +70,19 @@ import {
   SaveTemplateModal,
   Templates,
 } from '@pubstudio/frontend/ui-widgets'
-import { serializeSite } from '@pubstudio/frontend/util-site-store'
 import { defaultExportedFileName, validateSite } from '@pubstudio/frontend/util-doc-site'
 import { loadFile } from '@pubstudio/frontend/util-doc'
 import {
   deserializeSite,
   replaceNamespace,
 } from '@pubstudio/frontend/util-site-deserialize'
-import { ISerializedSite } from '@pubstudio/shared/type-site'
-import { useBuild } from '@pubstudio/frontend/feature-build'
+import {
+  setShowExportModal,
+  showExport,
+  showSaveTemplateModal,
+  storedTemplate,
+  useBuild,
+} from '@pubstudio/frontend/feature-build'
 import { makeNamespace } from '@pubstudio/frontend/data-access-command'
 import BuildMenuIconText from './BuildMenuIconText.vue'
 
@@ -89,8 +93,6 @@ const emit = defineEmits<{
   (e: 'showTemplates'): void
 }>()
 
-const showExport = ref(false)
-const storedTemplate = ref<ISerializedSite>()
 const pendingSiteImport = ref()
 const parseError = ref()
 const showConfirmReset = ref(false)
@@ -120,16 +122,6 @@ const importSite = async (file: File) => {
   }
   parseError.value = 'Failed to parse site data from file.'
 }
-
-const showTemplateModal = () => {
-  storedTemplate.value = serializeSite(site.value)
-}
-
-const setShowExportModal = (show: boolean) => {
-  showExport.value = show
-}
-
-const setShowImportModal = (show: boolean) => {}
 
 const resetConfirmed = () => {
   resetSite()

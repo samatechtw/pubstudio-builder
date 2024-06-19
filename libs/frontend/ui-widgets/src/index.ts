@@ -58,6 +58,7 @@ export { default as Pages } from './lib/svg/Pages.vue'
 export { default as Custom } from './lib/svg/Custom.vue'
 export { default as Versions } from './lib/svg/Versions.vue'
 export { default as Print } from './lib/svg/Print.vue'
+export { default as Reset } from './lib/svg/Reset.vue'
 export { default as Shrink } from './lib/svg/Shrink.vue'
 export { default as Text } from './lib/svg/Text.vue'
 

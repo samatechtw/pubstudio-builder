@@ -29,7 +29,7 @@ import {
   computeFlattenedStyles,
   flattenedComponentStyle,
 } from '@pubstudio/frontend/util-component'
-import { DEFAULT_BREAKPOINT_ID, styleId } from '@pubstudio/frontend/util-ids'
+import { DEFAULT_BREAKPOINT_ID } from '@pubstudio/frontend/util-ids'
 import { resolveComponent } from '@pubstudio/frontend/util-resolve'
 import { serializePage } from '@pubstudio/frontend/util-site-store'
 import { uiAlert } from '@pubstudio/frontend/util-ui-alert'
@@ -39,7 +39,6 @@ import {
   IAddComponentMixinData,
   IAddCustomComponentData,
   IAddPageData,
-  IAddStyleMixinData,
   IAddThemeFontData,
   IAddThemeVariableData,
   IChangePageData,
@@ -80,7 +79,6 @@ import {
   IBehavior,
   IBehaviorArg,
   IBreakpoint,
-  IBreakpointStyles,
   IComponent,
   IComponentEvent,
   IComponentInput,
@@ -140,7 +138,6 @@ export interface IUseBuild {
   resetSite: () => void
   replaceSite: (newSite: ISite) => Promise<void>
   addComponent: (data?: Partial<IAddComponentData>) => void
-  addComponentData: (data: IAddComponentData) => void
   duplicateComponent: () => void
   pasteComponent: (copiedComponentId: string, parent: IComponent) => void
   replacePageRoot: (copiedComponentId: string, pageRoute: string) => void
@@ -195,13 +192,7 @@ export interface IUseBuild {
     oldArg: IBehaviorArg | undefined,
     newArg: IBehaviorArg | undefined,
   ) => void
-  addStyle: (name: string, breakpoints: IBreakpointStyles) => void
   flattenComponentMixin: (componentId: string, mixinId: string) => void
-  convertComponentStyle: (
-    componentId: string,
-    name: string,
-    breakpoints: IBreakpointStyles,
-  ) => string | undefined
   deleteStyle: (style: IStyle) => void
   setTranslations: (props: ISetTranslationsProps) => void
   setActiveI18n: (activeI18n: string) => void
@@ -337,10 +328,6 @@ export const useBuild = (): IUseBuild => {
       },
     }
     pushCommand(site.value, CommandType.AddComponent, addData)
-  }
-
-  const addComponentData = (data: IAddComponentData) => {
-    pushCommand(site.value, CommandType.AddComponent, data)
   }
 
   const editComponent = (
@@ -757,14 +744,6 @@ export const useBuild = (): IUseBuild => {
     }
   }
 
-  const addStyle = (name: string, breakpoints: IBreakpointStyles) => {
-    const data: IAddStyleMixinData = {
-      name: name,
-      breakpoints: breakpoints,
-    }
-    pushCommand(site.value, CommandType.AddStyleMixin, data)
-  }
-
   const flattenComponentMixin = (componentId: string, mixinId: string) => {
     const component = resolveComponent(site.value.context, componentId)
     const mixin = site.value.context.styles[mixinId]
@@ -819,63 +798,6 @@ export const useBuild = (): IUseBuild => {
         }
         pushCommand(site.value, CommandType.Group, data)
       }
-    }
-  }
-
-  const convertComponentStyle = (
-    componentId: string,
-    name: string,
-    breakpoints: IBreakpointStyles,
-  ): string | undefined => {
-    const component = resolveComponent(site.value.context, componentId)
-    if (component) {
-      // Create the new mixin
-      const styleData: IAddStyleMixinData = {
-        name,
-        breakpoints,
-      }
-      // Add the new mixin to the component
-      const { nextId, namespace } = site.value.context
-      const mixinId = styleId(namespace, nextId.toString())
-      const addToComponent: IAddComponentMixinData = {
-        componentId,
-        // Precalculate the expected mixin ID
-        mixinId,
-      }
-      const commands: ICommand[] = [
-        { type: CommandType.AddStyleMixin, data: styleData },
-        { type: CommandType.AddComponentMixin, data: addToComponent },
-      ]
-      // Delete the old component styles
-      for (const [bpId, bp] of Object.entries(component.style.custom)) {
-        for (const [pClass, pseudo] of Object.entries(bp)) {
-          const pseudoClass = pClass as CssPseudoClass
-          for (const [prop, val] of Object.entries(pseudo)) {
-            const pseudos = breakpoints[bpId]?.[pseudoClass]
-            if (pseudos?.[prop as Css] !== undefined) {
-              const styleData: ISetComponentCustomStyleData = {
-                componentId,
-                breakpointId: bpId,
-                oldStyle: {
-                  pseudoClass,
-                  property: prop as Css,
-                  value: val,
-                },
-                newStyle: undefined,
-              }
-              commands.push({
-                type: CommandType.SetComponentCustomStyle,
-                data: styleData,
-              })
-            }
-          }
-        }
-      }
-      const data: ICommandGroupData = {
-        commands,
-      }
-      pushCommand(site.value, CommandType.Group, data)
-      return mixinId
     }
   }
 
@@ -1211,7 +1133,6 @@ export const useBuild = (): IUseBuild => {
     resetSite,
     replaceSite,
     addComponent,
-    addComponentData,
     duplicateComponent,
     pasteComponent,
     replacePageRoot,
@@ -1245,8 +1166,6 @@ export const useBuild = (): IUseBuild => {
     setBehavior,
     removeBehavior,
     setBehaviorArg,
-    addStyle,
-    convertComponentStyle,
     flattenComponentMixin,
     deleteStyle,
     setTranslations,

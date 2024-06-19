@@ -33,9 +33,10 @@ import { computed, toRefs } from 'vue'
 import { useDropdown } from '@pubstudio/frontend/util-dropdown'
 import { useClickaway } from '@pubstudio/frontend/util-clickaway'
 import { randChars } from '@pubstudio/shared/util-format'
-import { Keys, useKeyListener } from '@pubstudio/frontend/util-key-listener'
-import DropdownMenuItems from './DropdownMenuItems.vue'
+import { Keys } from '@pubstudio/shared/type-site'
+import { useKeyListener } from '@pubstudio/frontend/util-key-listener'
 import { IDropdownMenuItem } from '@pubstudio/frontend/type-ui-widgets'
+import DropdownMenuItems from './DropdownMenuItems.vue'
 
 const props = withDefaults(
   defineProps<{
