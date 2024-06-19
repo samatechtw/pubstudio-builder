@@ -33,6 +33,7 @@ import { setBuildSubmenu } from '@pubstudio/frontend/data-access-command'
 import { canBecomeCustom } from '@pubstudio/frontend/util-component'
 import { dragSource } from '@pubstudio/frontend/feature-render-builder'
 import CustomComponent from './CustomComponent.vue'
+import { getTopLevelCustomComponents } from '@pubstudio/frontend/util-builder'
 
 const { t } = useI18n()
 
@@ -79,11 +80,7 @@ const customMenuDrop = (_e: DragEvent) => {
 }
 
 const topLevelCustomComponents = computed<IComponent[]>(() => {
-  const { context } = site.value
-  const ids = context?.customComponentIds.values() ?? []
-  return Array.from(ids)
-    .map((id) => resolveComponent(context, id))
-    .filter((cmp) => !!cmp) as IComponent[]
+  return getTopLevelCustomComponents(site.value.context)
 })
 </script>
 

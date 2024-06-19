@@ -18,12 +18,13 @@
 
 <script lang="ts" setup>
 import { computed, toRefs } from 'vue'
-import { useBuild } from '@pubstudio/frontend/feature-build'
+import {
+  addCustomComponentAtSelection,
+  useBuild,
+} from '@pubstudio/frontend/feature-build'
 import { useDragDrop } from '@pubstudio/frontend/feature-render-builder'
-import { makeAddCustomComponentData } from '@pubstudio/frontend/util-command-data'
 import { IComponent } from '@pubstudio/shared/type-site'
 import { runtimeContext } from '@pubstudio/frontend/util-runtime'
-import { getActivePage } from '@pubstudio/frontend/feature-site-store'
 import { BuilderDragDataType } from '@pubstudio/frontend/type-builder'
 
 const props = defineProps<{
@@ -32,7 +33,7 @@ const props = defineProps<{
 
 const { customComponent } = toRefs(props)
 
-const { site, editor, addComponentData } = useBuild()
+const { site } = useBuild()
 
 const text = computed(() => {
   const { id, name } = customComponent.value
@@ -44,18 +45,7 @@ const text = computed(() => {
 })
 
 const addCustomComponent = () => {
-  const { selectedComponent } = editor.value ?? {}
-  const activePage = getActivePage(site.value)
-
-  const data = makeAddCustomComponentData(
-    site.value,
-    customComponent.value.id,
-    selectedComponent ?? (activePage?.root as IComponent),
-    selectedComponent?.id,
-  )
-  if (data) {
-    addComponentData(data)
-  }
+  addCustomComponentAtSelection(site.value, customComponent.value.id)
 }
 
 const { dndState, elementRef, dragstart, drag, dragend } = useDragDrop({

@@ -30,7 +30,7 @@ import {
   SiteSaveErrorModal,
 } from '@pubstudio/frontend/ui-widgets'
 import { PSApi } from '@pubstudio/frontend/util-api'
-import { Keys, useKeyListener } from '@pubstudio/frontend/util-key-listener'
+import { useKeyListener } from '@pubstudio/frontend/util-key-listener'
 import { iteratePage, RenderMode } from '@pubstudio/frontend/util-render'
 import {
   computeLocationParts,
@@ -48,7 +48,7 @@ import {
   storeSite,
   stringifySite,
 } from '@pubstudio/frontend/util-site-store'
-import { EditorMode } from '@pubstudio/shared/type-site'
+import { EditorMode, Keys } from '@pubstudio/shared/type-site'
 
 import type { IPage, ISite } from '@pubstudio/shared/type-site'
 import type { IRouteWithPathRegex } from '@pubstudio/frontend/util-router'

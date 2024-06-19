@@ -31,11 +31,11 @@
       />
     </div>
     <CreateAssetModal
-      :show="showCreateModal"
+      :show="showCreateAssetModal"
       :sites="sites"
       :assetToUpdate="updateAsset"
       @complete="uploadComplete"
-      @cancel="showCreateModal = false"
+      @cancel="showCreateAssetModal = false"
     />
     <DeleteAssetModal
       :show="!!deletedAssetId"
@@ -68,6 +68,7 @@ import AssetsHeader from './AssetsHeader.vue'
 import AssetFilters from './AssetFilters.vue'
 import PreviewAssetModal from './PreviewAssetModal.vue'
 import { IUploadFileResult } from '../lib/upload-asset'
+import { showCreateAssetModal } from '../lib/use-build-menu-assets'
 
 const { t } = useI18n()
 const {
@@ -79,18 +80,17 @@ const {
 } = useSiteAssets()
 const { listSites, sites, usageAllowance, loading: loadingSites } = useSites()
 
-const showCreateModal = ref(false)
 const deletedAssetId = ref<string>()
 const previewAssetUrl = ref<string>()
 const updateAsset = ref<ISiteAssetViewModel | undefined>()
 
 const showCreate = () => {
   updateAsset.value = undefined
-  showCreateModal.value = true
+  showCreateAssetModal.value = true
 }
 
 const showReplace = (asset: ISiteAssetViewModel) => {
-  showCreateModal.value = true
+  showCreateAssetModal.value = true
   updateAsset.value = asset
 }
 
@@ -110,7 +110,7 @@ const removeDeletedAsset = () => {
 const uploadComplete = (asset: IUploadFileResult) => {
   updateAssetList(asset)
   updateAsset.value = undefined
-  showCreateModal.value = false
+  showCreateAssetModal.value = false
 }
 
 onMounted(async () => {

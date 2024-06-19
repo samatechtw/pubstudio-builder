@@ -58,7 +58,7 @@ import EditMenuTitle from '../EditMenuTitle.vue'
 
 const { t } = useI18n()
 const { site, editor, currentPseudoClass, selectedComponentFlattenedStyles } = useBuild()
-const { newStyle } = useMixinMenu()
+const { newMixin } = useMixinMenu()
 const {
   styleEntries,
   editStyle,
@@ -138,7 +138,7 @@ const convertToMixin = () => {
   toMixinRef.value?.cancelHoverTimer()
   const cmp = editor.value?.selectedComponent
   if (cmp) {
-    newStyle(cmp)
+    newStyle(site.value, cmp)
   }
 }
 </script>

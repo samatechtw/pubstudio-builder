@@ -21,7 +21,7 @@ import { IComponent } from '@pubstudio/shared/type-site'
 import { onMounted, ref, toRefs } from 'vue'
 import { runtimeContext } from '@pubstudio/frontend/util-runtime'
 import { PSInput } from '@pubstudio/frontend/ui-widgets'
-import { Keys } from '@pubstudio/frontend/util-key-listener'
+import { Keys } from '@pubstudio/shared/type-site'
 import { useBuild } from '@pubstudio/frontend/feature-build'
 
 const props = defineProps<{

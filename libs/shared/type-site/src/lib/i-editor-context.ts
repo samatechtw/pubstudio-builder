@@ -6,6 +6,7 @@ import {
   MailingListWalkthroughState,
 } from './enum-walkthrough-state'
 import { IBehavior, IComponent, IComponentEvent } from './i-component'
+import { IHotkeys } from './i-hotkeys'
 import { ISerializedComponent } from './i-serialized-site'
 import { ISiteStore } from './i-site-store'
 
@@ -194,6 +195,8 @@ export interface IEditorContext {
   builderScale: number
   // Active pseudo class
   cssPseudoClass: CssPseudoClass
+  // Custom hotkey map
+  hotkeys: IHotkeys
   // If false/undefined, template selector is shown when the site is loaded
   templatesShown?: boolean
   // State of contact form walkthrough modal

@@ -49,6 +49,8 @@ export const deserializeEditor = (
         builderWidth: serializedEditor.builderWidth,
         builderScale: serializedEditor.builderScale,
         cssPseudoClass: serializedEditor.cssPseudoClass,
+        // Added 240617
+        hotkeys: serializedEditor.hotkeys ?? {},
         templatesShown: serializedEditor.templatesShown,
         // Added 231201
         componentMenuCollapses: serializedEditor.componentMenuCollapses ?? {},

@@ -58,7 +58,8 @@ import {
   Spinner,
 } from '@pubstudio/frontend/ui-widgets'
 import { urlFromAsset } from '@pubstudio/frontend/util-asset'
-import { Keys, useKeyListener } from '@pubstudio/frontend/util-key-listener'
+import { Keys } from '@pubstudio/shared/type-site'
+import { useKeyListener } from '@pubstudio/frontend/util-key-listener'
 import {
   AssetContentType,
   ISiteAssetViewModel,

@@ -9,13 +9,13 @@ import {
   useBuild,
   useCopyPaste,
   useDuplicateComponent,
+  useHistory,
   useMixinMenuUi,
   usePaddingMarginEdit,
 } from '@pubstudio/frontend/feature-build'
 import { activeBreakpoint } from '@pubstudio/frontend/feature-site-source'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { resolvedComponentStyle } from '@pubstudio/frontend/util-component'
-import { Keys } from '@pubstudio/frontend/util-key-listener'
 import { resolveComponent } from '@pubstudio/frontend/util-resolve'
 import { runtimeContext } from '@pubstudio/frontend/util-runtime'
 import {
@@ -23,7 +23,9 @@ import {
   Css,
   CssPseudoClass,
   CssUnit,
+  EditorMode,
   IStyleEntry,
+  Keys,
 } from '@pubstudio/shared/type-site'
 import { onMounted, onUnmounted } from 'vue'
 import {
@@ -31,7 +33,8 @@ import {
   selectNextComponent,
   selectPreviousComponent,
 } from './select-component'
-import { hotkeysDisabled } from './util-build-event'
+import { triggerHotkey } from './trigger-hotkey'
+import { hotkeysDisabled, prosemirrorActive } from './util-build-event'
 import {
   calcNextHeight,
   calcNextWidth,
@@ -114,6 +117,7 @@ export const useBuildEvent = () => {
   } = useBuild()
   const { siteStore } = useSiteSource()
   const { pressCopy, pressPaste } = useCopyPaste()
+  const { undo, redo } = useHistory()
   const { pressDuplicate } = useDuplicateComponent()
   const { dragging: paddingMarginDragData, drag, stopDrag } = usePaddingMarginEdit()
   const { closeMixinMenu } = useMixinMenuUi()
@@ -241,7 +245,7 @@ export const useBuildEvent = () => {
   const pressTab = async (e: KeyboardEvent) => {
     // TODO -- alert the user that editing styles are active, or find a way to disable tab
     // when a style property is selected, without disabling tab in other situations
-    if (editingCommandCount() > 0) {
+    if (editingCommandCount() > 0 || site.value.editor?.mode === EditorMode.Styles) {
       return
     }
     const { selectedComponent } = editor.value ?? {}
@@ -257,37 +261,53 @@ export const useBuildEvent = () => {
     }
   }
 
-  const pressHotkey = (e: KeyboardEvent, hotkeyFn: (e: KeyboardEvent) => void) => {
-    // Don't activate hotkey if an input/textarea has focus, or a modal is active
-    // TODO -- is there a general way to make sure another element doesn't have focus?
-    if (manualDisableHotkeys || hotkeysDisabled(e)) {
+  const handleKeyup = (event: KeyboardEvent) => {
+    // Special case for escape when prosemirror active
+    if (
+      event.key === Keys.Escape &&
+      editor.value?.selectedComponent &&
+      prosemirrorActive(event)
+    ) {
+      document.getElementById(editor.value.selectedComponent.id)?.focus()
+    }
+    if (manualDisableHotkeys || hotkeysDisabled(event)) {
       return
     }
-    hotkeyFn(e)
-  }
-
-  const handleKeyup = (event: KeyboardEvent) => {
     if (event.key === Keys.Escape) {
-      pressHotkey(event, pressEscape)
+      pressEscape()
     } else if (event.key === Keys.Enter) {
-      pressHotkey(event, pressEnter)
+      pressEnter()
     } else if (event.key === Keys.Tab) {
-      pressHotkey(event, pressTab)
+      pressTab(event)
     }
   }
 
   const handleKeydown = (event: KeyboardEvent) => {
+    if (manualDisableHotkeys || hotkeysDisabled(event)) {
+      return
+    }
     if (event.key === Keys.Delete) {
-      pressHotkey(event, deleteSelected)
-    } else if (event.key === Keys.LowerC || event.key === Keys.UpperC) {
-      const selection = window.getSelection()
-      if (selection?.type !== 'Range') {
-        pressHotkey(event, pressCopy)
+      deleteSelected()
+    } else if (event.ctrlKey || event.metaKey) {
+      if (event.key === Keys.c || event.key === Keys.C) {
+        const selection = window.getSelection()
+        if (selection?.type !== 'Range') {
+          pressCopy(event)
+        }
+      } else if (event.key === Keys.v || event.key === Keys.V) {
+        pressPaste(event)
+      } else if (event.key === Keys.d || event.key === Keys.D) {
+        pressDuplicate(event)
+      } else if (event.key === Keys.z || event.key === Keys.Z) {
+        if (event.shiftKey) {
+          redo(true)
+        } else {
+          undo(true)
+        }
       }
-    } else if (event.key === Keys.LowerV || event.key === Keys.UpperV) {
-      pressHotkey(event, pressPaste)
-    } else if (event.key === Keys.LowerD || event.key === Keys.UpperD) {
-      pressHotkey(event, pressDuplicate)
+    } else if (!event.shiftKey) {
+      event.preventDefault()
+      triggerHotkey(site.value, event.key as Keys)
     }
   }
 

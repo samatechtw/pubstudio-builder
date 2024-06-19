@@ -6,3 +6,4 @@ export { default as SelectAssetModal } from './components/SelectAssetModal.vue'
 
 export * from './lib/use-site-assets'
 export * from './lib/upload-asset'
+export * from './lib/use-build-menu-assets'
