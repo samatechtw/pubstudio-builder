@@ -14,6 +14,23 @@ export interface IHotkeys {
   [HotkeyStates.File]?: { [k in Keys]?: FileHotkeys }
 }
 
+export type IInvertedHotkeys = Record<HotkeyStates, Record<string, string>>
+/*
+export interface IInvertedHotkeys {
+  [HotkeyStates.None]?: { [k in MenuHotkeys]?: Keys }
+  [HotkeyStates.ComponentBasic]?: { [k in ComponentHotkeys]?: Keys }
+  [HotkeyStates.ComponentAdvanced]?: { [k in ComponentAdvancedHotkeys]?: Keys }
+  [HotkeyStates.CustomComponents]?: { [k in CustomComponentHotkeys]?: Keys }
+  [HotkeyStates.Pages]?: { [k in PageHotkeys]?: Keys }
+  [HotkeyStates.Theme]?: { [k in ThemeHotkeys]?: Keys }
+  [HotkeyStates.Style]?: { [k in StyleHotkeys]?: Keys }
+  [HotkeyStates.Assets]?: { [k in AssetHotkeys]?: Keys }
+  [HotkeyStates.Behavior]?: { [k in BehaviorHotkeys]?: Keys }
+  [HotkeyStates.History]?: { [k in HistoryHotkeys]?: Keys }
+  [HotkeyStates.File]?: { [k in FileHotkeys]?: Keys }
+}
+  */
+
 export enum HotkeyStates {
   None = 'none',
   ComponentBasic = 'cb',

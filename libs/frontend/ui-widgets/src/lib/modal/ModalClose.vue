@@ -24,7 +24,7 @@ withDefaults(
 <style lang="postcss" scoped>
 .modal-close {
   position: absolute;
-  top: 4px;
+  top: 6px;
   right: 8px;
   padding: 8px;
   cursor: pointer;
