@@ -48,10 +48,17 @@
     </ToolbarItem>
     <ToolbarItem
       :tooltip="t('toolbar.bug_title')"
-      class="bounding"
+      class="bug"
       @click="setShowBugReportModal(true)"
     >
       <Bug />
+    </ToolbarItem>
+    <ToolbarItem
+      :tooltip="t('toolbar.prefs')"
+      class="preferences"
+      @click="setShowPreferencesModal(true)"
+    >
+      <Preferences />
     </ToolbarItem>
     <ToolbarItem
       v-if="!hideSettings && apiSiteId && apiSiteId !== 'scratch'"
@@ -64,6 +71,10 @@
       <div class="save-state" :class="siteStore.saveState" @click="forceSave" />
     </ToolbarItem>
     <BugReportModal :show="showBugReportModal" @cancel="setShowBugReportModal(false)" />
+    <EditorPreferencesModal
+      :show="showPreferencesModal"
+      @cancel="setShowPreferencesModal(false)"
+    />
   </div>
 </template>
 
@@ -78,21 +89,23 @@ import {
 import {
   BoundingBox,
   Bug,
+  Hierarchy,
+  Preferences,
   Redo,
+  Settings,
   ToolbarItem,
   Undo,
-  Hierarchy,
-  Settings,
 } from '@pubstudio/frontend/ui-widgets'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
+import { BuildSubmenu, SiteSaveState } from '@pubstudio/shared/type-site'
 import { CommandType } from '@pubstudio/shared/type-command'
 import ToolbarPage from './ToolbarPage.vue'
 import ToolbarPseudoClass from './ToolbarPseudoClass.vue'
 import ToolbarBuilderWidth from './ToolbarBuilderWidth.vue'
 import ToolbarBreakpoint from './ToolbarBreakpoint.vue'
 import BugReportModal from './BugReportModal.vue'
+import EditorPreferencesModal from './EditorPreferencesModal.vue'
 import ToolbarVersion from './ToolbarVersion.vue'
-import { BuildSubmenu, SiteSaveState } from '@pubstudio/shared/type-site'
 
 defineProps<{
   hideSettings?: boolean
@@ -108,6 +121,7 @@ const { siteStore, isSaving } = useSiteSource()
 const { canUndo, canRedo, undo, redo } = useHistory()
 const { apiSiteId } = useSiteSource()
 const showBugReportModal = ref(false)
+const showPreferencesModal = ref(false)
 
 const toggleComponentTree = () => {
   if (editor.value) {
@@ -118,6 +132,10 @@ const toggleComponentTree = () => {
 
 const setShowBugReportModal = (show: boolean) => {
   showBugReportModal.value = show
+}
+
+const setShowPreferencesModal = (show: boolean) => {
+  showPreferencesModal.value = show
 }
 
 const historyAction = (e: Event, action: () => void) => {

@@ -28,6 +28,7 @@ export const mockSerializedSite: ISerializedSite = {
     builderWidth: 1080,
     builderScale: 1,
     cssPseudoClass: CssPseudoClass.Default,
+    hotkeys: {},
   },
   context: {
     namespace: 'test',

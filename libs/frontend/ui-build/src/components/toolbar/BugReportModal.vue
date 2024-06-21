@@ -1,5 +1,5 @@
 <template>
-  <Modal cls="confirm-modal" @cancel="emit('cancel')">
+  <Modal cls="bug-modal" @cancel="emit('cancel')">
     <div class="modal-title">
       {{ t('toolbar.bug_title') }}
     </div>

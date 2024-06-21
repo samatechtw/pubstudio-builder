@@ -15,6 +15,20 @@ import {
   ThemeHotkeys,
 } from '@pubstudio/shared/type-site'
 
+export const HotkeyStateToMenuAction: Record<HotkeyStates, MenuHotkeys> = {
+  [HotkeyStates.None]: '' as MenuHotkeys,
+  [HotkeyStates.ComponentBasic]: MenuHotkeys.OpenNewComponent,
+  [HotkeyStates.ComponentAdvanced]: MenuHotkeys.OpenNewComponent,
+  [HotkeyStates.CustomComponents]: MenuHotkeys.OpenCustomComponent,
+  [HotkeyStates.Pages]: MenuHotkeys.OpenPages,
+  [HotkeyStates.Theme]: MenuHotkeys.OpenTheme,
+  [HotkeyStates.Style]: MenuHotkeys.OpenStyle,
+  [HotkeyStates.Assets]: MenuHotkeys.OpenAssets,
+  [HotkeyStates.Behavior]: MenuHotkeys.OpenBehavior,
+  [HotkeyStates.History]: MenuHotkeys.OpenHistory,
+  [HotkeyStates.File]: MenuHotkeys.OpenFile,
+}
+
 export const DefaultHotkeys: IHotkeys = {
   [HotkeyStates.None]: {
     [Keys.a]: MenuHotkeys.OpenNewComponent,

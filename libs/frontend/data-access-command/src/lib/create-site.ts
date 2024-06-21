@@ -32,6 +32,7 @@ export const createEditorContext = (homePage: IPage): IEditorContext => {
     builderWidth: 1080,
     builderScale: 1,
     cssPseudoClass: CssPseudoClass.Default,
+    hotkeys: {},
     componentMenuCollapses: {
       [ComponentMenuCollapsible.Dimensions]: false,
       [ComponentMenuCollapsible.Styles]: false,
