@@ -102,7 +102,7 @@ const {
   site,
   changePage,
   setSelectedIsInput,
-  addOrUpdateComponentInput,
+  addOrUpdateSelectedInput,
   removeComponentInput,
 } = useBuild()
 
@@ -182,7 +182,7 @@ const updateComponentInputs = () => {
   setSelectedIsInput('href', editedLink.value)
 
   if (openInNewTab.value) {
-    addOrUpdateComponentInput('target', {
+    addOrUpdateSelectedInput('target', {
       type: ComponentArgPrimitive.String,
       name: 'target',
       attr: true,

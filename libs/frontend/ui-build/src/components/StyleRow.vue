@@ -65,6 +65,7 @@
       />
     </div>
     <SelectAssetModal
+      v-if="showAssetButton"
       :show="showSelectAssetModal"
       :initialSiteId="siteId"
       :contentTypes="contentTypes"
@@ -103,6 +104,7 @@ import { SelectAssetModal } from '@pubstudio/frontend/feature-site-assets'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { ISiteAssetViewModel } from '@pubstudio/shared/type-api-platform-site-asset'
 import { urlFromAsset } from '@pubstudio/frontend/util-asset'
+import { replaceBackground } from '@pubstudio/frontend/util-component'
 
 const { t } = useI18n()
 const { site } = useBuild()
@@ -240,7 +242,7 @@ const onBackgroundAssetSelected = (asset: ISiteAssetViewModel) => {
 
 const onBackgroundUrlSelected = (url: string) => {
   if (style.value.property === Css.Background) {
-    const newValue = replaceBackground(url)
+    const newValue = replaceBackground(style.value.value, url)
     updateValue(newValue)
     saveStyle()
   } else if (style.value.property === Css.BackgroundImage) {
@@ -248,29 +250,6 @@ const onBackgroundUrlSelected = (url: string) => {
     saveStyle()
   }
   showSelectAssetModal.value = false
-}
-
-const replaceBackground = (assetUrl: string) => {
-  const cssValue = `url("${assetUrl}")`
-  const currentValue = style.value.value
-  if (CSS.supports('background', currentValue)) {
-    // Replace the background value and retain any non-url information.
-    // Find a more efficient & comprehensive way to extract attributes from CSS value.
-    const attributes = style.value.value
-      .split(/([^\s]+|"[^"]+"|'[^']+')/g)
-      .filter((value) => value.trim())
-    const valueIndex = attributes.findIndex(
-      (value) =>
-        // url(...), radial-gradient(crimson, skyblue), etc.
-        CSS.supports('background-image', value) ||
-        // red, green, etc.
-        CSS.supports('color', value),
-    )
-    attributes[valueIndex] = cssValue
-    return attributes.join(' ')
-  } else {
-    return cssValue
-  }
 }
 
 onMounted(() => {

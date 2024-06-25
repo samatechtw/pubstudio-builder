@@ -18,7 +18,7 @@ export interface IUseEditComponentInputFeature {
 }
 
 export const useEditComponentInput = (): IUseEditComponentInputFeature => {
-  const { editor, addOrUpdateComponentInput, removeComponentInput, setSelectedIsInput } =
+  const { editor, addOrUpdateSelectedInput, removeComponentInput, setSelectedIsInput } =
     useBuild()
 
   const isEditingInput = computed(() => {
@@ -38,7 +38,7 @@ export const useEditComponentInput = (): IUseEditComponentInputFeature => {
   }
 
   const upsertInput = (input: IComponentInput) => {
-    addOrUpdateComponentInput(input.name, input)
+    addOrUpdateSelectedInput(input.name, input)
     setEditedInput(undefined)
   }
 

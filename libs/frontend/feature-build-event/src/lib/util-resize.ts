@@ -1,4 +1,4 @@
-import { CssUnit, IResizeData } from '@pubstudio/shared/type-site'
+import { CssUnit, IEditorContext, IResizeData } from '@pubstudio/shared/type-site'
 
 export const getWidthPxPerPercent = (parentRect: DOMRect, unit: CssUnit): number => {
   if (unit === CssUnit['%']) {
@@ -29,9 +29,14 @@ const normalize = (value: number): string => {
   return Math.max(nonNaNValue, 0).toFixed(2).replace('.00', '')
 }
 
-export const calcNextHeight = (e: MouseEvent, data: IResizeData): string => {
+export const calcNextHeight = (
+  editor: IEditorContext | undefined,
+  e: MouseEvent,
+  data: IResizeData,
+): string => {
+  const builderScale = editor?.builderScale ?? 1
   let value = -1
-  const offset = e.clientY - data.startY
+  const offset = (e.clientY - data.startY) / builderScale
   if (data.heightUnit === CssUnit.px) {
     value = data.startHeight + offset
   } else if ([CssUnit['%'], CssUnit.vw, CssUnit.vh].includes(data.heightUnit)) {

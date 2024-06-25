@@ -32,7 +32,7 @@ const getDefaultError = (): IPageError => ({ name: '', route: '' })
 const emptyPage = (): IPageEdit => ({
   name: '',
   public: true,
-  route: '/',
+  route: '',
   head: {},
 })
 
@@ -62,6 +62,10 @@ export const setEditingPage = (site: ISite, route: string) => {
   const page = site.pages[route]
   if (page) {
     Object.assign(editingPage, getMetadataCopy(page))
+    const route = editingPage.route
+    // Remove leading slash for display
+    editingPage.route = route.startsWith('/') ? route.slice(1) : route
+
     Object.assign(editingPageSource, getMetadataCopy(page))
     editing.value = true
   }
@@ -95,8 +99,6 @@ export const usePageMenu = (): IUsePageMenuFeature => {
       editingPage.route !== editingPageSource.route
     ) {
       pageError.value.route = t('build.page_route_unique')
-    } else if (!editingPage.route.startsWith('/')) {
-      pageError.value.route = t('build.page_route_format')
     }
 
     // Name
@@ -131,9 +133,12 @@ export const usePageMenu = (): IUsePageMenuFeature => {
         return
       }
       const newPage = getMetadataCopy(editingPage)
+      const route = newPage.route
+      newPage.route = route.startsWith('/') ? route : `/${route}`
 
       if (isNew.value) {
         addPage(newPage, editingPage.copyFrom)
+        setEditPage(site.value.editor, newPage.route)
       } else {
         editPage(getMetadataCopy(editingPageSource), newPage)
       }
