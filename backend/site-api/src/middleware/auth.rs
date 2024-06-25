@@ -17,7 +17,7 @@ use lib_shared_types::shared::user::{RequestUser, UserType};
 
 use crate::{
     api_context::ApiContext,
-    db::cache_helpers::{get_metadata_from_cache_or_repo, get_site_from_cache_or_repo},
+    db::db_cache_layer::{get_metadata_from_cache_or_repo, get_site_from_cache_or_repo},
 };
 
 // Verify that the requestor ID matches the Site Owner
@@ -135,7 +135,7 @@ pub async fn error_cache(
 ) -> Result<Response, ApiError> {
     let response = next.run(request).await;
     if response.status() != 200 {
-        let site = get_site_from_cache_or_repo(&context, &site_id).await?;
+        let site = get_site_from_cache_or_repo(&context, &site_id).await?.site;
 
         let metadata = get_metadata_from_cache_or_repo(&context, &site_id).await?;
 

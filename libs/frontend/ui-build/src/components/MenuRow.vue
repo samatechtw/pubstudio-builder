@@ -13,6 +13,7 @@
         @keydown.enter="setValue"
         @keyup.esc="($event.target as HTMLInputElement)?.blur()"
       />
+      <Check v-if="showCheck" class="item-save" color="#009879" @click="setValue" />
     </slot>
     <div
       v-else
@@ -38,7 +39,7 @@
 <script lang="ts" setup>
 import { nextTick, onMounted, ref, toRefs, watch } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
-import { Copy, Edit, InfoBubble, PSInput } from '@pubstudio/frontend/ui-widgets'
+import { Check, Copy, Edit, InfoBubble, PSInput } from '@pubstudio/frontend/ui-widgets'
 import { copy } from '@pubstudio/frontend/util-doc'
 
 const { t } = useI18n()
@@ -56,6 +57,7 @@ const props = withDefaults(
     placeholder?: string
     immediateUpdate?: boolean
     copyValue?: boolean
+    showCheck?: boolean
   }>(),
   {
     value: undefined,
@@ -65,6 +67,7 @@ const props = withDefaults(
     info: undefined,
     infoKey: undefined,
     htmlInfo: false,
+    showCheck: false,
   },
 )
 const { value, editable, focusInput, forceEdit, immediateUpdate } = toRefs(props)

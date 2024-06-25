@@ -1,5 +1,6 @@
 pub mod cache;
 pub mod constants;
+pub mod domain;
 pub mod dto;
 pub mod entity;
 pub mod error;

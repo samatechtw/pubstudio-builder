@@ -11,6 +11,10 @@ import {
 const removeHeadField = (site: ISite, tag: IHeadTag, index: number) => {
   if (tag === 'base') {
     site.defaults.head.base = undefined
+  } else if (tag === 'title') {
+    site.defaults.head.title = undefined
+  } else if (tag === 'description') {
+    site.defaults.head.description = undefined
   } else {
     // TODO -- find a better way to handle these types
     const head = site.defaults.head[tag as keyof IHead] as IPageHeadObject[]
@@ -29,8 +33,12 @@ const setHeadField = (
 ) => {
   if (tag === 'base') {
     site.defaults.head.base = newValue as IHeadBase
+  } else if (tag === 'title') {
+    site.defaults.head.title = newValue as string
+  } else if (tag === 'description') {
+    site.defaults.head.description = newValue as string
   } else {
-    const tagObj = site.defaults.head[tag as keyof IHead] as IPageHeadObject[]
+    const tagObj = site.defaults.head[tag as keyof IHead] as IHeadObject[]
     tagObj[index] = newValue
   }
 }
@@ -43,8 +51,12 @@ const addHeadField = (
 ) => {
   if (tag === 'base') {
     site.defaults.head.base = newValue as IHeadBase
+  } else if (tag === 'title') {
+    site.defaults.head.title = newValue as string
+  } else if (tag === 'description') {
+    site.defaults.head.description = newValue as string
   } else {
-    const head = site.defaults.head[tag as keyof IHead] as IPageHeadObject[]
+    const head = site.defaults.head[tag as keyof IHead] as IHeadObject[]
     if (head) {
       head.splice(index, 0, newValue)
     } else {

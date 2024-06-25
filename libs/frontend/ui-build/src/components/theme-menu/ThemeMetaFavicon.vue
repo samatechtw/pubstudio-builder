@@ -15,7 +15,7 @@
         <Check class="item-save" @click="updateFavicon(newFavicon)" />
       </div>
       <div v-else class="favicon-info favicon-view">
-        <div class="favicon-url">
+        <div class="favicon-url" :class="{ none: !favicon }">
           {{ favicon || t('none') }}
         </div>
         <Edit class="edit-icon" @click="setEditingFavicon" />
@@ -122,6 +122,7 @@ const setEditingFavicon = () => {
   display: flex;
   flex-flow: column nowrap;
   width: 100%;
+  padding-top: 6px;
 }
 .favicon-info {
   display: flex;
@@ -139,6 +140,9 @@ const setEditingFavicon = () => {
   @mixin truncate;
   @mixin text 14px;
 }
+.none {
+  color: $grey-700;
+}
 .edit-icon {
   flex-shrink: 0;
 }
@@ -149,7 +153,7 @@ const setEditingFavicon = () => {
   @mixin size 22px;
 }
 .meta-name {
-  @mixin title 14px;
+  @mixin title-bold 13px;
   margin-right: 12px;
 }
 .item-delete {

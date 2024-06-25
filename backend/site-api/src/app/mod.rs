@@ -4,5 +4,6 @@ pub mod backup;
 pub mod custom;
 pub mod health;
 pub mod publish;
+pub mod serve;
 pub mod site;
 pub mod usage;

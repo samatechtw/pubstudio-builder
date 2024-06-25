@@ -17,7 +17,7 @@ use lib_shared_types::{
 use validator::Validate;
 
 use crate::{
-    api_context::ApiContext, db::cache_helpers::get_metadata_from_cache_or_repo,
+    api_context::ApiContext, db::db_cache_layer::get_metadata_from_cache_or_repo,
     middleware::auth::verify_site_owner,
 };
 

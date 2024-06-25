@@ -43,7 +43,7 @@ const setHeadField = (
       page.head.title = newValue as string
     } else {
       const tagObj = page.head[tag] as IPageHeadObject[]
-      tagObj[index] = newValue as IHeadObject
+      tagObj[index] = newValue as IPageHeadObject
     }
   }
 }
@@ -62,7 +62,7 @@ const addHeadField = (
     } else {
       const head = page.head[tag as keyof IPageHead] as IPageHeadObject[]
       if (head) {
-        head.splice(index, 0, newValue as IHeadObject)
+        head.splice(index, 0, newValue as IPageHeadObject)
       } else {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         page.head[tag as keyof IPageHead] = [newValue] as any

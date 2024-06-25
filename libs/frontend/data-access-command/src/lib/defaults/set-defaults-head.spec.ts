@@ -119,6 +119,88 @@ describe('Set Defaults Head', () => {
     expect(site.defaults.head.base).toBeUndefined()
   })
 
+  it('should add, set, and remove title', () => {
+    const newValue = 'NEWTITLE'
+    const addData: ISetDefaultsHeadData = {
+      tag: 'title',
+      index: 0,
+      newValue,
+    }
+    applySetDefaultsHead(site, addData)
+    // Assert title is added
+    expect(site.defaults.head.title).toEqual(newValue)
+
+    const updatedValue = 'UPDATED TITLE'
+    const updateData: ISetDefaultsHeadData = {
+      tag: 'title',
+      index: 0,
+      oldValue: newValue,
+      newValue: updatedValue,
+    }
+    // Assert title is updated
+    applySetDefaultsHead(site, updateData)
+    expect(site.defaults.head.title).toEqual(updatedValue)
+
+    const removeData: ISetDefaultsHeadData = {
+      tag: 'title',
+      index: 0,
+      oldValue: updatedValue,
+      newValue: undefined,
+    }
+    applySetDefaultsHead(site, removeData)
+    // Assert title is removed
+    expect(site.defaults.head.title).toBeUndefined()
+
+    // Undo all
+    undoSetDefaultsHead(site, removeData)
+    expect(site.defaults.head.title).toEqual(updatedValue)
+    undoSetDefaultsHead(site, updateData)
+    expect(site.defaults.head.title).toEqual(newValue)
+    undoSetDefaultsHead(site, addData)
+    expect(site.defaults.head.title).toBeUndefined()
+  })
+
+  it('should add, set, and remove description', () => {
+    const newValue = 'Some Description'
+    const addData: ISetDefaultsHeadData = {
+      tag: 'description',
+      index: 0,
+      newValue,
+    }
+    applySetDefaultsHead(site, addData)
+    // Assert description is added
+    expect(site.defaults.head.description).toEqual(newValue)
+
+    const updatedValue = 'UPDATED DESCRIPTION'
+    const updateData: ISetDefaultsHeadData = {
+      tag: 'description',
+      index: 0,
+      oldValue: newValue,
+      newValue: updatedValue,
+    }
+    // Assert description is updated
+    applySetDefaultsHead(site, updateData)
+    expect(site.defaults.head.description).toEqual(updatedValue)
+
+    const removeData: ISetDefaultsHeadData = {
+      tag: 'description',
+      index: 0,
+      oldValue: updatedValue,
+      newValue: undefined,
+    }
+    applySetDefaultsHead(site, removeData)
+    // Assert description is removed
+    expect(site.defaults.head.description).toBeUndefined()
+
+    // Undo all
+    undoSetDefaultsHead(site, removeData)
+    expect(site.defaults.head.description).toEqual(updatedValue)
+    undoSetDefaultsHead(site, updateData)
+    expect(site.defaults.head.description).toEqual(newValue)
+    undoSetDefaultsHead(site, addData)
+    expect(site.defaults.head.description).toBeUndefined()
+  })
+
   describe('multiple items in head meta array', () => {
     let data1: ISetDefaultsHeadData
     let data2: ISetDefaultsHeadData
