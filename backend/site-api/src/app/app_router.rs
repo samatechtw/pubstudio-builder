@@ -11,17 +11,17 @@ use axum::middleware::from_fn_with_state;
 use axum::response::IntoResponse;
 use axum::routing::{delete, patch, post};
 use axum::{routing::get, Router};
-use tower_http::services::ServeFile;
 
 use super::admin;
 use super::backup;
+use super::serve::serve_web_site;
 
 pub fn app_router(context: &ApiContext) -> Router<ApiContext> {
     let api_router = api_router(context);
 
     Router::new()
         .nest("/api", api_router)
-        .fallback_service(ServeFile::new("index.html")) // Handle all non-api/* routes and render the frontend
+        .fallback(get(serve_web_site::serve_web_site)) // Handle all non-api/* routes and render the frontend
 }
 
 fn api_router(context: &ApiContext) -> Router<ApiContext> {
@@ -59,6 +59,10 @@ fn api_router(context: &ApiContext) -> Router<ApiContext> {
                 site::delete_site::delete_site
                     .layer(from_fn_with_state(context.clone(), auth_admin)),
             ),
+        )
+        .route(
+            "/sites/:site_id/head",
+            get(site::get_site_head::get_site_head),
         )
         .route(
             "/sites",

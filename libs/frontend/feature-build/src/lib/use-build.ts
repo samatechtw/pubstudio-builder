@@ -64,7 +64,6 @@ import {
   ISetComponentCustomStyleData,
   ISetComponentEventData,
   ISetComponentInputData,
-  ISetDefaultsHeadData,
   ISetHomePageData,
   ISetPageHeadData,
   IUpdateMixinOrderData,
@@ -85,7 +84,6 @@ import {
   IEditorContext,
   IEditorEvent,
   IHeadObject,
-  IHeadTag,
   IPageHeadTag,
   IPageMetadata,
   IRawStylesWithSource,
@@ -210,10 +208,6 @@ export interface IUseBuild {
   setHomePage: (route: string) => void
   deleteSelected: () => void
   selectComponentParent: () => void
-  addDefaultsHead: (tag: IHeadTag, value: IHeadObject) => void
-  setDefaultsHead: (tag: IHeadTag, index: number, value: IHeadObject) => void
-  removeDefaultsHead: (tag: IHeadTag, index: number) => void
-  setFavicon: (newFavicon: string | undefined) => void
   addPageHead: (route: string, tag: IPageHeadTag, value: IHeadObject | string) => void
   setPageHead: (
     route: string,
@@ -958,62 +952,6 @@ export const useBuild = (): IUseBuild => {
     setSelectedComponent(site.value, parent)
   }
 
-  const setFavicon = (newFavicon: string | undefined) => {
-    const index =
-      site.value.defaults.head.link?.findIndex((link) => link.rel === 'icon') ?? 0
-    const oldValue = index === -1 ? undefined : site.value.defaults.head.link?.[index]
-    const data: ISetDefaultsHeadData = {
-      tag: 'link',
-      index: index === -1 ? 0 : index,
-      oldValue,
-      newValue: {
-        href: newFavicon,
-        rel: 'icon',
-      },
-    }
-    pushCommand(site.value, CommandType.SetDefaultsHead, data)
-  }
-
-  const addDefaultsHead = (tag: IHeadTag, value: IHeadObject) => {
-    const data: ISetDefaultsHeadData = {
-      tag,
-      index: 0,
-      newValue: value,
-    }
-    pushCommand(site.value, CommandType.SetDefaultsHead, data)
-  }
-
-  const setDefaultsHead = (tag: IHeadTag, index: number, value: IHeadObject) => {
-    let oldValue: IHeadObject | undefined
-    if (tag === 'base') {
-      oldValue = site.value.defaults.head.base
-    } else {
-      oldValue = site.value.defaults.head[tag]?.[index] as IHeadObject
-    }
-    const data: ISetDefaultsHeadData = {
-      tag,
-      index,
-      oldValue,
-      newValue: value,
-    }
-    pushCommand(site.value, CommandType.SetDefaultsHead, data)
-  }
-
-  const removeDefaultsHead = (tag: IHeadTag, index: number) => {
-    let oldValue: IHeadObject | undefined
-    if (tag === 'base') {
-      oldValue = site.value.defaults.head.base
-    } else {
-      oldValue = site.value.defaults.head[tag]?.[index] as IHeadObject
-    }
-    const data: ISetDefaultsHeadData = {
-      tag,
-      index,
-      oldValue,
-    }
-    pushCommand(site.value, CommandType.SetDefaultsHead, data)
-  }
-
   const addPageHead = (route: string, tag: IPageHeadTag, value: IHeadObject | string) => {
     const data: ISetPageHeadData = {
       route,
@@ -1031,10 +969,11 @@ export const useBuild = (): IUseBuild => {
     value: IHeadObject | string,
   ) => {
     let oldValue: IHeadObject | string | undefined
+    const head = site.value.pages[route]?.head
     if (tag === 'title') {
-      oldValue = site.value.pages[route]?.head.title
+      oldValue = head.title
     } else {
-      oldValue = site.value.pages[route]?.head[tag]?.[index]
+      oldValue = (head[tag] as unknown[])?.[index] as IHeadObject
     }
 
     const data: ISetPageHeadData = {
@@ -1049,10 +988,11 @@ export const useBuild = (): IUseBuild => {
 
   const removePageHead = (route: string, tag: IPageHeadTag, index: number) => {
     let oldValue: IHeadObject | string | undefined
+    const head = site.value.pages[route]?.head
     if (tag === 'title') {
-      oldValue = site.value.pages[route]?.head.title
+      oldValue = head.title
     } else {
-      oldValue = site.value.pages[route]?.head[tag]?.[index]
+      oldValue = (head[tag] as unknown[])?.[index] as IHeadObject
     }
 
     const data: ISetPageHeadData = {
@@ -1182,10 +1122,6 @@ export const useBuild = (): IUseBuild => {
     removePage,
     changePage,
     setHomePage,
-    setFavicon,
-    addDefaultsHead,
-    setDefaultsHead,
-    removeDefaultsHead,
     addPageHead,
     setPageHead,
     removePageHead,

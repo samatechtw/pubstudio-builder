@@ -3,6 +3,7 @@ pub mod create_site_from_backup;
 pub mod delete_site;
 pub mod get_current_site;
 pub mod get_site_domains;
+pub mod get_site_head;
 pub mod get_site_metadata;
 pub mod get_site_usage;
 pub mod get_site_version;

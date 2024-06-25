@@ -32,18 +32,18 @@ export interface IHeadScript {
 }
 
 export interface IHead {
+  title?: string
+  description?: string
   base?: IHeadBase
   link?: IHeadLink[]
   meta?: IHeadMeta[]
   script?: IHeadScript[]
 }
 
-export type IHeadObject = IHeadBase | IHeadLink | IHeadMeta | IHeadScript
+export type IHeadObject = string | IHeadBase | IHeadLink | IHeadMeta | IHeadScript
 export type IPageHeadObject = IHeadLink | IHeadMeta | IHeadScript
 
-export type IPageHead = Omit<IHead, 'base'> & {
-  title?: string
-}
+export type IPageHead = IHead
 
 export type IHeadTag = keyof IHead
 

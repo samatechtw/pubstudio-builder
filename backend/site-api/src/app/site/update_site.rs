@@ -97,6 +97,7 @@ pub async fn update_site(
     // extra work to determine that, so it's easier and more efficient just to let get_current_site
     // take care of refreshing the cache
     context.cache.remove_site(&id).await;
+    context.cache.sync().await;
     context
         .cache
         .create_or_update_usage(&id, site.calculate_site_size(), site_type)

@@ -2,13 +2,12 @@ use std::{borrow::Borrow, future::Future};
 
 use lib_shared_types::{
     cache::site_usage_data::SiteUsageData,
-    dto::site_api::get_current_site_dto::GetCurrentSiteResponse,
-    entity::site_api::{site_entity::SiteEntity, site_usage_entity::SiteUsageEntity},
+    entity::site_api::site_usage_entity::SiteUsageEntity,
     shared::{core::ExecEnv, js_date::JsDate, site::SiteType},
 };
 use moka::future::Cache;
 use serde::Serialize;
-use serde_json::{Map, Value};
+use serde_json::Value;
 
 use crate::error::api_error::ApiError;
 
@@ -31,32 +30,6 @@ pub struct AppCache {
     pub metadata_cache: SiteMetadataCache,
     pub site_data_cache: SiteDataCache,
     exec_env: ExecEnv,
-}
-
-pub fn site_to_value(site: &SiteEntity) -> Result<Value, serde_json::Error> {
-    let unwrapped_pages: String = serde_json::from_str(&site.pages)?;
-    let mut pages: Map<String, Value> = serde_json::from_str(&unwrapped_pages)?;
-
-    let mut filtered_json = Map::new();
-    for (key, value) in pages.iter_mut() {
-        if let Some(public) = value.get("public").and_then(Value::as_bool) {
-            if public {
-                filtered_json.insert(key.clone(), value.clone());
-            }
-        }
-    }
-    let pages_json = serde_json::to_string(&filtered_json)?;
-    let filtered_pages = serde_json::to_string(&pages_json)?;
-    let response = GetCurrentSiteResponse {
-        id: site.id.to_string(),
-        name: site.name.clone(),
-        version: site.version.clone(),
-        context: site.context.clone(),
-        defaults: site.defaults.clone(),
-        pages: filtered_pages,
-        published: site.published,
-    };
-    Ok(serde_json::to_value(response)?)
 }
 
 impl AppCache {
@@ -253,6 +226,6 @@ impl AppCache {
     }
 
     pub async fn remove_site(&self, site_id: &str) {
-        self.site_data_cache.invalidate(site_id).await;
+        self.site_data_cache.remove(site_id).await;
     }
 }

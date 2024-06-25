@@ -8,7 +8,7 @@ pub struct GetCurrentSiteQuery {
     pub p: Option<String>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct GetCurrentSiteResponse {
     pub id: String,
     pub name: String,
