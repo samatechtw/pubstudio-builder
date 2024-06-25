@@ -19,6 +19,7 @@
           <div class="context">
             <BehaviorContextVars />
             <MenuRow
+              ref="nameRef"
               :label="t('name')"
               :value="newBehavior.name"
               :forceEdit="true"
@@ -63,7 +64,7 @@
 
 <script lang="ts" setup>
 import { useI18n } from 'petite-vue-i18n'
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import hljs from 'highlight.js/lib/core'
 import js from 'highlight.js/lib/languages/javascript'
 import { EditorView } from 'prosemirror-view'
@@ -85,6 +86,8 @@ const { site, editor, setBehavior, removeBehavior, setBehaviorArg } = useBuild()
 const newBehavior = ref<IEditBehavior>({ name: '', code: '' })
 let saveStateTimer: ReturnType<typeof setInterval> | undefined
 
+const nameRef = ref<InstanceType<typeof MenuRow> | undefined>()
+
 const emit = defineEmits<{
   (e: 'saved', behavior: IBehavior): void
 }>()
@@ -93,9 +96,13 @@ const behavior = computed(() => {
   return editor.value?.editBehavior
 })
 
-watch(behavior, (behavior: IEditBehavior | undefined) => {
+watch(behavior, async (behavior: IEditBehavior | undefined) => {
   if (behavior) {
     newBehavior.value = { ...behavior }
+    if (!newBehavior.value.name) {
+      await nextTick()
+      nameRef.value?.newValueRef?.inputRef?.focus()
+    }
   }
 })
 

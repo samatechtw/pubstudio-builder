@@ -30,7 +30,7 @@ import {
 } from '@pubstudio/shared/type-site'
 import { clone } from '@pubstudio/frontend/util-component'
 
-const { addOrUpdateComponentInput, selectedComponentFlattenedStyles } = useBuild()
+const { addOrUpdateSelectedInput, selectedComponentFlattenedStyles } = useBuild()
 const { setOrRemoveStyle } = useToolbar()
 const { site, siteStore } = useSiteSource()
 const { showSelectAssetModal, contentTypes } = useSelectAsset()
@@ -62,7 +62,7 @@ const onUrlSelected = (url: string) => {
         is: url,
       }
       input.is = url
-      addOrUpdateComponentInput(input.name, input)
+      addOrUpdateSelectedInput(input.name, input)
     } else {
       const style = selectedComponentFlattenedStyles.value['background-image']
       if (style) {

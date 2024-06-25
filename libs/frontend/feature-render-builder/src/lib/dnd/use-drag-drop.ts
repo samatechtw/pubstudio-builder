@@ -20,6 +20,7 @@ import {
   CssPseudoClass,
   IComponent,
   ISite,
+  Tag,
 } from '@pubstudio/shared/type-site'
 import { computed, ComputedRef, Ref, ref } from 'vue'
 import { IDndState, IDraggedComponent, IDroppedFile, IDropProps } from './builder-dnd'
@@ -183,7 +184,8 @@ export const useDragDrop = (props: IUseDragDropProps): IUseDragDrop => {
       e.dataTransfer.effectAllowed = 'move'
       // If a parent of the original component is being dragged,
       // we need to manually set the drag image
-      if (isParent) {
+      const component = resolveComponent(site.context, componentId)
+      if (isParent || component?.tag === Tag.Img) {
         if (el) {
           e.dataTransfer.setDragImage(
             el,
@@ -252,6 +254,7 @@ export const useDragDrop = (props: IUseDragDropProps): IUseDragDrop => {
         dropProps.value = onDrag({
           e,
           site,
+          isFile,
           dragSrc: dragSource.value,
           hoverCmpIndex: getComponentIndex(),
           hoverCmp: component,

@@ -5,6 +5,7 @@
         {{ t('name') }}
       </div>
       <PSInput
+        ref="nameRef"
         v-model="editingPage.name"
         class="item name-input"
         name="name"
@@ -21,14 +22,17 @@
         :message="t('build.route-not-found')"
         class="route-info"
       />
+      <span class="route-slash">/</span>
       <PSInput
-        v-model="editingPage.route"
+        ref="routeRef"
+        :modelValue="editingPage.route"
         class="item route-input"
         name="route"
         :placeholder="t('build.route')"
         datalistId="page-route"
         :datalist="predefinedRoutes"
         :isError="!!pageError.route"
+        @update:modelValue="updateRoute"
       />
     </div>
     <div v-if="isNew" class="menu-row">
@@ -76,7 +80,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import {
   PSButton,
@@ -92,13 +96,34 @@ const { t } = useI18n()
 
 const { pageError, editingPage, pageOptions, isNew, savePage } = usePageMenu()
 
+const nameRef = ref<InstanceType<typeof PSInput> | undefined>()
+const routeRef = ref<InstanceType<typeof PSInput> | undefined>()
+
 const publicCheckboxData = computed(() => ({
   checked: editingPage.public,
 }))
 
+const updateRoute = (route: string) => {
+  if (route.startsWith('/')) {
+    editingPage.route = route.slice(1)
+    if (routeRef.value?.inputRef?.value) {
+      routeRef.value.inputRef.value = editingPage.route
+      routeRef.value.inputRef.setSelectionRange(0, 0)
+    }
+  } else {
+    editingPage.route = route
+  }
+}
+
 const notFoundRoute = '/not-found'
 
 const predefinedRoutes = [{ label: notFoundRoute, value: notFoundRoute }]
+
+onMounted(() => {
+  if (isNew.value) {
+    nameRef.value?.inputRef?.focus()
+  }
+})
 </script>
 
 <style lang="postcss" scoped>
@@ -106,6 +131,9 @@ const predefinedRoutes = [{ label: notFoundRoute, value: notFoundRoute }]
 
 .route-info {
   margin: 0 8px 0 auto;
+}
+.route-slash {
+  margin-left: auto;
 }
 .public-checkbox {
   margin: 8px 0;

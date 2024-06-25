@@ -148,6 +148,11 @@ export interface IUseBuild {
     newStyle: IStyleEntry,
     replace?: boolean,
   ) => void
+  setActiveCustomStyle: (
+    component: IComponent,
+    newStyle: IStyleEntry,
+    replace?: boolean,
+  ) => void
   setCustomStyles: (
     component: IComponent,
     styles: IOldNewStyleEntry[],
@@ -180,7 +185,12 @@ export interface IUseBuild {
     oldEventName: string,
     newEvent: IEditorEvent,
   ) => void
-  addOrUpdateComponentInput: (property: string, payload: Partial<IComponentInput>) => void
+  addOrUpdateComponentInput: (
+    component: IComponent | undefined,
+    property: string,
+    payload: Partial<IComponentInput>,
+  ) => void
+  addOrUpdateSelectedInput: (property: string, payload: Partial<IComponentInput>) => void
   removeComponentInput: (name: string) => void
   setSelectedIsInput: (prop: string, newValue: unknown) => void
   setBehavior: (behavior: IBehavior) => void
@@ -454,6 +464,32 @@ export const useBuild = (): IUseBuild => {
     pushOrReplaceCommand(site.value, command, replace)
   }
 
+  const setActiveCustomStyle = (
+    component: IComponent,
+    newStyle: IStyleEntry,
+    replace = false,
+  ) => {
+    const oldValue =
+      component.style.custom[activeBreakpoint.value.id]?.[newStyle.pseudoClass]?.[
+        newStyle.property
+      ]
+    const oldStyle: IStyleEntry | undefined = oldValue
+      ? {
+          pseudoClass: newStyle.pseudoClass,
+          property: newStyle.property,
+          value: oldValue,
+        }
+      : undefined
+    const command = setCustomStyleCommand(
+      site.value,
+      component,
+      oldStyle,
+      newStyle,
+      replace,
+    )
+    pushOrReplaceCommand(site.value, command, replace)
+  }
+
   const setCustomStyles = (
     component: IComponent,
     styles: IOldNewStyleEntry[],
@@ -668,14 +704,22 @@ export const useBuild = (): IUseBuild => {
   }
 
   const addOrUpdateComponentInput = (
+    component: IComponent | undefined,
+    property: string,
+    payload: Partial<IComponentInput>,
+  ) => {
+    const data = makeSetInputData(component, property, payload)
+    if (data) {
+      pushCommand(site.value, CommandType.SetComponentInput, data)
+    }
+  }
+
+  const addOrUpdateSelectedInput = (
     property: string,
     payload: Partial<IComponentInput>,
   ) => {
     const selected = site.value.editor?.selectedComponent
-    const data = makeSetInputData(selected, property, payload)
-    if (data) {
-      pushCommand(site.value, CommandType.SetComponentInput, data)
-    }
+    addOrUpdateComponentInput(selected, property, payload)
   }
 
   const removeComponentInput = (name: string) => {
@@ -1080,6 +1124,7 @@ export const useBuild = (): IUseBuild => {
     editSelectedComponent,
     getSelectedComponent,
     setCustomStyle,
+    setActiveCustomStyle,
     setCustomStyles,
     setPositionAbsolute,
     removeComponentCustomStyle,
@@ -1099,6 +1144,7 @@ export const useBuild = (): IUseBuild => {
     updateSelectedComponentEditorEvent,
     removeSelectedComponentEditorEvent,
     addOrUpdateComponentInput,
+    addOrUpdateSelectedInput,
     removeComponentInput,
     setSelectedIsInput,
     deleteSelected,

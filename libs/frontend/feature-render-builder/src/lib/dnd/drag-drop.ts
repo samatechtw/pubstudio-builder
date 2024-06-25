@@ -17,6 +17,7 @@ export interface IDropResult {
 export interface IOnDragOptions {
   e: DragEvent
   site: ISite
+  isFile: boolean
   dragSrc: IDraggedComponent | undefined
   hoverCmpIndex: number
   hoverCmp: IComponent
@@ -30,7 +31,8 @@ const getMousePosition = (e: DragEvent): XYCoord => {
 }
 
 export const onDrag = (options: IOnDragOptions): IDropProps => {
-  const { e, site, dragSrc, hoverCmpIndex, hoverCmp, elementRef, verticalOnly } = options
+  const { e, site, isFile, dragSrc, hoverCmpIndex, hoverCmp, elementRef, verticalOnly } =
+    options
 
   const dropProps = defaultDropProps()
 
@@ -84,6 +86,8 @@ export const onDrag = (options: IOnDragOptions): IDropProps => {
 
       if (
         addNewComponentToRoot ||
+        // Set image URL
+        (hoverCmp.tag === Tag.Img && isFile) ||
         (hoverCmp.id !== dragCmpParentId &&
           !hoverCmp.content &&
           hoverCmp.tag !== Tag.Img &&

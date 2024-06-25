@@ -339,7 +339,7 @@ export const useBuildEvent = () => {
         const newHeightStyle: IStyleEntry = {
           pseudoClass: CssPseudoClass.Default,
           property: Css.Height,
-          value: calcNextHeight(e, data),
+          value: calcNextHeight(editor, e, data),
         }
 
         // Width
