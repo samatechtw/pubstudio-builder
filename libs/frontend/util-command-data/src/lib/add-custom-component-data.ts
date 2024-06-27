@@ -16,6 +16,7 @@ export const makeAddCustomComponentData = (
   }
   const data: IAddComponentData = {
     tag: customCmp.tag,
+    name: customCmp.name,
     ...selectAddParent(parent, undefined),
     customComponentId: customCmp.id,
     selectedComponentId,

@@ -134,7 +134,7 @@ const inputArray = computed(() => {
   const cmp = component.value
   const custom = resolveComponent(site.value.context, cmp.customSourceId)
 
-  for (const [key, input] of Object.entries({ ...cmp.inputs, ...custom?.inputs })) {
+  for (const [key, input] of Object.entries({ ...custom?.inputs, ...cmp.inputs })) {
     inputs[key] = resolveInput(site.value.context, input.is ?? input.default, false)
   }
   return Object.entries(inputs).sort((entryA, entryB) =>

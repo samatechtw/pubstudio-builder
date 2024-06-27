@@ -1,6 +1,6 @@
 <template>
   <div class="style-menu-list">
-    <EditMenuTitle :title="t('style.reusable')" @add="newStyle" />
+    <EditMenuTitle :title="t('style.reusable')" @add="newMixin(site)" />
     <div v-if="styles.length" class="styles">
       <div
         v-for="(style, index) in styles"
@@ -43,7 +43,7 @@ import { useListDrag } from '@pubstudio/frontend/util-doc'
 
 const { t } = useI18n()
 
-const { newStyle } = useMixinMenu()
+const { newMixin } = useMixinMenu()
 const { deleteStyle, updateMixinOrder, site } = useBuild()
 
 const { openMixinMenu } = useMixinMenuUi()

@@ -138,7 +138,7 @@ const convertToMixin = () => {
   toMixinRef.value?.cancelHoverTimer()
   const cmp = editor.value?.selectedComponent
   if (cmp) {
-    newStyle(site.value, cmp)
+    newMixin(site.value, cmp)
   }
 }
 </script>
