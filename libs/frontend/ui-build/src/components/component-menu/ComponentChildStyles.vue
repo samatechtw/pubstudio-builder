@@ -55,7 +55,6 @@
         :editing="isEditing(entry.property)"
         :omitEditProperties="nonInheritedProperties"
         :error="!resolveThemeVariables(site.context, entry.value)"
-        class="menu-row"
         @setProperty="setProperty(entry, $event)"
         @setValue="setValue(entry, $event)"
         @edit="editStyle(entry.property)"
@@ -165,6 +164,7 @@ const removeSelector = () => {
 @import '@theme/css/mixins.postcss';
 
 .child-styles {
+  background-color: $menu-bg2;
   padding: 0 16px;
   width: 100%;
 }

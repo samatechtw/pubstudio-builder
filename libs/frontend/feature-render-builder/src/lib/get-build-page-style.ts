@@ -118,10 +118,10 @@ export const getBuildPageStyle = (site: ISite, page: IPage): IResolvedBuildPageS
   iteratePage(page, appendStyle)
 
   const sortedPageStyle = sortRawStyleRecord(pageStyle)
-  const sortedcustomStyle = sortRawStyleRecord(customStyle)
+  const sortedCustomStyle = sortRawStyleRecord(customStyle)
 
   return {
     component: sortedPageStyle,
-    custom: sortedcustomStyle,
+    custom: sortedCustomStyle,
   }
 }

@@ -18,7 +18,6 @@
       :editing="isEditing(entry.property)"
       :focusProp="!entry.property"
       :omitEditProperties="nonInheritedProperties"
-      class="menu-row"
       @setProperty="setProperty(entry, $event)"
       @setValue="setValue(entry, $event)"
       @edit="editStyle(entry.property)"
