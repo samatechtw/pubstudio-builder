@@ -43,7 +43,7 @@ const targetRoute = computed<IRoute<unknown> | undefined>(() => {
     }
     return route
   } else {
-    return router.resolve(to.value.path)
+    return router.resolvePath(to.value.path)
   }
 })
 
@@ -57,8 +57,8 @@ const link = computed(() => {
   }
 })
 
-const isActive = computed(
-  () => matchedRoutes?.value.some((route) => route.name === targetRoute.value?.name),
+const isActive = computed(() =>
+  matchedRoutes?.value.some((route) => route.name === targetRoute.value?.name),
 )
 
 const isExactActive = computed(() => {
