@@ -3,6 +3,7 @@ export interface ISiteMetadata {
   disabled: boolean
   location: string
   site_type: string
+  custom_domains: string[]
 }
 
 export type IListSitesApiResponse = ISiteMetadata[]

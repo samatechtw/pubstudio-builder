@@ -58,6 +58,12 @@
         :text="t('build.divider_horizontal')"
         :builtinComponentId="dividerHorizontal.id"
       />
+      <NewComponent
+        v-if="isSiteApi"
+        class="new-view-counter"
+        :text="t('build.view_counter')"
+        :builtinComponentId="viewCounter.id"
+      />
     </div>
     <div class="new-right">
       <NewComponent
@@ -136,6 +142,7 @@ import {
   contactForm,
   mailingList,
   backgroundImage,
+  viewCounter,
 } from '@pubstudio/frontend/util-builtin'
 import {
   ContactFormWalkthroughModal,

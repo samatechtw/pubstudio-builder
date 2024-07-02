@@ -22,7 +22,7 @@ describe('Serve site', () => {
   })
 
   it('returns site with correct metadata', async () => {
-    const response = await api.get('').set('Host', 'test3.com').expect(200)
+    const response = await api.get('').set('Host', 'test3.localhost').expect(200)
     const body = response.text
 
     // Make sure response is HTML and contains site name
@@ -42,7 +42,7 @@ describe('Serve site', () => {
       .send(payload)
       .expect(200)
 
-    const response = await api.get('').set('Host', 'test3.com').expect(200)
+    const response = await api.get('').set('Host', 'test3.localhost').expect(200)
     const body = response.text
 
     // Make sure response is HTML and contains updated meta title
@@ -52,7 +52,7 @@ describe('Serve site', () => {
 
   it('updates site defaults and returns correct description', async () => {
     // Check default description is site title
-    const r1 = await api.get('').set('Host', 'test3.com').expect(200)
+    const r1 = await api.get('').set('Host', 'test3.localhost').expect(200)
     const b1 = r1.text
     expect(b1.includes('<meta name="description" content="Test Site 3" />')).toBe(true)
 
@@ -67,7 +67,7 @@ describe('Serve site', () => {
       .send(payload)
       .expect(200)
 
-    const r2 = await api.get('').set('Host', 'test3.com').expect(200)
+    const r2 = await api.get('').set('Host', 'test3.localhost').expect(200)
     const b2 = r2.text
 
     // Make sure response is HTML and contains updated meta title

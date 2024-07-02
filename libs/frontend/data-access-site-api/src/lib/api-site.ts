@@ -6,8 +6,10 @@ import {
   IGetSiteVersionApiResponse,
   IListSiteVersionsApiResponse,
   IPublishSiteApiRequest,
+  ISiteMetadata,
   IUpdateSiteApiRequest,
   IUpdateSiteApiResponse,
+  IUpdateSiteMetadataApiRequest,
 } from '@pubstudio/shared/type-api-site-sites'
 import { RequestParams } from '@sampullman/fetch-api'
 
@@ -26,6 +28,11 @@ export interface IApiSite {
   getSiteVersion: GetSiteVersionFn
   listSiteVersions(siteId: string): Promise<IListSiteVersionsApiResponse>
   getSiteUsage(siteId: string): Promise<IGetSiteUsageApiResponse>
+  getSiteMetadata(siteId: string): Promise<ISiteMetadata>
+  updateSiteMetadata(
+    siteId: string,
+    payload: IUpdateSiteMetadataApiRequest,
+  ): Promise<void>
   updateSite(
     siteId: string,
     payload: IUpdateSiteApiRequest,
@@ -60,7 +67,7 @@ export const useSiteApi = (api: PSApi): IApiSite => {
       editor: serialized.editor ? JSON.parse(serialized.editor) : undefined,
       history: serialized.history ? JSON.parse(serialized.history) : undefined,
       pages: JSON.parse(serialized.pages),
-      pageOrder: JSON.parse(serialized.pageOrder),
+      pageOrder: serialized.pageOrder ? JSON.parse(serialized.pageOrder) : undefined,
       published: serialized.published,
       disabled: serialized.disabled,
       updated_at: serialized.updated_at,
@@ -74,6 +81,24 @@ export const useSiteApi = (api: PSApi): IApiSite => {
       url: `sites/${siteId}/usage`,
     })
     return data
+  }
+
+  const getSiteMetadata = async (siteId: string): Promise<ISiteMetadata> => {
+    const { data } = await api.authRequest<ISiteMetadata>({
+      url: `sites_metadata/${siteId}`,
+    })
+    return data
+  }
+
+  const updateSiteMetadata = async (
+    siteId: string,
+    payload: IUpdateSiteMetadataApiRequest,
+  ) => {
+    await api.authRequest({
+      url: `sites_metadata/${siteId}`,
+      method: 'PATCH',
+      data: payload,
+    })
   }
 
   const listSiteVersions = async (
@@ -131,7 +156,7 @@ export const useSiteApi = (api: PSApi): IApiSite => {
       editor: serialized.editor ? JSON.parse(serialized.editor) : undefined,
       history: serialized.history ? JSON.parse(serialized.history) : undefined,
       pages: JSON.parse(serialized.pages),
-      pageOrder: JSON.parse(serialized.pageOrder),
+      pageOrder: serialized.pageOrder ? JSON.parse(serialized.pageOrder) : undefined,
       disabled: serialized.disabled,
       published: serialized.published,
       updated_at: serialized.updated_at,
@@ -143,6 +168,8 @@ export const useSiteApi = (api: PSApi): IApiSite => {
   return {
     updateSite,
     getSiteUsage,
+    getSiteMetadata,
+    updateSiteMetadata,
     getSiteVersion,
     listSiteVersions,
     createDraft,

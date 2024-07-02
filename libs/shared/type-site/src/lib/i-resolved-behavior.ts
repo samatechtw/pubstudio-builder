@@ -1,3 +1,4 @@
+import { IGetPublicSiteUsageApiResponse } from '@pubstudio/shared/type-api-site-sites'
 import { Css } from './enum-css'
 import { IComponent, IComponentEventBehavior, IComponentState } from './i-component'
 import { ISite } from './i-site'
@@ -30,6 +31,7 @@ export interface IBehaviorHelpers {
   ): string
   setLoading(component: IComponent | undefined, loading: boolean): void
   addRow(table: string, row: Record<string, string>): Promise<void>
+  getPublicUsage(site: ISite): Promise<IGetPublicSiteUsageApiResponse>
 }
 
 export interface IBehaviorContext {

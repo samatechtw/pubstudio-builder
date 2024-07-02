@@ -5,6 +5,7 @@ import { useLocalStore } from './use-local-store'
 
 export interface IInitializeSiteStoreOptions {
   siteApiUrl?: string
+  authBypassToken?: Ref<string>
   siteId: string | undefined
   // For setting up access to the Site API
   userToken?: Ref<string | null>
@@ -14,7 +15,7 @@ export const initializeSiteStore = async (
   options: IInitializeSiteStoreOptions,
 ): Promise<string | undefined> => {
   const { initializeSite } = useSiteSource()
-  const { siteId, siteApiUrl, userToken } = options
+  const { siteId, siteApiUrl, authBypassToken, userToken } = options
 
   // The reason we initialize localstore like this is not obvious, the purpose
   // is to allow other code to later call `useLocalStore` without calculating the key,
@@ -22,7 +23,9 @@ export const initializeSiteStore = async (
   const isScratch = !siteId || siteId === 'scratch'
   const localStoreKey = isScratch ? 'scratchSite' : 'site'
   const localStore = useLocalStore(localStoreKey)
-  const store = isScratch ? localStore : useApiStore({ siteId, siteApiUrl })
+  const store = isScratch
+    ? localStore
+    : useApiStore({ siteId, siteApiUrl, authBypassToken })
   const serverAddress = await initializeSite({
     store,
     siteId,

@@ -37,6 +37,10 @@ describe('List Sites', () => {
       expect(body.location).toEqual(`site-api/db/sites/site_${siteId}.db`)
       expect(body.disabled).toEqual(false)
       expect(body.site_type).toEqual(SiteType.Paid2)
+      expect(body.custom_domains).toEqual([
+        'test3.localhost',
+        'user1-site3-subdomain.dev.pubstud.io',
+      ])
     })
   })
 

@@ -1,9 +1,9 @@
 <template>
-  <div class="not-found content-wrap">
-    <div class="not-found-title content-title">
+  <div class="f">
+    <div class="nf1">
       {{ notFoundTitle }}
     </div>
-    <div class="not-found-text">
+    <div class="nf2">
       {{ notFoundText }}
     </div>
   </div>
@@ -15,22 +15,21 @@ const notFoundText = "Sorry, we can't find what you're looking for."
 </script>
 
 <style lang="postcss">
-.not-found {
+.nf {
   color: #070028;
   min-height: 480px;
   text-align: center;
   padding-top: 120px;
   position: relative;
+  font-family: Helvetica, sans-serif;
 }
-.not-found-title {
+.nf1 {
   font-size: 24px;
   font-weight: 600;
-  font-family: Helvetica, sans-serif;
 }
-.not-found-text {
+.nf2 {
   font-size: 16px;
   font-weight: 500;
-  font-family: Helvetica, sans-serif;
   color: rgba(black, 0.6);
   margin-top: 24px;
 }

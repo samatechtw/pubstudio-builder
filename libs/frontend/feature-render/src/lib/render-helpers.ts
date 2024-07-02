@@ -7,33 +7,25 @@ export const computeEvents = (site: ISite, component: IComponent): IEventCollect
     native: {},
     custom: {},
   }
+  const customCmp = resolveComponent(site.context, component.customSourceId)
+  const allEvents = [
+    ...Object.values(customCmp?.events ?? {}),
+    ...Object.values(component.events ?? {}),
+  ]
 
-  const appendEvents = (cmp: IComponent) => {
-    for (const event of Object.values(cmp.events ?? {})) {
-      const nativeEventName = NativeEvents[event.name]
+  for (const event of allEvents) {
+    const nativeEventName = NativeEvents[event.name]
 
-      const eventHandler = (e: Event | undefined) => {
-        triggerEventBehaviors(event.behaviors, site, component, e)
-      }
+    const eventHandler = (e: Event | undefined) => {
+      triggerEventBehaviors(event.behaviors, site, component, e)
+    }
 
-      if (nativeEventName) {
-        events.native[nativeEventName] = eventHandler
-      } else {
-        events.custom[event.name] = [eventHandler, event.eventParams]
-      }
+    if (nativeEventName) {
+      events.native[nativeEventName] = eventHandler
+    } else {
+      events.custom[event.name] = [eventHandler, event.eventParams]
     }
   }
-
-  const customCmp = resolveComponent(site.context, component.customSourceId)
-
-  // Append custom source events
-  if (customCmp) {
-    appendEvents(customCmp)
-  }
-
-  // Append component events
-  appendEvents(component)
-
   return events
 }
 

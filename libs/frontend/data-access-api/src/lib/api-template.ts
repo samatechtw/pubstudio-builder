@@ -31,7 +31,7 @@ export const useTemplateApi = (api: PSApi): IApiTemplate => {
       context: JSON.parse(serialized.context),
       defaults: JSON.parse(serialized.defaults),
       pages: JSON.parse(serialized.pages),
-      pageOrder: JSON.parse(serialized.pageOrder),
+      pageOrder: serialized.pageOrder ? JSON.parse(serialized.pageOrder) : undefined,
       created_at: serialized.created_at,
       public: serialized.public,
     }
@@ -69,7 +69,7 @@ export const useTemplateApi = (api: PSApi): IApiTemplate => {
       context: JSON.parse(serialized.context),
       defaults: JSON.parse(serialized.defaults),
       pages: JSON.parse(serialized.pages),
-      pageOrder: JSON.parse(serialized.pageOrder),
+      pageOrder: serialized.pageOrder ? JSON.parse(serialized.pageOrder) : undefined,
       created_at: serialized.created_at,
       public: serialized.public,
     }
@@ -97,7 +97,7 @@ export const useTemplateApi = (api: PSApi): IApiTemplate => {
       context: JSON.parse(serialized.context),
       defaults: JSON.parse(serialized.defaults),
       pages: JSON.parse(serialized.pages),
-      pageOrder: JSON.parse(serialized.pageOrder),
+      pageOrder: serialized.pageOrder ? JSON.parse(serialized.pageOrder) : undefined,
       created_at: serialized.created_at,
       public: serialized.public,
     }

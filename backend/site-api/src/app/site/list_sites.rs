@@ -16,6 +16,7 @@ fn to_api_response(metadata: Vec<SiteMetadataEntity>) -> Json<Vec<SiteMetadataVi
                 location: meta.location,
                 disabled: meta.disabled,
                 site_type: meta.site_type,
+                custom_domains: meta.domains,
             })
             .collect(),
     )

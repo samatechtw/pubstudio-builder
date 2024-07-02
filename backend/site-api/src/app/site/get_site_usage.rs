@@ -5,7 +5,9 @@ use axum::{
 use axum_macros::debug_handler;
 use lib_shared_site_api::error::api_error::ApiError;
 use lib_shared_types::{
-    dto::site_api::site_usage_viewmodel::{from_usage_data, SiteUsageViewModel},
+    dto::site_api::site_usage_viewmodel::{
+        from_usage_data, PublicSiteUsageViewModel, SiteUsageViewModel,
+    },
     shared::user::RequestUser,
 };
 
@@ -34,4 +36,14 @@ pub async fn get_site_usage(
             .site_type
             .get_custom_data_allowance(context.config.exec_env),
     )));
+}
+
+#[debug_handler]
+pub async fn get_public_site_usage(
+    Path(site_id): Path<String>,
+    State(context): State<ApiContext>,
+) -> Result<Json<PublicSiteUsageViewModel>, ApiError> {
+    let usage = context.cache.get_usage(&site_id).await?;
+
+    return Ok(Json(usage.into()));
 }

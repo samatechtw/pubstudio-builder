@@ -52,7 +52,7 @@ describe('Get Current Site', () => {
         .expect(200)
 
       const body1: IGetSiteApiResponse = r1.body
-      expect(body1.id).toEqual('1')
+      expect(body1.id).toEqual('870aafc9-36e9-476a-b38c-c1aaaad9d9fe')
       expect(body1.context).toEqual(JSON.stringify(newData1))
 
       // Create a draft
@@ -141,7 +141,10 @@ describe('Get Current Site', () => {
     })
 
     it('returns current site when requester is anonymous', async () => {
-      const response = await api.get(testEndpoint).set('Host', 'test3.com').expect(200)
+      const response = await api
+        .get(testEndpoint)
+        .set('Host', 'test3.localhost')
+        .expect(200)
 
       const body: IGetSiteApiResponse = response.body
       expect(body.name).toEqual('Test Site 3')

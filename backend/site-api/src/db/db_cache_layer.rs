@@ -18,11 +18,10 @@ pub fn site_response_to_cached(site: GetCurrentSiteResponse) -> CachedSiteData {
         title: get_site_title(&defaults, &site.name),
         description: get_site_description(&defaults, &site.name),
     };
-    println!("GET META {:?} {:?}", defaults, meta);
     CachedSiteData { site, meta }
 }
 
-pub fn site_to_value(site: &SiteEntity) -> Result<Value, serde_json::Error> {
+pub fn site_to_value(site: &SiteEntity, site_id: &str) -> Result<Value, serde_json::Error> {
     let unwrapped_pages: String = serde_json::from_str(&site.pages)?;
     let mut pages: Map<String, Value> = serde_json::from_str(&unwrapped_pages)?;
 
@@ -37,7 +36,7 @@ pub fn site_to_value(site: &SiteEntity) -> Result<Value, serde_json::Error> {
     let pages_json = serde_json::to_string(&filtered_json)?;
     let filtered_pages = serde_json::to_string(&pages_json)?;
     let response = GetCurrentSiteResponse {
-        id: site.id.to_string(),
+        id: site_id.to_string(),
         name: site.name.clone(),
         version: site.version.clone(),
         context: site.context.clone(),
@@ -61,7 +60,7 @@ pub async fn get_raw_site_from_cache_or_repo(
                 .get_site_latest_version(site_id, true)
                 .await
                 .map_err(|e| ApiError::not_found().message(e))?;
-            Ok(site_to_value(&site).map_err(|e| ApiError::internal_error().message(e))?)
+            Ok(site_to_value(&site, site_id).map_err(|e| ApiError::internal_error().message(e))?)
         })
         .await?;
 
@@ -88,7 +87,7 @@ pub async fn get_site_or_preview(
             .get_site_by_preview_id(site_id, &preview_id)
             .await
             .map_err(|_| ApiError::not_found().message("Site preview not found"))?;
-        site_response_to_cached(to_api_response(&site))
+        site_response_to_cached(to_api_response(&site, site_id))
     } else {
         // Get site from cache
         let site_data: CachedSiteData = get_site_from_cache_or_repo(&context, site_id).await?;

@@ -16,6 +16,7 @@ import { navMenu, navMenuItem } from './builtin-nav-menu'
 import { svg } from './builtin-svg'
 import { text } from './builtin-text'
 import { textarea } from './builtin-textarea'
+import { viewCounter } from './builtin-view-counter'
 
 export const builtinComponents: Record<string, ISerializedComponent> = {
   [containerHorizontal.id]: containerHorizontal,
@@ -49,4 +50,5 @@ export const builtinComponents: Record<string, ISerializedComponent> = {
   [dividerHorizontal.id]: dividerHorizontal,
   [contactForm.id]: contactForm,
   [mailingList.id]: mailingList,
+  [viewCounter.id]: viewCounter,
 }
