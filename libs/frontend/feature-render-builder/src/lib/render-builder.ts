@@ -294,6 +294,15 @@ export const computePropsContent = (
     }
   }
 
+  let builderStyleProps: IBuilderStyleProps | undefined = undefined
+  if (editor?.active) {
+    builderStyleProps = computeBuilderStyleProps(site, component, data, dndState)
+    const { extraChildren } = builderStyleProps
+    if (extraChildren) {
+      content.push(...extraChildren)
+    }
+  }
+
   // TODO -- improve efficiency by avoiding unnecessary input/attr computation
   // in computeAttrsInputsMixins
   // Ignore HTML attrs in builder
@@ -305,15 +314,6 @@ export const computePropsContent = (
     attrs.src = data.attrs.src
   }
   data.attrs = attrs
-
-  let builderStyleProps: IBuilderStyleProps | undefined = undefined
-  if (editor?.active) {
-    builderStyleProps = computeBuilderStyleProps(site, component, data, dndState)
-    const { extraChildren } = builderStyleProps
-    if (extraChildren) {
-      content.push(...extraChildren)
-    }
-  }
 
   const props = {
     ...data.attrs,
