@@ -36,7 +36,7 @@ async fn main() {
     const CRATE_NAME: &str = env!("CARGO_CRATE_NAME");
 
     // Parse config
-    let config = Config::parse();
+    let mut config = Config::parse();
     let host = config.api_host.clone();
     let port = config.api_port.clone();
     let s3_url = config.s3_url.clone();
@@ -45,6 +45,10 @@ async fn main() {
 
     let api_url = format!("{}:{}", host, port);
 
+    // Don't allow empty string as auth bypass
+    if config.auth_bypass_api_key == Some("".to_string()) {
+        config.auth_bypass_api_key = None;
+    }
     // Notify auth mode
     if config.auth_bypass_api_key.is_some() {
         println!("Auth mode: bypass (In production, make sure to generate a secure token.)");
