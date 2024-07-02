@@ -146,6 +146,10 @@ fn api_router(context: &ApiContext) -> Router<ApiContext> {
                 .route_layer(from_fn_with_state(context.clone(), auth_admin_owner)),
         )
         .route(
+            "/sites/:site_id/public_usage",
+            get(site::get_site_usage::get_public_site_usage),
+        )
+        .route(
             "/actions/persist-usage",
             get(usage::persist_usage::persist_usage),
         )

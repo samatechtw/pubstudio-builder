@@ -1,1 +1,1 @@
-jest.mock('@pubstudio/frontend/util-config', () => ({}))
+jest.mock('@pubstudio/frontend/util-config', () => ({ builderConfig: {} }))

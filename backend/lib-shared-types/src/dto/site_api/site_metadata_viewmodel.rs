@@ -8,4 +8,5 @@ pub struct SiteMetadataViewModel {
     pub location: String,
     pub disabled: bool,
     pub site_type: SiteType,
+    pub custom_domains: Vec<String>,
 }

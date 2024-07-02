@@ -155,7 +155,7 @@ fn root_seed_data() -> Vec<RootSiteEntity> {
             disabled: false,
             subdomain_record_id: "user1-site3-record-id".into(),
             subdomain: "user1-site3-subdomain".into(),
-            custom_domains: vec!["test3.com".into()],
+            custom_domains: vec!["test3.localhost".into()],
             created_at: Utc::now() + Duration::days(2),
             updated_at: Utc::now(),
         },

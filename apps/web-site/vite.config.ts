@@ -30,6 +30,7 @@ export default defineConfig({
       'frontend/util-api',
       'frontend/util-clickaway',
       'frontend/util-router',
+      'frontend/feature-builtin',
       'frontend/feature-site-source',
       'frontend/feature-render',
       'frontend/util-ids',

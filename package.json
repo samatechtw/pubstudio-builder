@@ -12,7 +12,7 @@
     "format:check": "nx format:check",
     "lint": "nx workspace-lint && nx lint",
     "lint:style": "./node_modules/stylelint/bin/stylelint.js \"**/src/**/*.{css,vue}\"",
-    "build:web-site": "cd apps/web-site && vite build --outDir ../../dist/apps/web-site --emptyOutDir",
+    "build:web-site": "npx nx build web-site --skip-nx-cache && cp ./dist/apps/web-site/index.html ./backend/",
     "build:feature-external": "cd libs/frontend/feature-external && npm run build",
     "build:util-external": "cd libs/frontend/util-external && npm run build",
     "publish": "cd dist/libs/feature-external/ && npm publish --access=public",
@@ -55,8 +55,8 @@
     "prosemirror-state": "^1.4.3",
     "prosemirror-transform": "^1.9.0",
     "prosemirror-view": "^1.33.6",
-    "vue": "^3.4.27",
-    "vue-router": "^4.3.2"
+    "vue": "^3.4.31",
+    "vue-router": "^4.4.0"
   },
   "devDependencies": {
     "@commitlint/config-conventional": "^19.2.2",
@@ -77,7 +77,7 @@
     "@typescript-eslint/eslint-plugin": "^7.8.0",
     "@typescript-eslint/parser": "^7.8.0",
     "@videojs/themes": "^1.0.1",
-    "@vitejs/plugin-vue": "^5.0.4",
+    "@vitejs/plugin-vue": "^5.0.5",
     "@vue/eslint-config-typescript": "^13.0.0",
     "commitlint": "^19.3.0",
     "convict": "^6.2.4",
@@ -100,9 +100,9 @@
     "ts-jest": "^29.1.2",
     "ts-jest-mock-import-meta": "^1.2.0",
     "typescript": "^5.4.5",
-    "vite": "5.2.11",
+    "vite": "5.3.2",
     "vite-plugin-dts": "^3.9.1",
-    "vite-plugin-singlefile": "^2.0.1",
+    "vite-plugin-singlefile": "^2.0.2",
     "vue-eslint-parser": "^9.4.2"
   }
 }

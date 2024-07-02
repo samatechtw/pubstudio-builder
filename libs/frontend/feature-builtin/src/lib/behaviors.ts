@@ -6,6 +6,7 @@ import {
   noBehaviorId,
   setHiddenId,
   toggleHiddenId,
+  viewCounterBehaviorId,
 } from '@pubstudio/frontend/util-ids'
 import { findComponent } from '@pubstudio/frontend/util-render'
 import {
@@ -86,6 +87,21 @@ export const setHidden: IBehavior = {
   },
 }
 registerBuiltinBehavior(setHidden)
+
+export const viewCounterBehavior: IBehavior = {
+  id: viewCounterBehaviorId,
+  name: 'View Counter',
+  builtin: async (
+    helpers: IBehaviorHelpers,
+    behaviorContext: IBehaviorContext,
+    _args?: IBehaviorCustomArgs,
+  ) => {
+    const { site, component } = behaviorContext
+    const usage = await helpers.getPublicUsage(site)
+    helpers.setContent(component, usage.request_count.toString())
+  },
+}
+registerBuiltinBehavior(viewCounterBehavior)
 
 export const homeLinkBehavior: IBehavior = {
   id: homeLinkBehaviorId,

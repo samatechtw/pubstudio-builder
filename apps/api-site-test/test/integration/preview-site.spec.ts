@@ -59,7 +59,7 @@ describe('Publish Site', () => {
     // Get current site with preview
     const response = await api
       .get('/api/sites/current')
-      .set('Host', 'test3.com')
+      .set('Host', 'test3.localhost')
       .query({ p: previewId })
       .expect(200)
 
@@ -95,7 +95,7 @@ describe('Publish Site', () => {
     // Get current site with preview
     const response = await api
       .get('/api/sites/current')
-      .set('Host', 'test3.com')
+      .set('Host', 'test3.localhost')
       .query({ p: previewId })
       .expect(200)
 

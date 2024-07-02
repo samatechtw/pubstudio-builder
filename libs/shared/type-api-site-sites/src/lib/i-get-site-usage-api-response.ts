@@ -11,3 +11,8 @@ export interface IGetSiteUsageApiResponse {
   custom_data_allowance: number
   last_updated: Date
 }
+
+export interface IGetPublicSiteUsageApiResponse {
+  request_count: number
+  last_updated: Date
+}

@@ -5,19 +5,12 @@ import {
   mailingListId,
   verticalStyleId,
 } from '@pubstudio/frontend/util-ids'
-import { IBreakpointStyles, IRawStyle, Tag } from '@pubstudio/shared/type-site'
+import { Tag } from '@pubstudio/shared/type-site'
 import { makeButton } from './builtin-button'
 import { makeH2 } from './builtin-h'
 import { makeText } from './builtin-text'
-import { makeInput } from './helpers'
+import { defaultStyle, makeInput } from './helpers'
 
-const defaultStyle = (raw: IRawStyle): IBreakpointStyles => {
-  return {
-    [DEFAULT_BREAKPOINT_ID]: {
-      default: raw,
-    },
-  }
-}
 export const mailingList = {
   id: mailingListId,
   name: 'MailingList',

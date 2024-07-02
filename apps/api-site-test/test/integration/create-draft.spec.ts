@@ -89,7 +89,10 @@ describe('Create Site Draft', () => {
 
       const newData1 = '{"test":"SOME TEST DATA"}'
 
-      const res = await api.get('/api/sites/current').set('Host', 'test3.com').expect(200)
+      const res = await api
+        .get('/api/sites/current')
+        .set('Host', 'test3.localhost')
+        .expect(200)
       const initialData = (res.body as IGetSiteApiResponse).pages
 
       // Create draft
@@ -110,7 +113,10 @@ describe('Create Site Draft', () => {
         .expect(200)
 
       // Published version not updated
-      const r1 = await api.get('/api/sites/current').set('Host', 'test3.com').expect(200)
+      const r1 = await api
+        .get('/api/sites/current')
+        .set('Host', 'test3.localhost')
+        .expect(200)
       const b1: IGetSiteVersionApiResponse = r1.body
       expect(b1.pages).toEqual(initialData)
 

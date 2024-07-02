@@ -19,9 +19,9 @@ pub struct GetCurrentSiteResponse {
     pub published: bool,
 }
 
-pub fn to_api_response(site: &SiteEntity) -> GetCurrentSiteResponse {
+pub fn to_api_response(site: &SiteEntity, site_id: &str) -> GetCurrentSiteResponse {
     GetCurrentSiteResponse {
-        id: site.id.to_string(),
+        id: site_id.to_string(),
         name: site.name.clone(),
         version: site.version.clone(),
         context: site.context.clone(),

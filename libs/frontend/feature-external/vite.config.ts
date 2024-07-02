@@ -22,6 +22,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@theme/': `${resolve('../ui-theme/src')}/`,
+      '@frontend-assets/': `${resolve('../ui-assets/src')}/`,
       ...tsconfigBaseAliases(__dirname),
     },
   },
@@ -36,7 +37,7 @@ export default defineConfig({
     },
     rollupOptions: {
       // externalize deps that shouldn't be bundled
-      external: ['vue'],
+      external: ['vue', 'vue-router', 'petite-vue-i18n'],
       output: {
         // globals to use in the UMD build for externalized deps
         globals: {

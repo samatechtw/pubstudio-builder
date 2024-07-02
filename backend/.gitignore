@@ -4,6 +4,7 @@ dist/
 tmp/
 out-tsc/
 node_modules/
+logs/
 
 package-lock.json
 pnpm-lock.yaml
@@ -33,3 +34,5 @@ log
 .netlify
 
 node_modules/
+
+/index.html

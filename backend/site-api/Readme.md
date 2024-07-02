@@ -1,6 +1,6 @@
 # Pubstudio Site API
 
-The Site API is written in Rust, and is not managed by Nx. Use the instructions below to install and run.
+The Site API is written in Rust, and not managed by Nx. Use the instructions below to install and run.
 
 ## Prerequisites
 
@@ -10,9 +10,17 @@ The Site API is written in Rust, and is not managed by Nx. Use the instructions 
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 ```
 
-## Generate Auth Keys
+## Auth
 
-When testing or developing locally, you can use the [below test keys](#test-keys). When running a public Site API server, you must generate your own RS256 key pair:
+PubStudio uses public key authentication to access protected endpoints. There are separate Admin and User types, which are specified in a bearer JWT for accessing endpoints.
+
+### Bypassing Auth
+
+Public key authentication can be bypassed by setting an `AUTH_BYPASS_API_KEY`, which defaults to `dev` when running locally (not in Docker). Change this when deploying, if Docker is not used. This key has Admin authority, and is passed the same way as the JWTs described below (bearer token in HTTP auth header).
+
+### Auth Keys
+
+You can use the [below test keys](#test-keys) to sign JWTs in development. When running a public Site API server, you must generate your own RS256 key pair and set the appropriate environment variables:
 
 ```bash
 # Generate private key (don't add passphrase)
@@ -40,6 +48,7 @@ PLATFORM_WEB_URL        | URL used for linking to sites (e.g. in notification em
 DATABASE_URL            | URL of the site metadata SQLite database
 SITE_API_HOST           | API host address
 SITE_API_PORT           | Port the API listens on
+AUTH_BYPASS_API_KEY     | Used to bypass public key auth in self-hosting mode
 SITE_ADMIN_PUBLIC_KEY   | Public key for authorizing Admin/Owner requests
 S3_URL                  | Optional URL for S3 object storage
 S3_ACCESS_KEY_ID        | Optional key ID for signing S3 requests

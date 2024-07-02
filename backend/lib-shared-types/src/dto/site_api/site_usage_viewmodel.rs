@@ -40,3 +40,18 @@ pub fn from_usage_data(
         last_updated: data.last_updated,
     }
 }
+
+#[derive(Debug, Clone, Serialize)]
+pub struct PublicSiteUsageViewModel {
+    pub request_count: u64,
+    pub last_updated: JsDate,
+}
+
+impl From<SiteUsageData> for PublicSiteUsageViewModel {
+    fn from(value: SiteUsageData) -> Self {
+        PublicSiteUsageViewModel {
+            request_count: value.request_count,
+            last_updated: value.last_updated,
+        }
+    }
+}

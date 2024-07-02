@@ -4,6 +4,7 @@ import {
   IAddRowApiRequest,
   ICustomDataApiRequest,
 } from '@pubstudio/shared/type-api-site-custom-data'
+import { IGetPublicSiteUsageApiResponse } from '@pubstudio/shared/type-api-site-sites'
 import {
   ComponentArgPrimitive,
   Css,
@@ -16,6 +17,10 @@ import {
 } from '@pubstudio/shared/type-site'
 import { rootSiteApi } from '@pubstudio/shared/util-web-site-api'
 import { resolveComponent } from './resolve-component'
+
+export interface IQueryOptions {
+  clearCache: boolean
+}
 
 export const requireArgs = (
   args: IBehaviorCustomArgs | undefined,
@@ -150,6 +155,13 @@ const addRow = async (table: string, row: Record<string, string>) => {
   })
 }
 
+const getPublicUsage = async (site: ISite, options?: IQueryOptions) => {
+  const { data } = await rootSiteApi.authOptRequest<IGetPublicSiteUsageApiResponse>({
+    url: `api/sites/${rootSiteApi.siteId.value}/public_usage`,
+  })
+  return data
+}
+
 export const argArray = <T extends ComponentArgPrimitive>(arr: unknown): T[] => {
   const arrayStr = arr as string | undefined
   return (arrayStr ?? '').split(',') as T[]
@@ -168,4 +180,5 @@ export const behaviorHelpers: IBehaviorHelpers = {
   setLoading,
   setError,
   addRow,
+  getPublicUsage,
 }

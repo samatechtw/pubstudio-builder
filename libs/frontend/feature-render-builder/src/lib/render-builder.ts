@@ -227,7 +227,7 @@ export const computePropsContent = (
     renderMode,
     editor: site.editor,
   })
-  const events = computeEvents(site, component)
+  computeEvents(site, component)
 
   const { editor } = site
   const isSelected = editor?.selectedComponent?.id === component.id
@@ -328,7 +328,6 @@ export const computePropsContent = (
   return {
     content,
     props,
-    customEventHandlers: events.custom,
   }
 }
 

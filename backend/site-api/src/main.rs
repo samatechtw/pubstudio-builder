@@ -45,6 +45,13 @@ async fn main() {
 
     let api_url = format!("{}:{}", host, port);
 
+    // Notify auth mode
+    if config.auth_bypass_api_key.is_some() {
+        println!("Auth mode: bypass (In production, make sure to generate a secure token.)");
+    } else {
+        println!("Auth mode: public key");
+    }
+
     // Setup tracing
     let _guard = setup_logging(CRATE_NAME);
 

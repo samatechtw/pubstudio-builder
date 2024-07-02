@@ -39,7 +39,6 @@ export const computePropsContent = (
   return {
     content,
     props,
-    customEventHandlers: events.custom,
   }
 }
 

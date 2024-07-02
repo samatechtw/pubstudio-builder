@@ -27,6 +27,7 @@ import { unstoreSite } from '@pubstudio/frontend/util-site-deserialize'
 import { rootSiteApi } from '@pubstudio/shared/util-web-site-api'
 import { ISite } from '@pubstudio/shared/type-site'
 import { IGetSiteApiResponse } from '@pubstudio/shared/type-api-site-sites'
+import '@pubstudio/frontend/feature-builtin' // Ensure builtin behaviors loaded
 import ErrorMessage from './components/ErrorMessage.vue'
 import Spinner from './components/Spinner.vue'
 import NotFound from './components/NotFound.vue'
@@ -54,6 +55,7 @@ const getSite = async (url: string): Promise<ISite | undefined> => {
     defaults: JSON.parse(serialized.defaults),
     context: JSON.parse(serialized.context),
     pages: JSON.parse(serialized.pages),
+    pageOrder: serialized.pageOrder ? JSON.parse(serialized.pageOrder) : undefined,
   })
 }
 
@@ -88,7 +90,7 @@ const getUserSite = async () => {
       if (p) {
         url += `?p=${p}`
       }
-      rootSiteApi.baseUrl = host
+      rootSiteApi.baseUrl = `${host}/`
     }
     const userSite = await getSite(url)
     return userSite

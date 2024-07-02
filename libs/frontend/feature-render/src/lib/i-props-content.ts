@@ -11,11 +11,9 @@ export type IContent = string | IBuildContent
 export type IPropsContent = {
   content: IContent
   props: Record<string, unknown>
-  customEventHandlers: ICustomEvents
 }
 
 export type IPropsBuildContent = {
   content: IBuildContent
   props: Record<string, unknown>
-  customEventHandlers: ICustomEvents
 }

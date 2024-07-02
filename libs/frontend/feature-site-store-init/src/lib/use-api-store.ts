@@ -23,12 +23,13 @@ import {
   SiteSaveState,
 } from '@pubstudio/shared/type-site'
 import { plainResponseInterceptors } from '@pubstudio/shared/util-web-site-api'
-import { computed, inject, ref } from 'vue'
+import { computed, inject, Ref, ref } from 'vue'
 import { SiteSaveAlert, siteSaveAlert } from './site-save-alert'
 
 export interface IUseApiStoreProps {
   siteId: string
   siteApiUrl?: string
+  authBypassToken?: Ref<string>
 }
 
 interface IUpdateApiOptions {
@@ -106,7 +107,7 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
 
       const api = new PSApi({
         baseUrl: `${serverAddress}/api/`,
-        userToken: store.auth.token,
+        userToken: props.authBypassToken || store.auth.token,
         responseInterceptors: [...plainResponseInterceptors],
       })
 

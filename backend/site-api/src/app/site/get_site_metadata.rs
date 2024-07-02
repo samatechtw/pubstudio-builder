@@ -22,5 +22,6 @@ pub async fn get_site_metadata(
         location: meta.location,
         disabled: meta.disabled,
         site_type: meta.site_type,
+        custom_domains: meta.domains,
     }))
 }

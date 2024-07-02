@@ -54,7 +54,7 @@ describe('Get Site Usage', () => {
       expect(body1.last_updated).toMatch(new RegExp(commonRegex.date))
 
       // Successful site request
-      await api.get('/api/sites/current').set('Host', 'test3.com').expect(200)
+      await api.get('/api/sites/current').set('Host', 'test3.localhost').expect(200)
 
       // Verify updated site usage after successful request
       const res2 = await api

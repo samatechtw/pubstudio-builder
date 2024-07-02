@@ -31,6 +31,10 @@ pub struct Config {
     #[clap(long, env = "SITE_API_PORT")]
     pub api_port: u16,
 
+    /// API key used for single user self-hosting
+    #[clap(long, env = "AUTH_BYPASS_API_KEY")]
+    pub auth_bypass_api_key: Option<String>,
+
     /// Public key used to verify Admin
     #[clap(long, env = "SITE_ADMIN_PUBLIC_KEY")]
     pub admin_public_key: String,

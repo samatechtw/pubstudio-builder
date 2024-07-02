@@ -119,6 +119,28 @@ describe('Update Site', () => {
   })
 
   describe('when request is not valid', () => {
+    it('auth bypass off by default', async () => {
+      await api
+        .patch(`${testEndpoint}/${siteId}`)
+        .send(payload)
+        .set('Authorization', 'Bearer dev')
+        .expect(401, {
+          code: 'InvalidAuth',
+          message: 'Unauthorized',
+          status: 401,
+        })
+
+      await api
+        .patch(`${testEndpoint}/${siteId}`)
+        .send(payload)
+        .set('Authorization', 'Bearer ')
+        .expect(401, {
+          code: 'Unauthorized',
+          message: 'Unauthorized',
+          status: 401,
+        })
+    })
+
     it('when user is other owner', () => {
       const ownerAuth = ownerAuthHeader('0c069253-e45d-487c-b7c0-cbe467c33a10')
 

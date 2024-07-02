@@ -1,6 +1,6 @@
 # PubStudio Backend
 
-Rust/Cargo workspace for PubStudio Site API, and related libraries.
+Cargo (Rust) workspace for PubStudio Site API, and related libraries.
 
 The main setup instructions are located in the [site-api](./site-api/Readme.md) Readme.
 
@@ -8,9 +8,14 @@ The main setup instructions are located in the [site-api](./site-api/Readme.md) 
 
 TODO
 
-**Run Site API**
+## Run Site API Locally
+
+Run these commands from the repository root after installing all prerequisites.
 
 ```bash
+# Build frontend bundle for serving sites
+npm run build:web-site
+
 # Compile Site API
 npm run dev:build
 
