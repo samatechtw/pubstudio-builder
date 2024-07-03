@@ -1,4 +1,5 @@
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
+import { rootSiteApi } from '@pubstudio/shared/util-web-site-api'
 import { Ref } from 'vue'
 import { useApiStore } from './use-api-store'
 import { useLocalStore } from './use-local-store'
@@ -31,5 +32,7 @@ export const initializeSiteStore = async (
     siteId,
     userToken,
   })
+  rootSiteApi.baseUrl = serverAddress ? `${serverAddress}/` : ''
+  rootSiteApi.siteId.value = siteId
   return serverAddress
 }
