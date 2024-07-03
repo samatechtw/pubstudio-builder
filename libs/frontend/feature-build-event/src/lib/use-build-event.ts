@@ -131,7 +131,8 @@ export const useBuildEvent = () => {
       siteStore.value.saveEditor(site.value.editor)
     } else {
       const componentId =
-        target?.id || target?.closest('.component-content-container')?.parentElement?.id
+        target?.id ||
+        target?.closest('.component-content-container, .svg-container')?.parentElement?.id
       if (componentId) {
         const component = site.value.context.components[componentId]
         if (component) {

@@ -27,6 +27,8 @@ describe('List Sites', () => {
 
   describe('when request is valid and requestor is Admin', () => {
     it('returns 200 status code and sites metadata for enabled site', async () => {
+      const execEnv = testConfig.get('execEnv')
+
       const response = await api
         .get(testEndpoint(siteId))
         .set('Authorization', adminAuth)
@@ -39,7 +41,7 @@ describe('List Sites', () => {
       expect(body.site_type).toEqual(SiteType.Paid2)
       expect(body.custom_domains).toEqual([
         'test3.localhost',
-        'user1-site3-subdomain.dev.pubstud.io',
+        `user1-site3-subdomain.${execEnv}.pubstud.io`,
       ])
     })
   })
