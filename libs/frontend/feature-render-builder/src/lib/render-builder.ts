@@ -253,9 +253,7 @@ export const computePropsContent = (
     )
   } else if (cmpContent) {
     if (component.tag === Tag.Svg) {
-      content.push(
-        h('div', { class: 'component-content-container', innerHTML: cmpContent }),
-      )
+      content.push(h('div', { class: 'svg-container', innerHTML: cmpContent }))
     } else if (
       isSelected &&
       component.tag !== Tag.Input &&
