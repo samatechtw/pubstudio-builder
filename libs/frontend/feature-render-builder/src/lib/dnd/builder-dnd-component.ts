@@ -165,7 +165,8 @@ export const BuilderDndComponent = defineComponent({
     onMounted(() => {
       const { custom } = computeEvents(site.value, component.value)
       const root = document.getElementById(buildContentWindowInnerId)
-      registerCustomEvents(component.value, custom, root, true)
+      // Pass `false` for `isMounted` to avoid triggering OnAppear event
+      registerCustomEvents(component.value, custom, root, false)
     })
     onUnmounted(() => {
       removeListeners(component.value)
