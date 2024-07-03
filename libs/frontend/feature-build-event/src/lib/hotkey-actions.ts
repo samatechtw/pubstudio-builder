@@ -1,6 +1,7 @@
 import {
   setActivePage,
   setEditPage,
+  setSelectedComponent,
   setStyleTab,
 } from '@pubstudio/frontend/data-access-command'
 import {
@@ -21,6 +22,7 @@ export const setPageByIndex = (site: ISite, index: number) => {
   const page = getOrderedPages(site)[index]
   if (page) {
     setActivePage(site.editor, page.route)
+    setSelectedComponent(site, site.pages[page.route]?.root)
     resetPageMenu()
     setEditPage(site.editor, page.route)
   }
