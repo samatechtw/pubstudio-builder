@@ -802,7 +802,7 @@ export const useBuild = (): IUseBuild => {
           for (const [prop, val] of Object.entries(pseudo)) {
             const css = prop as Css
             const oldValue = component.style.custom[bpId]?.[pseudoClass]?.[css]
-            if (val === oldValue) {
+            if (oldValue) {
               // Skip if component already has the same style as the mixin
               continue
             }
