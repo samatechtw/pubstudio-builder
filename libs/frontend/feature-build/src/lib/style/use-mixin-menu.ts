@@ -31,7 +31,6 @@ import { useI18n } from 'petite-vue-i18n'
 import { computed, ComputedRef, Ref, ref } from 'vue'
 import { editMixinEntryCommand, editStyleNameCommand } from '../build-command-helpers'
 import { addMixin, convertComponentStyle } from '../command-wrap/mixins'
-import { useBuild } from '../use-build'
 import {
   pushOrReplaceStyleCommand,
   removeEditCommand,
@@ -94,7 +93,7 @@ export const newMixin = (site: ISite, source?: IComponent) => {
 
 export const useMixinMenu = (): IUseStyleMenuFeature => {
   const { t } = useI18n()
-  const { site, editor, currentPseudoClass } = useBuild()
+  const { site, editor, currentPseudoClass } = useSiteSource()
   const { closeMixinMenu } = useMixinMenuUi()
 
   const styleEntries = computed(() => {

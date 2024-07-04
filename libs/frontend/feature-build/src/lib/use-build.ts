@@ -129,7 +129,6 @@ export interface IUseBuild {
   siteError: Ref<string | undefined>
   // TODO -- move to useSiteSource
   editor: ComputedRef<IEditorContext | undefined>
-  currentPseudoClass: ComputedRef<CssPseudoClass>
   selectedComponentFlattenedStyles: ComputedRef<IRawStylesWithSource>
   commandAlert: Ref<CommandType | undefined>
   clearSiteError: () => void
@@ -251,10 +250,6 @@ export const useBuild = (): IUseBuild => {
   const editor = computed(() => {
     return site.value.editor
   })
-
-  const currentPseudoClass = computed(
-    () => editor.value?.cssPseudoClass ?? CssPseudoClass.Default,
-  )
 
   const selectedComponentFlattenedStyles = computed<IRawStylesWithSource>(() => {
     const { selectedComponent } = site.value.editor ?? {}
@@ -1110,7 +1105,6 @@ export const useBuild = (): IUseBuild => {
     site,
     siteError,
     editor,
-    currentPseudoClass,
     selectedComponentFlattenedStyles,
     commandAlert,
     clearSiteError,

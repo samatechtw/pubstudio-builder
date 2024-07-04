@@ -1,5 +1,6 @@
 import { editCommands, undoCommand } from '@pubstudio/frontend/data-access-command'
 import { activeBreakpoint } from '@pubstudio/frontend/feature-site-source'
+import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { ICommand, StyleType } from '@pubstudio/shared/type-command'
 import {
   Css,
@@ -21,7 +22,8 @@ import { IUseEditStyles, useEditStyles } from './use-edit-styles'
 
 export const useEditComponentStyles = (): IUseEditStyles => {
   const { t } = useI18n()
-  const { site, currentPseudoClass, selectedComponentFlattenedStyles } = useBuild()
+  const { site, currentPseudoClass } = useSiteSource()
+  const { selectedComponentFlattenedStyles } = useBuild()
 
   const styleEntries = computed(() =>
     Object.entries(selectedComponentFlattenedStyles.value)

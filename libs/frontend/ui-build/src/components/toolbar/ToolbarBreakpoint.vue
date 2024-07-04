@@ -29,8 +29,8 @@ import { useBuild, useEditBreakpoints } from '@pubstudio/frontend/feature-build'
 
 const { t } = useI18n()
 
-const { editor, setBreakpoint } = useBuild()
-const { breakpoints } = useBreakpoint(editor)
+const { setBreakpoint } = useBuild()
+const { breakpoints } = useBreakpoint()
 
 const { initBreakpoints } = useEditBreakpoints()
 const showEditModal = ref(false)

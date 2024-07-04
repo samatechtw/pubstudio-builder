@@ -27,7 +27,6 @@ import { computed, toRefs } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { IBreakpoint } from '@pubstudio/shared/type-site'
 import { useBreakpoint } from '@pubstudio/frontend/feature-breakpoint'
-import { useBuild } from '@pubstudio/frontend/feature-build'
 import ToolbarBreakpointIcon from './ToolbarBreakpointIcon.vue'
 import { ToolbarItem } from '@pubstudio/frontend/ui-widgets'
 
@@ -39,8 +38,7 @@ const props = defineProps<{
 
 const { breakpoint } = toRefs(props)
 
-const { editor } = useBuild()
-const { activeBreakpoint, applyBreakpoint } = useBreakpoint(editor)
+const { activeBreakpoint, applyBreakpoint } = useBreakpoint()
 
 const click = () => {
   applyBreakpoint(breakpoint.value)

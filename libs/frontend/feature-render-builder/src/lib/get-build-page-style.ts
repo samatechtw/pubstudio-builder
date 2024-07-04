@@ -50,7 +50,7 @@ export const getBuildPageStyle = (site: ISite, page: IPage): IResolvedBuildPageS
     const isCustom =
       site.context.customComponentIds.has(component.id) ||
       site.context.customChildIds.has(component.id)
-    const currentPseudoClass = site.editor?.cssPseudoClass ?? CssPseudoClass.Default
+    const curPseudo = site.editor?.cssPseudoClass ?? CssPseudoClass.Default
 
     const styleRecord = isCustom ? customStyle : pageStyle
 
@@ -63,9 +63,9 @@ export const getBuildPageStyle = (site: ISite, page: IPage): IResolvedBuildPageS
 
       // Compute styles in the current pseudo class
       let pseudoCls: string | undefined
-      if (currentPseudoClass !== CssPseudoClass.Default) {
-        const rawStyle = bpStyle?.[currentPseudoClass] ?? {}
-        const pseudoClassName = pseudoClassToCssClass(currentPseudoClass)
+      if (curPseudo !== CssPseudoClass.Default) {
+        const rawStyle = bpStyle?.[curPseudo] ?? {}
+        const pseudoClassName = pseudoClassToCssClass(curPseudo)
         pseudoCls = `.${component.id}.${pseudoClassName}`
         styleRecord[pseudoCls] = { ...styleRecord[pseudoCls], ...rawStyle }
       }
@@ -82,10 +82,10 @@ export const getBuildPageStyle = (site: ISite, page: IPage): IResolvedBuildPageS
             styleRecord[cls],
           )
           // Compute mixin styles in the current pseudo class
-          if (pseudoCls && currentPseudoClass !== CssPseudoClass.Default) {
+          if (pseudoCls && curPseudo !== CssPseudoClass.Default) {
             styleRecord[pseudoCls] = computeMixinStyles(
               mixinPseudo,
-              currentPseudoClass,
+              curPseudo,
               styleRecord[pseudoCls],
             )
           }
@@ -103,9 +103,9 @@ export const getBuildPageStyle = (site: ISite, page: IPage): IResolvedBuildPageS
             styleRecord[`.${component.id} .${selector}`] = { ...rawStyle }
 
             // Compute styles in the current pseudo class
-            if (currentPseudoClass !== CssPseudoClass.Default) {
-              const rawStyle = bpStyle?.[currentPseudoClass] ?? {}
-              const pseudoClassName = pseudoClassToCssClass(currentPseudoClass)
+            if (curPseudo !== CssPseudoClass.Default) {
+              const rawStyle = bpStyle?.[curPseudo] ?? {}
+              const pseudoClassName = pseudoClassToCssClass(curPseudo)
               styleRecord[`.${component.id} .${selector}.${pseudoClassName}`] = {
                 ...rawStyle,
               }

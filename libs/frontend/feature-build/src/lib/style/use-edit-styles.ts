@@ -5,6 +5,7 @@ import {
   editStylesCancelEdit,
   setStyleType,
 } from '@pubstudio/frontend/data-access-command'
+import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { StyleType } from '@pubstudio/shared/type-command'
 import { ICommandGroupData } from '@pubstudio/shared/type-command-data'
 import {
@@ -14,7 +15,6 @@ import {
   IStyleEntry,
 } from '@pubstudio/shared/type-site'
 import { computed, ComputedRef, Ref } from 'vue'
-import { useBuild } from '../use-build'
 
 // Interface for composable that provides data and methods for updating styles
 // Implemented for component styles, child override styles, and reusable styles
@@ -46,7 +46,7 @@ export interface IUseEditStyles extends Omit<IUseEditStylesOptions, 'setStyle'> 
 
 export const useEditStyles = (options: IUseEditStylesOptions): IUseEditStyles => {
   const { styleType, styleEntries, getInheritedFrom, setStyle } = options
-  const { site, currentPseudoClass } = useBuild()
+  const { site, currentPseudoClass } = useSiteSource()
 
   const nonInheritedProperties = computed(() =>
     styleEntries.value

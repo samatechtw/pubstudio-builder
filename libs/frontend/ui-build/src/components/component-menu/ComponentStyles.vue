@@ -55,9 +55,11 @@ import {
 } from '@pubstudio/frontend/data-access-command'
 import StyleRow from '../StyleRow.vue'
 import EditMenuTitle from '../EditMenuTitle.vue'
+import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 
 const { t } = useI18n()
-const { site, editor, currentPseudoClass, selectedComponentFlattenedStyles } = useBuild()
+const { site, editor, currentPseudoClass } = useSiteSource()
+const { selectedComponentFlattenedStyles } = useBuild()
 const { newMixin } = useMixinMenu()
 const {
   styleEntries,

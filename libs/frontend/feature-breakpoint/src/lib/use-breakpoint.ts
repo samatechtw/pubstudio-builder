@@ -1,10 +1,14 @@
-import { setBuilderWidth } from '@pubstudio/frontend/data-access-command'
+import {
+  editStylesSwitchMode,
+  setBuilderWidth,
+} from '@pubstudio/frontend/data-access-command'
 import {
   activeBreakpoint,
   sortedBreakpoints,
 } from '@pubstudio/frontend/feature-site-source'
+import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { runtimeContext } from '@pubstudio/frontend/util-runtime'
-import { IBreakpoint, IEditorContext } from '@pubstudio/shared/type-site'
+import { IBreakpoint } from '@pubstudio/shared/type-site'
 import { ComputedRef } from 'vue'
 
 export interface IUseBreakpoint {
@@ -13,11 +17,16 @@ export interface IUseBreakpoint {
   applyBreakpoint: (breakpoint: IBreakpoint) => void
 }
 
-export const useBreakpoint = (
-  editor: ComputedRef<IEditorContext | undefined>,
-): IUseBreakpoint => {
+export const useBreakpoint = (): IUseBreakpoint => {
+  const { site, editor } = useSiteSource()
+
   const applyBreakpoint = (breakpoint: IBreakpoint) => {
+    if (activeBreakpoint.value.id === breakpoint.id) {
+      return
+    }
     const { minWidth, maxWidth } = breakpoint
+
+    editStylesSwitchMode(site.value)
 
     if (minWidth !== undefined || maxWidth !== undefined) {
       setBuilderWidth(editor.value, (maxWidth ?? minWidth) as number)

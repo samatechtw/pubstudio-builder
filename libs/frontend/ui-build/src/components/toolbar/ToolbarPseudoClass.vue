@@ -18,7 +18,6 @@
 <script lang="ts" setup>
 import { onMounted } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
-import { useBuild } from '@pubstudio/frontend/feature-build'
 import {
   setEditorDropdown,
   setCssPseudoClass,
@@ -29,13 +28,14 @@ import {
   CssPseudoClassValues,
   EditorDropdown,
 } from '@pubstudio/shared/type-site'
+import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 
 const { t } = useI18n()
-const { editor } = useBuild()
+const { site, editor } = useSiteSource()
 
 const updatePseudoClass = (value: CssPseudoClass | undefined) => {
   if (value) {
-    setCssPseudoClass(editor.value, value)
+    setCssPseudoClass(site.value, value)
   }
 }
 

@@ -108,9 +108,9 @@ watch(editViewTxCount, (newCount, oldCount) => {
 })
 
 export const useToolbar = (): IUseToolbar => {
+  const { currentPseudoClass } = useSiteSource()
   const {
     editor,
-    currentPseudoClass,
     selectedComponentFlattenedStyles,
     removeComponentCustomStyle,
     getSelectedComponent,
