@@ -58,6 +58,13 @@ export const editStylesCancelEdit = (site: ISite) => {
   cancelEdit(site)
 }
 
+// Reset the edit style command data when switching breakpoints or pseudo selector
+export const editStylesSwitchMode = (site: ISite) => {
+  clearBlankCommands(site)
+  editStyles.value.clear()
+  editCommands.value = undefined
+}
+
 export const setStyleType = (site: ISite, styleType: StyleType | undefined) => {
   // Only one type of style can be edited
   if (currentStyleType.value !== styleType) {

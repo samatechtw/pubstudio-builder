@@ -23,6 +23,7 @@ import {
   StyleTab,
   ThemeTab,
 } from '@pubstudio/shared/type-site'
+import { editStylesSwitchMode } from './edit-styles-data'
 
 const setEditorMode = (editor: IEditorContext, mode: EditorMode) => {
   const prevMode = editor.mode
@@ -346,11 +347,10 @@ export const unselectColor = (
   }
 }
 
-export const setCssPseudoClass = (
-  editor: IEditorContext | undefined,
-  pseudoClass: CssPseudoClass,
-) => {
+export const setCssPseudoClass = (site: ISite, pseudoClass: CssPseudoClass) => {
+  const editor = site.editor
   if (editor) {
+    editStylesSwitchMode(site)
     editor.cssPseudoClass = pseudoClass
     editor.store?.saveEditor(editor)
   }

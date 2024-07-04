@@ -42,7 +42,7 @@
 import { computed, onUnmounted } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { ErrorMessage, PSButton } from '@pubstudio/frontend/ui-widgets'
-import { useBuild, useMixinMenu } from '@pubstudio/frontend/feature-build'
+import { useMixinMenu } from '@pubstudio/frontend/feature-build'
 import {
   editStylesCancelEdit,
   isEditingStyles,
@@ -50,6 +50,7 @@ import {
 import EditMenuTitle from '../EditMenuTitle.vue'
 import MenuRowEdit from '../MenuRowEdit.vue'
 import StyleRow from '../StyleRow.vue'
+import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 
 const { t } = useI18n()
 
@@ -69,7 +70,7 @@ const {
   setValue,
 } = useMixinMenu()
 
-const { site, currentPseudoClass } = useBuild()
+const { site, currentPseudoClass } = useSiteSource()
 
 const menuSubTitle = computed(() => `(${currentPseudoClass.value})`)
 

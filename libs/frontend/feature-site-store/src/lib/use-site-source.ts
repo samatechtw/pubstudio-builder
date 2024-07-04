@@ -2,6 +2,8 @@ import { site } from '@pubstudio/frontend/feature-site-source'
 import { PSApi } from '@pubstudio/frontend/util-api'
 import { IUpdateSiteApiResponse } from '@pubstudio/shared/type-api-site-sites'
 import {
+  CssPseudoClass,
+  IEditorContext,
   IPage,
   ISite,
   ISiteRestore,
@@ -17,7 +19,9 @@ import { getActivePage } from './get-active-page'
 
 export interface IUseSiteSource {
   site: Ref<ISite>
+  editor: ComputedRef<IEditorContext | undefined>
   activePage: Ref<IPage | undefined>
+  currentPseudoClass: ComputedRef<CssPseudoClass>
   siteError: Ref<string | undefined>
   apiSiteId: Ref<string | undefined>
   apiSite: PSApi | undefined
@@ -43,6 +47,10 @@ const siteError = ref<string>()
 const apiSiteId = ref<string>()
 let apiSite: PSApi
 
+const editor = computed(() => {
+  return site.value.editor
+})
+
 const isSaving = computed(() => {
   // TODO -- figure out how to avoid nested ComputedRef in `siteStore` Ref
   const saveState = siteStore.value.saveState as unknown as SiteSaveState
@@ -52,6 +60,10 @@ const isSaving = computed(() => {
 const activePage = computed(() => {
   return getActivePage(site.value)
 })
+
+const currentPseudoClass = computed(
+  () => site.value.editor?.cssPseudoClass ?? CssPseudoClass.Default,
+)
 
 const isSiteApi = computed(() => {
   const siteId = apiSiteId.value
@@ -126,6 +138,8 @@ export const useSiteSource = (): IUseSiteSource => {
     isSaving,
     isSiteApi,
     site,
+    editor,
+    currentPseudoClass,
     activePage,
     siteError,
   }

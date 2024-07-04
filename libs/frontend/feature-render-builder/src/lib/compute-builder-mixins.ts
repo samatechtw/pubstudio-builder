@@ -7,7 +7,7 @@ export const computeBuilderMixins = (site: ISite): IRawStyleRecord => {
   const result: IRawStyleRecord = {}
 
   // Compute styles in the current pseudo class
-  const currentPseudoClass = site.editor?.cssPseudoClass ?? CssPseudoClass.Default
+  const currentPseudo = site.editor?.cssPseudoClass ?? CssPseudoClass.Default
   const accumulatedBreakpointIds = getActiveBreakpointIds()
 
   // Compute styles in default pseudo class
@@ -22,9 +22,9 @@ export const computeBuilderMixins = (site: ISite): IRawStyleRecord => {
         result[cls] = { ...currentStyle, ...rawStyle }
 
         // Compute styles in the current pseudo class
-        if (currentPseudoClass !== CssPseudoClass.Default) {
-          const rawStyle = bpStyle?.[currentPseudoClass] ?? {}
-          const pseudoClassName = pseudoClassToCssClass(currentPseudoClass)
+        if (currentPseudo !== CssPseudoClass.Default) {
+          const rawStyle = bpStyle?.[currentPseudo] ?? {}
+          const pseudoClassName = pseudoClassToCssClass(currentPseudo)
 
           const cls = `.${styleId}.${pseudoClassName}`
           const currentStyle = result[cls] ?? {}

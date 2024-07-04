@@ -3,9 +3,10 @@ import {
   activeBreakpoint,
   descSortedBreakpoints,
 } from '@pubstudio/frontend/feature-site-source'
+import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import {
-  computeFlattenedStyles,
   computeComponentOverrideStyle,
+  computeFlattenedStyles,
 } from '@pubstudio/frontend/util-component'
 import { ICommand, StyleType } from '@pubstudio/shared/type-command'
 import {
@@ -22,7 +23,6 @@ import {
   removeComponentOverrideStyleEntryCommand,
   setOverrideStyleCommand,
 } from '../build-command-helpers'
-import { useBuild } from '../use-build'
 import { pushOrReplaceStyleCommand, removeEditCommand } from './set-style-helpers'
 import { IUseEditStyles, useEditStyles } from './use-edit-styles'
 
@@ -43,7 +43,7 @@ export const useEditComponentChildStyles = (
 ): IUseEditComponentChildStyles => {
   const { component } = options
   const { t } = useI18n()
-  const { site, editor, currentPseudoClass } = useBuild()
+  const { site, editor, currentPseudoClass } = useSiteSource()
 
   const getDefaultSelector = (): string | undefined => {
     return Object.keys(component.value.style.overrides ?? {})[0]
