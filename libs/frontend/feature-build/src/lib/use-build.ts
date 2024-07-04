@@ -127,7 +127,7 @@ export const buildContentWindowInnerId = 'build-content-window-inner'
 export interface IUseBuild {
   site: Ref<ISite>
   siteError: Ref<string | undefined>
-  // TODO -- move to useSiteSource
+  // TODO -- remove after updating references to useSiteSource
   editor: ComputedRef<IEditorContext | undefined>
   selectedComponentFlattenedStyles: ComputedRef<IRawStylesWithSource>
   commandAlert: Ref<CommandType | undefined>
