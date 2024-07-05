@@ -1,9 +1,9 @@
 <template>
-  <BuilderEdit :componentId="componentId" @click="editSvg" />
+  <BuilderEdit :componentId="componentId" @click="editVue" />
 </template>
 
 <script lang="ts" setup>
-import { setEditSvg } from '@pubstudio/frontend/data-access-command'
+import { setEditVue } from '@pubstudio/frontend/data-access-command'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import BuilderEdit from './BuilderEdit.vue'
 
@@ -13,9 +13,9 @@ defineProps<{
   componentId: string
 }>()
 
-const editSvg = () => {
+const editVue = () => {
   if (editor.value && editor.value.selectedComponent) {
-    setEditSvg(editor.value, { content: editor.value.selectedComponent.content ?? '' })
+    setEditVue(editor.value, { content: editor.value.selectedComponent.content ?? '' })
   }
 }
 </script>

@@ -57,6 +57,14 @@ export const setState = (
   }
 }
 
+export const getState = (
+  component: IComponent | undefined,
+  field: string,
+  defaultVal: IComponentState,
+): IComponentState | undefined => {
+  return component?.state?.[field] ?? defaultVal
+}
+
 export const setContent = (
   component: IComponent | undefined,
   content: string | undefined,
@@ -156,6 +164,7 @@ const addRow = async (table: string, row: Record<string, string>) => {
 }
 
 const getPublicUsage = async (site: ISite, options?: IQueryOptions) => {
+  // TODO -- cache usage
   const { data } = await rootSiteApi.authOptRequest<IGetPublicSiteUsageApiResponse>({
     url: `api/sites/${rootSiteApi.siteId.value}/public_usage`,
   })
@@ -170,6 +179,7 @@ export const argArray = <T extends ComponentArgPrimitive>(arr: unknown): T[] => 
 export const behaviorHelpers: IBehaviorHelpers = {
   requireArgs,
   getComponent,
+  getState,
   setState,
   setContent,
   getValue,

@@ -6,7 +6,7 @@
     escapeEvent="keyup"
     @cancel="clearBehavior"
   >
-    <div>
+    <div class="bm-content">
       <div class="modal-title">
         {{ behavior?.id ? t('build.edit_behavior') : t('build.new_behavior') }}
       </div>
@@ -235,15 +235,30 @@ onUnmounted(() => {
     font-size: 15px;
   }
   .modal-inner {
-    width: 640px;
+    width: 800px;
     max-width: 90%;
+    height: 90vh;
     max-height: 90vh;
     overflow-y: auto;
+  }
+  .bm-content {
+    @mixin flex-col;
+    height: 100%;
   }
   .menu-row {
     justify-content: flex-start;
     .item {
       margin-left: 32px;
+    }
+  }
+  .code-wrap {
+    flex-grow: 1;
+    max-height: unset;
+    .ProseMirror {
+      height: 100%;
+    }
+    .ProseMirror .hljs {
+      min-height: 100%;
     }
   }
   .context-wrap {

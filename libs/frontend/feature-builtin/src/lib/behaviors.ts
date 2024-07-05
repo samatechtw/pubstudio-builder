@@ -49,11 +49,12 @@ export const toggleHidden: IBehavior = {
     args?: IBehaviorCustomArgs,
   ) => {
     const { site } = behaviorContext
+    const { getState, setState } = helpers
     let cmp: IComponent | undefined = undefined
     if (args?.id) {
       cmp = resolveComponent(site.context, args.id as string)
     }
-    helpers.setState(cmp, 'hide', !cmp?.state?.hide)
+    setState(cmp, 'hide', !getState(cmp, 'hide'))
   },
 }
 registerBuiltinBehavior(toggleHidden)
