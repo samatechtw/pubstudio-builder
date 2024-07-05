@@ -281,10 +281,15 @@ const setOrAddBehavior = (behavior: IBehavior) => {
   if (!behavior) {
     return
   }
+  const updatedBehavior = newEvent.value.behaviors.find(
+    (b) => b.behavior.id === behavior.id,
+  )
   const overrideBehavior = newEvent.value.behaviors.find(
     (b) => b.behavior.id === noBehavior.id,
   )
-  if (overrideBehavior) {
+  if (updatedBehavior) {
+    updatedBehavior.behavior = behavior
+  } else if (overrideBehavior) {
     overrideBehavior.behavior = behavior
   } else {
     newEvent.value.behaviors.push({ behavior })
