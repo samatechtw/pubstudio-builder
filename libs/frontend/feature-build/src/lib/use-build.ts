@@ -643,7 +643,7 @@ export const useBuild = (): IUseBuild => {
     pushCommand(site.value, CommandType.SetComponentEvent, data)
   }
 
-  const removeSelectedComponentEditorEvent = (name: string) => {
+  const removeSelectedComponentEvent = (name: string) => {
     const selected = site.value.editor?.selectedComponent
     const oldEvent = selected?.events?.[name]
     if (!selected) {
@@ -655,6 +655,20 @@ export const useBuild = (): IUseBuild => {
       newEvent: undefined,
     }
     pushCommand(site.value, CommandType.SetComponentEvent, data)
+  }
+
+  const removeSelectedComponentEditorEvent = (name: string) => {
+    const selected = site.value.editor?.selectedComponent
+    const oldEvent = selected?.editorEvents?.[name as EditorEventName]
+    if (!selected) {
+      return
+    }
+    const data: ISetComponentEventData = {
+      componentId: selected.id,
+      oldEvent,
+      newEvent: undefined,
+    }
+    pushCommand(site.value, CommandType.SetComponentEditorEvent, data)
   }
 
   const addSelectedComponentEditorEvent = (newEvent: IEditorEvent) => {
@@ -680,20 +694,6 @@ export const useBuild = (): IUseBuild => {
       componentId: selected.id,
       oldEvent,
       newEvent,
-    }
-    pushCommand(site.value, CommandType.SetComponentEditorEvent, data)
-  }
-
-  const removeSelectedComponentEvent = (name: string) => {
-    const selected = site.value.editor?.selectedComponent
-    const oldEvent = selected?.editorEvents?.[name as EditorEventName]
-    if (!selected) {
-      return
-    }
-    const data: ISetComponentEventData = {
-      componentId: selected.id,
-      oldEvent,
-      newEvent: undefined,
     }
     pushCommand(site.value, CommandType.SetComponentEditorEvent, data)
   }
