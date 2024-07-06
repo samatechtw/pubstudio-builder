@@ -12,6 +12,7 @@ import { undoRemoveComponentMixin } from './component-mixin/remove-component-mix
 import { undoReplaceComponentMixin } from './component-mixin/replace-component-mixin'
 import { undoRemoveComponentOverrideStyle } from './component-override-style/remove-component-override-style'
 import { undoSetComponentOverrideStyle } from './component-override-style/set-component-override-style'
+import { undoSetComponentState } from './component-state/set-component-state'
 import { undoMergeComponentStyle } from './component-style/merge-component-style'
 import { undoAddComponent } from './component/add-component'
 import { undoEditComponent } from './component/edit-component'
@@ -89,6 +90,7 @@ export const undoCommand = (site: ISite, command: ICommand) => {
     [CommandType.SetGlobalStyle]: undoSetGlobalStyle,
     [CommandType.UpdateUi]: undoUpdateUi,
     [CommandType.AddCustomComponent]: undoAddCustomComponent,
+    [CommandType.SetComponentState]: undoSetComponentState,
   }[command.type]
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   applyFunction(site, command.data as any)

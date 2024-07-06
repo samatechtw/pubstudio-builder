@@ -25,6 +25,7 @@
       />
       <ComponentEvents :component="component" />
       <ComponentEditorEvents :component="component" />
+      <ComponentState :component="component" />
       <div class="actions">
         <PSButton
           v-if="isDev"
@@ -86,6 +87,7 @@ import StyleMenuEdit from '../style-menu/StyleMenuEdit.vue'
 import ComponentFlex from './ComponentFlex.vue'
 import ToolbarContainer from '../toolbar/ToolbarContainer.vue'
 import ToolbarText from '../toolbar/ToolbarText.vue'
+import ComponentState from './ComponentState.vue'
 
 const { t } = useI18n()
 const { site, editor, replacePageRoot, addCustomComponent } = useBuild()
@@ -158,7 +160,7 @@ const toCustomComponent = () => {
 .actions {
   display: flex;
   align-items: flex-end;
-  margin-top: 24px;
+  padding-top: 24px;
   padding-left: 16px;
   .to-custom-button {
     margin-left: 8px;

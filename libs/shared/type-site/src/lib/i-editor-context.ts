@@ -32,6 +32,7 @@ export enum ComponentMenuCollapsible {
   Dimensions = 'dimensions',
   Styles = 'styles',
   ChildStyles = 'childStyles',
+  State = 'state',
 }
 
 export enum EditorDropdown {

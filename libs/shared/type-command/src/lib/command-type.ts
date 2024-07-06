@@ -47,4 +47,5 @@ export enum CommandType {
   SetGlobalStyle = 'setGS',
   UpdateUi = 'uUi',
   AddCustomComponent = 'addR',
+  SetComponentState = 'sCS',
 }

@@ -12,6 +12,7 @@ import { applyRemoveComponentMixin } from './component-mixin/remove-component-mi
 import { applyReplaceComponentMixin } from './component-mixin/replace-component-mixin'
 import { applyRemoveComponentOverrideStyle } from './component-override-style/remove-component-override-style'
 import { applySetComponentOverrideStyle } from './component-override-style/set-component-override-style'
+import { applySetComponentState } from './component-state/set-component-state'
 import { applyMergeComponentStyle } from './component-style/merge-component-style'
 import { applyAddComponent } from './component/add-component'
 import { applyEditComponent } from './component/edit-component'
@@ -96,6 +97,7 @@ export const applyCommand = (
     [CommandType.SetGlobalStyle]: applySetGlobalStyle,
     [CommandType.UpdateUi]: applyUpdateUi,
     [CommandType.AddCustomComponent]: applyAddCustomComponent,
+    [CommandType.SetComponentState]: applySetComponentState,
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   applyFunctions[command.type](site, command.data as any, isRedo)
