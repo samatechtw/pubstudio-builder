@@ -1,3 +1,4 @@
+export * from './lib/command-wrap/component-state'
 export * from './lib/command-wrap/global-style'
 export * from './lib/command-wrap/mixins'
 export * from './lib/command-wrap/move-component'

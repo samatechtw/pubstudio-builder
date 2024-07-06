@@ -35,6 +35,7 @@
 <script lang="ts" setup>
 import { computed, ref } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
+import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { resolveThemeVariables } from '@pubstudio/frontend/util-resolve'
 import {
   ComponentMenuCollapsible,
@@ -55,7 +56,6 @@ import {
 } from '@pubstudio/frontend/data-access-command'
 import StyleRow from '../StyleRow.vue'
 import EditMenuTitle from '../EditMenuTitle.vue'
-import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 
 const { t } = useI18n()
 const { site, editor, currentPseudoClass } = useSiteSource()
