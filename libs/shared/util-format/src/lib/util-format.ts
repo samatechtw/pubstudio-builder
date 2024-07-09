@@ -80,6 +80,7 @@ export function contentTypeExt(contentType: AssetContentType): string {
     [AssetContentType.Gif]: 'gif',
     [AssetContentType.Mp4]: 'mp4',
     [AssetContentType.Pdf]: 'pdf',
+    [AssetContentType.Wasm]: 'wasm',
   }[contentType]
 }
 

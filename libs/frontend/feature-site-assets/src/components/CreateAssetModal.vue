@@ -47,6 +47,9 @@
         <template v-if="validatedFile?.type === AssetContentType.Pdf" #preview>
           <img :src="PdfPreview" class="pdf-preview" />
         </template>
+        <template v-else-if="validatedFile?.type === AssetContentType.Wasm" #preview>
+          <Wasm class="wasm-preview" />
+        </template>
       </UploadFile>
     </div>
   </Modal>
@@ -62,6 +65,7 @@ import {
   PSInput,
   PSMultiselect,
   UploadFile,
+  Wasm,
 } from '@pubstudio/frontend/ui-widgets'
 import {
   ALL_CONTENT_TYPES,
@@ -163,7 +167,10 @@ const resolvedSites = computed<ISelectableSite[]>(() => {
 })
 
 const handleAssetSelect = (validFile: ValidatedFile) => {
-  if (validFile.file.type === AssetContentType.Pdf) {
+  if (
+    validFile.file.type === AssetContentType.Pdf ||
+    validFile.file.type === AssetContentType.Wasm
+  ) {
     // Handle PDF preview in UploadFile slot
   } else {
     const reader = new FileReader()
@@ -352,6 +359,10 @@ onMounted(() => {
   }
   img.pdf-preview {
     width: 40%;
+  }
+  .wasm-preview {
+    width: 40%;
+    height: 40%;
   }
 }
 </style>

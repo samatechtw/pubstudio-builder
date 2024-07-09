@@ -35,6 +35,10 @@ pub enum AssetContentType {
     #[sqlx(rename = "application/pdf")]
     #[strum(serialize = "application/pdf")]
     Pdf,
+    #[serde(rename = "application/wasm")]
+    #[sqlx(rename = "application/wasm")]
+    #[strum(serialize = "application/wasm")]
+    Wasm,
 }
 
 impl AssetContentType {
@@ -45,6 +49,7 @@ impl AssetContentType {
             AssetContentType::Gif => "gif",
             AssetContentType::Mp4 => "mp4",
             AssetContentType::Pdf => "pdf",
+            AssetContentType::Wasm => "wasm",
         }
         .into()
     }
