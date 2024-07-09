@@ -61,6 +61,7 @@ export { default as Print } from './lib/svg/Print.vue'
 export { default as Reset } from './lib/svg/Reset.vue'
 export { default as Shrink } from './lib/svg/Shrink.vue'
 export { default as Text } from './lib/svg/Text.vue'
+export { default as Wasm } from './lib/svg/Wasm.vue'
 
 // toolbar
 export { default as AlignBottom } from './lib/toolbar/AlignBottom.vue'

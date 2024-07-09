@@ -1,8 +1,11 @@
 <template>
   <div :id="asset.id" class="asset-card" :class="{ small }" v-bind="dndProps">
     <div class="asset-image">
-      <div v-if="asset.content_type === AssetContentType.Pdf" class="pdf-preview">
+      <div v-if="asset.content_type === AssetContentType.Pdf" class="asset-preview">
         <img :src="PdfPreview" />
+      </div>
+      <div v-else-if="asset.content_type === AssetContentType.Wasm" class="asset-preview">
+        <Wasm />
       </div>
       <PSAsset v-else :asset="assetUrl" :canPlayVideo="false" :contentHash="asset.size" />
     </div>
@@ -56,6 +59,7 @@ import {
   PSAsset,
   PSInput,
   Spinner,
+  Wasm,
 } from '@pubstudio/frontend/ui-widgets'
 import { urlFromAsset } from '@pubstudio/frontend/util-asset'
 import { Keys } from '@pubstudio/shared/type-site'
@@ -86,7 +90,7 @@ const emit = defineEmits<{
 const { asset, small } = toRefs(props)
 
 const dndProps = computed(() => {
-  if (!small.value) {
+  if (!small.value || asset.value.content_type === AssetContentType.Wasm) {
     return
   }
   let dragType: BuilderDragDataType
@@ -218,7 +222,7 @@ const updateName = async () => {
   cursor: pointer;
   color: $color-text;
 }
-.pdf-preview {
+.asset-preview {
   @mixin flex-center;
   height: 100px;
   img {
