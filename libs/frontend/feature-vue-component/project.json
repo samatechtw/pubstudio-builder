@@ -1,0 +1,25 @@
+{
+  "name": "frontend-feature-vue-component",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/frontend/feature-vue-component/src",
+  "projectType": "library",
+  "targets": {
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/frontend/feature-vue-component/**/*.ts"],
+        "eslintConfig": "libs/frontend/feature-vue-component/.eslintrc.cjs"
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/libs/frontend/feature-vue-component"],
+      "options": {
+        "jestConfig": "libs/frontend/feature-vue-component/jest.config.ts",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": ["scope:frontend", "type:feature"]
+}

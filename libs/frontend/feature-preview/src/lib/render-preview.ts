@@ -1,11 +1,9 @@
 import {
   computeAttrsInputsMixins,
   computeEvents,
-  IContent,
-  IPropsContent,
   parseI18n,
 } from '@pubstudio/frontend/feature-render'
-import { RenderMode } from '@pubstudio/frontend/util-render'
+import { IContent, IPropsContent, RenderMode } from '@pubstudio/frontend/util-render'
 import { resetRuntimeContext } from '@pubstudio/frontend/util-runtime'
 import { IComponent, IPage, ISite } from '@pubstudio/shared/type-site'
 import { h, VNode } from 'vue'

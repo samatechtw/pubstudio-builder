@@ -29,7 +29,7 @@
         class="cancel-button"
         :text="t('cancel')"
         size="small"
-        variant="secondary"
+        :secondary="true"
         @click="emit('close')"
       />
     </div>

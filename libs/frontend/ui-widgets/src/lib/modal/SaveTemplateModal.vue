@@ -53,7 +53,7 @@
       <PSButton
         class="cancel-button"
         :text="t('cancel')"
-        variant="secondary"
+        :secondary="true"
         @click="emit('cancel')"
       />
     </div>

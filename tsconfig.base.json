@@ -52,6 +52,9 @@
       "@pubstudio/frontend/feature-walkthrough": [
         "libs/frontend/feature-walkthrough/src/index.ts"
       ],
+      "@pubstudio/frontend/feature-vue-component": [
+        "libs/frontend/feature-vue-component/src/index.ts"
+      ],
       "@pubstudio/frontend/type-builder": ["libs/frontend/type-builder/src/index.ts"],
       "@pubstudio/frontend/type-ui-widgets": [
         "libs/frontend/type-ui-widgets/src/index.ts"

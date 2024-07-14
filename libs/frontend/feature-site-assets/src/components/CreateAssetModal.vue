@@ -48,7 +48,10 @@
           <img :src="PdfPreview" class="pdf-preview" />
         </template>
         <template v-else-if="validatedFile?.type === AssetContentType.Wasm" #preview>
-          <Wasm class="wasm-preview" />
+          <Wasm class="asset-preview" />
+        </template>
+        <template v-else-if="validatedFile?.type === AssetContentType.Js" #preview>
+          <Javascript class="asset-preview" />
         </template>
       </UploadFile>
     </div>
@@ -60,6 +63,7 @@ import { computed, onMounted, ref, toRefs, watch } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import {
   ErrorMessage,
+  Javascript,
   Modal,
   PSButton,
   PSInput,
@@ -167,21 +171,23 @@ const resolvedSites = computed<ISelectableSite[]>(() => {
 })
 
 const handleAssetSelect = (validFile: ValidatedFile) => {
+  const file = validFile.file
   if (
-    validFile.file.type === AssetContentType.Pdf ||
-    validFile.file.type === AssetContentType.Wasm
+    file.type === AssetContentType.Pdf ||
+    file.type === AssetContentType.Wasm ||
+    file.type === AssetContentType.Js
   ) {
     // Handle PDF preview in UploadFile slot
   } else {
     const reader = new FileReader()
-    reader.readAsDataURL(validFile.file)
+    reader.readAsDataURL(file)
     reader.onload = () => {
       assetBase64.value = reader.result?.toString() ?? ''
     }
   }
   validatedFile.value = validFile
   if (!name.value) {
-    name.value = validFile.file.name
+    name.value = file.name
   }
 }
 
@@ -360,7 +366,7 @@ onMounted(() => {
   img.pdf-preview {
     width: 40%;
   }
-  .wasm-preview {
+  .asset-preview {
     width: 40%;
     height: 40%;
   }

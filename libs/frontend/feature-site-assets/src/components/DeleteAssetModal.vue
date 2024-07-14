@@ -16,7 +16,7 @@
       <PSButton
         class="cancel-button"
         :text="t('cancel')"
-        variant="secondary"
+        :secondary="true"
         @click="closeModal"
       />
     </div>

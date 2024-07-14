@@ -1,10 +1,9 @@
 import {
   computeEvents,
-  IContent,
   registerCustomEvents,
   removeListeners,
 } from '@pubstudio/frontend/feature-render'
-import { RenderMode } from '@pubstudio/frontend/util-render'
+import { IContent, RenderMode, renderVueComponent } from '@pubstudio/frontend/util-render'
 import { hrefToUrl } from '@pubstudio/frontend/util-router'
 import { IComponent, ISite, Tag } from '@pubstudio/shared/type-site'
 import { defineComponent, h, onMounted, onUnmounted, PropType, toRefs } from 'vue'
@@ -123,6 +122,8 @@ export const PreviewComponent = () => {
               return h(RouterLink, copiedRenderProps, () => children)
             }
           }
+        } else if (tag === Tag.Vue) {
+          return renderVueComponent(site.value.context, component.value, renderProps)
         }
 
         return h(tag as string, renderProps, children)

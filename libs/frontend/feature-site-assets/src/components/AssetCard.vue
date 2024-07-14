@@ -7,6 +7,9 @@
       <div v-else-if="asset.content_type === AssetContentType.Wasm" class="asset-preview">
         <Wasm />
       </div>
+      <div v-else-if="asset.content_type === AssetContentType.Js" class="asset-preview">
+        <Javascript />
+      </div>
       <PSAsset v-else :asset="assetUrl" :canPlayVideo="false" :contentHash="asset.size" />
     </div>
     <div class="asset-info">
@@ -56,12 +59,13 @@ import {
   CopyText,
   Cross,
   Edit,
+  Javascript,
   PSAsset,
   PSInput,
   Spinner,
   Wasm,
 } from '@pubstudio/frontend/ui-widgets'
-import { urlFromAsset } from '@pubstudio/frontend/util-asset'
+import { isAssetDroppable, urlFromAsset } from '@pubstudio/frontend/util-asset'
 import { Keys } from '@pubstudio/shared/type-site'
 import { useKeyListener } from '@pubstudio/frontend/util-key-listener'
 import {
@@ -90,7 +94,7 @@ const emit = defineEmits<{
 const { asset, small } = toRefs(props)
 
 const dndProps = computed(() => {
-  if (!small.value || asset.value.content_type === AssetContentType.Wasm) {
+  if (!small.value || !isAssetDroppable(asset.value.content_type)) {
     return
   }
   let dragType: BuilderDragDataType
@@ -225,7 +229,8 @@ const updateName = async () => {
 .asset-preview {
   @mixin flex-center;
   height: 100px;
-  img {
+  img,
+  svg {
     width: 40%;
   }
 }

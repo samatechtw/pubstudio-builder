@@ -107,9 +107,18 @@
         :builtinComponentId="mailingList.id"
         @add="showMailingListWalkthrough"
       />
+      <NewComponent
+        v-if="store.user.isAdmin.value"
+        class="new-vue"
+        :text="t('build.vue')"
+        :skipAdd="true"
+        :builtinComponentId="vueComponent.id"
+        @add="showVueComponentModal = true"
+      />
     </div>
     <ContactFormWalkthroughModal />
     <MailingListWalkthroughModal />
+    <VueComponentModal />
   </div>
 </template>
 
@@ -143,6 +152,7 @@ import {
   mailingList,
   backgroundImage,
   viewCounter,
+  vueComponent,
 } from '@pubstudio/frontend/util-builtin'
 import {
   ContactFormWalkthroughModal,
@@ -152,12 +162,18 @@ import {
   MailingListWalkthroughModal,
   useMailingListForm,
 } from '@pubstudio/frontend/feature-mailing-list-form'
+import {
+  useVueComponent,
+  VueComponentModal,
+} from '@pubstudio/frontend/feature-vue-component'
 import NewComponent from './NewComponent.vue'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
+import { store } from '@pubstudio/frontend/data-access-web-store'
 
 const { t } = useI18n()
 const { showContactFormWalkthrough } = useContactForm()
 const { showMailingListWalkthrough } = useMailingListForm()
+const { showVueComponentModal } = useVueComponent()
 const { isSiteApi } = useSiteSource()
 </script>
 

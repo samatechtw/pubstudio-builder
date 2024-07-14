@@ -1,9 +1,17 @@
+import * as Vue from 'vue'
 import { createHead } from '@unhead/vue'
-import { createApp } from 'vue'
 import App from './app/App.vue'
 import router from './app/router'
 
-const app = createApp(App)
+declare global {
+  interface Window {
+    Vue: unknown
+  }
+}
+
+window.Vue = Vue
+
+const app = Vue.createApp(App)
 const head = createHead()
 app.use(head)
 app.use(router).mount('#app')

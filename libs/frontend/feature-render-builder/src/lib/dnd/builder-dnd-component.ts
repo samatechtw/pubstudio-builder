@@ -1,7 +1,6 @@
 import { buildContentWindowInnerId } from '@pubstudio/frontend/feature-build'
 import {
   computeEvents,
-  IContent,
   registerCustomEvents,
   removeListeners,
 } from '@pubstudio/frontend/feature-render'
@@ -10,7 +9,7 @@ import {
   descSortedBreakpoints,
 } from '@pubstudio/frontend/feature-site-source'
 import { findStyles } from '@pubstudio/frontend/util-component'
-import { RenderMode } from '@pubstudio/frontend/util-render'
+import { IContent, RenderMode, renderVueComponent } from '@pubstudio/frontend/util-render'
 import { runtimeContext } from '@pubstudio/frontend/util-runtime'
 import { Css, IComponent, ISite, Tag } from '@pubstudio/shared/type-site'
 import {
@@ -243,6 +242,8 @@ export const BuilderDndComponent = defineComponent({
           propsContent.content,
           dndProps,
         )
+      } else if (tag === Tag.Vue) {
+        return h('div', props, 'View in preview')
       } else if (tag === Tag.Svg) {
         return h(Tag.Div, props, propsContent.content)
       } else {

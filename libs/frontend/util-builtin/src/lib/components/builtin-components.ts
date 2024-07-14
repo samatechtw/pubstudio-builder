@@ -17,6 +17,7 @@ import { svg } from './builtin-svg'
 import { text } from './builtin-text'
 import { textarea } from './builtin-textarea'
 import { viewCounter } from './builtin-view-counter'
+import { vueComponent } from './builtin-vue-component'
 
 export const builtinComponents: Record<string, ISerializedComponent> = {
   [containerHorizontal.id]: containerHorizontal,
@@ -51,4 +52,5 @@ export const builtinComponents: Record<string, ISerializedComponent> = {
   [contactForm.id]: contactForm,
   [mailingList.id]: mailingList,
   [viewCounter.id]: viewCounter,
+  [vueComponent.id]: vueComponent,
 }

@@ -1,5 +1,5 @@
-import { RenderMode } from '@pubstudio/frontend/util-render'
-import { resolveComponent, resolveThemeVariables } from '@pubstudio/frontend/util-resolve'
+import { computeInputs, RenderMode } from '@pubstudio/frontend/util-render'
+import { resolveComponent } from '@pubstudio/frontend/util-resolve'
 import {
   CssPseudoClass,
   IComponent,
@@ -19,18 +19,6 @@ export interface IComputeAttrsInputsMixinsOptions {
   editor?: IEditorContext
 }
 
-export const resolveInput = (
-  context: ISiteContext,
-  value: unknown,
-  resolveTheme = true,
-): unknown => {
-  if (resolveTheme && typeof value === 'string') {
-    return resolveThemeVariables(context, value, false) ?? value
-  } else {
-    return value
-  }
-}
-
 // Compute component attributes/props, inputs, and mixins
 // TODO -- return correct input/attr type instead of `unknown`
 export const computeAttrsInputsMixins = (
@@ -46,7 +34,6 @@ export const computeAttrsInputsMixins = (
 
   const c: IComponent = component
   let r: IComponent | undefined = undefined
-  const attrs: Record<string, unknown> = {}
   const mixins: string[] = []
 
   if (component.customSourceId) {
@@ -65,23 +52,7 @@ export const computeAttrsInputsMixins = (
   if (!isCustom && c.style.mixins) {
     mixins.push(...c.style.mixins)
   }
-
-  if (r?.inputs) {
-    for (const [key, input] of Object.entries(r.inputs)) {
-      if (input.attr) {
-        attrs[key] = resolveInput(context, input.is ?? input.default, resolveTheme)
-      }
-    }
-  }
-
-  if (c.inputs) {
-    // If the component is a custom instance, only the overridden inputs will be in `c.inputs`.
-    for (const [key, input] of Object.entries(c.inputs)) {
-      if (input.attr) {
-        attrs[key] = resolveInput(context, input.is ?? input.default, resolveTheme)
-      }
-    }
-  }
+  const attrs = computeInputs(context, component, r, { resolveTheme, onlyAttrs: true })
 
   // Add role
   if (!attrs.role) {

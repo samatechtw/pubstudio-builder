@@ -1,9 +1,8 @@
-import { RenderMode } from '@pubstudio/frontend/util-render'
+import { IContent, RenderMode, renderVueComponent } from '@pubstudio/frontend/util-render'
 import { RouterLink } from '@pubstudio/frontend/util-router'
 import { IComponent, ISite, Tag } from '@pubstudio/shared/type-site'
 import { defineComponent, h, onMounted, onUnmounted, PropType, toRefs } from 'vue'
 import { registerCustomEvents, removeListeners } from './custom-event-handlers'
-import { IContent } from './i-props-content'
 import { computePropsContent } from './render'
 import { computeEvents } from './render-helpers'
 
@@ -72,6 +71,8 @@ export const LiveComponent = () => {
             to: { path },
           }
           return h(RouterLink, linkProps, () => children)
+        } else if (tag === Tag.Vue) {
+          return renderVueComponent(site.value.context, component.value, renderProps)
         }
 
         return h(tag as string, renderProps, children)

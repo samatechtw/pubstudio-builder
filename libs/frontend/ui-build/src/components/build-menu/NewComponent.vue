@@ -27,6 +27,7 @@ import { BuilderDragDataType } from '@pubstudio/frontend/type-builder'
 const props = defineProps<{
   text: string
   active?: boolean
+  skipAdd?: boolean
   builtinComponentId: string
 }>()
 
@@ -34,12 +35,15 @@ const emit = defineEmits<{
   (e: 'add', componentId: string | undefined): void
 }>()
 
-const { builtinComponentId } = toRefs(props)
+const { builtinComponentId, skipAdd } = toRefs(props)
 
 const { site } = useSiteSource()
 
 const clickAddComponent = () => {
-  const componentId = addBuiltinComponent(site.value, { id: builtinComponentId.value })
+  let componentId: string | undefined
+  if (!skipAdd.value) {
+    componentId = addBuiltinComponent(site.value, { id: builtinComponentId.value })
+  }
   emit('add', componentId)
 }
 

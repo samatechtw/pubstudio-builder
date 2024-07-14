@@ -90,7 +90,7 @@ export const onDrag = (options: IOnDragOptions): IDropProps => {
         (hoverCmp.tag === Tag.Img && isFile) ||
         (hoverCmp.id !== dragCmpParentId &&
           !hoverCmp.content &&
-          hoverCmp.tag !== Tag.Img &&
+          ![Tag.Img, Tag.Vue].includes(hoverCmp.tag) &&
           !hoverCmp.customSourceId)
       ) {
         dropProps.hoverSelf = true

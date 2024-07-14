@@ -144,6 +144,10 @@ export const useRender = (options: IUseRenderOptions): IUseRender => {
 
     const activePageTitle = activePage.value?.head.title || activePageName
 
+    const script = [
+      ...(site.value?.defaults.head.script ?? []),
+      ...(activePage.value?.head.script ?? []),
+    ] as Script[]
     return {
       title: activePageTitle,
       meta: [
@@ -159,10 +163,7 @@ export const useRender = (options: IUseRenderOptions): IUseRender => {
         ...((activePage.value?.head.meta ?? []) as Meta[]),
       ],
       link: link as Link[],
-      script: [
-        ...((site.value?.defaults.head.script ?? []) as Script[]),
-        ...((activePage.value?.head.script ?? []) as Script[]),
-      ],
+      script,
     }
   })
   useHead(headData)

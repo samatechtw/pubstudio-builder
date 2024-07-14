@@ -103,5 +103,6 @@ export const loadingStyleId = styleId(globalContext.namespace, 'loading')
 export const loadingDotStyleId = styleId(globalContext.namespace, 'loadingdot')
 export const viewCounterId = componentId(globalContext.namespace, 'viewcounter')
 export const viewCounterBehaviorId = behaviorId(globalContext.namespace, 'viewcounter')
+export const vueComponentId = componentId(globalContext.namespace, 'vuecomponent')
 // Placeholder for children of builtin components that aren't used independently
 export const tempChildId = componentId(globalContext.namespace, 'tempchild')

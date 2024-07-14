@@ -95,7 +95,11 @@ export async function validateMedia(
           reject({ fileErrors: ['errors.default'] })
         }
       })
-    } else if (fileType.includes('pdf') || fileType.includes('wasm')) {
+    } else if (
+      fileType.includes('pdf') ||
+      fileType.includes('wasm') ||
+      fileType.includes('javascript')
+    ) {
       return result
     }
   } catch (error) {
