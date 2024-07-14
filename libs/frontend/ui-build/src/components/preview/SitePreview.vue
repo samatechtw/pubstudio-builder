@@ -49,7 +49,7 @@ const {
 })
 </script>
 
-<style lang="postcss">
+<style lang="postcss" scoped>
 html {
   background-color: black;
 }

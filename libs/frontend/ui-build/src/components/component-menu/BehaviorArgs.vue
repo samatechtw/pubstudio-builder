@@ -186,9 +186,11 @@ const addArg = () => {
 }
 .cancel {
   cursor: pointer;
+  margin-left: 6px;
 }
 .edit-actions {
-  text-align: center;
+  display: flex;
+  align-items: center;
 }
 .edit-help {
   height: 36px;
