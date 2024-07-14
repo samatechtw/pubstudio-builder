@@ -1,4 +1,4 @@
-import { ISite } from '@pubstudio/shared/type-site'
+import { IComponentStyleOverrides, ISite } from '@pubstudio/shared/type-site'
 
 // Replace all references to the site namespace
 export const replaceNamespace = (site: ISite, namespace: string): ISite => {
@@ -33,9 +33,19 @@ export const replaceNamespace = (site: ISite, namespace: string): ISite => {
     component.id = newId
     delete context.components[cmpId]
     context.components[newId] = component
+    // Mixin styles
     if (component.style.mixins) {
       component.style.mixins = component.style.mixins.map(updateId)
     }
+    // Override styles
+    if (component.style.overrides) {
+      const newOverrides: IComponentStyleOverrides = {}
+      for (const [key, style] of Object.entries(component.style.overrides)) {
+        newOverrides[updateId(key)] = style
+      }
+      component.style.overrides = newOverrides
+    }
+    // Inputs
     if (component.inputs) {
       for (const input of Object.values(component.inputs)) {
         if (hasId(input.default)) {
@@ -46,7 +56,7 @@ export const replaceNamespace = (site: ISite, namespace: string): ISite => {
         }
       }
     }
-    // Update event behavior inputs
+    // Event behavior inputs
     if (component.events) {
       for (const event of Object.values(component.events)) {
         for (const behavior of event.behaviors) {
