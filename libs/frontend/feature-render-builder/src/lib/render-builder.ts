@@ -3,8 +3,6 @@ import {
   computeAttrsInputsMixins,
   computeEvents,
   IAttrsInputsMixins,
-  IBuildContent,
-  IPropsBuildContent,
   parseI18n,
 } from '@pubstudio/frontend/feature-render'
 import {
@@ -12,7 +10,11 @@ import {
   descSortedBreakpoints,
 } from '@pubstudio/frontend/feature-site-source'
 import { findStyles } from '@pubstudio/frontend/util-component'
-import { RenderMode } from '@pubstudio/frontend/util-render'
+import {
+  IBuildContent,
+  IPropsBuildContent,
+  RenderMode,
+} from '@pubstudio/frontend/util-render'
 import { resolveComponent } from '@pubstudio/frontend/util-resolve'
 import { resetRuntimeContext, runtimeContext } from '@pubstudio/frontend/util-runtime'
 import {

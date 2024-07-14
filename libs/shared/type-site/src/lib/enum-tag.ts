@@ -20,6 +20,7 @@ export enum Tag {
   Ul = 'ul',
   Ol = 'ol',
   Li = 'li',
+  Vue = 'vue',
 }
 
 export const TagValues: Tag[] = Object.values(Tag)

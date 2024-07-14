@@ -9,7 +9,7 @@
         {{ t('assets.usage') }}
         <InfoBubble :message="t('assets.usage_info')" class="info" />
       </div>
-      <UsageProgress :current="usage" :max="usageAllowance" />
+      <UsageProgress :loading="false" :current="usage" :max="usageAllowance" />
     </div>
     <AssetFilters :sites="sites" @updateFilter="updateFilter" />
     <div v-if="loadingAssets" class="assets-spinner">

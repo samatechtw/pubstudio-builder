@@ -21,6 +21,7 @@
         :datalistId="componentId"
         :datalist="datalist"
         :isError="!inputValid"
+        class="value-input"
         @keydown.enter="updateValue"
         @keyup.esc="($event.target as HTMLInputElement)?.blur()"
       />
@@ -137,6 +138,14 @@ const datalist = computed<IDatalistOption[] | undefined>(() => {
   flex-grow: 1;
   text-align: end;
   color: $grey-700;
+}
+.value-input {
+  max-width: 140px;
+  width: 140px;
+  margin-left: 6px;
+  :deep(.ps-input) {
+    height: 34px;
+  }
 }
 
 .edit-icon {

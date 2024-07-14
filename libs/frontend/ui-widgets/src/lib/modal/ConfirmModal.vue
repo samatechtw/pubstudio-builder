@@ -17,7 +17,7 @@
       <PSButton
         class="cancel-button"
         :text="computedCancelText"
-        variant="secondary"
+        :secondary="true"
         @click="emit('cancel')"
       />
     </div>

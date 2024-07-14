@@ -1,4 +1,3 @@
-import { ICustomEvents } from '@pubstudio/shared/type-site'
 import { VNode } from 'vue'
 
 export type IBuildContent = (VNode | string | undefined)[] | undefined

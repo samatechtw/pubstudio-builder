@@ -6,11 +6,15 @@ import {
   IRawStyle,
 } from '@pubstudio/shared/type-site'
 
-export const makeInput = (name: string, text: string): IComponentInput => {
+export const makeInput = (
+  name: string,
+  text: string,
+  isAttr?: boolean,
+): IComponentInput => {
   return {
     type: ComponentArgPrimitive.String,
     name,
-    attr: true,
+    attr: isAttr ?? true,
     default: '',
     is: text,
   }

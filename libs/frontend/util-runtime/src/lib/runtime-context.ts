@@ -1,4 +1,4 @@
-import { Ref, ref } from 'vue'
+import { Ref, ref, VNode } from 'vue'
 
 export interface IRuntimeContext {
   eventHandlers: {
@@ -13,6 +13,13 @@ export interface IRuntimeContext {
   componentTreeItemRenameData: Ref<IComponentTreeItemRenameData>
   resetComponentTreeItemRenameData: () => void
   rightMenuFocused: Ref<boolean>
+  loadVueComponent: ILoadVueComponent
+}
+
+export interface ILoadVueComponent {
+  loadComponentTimer: ReturnType<typeof setTimeout> | undefined
+  loadedComponents: Record<string, Ref<VNode | undefined>>
+  retries: number
 }
 
 export interface ISize {
@@ -54,6 +61,11 @@ export const runtimeContext: IRuntimeContext = {
     runtimeContext.componentTreeItemRenameData.value = defaultComponentTreItemRenameData()
   },
   rightMenuFocused: ref(false),
+  loadVueComponent: {
+    loadComponentTimer: undefined,
+    loadedComponents: {},
+    retries: 0,
+  },
 }
 
 export const resetRuntimeContext = () => {
@@ -64,4 +76,12 @@ export const resetRuntimeContext = () => {
   runtimeContext.buildDndState.value = undefined
   runtimeContext.componentTreeItemRenameData.value = defaultComponentTreItemRenameData()
   runtimeContext.rightMenuFocused.value = false
+  if (runtimeContext.loadVueComponent.loadComponentTimer) {
+    clearInterval(runtimeContext.loadVueComponent.loadComponentTimer)
+  }
+  runtimeContext.loadVueComponent = {
+    loadComponentTimer: undefined,
+    loadedComponents: {},
+    retries: 0,
+  }
 }

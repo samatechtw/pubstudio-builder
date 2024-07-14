@@ -173,6 +173,12 @@
               @update:modelValue="update('async', $event)"
             />
             <PSInput
+              :modelValue="data.meta.crossorigin || ''"
+              name="crossorigin"
+              placeholder="crossorigin"
+              @update:modelValue="update('crossorigin', $event)"
+            />
+            <PSInput
               :modelValue="data.meta.blocking || ''"
               name="blocking"
               placeholder="blocking"
@@ -242,7 +248,7 @@ const save = () => {
   emit('save', data.value)
 }
 
-const updateTag = (tag: IHeadTagStr) => {
+const updateTag = (tag: IHeadTagStr | undefined) => {
   data.value.tag = tag
   if (tag === 'title') {
     data.value.meta = ''

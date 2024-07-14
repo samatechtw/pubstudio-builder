@@ -5,6 +5,7 @@ export enum AssetContentType {
   Mp4 = 'video/mp4',
   Pdf = 'application/pdf',
   Wasm = 'application/wasm',
+  Js = 'text/javascript',
 }
 
 export const ALL_CONTENT_TYPES = Object.values(AssetContentType)
@@ -15,4 +16,5 @@ export const MEDIA_CONTENT_TYPES = [
   AssetContentType.Gif,
   AssetContentType.Mp4,
   AssetContentType.Wasm,
+  AssetContentType.Js,
 ]

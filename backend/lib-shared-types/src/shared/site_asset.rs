@@ -39,6 +39,10 @@ pub enum AssetContentType {
     #[sqlx(rename = "application/wasm")]
     #[strum(serialize = "application/wasm")]
     Wasm,
+    #[serde(rename = "text/javascript")]
+    #[sqlx(rename = "text/javascript")]
+    #[strum(serialize = "text/javascript")]
+    Js,
 }
 
 impl AssetContentType {
@@ -50,6 +54,7 @@ impl AssetContentType {
             AssetContentType::Mp4 => "mp4",
             AssetContentType::Pdf => "pdf",
             AssetContentType::Wasm => "wasm",
+            AssetContentType::Js => "js",
         }
         .into()
     }

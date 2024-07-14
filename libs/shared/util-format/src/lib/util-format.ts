@@ -81,6 +81,7 @@ export function contentTypeExt(contentType: AssetContentType): string {
     [AssetContentType.Mp4]: 'mp4',
     [AssetContentType.Pdf]: 'pdf',
     [AssetContentType.Wasm]: 'wasm',
+    [AssetContentType.Js]: 'js',
   }[contentType]
 }
 
