@@ -64,7 +64,7 @@ export const useSiteVersion = (options?: IUseSiteVersionOptions): IUseSiteVersio
       } catch (e) {
         console.log('Failed to list site versions', e)
         const err = e as IApiError
-        if (err.status) {
+        if (err.status === 401) {
           store.auth.setLoginRedirect(location.pathname)
           store.auth.logOut()
         }

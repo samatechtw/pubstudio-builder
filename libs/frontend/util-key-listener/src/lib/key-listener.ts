@@ -1,5 +1,5 @@
+import { Keys } from '@pubstudio/shared/type-site'
 import { onMounted, onUnmounted } from 'vue'
-import { Keys } from './enum-keys'
 import { KeyCallback } from './key-callback'
 
 export const useKeyListener = (

@@ -9,7 +9,7 @@ import {
   descSortedBreakpoints,
 } from '@pubstudio/frontend/feature-site-source'
 import { findStyles } from '@pubstudio/frontend/util-component'
-import { IContent, RenderMode, renderVueComponent } from '@pubstudio/frontend/util-render'
+import { IContent, RenderMode } from '@pubstudio/frontend/util-render'
 import { runtimeContext } from '@pubstudio/frontend/util-runtime'
 import { Css, IComponent, ISite, Tag } from '@pubstudio/shared/type-site'
 import {
@@ -246,8 +246,11 @@ export const BuilderDndComponent = defineComponent({
         return h('div', props, 'View in preview')
       } else if (tag === Tag.Svg) {
         return h(Tag.Div, props, propsContent.content)
+      } else if (tag === Tag.Button) {
+        // Render as div to avoid space bar triggering click
+        return h('div', props, propsContent.content)
       } else {
-        return h(component.value.tag as string, props, propsContent.content)
+        return h(tag as string, props, propsContent.content)
       }
     }
   },
