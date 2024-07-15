@@ -71,8 +71,8 @@ import {
   Publish,
   Spinner,
   ToolbarItem,
-  useToast,
 } from '@pubstudio/frontend/ui-widgets'
+import { useToast } from '@pubstudio/frontend/util-ui-alert'
 import { EditorDropdown } from '@pubstudio/shared/type-site'
 import { useSiteVersion, VersionOption } from '@pubstudio/frontend/feature-site-version'
 import { IMultiselectObj } from '@pubstudio/frontend/type-ui-widgets'

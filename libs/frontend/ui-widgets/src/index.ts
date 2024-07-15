@@ -125,10 +125,6 @@ export { default as SiteSaveErrorModal } from './lib/modal/SiteSaveErrorModal.vu
 
 // toast
 export { default as AppToast } from './lib/toast/AppToast.vue'
-export * from './lib/toast/use-toast'
-
-// hud
-export { default as AppHUD } from './lib/hud/AppHUD.vue'
 
 export { default as StyleProperty } from './lib/StyleProperty.vue'
 export { default as SizeUnit } from './lib/SizeUnit.vue'

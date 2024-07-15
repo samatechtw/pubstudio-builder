@@ -1,4 +1,4 @@
-import { useHUD } from '@pubstudio/frontend/util-ui-alert'
+import { useToast } from '@pubstudio/frontend/util-ui-alert'
 import { useBuild } from './use-build'
 
 export interface IUseDuplicateComponet {
@@ -8,7 +8,7 @@ export interface IUseDuplicateComponet {
 
 export const useDuplicateComponent = (): IUseDuplicateComponet => {
   const { editor, duplicateComponent } = useBuild()
-  const { addHUD } = useHUD()
+  const { addHUD } = useToast()
 
   const pressDuplicate = (evt: KeyboardEvent) => {
     evt.stopImmediatePropagation()

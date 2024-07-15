@@ -1,5 +1,5 @@
 import { serializeComponent } from '@pubstudio/frontend/util-site-store'
-import { useHUD } from '@pubstudio/frontend/util-ui-alert'
+import { useToast } from '@pubstudio/frontend/util-ui-alert'
 import { ISerializedComponent } from '@pubstudio/shared/type-site'
 import { useBuild } from './use-build'
 
@@ -18,7 +18,7 @@ export const useCopyPaste = (): IUseCopyPaste => {
     mergeComponentStyle,
     pasteComponent: executePasteComponent,
   } = useBuild()
-  const { addHUD } = useHUD()
+  const { addHUD } = useToast()
 
   const pressCopy = (evt: KeyboardEvent) => {
     evt.stopImmediatePropagation()
@@ -33,9 +33,7 @@ export const useCopyPaste = (): IUseCopyPaste => {
 
   const pasteStyle = (copiedComponent: ISerializedComponent): void => {
     mergeComponentStyle(copiedComponent)
-    addHUD({
-      text: 'Style Pasted',
-    })
+    addHUD({ text: 'Style Pasted' })
   }
 
   const pasteComponent = (copiedComponent: ISerializedComponent): void => {

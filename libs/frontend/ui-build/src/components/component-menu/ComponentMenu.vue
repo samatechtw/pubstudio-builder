@@ -66,7 +66,7 @@ import { PSButton, InfoBubble } from '@pubstudio/frontend/ui-widgets'
 import { prosemirrorEditing } from '@pubstudio/frontend/util-edit-text'
 import { BuildSubmenu, ComponentTabState, IComponent } from '@pubstudio/shared/type-site'
 import { serializeComponent } from '@pubstudio/frontend/util-site-store'
-import { useHUD } from '@pubstudio/frontend/util-ui-alert'
+import { useToast } from '@pubstudio/frontend/util-ui-alert'
 import { isDev } from '@pubstudio/frontend/util-config'
 import ComponentTabInfo from './ComponentTabInfo.vue'
 import ComponentDimensions from './ComponentDimensions.vue'
@@ -92,7 +92,7 @@ import ComponentState from './ComponentState.vue'
 const { t } = useI18n()
 const { site, editor, replacePageRoot, addCustomComponent } = useBuild()
 const { isEditingMixin } = useMixinMenu()
-const { addHUD } = useHUD()
+const { addHUD } = useToast()
 
 const props = defineProps<{
   component: IComponent

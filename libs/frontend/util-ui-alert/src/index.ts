@@ -1,2 +1,2 @@
 export * from './lib/ui-alert'
-export * from './lib/use-hud'
+export * from './lib/use-toast'
