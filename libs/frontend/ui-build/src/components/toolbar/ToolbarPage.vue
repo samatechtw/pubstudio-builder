@@ -32,13 +32,14 @@ import { useBuild, newPage } from '@pubstudio/frontend/feature-build'
 import { setEditorDropdown } from '@pubstudio/frontend/data-access-command'
 import { IMultiselectOption, IMultiselectObj } from '@pubstudio/frontend/type-ui-widgets'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
+import { getOrderedPages } from '@pubstudio/frontend/util-builder'
 
 const { t } = useI18n()
 const { site, activePage } = useSiteSource()
 const { editor, changePage } = useBuild()
 
 const pageOptions = computed(() =>
-  Object.values(site.value.pages)
+  getOrderedPages(site.value)
     .filter((page) => page.route !== activePage.value?.route)
     .map((page) => ({
       label: page.name,

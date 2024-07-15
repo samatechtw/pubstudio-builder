@@ -176,6 +176,7 @@ const toggleOverflow = (value: string) => {
 }
 
 .dimensions-wrap {
+  font-family: $font-text;
   max-height: v-bind(sectionHeight);
   transition: max-height 0.2s;
   &.collapsed {
