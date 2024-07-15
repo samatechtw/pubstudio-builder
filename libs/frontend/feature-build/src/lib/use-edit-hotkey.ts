@@ -1,6 +1,6 @@
 import { DefaultHotkeys } from '@pubstudio/frontend/feature-builtin-editor'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
-import { useHUD } from '@pubstudio/frontend/util-ui-alert'
+import { useToast } from '@pubstudio/frontend/util-ui-alert'
 import {
   HotkeyStates,
   IHotkeys,
@@ -40,7 +40,7 @@ const editingAction = ref<{ state: HotkeyStates; action: string }>()
 
 export const useEditHotkey = (options?: IUseEditHotkeyOptions): IUseEditHotkey => {
   const { site } = useSiteSource()
-  const { addHUD } = useHUD()
+  const { addHUD } = useToast()
   const { state, action } = options ?? {}
 
   const isEditing = computed(() => {

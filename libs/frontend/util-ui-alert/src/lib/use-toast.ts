@@ -1,7 +1,9 @@
-import { Ref, ref } from 'vue'
+import { computed, ComputedRef, Ref, ref } from 'vue'
 
 export enum ToastType {
+  Toast = 'toast',
   Error = 'error',
+  Hud = 'hud',
 }
 
 export interface IToastOptions {
@@ -11,26 +13,34 @@ export interface IToastOptions {
   duration?: number
 }
 
+export interface IHUDOptions {
+  text: string
+  // Default 1500ms
+  duration?: number
+}
+
 export interface IToast {
   text: string
   id: string
-  type?: ToastType
+  type: ToastType
   duration?: number
   durationTimeout?: ReturnType<typeof setTimeout>
 }
 
 export interface IToastFeature {
-  toasts: Ref<IToast[]>
+  toasts: ComputedRef<IToast[]>
+  huds: ComputedRef<IToast[]>
   addToast: (toast: IToastOptions) => void
+  addHUD: (options: IHUDOptions) => void
   removeToast: (index: number) => void
 }
 
-const toasts: Ref<IToast[]> = ref([])
+const allToasts: Ref<IToast[]> = ref([])
 let toastCount = 0
 
 export const useToast = (): IToastFeature => {
   const toastById = (id: string) => {
-    return toasts.value.find((t) => t.id === id)
+    return allToasts.value.find((t) => t.id === id)
   }
   const addToast = (toast: IToastOptions) => {
     let durationTimeout = undefined
@@ -46,18 +56,28 @@ export const useToast = (): IToastFeature => {
     if (toast.duration) {
       // Hide the toast after a duration
       durationTimeout = setTimeout(() => {
-        toasts.value = toasts.value.filter((toast) => toast.id !== id)
+        allToasts.value = allToasts.value.filter((toast) => toast.id !== id)
       }, toast.duration)
     }
-    toasts.value.push({
+    allToasts.value.push({
       ...toast,
+      type: toast.type ?? ToastType.Toast,
       id,
       durationTimeout,
     })
   }
+  const addHUD = (options: IHUDOptions) => {
+    addToast({
+      text: options.text,
+      duration: options.duration ?? 1500,
+      type: ToastType.Hud,
+    })
+  }
+  const toasts = computed(() => allToasts.value.filter((t) => t.type !== ToastType.Hud))
+  const huds = computed(() => allToasts.value.filter((t) => t.type === ToastType.Hud))
 
   const removeToast = (index: number) => {
-    const toast = toasts.value.splice(index, 1)[0]
+    const toast = allToasts.value.splice(index, 1)[0]
     if (toast?.durationTimeout) {
       clearTimeout(toast?.durationTimeout)
     }
@@ -65,7 +85,9 @@ export const useToast = (): IToastFeature => {
 
   return {
     toasts,
+    huds,
     addToast,
+    addHUD,
     removeToast,
   }
 }
