@@ -1,5 +1,4 @@
-import { IPickerColor } from '@pubstudio/frontend/feature-color-picker'
-import { IThemedGradient } from '@pubstudio/frontend/util-gradient'
+import { IPickerColor, IThemedGradient } from '@samatech/vue-color-picker'
 
 export interface IToolbarPickerColor {
   color: IPickerColor | undefined
