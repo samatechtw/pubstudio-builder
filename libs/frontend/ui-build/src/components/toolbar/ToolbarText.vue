@@ -67,12 +67,10 @@ import {
 } from '@pubstudio/frontend/ui-widgets'
 import { PSInput } from '@pubstudio/frontend/ui-widgets'
 import { useControlledClickaway } from '@pubstudio/frontend/util-clickaway'
-import { colorToCssValue } from '@pubstudio/frontend/feature-color-picker'
+import { colorToCssValue } from '@samatech/vue-color-picker'
 import { Css, EditorDropdown } from '@pubstudio/shared/type-site'
-import { isTextGradient, parseGradientColors } from '@pubstudio/frontend/util-gradient'
+import { isTextGradient, parseGradientColors } from '@samatech/vue-color-picker'
 import { ICommand } from '@pubstudio/shared/type-command'
-import FontFamily from '../FontFamily.vue'
-import FontWeight from '../FontWeight.vue'
 import {
   useBuild,
   useToolbar,
@@ -82,6 +80,8 @@ import {
 import { setEditorDropdown } from '@pubstudio/frontend/data-access-command'
 import ToolbarColorPicker from './ToolbarColorPicker.vue'
 import { IToolbarPickerColor, IToolbarThemedGradient } from './i-toolbar-color-picker'
+import FontFamily from '../FontFamily.vue'
+import FontWeight from '../FontWeight.vue'
 
 const { t } = useI18n()
 const {

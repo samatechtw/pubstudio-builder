@@ -311,6 +311,7 @@ onUnmounted(() => {
 
 .edit {
   @mixin size 28px;
+  font-family: $font-text;
   cursor: pointer;
   filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.8));
   position: absolute;

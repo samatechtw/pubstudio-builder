@@ -53,11 +53,8 @@ import {
   FlexWrap,
   FlexRow,
 } from '@pubstudio/frontend/ui-widgets'
-import { colorToCssValue } from '@pubstudio/frontend/feature-color-picker'
-import {
-  GradientTypeValues,
-  parseGradientColors,
-} from '@pubstudio/frontend/util-gradient'
+import { colorToCssValue, GradientTypeValues } from '@samatech/vue-color-picker'
+import { parseGradientColors } from '@samatech/vue-color-picker'
 import { useControlledClickaway } from '@pubstudio/frontend/util-clickaway'
 import { Css, EditorDropdown } from '@pubstudio/shared/type-site'
 import { ICommand } from '@pubstudio/shared/type-command'

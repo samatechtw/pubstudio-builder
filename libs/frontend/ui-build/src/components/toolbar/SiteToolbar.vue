@@ -106,6 +106,7 @@ import ToolbarBreakpoint from './ToolbarBreakpoint.vue'
 import BugReportModal from './BugReportModal.vue'
 import EditorPreferencesModal from './EditorPreferencesModal.vue'
 import ToolbarVersion from './ToolbarVersion.vue'
+import '@samatech/vue-color-picker/dist/style.css'
 
 defineProps<{
   hideSettings?: boolean

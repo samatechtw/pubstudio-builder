@@ -37,9 +37,6 @@
       "@pubstudio/frontend/feature-checkout": [
         "libs/frontend/feature-checkout/src/index.ts"
       ],
-      "@pubstudio/frontend/feature-color-picker": [
-        "libs/frontend/feature-color-picker/src/index.ts"
-      ],
       "@pubstudio/frontend/feature-contact-form": [
         "libs/frontend/feature-contact-form/src/index.ts"
       ],
@@ -69,7 +66,6 @@
       "@pubstudio/frontend/util-dropdown": ["libs/frontend/util-dropdown/src/index.ts"],
       "@pubstudio/frontend/util-i18n": ["libs/frontend/util-i18n/src/index.ts"],
       "@pubstudio/frontend/util-fields": ["libs/frontend/util-fields/src/index.ts"],
-      "@pubstudio/frontend/util-gradient": ["libs/frontend/util-gradient/src/index.ts"],
       "@pubstudio/frontend/util-identicon": ["libs/frontend/util-identicon/src/index.ts"],
       "@pubstudio/frontend/util-key-listener": [
         "libs/frontend/util-key-listener/src/index.ts"

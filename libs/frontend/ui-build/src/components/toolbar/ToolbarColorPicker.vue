@@ -24,9 +24,8 @@
 
 <script lang="ts" setup>
 import { toRefs } from 'vue'
-import { ColorPicker, IPickerColor } from '@pubstudio/frontend/feature-color-picker'
+import { ColorPicker, IPickerColor, IThemedGradient } from '@samatech/vue-color-picker'
 import { IThemeVariable } from '@pubstudio/shared/type-site'
-import { IThemedGradient } from '@pubstudio/frontend/util-gradient'
 import { resolveThemeVariables } from '@pubstudio/frontend/util-resolve'
 import { ToolbarItem } from '@pubstudio/frontend/ui-widgets'
 import { useBuild, useToolbarResumeTextFocus } from '@pubstudio/frontend/feature-build'

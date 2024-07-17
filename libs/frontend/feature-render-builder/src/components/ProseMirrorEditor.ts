@@ -19,7 +19,6 @@ import {
   schemaText,
   setOrRemoveStyleMark,
 } from '@pubstudio/frontend/util-edit-text'
-import { isTextGradient } from '@pubstudio/frontend/util-gradient'
 import { resolveComponent, resolveThemeVariables } from '@pubstudio/frontend/util-resolve'
 import { Css, IComponent, IEditorContext } from '@pubstudio/shared/type-site'
 import { EditorState, Plugin, TextSelection, Transaction } from 'prosemirror-state'
@@ -36,6 +35,7 @@ import {
   toRefs,
   watch,
 } from 'vue'
+import { isTextGradient } from '@samatech/vue-color-picker'
 import { LinkTooltipMode } from '../lib/enum-link-tooltip-mode'
 import LinkTooltip from './LinkTooltip.vue'
 

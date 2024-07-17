@@ -81,10 +81,13 @@ import {
   useThemeMenuVariables,
 } from '@pubstudio/frontend/feature-build'
 import MenuRow from '../MenuRow.vue'
-import { ColorPicker, IPickerColor } from '@pubstudio/frontend/feature-color-picker'
-import { colorToCssValue } from '@pubstudio/frontend/feature-color-picker'
+import {
+  ColorPicker,
+  IPickerColor,
+  colorToCssValue,
+  IThemedGradient,
+} from '@samatech/vue-color-picker'
 import { resolveThemeVariables } from '@pubstudio/frontend/util-resolve'
-import { IThemedGradient } from '@pubstudio/frontend/util-gradient'
 import { useClickaway } from '@pubstudio/frontend/util-clickaway'
 import ThemeVariableFont from './ThemeVariableFont.vue'
 import { BuildMenuIcon } from '../..'
