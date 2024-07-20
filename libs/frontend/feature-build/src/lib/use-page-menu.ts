@@ -1,5 +1,6 @@
 import { setEditPage } from '@pubstudio/frontend/data-access-command'
 import { IMultiselectOptions } from '@pubstudio/frontend/type-ui-widgets'
+import { getOrderedPages } from '@pubstudio/frontend/util-builder'
 import { IEditorContext, IPage, IPageMetadata, ISite } from '@pubstudio/shared/type-site'
 import { useI18n } from 'petite-vue-i18n'
 import { computed, ComputedRef, reactive, Ref, ref, UnwrapNestedRefs } from 'vue'
@@ -121,7 +122,7 @@ export const usePageMenu = (): IUsePageMenuFeature => {
   })
 
   const pageOptions = computed<IMultiselectOptions>(() => {
-    return Object.values(site.value.pages).map((page) => ({
+    return getOrderedPages(site.value).map((page) => ({
       label: page.name,
       value: page.route,
     }))

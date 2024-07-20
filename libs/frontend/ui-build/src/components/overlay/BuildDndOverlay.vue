@@ -70,6 +70,8 @@ const setSelectionOverlayStyle = async (component: IComponent | undefined) => {
       height: `${dim.height}px`,
       border: '2px solid #3768FF',
     }
+  } else {
+    selectionOverlayStyle.value = undefined
   }
 }
 
