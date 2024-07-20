@@ -23,4 +23,4 @@ export enum Tag {
   Vue = 'vue',
 }
 
-export const TagValues: Tag[] = Object.values(Tag)
+export type TagType = `${Tag}`

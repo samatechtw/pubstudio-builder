@@ -2,7 +2,7 @@ import { site } from '@pubstudio/frontend/feature-site-source'
 import { PSApi } from '@pubstudio/frontend/util-api'
 import { IUpdateSiteApiResponse } from '@pubstudio/shared/type-api-site-sites'
 import {
-  CssPseudoClass,
+  CssPseudoClassType,
   IEditorContext,
   IPage,
   ISite,
@@ -21,7 +21,7 @@ export interface IUseSiteSource {
   site: Ref<ISite>
   editor: ComputedRef<IEditorContext | undefined>
   activePage: Ref<IPage | undefined>
-  currentPseudoClass: ComputedRef<CssPseudoClass>
+  currentPseudoClass: ComputedRef<CssPseudoClassType>
   siteError: Ref<string | undefined>
   apiSiteId: Ref<string | undefined>
   apiSite: PSApi | undefined
@@ -61,8 +61,8 @@ const activePage = computed(() => {
   return getActivePage(site.value)
 })
 
-const currentPseudoClass = computed(
-  () => site.value.editor?.cssPseudoClass ?? CssPseudoClass.Default,
+const currentPseudoClass = computed<CssPseudoClassType>(
+  () => site.value.editor?.cssPseudoClass ?? 'default',
 )
 
 const isSiteApi = computed(() => {

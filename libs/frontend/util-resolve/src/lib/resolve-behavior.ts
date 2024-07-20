@@ -28,7 +28,7 @@ export const NativeEvents: Record<string, string> = {
   mouseover: 'onMouseover',
   mouseleave: 'onMouseleave',
   submit: 'onSubmit',
-  [ComponentEventType.Input]: 'onInput',
+  input: 'onInput',
 }
 
 export const resolveBehaviorFunction = (

@@ -1,8 +1,16 @@
 <template>
   <div class="app">
     <div id="scroll-container" class="app-content">
-      <Spinner v-if="loading" class="app-spinner" />
-      <ErrorMessage v-else-if="error" class="app-error" :error="error" />
+      <div v-if="loading" class="sw c">
+        <span class="dot" />
+        <span class="dot" />
+        <span class="dot" />
+      </div>
+      <div v-else-if="error" class="emw c">
+        <div class="em c">
+          <span v-html="error" />
+        </div>
+      </div>
       <template v-else>
         <CustomStyle />
         <Mixins />
@@ -28,8 +36,6 @@ import { rootSiteApi } from '@pubstudio/shared/util-web-site-api'
 import { ISite } from '@pubstudio/shared/type-site'
 import { IGetSiteApiResponse } from '@pubstudio/shared/type-api-site-sites'
 import '@pubstudio/frontend/feature-builtin' // Ensure builtin behaviors loaded
-import ErrorMessage from './components/ErrorMessage.vue'
-import Spinner from './components/Spinner.vue'
 import NotFound from './components/NotFound.vue'
 
 const API_URL = '___SITE_API_URL___'
@@ -116,6 +122,8 @@ onMounted(async () => {
 </script>
 
 <style lang="postcss">
+$color-error: #ef4444;
+
 html,
 body {
   padding: 0;
@@ -161,34 +169,63 @@ a {
   flex-direction: column;
   height: 100%;
   overflow-y: auto;
-  & > .app-content {
-    display: flex;
-    flex-direction: column;
-    flex-shrink: 0;
-    flex-grow: 1;
-    & > .app-router-view {
-      flex-grow: 1;
-    }
+}
+.app-content {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  flex-grow: 1;
+}
+.app-router-view {
+  flex-grow: 1;
+}
+.c {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.emw {
+  width: 100%;
+  height: 100%;
+  padding: 16px;
+}
+
+.em {
+  font-family: Helvetica, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: $color-error;
+  max-height: 72px;
+}
+
+.sw {
+  width: 100%;
+  height: 100%;
+}
+.dot {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: #2a17d6;
+  animation: scale 0.6s ease alternate infinite;
+  &:not(:first-child) {
+    margin-left: calc(32px / 4);
   }
-  .app-spinner {
-    width: 100%;
-    height: 100%;
+  &:nth-of-type(2) {
+    animation-delay: 0.2s;
   }
-  .app-error {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 100%;
-    padding: 16px;
-    .error {
-      padding: 0;
-      font-size: 24px;
-    }
-    .error-icon {
-      width: 24px;
-      height: 24px;
-    }
+  &:nth-of-type(3) {
+    animation-delay: 0.4s;
+  }
+}
+
+@keyframes scale {
+  0% {
+    transform: scale(0);
+  }
+  100% {
+    transform: scale(1);
   }
 }
 

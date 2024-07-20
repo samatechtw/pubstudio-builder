@@ -6,7 +6,7 @@ import {
 import { resolveComponent } from '@pubstudio/frontend/util-resolve'
 import {
   Css,
-  CssPseudoClass,
+  CssPseudoClassType,
   IBreakpointStylesWithSource,
   IComponent,
   IRawStylesWithSource,
@@ -69,10 +69,12 @@ export const computeComponentOverrideStyle = (
     const pseudoStyle = result[breakpointId]
 
     Object.entries(customPseudoStyle).forEach(([pseudoClass, customRawStyle]) => {
-      if (!pseudoStyle[pseudoClass as CssPseudoClass]) {
-        pseudoStyle[pseudoClass as CssPseudoClass] = {}
+      if (!pseudoStyle[pseudoClass as CssPseudoClassType]) {
+        pseudoStyle[pseudoClass as CssPseudoClassType] = {}
       }
-      const rawStyle = pseudoStyle[pseudoClass as CssPseudoClass] as IRawStylesWithSource
+      const rawStyle = pseudoStyle[
+        pseudoClass as CssPseudoClassType
+      ] as IRawStylesWithSource
 
       Object.entries(customRawStyle).forEach(([css, value]) => {
         rawStyle[css as Css] = {

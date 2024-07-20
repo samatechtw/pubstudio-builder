@@ -22,7 +22,9 @@
 import { ref, toRefs } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { PSMultiselect } from '@pubstudio/frontend/ui-widgets'
-import { WebSafeFont, WebSafeFontValues } from '@pubstudio/shared/type-site'
+import { WebSafeFont } from '@pubstudio/shared/type-site'
+
+const WebSafeFontValues = Object.values(WebSafeFont)
 
 const { t } = useI18n()
 
@@ -34,7 +36,7 @@ const props = defineProps<{
 const { modelValue } = toRefs(props)
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: WebSafeFont): void
+  (e: 'update:modelValue', value: WebSafeFont | undefined): void
 }>()
 
 const multiselectRef = ref(null)

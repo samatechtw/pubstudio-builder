@@ -1,7 +1,7 @@
 import { resolveStyle } from '@pubstudio/frontend/util-resolve'
 import {
   Css,
-  CssPseudoClass,
+  CssPseudoClassType,
   IBreakpointStylesWithSource,
   IComponent,
   IPseudoStyle,
@@ -29,11 +29,11 @@ export const computeMixinBreakpointStyles = (
         const pseudoStyle = result[breakpointId]
 
         Object.entries(mixinPseudoStyle).forEach(([pseudoClass, mixinRawStyle]) => {
-          if (!pseudoStyle[pseudoClass as CssPseudoClass]) {
-            pseudoStyle[pseudoClass as CssPseudoClass] = {}
+          if (!pseudoStyle[pseudoClass as CssPseudoClassType]) {
+            pseudoStyle[pseudoClass as CssPseudoClassType] = {}
           }
           const rawStyle = pseudoStyle[
-            pseudoClass as CssPseudoClass
+            pseudoClass as CssPseudoClassType
           ] as IRawStylesWithSource
 
           Object.entries(mixinRawStyle).forEach(([css, value]) => {
@@ -60,10 +60,10 @@ export const computePseudoStyleWithSource = (
   overrideSourceType?: StyleSourceType,
 ) => {
   Object.entries(pseudo).forEach(([pseudoClass, customRawStyle]) => {
-    if (!result[pseudoClass as CssPseudoClass]) {
-      result[pseudoClass as CssPseudoClass] = {}
+    if (!result[pseudoClass as CssPseudoClassType]) {
+      result[pseudoClass as CssPseudoClassType] = {}
     }
-    const rawStyle = result[pseudoClass as CssPseudoClass] as IRawStylesWithSource
+    const rawStyle = result[pseudoClass as CssPseudoClassType] as IRawStylesWithSource
 
     Object.entries(customRawStyle).forEach(([css, value]) => {
       rawStyle[css as Css] = {
@@ -111,11 +111,11 @@ export const mergeBreakpointStylesWithSource = (
       const pseudoStyle = result[breakpointId]
 
       Object.entries(sourcePseudoStyle).forEach(([pseudoClass, sourceRawStyle]) => {
-        if (!pseudoStyle[pseudoClass as CssPseudoClass]) {
-          pseudoStyle[pseudoClass as CssPseudoClass] = {}
+        if (!pseudoStyle[pseudoClass as CssPseudoClassType]) {
+          pseudoStyle[pseudoClass as CssPseudoClassType] = {}
         }
         const rawStyle = pseudoStyle[
-          pseudoClass as CssPseudoClass
+          pseudoClass as CssPseudoClassType
         ] as IRawStylesWithSource
 
         Object.entries(sourceRawStyle).forEach(([css, source]) => {

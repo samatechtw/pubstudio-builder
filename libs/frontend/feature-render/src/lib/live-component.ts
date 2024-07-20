@@ -1,6 +1,6 @@
 import { IContent, RenderMode, renderVueComponent } from '@pubstudio/frontend/util-render'
 import { RouterLink } from '@pubstudio/frontend/util-router'
-import { IComponent, ISite, Tag } from '@pubstudio/shared/type-site'
+import { IComponent, ISite } from '@pubstudio/shared/type-site'
 import { defineComponent, h, onMounted, onUnmounted, PropType, toRefs } from 'vue'
 import { registerCustomEvents, removeListeners } from './custom-event-handlers'
 import { computePropsContent } from './render'
@@ -58,20 +58,20 @@ export const LiveComponent = () => {
           renderProps = { ...props, innerHTML: content }
 
           // Vue render function requires a tag, and we don't want two layers of <svg>
-          if (tag === Tag.Svg && content.includes('<svg')) {
-            tag = Tag.Div
+          if (tag === 'svg' && content.includes('<svg')) {
+            tag = 'div'
           }
         } else {
           children = content
         }
-        if (tag === Tag.A) {
+        if (tag === 'a') {
           const path = props.href ?? ''
           const linkProps = {
             ...renderProps,
             to: { path },
           }
           return h(RouterLink, linkProps, () => children)
-        } else if (tag === Tag.Vue) {
+        } else if (tag === 'vue') {
           return renderVueComponent(site.value.context, component.value, renderProps)
         }
 

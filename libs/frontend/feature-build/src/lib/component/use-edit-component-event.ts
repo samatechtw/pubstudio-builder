@@ -1,12 +1,7 @@
 import { setComponentEditEvent } from '@pubstudio/frontend/data-access-command'
 import { noBehavior } from '@pubstudio/frontend/feature-builtin'
 import { builtinBehaviors, resolveComponent } from '@pubstudio/frontend/util-resolve'
-import {
-  ComponentEventType,
-  ComponentEventTypeValues,
-  IComponentEvent,
-  ISite,
-} from '@pubstudio/shared/type-site'
+import { ComponentEventType, IComponentEvent, ISite } from '@pubstudio/shared/type-site'
 import { computed } from 'vue'
 import { useBuild } from '../use-build'
 import {
@@ -14,6 +9,9 @@ import {
   IResolvedComponentEvent,
   IUseEditComponentEventFeature,
 } from './edit-component-event-common'
+
+export const ComponentEventTypeValues: ComponentEventType[] =
+  Object.values(ComponentEventType)
 
 export const defaultEvent = (): IResolvedComponentEvent => ({
   name: ComponentEventType.Click,

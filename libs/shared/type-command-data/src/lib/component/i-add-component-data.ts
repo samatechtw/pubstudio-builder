@@ -6,7 +6,7 @@ import {
   IComponentState,
   IComponentStyle,
   ISerializedComponent,
-  Tag,
+  TagType,
 } from '@pubstudio/shared/type-site'
 
 export interface IAddComponentData {
@@ -18,7 +18,7 @@ export interface IAddComponentData {
   // Human readable name
   name?: string
   // HTML tag
-  tag: Tag
+  tag: TagType
   // HTML content
   content?: string
   // DOM parent

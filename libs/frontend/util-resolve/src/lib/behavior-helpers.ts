@@ -7,7 +7,7 @@ import {
 import { IGetPublicSiteUsageApiResponse } from '@pubstudio/shared/type-api-site-sites'
 import {
   ComponentArgPrimitive,
-  Css,
+  CssType,
   IBehaviorCustomArgs,
   IBehaviorHelpers,
   IComponent,
@@ -91,7 +91,7 @@ export const setInputIs = (
 
 export const setCustomStyle = (
   component: IComponent | undefined,
-  prop: Css,
+  prop: CssType,
   value: string,
 ) => {
   if (component?.style.custom[DEFAULT_BREAKPOINT_ID]?.default) {
@@ -105,7 +105,7 @@ export const setCustomStyle = (
 
 export const getCustomStyle = (
   component: IComponent | undefined,
-  prop: Css,
+  prop: CssType,
 ): string | undefined => {
   return component?.style.custom?.[DEFAULT_BREAKPOINT_ID].default?.[prop]
 }
@@ -130,7 +130,7 @@ export const setLoading = (component: IComponent | undefined, loading: boolean) 
   const content = component?.children?.[0]
   const loader = component?.children?.[1]
   setState(loader, 'hide', !loading)
-  setCustomStyle(content, Css.Opacity, loading ? '0' : '1')
+  setCustomStyle(content, 'opacity', loading ? '0' : '1')
 }
 
 const setError = (
@@ -142,8 +142,8 @@ const setError = (
   console.error(e)
   const errorMsg = errorMap?.[e.code] ?? e.message ?? 'Unknown error, try again later'
   setContent(errorCmp, errorMsg)
-  setCustomStyle(errorCmp, Css.Opacity, '1')
-  setCustomStyle(errorCmp, Css.Color, '${color-error}')
+  setCustomStyle(errorCmp, 'opacity', '1')
+  setCustomStyle(errorCmp, 'color', '${color-error}')
   return errorMsg
 }
 

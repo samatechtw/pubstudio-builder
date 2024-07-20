@@ -1,8 +1,8 @@
 import { DEFAULT_BREAKPOINT_ID } from '@pubstudio/frontend/util-ids'
 import { resolveThemeVariables } from '@pubstudio/frontend/util-resolve'
 import {
-  Css,
-  CssPseudoClass,
+  CssPseudoClassType,
+  CssType,
   IBreakpoint,
   IComponent,
   IRawStyle,
@@ -21,7 +21,7 @@ export const rawStyleRecordToString = (
   return Object.entries(record).reduce((result, [selector, rawStyle]) => {
     const fields = Object.entries(rawStyle)
       .map(([prop, value]) => {
-        const computedValue = computeCssValue(prop as Css, value, context)
+        const computedValue = computeCssValue(prop as CssType, value, context)
         const supportedValue = CSS.supports(prop, computedValue) ? computedValue : ''
         return `${prop}:${supportedValue};`
       })
@@ -30,10 +30,10 @@ export const rawStyleRecordToString = (
   }, '')
 }
 
-const computeCssValue = (prop: Css, value: string, context: ISiteContext): string => {
+const computeCssValue = (prop: CssType, value: string, context: ISiteContext): string => {
   let computedValue = resolveThemeVariables(context, value) ?? value
 
-  if (prop === Css.FontFamily) {
+  if (prop === 'font-family') {
     const appliedFont: IThemeFont | undefined = context.theme.fonts[value]
     if (appliedFont?.fallback) {
       computedValue = `"${appliedFont.name}", "${appliedFont.fallback}", sans-serif`
@@ -92,7 +92,7 @@ export const rawStyleToResolvedStyle = (
   return Object.entries(rawStyle)
     .sort((a, b) => b[0].localeCompare(a[0]))
     .reduce((result, [css, value]) => {
-      result[css as Css] = resolveThemeVariables(context, value)
+      result[css as CssType] = resolveThemeVariables(context, value)
       return result
     }, {} as IRawStyle)
 }
@@ -104,7 +104,7 @@ export const rawStyleToResolvedStyleWithSource = (
   return Object.entries(rawStyleWithSource)
     .sort((a, b) => b[0].localeCompare(a[0]))
     .reduce((result, [css, source]) => {
-      result[css as Css] = resolveThemeVariables(context, source.value)
+      result[css as CssType] = resolveThemeVariables(context, source.value)
       return result
     }, {} as IRawStyle)
 }
@@ -141,7 +141,8 @@ export const iterateMixin = (context: ISiteContext, mixinId: string, fn: MixinIt
   const mixin = context.styles[mixinId]
   Object.entries(mixin.breakpoints ?? {}).forEach(([bpId, pseudoStyle]) => {
     Object.entries(pseudoStyle).forEach(([pseudoClass, rawStyle]) => {
-      const pseudoValue = pseudoClass === CssPseudoClass.Default ? '' : pseudoClass
+      const pseudoValue =
+        (pseudoClass as CssPseudoClassType) === 'default' ? '' : pseudoClass
       fn(bpId, pseudoValue, rawStyle)
     })
   })

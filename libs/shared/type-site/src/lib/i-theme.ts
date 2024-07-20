@@ -17,8 +17,6 @@ export enum ThemeFontSource {
   Google = 'google',
 }
 
-export const ThemeFontSourceValues = Object.values(ThemeFontSource)
-
 export enum WebSafeFont {
   Arial = 'Arial',
   Verdana = 'Verdana',
@@ -30,8 +28,6 @@ export enum WebSafeFont {
   CourierNew = 'Courier New',
   BrushScriptMT = 'Brush Script MT',
 }
-
-export const WebSafeFontValues = Object.values(WebSafeFont)
 
 export type IThemeFont = {
   source: ThemeFontSource

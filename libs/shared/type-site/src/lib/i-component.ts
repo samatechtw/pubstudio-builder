@@ -1,5 +1,5 @@
-import { AriaRole } from './enum-aria-role'
-import { Tag } from './enum-tag'
+import { AriaRoleType } from './enum-aria-role'
+import { TagType } from './enum-tag'
 import { IComponentEditorEvents } from './i-editor-context'
 import { IBehaviorCustomArgs, IResolvedBehavior } from './i-resolved-behavior'
 import { IBreakpointStyles } from './i-style'
@@ -101,9 +101,9 @@ export interface IComponent {
   // Human readable name
   name: string
   // HTML tag
-  tag: Tag
+  tag: TagType
   // ARIA role
-  role?: AriaRole
+  role?: AriaRoleType
   // HTML content.
   // This is also used to override custom component content.
   content?: string

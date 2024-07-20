@@ -19,8 +19,10 @@
 <script lang="ts" setup>
 import { toRefs } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
-import { AriaRole, AriaRoleValues } from '@pubstudio/shared/type-site'
+import { AriaRole } from '@pubstudio/shared/type-site'
 import { InfoBubble, PSMultiselect } from '@pubstudio/frontend/ui-widgets'
+
+const AriaRoleValues: AriaRole[] = Object.values(AriaRole)
 
 const props = withDefaults(
   defineProps<{
