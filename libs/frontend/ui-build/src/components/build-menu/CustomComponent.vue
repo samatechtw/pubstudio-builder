@@ -24,8 +24,8 @@ import {
 } from '@pubstudio/frontend/feature-build'
 import { useDragDrop } from '@pubstudio/frontend/feature-render-builder'
 import { IComponent } from '@pubstudio/shared/type-site'
-import { runtimeContext } from '@pubstudio/frontend/util-runtime'
 import { BuilderDragDataType } from '@pubstudio/frontend/type-builder'
+import { builderContext } from '@pubstudio/frontend/util-builder'
 
 const props = defineProps<{
   customComponent: IComponent
@@ -61,11 +61,11 @@ const { dndState, elementRef, dragstart, drag, dragend } = useDragDrop({
 })
 
 const mouseEnter = () => {
-  runtimeContext.hoveredComponentIdInComponentTree.value = customComponent.value.id
+  builderContext.hoveredComponentIdInComponentTree.value = customComponent.value.id
 }
 
 const mouseLeave = () => {
-  runtimeContext.hoveredComponentIdInComponentTree.value = undefined
+  builderContext.hoveredComponentIdInComponentTree.value = undefined
 }
 </script>
 

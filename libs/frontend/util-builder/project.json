@@ -1,20 +1,20 @@
 {
-  "name": "util-builtin",
+  "name": "util-builder",
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/frontend/util-builtin/src",
+  "sourceRoot": "libs/frontend/util-builder/src",
   "projectType": "library",
   "targets": {
     "lint": {
       "executor": "@nx/eslint:lint",
       "options": {
-        "lintFilePatterns": ["libs/frontend/util-builtin/**/*.ts"]
+        "lintFilePatterns": ["libs/frontend/util-builder/**/*.ts"]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/libs/frontend/util-builtin"],
+      "outputs": ["{workspaceRoot}/coverage/libs/frontend/util-builder"],
       "options": {
-        "jestConfig": "libs/frontend/util-builtin/jest.config.ts",
+        "jestConfig": "libs/frontend/util-builder/jest.config.ts",
         "passWithNoTests": true
       }
     }

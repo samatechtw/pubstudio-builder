@@ -1,6 +1,6 @@
+import { builderContext } from '@pubstudio/frontend/util-builder'
 import { iterateComponent } from '@pubstudio/frontend/util-render'
 import { resolveComponent } from '@pubstudio/frontend/util-resolve'
-import { runtimeContext } from '@pubstudio/frontend/util-runtime'
 import {
   BuildSubmenu,
   ComponentMenuCollapsible,
@@ -297,9 +297,9 @@ export const setShowComponentTree = (
 export const setBuilderWidth = (editor: IEditorContext | undefined, width: number) => {
   if (editor) {
     editor.builderWidth = width
-    if (width > runtimeContext.buildContentWindowSize.value.width) {
+    if (width > builderContext.buildContentWindowSize.value.width) {
       editor.builderScale =
-        Math.round((runtimeContext.buildContentWindowSize.value.width / width) * 100) /
+        Math.round((builderContext.buildContentWindowSize.value.width / width) * 100) /
         100
     } else {
       editor.builderScale = 1
@@ -313,7 +313,7 @@ export const setBuilderScale = (editor: IEditorContext | undefined, scale: numbe
   if (editor) {
     editor.builderScale = scale
     editor.builderWidth = Math.round(
-      runtimeContext.buildContentWindowSize.value.width / scale,
+      builderContext.buildContentWindowSize.value.width / scale,
     )
     editor.store?.saveEditor(editor)
   }

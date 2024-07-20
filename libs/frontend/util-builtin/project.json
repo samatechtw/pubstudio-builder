@@ -1,5 +1,5 @@
 {
-  "name": "util-builder",
+  "name": "util-builtin",
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/frontend/util-builder/src",
   "projectType": "library",
@@ -12,7 +12,7 @@
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/libs/frontend/util-builder"],
+      "outputs": ["{workspaceRoot}/coverage/libs/frontend/util-builtin"],
       "options": {
         "jestConfig": "libs/frontend/util-builder/jest.config.ts",
         "passWithNoTests": true

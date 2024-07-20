@@ -8,9 +8,9 @@ import {
   activeBreakpoint,
   descSortedBreakpoints,
 } from '@pubstudio/frontend/feature-site-source'
+import { builderContext } from '@pubstudio/frontend/util-builder'
 import { findStyles } from '@pubstudio/frontend/util-component'
 import { IContent, RenderMode } from '@pubstudio/frontend/util-render'
-import { runtimeContext } from '@pubstudio/frontend/util-runtime'
 import { Css, IComponent, ISite, Tag } from '@pubstudio/shared/type-site'
 import {
   computed,
@@ -149,15 +149,15 @@ export const BuilderDndComponent = defineComponent({
         getComponentIndex: () => componentIndex,
         isParent: component.value.id !== dragCmp?.id,
         dragleave: () => {
-          if (runtimeContext.buildDndState.value?.hoverCmpId === component.value.id) {
-            runtimeContext.buildDndState.value = undefined
+          if (builderContext.buildDndState.value?.hoverCmpId === component.value.id) {
+            builderContext.buildDndState.value = undefined
           }
         },
         dragend: () => {
-          runtimeContext.buildDndState.value = undefined
+          builderContext.buildDndState.value = undefined
         },
         drop: () => {
-          runtimeContext.buildDndState.value = undefined
+          builderContext.buildDndState.value = undefined
         },
       })
     })

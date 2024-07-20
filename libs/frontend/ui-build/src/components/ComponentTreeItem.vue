@@ -77,8 +77,8 @@ import {
   getComponentTreeItemId,
   setSelectedComponent,
 } from '@pubstudio/frontend/data-access-command'
+import { builderContext } from '@pubstudio/frontend/util-builder'
 import { Eye, Hide } from '@pubstudio/frontend/ui-widgets'
-import { runtimeContext } from '@pubstudio/frontend/util-runtime'
 import ComponentTreeItemRename from './ComponentTreeItemRename.vue'
 
 const props = defineProps<{
@@ -99,11 +99,11 @@ const canDrag = computed(
 )
 
 const mouseEnter = () => {
-  runtimeContext.hoveredComponentIdInComponentTree.value = component.value.id
+  builderContext.hoveredComponentIdInComponentTree.value = component.value.id
 }
 
 const mouseLeave = () => {
-  runtimeContext.hoveredComponentIdInComponentTree.value = undefined
+  builderContext.hoveredComponentIdInComponentTree.value = undefined
 }
 
 const {
@@ -159,7 +159,7 @@ const toggleExpanded = () => {
 
 const isBeingRenamed = () => {
   const { treeItemId: contextTreeItemId, renaming } =
-    runtimeContext.componentTreeItemRenameData.value
+    builderContext.componentTreeItemRenameData.value
   return renaming && contextTreeItemId === treeItemId.value
 }
 </script>
