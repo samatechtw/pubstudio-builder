@@ -1,4 +1,5 @@
 import { IDatalistOption } from '@pubstudio/frontend/type-ui-widgets'
+import { getOrderedPages } from '@pubstudio/frontend/util-builder'
 import { IComponent, ISite } from '@pubstudio/shared/type-site'
 
 export const getLinkDatalistOptions = (
@@ -8,7 +9,7 @@ export const getLinkDatalistOptions = (
   const options: IDatalistOption[] = []
 
   // Pages
-  Object.values(site.pages).forEach((page) => {
+  getOrderedPages(site).forEach((page) => {
     options.push({
       label: page.name,
       value: page.route,
