@@ -9,6 +9,7 @@ import {
   activeBreakpoint,
   descSortedBreakpoints,
 } from '@pubstudio/frontend/feature-site-source'
+import { builderContext, resetBuilderContext } from '@pubstudio/frontend/util-builder'
 import { findStyles } from '@pubstudio/frontend/util-component'
 import {
   IBuildContent,
@@ -16,7 +17,6 @@ import {
   RenderMode,
 } from '@pubstudio/frontend/util-render'
 import { resolveComponent } from '@pubstudio/frontend/util-resolve'
-import { resetRuntimeContext, runtimeContext } from '@pubstudio/frontend/util-runtime'
 import {
   Css,
   IComponent,
@@ -135,7 +135,7 @@ const computeBuilderStyleProps = (
   }
 
   const hoveredInComponentTree =
-    runtimeContext.hoveredComponentIdInComponentTree.value === component.id
+    builderContext.hoveredComponentIdInComponentTree.value === component.id
 
   if (hoveredInComponentTree) {
     builderClass.push('hover-in-tree')
@@ -214,7 +214,7 @@ const computeBuilderStyleProps = (
 }
 
 export const renderPage = (site: ISite, page: IPage): VNode | undefined => {
-  resetRuntimeContext()
+  resetBuilderContext()
   const rootNode = renderComponent(site, page.root, 0)
   return rootNode
 }

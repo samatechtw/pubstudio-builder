@@ -26,7 +26,7 @@
 <script lang="ts" setup>
 import { ref, toRefs } from 'vue'
 import { uidSingleton } from '@pubstudio/frontend/util-doc'
-import { rightMenuTabIndex } from '@pubstudio/frontend/util-runtime'
+import { rightMenuTabIndex } from '@pubstudio/frontend/util-builder'
 
 const uid = uidSingleton.next()
 const inputRef = ref()

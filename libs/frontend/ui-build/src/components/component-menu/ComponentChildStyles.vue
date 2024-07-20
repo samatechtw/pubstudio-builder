@@ -73,9 +73,9 @@ import { ComponentMenuCollapsible, Css, IComponent } from '@pubstudio/shared/typ
 import { useBuild, useEditComponentChildStyles } from '@pubstudio/frontend/feature-build'
 import { setComponentMenuCollapses } from '@pubstudio/frontend/data-access-command'
 import { resolveThemeVariables } from '@pubstudio/frontend/util-resolve'
-import { runtimeContext } from '@pubstudio/frontend/util-runtime'
 import EditMenuTitle from '../EditMenuTitle.vue'
 import StyleRow from '../StyleRow.vue'
+import { builderContext } from '@pubstudio/frontend/util-builder'
 
 const props = defineProps<{
   component: IComponent
@@ -121,11 +121,11 @@ const currentSelectorMissing = computed(
 )
 
 const labelEnter = (id: string) => {
-  runtimeContext.hoveredComponentIdInComponentTree.value = id
+  builderContext.hoveredComponentIdInComponentTree.value = id
 }
 
 const labelLeave = () => {
-  runtimeContext.hoveredComponentIdInComponentTree.value = undefined
+  builderContext.hoveredComponentIdInComponentTree.value = undefined
 }
 
 const styleRowHeight = computed(() => {
@@ -143,7 +143,7 @@ const styleRowHeight = computed(() => {
 const setSelector = (sel: string | undefined) => {
   selector.value = sel
   if (collapsed.value) {
-    collapsed.value = false
+    toggleCollapse()
   }
 }
 

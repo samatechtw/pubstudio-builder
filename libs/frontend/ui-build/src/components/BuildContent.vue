@@ -20,7 +20,6 @@
 
 <script lang="ts" setup>
 import { computed, onMounted, onUnmounted, ref, StyleValue } from 'vue'
-import { runtimeContext } from '@pubstudio/frontend/util-runtime'
 import { debounce } from '@pubstudio/shared/util-debounce'
 import { Css, IRawStyle } from '@pubstudio/shared/type-site'
 import { findStyles } from '@pubstudio/frontend/util-component'
@@ -28,7 +27,6 @@ import {
   activeBreakpoint,
   descSortedBreakpoints,
 } from '@pubstudio/frontend/feature-site-source'
-import BuildDndOverlay from './overlay/BuildDndOverlay.vue'
 import {
   useBuild,
   buildContentWindowId,
@@ -40,6 +38,8 @@ import {
 } from '@pubstudio/frontend/data-access-command'
 import { useRenderBuilder } from '@pubstudio/frontend/feature-render-builder'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
+import { builderContext } from '@pubstudio/frontend/util-builder'
+import BuildDndOverlay from './overlay/BuildDndOverlay.vue'
 
 const { site, activePage } = useSiteSource()
 const { editor } = useBuild()
@@ -61,7 +61,7 @@ const contentWindowRef = ref<HTMLDivElement>()
 const innerStyle = computed<StyleValue>(() => {
   const { builderWidth = 0, builderScale = 1 } = editor.value ?? {}
   const { width: buildContentWindowWidth, height: buildContentWindowHeight } =
-    runtimeContext.buildContentWindowSize.value
+    builderContext.buildContentWindowSize.value
 
   let innerWidth = 0
   if (builderWidth <= buildContentWindowWidth) {
@@ -96,7 +96,7 @@ const innerStyle = computed<StyleValue>(() => {
 
 const resizeObserver = new ResizeObserver(
   debounce(([entry]) => {
-    runtimeContext.buildContentWindowSize.value = {
+    builderContext.buildContentWindowSize.value = {
       width: entry.contentRect.width,
       height: entry.contentRect.height,
     }

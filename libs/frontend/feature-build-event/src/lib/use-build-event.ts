@@ -15,9 +15,9 @@ import {
 } from '@pubstudio/frontend/feature-build'
 import { activeBreakpoint } from '@pubstudio/frontend/feature-site-source'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
+import { builderContext } from '@pubstudio/frontend/util-builder'
 import { resolvedComponentStyle } from '@pubstudio/frontend/util-component'
 import { resolveComponent } from '@pubstudio/frontend/util-resolve'
-import { runtimeContext } from '@pubstudio/frontend/util-runtime'
 import {
   BuildSubmenu,
   Css,
@@ -171,11 +171,11 @@ export const useBuildEvent = () => {
     if (!target?.closest('.to-reusable-button')) {
       setBuildSubmenu(editor.value, undefined)
     }
-    runtimeContext.rightMenuFocused.value = true
+    builderContext.rightMenuFocused.value = true
   }
   const clickComponentTree = (componentTreeItemId: string) => {
     setBuildSubmenu(editor.value, undefined)
-    runtimeContext.componentTreeItemRenameData.value.treeItemId = componentTreeItemId
+    builderContext.componentTreeItemRenameData.value.treeItemId = componentTreeItemId
   }
   const handleClick = (event: Event) => {
     const target = event.target as HTMLElement | undefined
@@ -183,11 +183,11 @@ export const useBuildEvent = () => {
 
     if (
       clickedComponentTreeItemId !==
-      runtimeContext.componentTreeItemRenameData.value.treeItemId
+      builderContext.componentTreeItemRenameData.value.treeItemId
     ) {
-      runtimeContext.resetComponentTreeItemRenameData()
+      builderContext.resetComponentTreeItemRenameData()
     }
-    runtimeContext.rightMenuFocused.value = false
+    builderContext.rightMenuFocused.value = false
 
     if (isRenderer(target)) {
       if (!mouseDownOnTextEditableComponent) {
@@ -211,11 +211,11 @@ export const useBuildEvent = () => {
   }
 
   const pressEscape = () => {
-    if (runtimeContext.componentTreeItemRenameData.value.renaming) {
+    if (builderContext.componentTreeItemRenameData.value.renaming) {
       // This is for the case where rename input is still visible in the tree, but
       // the input has lost focus. i.e. clicking on the hide/show button of the
       // same component in the tree during rename.
-      runtimeContext.componentTreeItemRenameData.value.renaming = false
+      builderContext.componentTreeItemRenameData.value.renaming = false
     } else if (editor.value?.editorDropdown) {
       setEditorDropdown(editor.value, undefined)
     } else if (editor.value?.buildSubmenu) {
@@ -237,9 +237,9 @@ export const useBuildEvent = () => {
   }
 
   const pressEnter = () => {
-    const { treeItemId, renaming } = runtimeContext.componentTreeItemRenameData.value
+    const { treeItemId, renaming } = builderContext.componentTreeItemRenameData.value
     if (treeItemId && !renaming) {
-      runtimeContext.componentTreeItemRenameData.value.renaming = true
+      builderContext.componentTreeItemRenameData.value.renaming = true
     }
   }
 
@@ -258,7 +258,7 @@ export const useBuildEvent = () => {
       }
       // Remove focus, some browsers will select the next DOM element on Tab keydown
       ;(document.activeElement as HTMLElement)?.blur()
-      runtimeContext.rightMenuFocused.value = false
+      builderContext.rightMenuFocused.value = false
     }
   }
 

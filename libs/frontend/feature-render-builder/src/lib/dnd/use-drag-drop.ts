@@ -11,9 +11,9 @@ import {
   BuilderDragDataType,
   IDraggedComponentAddData,
 } from '@pubstudio/frontend/type-builder'
+import { builderContext } from '@pubstudio/frontend/util-builder'
 import { resolvedComponentStyle } from '@pubstudio/frontend/util-component'
 import { resolveComponent } from '@pubstudio/frontend/util-resolve'
-import { runtimeContext } from '@pubstudio/frontend/util-runtime'
 import {
   BuildSubmenu,
   Css,
@@ -229,7 +229,7 @@ export const useDragDrop = (props: IUseDragDropProps): IUseDragDrop => {
         drop.hoverBottom ||
         drop.hoverLeft)
     ) {
-      runtimeContext.buildDndState.value = {
+      builderContext.buildDndState.value = {
         hoverSelf: drop.hoverSelf,
         hoverTop: drop.hoverTop,
         hoverRight: drop.hoverRight,
@@ -265,12 +265,12 @@ export const useDragDrop = (props: IUseDragDropProps): IUseDragDrop => {
       } else {
         // Reset `buildDndState` to avoid the hover overlay from being stuck.
         // This handles the case where the dragged component is hovered on its children.
-        runtimeContext.buildDndState.value = undefined
+        builderContext.buildDndState.value = undefined
       }
     } else {
       // Reset `buildDndState` to avoid the hover overlay from being stuck.
       // This handles the case where the dragged component is hovered on itself.
-      runtimeContext.buildDndState.value = undefined
+      builderContext.buildDndState.value = undefined
     }
   }
 
@@ -374,7 +374,7 @@ export const useDragDrop = (props: IUseDragDropProps): IUseDragDrop => {
     dropProps.value = defaultDropProps()
     dragSource.value = undefined
     dragendOption?.()
-    runtimeContext.buildDndState.value = undefined
+    builderContext.buildDndState.value = undefined
   }
 
   return {

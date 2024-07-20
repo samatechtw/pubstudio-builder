@@ -7,7 +7,7 @@ import {
   sortedBreakpoints,
 } from '@pubstudio/frontend/feature-site-source'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
-import { runtimeContext } from '@pubstudio/frontend/util-runtime'
+import { builderContext } from '@pubstudio/frontend/util-builder'
 import { IBreakpoint } from '@pubstudio/shared/type-site'
 import { ComputedRef } from 'vue'
 
@@ -37,7 +37,7 @@ export const useBreakpoint = (): IUseBreakpoint => {
       const width = sortedBreakpoints.value.reduce((prev, cur) => {
         const size = (cur.maxWidth ?? cur.minWidth ?? 0) + 1
         return Math.max(prev, size)
-      }, runtimeContext.buildContentWindowSize.value.width)
+      }, builderContext.buildContentWindowSize.value.width)
       setBuilderWidth(editor.value, width)
     }
   }

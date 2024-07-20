@@ -1,5 +1,5 @@
 import { buildContentWindowInnerId } from '@pubstudio/frontend/feature-build'
-import { runtimeContext } from '@pubstudio/frontend/util-runtime'
+import { builderContext } from '@pubstudio/frontend/util-builder'
 import { IEditorContext } from '@pubstudio/shared/type-site'
 import { computeRelativeRect, normalizeDimensions } from './overlay-util'
 
@@ -8,7 +8,7 @@ const outlineColor = '#000'
 const selfOutlineColor = '#F82389'
 
 export const computeHoverOverlayStyle = (editor: IEditorContext | undefined) => {
-  const buildDndState = runtimeContext.buildDndState.value
+  const buildDndState = builderContext.buildDndState.value
   if (buildDndState) {
     const buildContentWindowInner = document.getElementById(buildContentWindowInnerId)
     const hoverElement = document.getElementById(buildDndState.hoverCmpId)

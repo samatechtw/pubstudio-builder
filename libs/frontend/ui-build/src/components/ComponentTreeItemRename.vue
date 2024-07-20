@@ -17,12 +17,12 @@ enum UpdateNameEventSource {
 </script>
 
 <script lang="ts" setup>
-import { IComponent } from '@pubstudio/shared/type-site'
 import { onMounted, ref, toRefs } from 'vue'
-import { runtimeContext } from '@pubstudio/frontend/util-runtime'
+import { IComponent } from '@pubstudio/shared/type-site'
 import { PSInput } from '@pubstudio/frontend/ui-widgets'
 import { Keys } from '@pubstudio/shared/type-site'
 import { useBuild } from '@pubstudio/frontend/feature-build'
+import { builderContext } from '@pubstudio/frontend/util-builder'
 
 const props = defineProps<{
   component: IComponent
@@ -41,7 +41,7 @@ const keyup = (e: KeyboardEvent) => {
   // This is for the keyup events when the input is focused.
   if (e.key === Keys.Escape) {
     // Cancel rename when escape is pressed.
-    runtimeContext.componentTreeItemRenameData.value.renaming = false
+    builderContext.componentTreeItemRenameData.value.renaming = false
   } else if (e.key === Keys.Enter) {
     updateName(UpdateNameEventSource.EnterPress)
   }
@@ -55,7 +55,7 @@ const updateName = (eventSource: UpdateNameEventSource) => {
   // when the focusout event is triggered due to enter-press.
   if (
     eventSource === UpdateNameEventSource.FocusOut &&
-    !runtimeContext.componentTreeItemRenameData.value.renaming
+    !builderContext.componentTreeItemRenameData.value.renaming
   ) {
     // The component is not being renamed anymore when this function is trigged by focusout event.
     // This means there was rename event prior to this one, which is triggered by an enter pess.
@@ -63,7 +63,7 @@ const updateName = (eventSource: UpdateNameEventSource) => {
     return
   } else if (eventSource === UpdateNameEventSource.EnterPress) {
     // Manually change `renaming` to false because no click event has happened in this case.
-    runtimeContext.componentTreeItemRenameData.value.renaming = false
+    builderContext.componentTreeItemRenameData.value.renaming = false
   }
 
   if (name.value && component.value.name !== name.value) {

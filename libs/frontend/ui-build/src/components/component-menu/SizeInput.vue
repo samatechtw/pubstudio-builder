@@ -24,7 +24,7 @@ import { toRefs } from 'vue'
 import { uidSingleton } from '@pubstudio/frontend/util-doc'
 import { Css } from '@pubstudio/shared/type-site'
 import { useToolbar, useBuild, useCssSize } from '@pubstudio/frontend/feature-build'
-import { rightMenuTabIndex } from '@pubstudio/frontend/util-runtime'
+import { rightMenuTabIndex } from '@pubstudio/frontend/util-builder'
 import { ICssSize } from '@pubstudio/frontend/util-component'
 import { SizeUnit } from '@pubstudio/frontend/ui-widgets'
 
