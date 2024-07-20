@@ -16,4 +16,4 @@ export enum AriaRole {
   Treeitem = 'treeitem',
 }
 
-export const AriaRoleValues: AriaRole[] = Object.values(AriaRole)
+export type AriaRoleType = `${AriaRole}`

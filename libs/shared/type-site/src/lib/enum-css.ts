@@ -94,4 +94,4 @@ export enum Css {
   ZIndex = 'z-index',
 }
 
-export const CssValues: Css[] = Object.values(Css).filter((css) => css !== Css.Empty)
+export type CssType = `${Css}`

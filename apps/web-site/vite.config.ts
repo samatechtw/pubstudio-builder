@@ -64,4 +64,7 @@ export default defineConfig({
       filename: 'analyse.html', // will be saved in project's root
     }) as PluginOption,
   ],
+  define: {
+    __VUE_OPTIONS_API__: false,
+  },
 })

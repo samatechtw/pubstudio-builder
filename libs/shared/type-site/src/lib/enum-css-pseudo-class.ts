@@ -10,4 +10,6 @@ export enum CssPseudoClass {
   Placeholder = '::placeholder',
 }
 
+export type CssPseudoClassType = `${CssPseudoClass}`
+
 export const CssPseudoClassValues: CssPseudoClass[] = Object.values(CssPseudoClass)

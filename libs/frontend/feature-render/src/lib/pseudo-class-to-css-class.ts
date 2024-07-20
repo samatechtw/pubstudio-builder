@@ -1,7 +1,7 @@
-import { CssPseudoClass } from '@pubstudio/shared/type-site'
+import { CssPseudoClassType } from '@pubstudio/shared/type-site'
 
-export const pseudoClassToCssClass = (pseudoClass: CssPseudoClass): string => {
-  if (pseudoClass === CssPseudoClass.Default) {
+export const pseudoClassToCssClass = (pseudoClass: CssPseudoClassType): string => {
+  if (pseudoClass === 'default') {
     return ''
   }
   return pseudoClass.replace(/:/g, '_')

@@ -13,8 +13,8 @@ import {
   sortMixinIds,
 } from '@pubstudio/frontend/util-render'
 import {
-  Css,
-  CssPseudoClass,
+  CssPseudoClassType,
+  CssType,
   IComponent,
   IPage,
   IRawStyle,
@@ -37,13 +37,14 @@ export const getRootBackgroundStyle = (
       Object.entries(pseudoStyle).forEach(([pseudoClass, rawStyle]) => {
         const resolvedStyle = rawStyleToResolvedStyleWithSource(context, rawStyle)
         const filteredStyle: IRawStyle = {}
-        if (resolvedStyle[Css.Background]) {
-          filteredStyle[Css.Background] = resolvedStyle[Css.Background]
+        if (resolvedStyle['background']) {
+          filteredStyle['background'] = resolvedStyle['background']
         }
-        if (resolvedStyle[Css.BackgroundColor]) {
-          filteredStyle[Css.BackgroundColor] = resolvedStyle[Css.BackgroundColor]
+        if (resolvedStyle['background-color']) {
+          filteredStyle['background-color'] = resolvedStyle['background-color']
         }
-        const pseudoValue = pseudoClass === CssPseudoClass.Default ? '' : pseudoClass
+        const pseudoValue =
+          (pseudoClass as CssPseudoClassType) === 'default' ? '' : pseudoClass
         queryStyle[breakpointId][`html${pseudoValue}`] = filteredStyle
       })
     }
@@ -63,8 +64,8 @@ const computeComponentcustomStyle = (
       const styleAcc = styles[bpId][`.${component.id}${pseudoClass}`]
       if (styleAcc) {
         for (const [css, value] of Object.entries(rawStyle)) {
-          if (!styleAcc[css as Css]) {
-            styleAcc[css as Css] = value
+          if (!styleAcc[css as CssType]) {
+            styleAcc[css as CssType] = value
           }
         }
       } else {
@@ -90,7 +91,8 @@ export const getLivePageStyle = (
       const pseudoStyle = component.style.custom[breakpointId]
       if (pseudoStyle) {
         Object.entries(pseudoStyle).forEach(([pseudoClass, rawStyle]) => {
-          const pseudoValue = pseudoClass === CssPseudoClass.Default ? '' : pseudoClass
+          const pseudoValue =
+            (pseudoClass as CssPseudoClassType) === 'default' ? '' : pseudoClass
           const selector = `.${component.id}${pseudoValue}`
           if (isCustom) {
             customStyle[breakpointId][selector] = rawStyle
@@ -107,7 +109,7 @@ export const getLivePageStyle = (
           if (breakpointStyles[breakpointId]) {
             Object.entries(selectorStyles).forEach(([pseudoClass, rawStyle]) => {
               const pseudoValue =
-                pseudoClass === CssPseudoClass.Default ? '' : pseudoClass
+                (pseudoClass as CssPseudoClassType) === 'default' ? '' : pseudoClass
               const cssSelector = `.${component.id}${pseudoValue} .${selector}`
 
               if (isCustom) {
@@ -173,7 +175,7 @@ const sortRawStyle = (rawStyle: IRawStyle): IRawStyle => {
   return Object.entries(rawStyle)
     .sort((a, b) => b[0].localeCompare(a[0]))
     .reduce((result, [property, value]) => {
-      result[property as Css] = value
+      result[property as CssType] = value
       return result
     }, {} as IRawStyle)
 }

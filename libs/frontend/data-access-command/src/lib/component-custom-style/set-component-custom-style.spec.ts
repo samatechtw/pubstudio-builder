@@ -12,6 +12,7 @@ import {
 import {
   Css,
   CssPseudoClass,
+  CssPseudoClassType,
   CssPseudoClassValues,
   ISerializedComponent,
   ISite,
@@ -30,7 +31,7 @@ describe('Set Component Custom Style', () => {
   let newStyle: IStyleEntry
   let component: ISerializedComponent
 
-  const getDefaultPseudo = (componentId: string, pseudo: CssPseudoClass) => {
+  const getDefaultPseudo = (componentId: string, pseudo: CssPseudoClassType) => {
     const cmp = resolveComponent(site.context, componentId)
     return cmp?.style.custom[DEFAULT_BREAKPOINT_ID][pseudo]
   }

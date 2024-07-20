@@ -17,7 +17,9 @@
 import { computed, onMounted, ref, toRefs, watch } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { PSMultiselect } from '@pubstudio/frontend/ui-widgets'
-import { Css, CssValues } from '@pubstudio/shared/type-site'
+import { Css } from '@pubstudio/shared/type-site'
+
+const CssValues: Css[] = Object.values(Css).filter((css) => css !== Css.Empty)
 
 const { t } = useI18n()
 

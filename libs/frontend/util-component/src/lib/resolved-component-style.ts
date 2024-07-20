@@ -1,6 +1,6 @@
 import {
   Css,
-  CssPseudoClass,
+  CssPseudoClassType,
   IComponent,
   ISiteContext,
 } from '@pubstudio/shared/type-site'
@@ -9,7 +9,7 @@ import { computeComponentBreakpointStyles } from './compute-component-breakpoint
 export const resolvedComponentStyle = (
   context: ISiteContext,
   component: IComponent | undefined,
-  pseudoClass: CssPseudoClass,
+  pseudoClass: CssPseudoClassType,
   cssProp: Css,
   targetBreakpointId: string,
 ): string | undefined => {

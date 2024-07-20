@@ -9,6 +9,3 @@ export enum ComponentEventType {
   Input = 'input',
   Submit = 'submit',
 }
-
-export const ComponentEventTypeValues: ComponentEventType[] =
-  Object.values(ComponentEventType)

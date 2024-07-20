@@ -10,7 +10,7 @@ import {
 } from '@pubstudio/frontend/util-render'
 import {
   Css,
-  CssPseudoClass,
+  CssPseudoClassType,
   IComponent,
   IPage,
   IPseudoStyle,
@@ -20,7 +20,7 @@ import {
 
 const computeMixinStyles = (
   mixinPseudo: IPseudoStyle,
-  pseudoClass: CssPseudoClass,
+  pseudoClass: CssPseudoClassType,
   styleAcc: IRawStyle,
 ): IRawStyle => {
   const mixinStyles = mixinPseudo?.[pseudoClass] ?? {}
@@ -50,20 +50,20 @@ export const getBuildPageStyle = (site: ISite, page: IPage): IResolvedBuildPageS
     const isCustom =
       site.context.customComponentIds.has(component.id) ||
       site.context.customChildIds.has(component.id)
-    const curPseudo = site.editor?.cssPseudoClass ?? CssPseudoClass.Default
+    const curPseudo = site.editor?.cssPseudoClass ?? 'default'
 
     const styleRecord = isCustom ? customStyle : pageStyle
 
     // Compute default styles
     accumulatedBreakpointIds.forEach((breakpointId) => {
       const bpStyle = component.style.custom[breakpointId]
-      const rawStyle = bpStyle?.[CssPseudoClass.Default] ?? {}
+      const rawStyle = bpStyle?.default ?? {}
       const cls = `.${component.id}`
       styleRecord[cls] = { ...styleRecord[cls], ...rawStyle }
 
       // Compute styles in the current pseudo class
       let pseudoCls: string | undefined
-      if (curPseudo !== CssPseudoClass.Default) {
+      if (curPseudo !== 'default') {
         const rawStyle = bpStyle?.[curPseudo] ?? {}
         const pseudoClassName = pseudoClassToCssClass(curPseudo)
         pseudoCls = `.${component.id}.${pseudoClassName}`
@@ -76,13 +76,9 @@ export const getBuildPageStyle = (site: ISite, page: IPage): IResolvedBuildPageS
         for (const mixinId of reusableMixins) {
           const mixinPseudo = site.context.styles[mixinId]?.breakpoints?.[breakpointId]
           // Compute default mixin styles
-          styleRecord[cls] = computeMixinStyles(
-            mixinPseudo,
-            CssPseudoClass.Default,
-            styleRecord[cls],
-          )
+          styleRecord[cls] = computeMixinStyles(mixinPseudo, 'default', styleRecord[cls])
           // Compute mixin styles in the current pseudo class
-          if (pseudoCls && curPseudo !== CssPseudoClass.Default) {
+          if (pseudoCls && curPseudo !== 'default') {
             styleRecord[pseudoCls] = computeMixinStyles(
               mixinPseudo,
               curPseudo,
@@ -99,11 +95,11 @@ export const getBuildPageStyle = (site: ISite, page: IPage): IResolvedBuildPageS
           // Compute styles in default pseudo class
           accumulatedBreakpointIds.forEach((breakpointId) => {
             const bpStyle = breakpointStyles[breakpointId]
-            const rawStyle = bpStyle?.[CssPseudoClass.Default] ?? {}
+            const rawStyle = bpStyle?.default ?? {}
             styleRecord[`.${component.id} .${selector}`] = { ...rawStyle }
 
             // Compute styles in the current pseudo class
-            if (curPseudo !== CssPseudoClass.Default) {
+            if (curPseudo !== 'default') {
               const rawStyle = bpStyle?.[curPseudo] ?? {}
               const pseudoClassName = pseudoClassToCssClass(curPseudo)
               styleRecord[`.${component.id} .${selector}.${pseudoClassName}`] = {

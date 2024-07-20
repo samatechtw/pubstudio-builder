@@ -17,8 +17,10 @@
 <script lang="ts" setup>
 import { toRefs } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
-import { Tag, TagValues } from '@pubstudio/shared/type-site'
+import { Tag } from '@pubstudio/shared/type-site'
 import { PSMultiselect } from '@pubstudio/frontend/ui-widgets'
+
+const TagValues: Tag[] = Object.values(Tag)
 
 const props = defineProps<{
   tag: Tag

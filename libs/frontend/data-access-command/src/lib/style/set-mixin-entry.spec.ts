@@ -11,6 +11,7 @@ import {
 import {
   Css,
   CssPseudoClass,
+  CssPseudoClassType,
   CssPseudoClassValues,
   IPseudoStyle,
   ISite,
@@ -28,7 +29,7 @@ describe('Set Mixin Entry', () => {
   let oldStyle: IStyleEntry
   let newStyle: IStyleEntry
 
-  const getDefaultPseudo = (mixinId: string, pseudo: CssPseudoClass) => {
+  const getDefaultPseudo = (mixinId: string, pseudo: CssPseudoClassType) => {
     const cmp = resolveStyle(site.context, mixinId)
     return cmp?.breakpoints[DEFAULT_BREAKPOINT_ID][pseudo]
   }

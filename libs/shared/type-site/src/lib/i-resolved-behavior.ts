@@ -1,5 +1,5 @@
 import { IGetPublicSiteUsageApiResponse } from '@pubstudio/shared/type-api-site-sites'
-import { Css } from './enum-css'
+import { CssType } from './enum-css'
 import { IComponent, IComponentEventBehavior, IComponentState } from './i-component'
 import { ISite } from './i-site'
 
@@ -23,10 +23,10 @@ export interface IBehaviorHelpers {
   ): IComponentState | undefined
   setInputIs(component: IComponent | undefined, name: string, value: unknown): void
   getEventBehavior(component: IComponent, behaviorId: string): IComponentEventBehavior[]
-  setCustomStyle(component: IComponent | undefined, prop: Css, value: string): void
+  setCustomStyle(component: IComponent | undefined, prop: CssType, value: string): void
   getCustomStyle(
     component: IComponent | undefined,
-    prop: Css,
+    prop: CssType,
     value: string,
   ): string | undefined
   setError(

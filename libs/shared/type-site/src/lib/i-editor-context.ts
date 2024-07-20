@@ -1,5 +1,5 @@
 import { EditorView } from 'prosemirror-view'
-import { CssPseudoClass } from './enum-css-pseudo-class'
+import { CssPseudoClassType } from './enum-css-pseudo-class'
 import { CssUnit } from './enum-css-unit'
 import {
   ContactFormWalkthroughState,
@@ -195,7 +195,7 @@ export interface IEditorContext {
   // Defaults to 1
   builderScale: number
   // Active pseudo class
-  cssPseudoClass: CssPseudoClass
+  cssPseudoClass: CssPseudoClassType
   // Custom hotkey map
   hotkeys: IHotkeys
   // If false/undefined, template selector is shown when the site is loaded

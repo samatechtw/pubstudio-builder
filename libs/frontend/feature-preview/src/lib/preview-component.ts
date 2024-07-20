@@ -5,7 +5,7 @@ import {
 } from '@pubstudio/frontend/feature-render'
 import { IContent, RenderMode, renderVueComponent } from '@pubstudio/frontend/util-render'
 import { hrefToUrl } from '@pubstudio/frontend/util-router'
-import { IComponent, ISite, Tag } from '@pubstudio/shared/type-site'
+import { IComponent, ISite } from '@pubstudio/shared/type-site'
 import { defineComponent, h, onMounted, onUnmounted, PropType, toRefs } from 'vue'
 import { RouterLink } from 'vue-router'
 import EmbedRouterLink from './EmbedRouterLink.vue'
@@ -59,14 +59,14 @@ export const PreviewComponent = () => {
           // non-string value because Vue will use whatever value it contains to
           // render components when using `h()`.
           renderProps = { ...props, innerHTML: content }
-          if (tag === Tag.Svg && content.includes('<svg')) {
-            tag = Tag.Div
+          if (tag === 'svg' && content.includes('<svg')) {
+            tag = 'div'
           }
         } else {
           children = content
         }
 
-        if (tag === Tag.A) {
+        if (tag === 'a') {
           // TODO: merge back with `live-component.ts` once the custom router is used for `web`
           const hrefProp = (props.href ?? '') as string
           const pathPrefix = mode === RenderMode.PreviewEmbed ? '/' : '/preview'
@@ -122,7 +122,7 @@ export const PreviewComponent = () => {
               return h(RouterLink, copiedRenderProps, () => children)
             }
           }
-        } else if (tag === Tag.Vue) {
+        } else if (tag === 'vue') {
           return renderVueComponent(site.value.context, component.value, renderProps)
         }
 

@@ -1,12 +1,12 @@
 import { Css } from './enum-css'
-import { CssPseudoClass } from './enum-css-pseudo-class'
+import { CssPseudoClassType } from './enum-css-pseudo-class'
 
 export interface IGlobalStyle {
   style: string
 }
 
 export interface IStyleEntry {
-  pseudoClass: CssPseudoClass
+  pseudoClass: CssPseudoClassType
   property: Css
   value: string
 }
@@ -24,7 +24,7 @@ export interface IStyleOverrideEntry extends IStyleEntry {
 
 export type IRawStyle = { [key in Css]?: string }
 
-export type IPseudoStyle = { [key in CssPseudoClass]?: IRawStyle }
+export type IPseudoStyle = { [key in CssPseudoClassType]?: IRawStyle }
 
 // Use breakpoint id as key, IPseudoStyle as value
 export type IBreakpointStyles = Record<string, IPseudoStyle>
@@ -40,7 +40,7 @@ export type IRawStyleWithSource = {
   sourceId: string
   sourceBreakpointId: string
   // Only used in mixins
-  sourcePseudoClass?: CssPseudoClass
+  sourcePseudoClass?: CssPseudoClassType
   value: string
 }
 
@@ -48,7 +48,9 @@ export type IRawStylesWithSource = {
   [key in Css]?: IRawStyleWithSource
 }
 
-export type IPseudoStyleWithSource = { [key in CssPseudoClass]?: IRawStylesWithSource }
+export type IPseudoStyleWithSource = {
+  [key in CssPseudoClassType]?: IRawStylesWithSource
+}
 
 // Use breakpoint id as key, IPseudoStyle as value
 export type IBreakpointStylesWithSource = Record<string, IPseudoStyleWithSource>

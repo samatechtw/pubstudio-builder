@@ -1,7 +1,7 @@
 import { DEFAULT_BREAKPOINT_ID } from '@pubstudio/frontend/util-ids'
 import {
   Css,
-  CssPseudoClass,
+  CssPseudoClassType,
   IBreakpoint,
   IBreakpointStylesWithSource,
   IEditorContext,
@@ -19,23 +19,19 @@ export const computeFlattenedStyles = (
   const result: IRawStylesWithSource = {}
 
   // Add styles with default breakpoint & default pseudo class to the result
-  const defaultStyle =
-    breakpointStyles[DEFAULT_BREAKPOINT_ID]?.[CssPseudoClass.Default] ?? {}
+  const defaultStyle = breakpointStyles[DEFAULT_BREAKPOINT_ID]?.['default'] ?? {}
 
   Object.entries(defaultStyle).forEach(([css, source]) => {
     const styleWithSource = { ...source }
     if (includePseudoClass) {
-      styleWithSource.sourcePseudoClass = CssPseudoClass.Default
+      styleWithSource.sourcePseudoClass = 'default'
     }
     result[css as Css] = styleWithSource
   })
 
-  const currentPseudoClass = editor?.cssPseudoClass ?? CssPseudoClass.Default
+  const currentPseudoClass: CssPseudoClassType = editor?.cssPseudoClass ?? 'default'
 
-  if (
-    activeBreakpoint.id === DEFAULT_BREAKPOINT_ID &&
-    currentPseudoClass === CssPseudoClass.Default
-  ) {
+  if (activeBreakpoint.id === DEFAULT_BREAKPOINT_ID && currentPseudoClass === 'default') {
     return result
   }
 
@@ -43,10 +39,7 @@ export const computeFlattenedStyles = (
   for (const { id: breakpointId } of descSortedBreakpoints) {
     // Skip default breakpoint with default pseudo class because
     // it's already added to the result before entering this for-loop.
-    if (
-      breakpointId === DEFAULT_BREAKPOINT_ID &&
-      currentPseudoClass === CssPseudoClass.Default
-    ) {
+    if (breakpointId === DEFAULT_BREAKPOINT_ID && currentPseudoClass === 'default') {
       continue
     }
 

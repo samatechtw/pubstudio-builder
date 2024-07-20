@@ -15,13 +15,11 @@ import {
 } from '@pubstudio/frontend/util-resolve'
 import {
   ComponentArgPrimitive,
-  Css,
   IBehavior,
   IBehaviorContext,
   IBehaviorCustomArgs,
   IBehaviorHelpers,
   IComponent,
-  Tag,
 } from '@pubstudio/shared/type-site'
 
 export const noBehavior: IBehavior = {
@@ -140,7 +138,7 @@ export const clearFormErrorBehavior: IBehavior = {
     if (args?.errorId) {
       const errorCmp = helpers.getComponent(site, args.errorId as string)
       helpers.setContent(errorCmp, '')
-      helpers.setCustomStyle(errorCmp, Css.Opacity, '0')
+      helpers.setCustomStyle(errorCmp, 'opacity', '0')
     }
   },
 }
@@ -217,7 +215,7 @@ export const contactFormBehavior: IBehavior = {
       if (args?.nameId) {
         name = helpers.getValue(args.nameId as string)
       }
-      const button = findComponent(component, (cmp) => cmp.tag === Tag.Button)
+      const button = findComponent(component, (cmp) => cmp.tag === 'button')
       try {
         helpers.setLoading(button, true)
         const row: Record<string, string> = {
@@ -228,8 +226,8 @@ export const contactFormBehavior: IBehavior = {
           row[args?.apiNameField as string] = name
         }
         await helpers.addRow(resolvedArgs.tableName, row)
-        helpers.setCustomStyle(errorCmp, Css.Opacity, '1')
-        helpers.setCustomStyle(errorCmp, Css.Color, '${color-success}')
+        helpers.setCustomStyle(errorCmp, 'opacity', '1')
+        helpers.setCustomStyle(errorCmp, 'color', '${color-success}')
         helpers.setContent(errorCmp, 'Contact request sent!')
       } catch (e) {
         helpers.setError(errorCmp, e, {
@@ -300,7 +298,7 @@ export const mailingListBehavior: IBehavior = {
       if (args?.nameId) {
         name = helpers.getValue(args.nameId as string)
       }
-      const button = findComponent(component, (cmp) => cmp.tag === Tag.Button)
+      const button = findComponent(component, (cmp) => cmp.tag === 'button')
       try {
         helpers.setLoading(button, true)
         const row: Record<string, string> = {
@@ -310,8 +308,8 @@ export const mailingListBehavior: IBehavior = {
           row[args?.apiNameField as string] = name
         }
         await helpers.addRow(resolvedArgs.tableName, row)
-        helpers.setCustomStyle(errorCmp, Css.Opacity, '1')
-        helpers.setCustomStyle(errorCmp, Css.Color, '${color-success}')
+        helpers.setCustomStyle(errorCmp, 'opacity', '1')
+        helpers.setCustomStyle(errorCmp, 'color', '${color-success}')
         helpers.setContent(errorCmp, 'Subscribed!')
       } catch (e) {
         helpers.setError(errorCmp, e, {
