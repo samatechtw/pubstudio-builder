@@ -36,6 +36,8 @@ describe('List Sites', () => {
       const body: ISiteMetadata = response.body
 
       expect(body.id).toEqual(siteId)
+      expect(body.owner_email).toEqual('user1@samatech.tw')
+      expect(body.owner_id).toEqual('903b3c28-deaa-45dc-a43f-511fe965d34e')
       expect(body.location).toEqual(`site-api/db/sites/site_${siteId}.db`)
       expect(body.disabled).toEqual(false)
       expect(body.site_type).toEqual(SiteType.Paid2)

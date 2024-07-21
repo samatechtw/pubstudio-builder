@@ -180,6 +180,7 @@ impl SitesMetadataRepoTrait for SitesMetadataRepo {
 
         let (query, count) = append_comma(query, "site_type", dto.site_type, count);
         let (query, count) = append_comma(query, "owner_email", dto.owner_email.clone(), count);
+        let (query, count) = append_comma(query, "owner_id", dto.owner_id.clone(), count);
         let (query, count) = append_comma(query, "disabled", dto.disabled, count);
         let (mut query, count) =
             append_comma(query, "custom_data_usage", dto.custom_data_usage, count);

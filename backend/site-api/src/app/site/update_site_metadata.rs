@@ -41,7 +41,11 @@ pub async fn update_site_metadata(
             ApiError::internal_error().message(format!("Failed to save domains: {}", e))
         })?;
 
-    if dto.disabled.is_some() || dto.site_type.is_some() {
+    if dto.disabled.is_some()
+        || dto.site_type.is_some()
+        || dto.owner_email.is_some()
+        || dto.owner_id.is_some()
+    {
         let metadata = context
             .metadata_repo
             .update_site_metadata_with_tx(&mut tx, &id, &dto.clone().into())
