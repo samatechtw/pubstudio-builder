@@ -2,6 +2,7 @@ import { SiteType } from '@pubstudio/shared/type-api-platform-site'
 import {
   IGetSiteDomainsApiResponse,
   IListSitesApiResponse,
+  ISiteMetadata,
   IUpdateSiteMetadataApiRequest,
 } from '@pubstudio/shared/type-api-site-sites'
 import { SiteApiResetService } from '@pubstudio/shared/util-test-reset'
@@ -68,6 +69,42 @@ describe('Update Site Metadata', () => {
       const targetSite = body.find((site) => site.id.toString() == siteId)
 
       expect(targetSite?.site_type).toEqual(payload.site_type)
+    })
+
+    it('returns 200 status and message when update owner email', async () => {
+      payload.owner_email = 'newemail@test.com'
+      await api
+        .patch(`${testEndpoint}/${siteId}`)
+        .set('Authorization', adminAuth)
+        .send(payload)
+        .expect(200)
+
+      // Verify owner email is updated
+      const response = await api
+        .get(`${testEndpoint}/${siteId}`)
+        .set('Authorization', adminAuth)
+        .expect(200)
+      const body: ISiteMetadata = response.body
+
+      expect(body?.owner_email).toEqual(payload.owner_email)
+    })
+
+    it('returns 200 status and message when update owner id', async () => {
+      payload.owner_id = '3ba201ff-a8d8-42bb-84ef-8470e6d97f78'
+      await api
+        .patch(`${testEndpoint}/${siteId}`)
+        .set('Authorization', adminAuth)
+        .send(payload)
+        .expect(200)
+
+      // Verify owner id is updated
+      const response = await api
+        .get(`${testEndpoint}/${siteId}`)
+        .set('Authorization', adminAuth)
+        .expect(200)
+      const body: ISiteMetadata = response.body
+
+      expect(body?.owner_id).toEqual(payload.owner_id)
     })
 
     it('disables site and verifies it cannot be retrieved', async () => {

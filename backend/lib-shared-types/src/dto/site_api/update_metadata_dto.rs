@@ -8,4 +8,5 @@ pub struct UpdateSiteMetadataDto {
     pub disabled: Option<bool>,
     pub domains: Option<Vec<String>>,
     pub owner_email: Option<String>,
+    pub owner_id: Option<String>,
 }

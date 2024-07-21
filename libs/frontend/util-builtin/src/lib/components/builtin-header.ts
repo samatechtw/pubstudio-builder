@@ -61,7 +61,6 @@ export const header: IComponent = {
   id: headerId,
   name: 'Header',
   tag: Tag.Header,
-  content: 'header',
   style: {
     custom: {},
     mixins: [horizontalStyleId, headerStyle.id],

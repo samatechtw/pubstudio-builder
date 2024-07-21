@@ -13,6 +13,8 @@ fn to_api_response(metadata: Vec<SiteMetadataEntity>) -> Json<Vec<SiteMetadataVi
             .into_iter()
             .map(|meta| SiteMetadataViewModel {
                 id: meta.id,
+                owner_email: meta.owner_email,
+                owner_id: meta.owner_id,
                 location: meta.location,
                 disabled: meta.disabled,
                 site_type: meta.site_type,
