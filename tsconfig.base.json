@@ -40,11 +40,11 @@
       "@pubstudio/frontend/feature-contact-form": [
         "libs/frontend/feature-contact-form/src/index.ts"
       ],
-      "@pubstudio/frontend/feature-mailing-list-form": [
-        "libs/frontend/feature-mailing-list-form/src/index.ts"
-      ],
       "@pubstudio/frontend/feature-custom-data": [
         "libs/frontend/feature-custom-data/src/index.ts"
+      ],
+      "@pubstudio/frontend/feature-mailing-list-form": [
+        "libs/frontend/feature-mailing-list-form/src/index.ts"
       ],
       "@pubstudio/frontend/feature-template": [
         "libs/frontend/feature-template/src/index.ts"

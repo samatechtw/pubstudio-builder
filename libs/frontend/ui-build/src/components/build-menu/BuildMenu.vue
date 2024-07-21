@@ -63,7 +63,7 @@
       </BuildMenuIcon>
       <BuildMenuIcon
         id="build-custom-data"
-        :text="t('build.custom_data')"
+        :text="t('custom_data.title')"
         @click="showCustomDataModal = true"
       >
         <DataTable></DataTable>
