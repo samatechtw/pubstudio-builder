@@ -6,10 +6,10 @@
     @cancel="cancel"
   >
     <div class="modal-title">
-      {{ t('build.custom_data') }}
+      {{ t('custom_data.title') }}
     </div>
     <div class="modal-text">
-      {{ t('build.custom_data_subtitle') }}
+      {{ t('custom_data.subtitle') }}
     </div>
     <div class="table-select-wrap">
       <div class="label">
