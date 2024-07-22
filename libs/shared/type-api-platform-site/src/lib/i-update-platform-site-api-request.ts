@@ -5,4 +5,6 @@ export interface IUpdatePlatformSiteRequest {
   subdomain?: string
   custom_domains?: string[]
   type?: SiteType
+  owner_id?: string
+  owner_email?: string
 }
