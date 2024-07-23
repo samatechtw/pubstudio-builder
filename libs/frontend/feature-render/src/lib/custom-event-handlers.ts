@@ -13,7 +13,7 @@ const toInt = (thing: string | undefined, fallback: number): number => {
   return parseInt(thing)
 }
 
-export const registerClickOutsideEvent = (
+const registerClickOutsideEvent = (
   component: IComponent,
   customEventHandlers: ICustomEvents,
 ) => {
@@ -27,11 +27,11 @@ export const registerClickOutsideEvent = (
   }
 }
 
-export const removeClickOutsideEvent = (component: IComponent) => {
+const removeClickOutsideEvent = (component: IComponent) => {
   delete runtimeContext.eventHandlers.click[component.id]
 }
 
-export const registerScrollIntoViewEvent = (
+const registerScrollIntoViewEvent = (
   component: IComponent,
   customEventHandlers: ICustomEvents,
   root: HTMLElement | null,
@@ -107,7 +107,7 @@ export const registerScrollIntoViewEvent = (
   }
 }
 
-export const removeScrollIntoViewEvent = (component: IComponent) => {
+const removeScrollIntoViewEvent = (component: IComponent) => {
   const observer = runtimeContext.eventHandlers.scrollIntoView[component.id]
   if (observer) {
     observer.disconnect()
@@ -115,7 +115,7 @@ export const removeScrollIntoViewEvent = (component: IComponent) => {
   }
 }
 
-export const registerPeriodicEvent = (
+const registerPeriodicEvent = (
   component: IComponent,
   customEventHandlers: ICustomEvents,
 ) => {
@@ -131,14 +131,32 @@ export const registerPeriodicEvent = (
   }
 }
 
-export const removePeriodicEvent = (component: IComponent) => {
+const registerKeyEvents = (component: IComponent, customEventHandlers: ICustomEvents) => {
+  const keydown = customEventHandlers[ComponentEventType.Keydown]
+  const keyup = customEventHandlers[ComponentEventType.Keyup]
+
+  if (keydown) {
+    runtimeContext.eventHandlers.keydown[component.id] = (event: Event) =>
+      keydown[0](event)
+  }
+  if (keyup) {
+    runtimeContext.eventHandlers.keyup[component.id] = (event: Event) => keyup[0](event)
+  }
+}
+
+const removeKeyEvents = (component: IComponent) => {
+  delete runtimeContext.eventHandlers.keydown[component.id]
+  delete runtimeContext.eventHandlers.keyup[component.id]
+}
+
+const removePeriodicEvent = (component: IComponent) => {
   if (runtimeContext.eventHandlers.periodic[component.id]) {
     clearInterval(runtimeContext.eventHandlers.periodic[component.id])
     delete runtimeContext.eventHandlers.periodic[component.id]
   }
 }
 
-export const handleOnAppearEvent = (customEventHandlers: ICustomEvents) => {
+const handleOnAppearEvent = (customEventHandlers: ICustomEvents) => {
   const eventWithArgs = customEventHandlers[ComponentEventType.OnAppear]
   if (eventWithArgs) {
     eventWithArgs[0]()
@@ -154,6 +172,7 @@ export const registerCustomEvents = (
   registerClickOutsideEvent(component, customEventHandlers)
   registerPeriodicEvent(component, customEventHandlers)
   registerScrollIntoViewEvent(component, customEventHandlers, root)
+  registerKeyEvents(component, customEventHandlers)
   if (isMounted) {
     handleOnAppearEvent(customEventHandlers)
   }
@@ -163,4 +182,5 @@ export const removeListeners = (component: IComponent): void => {
   removePeriodicEvent(component)
   removeClickOutsideEvent(component)
   removeScrollIntoViewEvent(component)
+  removeKeyEvents(component)
 }

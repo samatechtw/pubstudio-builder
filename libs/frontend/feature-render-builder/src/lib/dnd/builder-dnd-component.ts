@@ -1,9 +1,3 @@
-import { buildContentWindowInnerId } from '@pubstudio/frontend/feature-build'
-import {
-  computeEvents,
-  registerCustomEvents,
-  removeListeners,
-} from '@pubstudio/frontend/feature-render'
 import {
   activeBreakpoint,
   descSortedBreakpoints,
@@ -12,16 +6,7 @@ import { builderContext } from '@pubstudio/frontend/util-builder'
 import { findStyles } from '@pubstudio/frontend/util-component'
 import { IContent, RenderMode } from '@pubstudio/frontend/util-render'
 import { Css, IComponent, ISite, Tag } from '@pubstudio/shared/type-site'
-import {
-  computed,
-  defineComponent,
-  h,
-  onMounted,
-  onUnmounted,
-  PropType,
-  toRefs,
-  VNode,
-} from 'vue'
+import { computed, defineComponent, h, PropType, toRefs, VNode } from 'vue'
 import { computePropsContent } from '../render-builder'
 import { useDragDrop } from './use-drag-drop'
 
@@ -133,10 +118,6 @@ export const BuilderDndComponent = defineComponent({
   setup(props: IDndComponentProps) {
     const { site, component, renderKey } = toRefs(props)
 
-    const { custom } = computeEvents(site.value, component.value)
-    const root = document.getElementById(buildContentWindowInnerId)
-    registerCustomEvents(component.value, custom, root, false)
-
     const dndRef = computed(() => {
       const dragCmp = component.value
       const componentIndex =
@@ -160,15 +141,6 @@ export const BuilderDndComponent = defineComponent({
           builderContext.buildDndState.value = undefined
         },
       })
-    })
-    onMounted(() => {
-      const { custom } = computeEvents(site.value, component.value)
-      const root = document.getElementById(buildContentWindowInnerId)
-      // Pass `false` for `isMounted` to avoid triggering OnAppear event
-      registerCustomEvents(component.value, custom, root, false)
-    })
-    onUnmounted(() => {
-      removeListeners(component.value)
     })
     return () => {
       const dnd = dndRef.value

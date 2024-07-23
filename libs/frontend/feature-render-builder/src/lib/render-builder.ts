@@ -256,11 +256,7 @@ export const computePropsContent = (
   } else if (cmpContent) {
     if (component.tag === Tag.Svg) {
       content.push(h('div', { class: 'svg-container', innerHTML: cmpContent }))
-    } else if (
-      isSelected &&
-      component.tag !== Tag.Input &&
-      component.tag !== Tag.Textarea
-    ) {
+    } else if (isSelected && component.tag !== 'input' && component.tag !== 'textarea') {
       const cmpWithDefaultContent: IComponent = { ...component, content: cmpContent }
       content.push(h(ProseMirrorEditor, { component: cmpWithDefaultContent, editor }))
     } else {
@@ -272,7 +268,7 @@ export const computePropsContent = (
       )
     }
   } else if (
-    ![Tag.Img, Tag.Svg, Tag.Input, Tag.Textarea].includes(component.tag) &&
+    !['img', 'svg', 'input', 'textarea'].includes(component.tag) &&
     !hasChildren &&
     !customCmpHasChildren
   ) {

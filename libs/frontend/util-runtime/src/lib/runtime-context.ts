@@ -3,6 +3,8 @@ import { Ref, VNode } from 'vue'
 export interface IRuntimeContext {
   eventHandlers: {
     click: Record<string, EventHandler>
+    keyup: Record<string, EventHandler>
+    keydown: Record<string, EventHandler>
     // Store `setInterval` id
     periodic: Record<string, ReturnType<typeof setInterval>>
     scrollIntoView: Record<string, IntersectionObserver>
@@ -33,7 +35,13 @@ export interface IComponentTreeItemRenameData {
 
 export type EventHandler = (e: Event) => void
 
-const initialHandlers = () => ({ click: {}, periodic: {}, scrollIntoView: {} })
+const initialHandlers = () => ({
+  click: {},
+  periodic: {},
+  scrollIntoView: {},
+  keyup: {},
+  keydown: {},
+})
 
 export const runtimeContext: IRuntimeContext = {
   eventHandlers: initialHandlers(),
@@ -42,6 +50,18 @@ export const runtimeContext: IRuntimeContext = {
     loadedComponents: {},
     retries: 0,
   },
+}
+
+const keyupHandler = (e: KeyboardEvent) => {
+  for (const event of Object.values(runtimeContext.eventHandlers.keyup)) {
+    event(e)
+  }
+}
+
+const keydownHandler = (e: KeyboardEvent) => {
+  for (const event of Object.values(runtimeContext.eventHandlers.keydown)) {
+    event(e)
+  }
 }
 
 export const resetRuntimeContext = () => {
@@ -54,4 +74,9 @@ export const resetRuntimeContext = () => {
     loadedComponents: {},
     retries: 0,
   }
+
+  document.removeEventListener('keyup', keyupHandler)
+  document.removeEventListener('keydown', keydownHandler)
+  document.addEventListener('keyup', keyupHandler)
+  document.addEventListener('keydown', keydownHandler)
 }

@@ -8,4 +8,6 @@ export enum ComponentEventType {
   ScrollIntoView = 'scrollIntoView',
   Input = 'input',
   Submit = 'submit',
+  Keyup = 'keyup',
+  Keydown = 'keydown',
 }
