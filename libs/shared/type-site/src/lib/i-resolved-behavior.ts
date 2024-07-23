@@ -21,7 +21,8 @@ export interface IBehaviorHelpers {
     field: string,
     defaultVal?: IComponentState,
   ): IComponentState | undefined
-  setInputIs(component: IComponent | undefined, name: string, value: unknown): void
+  setInput(component: IComponent | undefined, name: string, value: unknown): void
+  getInput(component: IComponent | undefined, name: string): string | undefined
   getEventBehavior(component: IComponent, behaviorId: string): IComponentEventBehavior[]
   setCustomStyle(component: IComponent | undefined, prop: CssType, value: string): void
   getCustomStyle(

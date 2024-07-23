@@ -79,7 +79,7 @@ export const getValue = (componentId: string): string | undefined => {
   return el?.value
 }
 
-export const setInputIs = (
+export const setInput = (
   component: IComponent | undefined,
   name: string,
   value: unknown,
@@ -87,6 +87,11 @@ export const setInputIs = (
   if (component?.inputs?.[name]) {
     component.inputs[name].is = value
   }
+}
+
+export const getInput = (component: IComponent | undefined, name: string) => {
+  const input = component?.inputs?.[name]
+  return input?.is ?? input?.default
 }
 
 export const setCustomStyle = (
@@ -183,7 +188,8 @@ export const behaviorHelpers: IBehaviorHelpers = {
   setState,
   setContent,
   getValue,
-  setInputIs,
+  setInput,
+  getInput,
   getEventBehavior,
   getCustomStyle,
   setCustomStyle,
