@@ -1,10 +1,5 @@
 import { globalContext } from '@pubstudio/frontend/util-ids'
-import {
-  ComponentEventType,
-  IBehavior,
-  IResolvedBehavior,
-  ISiteContext,
-} from '@pubstudio/shared/type-site'
+import { IBehavior, IResolvedBehavior, ISiteContext } from '@pubstudio/shared/type-site'
 
 export const builtinBehaviors: Record<string, IBehavior> = {
   // Populated by '@pubstudio/frontend/feature-builtin' to avoid circular dependencies
@@ -29,6 +24,8 @@ export const NativeEvents: Record<string, string> = {
   mouseleave: 'onMouseleave',
   submit: 'onSubmit',
   input: 'onInput',
+  keydown: 'onKeydownPrevent',
+  keyup: 'onKeyupPrevent',
 }
 
 export const resolveBehaviorFunction = (

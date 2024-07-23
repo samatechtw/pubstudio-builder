@@ -25,6 +25,14 @@
     >
       context
     </InfoBubble>
+    <InfoBubble
+      :message="t('behavior_context.event')"
+      placement="right"
+      :customIcon="true"
+      class="context-var"
+    >
+      event
+    </InfoBubble>
     <!-- eslint-enable -->
     <InfoBubble
       placement="right"
