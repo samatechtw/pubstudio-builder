@@ -37,14 +37,17 @@ import {
 import {
   ICreateTableApiRequest,
   ICreateTableResponse,
+  IListRowsApiQuery,
+  IListRowsResponse,
   IListTablesApiQuery,
   IListTablesResponse,
 } from '@pubstudio/shared/type-api-site-custom-data'
 import { EnumFileFormat, IImageJobConfig } from '@samatech/image-api-types'
 
 export interface IApiCustomData {
-  createTable(payload: ICreateTableApiRequest): Promise<ICreateTableResponse>
-  listTables(query: IListTablesApiQuery): Promise<IListTablesResponse>
+  listRows: (query: IListRowsApiQuery) => Promise<IListRowsResponse>
+  createTable: (payload: ICreateTableApiRequest) => Promise<ICreateTableResponse>
+  listTables: (query: IListTablesApiQuery) => Promise<IListTablesResponse>
 }
 
 export interface IApiLocalSite {

@@ -5,6 +5,8 @@ export type ICustomTableColumnRuleType =
   | 'MinLength'
   | 'MaxLength'
 
+export type ICustomTableDataType = 'TEXT'
+
 export interface ICustomTableColumnRule {
   parameter?: number
   rule_type: ICustomTableColumnRuleType
@@ -12,7 +14,7 @@ export interface ICustomTableColumnRule {
 
 export interface ICustomTableColumn {
   name: string
-  data_type: 'TEXT'
+  data_type: ICustomTableDataType
   validation_rules: ICustomTableColumnRule[]
 }
 

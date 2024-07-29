@@ -5,6 +5,8 @@ import {
   ICreateTableApiRequest,
   ICreateTableResponse,
   ICustomDataApiRequest,
+  IListRowsApiQuery,
+  IListRowsResponse,
   IListTablesApiQuery,
   IListTablesResponse,
 } from '@pubstudio/shared/type-api-site-custom-data'
@@ -24,6 +26,19 @@ export const useCustomDataApi = (api: PSApi, siteId: string): IApiCustomData => 
     return data as IListTablesResponse
   }
 
+  const listRows = async (query: IListRowsApiQuery): Promise<IListRowsResponse> => {
+    const payload: ICustomDataApiRequest = {
+      action: CustomDataAction.ListRows,
+      data: query,
+    }
+    const { data } = await api.authRequest({
+      url: `sites/${siteId}/custom_data`,
+      method: 'POST',
+      data: payload,
+    })
+    return data as IListRowsResponse
+  }
+
   const createTable = async (
     payload: ICreateTableApiRequest,
   ): Promise<ICreateTableResponse> => {
@@ -40,6 +55,7 @@ export const useCustomDataApi = (api: PSApi, siteId: string): IApiCustomData => 
   }
 
   return {
+    listRows,
     createTable,
     listTables,
   }
