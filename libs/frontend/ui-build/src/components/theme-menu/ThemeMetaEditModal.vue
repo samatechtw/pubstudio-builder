@@ -184,6 +184,12 @@
               placeholder="blocking"
               @update:modelValue="update('blocking', $event)"
             />
+            <PSInput
+              :modelValue="data.meta.id || ''"
+              name="id"
+              placeholder="id"
+              @update:modelValue="update('id', $event)"
+            />
           </div>
         </div>
         <div class="actions">

@@ -25,6 +25,7 @@ export interface IHeadMeta {
 }
 
 export interface IHeadScript {
+  id?: string
   src?: string
   type?: string
   async?: boolean
