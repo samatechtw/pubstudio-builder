@@ -21,6 +21,7 @@ export enum Tag {
   Ol = 'ol',
   Li = 'li',
   Vue = 'vue',
+  Canvas = 'canvas',
 }
 
 export type TagType = `${Tag}`
