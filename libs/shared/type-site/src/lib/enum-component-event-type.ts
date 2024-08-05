@@ -5,6 +5,7 @@ export enum ComponentEventType {
   MouseLeave = 'mouseleave',
   Periodic = 'periodic',
   OnAppear = 'appear',
+  Scroll = 'scroll',
   ScrollIntoView = 'scrollIntoView',
   Input = 'input',
   Submit = 'submit',

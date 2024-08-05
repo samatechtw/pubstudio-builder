@@ -24,6 +24,7 @@ See the table below for event descriptions:
 | MouseLeave     | N/A               | Mouse leaves the component                                                                                                                                  |
 | Periodic       | interval          | Triggers once every `interval` milliseconds                                                                                                                 |
 | OnAppear       | appear            | Triggers each time the component appears on the page                                                                                                        |
+| Scroll         | scroll            | Document scroll event                                                                                                                                       |
 | ScrollIntoView | margin, direction | Triggers when the component is `margin` distance from the top oof the window. `direction` determines if it triggers when scrolling `up`, `down`, or `both`. |
 | Input          | N/A               | For `input` or `textfield` components, whenever a character is typed.                                                                                       |
 
