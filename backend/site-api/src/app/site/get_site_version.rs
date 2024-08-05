@@ -66,7 +66,7 @@ pub async fn get_site_version_result(
 
     if let Some(update_key) = query.update_key {
         let content_updated = site.content_updated_at;
-        return if content_updated == update_key {
+        return if content_updated <= update_key {
             Ok(StatusCode::NO_CONTENT.into_response())
         } else {
             Ok(Json(to_api_response(site)).into_response())

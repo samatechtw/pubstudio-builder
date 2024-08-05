@@ -120,6 +120,7 @@ export const storeSite = (site: ISite): IStoredSite => {
     editor: JSON.stringify(serialized.editor),
     history: JSON.stringify(serialized.history),
     updated_at: serialized.updated_at,
+    content_updated_at: serialized.content_updated_at,
   }
 }
 
