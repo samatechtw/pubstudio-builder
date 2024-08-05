@@ -5,7 +5,10 @@ import {
 } from '@pubstudio/frontend/data-access-command'
 import { ApiInjectionKey } from '@pubstudio/frontend/data-access-injection'
 import { GetSiteVersionFn, useSiteApi } from '@pubstudio/frontend/data-access-site-api'
-import { store } from '@pubstudio/frontend/data-access-web-store'
+import {
+  setLocalContentUpdatedAt,
+  store,
+} from '@pubstudio/frontend/data-access-web-store'
 import { parseApiErrorKey, PSApi, toApiError } from '@pubstudio/frontend/util-api'
 import { serializeEditor, storeSite } from '@pubstudio/frontend/util-site-store'
 import { IApiError } from '@pubstudio/shared/type-api'
@@ -140,6 +143,9 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
       }
       if (hasUpdates) {
         const result = await updateFn(siteId.value, payload, keepalive)
+        if (result.content_updated_at) {
+          setLocalContentUpdatedAt(result.content_updated_at)
+        }
         updateKey.value = result.updated_at.toString()
       }
       dirty.value = dirtyDefault()
@@ -181,6 +187,7 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
       }
     }
     store.site.setSite(storedSite)
+    setLocalContentUpdatedAt(Date.now())
     if (changed) {
       if (options?.immediate) {
         if (saveTimer) {
@@ -233,6 +240,7 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
         updated_at: updateKey.value,
         content_updated_at: siteData?.content_updated_at,
       }
+      setLocalContentUpdatedAt(siteData?.content_updated_at)
       return restoreSiteHelper(data)
     } catch (e) {
       console.log('Restore failed:', e)

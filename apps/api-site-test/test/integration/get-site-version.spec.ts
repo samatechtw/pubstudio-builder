@@ -88,10 +88,16 @@ describe('Get Site Version', () => {
       await expectGetSiteVersion(ownerAuth, versionId)
     })
 
-    it('returns site data if current update_key does not match the saved content_updated_at', async () => {
+    it('returns site data if current update_key is older than content_updated_at', async () => {
+      const prevResponse = await api
+        .get(`${testEndpoint}/${siteId}/versions/${versionId}`)
+        .set('Authorization', ownerAuth)
+        .expect(200)
+      const prevBody: IGetSiteVersionApiResponse = prevResponse.body
+
       const response = await api
         .get(`${testEndpoint}/${siteId}/versions/${versionId}`)
-        .query({ update_key: 123456789 })
+        .query({ update_key: prevBody.content_updated_at - 100 })
         .set('Authorization', adminAuth)
         .expect(200)
       const body: IGetSiteVersionApiResponse = response.body
@@ -107,7 +113,7 @@ describe('Get Site Version', () => {
       expect(body.pages).toBeDefined()
     })
 
-    it('returns empty site if current update_key match the saved content_updated_at', async () => {
+    it('returns empty site if current update_key matches saved content_updated_at', async () => {
       const prevResponse = await api
         .get(`${testEndpoint}/${siteId}/versions/${versionId}`)
         .set('Authorization', ownerAuth)
@@ -117,6 +123,22 @@ describe('Get Site Version', () => {
       const response = await api
         .get(`${testEndpoint}/${siteId}/versions/${versionId}`)
         .query({ update_key: prevBody.content_updated_at })
+        .set('Authorization', adminAuth)
+        .expect(204)
+
+      expect(response.body).toEqual({})
+    })
+
+    it('returns empty site if current update_key is new than content_updated_at', async () => {
+      const prevResponse = await api
+        .get(`${testEndpoint}/${siteId}/versions/${versionId}`)
+        .set('Authorization', ownerAuth)
+        .expect(200)
+      const prevBody: IGetSiteVersionApiResponse = prevResponse.body
+
+      const response = await api
+        .get(`${testEndpoint}/${siteId}/versions/${versionId}`)
+        .query({ update_key: prevBody.content_updated_at + 100 })
         .set('Authorization', adminAuth)
         .expect(204)
 

@@ -29,7 +29,6 @@ export interface IUseSiteSource {
   isSaving: ComputedRef<boolean>
   isSiteApi: ComputedRef<boolean>
   initializeSite: (options: IInitializeSiteOptions) => Promise<string | undefined>
-  checkOutdated: () => Promise<void>
   syncUpdateKey: (updateBody: IUpdateSiteApiResponse) => void
   replaceSite: (newSite: ISite) => void
   setRestoredSite: (restored: ISiteRestore | undefined) => void
@@ -113,23 +112,9 @@ export const useSiteSource = (): IUseSiteSource => {
     siteStore.value.setUpdateKey(updateBody.updated_at.toString())
   }
 
-  const checkOutdated = async () => {
-    if (!site.value) {
-      return
-    }
-    const restored = await siteStore.value.restore(site.value.content_updated_at)
-    setRestoredSite(restored)
-    if (restored) {
-      console.log('Site updated:', site.value.content_updated_at)
-    } else {
-      console.log('No site updates')
-    }
-  }
-
   return {
     initializeSite,
     syncUpdateKey,
-    checkOutdated,
     replaceSite,
     setRestoredSite,
     apiSite,

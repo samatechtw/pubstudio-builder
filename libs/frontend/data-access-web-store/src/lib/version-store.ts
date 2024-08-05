@@ -16,7 +16,7 @@ export const versionStoreGetters = (state: IVersionState) => ({
 
 export const versionStoreMutations = (state: IVersionState) => ({
   setActiveVersion(newVersion: string | undefined | null) {
-    state.activeVersionId = newVersion || null
+    state.activeVersionId = newVersion ?? null
   },
 })
 
