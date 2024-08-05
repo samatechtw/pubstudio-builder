@@ -35,7 +35,7 @@
       </div>
       <div class="component-name" :class="{ 'no-children': !haveChildren }">
         <ComponentTreeItemRename
-          v-if="isBeingRenamed()"
+          v-if="isRenaming"
           :component="component"
           :treeItemId="treeItemId"
           class="component-tree-item-rename"
@@ -93,9 +93,10 @@ const { site, editor } = useBuild()
 
 const canDrag = computed(
   () =>
-    !component.value.parent ||
-    // Prevent custom instance children from being dragged.
-    !component.value.parent.customSourceId,
+    (!component.value.parent ||
+      // Prevent custom instance children from being dragged.
+      !component.value.parent.customSourceId) &&
+    !isRenaming.value,
 )
 
 const mouseEnter = () => {
@@ -157,9 +158,9 @@ const toggleExpanded = () => {
   }
 }
 
-const isBeingRenamed = () => {
+const isRenaming = computed(() => {
   const { treeItemId: contextTreeItemId, renaming } =
     builderContext.componentTreeItemRenameData.value
   return renaming && contextTreeItemId === treeItemId.value
-}
+})
 </script>
