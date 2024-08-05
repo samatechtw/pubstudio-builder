@@ -1,5 +1,5 @@
 import { createClickawayListener } from '@pubstudio/frontend/util-clickaway'
-import { runtimeContext } from '@pubstudio/frontend/util-runtime'
+import { registerScroll, runtimeContext } from '@pubstudio/frontend/util-runtime'
 import {
   ComponentEventType,
   IComponent,
@@ -144,6 +144,21 @@ const registerKeyEvents = (component: IComponent, customEventHandlers: ICustomEv
   }
 }
 
+const registerScrollEvent = (
+  component: IComponent,
+  customEventHandlers: ICustomEvents,
+) => {
+  const scroll = customEventHandlers[ComponentEventType.Scroll]
+
+  if (scroll) {
+    registerScroll(component.id, scroll[0])
+  }
+}
+
+const removeScrollEvent = (component: IComponent) => {
+  delete runtimeContext.eventHandlers.scroll[component.id]
+}
+
 const removeKeyEvents = (component: IComponent) => {
   delete runtimeContext.eventHandlers.keydown[component.id]
   delete runtimeContext.eventHandlers.keyup[component.id]
@@ -173,6 +188,7 @@ export const registerCustomEvents = (
   registerPeriodicEvent(component, customEventHandlers)
   registerScrollIntoViewEvent(component, customEventHandlers, root)
   registerKeyEvents(component, customEventHandlers)
+  registerScrollEvent(component, customEventHandlers)
   if (isMounted) {
     handleOnAppearEvent(customEventHandlers)
   }
@@ -183,4 +199,5 @@ export const removeListeners = (component: IComponent): void => {
   removeClickOutsideEvent(component)
   removeScrollIntoViewEvent(component)
   removeKeyEvents(component)
+  removeScrollEvent(component)
 }

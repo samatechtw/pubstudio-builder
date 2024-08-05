@@ -1,3 +1,4 @@
+import { EventHandler } from '@pubstudio/shared/type-site'
 import { Ref, VNode } from 'vue'
 
 export interface IRuntimeContext {
@@ -8,7 +9,9 @@ export interface IRuntimeContext {
     // Store `setInterval` id
     periodic: Record<string, ReturnType<typeof setInterval>>
     scrollIntoView: Record<string, IntersectionObserver>
+    scroll: Record<string, EventHandler>
   }
+  scrollEventAdded: boolean
   loadVueComponent: ILoadVueComponent
 }
 
@@ -33,18 +36,18 @@ export interface IComponentTreeItemRenameData {
   renaming: boolean
 }
 
-export type EventHandler = (e: Event) => void
-
 const initialHandlers = () => ({
   click: {},
   periodic: {},
   scrollIntoView: {},
   keyup: {},
   keydown: {},
+  scroll: {},
 })
 
 export const runtimeContext: IRuntimeContext = {
   eventHandlers: initialHandlers(),
+  scrollEventAdded: false,
   loadVueComponent: {
     loadComponentTimer: undefined,
     loadedComponents: {},
@@ -64,6 +67,20 @@ const keydownHandler = (e: KeyboardEvent) => {
   }
 }
 
+const scrollHandler = () => {
+  for (const event of Object.values(runtimeContext.eventHandlers.scroll)) {
+    event()
+  }
+}
+
+export const registerScroll = (id: string, handler: EventHandler) => {
+  runtimeContext.eventHandlers.scroll[id] = handler
+  if (!runtimeContext.scrollEventAdded) {
+    runtimeContext.scrollEventAdded = true
+    document.addEventListener('scroll', scrollHandler, { passive: true })
+  }
+}
+
 export const resetRuntimeContext = () => {
   runtimeContext.eventHandlers = initialHandlers()
   if (runtimeContext.loadVueComponent.loadComponentTimer) {
@@ -74,7 +91,8 @@ export const resetRuntimeContext = () => {
     loadedComponents: {},
     retries: 0,
   }
-
+  runtimeContext.scrollEventAdded = false
+  document.removeEventListener('scroll', scrollHandler)
   document.removeEventListener('keyup', keyupHandler)
   document.removeEventListener('keydown', keydownHandler)
   document.addEventListener('keyup', keyupHandler)
