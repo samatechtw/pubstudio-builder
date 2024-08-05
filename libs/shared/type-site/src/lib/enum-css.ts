@@ -34,6 +34,7 @@ export enum Css {
   BoxShadow = 'box-shadow',
   Bottom = 'bottom',
   Color = 'color',
+  ClipPath = 'clip-path',
   Cursor = 'cursor',
   Display = 'display',
   Fill = 'fill',
