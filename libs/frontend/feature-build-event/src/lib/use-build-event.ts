@@ -4,6 +4,7 @@ import {
   isEditingStyles,
   setBuildSubmenu,
   setEditorDropdown,
+  toggleEditorMenu,
 } from '@pubstudio/frontend/data-access-command'
 import {
   useBuild,
@@ -231,6 +232,11 @@ export const useBuildEvent = () => {
       // Let the style menu handle escape
     } else if (editor.value?.editingMixinData) {
       closeMixinMenu()
+    } else if (
+      editor.value?.mode &&
+      [EditorMode.Theme, EditorMode.Styles].includes(editor.value.mode)
+    ) {
+      toggleEditorMenu(editor.value, EditorMode.SelectedComponent, true)
     } else {
       selectComponentParent()
     }
