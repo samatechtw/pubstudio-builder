@@ -113,7 +113,7 @@ export const homeLinkBehavior: IBehavior = {
     const { site, component } = behaviorContext
     const homeRoute = site.defaults.homePage
     if (component.inputs?.href?.is !== homeRoute) {
-      helpers.setInputIs(component, 'href', homeRoute)
+      helpers.setInput(component, 'href', homeRoute)
     }
   },
 }

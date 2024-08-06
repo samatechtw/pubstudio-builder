@@ -63,6 +63,8 @@ export enum Css {
   Outline = 'outline',
   OutlineStyle = 'outline-style',
   Overflow = 'overflow',
+  OverflowX = 'overflow-x',
+  OverflowY = 'overflow-y',
   Padding = 'padding',
   PageBreakAfter = 'page-break-after',
   PointerEvents = 'pointer-events',
