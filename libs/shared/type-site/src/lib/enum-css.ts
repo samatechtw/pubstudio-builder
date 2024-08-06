@@ -70,11 +70,10 @@ export enum Css {
   PointerEvents = 'pointer-events',
   Position = 'position',
   Right = 'right',
-  // Rotate function
   Rotate = 'rotate',
-  // Scale function
   Scale = 'scale',
   ScrollBehavior = 'scroll-behavior',
+  StopColor = 'stop-color',
   Stroke = 'stroke',
   TextAlign = 'text-align',
   TextDecoration = 'text-decoration',
@@ -85,7 +84,6 @@ export enum Css {
   Transform = 'transform',
   TransformOrigin = 'transform-origin',
   Transition = 'transition',
-  // Translate function
   Translate = 'translate',
   UserSelect = 'user-select',
   Visibility = 'visibility',
