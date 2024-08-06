@@ -77,6 +77,7 @@ export function contentTypeExt(contentType: AssetContentType): string {
   return {
     [AssetContentType.Jpeg]: 'jpg',
     [AssetContentType.Png]: 'png',
+    [AssetContentType.Svg]: 'svg',
     [AssetContentType.Gif]: 'gif',
     [AssetContentType.Mp4]: 'mp4',
     [AssetContentType.Pdf]: 'pdf',
