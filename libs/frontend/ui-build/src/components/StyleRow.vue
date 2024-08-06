@@ -108,6 +108,7 @@ import { replaceBackground } from '@pubstudio/frontend/util-component'
 // Items listed here will be used to populate the dropdown in editor, disabling users
 // from entering custom values.
 // Only non-numeric, dynamic values should be listed here.
+const OVERFLOW = ['auto', 'hidden', 'scroll', 'visible']
 const cssValues = new Map<Css, string[]>([
   [
     Css.AlignContent,
@@ -127,7 +128,9 @@ const cssValues = new Map<Css, string[]>([
     ['center', 'flex-end', 'flex-start', 'space-around', 'space-between', 'stretch'],
   ],
   [Css.ObjectFit, ['contain', 'cover', 'fill', 'none', 'scale-down']],
-  [Css.Overflow, ['auto', 'hidden', 'scroll', 'visible']],
+  [Css.Overflow, OVERFLOW],
+  [Css.OverflowX, OVERFLOW],
+  [Css.OverflowY, OVERFLOW],
   [Css.PointerEvents, ['auto', 'none']],
   [Css.Position, ['absolute', 'fixed', 'relative', 'static', 'sticky']],
   [Css.ScrollBehavior, ['auto', 'smooth']],

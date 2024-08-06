@@ -50,6 +50,8 @@ const goBack = () => {
   height: 28px;
   cursor: pointer;
   background-color: #eee489;
+  position: relative;
+  z-index: 9999;
 }
 .preview-content {
   @mixin flex-center;
