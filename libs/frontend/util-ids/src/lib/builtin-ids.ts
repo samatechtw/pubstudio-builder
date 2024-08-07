@@ -88,6 +88,8 @@ export const headerNavMenuId = componentId(globalContext.namespace, 'headerNavMe
 
 export const textareaStyleId = nextStyleId(globalContext)
 export const textareaId = componentId(globalContext.namespace, 'textarea')
+export const labelStyleId = nextStyleId(globalContext)
+export const labelId = componentId(globalContext.namespace, 'label')
 
 // Advanced
 export const contactFormId = componentId(globalContext.namespace, 'contactform')

@@ -9,6 +9,7 @@ import { h1, h2, h3, h4, h5, h6 } from './builtin-h'
 import { header, headerLogo, headerLogoLink, headerNavMenu } from './builtin-header'
 import { backgroundImage, captionedImage, image } from './builtin-image'
 import { input } from './builtin-input'
+import { label } from './builtin-label'
 import { link } from './builtin-link'
 import { ol, ul } from './builtin-list'
 import { mailingList } from './builtin-mailing-list'
@@ -45,6 +46,7 @@ export const builtinComponents: Record<string, ISerializedComponent> = {
   [footer.id]: footer,
   [input.id]: input,
   [textarea.id]: textarea,
+  [label.id]: label,
   [ul.id]: ul,
   [ol.id]: ol,
   [dividerVertical.id]: dividerVertical,

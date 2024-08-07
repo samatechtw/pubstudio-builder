@@ -15,7 +15,7 @@ import {
   IAddStyleMixinData,
   ICommandGroupData,
 } from '@pubstudio/shared/type-command-data'
-import { IComponent, ISite } from '@pubstudio/shared/type-site'
+import { IComponent, IComponentInputs, ISite, Tag } from '@pubstudio/shared/type-site'
 
 // Get builtin mixins from a component & children that have not
 // been added to the site
@@ -73,8 +73,10 @@ const addComponentToParent = (
   parent = parent ?? site.editor?.selectedComponent ?? activePage.root
 
   const data = addData(parent)
-  if (data && parentIndex) {
-    data.parentIndex = parentIndex
+  if (data) {
+    if (parentIndex) {
+      data.parentIndex = parentIndex
+    }
   }
   return data
 }
