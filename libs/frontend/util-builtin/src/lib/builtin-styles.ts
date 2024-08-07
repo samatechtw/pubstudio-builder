@@ -22,6 +22,7 @@ import {
   imageStyle,
 } from './components/builtin-image'
 import { inputStyle } from './components/builtin-input'
+import { labelStyle } from './components/builtin-label'
 import { linkStyle } from './components/builtin-link'
 import { listItemStyle, listStyle } from './components/builtin-list'
 import { loadingDotStyle, loadingStyle } from './components/builtin-loading'
@@ -52,6 +53,7 @@ export const builtinStyles: Record<string, IStyle> = {
   [footerStyle.id]: footerStyle,
   [inputStyle.id]: inputStyle,
   [textareaStyle.id]: textareaStyle,
+  [labelStyle.id]: labelStyle,
   [loadingStyle.id]: loadingStyle,
   [loadingDotStyle.id]: loadingDotStyle,
   [listStyle.id]: listStyle,

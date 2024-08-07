@@ -17,6 +17,7 @@ export enum Tag {
   Svg = 'svg',
   Input = 'input',
   Textarea = 'textarea',
+  Label = 'label',
   Ul = 'ul',
   Ol = 'ol',
   Li = 'li',

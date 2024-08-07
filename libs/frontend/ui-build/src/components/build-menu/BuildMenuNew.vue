@@ -89,6 +89,11 @@
         :builtinComponentId="textarea.id"
       />
       <NewComponent
+        class="new-label"
+        :text="t('build.label')"
+        :builtinComponentId="label.id"
+      />
+      <NewComponent
         class="new-divider-vertical"
         :text="t('build.divider_vertical')"
         :builtinComponentId="dividerVertical.id"
@@ -153,6 +158,7 @@ import {
   backgroundImage,
   viewCounter,
   vueComponent,
+  label,
 } from '@pubstudio/frontend/util-builtin'
 import {
   ContactFormWalkthroughModal,
