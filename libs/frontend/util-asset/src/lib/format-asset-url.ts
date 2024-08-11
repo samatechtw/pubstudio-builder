@@ -5,6 +5,7 @@ export const urlFromAsset = (asset: ISiteAssetViewModel): string => {
   let ext = {
     'image/jpeg': 'jpg',
     'image/png': 'png',
+    'image/webp': 'webp',
     'image/svg+xml': 'svg',
     'image/gif': 'gif',
     'video/mp4': 'mp4',

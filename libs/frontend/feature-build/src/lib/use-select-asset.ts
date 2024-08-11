@@ -4,6 +4,7 @@ import { Ref, ref } from 'vue'
 const ContentTypes = [
   AssetContentType.Jpeg,
   AssetContentType.Png,
+  AssetContentType.Webp,
   AssetContentType.Svg,
   AssetContentType.Gif,
 ]

@@ -65,7 +65,7 @@ export const makeAsset = (values: IAdminAssetOptional) =>
     url: '',
     ...values,
     requirements: {
-      ext: ['jpg', 'jpeg', 'png'],
+      ext: ['jpg', 'jpeg', 'png', 'webp'],
       size: 4000000,
       ...values.requirements,
     },
