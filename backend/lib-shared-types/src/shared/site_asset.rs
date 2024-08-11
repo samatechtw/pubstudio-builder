@@ -23,6 +23,10 @@ pub enum AssetContentType {
     #[sqlx(rename = "image/png")]
     #[strum(serialize = "image/png")]
     Png,
+    #[serde(rename = "image/webp")]
+    #[sqlx(rename = "image/webp")]
+    #[strum(serialize = "image/webp")]
+    Webp,
     #[serde(rename = "image/svg+xml")]
     #[sqlx(rename = "image/svg+xml")]
     #[strum(serialize = "image/svg+xml")]
@@ -54,6 +58,7 @@ impl AssetContentType {
         match self {
             AssetContentType::Jpeg => "jpg",
             AssetContentType::Png => "png",
+            AssetContentType::Webp => "webp",
             AssetContentType::Svg => "svg",
             AssetContentType::Gif => "gif",
             AssetContentType::Mp4 => "mp4",
