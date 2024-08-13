@@ -104,7 +104,6 @@ import {
   removeComponentOverrideStyleEntryCommand,
   setCustomStyleCommand,
   setOverrideStyleCommand,
-  setPositionAbsoluteCommands,
 } from './build-command-helpers'
 import { resetThemeMenuVariables } from './use-theme-menu-variables'
 
@@ -157,7 +156,6 @@ export interface IUseBuild {
     styles: IOldNewStyleEntry[],
     replace?: boolean,
   ) => void
-  setPositionAbsolute: (oldStyle: IStyleEntry | undefined, newStyle: IStyleEntry) => void
   removeComponentCustomStyle: (style: IRemoveStyleEntry) => void
   setOverrideStyle: (
     selector: string,
@@ -422,17 +420,6 @@ export const useBuild = (): IUseBuild => {
       },
     }
     pushCommand(site.value, CommandType.ReplacePageRoot, data)
-  }
-
-  const setPositionAbsolute = (
-    oldStyle: IStyleEntry | undefined,
-    newStyle: IStyleEntry,
-  ) => {
-    const commands = setPositionAbsoluteCommands(site.value, oldStyle, newStyle)
-    if (commands.length) {
-      const data: ICommandGroupData = { commands }
-      pushCommand(site.value, CommandType.Group, { data })
-    }
   }
 
   const getSelectedComponent = (): IComponent => {
@@ -1120,7 +1107,6 @@ export const useBuild = (): IUseBuild => {
     setCustomStyle,
     setActiveCustomStyle,
     setCustomStyles,
-    setPositionAbsolute,
     removeComponentCustomStyle,
     setOverrideStyle,
     removeComponentOverrideStyleEntry,

@@ -54,13 +54,16 @@ export const useEditComponentStyles = (): IUseEditStyles => {
     const { removeCmd, originalStyle } = removeEditCommand(editCommands, prop)
 
     let commands: ICommand[] | undefined
+    if (removeCmd && newStyle) {
+      // Undo the previous command to clean up the old property/value
+      undoCommand(site.value, removeCmd)
+    }
     if (newStyle?.property === Css.Position && newStyle.value === 'absolute') {
       // Makes sure the parent has `relative` or `absolute` style.
       // Otherwise the component might jump to an unexpected location
-      commands = setPositionAbsoluteCommands(site.value, oldStyle, { ...newStyle })
+      const old = removeCmd ? originalStyle : oldStyle
+      commands = setPositionAbsoluteCommands(site.value, old, { ...newStyle })
     } else if (removeCmd && newStyle) {
-      // Undo the previous command to clean up the old property/value
-      undoCommand(site.value, removeCmd)
       // The property changed, and we're replacing a command in the current group
       const c = setComponentCustomStyleCommand(site.value, originalStyle, { ...newStyle })
       if (c) {

@@ -36,7 +36,6 @@ export const setSelectedComponent = (
   options?: ISetSelectedComponentOptions,
 ) => {
   const { editor } = site
-
   if (editor) {
     // Remember old state to see if we should save to local storage
     const prevComponent = editor.selectedComponent

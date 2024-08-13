@@ -45,20 +45,24 @@ export const applySetComponentCustomStyle = (
   site: ISite,
   data: ISetComponentCustomStyleData,
 ) => {
-  const { componentId, oldStyle, newStyle } = data
+  const { componentId, select, oldStyle, newStyle } = data
   const component = resolveComponent(site.context, componentId)
   setStyle(component, data.breakpointId, oldStyle, newStyle)
   // Select edited component for redo
-  setSelectedComponent(site, component)
+  if (select ?? true) {
+    setSelectedComponent(site, component)
+  }
 }
 
 export const undoSetComponentCustomStyle = (
   site: ISite,
   data: ISetComponentCustomStyleData,
 ) => {
-  const { componentId, oldStyle, newStyle } = data
+  const { componentId, select, oldStyle, newStyle } = data
   const component = resolveComponent(site.context, componentId)
   setStyle(component, data.breakpointId, newStyle, oldStyle)
   // Select edited component for undo
-  setSelectedComponent(site, component)
+  if (select ?? true) {
+    setSelectedComponent(site, component)
+  }
 }
