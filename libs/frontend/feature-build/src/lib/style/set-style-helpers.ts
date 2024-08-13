@@ -17,10 +17,15 @@ export const removeEditCommand = (
 ): { removeCmd: ICommand | undefined; originalStyle: IStyleEntry | undefined } => {
   const removeIndex = editCommands.value?.commands.findIndex((cmd) => {
     const data = cmd.data as ISetComponentCustomStyleData
-    // Remove command if it resulted in `prop` being changed or removed
+    // Remove command if it resulted in `prop` being changed or removed, or in an invalid state
+    const isInvalidPosition =
+      data.newStyle?.property === Css.Position && data.newStyle?.value === ''
+    const isInvalid = data.newStyle?.property === '' && data.newStyle?.value === ''
     return (
-      cmd.type === CommandType.SetMixinEntry &&
-      (data.newStyle?.property === prop || data.oldStyle?.property === prop)
+      isInvalid ||
+      isInvalidPosition ||
+      (cmd.type === CommandType.SetMixinEntry &&
+        (data.newStyle?.property === prop || data.oldStyle?.property === prop))
     )
   })
   let removeCmd: ICommand<ISetComponentCustomStyleData> | undefined

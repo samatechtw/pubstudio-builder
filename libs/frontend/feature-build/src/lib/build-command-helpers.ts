@@ -99,47 +99,44 @@ export const setPositionAbsoluteCommands = (
     Css.Position,
     activeBreakpoint.value.id,
   )
+  // Clear empty/invalid position
+  const old = oldStyle?.value ? oldStyle : undefined
+  const data: ISetComponentCustomStyleData = {
+    componentId: selected.id,
+    breakpointId: activeBreakpoint.value.id,
+    oldStyle: old,
+    newStyle,
+  }
+  const setAbsolute = { type: CommandType.SetComponentCustomStyle, data }
   // No action if parent already has relative position
   if (!parent || parentPosition === 'relative' || parentPosition === 'absolute') {
-    const data: ISetComponentCustomStyleData = {
-      componentId: selected.id,
-      breakpointId: activeBreakpoint.value.id,
-      oldStyle,
-      newStyle,
-    }
-    return [{ type: CommandType.SetComponentCustomStyle, data }]
+    return [setAbsolute]
   } else {
     const oldValue =
       parent.style.custom[activeBreakpoint.value.id][pseudoClass]?.[Css.Position]
+    const parentData: ISetComponentCustomStyleData = {
+      componentId: parent.id,
+      breakpointId: activeBreakpoint.value.id,
+      select: false,
+      oldStyle: oldValue
+        ? {
+            pseudoClass,
+            property: Css.Position,
+            value: oldValue,
+          }
+        : undefined,
+      newStyle: {
+        pseudoClass,
+        property: Css.Position,
+        value: 'relative',
+      },
+    }
     return [
       {
         type: CommandType.SetComponentCustomStyle,
-        data: {
-          componentId: selected.id,
-          breakpointId: activeBreakpoint.value.id,
-          oldStyle,
-          newStyle,
-        },
+        data: parentData,
       },
-      {
-        type: CommandType.SetComponentCustomStyle,
-        data: {
-          componentId: parent.id,
-          breakpointId: activeBreakpoint.value.id,
-          oldStyle: oldValue
-            ? {
-                pseudoClass,
-                property: Css.Position,
-                value: oldValue,
-              }
-            : undefined,
-          newStyle: {
-            pseudoClass,
-            property: Css.Position,
-            value: 'relative',
-          },
-        },
-      },
+      setAbsolute,
     ]
   }
 }

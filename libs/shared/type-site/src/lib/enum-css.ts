@@ -59,6 +59,7 @@ export enum Css {
   MinHeight = 'min-height',
   MinWidth = 'min-width',
   ObjectFit = 'object-fit',
+  ObjectPosition = 'object-position',
   Opacity = 'opacity',
   Outline = 'outline',
   OutlineStyle = 'outline-style',
