@@ -33,7 +33,6 @@ import {
 } from '@pubstudio/frontend/ui-build'
 import {
   AlertModal,
-  AppHUD,
   AppToast,
   ErrorMessage,
   Modal,
@@ -139,7 +138,6 @@ export {
   useListDrag,
   // Components
   AlertModal,
-  AppHUD,
   AppToast,
   BuildContent,
   BuildMenu,

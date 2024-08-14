@@ -54,7 +54,6 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
-import { useBuild } from '@pubstudio/frontend/feature-build'
 import { Modal, PSButton } from '@pubstudio/frontend/ui-widgets'
 import { saveSite, defaultExportedFileName } from '@pubstudio/frontend/util-doc-site'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
@@ -63,30 +62,35 @@ import { IApiError, ApiErrorCode } from '@pubstudio/shared/type-api'
 
 const { t } = useI18n()
 
-const { siteStore } = useSiteSource()
-const { site } = useBuild()
+const emit = defineEmits<{
+  (e: 'unauthorized'): void
+}>()
+
+const { siteStore, site } = useSiteSource()
 const show = ref(false)
 
 const isHistory = computed(() => {
-  return siteStore.value.saveError?.message?.startsWith('History')
+  return siteError.value?.message?.startsWith('History')
 })
 
 const isStale = computed(() => {
-  return siteStore.value.saveError?.code === ApiErrorCode.UpdateStale
+  return siteError.value?.code === ApiErrorCode.UpdateStale
 })
 
 const isValidateError = computed(() => {
-  return siteStore.value.saveError?.code === ApiErrorCode.InvalidFormData
+  return siteError.value?.code === ApiErrorCode.InvalidFormData
 })
 
-const error = computed(() => {
-  return siteStore.value.saveError
+const siteError = computed<IApiError | undefined>(() => {
+  return siteStore.value.saveError as unknown as IApiError | undefined
 })
 
-watch(error, (newError: IApiError | undefined) => {
+watch(siteError, (newError: IApiError | undefined) => {
   if (newError) {
     if (isHistory.value) {
       clearPartial(site.value, 0.3)
+    } else if (newError.status === 401) {
+      emit('unauthorized')
     } else {
       show.value = true
     }

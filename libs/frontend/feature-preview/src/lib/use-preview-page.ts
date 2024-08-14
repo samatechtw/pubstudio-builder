@@ -2,6 +2,7 @@ import { restoreSiteHelper } from '@pubstudio/frontend/data-access-command'
 import { checkSiteNeedsUpdate, store } from '@pubstudio/frontend/data-access-web-store'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { initializeSiteStore } from '@pubstudio/frontend/feature-site-store-init'
+import { toApiError } from '@pubstudio/frontend/util-api'
 import { ref, Ref } from 'vue'
 
 export interface IUsePreviewPage {
@@ -52,12 +53,19 @@ export const usePreviewPage = (siteId: string | undefined): IUsePreviewPage => {
       return
     }
     // If not updated locally for more than 5 seconds, check the API
-    const restored = await siteStore.value.restore(site.value.content_updated_at)
-    setRestoredSite(restored)
-    if (restored) {
-      console.log('Site updated:', site.value.content_updated_at)
-    } else {
-      console.log('No site updates')
+    try {
+      const restored = await siteStore.value.restore(site.value.content_updated_at)
+      setRestoredSite(restored)
+      if (restored) {
+        console.log('Site updated:', site.value.content_updated_at)
+      } else {
+        console.log('No site updates')
+      }
+    } catch (e) {
+      const err = toApiError(e)
+      if (err?.status === 401) {
+        store.auth.refreshData()
+      }
     }
     apiRestoreCounter = API_RESTORE_TIMEOUT
   }

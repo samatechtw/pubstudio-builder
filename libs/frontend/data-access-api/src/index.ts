@@ -1,3 +1,5 @@
+export * from './lib/api-auth'
+export * from './lib/api-user'
 export * from './lib/api-template'
 export * from './lib/api-site-asset'
 export * from './lib/api-platform-site'

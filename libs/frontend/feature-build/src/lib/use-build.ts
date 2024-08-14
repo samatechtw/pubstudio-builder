@@ -125,12 +125,10 @@ export const buildContentWindowInnerId = 'build-content-window-inner'
 
 export interface IUseBuild {
   site: Ref<ISite>
-  siteError: Ref<string | undefined>
   // TODO -- remove after updating references to useSiteSource
   editor: ComputedRef<IEditorContext | undefined>
   selectedComponentFlattenedStyles: ComputedRef<IRawStylesWithSource>
   commandAlert: Ref<CommandType | undefined>
-  clearSiteError: () => void
   resetSite: () => void
   replaceSite: (newSite: ISite) => Promise<void>
   addComponent: (data?: Partial<IAddComponentData>) => void
@@ -237,13 +235,7 @@ export interface IUseBuild {
 const commandAlert = uiAlert<CommandType | undefined>(ref())
 
 export const useBuild = (): IUseBuild => {
-  const {
-    site,
-    activePage,
-    siteError,
-    siteStore,
-    replaceSite: replaceSiteSource,
-  } = useSiteSource()
+  const { site, activePage, siteStore, replaceSite: replaceSiteSource } = useSiteSource()
 
   const editor = computed(() => {
     return site.value.editor
@@ -268,11 +260,6 @@ export const useBuild = (): IUseBuild => {
       return {}
     }
   })
-
-  const clearSiteError = () => {
-    siteError.value = undefined
-    resetSite()
-  }
 
   const resetSite = () => {
     editStylesCancelEdit(site.value)
@@ -1090,11 +1077,9 @@ export const useBuild = (): IUseBuild => {
 
   return {
     site,
-    siteError,
     editor,
     selectedComponentFlattenedStyles,
     commandAlert,
-    clearSiteError,
     resetSite,
     replaceSite,
     addComponent,
