@@ -63,6 +63,7 @@ import {
   PSButton,
 } from '@pubstudio/frontend/ui-widgets'
 import { defaultExportedFileName } from '@pubstudio/frontend/util-doc-site'
+import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 
 const { t } = useI18n()
 
@@ -70,13 +71,12 @@ const props = withDefaults(
   defineProps<{
     show: boolean
     siteId: string
-    siteError: string
     showSupport?: boolean
   }>(),
   { showSupport: true },
 )
 
-const { siteId, siteError } = toRefs(props)
+const { siteId } = toRefs(props)
 
 const emit = defineEmits<{
   (e: 'cancel'): void
@@ -85,12 +85,18 @@ const emit = defineEmits<{
 const showClear = ref(false)
 const showExport = ref(false)
 
-const { site, clearSiteError } = useBuild()
+const { siteError } = useSiteSource()
+const { site, resetSite } = useBuild()
 
 const contactSupport = () => {
   const subject = `Site Error for Site: ${siteId.value}`
   const url = `mailto:support@pubstud.io?subject=${subject}&body=${siteError.value}`
   window.open(url, '_blank')
+}
+
+const clearSiteError = () => {
+  siteError.value = undefined
+  resetSite()
 }
 
 const defaultFileName = computed(() => defaultExportedFileName(site.value.name))

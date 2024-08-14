@@ -121,7 +121,6 @@ export { default as ModalClose } from './lib/modal/ModalClose.vue'
 export { default as ExportModal } from './lib/modal/ExportModal.vue'
 export { default as SaveTemplateModal } from './lib/modal/SaveTemplateModal.vue'
 export { default as SiteErrorModal } from './lib/modal/SiteErrorModal.vue'
-export { default as SiteSaveErrorModal } from './lib/modal/SiteSaveErrorModal.vue'
 
 // toast
 export { default as AppToast } from './lib/toast/AppToast.vue'

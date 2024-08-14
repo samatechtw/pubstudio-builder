@@ -1,5 +1,6 @@
 import { IFrontendStore } from '@pubstudio/frontend/data-access-state'
 import { PSApi } from '@pubstudio/frontend/util-api'
+import { IApiError } from '@pubstudio/shared/type-api'
 import {
   IGetSiteUsageApiResponse,
   IGetSiteVersionApiRequest,
@@ -49,7 +50,7 @@ export const useSiteApi = (api: PSApi): IApiSite => {
     versionId: string,
     query?: IGetSiteVersionApiRequest,
   ): Promise<IGetSiteVersionApiResponse | undefined> => {
-    const res = await api.authRequest({
+    const res = await api.authRequest<IGetSiteVersionApiResponse | IApiError>({
       url: `sites/${siteId}/versions/${versionId}`,
       method: 'GET',
       params: query as RequestParams | undefined,
@@ -58,21 +59,25 @@ export const useSiteApi = (api: PSApi): IApiSite => {
       return undefined
     }
     const serialized = res.data as IGetSiteVersionApiResponse
-    return {
-      id: serialized.id,
-      name: serialized.name,
-      version: serialized.version,
-      context: JSON.parse(serialized.context),
-      defaults: JSON.parse(serialized.defaults),
-      editor: serialized.editor ? JSON.parse(serialized.editor) : undefined,
-      history: serialized.history ? JSON.parse(serialized.history) : undefined,
-      pages: JSON.parse(serialized.pages),
-      pageOrder: serialized.pageOrder ? JSON.parse(serialized.pageOrder) : undefined,
-      published: serialized.published,
-      disabled: serialized.disabled,
-      updated_at: serialized.updated_at,
-      content_updated_at: serialized.content_updated_at,
-      preview_id: serialized.preview_id,
+    if ('status' in res.data) {
+      throw res.data
+    } else {
+      return {
+        id: serialized.id,
+        name: serialized.name,
+        version: serialized.version,
+        context: JSON.parse(serialized.context),
+        defaults: JSON.parse(serialized.defaults),
+        editor: serialized.editor ? JSON.parse(serialized.editor) : undefined,
+        history: serialized.history ? JSON.parse(serialized.history) : undefined,
+        pages: JSON.parse(serialized.pages),
+        pageOrder: serialized.pageOrder ? JSON.parse(serialized.pageOrder) : undefined,
+        published: serialized.published,
+        disabled: serialized.disabled,
+        updated_at: serialized.updated_at,
+        content_updated_at: serialized.content_updated_at,
+        preview_id: serialized.preview_id,
+      }
     }
   }
 
@@ -140,28 +145,32 @@ export const useSiteApi = (api: PSApi): IApiSite => {
     payload: IUpdateSiteApiRequest,
     keepalive?: boolean,
   ): Promise<IUpdateSiteApiResponse> => {
-    const { data } = await api.authRequest({
+    const rsp = await api.authRequest<IGetSiteVersionApiResponse | IApiError>({
       url: `sites/${siteId}`,
       method: 'PATCH',
       data: payload,
       keepalive,
     })
-    const serialized = data as IGetSiteVersionApiResponse
-    return {
-      id: serialized.id,
-      name: serialized.name,
-      version: serialized.version,
-      context: JSON.parse(serialized.context),
-      defaults: JSON.parse(serialized.defaults),
-      editor: serialized.editor ? JSON.parse(serialized.editor) : undefined,
-      history: serialized.history ? JSON.parse(serialized.history) : undefined,
-      pages: JSON.parse(serialized.pages),
-      pageOrder: serialized.pageOrder ? JSON.parse(serialized.pageOrder) : undefined,
-      disabled: serialized.disabled,
-      published: serialized.published,
-      updated_at: serialized.updated_at,
-      content_updated_at: serialized.content_updated_at,
-      preview_id: serialized.preview_id,
+    const serialized = rsp.data as IGetSiteVersionApiResponse
+    if ('status' in rsp.data) {
+      throw rsp.data
+    } else {
+      return {
+        id: serialized.id,
+        name: serialized.name,
+        version: serialized.version,
+        context: JSON.parse(serialized.context),
+        defaults: JSON.parse(serialized.defaults),
+        editor: serialized.editor ? JSON.parse(serialized.editor) : undefined,
+        history: serialized.history ? JSON.parse(serialized.history) : undefined,
+        pages: JSON.parse(serialized.pages),
+        pageOrder: serialized.pageOrder ? JSON.parse(serialized.pageOrder) : undefined,
+        disabled: serialized.disabled,
+        published: serialized.published,
+        updated_at: serialized.updated_at,
+        content_updated_at: serialized.content_updated_at,
+        preview_id: serialized.preview_id,
+      }
     }
   }
 
