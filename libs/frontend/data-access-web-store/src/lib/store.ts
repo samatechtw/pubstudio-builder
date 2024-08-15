@@ -9,6 +9,12 @@ import { scratchSiteModule } from './scratch-site-store'
 import { siteModule } from './site-store'
 import { versionModule } from './version-store'
 
+declare global {
+  interface Window {
+    store: WebStore
+  }
+}
+
 export interface WebStore extends IFrontendStore {
   version: typeof versionModule
   site: typeof siteModule
@@ -24,3 +30,6 @@ export const store: WebStore = {
   site: siteModule,
   scratchSite: scratchSiteModule,
 }
+
+// Attach to window for debugging purposes
+window.store = store

@@ -21,6 +21,9 @@ module.exports = {
       },
     ],
   },
+  globals: {
+    window: {},
+  },
   moduleFileExtensions: ['ts', 'js'],
   setupFiles: ['jest-localstorage-mock'],
   setupFilesAfterEnv: ['./jest.setup.ts'],
