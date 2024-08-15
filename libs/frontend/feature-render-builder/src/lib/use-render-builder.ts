@@ -1,6 +1,6 @@
 /* eslint-disable vue/one-component-per-file */
 import { useThemeMenuFonts } from '@pubstudio/frontend/feature-build'
-import { IUseRender } from '@pubstudio/frontend/feature-render'
+import { getGlobalStyle, IUseRender } from '@pubstudio/frontend/feature-render'
 import {
   IUseRenderBuilderHelper,
   useRenderBuilderHelper,
@@ -83,9 +83,11 @@ export const useRenderBuilder = (
     let styleContent = ''
     let customContent = ''
     if (activePage.value && site.value) {
+      const globalStyle = getGlobalStyle(site.value.context)
       const pageStyle = getBuildPageStyle(site.value, activePage.value)
       customContent = rawStyleRecordToString(pageStyle.custom, site.value.context)
-      styleContent = rawStyleRecordToString(pageStyle.component, site.value.context)
+      styleContent =
+        globalStyle + rawStyleRecordToString(pageStyle.component, site.value.context)
     }
     return {
       component: h('style', styleContent),
