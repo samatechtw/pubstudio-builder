@@ -303,8 +303,12 @@ export const computePropsContent = (
   // in computeAttrsInputsMixins
   // Ignore HTML attrs in builder
   const attrs: Record<string, unknown> = {}
-  if (data.attrs.placeholder) {
-    attrs.placeholder = data.attrs.placeholder
+  if (component.tag === Tag.Input || component.tag === Tag.Textarea) {
+    for (const att of ['placeholder', 'rows', 'type']) {
+      if (data.attrs[att]) {
+        attrs[att] = data.attrs[att]
+      }
+    }
   }
   if (data.attrs.src) {
     attrs.src = data.attrs.src
