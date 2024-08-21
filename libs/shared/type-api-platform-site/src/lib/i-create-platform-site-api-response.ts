@@ -7,5 +7,4 @@ export interface ICreatePlatformSiteResponse {
   subdomain_record_id: string
   subdomain: string
   owner_id: string
-  custom_domains: string[]
 }

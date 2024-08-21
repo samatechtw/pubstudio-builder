@@ -1,4 +1,5 @@
 import { SiteType } from '@pubstudio/shared/type-api-platform-site'
+import { ICustomDomainRelationViewModel } from '@pubstudio/shared/type-api-shared'
 import {
   IGetSiteDomainsApiResponse,
   IListSitesApiResponse,
@@ -18,6 +19,7 @@ describe('Update Site Metadata', () => {
   let resetService: SiteApiResetService
   let adminAuth: string
   let ownerAuth: string
+  let domains: ICustomDomainRelationViewModel[]
   let payload: IUpdateSiteMetadataApiRequest
   let siteId: string
 
@@ -31,7 +33,11 @@ describe('Update Site Metadata', () => {
   beforeEach(async () => {
     await resetService.reset()
     siteId = '6d2c8359-6094-402c-bcbb-37202fd7c336'
-    payload = { domains: ['update-subdomain.dev.pubstud.io', 'shop.abc.com'] }
+    domains = [
+      { domain: 'update-subdomain.dev.pubstud.io', verified: true },
+      { domain: 'shop.abc.com', verified: false },
+    ]
+    payload = { domains }
   })
 
   describe('when requester is admin', () => {
@@ -219,17 +225,17 @@ describe('Update Site Metadata', () => {
     it('returns 400 when domains is invalid', () => {
       payload.domains = [
         // length > 10
-        'a1',
-        'a2',
-        'a3',
-        'a4',
-        'a5',
-        'a6',
-        'a7',
-        'a8',
-        'a9',
-        'a10',
-        'a11',
+        { domain: 'a1', verified: false },
+        { domain: 'a2', verified: false },
+        { domain: 'a3', verified: false },
+        { domain: 'a4', verified: false },
+        { domain: 'a5', verified: false },
+        { domain: 'a6', verified: false },
+        { domain: 'a7', verified: false },
+        { domain: 'a8', verified: false },
+        { domain: 'a9', verified: false },
+        { domain: 'a10', verified: false },
+        { domain: 'a11', verified: false },
       ]
       api
         .patch(`${testEndpoint}/${siteId}`)
@@ -241,7 +247,7 @@ describe('Update Site Metadata', () => {
           status: 400,
         })
 
-      payload.domains = ['1w1']
+      payload.domains = [{ domain: '1w1', verified: false }]
       api
         .patch(`${testEndpoint}/${siteId}`)
         .set('Authorization', adminAuth)

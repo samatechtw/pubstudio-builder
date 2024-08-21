@@ -1,7 +1,7 @@
 use axum::{extract::State, Json};
 use lib_shared_site_api::error::api_error::ApiError;
 use lib_shared_types::{
-    dto::site_api::site_metadata_viewmodel::SiteMetadataViewModel,
+    dto::site_api::site_metadata_viewmodel::{vec_from_entity, SiteMetadataViewModel},
     entity::site_api::site_metadata_entity::SiteMetadataEntity,
 };
 
@@ -18,7 +18,7 @@ fn to_api_response(metadata: Vec<SiteMetadataEntity>) -> Json<Vec<SiteMetadataVi
                 location: meta.location,
                 disabled: meta.disabled,
                 site_type: meta.site_type,
-                custom_domains: meta.domains,
+                custom_domains: vec_from_entity(meta.domains),
             })
             .collect(),
     )

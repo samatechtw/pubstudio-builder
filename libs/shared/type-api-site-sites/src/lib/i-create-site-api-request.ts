@@ -1,3 +1,5 @@
+import { ICustomDomainRelationViewModel } from '@pubstudio/shared/type-api-shared'
+
 export interface ICreateSiteApiRequest {
   id: string
   owner_id: string
@@ -11,6 +13,6 @@ export interface ICreateSiteApiRequest {
   pages: string
   pageOrder: string
   published: boolean
-  domains: string[]
+  domains: ICustomDomainRelationViewModel[]
   site_type: string
 }

@@ -1,6 +1,8 @@
 use super::api_error::ApiError;
 
-use lib_shared_types::error::api_error::ApiErrorCode;
+use lib_shared_types::{
+    dto::site_api::site_metadata_viewmodel::CustomDomainViewModel, error::api_error::ApiErrorCode,
+};
 use regex::Regex;
 use validator::ValidationErrors;
 
@@ -58,6 +60,10 @@ pub fn validate_subdomain(subdomain: &str, is_admin: bool) -> Result<(), ApiErro
     }
 
     Ok(())
+}
+
+pub fn domain_strings(domains: &Vec<CustomDomainViewModel>) -> Vec<String> {
+    domains.iter().map(|d| d.domain.clone()).collect()
 }
 
 pub fn validate_custom_domains(custom_domains: &Vec<String>) -> Result<(), ApiError> {

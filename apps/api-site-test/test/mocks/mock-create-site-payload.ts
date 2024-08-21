@@ -13,6 +13,6 @@ export const mockCreateSitePayload = (): ICreateSiteApiRequest => ({
   history: '{"some":"stringified_json"}',
   pages: '{"some":"stringified_json"}',
   pageOrder: '["some"]',
-  domains: ['test-subdomain'],
+  domains: [{ domain: 'test-subdomain', verified: true }],
   site_type: 'Free',
 })

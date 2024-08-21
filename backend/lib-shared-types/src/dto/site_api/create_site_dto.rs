@@ -6,6 +6,8 @@ use serde::{Deserialize, Serialize};
 use serde_json;
 use validator::Validate;
 
+use super::site_metadata_viewmodel::CustomDomainViewModel;
+
 #[derive(Debug, Clone, Deserialize, Serialize, Validate)]
 #[serde(deny_unknown_fields)]
 pub struct CreateSiteDto {
@@ -26,7 +28,7 @@ pub struct CreateSiteDto {
     #[serde(rename = "pageOrder")]
     pub page_order: serde_json::Value,
     pub published: bool,
-    pub domains: Vec<String>,
+    pub domains: Vec<CustomDomainViewModel>,
     pub site_type: SiteType,
 }
 

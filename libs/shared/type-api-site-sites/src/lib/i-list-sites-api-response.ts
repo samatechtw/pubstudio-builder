@@ -1,3 +1,5 @@
+import { ICustomDomainRelationViewModel } from '@pubstudio/shared/type-api-shared'
+
 export interface ISiteMetadata {
   id: string
   owner_email: string
@@ -5,7 +7,7 @@ export interface ISiteMetadata {
   disabled: boolean
   location: string
   site_type: string
-  custom_domains: string[]
+  custom_domains: ICustomDomainRelationViewModel[]
 }
 
 export type IListSitesApiResponse = ISiteMetadata[]

@@ -34,9 +34,9 @@ describe('Get Site Domains', () => {
     const body: IGetSiteDomainsApiResponse = response.body
 
     expect(body.domains).toEqual([
-      'www.myblog.org',
-      'user1-site3.localhost',
-      `user1-site2-subdomain.${execEnv}.pubstud.io`,
+      { domain: 'www.myblog.org', verified: false },
+      { domain: 'user1-site3.localhost', verified: false },
+      { domain: `user1-site2-subdomain.${execEnv}.pubstud.io`, verified: false },
     ])
   })
 
