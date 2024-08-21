@@ -61,17 +61,17 @@ describe('Create Site', () => {
     it('when custom_domains is invalid', () => {
       payload.domains = [
         // length > 10
-        'a1',
-        'a2',
-        'a3',
-        'a4',
-        'a5',
-        'a6',
-        'a7',
-        'a8',
-        'a9',
-        'a10',
-        'a11',
+        { domain: 'a1', verified: false },
+        { domain: 'a2', verified: false },
+        { domain: 'a3', verified: false },
+        { domain: 'a4', verified: false },
+        { domain: 'a5', verified: false },
+        { domain: 'a6', verified: false },
+        { domain: 'a7', verified: false },
+        { domain: 'a8', verified: false },
+        { domain: 'a9', verified: false },
+        { domain: 'a10', verified: false },
+        { domain: 'a11', verified: false },
       ]
       api.post(testEndpoint).set('Authorization', adminAuth).send(payload).expect(400, {
         code: 'InvalidFormData',
@@ -79,7 +79,7 @@ describe('Create Site', () => {
         status: 400,
       })
 
-      payload.domains = ['1w1']
+      payload.domains = [{ domain: '1w1', verified: false }]
       api.post(testEndpoint).set('Authorization', adminAuth).send(payload).expect(400, {
         code: 'InvalidFormData',
         message:

@@ -2,13 +2,15 @@ use serde::{Deserialize, Serialize};
 
 use crate::{dto::site_api::update_metadata_dto::UpdateSiteMetadataDto, shared::site::SiteType};
 
+use super::custom_domain_entity::{vec_from_viewmodel, CustomDomainRelationEntity};
+
 #[derive(Deserialize, Serialize, Clone, Debug)]
 pub struct SiteMetadataEntity {
     pub id: String,
     pub location: String,
     pub owner_id: String,
     pub owner_email: String,
-    pub domains: Vec<String>,
+    pub domains: Vec<CustomDomainRelationEntity>,
     pub site_type: SiteType,
     pub disabled: bool,
     pub custom_data_usage: i64,
@@ -19,7 +21,7 @@ pub struct UpdateSiteMetadataEntity {
     pub owner_email: Option<String>,
     pub owner_id: Option<String>,
     pub disabled: Option<bool>,
-    pub domains: Option<Vec<String>>,
+    pub domains: Option<Vec<CustomDomainRelationEntity>>,
     pub custom_data_usage: Option<i64>,
 }
 
@@ -43,7 +45,7 @@ impl From<UpdateSiteMetadataDto> for UpdateSiteMetadataEntity {
             owner_email: value.owner_email,
             owner_id: value.owner_id,
             disabled: value.disabled,
-            domains: value.domains,
+            domains: value.domains.and_then(|d| Some(vec_from_viewmodel(d))),
             custom_data_usage: None,
         }
     }

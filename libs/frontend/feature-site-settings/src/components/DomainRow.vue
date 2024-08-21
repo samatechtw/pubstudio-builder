@@ -24,6 +24,11 @@
       <div class="edit-item">
         <Edit class="edit-icon" @click="edit" />
       </div>
+      <Reload
+        v-if="domain && !domain.verified"
+        class="item-verify"
+        @click="emit('verify', domain.domain)"
+      />
       <Minus class="item-delete" @click.stop="removeDomain" />
     </div>
   </div>
@@ -32,14 +37,15 @@
 <script lang="ts" setup>
 import { onMounted, ref, toRefs, watch } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
-import { Check, Edit, Minus, PSInput } from '@pubstudio/frontend/ui-widgets'
+import { Check, Edit, Minus, PSInput, Reload } from '@pubstudio/frontend/ui-widgets'
+import { ICustomDomainRelationViewModel } from '@pubstudio/shared/type-api-shared'
 
 const { t } = useI18n()
 
 const props = withDefaults(
   defineProps<{
     editing?: boolean
-    domain?: string
+    domain?: ICustomDomainRelationViewModel
   }>(),
   {
     domain: undefined,
@@ -50,6 +56,7 @@ const { editing, domain } = toRefs(props)
 const emit = defineEmits<{
   (e: 'edit', domain: string): void
   (e: 'update', newDomain: string | undefined): void
+  (e: 'verify', domain: string): void
   (e: 'remove'): void
 }>()
 
@@ -60,7 +67,7 @@ const errorMessage = ref()
 function propOrNewDomain(): string {
   if (domain?.value) {
     // Use destructing assignment to prevent Ref from being passed by reference
-    return domain.value
+    return domain.value.domain
   }
   return ''
 }

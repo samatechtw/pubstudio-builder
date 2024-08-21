@@ -1,4 +1,7 @@
-import { SiteCheckoutState } from '@pubstudio/shared/type-api-shared'
+import {
+  ICustomDomainRelationViewModel,
+  SiteCheckoutState,
+} from '@pubstudio/shared/type-api-shared'
 import { SitePaymentPeriod } from './enum-site-payment-period'
 import { SiteType } from './enum-site-type'
 
@@ -23,7 +26,7 @@ export interface ISiteViewModel {
   subdomain: string
   site_server: ISiteServerRelationViewModel
   checkout?: ISiteCheckoutRelationViewModel
-  custom_domains: string[]
+  custom_domains: ICustomDomainRelationViewModel[]
   created_at: Date
   updated_at: Date
 }

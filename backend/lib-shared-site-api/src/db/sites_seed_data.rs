@@ -2,14 +2,34 @@ use std::str::FromStr;
 
 use chrono::{DateTime, Duration, Utc};
 use lib_shared_types::{
-    dto::site_api::create_site_dto::CreateSiteDto,
+    dto::site_api::{
+        create_site_dto::CreateSiteDto, site_metadata_viewmodel::CustomDomainViewModel,
+    },
+    entity::site_api::custom_domain_entity::CustomDomainRelationEntity,
     shared::{core::ExecEnv, site::SiteType},
 };
+use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use crate::util::domains::merge_domains;
 
-use super::entity::platform_site_entity::PlatformSiteEntity;
+// Distinct from `PlatformSiteEntity` since it includes `custom_domains`
+#[derive(Debug, Deserialize, Serialize)]
+pub struct PlatformSiteSeed {
+    pub id: Uuid,
+    pub name: String,
+    pub site_server_id: Uuid,
+    pub owner_id: Uuid,
+    #[serde(rename = "type")]
+    pub site_type: SiteType,
+    pub published: bool,
+    pub disabled: bool,
+    pub subdomain: String,
+    pub subdomain_record_id: String,
+    pub custom_domains: Vec<CustomDomainRelationEntity>,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
+}
 
 pub const SITE_SEED_VERSION: &str = "0.1";
 pub const SITE_SEED_DEFAULTS: &str = r##"{"head":{},"homePage":"/home"}"##;
@@ -69,16 +89,22 @@ pub fn sites_seed_data(exec_env: ExecEnv) -> Vec<CreateSiteDto> {
                     seed.custom_domains,
                     &seed.subdomain,
                     &format!("{}.pubstud.io", exec_env),
-                ),
+                )
+                .iter()
+                .map(|d| CustomDomainViewModel {
+                    domain: d.clone(),
+                    verified: false,
+                })
+                .collect(),
             }
         })
         .collect()
 }
 
-pub fn platform_sites_seed_data() -> Vec<PlatformSiteEntity> {
+pub fn platform_sites_seed_data() -> Vec<PlatformSiteSeed> {
     root_seed_data()
         .into_iter()
-        .map(|seed| PlatformSiteEntity {
+        .map(|seed| PlatformSiteSeed {
             id: seed.id,
             name: seed.name,
             site_server_id: seed.site_server_id,
@@ -88,7 +114,14 @@ pub fn platform_sites_seed_data() -> Vec<PlatformSiteEntity> {
             disabled: seed.disabled,
             subdomain_record_id: seed.subdomain_record_id,
             subdomain: seed.subdomain,
-            custom_domains: seed.custom_domains,
+            custom_domains: seed
+                .custom_domains
+                .into_iter()
+                .map(|d| CustomDomainRelationEntity {
+                    domain: d,
+                    verified: false,
+                })
+                .collect(),
             created_at: seed.created_at,
             updated_at: seed.updated_at,
         })

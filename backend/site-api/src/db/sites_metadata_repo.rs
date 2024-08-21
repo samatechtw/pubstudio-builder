@@ -2,7 +2,10 @@ use axum::async_trait;
 use lib_shared_site_api::db::{db_error::DbError, util::append_comma};
 use lib_shared_types::{
     dto::site_api::create_metadata_dto::CreateSiteMetadataDto,
-    entity::site_api::site_metadata_entity::{SiteMetadataEntity, UpdateSiteMetadataEntity},
+    entity::site_api::{
+        custom_domain_entity::CustomDomainRelationEntity,
+        site_metadata_entity::{SiteMetadataEntity, UpdateSiteMetadataEntity},
+    },
     shared::site::SiteType,
 };
 use sqlx::{
@@ -44,7 +47,7 @@ pub trait SitesMetadataRepoTrait {
         &self,
         tx: &mut Transaction<'_, Sqlite>,
         id: &str,
-        domains: &Vec<String>,
+        domains: &Vec<CustomDomainRelationEntity>,
     ) -> Result<(), Error>;
     async fn get_site_id_by_hostname(&self, hostname: &str) -> Result<String, Error>;
     async fn reset(&self) -> Result<(), Error>;
@@ -61,7 +64,17 @@ fn row_to_site_metadata(row: SqliteRow) -> Result<SiteMetadataEntity, Error> {
         location: row.try_get("location")?,
         owner_id: row.try_get("owner_id")?,
         owner_email: row.try_get("owner_email")?,
-        domains: domains.split(",").map(|d| d.to_string()).collect(),
+        domains: domains
+            .split(",")
+            .map(|r| {
+                let d: Vec<&str> = r.split("|").collect();
+                let verified = d.get(1).unwrap_or(&"0") == &"1";
+                CustomDomainRelationEntity {
+                    domain: d[0].into(),
+                    verified,
+                }
+            })
+            .collect(),
         site_type: row.try_get("site_type")?,
         disabled: row.try_get("disabled")?,
         custom_data_usage: row.try_get("custom_data_usage")?,
@@ -108,7 +121,7 @@ impl SitesMetadataRepoTrait for SitesMetadataRepo {
         let site: SiteMetadataEntity = sqlx::query(
             r#"
         SELECT s.id, s.location, s.owner_id, s.owner_email, s.site_type, s.disabled, s.custom_data_usage,
-            GROUP_CONCAT(d.domain) as domains
+            GROUP_CONCAT(d.domain || '|' || d.verified) as domains
         FROM sites s
         LEFT OUTER JOIN domains d ON d.site_id = s.id
         WHERE s.id = ?1
@@ -125,7 +138,7 @@ impl SitesMetadataRepoTrait for SitesMetadataRepo {
         let sites: Vec<SiteMetadataEntity> = sqlx::query(
             r#"
         SELECT s.id, s.location, s.owner_id, s.owner_email, s.site_type, s.disabled, s.custom_data_usage,
-            GROUP_CONCAT(d.domain) as domains
+            GROUP_CONCAT(d.domain || '|' || d.verified) as domains
         FROM sites s
         LEFT OUTER JOIN domains d ON d.site_id = s.id
         GROUP BY d.site_id
@@ -224,7 +237,7 @@ impl SitesMetadataRepoTrait for SitesMetadataRepo {
         &self,
         tx: &mut Transaction<'_, Sqlite>,
         id: &str,
-        domains: &Vec<String>,
+        domains: &Vec<CustomDomainRelationEntity>,
     ) -> Result<(), Error> {
         sqlx::query(
             r#"
@@ -236,11 +249,13 @@ impl SitesMetadataRepoTrait for SitesMetadataRepo {
         .await?;
 
         let mut query: QueryBuilder<'_, Sqlite> =
-            QueryBuilder::new("INSERT INTO domains ( domain, site_id )  VALUES ");
+            QueryBuilder::new("INSERT INTO domains ( domain, verified, site_id )  VALUES ");
         let mut domain_it = domains.iter().peekable();
         while let Some(domain) = domain_it.next() {
             query.push("(");
-            query.push_bind(domain);
+            query.push_bind(domain.domain.clone());
+            query.push(", ");
+            query.push_bind(domain.verified);
             query.push(", ");
             query.push_bind(id);
             if domain_it.peek().is_none() {

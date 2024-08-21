@@ -4,11 +4,15 @@ use axum::{
 };
 use lib_shared_site_api::{
     cache::cache::SiteMetadata,
-    error::{api_error::ApiError, helpers::validate_custom_domains},
+    error::{
+        api_error::ApiError,
+        helpers::{domain_strings, validate_custom_domains},
+    },
     util::json_extractor::PsJson,
 };
 use lib_shared_types::{
     dto::site_api::update_metadata_dto::UpdateSiteMetadataDto,
+    entity::site_api::custom_domain_entity::vec_from_viewmodel,
     shared::user::{RequestUser, UserType},
 };
 
@@ -30,7 +34,7 @@ pub async fn update_site_metadata(
     }
 
     if let Some(domains) = &dto.domains {
-        validate_custom_domains(domains)?;
+        validate_custom_domains(&domain_strings(domains))?;
     }
 
     let mut tx = context
@@ -68,17 +72,21 @@ pub async fn update_site_metadata(
             .await;
     }
 
-    if let Some(domains) = &dto.domains {
+    if let Some(domains) = dto.domains {
+        let domain_models = vec_from_viewmodel(domains);
         context
             .metadata_repo
-            .set_site_domains(&mut tx, &id, domains)
+            .set_site_domains(&mut tx, &id, &domain_models)
             .await
             .map_err(|e| {
                 ApiError::internal_error().message(format!("Failed to save domains: {}", e))
             })?;
 
         // Update domain -> site_id mapping
-        context.cache.update_site_domains(&id, domains).await
+        context
+            .cache
+            .update_site_domains(&id, &domain_models.into_iter().map(|d| d.domain).collect())
+            .await
     }
 
     tx.commit().await.map_err(|e| {

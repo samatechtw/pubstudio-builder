@@ -1,5 +1,6 @@
 use chrono::{DateTime, Utc};
 use lib_shared_types::{
+    entity::site_api::custom_domain_entity::CustomDomainRelationEntity,
     platform::site_checkout_state::SiteCheckoutState,
     shared::site::{SitePaymentPeriod, SiteType},
 };
@@ -31,7 +32,6 @@ pub struct PlatformSiteEntity {
     pub disabled: bool,
     pub subdomain: String,
     pub subdomain_record_id: String,
-    pub custom_domains: Vec<String>,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
 }
@@ -47,7 +47,7 @@ pub struct GetPlatformSiteEntity {
     pub disabled: bool,
     pub subdomain: String,
     pub subdomain_record_id: String,
-    pub custom_domains: Vec<String>,
+    pub custom_domains: Vec<CustomDomainRelationEntity>,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
     // Relations

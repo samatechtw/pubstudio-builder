@@ -1,7 +1,9 @@
 use axum::http::StatusCode;
 use axum::{extract::State, Json};
 use lib_shared_site_api::error::api_error::ApiError;
-use lib_shared_site_api::error::helpers::{check_bad_form, validate_custom_domains};
+use lib_shared_site_api::error::helpers::{
+    check_bad_form, domain_strings, validate_custom_domains,
+};
 use lib_shared_site_api::util::json_extractor::PsJson;
 use lib_shared_types::dto::site_api::create_metadata_dto::CreateSiteMetadataDto;
 use lib_shared_types::dto::site_api::create_site_dto::CreateSiteResponse;
@@ -22,7 +24,7 @@ async fn create_site_from_backup_helper(
     let site_type = dto.site_type.clone();
 
     let domains = &dto.domains.clone();
-    validate_custom_domains(domains)?;
+    validate_custom_domains(&domain_strings(domains))?;
 
     let site_id = dto.site_id.clone();
     let metadata_dto: CreateSiteMetadataDto = (&dto).into();
@@ -52,7 +54,10 @@ async fn create_site_from_backup_helper(
 
     // Add an in-memory cache to the app
     for domain in domains {
-        context.cache.insert_domain_mapping(&site_id, domain).await;
+        context
+            .cache
+            .insert_domain_mapping(&site_id, &domain.domain)
+            .await;
     }
     let size = site.calculate_site_size();
     context

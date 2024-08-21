@@ -42,8 +42,8 @@ describe('List Sites', () => {
       expect(body.disabled).toEqual(false)
       expect(body.site_type).toEqual(SiteType.Paid2)
       expect(body.custom_domains).toEqual([
-        'test3.localhost',
-        `user1-site3-subdomain.${execEnv}.pubstud.io`,
+        { domain: 'test3.localhost', verified: false },
+        { domain: `user1-site3-subdomain.${execEnv}.pubstud.io`, verified: false },
       ])
     })
   })

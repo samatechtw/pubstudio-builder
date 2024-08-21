@@ -3,7 +3,9 @@ use axum::{
     Json,
 };
 use lib_shared_site_api::error::api_error::ApiError;
-use lib_shared_types::dto::site_api::site_metadata_viewmodel::SiteMetadataViewModel;
+use lib_shared_types::dto::site_api::site_metadata_viewmodel::{
+    vec_from_entity, SiteMetadataViewModel,
+};
 
 use crate::api_context::ApiContext;
 
@@ -24,6 +26,6 @@ pub async fn get_site_metadata(
         location: meta.location,
         disabled: meta.disabled,
         site_type: meta.site_type,
-        custom_domains: meta.domains,
+        custom_domains: vec_from_entity(meta.domains),
     }))
 }
