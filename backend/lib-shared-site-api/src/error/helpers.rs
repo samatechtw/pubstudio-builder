@@ -20,7 +20,7 @@ pub fn validate_integer(str: &str) -> Result<(), ApiError> {
 
 pub fn validate_subdomain(subdomain: &str, is_admin: bool) -> Result<(), ApiError> {
     // Validate if it contains only lowercase characters, numbers, and dashes, and starts with a lowercase character
-    validate_domain(subdomain).map_err(|e| {
+    validate_domain_helper(subdomain).map_err(|e| {
         ApiError::bad_request()
             .code(ApiErrorCode::InvalidFormData)
             .message(format!("{} {}", "Subdomain", e.to_string()))
@@ -68,18 +68,22 @@ pub fn domain_strings(domains: &Vec<CustomDomainViewModel>) -> Vec<String> {
 
 pub fn validate_custom_domains(custom_domains: &Vec<String>) -> Result<(), ApiError> {
     for domain in custom_domains {
-        let domain_without_dot = domain.replace('.', "");
-        validate_domain(&domain_without_dot).map_err(|e| {
-            ApiError::bad_request()
-                .code(ApiErrorCode::InvalidFormData)
-                .message(format!("{} {}", "Custom domains", e.to_string()))
-        })?;
+        validate_domain(domain)?;
     }
     Ok(())
 }
 
-fn validate_domain(value: &str) -> Result<(), &str> {
-    let pattern = Regex::new(r"^[a-z][a-z0-9-]*$").unwrap();
+pub fn validate_domain(domain: &str) -> Result<(), ApiError> {
+    let domain_without_dot = domain.replace('.', "");
+    validate_domain_helper(&domain_without_dot).map_err(|e| {
+        ApiError::bad_request()
+            .code(ApiErrorCode::InvalidFormData)
+            .message(format!("{} {}", "Custom domains", e.to_string()))
+    })
+}
+
+pub fn validate_domain_helper(value: &str) -> Result<(), &str> {
+    let pattern = Regex::new(r"^[a-z][a-z0-9-:]*$").unwrap();
 
     if pattern.is_match(value) {
         Ok(())
