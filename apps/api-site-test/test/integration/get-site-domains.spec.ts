@@ -35,7 +35,7 @@ describe('Get Site Domains', () => {
 
     expect(body.domains).toEqual([
       { domain: 'www.myblog.org', verified: false },
-      { domain: 'user1-site3.localhost', verified: false },
+      { domain: 'user1-site2.localhost', verified: false },
       { domain: `user1-site2-subdomain.${execEnv}.pubstud.io`, verified: false },
     ])
   })
