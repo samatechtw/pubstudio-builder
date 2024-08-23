@@ -1,8 +1,4 @@
-import {
-  IApiPlatformSite,
-  useLocalSiteApi,
-  usePlatformSiteApi,
-} from '@pubstudio/frontend/data-access-api'
+import { useLocalSiteApi, usePlatformSiteApi } from '@pubstudio/frontend/data-access-api'
 import {
   ApiInjectionKey,
   StoreInjectionKey,
@@ -15,6 +11,7 @@ import {
   toApiError,
 } from '@pubstudio/frontend/util-api'
 import { siteNameValid } from '@pubstudio/frontend/util-validate'
+import { IApiPlatformSite } from '@pubstudio/shared/type-api-interfaces'
 import { IUpdateLocalSiteApiRequest } from '@pubstudio/shared/type-api-local-site'
 import {
   ICreatePlatformSiteRequest,

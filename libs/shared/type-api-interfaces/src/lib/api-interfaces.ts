@@ -75,6 +75,9 @@ export interface IApiPlatformSite {
   listSites: (params: IListPlatformSitesRequest) => Promise<IListPlatformSitesResponse>
   getSite(siteId: string): Promise<IGetPlatformSiteApiResponse>
   deleteSite(siteId: string): Promise<void>
+  addSiteDomain(siteId: string, domain: string): Promise<void>
+  deleteSiteDomain(siteId: string, domain: string): Promise<void>
+  verifySiteDomain(siteId: string, domain: string): Promise<void>
 }
 
 export interface IOptimizationParams extends IImageJobConfig {
