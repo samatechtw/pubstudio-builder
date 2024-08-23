@@ -1,14 +1,14 @@
 <template>
   <div class="custom-domains-wrap">
-    <div class="custom-domains">
+    <div class="custom-domains" :class="{ updating }">
       <div class="custom-title">
         <div class="label">
           {{ t('sites.custom') }}
         </div>
         <Plus
-          v-if="newDomain === undefined && editDomainIndex === undefined"
+          v-if="newDomain === undefined"
           class="item-add"
-          @click="newDomain = ''"
+          @click="emit('setNewDomain', '')"
         />
       </div>
       <div class="custom-explainer">
@@ -21,74 +21,66 @@
           {{ t('read') }}
         </a>
       </div>
-      <div
-        v-if="updatedDomains?.length === 0 && newDomain === undefined"
-        class="no-domains"
-      >
+      <div v-if="domains?.length === 0 && newDomain === undefined" class="no-domains">
         {{ t('sites.no_domains') }}
       </div>
       <DomainRow
         v-if="newDomain !== undefined"
         :editing="true"
         class="new-domain menu-row"
-        @update="updateDomain(-1, $event)"
-        @verify="verifyDomain(-1)"
-        @remove="newDomain = undefined"
+        @save="addDomain($event)"
+        @remove="emit('setNewDomain', undefined)"
       />
       <DomainRow
-        v-for="(domain, index) in updatedDomains"
-        :key="domain"
-        :domain="domain"
-        :editing="editDomainIndex === index"
+        v-for="d in domains"
+        :key="d.domain"
+        :domain="d"
+        :verifying="d.domain === verifying"
         class="menu-row"
-        @edit="editDomainIndex = index"
-        @update="updateDomain(index, $event)"
-        @verify="verifyDomain(index)"
-        @remove="updateDomain(index, undefined)"
+        @verify="verifyDomain(d.domain)"
+        @remove="removeDomain(d.domain)"
       />
+    </div>
+    <div v-if="updating" class="domains-updating">
+      <Spinner :size="20" color="#2a17d6" />
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
+import { toRefs } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
-import { toRefs, watch } from 'vue'
-import { useEditDomains } from '../lib/use-edit-domains'
+import { Plus, Spinner } from '@pubstudio/frontend/ui-widgets'
+import { ICustomDomainRelationViewModel } from '@pubstudio/shared/type-api-shared'
 import DomainRow from './DomainRow.vue'
-import { Plus } from '@pubstudio/frontend/ui-widgets'
 
 const { t } = useI18n()
 
 const props = defineProps<{
-  initialDomains: string[] | undefined
+  domains: ICustomDomainRelationViewModel[] | undefined
+  newDomain: string | undefined
+  updating: string | undefined
+  verifying: string | undefined
 }>()
-const { initialDomains } = toRefs(props)
+const { domains } = toRefs(props)
 
 const emit = defineEmits<{
-  (e: 'updateDomains', domains: string[] | undefined): void
+  (e: 'setNewDomain', domain: string | undefined): void
+  (e: 'addDomain', domain: string): void
+  (e: 'deleteDomain', domain: string): void
+  (e: 'verifyDomain', domain: string): void
 }>()
 
-const {
-  updatedDomains,
-  newDomain,
-  editDomainIndex,
-  setCustomDomain,
-  verifyCustomDomain,
-} = useEditDomains()
-
-updatedDomains.value = [...(initialDomains.value ?? [])]
-
-watch(initialDomains, (domains) => {
-  updatedDomains.value = domains
-})
-
-const updateDomain = (index: number, domain: string | undefined) => {
-  setCustomDomain(index, domain)
-  emit('updateDomains', updatedDomains.value)
+const addDomain = (domain: string) => {
+  emit('addDomain', domain)
 }
 
-const verifyDomain = (index: number) => {
-  verifyCustomDomain(index)
+const removeDomain = (domain: string) => {
+  emit('deleteDomain', domain)
+}
+
+const verifyDomain = (domain: string) => {
+  emit('verifyDomain', domain)
 }
 </script>
 
@@ -105,6 +97,11 @@ const verifyDomain = (index: number) => {
   width: 100%;
   margin: 16px auto 0;
   max-width: 360px;
+  position: relative;
+}
+.domains-updating {
+  @mixin overlay;
+  @mixin flex-center;
 }
 .custom-title {
   @mixin title-bold 14px;
@@ -129,6 +126,9 @@ const verifyDomain = (index: number) => {
 }
 .custom-domains {
   width: 100%;
+  &.updating {
+    opacity: 0.4;
+  }
 }
 .menu-subtitle {
   max-width: 200px;

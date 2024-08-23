@@ -16,28 +16,31 @@
       <Minus class="item-delete" @click.stop="removeDomain" />
     </div>
   </div>
-  <div v-else class="domain">
+  <div v-else-if="domain" class="domain">
     <div class="label">
-      {{ domain }}
+      {{ domain.domain }}
     </div>
     <div class="item">
-      <div class="edit-item">
-        <Edit class="edit-icon" @click="edit" />
-      </div>
-      <Reload
-        v-if="domain && !domain.verified"
+      <Spinner v-if="verifying" color="#2a17d6" class="verifying" />
+      <div
+        v-else-if="!domain!.verified"
         class="item-verify"
-        @click="emit('verify', domain.domain)"
-      />
+        @click="emit('verify', domain!.domain)"
+      >
+        {{ t('verify') }}
+      </div>
+      <div v-else class="verified">
+        {{ t('verified') }}
+      </div>
       <Minus class="item-delete" @click.stop="removeDomain" />
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref, toRefs, watch } from 'vue'
+import { onMounted, ref, toRefs } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
-import { Check, Edit, Minus, PSInput, Reload } from '@pubstudio/frontend/ui-widgets'
+import { Check, Minus, PSInput, Reload, Spinner } from '@pubstudio/frontend/ui-widgets'
 import { ICustomDomainRelationViewModel } from '@pubstudio/shared/type-api-shared'
 
 const { t } = useI18n()
@@ -45,17 +48,17 @@ const { t } = useI18n()
 const props = withDefaults(
   defineProps<{
     editing?: boolean
+    verifying?: boolean
     domain?: ICustomDomainRelationViewModel
   }>(),
   {
     domain: undefined,
   },
 )
-const { editing, domain } = toRefs(props)
+const { editing, domain, verifying } = toRefs(props)
 
 const emit = defineEmits<{
-  (e: 'edit', domain: string): void
-  (e: 'update', newDomain: string | undefined): void
+  (e: 'save', newDomain: string): void
   (e: 'verify', domain: string): void
   (e: 'remove'): void
 }>()
@@ -72,29 +75,19 @@ function propOrNewDomain(): string {
   return ''
 }
 
-const edit = async () => {
-  newDomain.value = propOrNewDomain()
-  emit('edit', newDomain.value)
-}
-
-watch(editing, () => {
-  if (editing.value) {
-    errorMessage.value = undefined
-    valueInputRef.value?.inputRef.focus()
-  }
-})
-
 const emitUpdate = () => {
-  const valid = /^.+?\..+$/.test(newDomain.value)
+  const valid = /^.+?[.:].+$/.test(newDomain.value)
   if (valid) {
-    emit('update', newDomain.value || undefined)
+    emit('save', newDomain.value)
   } else {
     errorMessage.value = t('errors.invalid_domain')
   }
 }
 
 const removeDomain = () => {
-  emit('remove')
+  if (!verifying.value) {
+    emit('remove')
+  }
 }
 
 onMounted(() => {
@@ -112,11 +105,6 @@ onMounted(() => {
   font-size: 14px;
   padding: 8px 0;
 }
-.domain-row {
-  :deep(.ps-multiselect:hover) {
-    border: 1px solid $color-primary;
-  }
-}
 
 .item {
   display: flex;
@@ -125,12 +113,21 @@ onMounted(() => {
   overflow: hidden;
 }
 
-.edit-item {
-  margin-left: auto;
-  overflow: hidden;
-  .edit-icon {
-    flex-shrink: 0;
-  }
+.item-verify,
+.verified {
+  @mixin caption;
+  font-weight: medium;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  flex-shrink: 0;
+  color: $purple-500;
+}
+.verified {
+  color: $green-700;
+}
+
+.item-delete {
+  margin-left: 10px;
 }
 
 .label {

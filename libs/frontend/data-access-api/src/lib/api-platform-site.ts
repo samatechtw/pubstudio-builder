@@ -1,6 +1,7 @@
 import { PSApi } from '@pubstudio/frontend/util-api'
 import { IApiPlatformSite } from '@pubstudio/shared/type-api-interfaces'
 import {
+  ICreateDomainApiRequest,
   ICreatePlatformSiteRequest,
   ICreatePlatformSiteResponse,
   IGetPlatformSiteApiResponse,
@@ -73,6 +74,33 @@ export const usePlatformSiteApi = (api: PSApi): IApiPlatformSite => {
     })
   }
 
+  const addSiteDomain = async (siteId: string, domain: string): Promise<void> => {
+    const payload: ICreateDomainApiRequest = { domain }
+    await api.authRequest({
+      url: `sites/${siteId}/domains`,
+      method: 'POST',
+      data: payload,
+    })
+  }
+
+  const deleteSiteDomain = async (siteId: string, domain: string): Promise<void> => {
+    const payload: ICreateDomainApiRequest = { domain }
+    await api.authRequest({
+      url: `sites/${siteId}/domains`,
+      method: 'DELETE',
+      data: payload,
+    })
+  }
+
+  const verifySiteDomain = async (siteId: string, domain: string): Promise<void> => {
+    const payload: ICreateDomainApiRequest = { domain }
+    await api.authRequest({
+      url: `sites/${siteId}/domains/actions/verify`,
+      method: 'POST',
+      data: payload,
+    })
+  }
+
   return {
     createSite,
     updateSite,
@@ -80,5 +108,8 @@ export const usePlatformSiteApi = (api: PSApi): IApiPlatformSite => {
     listSites,
     getSite,
     deleteSite,
+    addSiteDomain,
+    deleteSiteDomain,
+    verifySiteDomain,
   }
 }

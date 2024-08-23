@@ -33,7 +33,6 @@ pub enum ApiErrorCode {
     SiteDataLenExceeded,
     SiteDisabled,
     SiteCheckoutNotActive,
-    DomainUnverified,
     DomainLimitExceeded,
     DomainExists,
     DomainVerifyFailed,
