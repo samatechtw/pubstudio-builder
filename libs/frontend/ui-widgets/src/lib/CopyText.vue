@@ -11,17 +11,23 @@ import { Copy } from '@pubstudio/frontend/ui-widgets'
 import { useI18n } from 'petite-vue-i18n'
 import IconTooltip from './IconTooltip.vue'
 
-const props = defineProps<{
-  text: string
-}>()
-const { text } = toRefs(props)
+const props = withDefaults(
+  defineProps<{
+    text: string
+    tooltip?: string
+  }>(),
+  {
+    tooltip: 'copy_text',
+  },
+)
+const { text, tooltip } = toRefs(props)
 
 const { t } = useI18n()
 
-const tip = ref(t('copy_text'))
+const tip = ref(t(tooltip.value))
 
 const mouseEnter = () => {
-  tip.value = t('copy_text')
+  tip.value = t(tooltip.value)
 }
 
 const copyText = () => {
