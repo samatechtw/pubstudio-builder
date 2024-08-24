@@ -11,15 +11,52 @@
           @click="emit('setNewDomain', '')"
         />
       </div>
-      <div class="custom-explainer">
-        <span>{{ t('sites.custom_explainer') }}</span>
-        <a
-          target="_blank"
-          href="https://blog.pubstud.io/custom-domains"
-          class="read-more"
-        >
-          {{ t('read') }}
-        </a>
+      <div v-if="server" class="custom-explainer">
+        <div class="explainer-text">
+          <span>{{ t('sites.custom_explainer') }}</span>
+          <a
+            target="_blank"
+            href="https://blog.pubstud.io/custom-domains"
+            class="read-more"
+          >
+            {{ t('read') }}
+          </a>
+        </div>
+        <div class="dns-row row-title">
+          <div class="name">
+            {{ t('name') }}
+          </div>
+          <div class="type">
+            {{ t('type') }}
+          </div>
+          <div class="value">
+            {{ t('value') }}
+          </div>
+        </div>
+        <div v-if="server.ip_address" class="dns-row">
+          <div class="name">
+            {{ '@' }}
+          </div>
+          <div class="type">
+            {{ 'A' }}
+          </div>
+          <div class="value">
+            <div>{{ server.ip_address }}</div>
+            <CopyText :text="server.ip_address" tooltip="copy" class="copy-text" />
+          </div>
+        </div>
+        <div class="dns-row">
+          <div class="name">
+            {{ 'www.mydomain.com' }}
+          </div>
+          <div class="type">
+            {{ 'CNAME' }}
+          </div>
+          <div class="value">
+            <div>{{ serverAddress }}</div>
+            <CopyText :text="serverAddress" tooltip="copy" class="copy-text" />
+          </div>
+        </div>
       </div>
       <div v-if="domains?.length === 0 && newDomain === undefined" class="no-domains">
         {{ t('sites.no_domains') }}
@@ -48,21 +85,23 @@
 </template>
 
 <script lang="ts" setup>
-import { toRefs } from 'vue'
+import { computed, toRefs } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
-import { Plus, Spinner } from '@pubstudio/frontend/ui-widgets'
+import { CopyText, Plus, Spinner } from '@pubstudio/frontend/ui-widgets'
 import { ICustomDomainRelationViewModel } from '@pubstudio/shared/type-api-shared'
 import DomainRow from './DomainRow.vue'
+import { ISiteServerRelationViewModel } from '@pubstudio/shared/type-api-platform-site'
 
 const { t } = useI18n()
 
 const props = defineProps<{
   domains: ICustomDomainRelationViewModel[] | undefined
+  server: ISiteServerRelationViewModel
   newDomain: string | undefined
   updating: string | undefined
   verifying: string | undefined
 }>()
-const { domains } = toRefs(props)
+const { domains, server } = toRefs(props)
 
 const emit = defineEmits<{
   (e: 'setNewDomain', domain: string | undefined): void
@@ -70,6 +109,14 @@ const emit = defineEmits<{
   (e: 'deleteDomain', domain: string): void
   (e: 'verifyDomain', domain: string): void
 }>()
+
+const serverAddress = computed(() => {
+  const address = server.value?.address
+  if (!address) {
+    return undefined
+  }
+  return address.replace(/^https?:\/\//i, '')
+})
 
 const addDomain = (domain: string) => {
   emit('addDomain', domain)
@@ -93,10 +140,36 @@ const verifyDomain = (domain: string) => {
   margin-bottom: 8px;
   text-align: center;
 }
+.dns-row {
+  display: flex;
+  margin-bottom: 6px;
+  text-align: left;
+  align-items: center;
+}
+.row-title {
+  font-weight: 700;
+}
+.name {
+  width: 40%;
+}
+.type {
+  width: 20%;
+}
+.value {
+  display: flex;
+  width: 40%;
+  > div:first-child {
+    min-width: 100px;
+  }
+}
+.copy {
+  @mixin size 18px;
+  margin-left: 6px;
+}
 .custom-domains-wrap {
   width: 100%;
   margin: 16px auto 0;
-  max-width: 360px;
+  max-width: 400px;
   position: relative;
 }
 .domains-updating {
@@ -118,7 +191,10 @@ const verifyDomain = (domain: string) => {
   padding-bottom: 8px;
   border-bottom: 1px solid $border1;
   text-align: center;
-  max-width: 300px;
+  width: 100%;
+}
+.explainer-text {
+  margin-bottom: 16px;
 }
 .read-more {
   margin-left: 6px;

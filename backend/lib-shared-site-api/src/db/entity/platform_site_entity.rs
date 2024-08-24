@@ -11,6 +11,7 @@ use uuid::Uuid;
 pub struct SiteServerRelationEntity {
     pub id: Uuid,
     pub address: String,
+    pub ip_address: String,
 }
 
 #[derive(Debug, Deserialize, Serialize)]

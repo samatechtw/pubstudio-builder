@@ -8,6 +8,7 @@ import { SiteType } from './enum-site-type'
 export interface ISiteServerRelationViewModel {
   id: string
   address: string
+  ip_address: string
 }
 
 export interface ISiteCheckoutRelationViewModel {
