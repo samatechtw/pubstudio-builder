@@ -1,4 +1,5 @@
 import { checkError, ValidateResult, Validator } from '@pubstudio/frontend/util-validate'
+import { AssetContentType } from '@pubstudio/shared/type-api-platform-site-asset'
 import { date2str } from '@pubstudio/shared/util-parse'
 import { reactive } from 'vue'
 import {
@@ -65,7 +66,7 @@ export const makeAsset = (values: IAdminAssetOptional) =>
     url: '',
     ...values,
     requirements: {
-      ext: ['jpg', 'jpeg', 'png', 'webp'],
+      types: [AssetContentType.Jpeg, AssetContentType.Png, AssetContentType.Webp],
       size: 4000000,
       ...values.requirements,
     },

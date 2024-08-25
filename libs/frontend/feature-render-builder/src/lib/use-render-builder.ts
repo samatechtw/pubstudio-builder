@@ -8,11 +8,12 @@ import {
 import { NotFound } from '@pubstudio/frontend/ui-widgets'
 import {
   rawStyleRecordToString,
-  renderGoogleFontsLink,
+  renderCustomFontLink,
+  renderGoogleFontLinks,
   themeToCssVars,
 } from '@pubstudio/frontend/util-render'
 import { IPage, ISite, ThemeFontSource } from '@pubstudio/shared/type-site'
-import { computed, defineComponent, h, Ref } from 'vue'
+import { computed, defineComponent, h, Ref, VNode } from 'vue'
 import { computeBuilderMixins } from './compute-builder-mixins'
 import { getBuildPageStyle } from './get-build-page-style'
 import { renderPage } from './render-builder'
@@ -64,19 +65,28 @@ export const useRenderBuilder = (
     },
   })
 
-  const googleFonts = computed(() => {
-    const themeFontNames = Object.values(site.value?.context.theme.fonts ?? {})
-      .filter((font) => font.source === ThemeFontSource.Google)
-      .map((font) => font.name)
+  const fontLinks = computed(() => {
+    const googleFonts: string[] = []
+    const customFonts: VNode[] = []
 
-    const fontNames = [...themeFontNames]
-    for (const googleFontName of selectedGoogleFonts.value) {
-      if (!fontNames.includes(googleFontName)) {
-        fontNames.push(googleFontName)
+    for (const font of Object.values(site.value?.context.theme.fonts ?? {})) {
+      if (font.source === ThemeFontSource.Google) {
+        googleFonts.push(font.name)
+      } else if (font.source === ThemeFontSource.Custom) {
+        const link = renderCustomFontLink(font)
+        if (link) {
+          customFonts.push(link)
+        }
       }
     }
 
-    return renderGoogleFontsLink(fontNames)
+    for (const googleFontName of selectedGoogleFonts.value) {
+      if (!googleFonts.includes(googleFontName)) {
+        googleFonts.push(googleFontName)
+      }
+    }
+
+    return [renderGoogleFontLinks(googleFonts), ...customFonts]
   })
 
   const buildPageComponentStyle = computed(() => {
@@ -107,9 +117,9 @@ export const useRenderBuilder = (
     },
   })
 
-  const GoogleFontLink = defineComponent({
+  const FontLinks = defineComponent({
     render() {
-      return googleFonts.value
+      return fontLinks.value
     },
   })
 
@@ -119,6 +129,6 @@ export const useRenderBuilder = (
     ComponentStyle,
     Mixins,
     PageContent,
-    GoogleFontLink,
+    FontLinks,
   }
 }

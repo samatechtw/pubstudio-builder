@@ -3,13 +3,14 @@ import {
   iterateMixin,
   queryStyleToString,
   rawStyleToResolvedStyle,
-  renderGoogleFontsLink,
+  renderCustomFontLink,
+  renderGoogleFontLinks,
   RenderMode,
   themeToCssVars,
 } from '@pubstudio/frontend/util-render'
 import { IPage, ISite, ThemeFontSource } from '@pubstudio/shared/type-site'
 import { Link, Meta, Script, useHead } from '@unhead/vue'
-import { Component, computed, defineComponent, h, Ref } from 'vue'
+import { Component, computed, defineComponent, h, Ref, VNode } from 'vue'
 import {
   getGlobalStyle,
   getLivePageStyle,
@@ -21,7 +22,7 @@ export interface IUseRender {
   CustomStyle: ReturnType<typeof defineComponent>
   Mixins: ReturnType<typeof defineComponent>
   ComponentStyle: ReturnType<typeof defineComponent>
-  GoogleFontLink: ReturnType<typeof defineComponent>
+  FontLinks: ReturnType<typeof defineComponent>
   PageContent: ReturnType<typeof defineComponent>
 }
 
@@ -93,16 +94,25 @@ export const useRender = (options: IUseRenderOptions): IUseRender => {
     },
   })
 
-  const googleFonts = computed(() => {
-    const fontNames = Object.values(site.value?.context.theme.fonts ?? {})
-      .filter((font) => font.source === ThemeFontSource.Google)
-      .map((font) => font.name)
-    return renderGoogleFontsLink(fontNames)
+  const fontLinks = computed(() => {
+    const googleFonts: string[] = []
+    const customFonts: VNode[] = []
+    for (const font of Object.values(site.value?.context.theme.fonts ?? {})) {
+      if (font.source === ThemeFontSource.Google) {
+        googleFonts.push(font.name)
+      } else if (font.source === ThemeFontSource.Custom) {
+        const link = renderCustomFontLink(font)
+        if (link) {
+          customFonts.push(link)
+        }
+      }
+    }
+    return [renderGoogleFontLinks(googleFonts), ...customFonts]
   })
 
-  const GoogleFontLink = defineComponent({
+  const FontLinks = defineComponent({
     render() {
-      return googleFonts.value
+      return fontLinks.value
     },
   })
 
@@ -172,7 +182,7 @@ export const useRender = (options: IUseRenderOptions): IUseRender => {
     CustomStyle,
     Mixins,
     ComponentStyle,
-    GoogleFontLink,
+    FontLinks,
     PageContent,
   }
 }

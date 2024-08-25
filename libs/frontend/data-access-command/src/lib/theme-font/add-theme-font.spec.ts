@@ -22,6 +22,7 @@ describe('Add Theme Font', () => {
     font = {
       source: ThemeFontSource.Google,
       name: 'Roboto',
+      url: 'https://dummyfont.com', // Normally a Google font shouldn't have a URL, it will be ignored
       fallback: WebSafeFont.TimesNewRoman,
     }
   })
@@ -31,7 +32,7 @@ describe('Add Theme Font', () => {
     expect(font.name in site.context.theme.fonts).toEqual(false)
 
     // Add font
-    const data = mockAddThemeFontData(font.source, font.name, font.fallback)
+    const data = mockAddThemeFontData(font.source, font.name, font.url, font.fallback)
     applyAddThemeFont(site, data)
 
     // Assert font is added
@@ -40,7 +41,7 @@ describe('Add Theme Font', () => {
 
   it('should undo add theme font', () => {
     // Add theme font and undo
-    const data = mockAddThemeFontData(font.source, font.name)
+    const data = mockAddThemeFontData(font.source, font.name, font.url)
     applyAddThemeFont(site, data)
     undoAddThemeFont(site, data)
 

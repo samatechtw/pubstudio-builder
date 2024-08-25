@@ -43,6 +43,18 @@ pub enum AssetContentType {
     #[sqlx(rename = "application/pdf")]
     #[strum(serialize = "application/pdf")]
     Pdf,
+    #[serde(rename = "font/ttf")]
+    #[sqlx(rename = "font/ttf")]
+    #[strum(serialize = "font/ttf")]
+    Ttf,
+    #[serde(rename = "font/otf")]
+    #[sqlx(rename = "font/otf")]
+    #[strum(serialize = "font/otf")]
+    Otf,
+    #[serde(rename = "font/woff2")]
+    #[sqlx(rename = "font/woff2")]
+    #[strum(serialize = "font/woff2")]
+    Woff2,
     #[serde(rename = "application/wasm")]
     #[sqlx(rename = "application/wasm")]
     #[strum(serialize = "application/wasm")]
@@ -65,6 +77,9 @@ impl AssetContentType {
             AssetContentType::Pdf => "pdf",
             AssetContentType::Wasm => "wasm",
             AssetContentType::Js => "js",
+            AssetContentType::Otf => "otf",
+            AssetContentType::Ttf => "ttf",
+            AssetContentType::Woff2 => "woff2",
         }
         .into()
     }

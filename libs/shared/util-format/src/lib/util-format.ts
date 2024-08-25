@@ -1,4 +1,7 @@
-import { AssetContentType } from '@pubstudio/shared/type-api-platform-site-asset'
+import {
+  AssetContentType,
+  CONTENT_TYPE_EXTS,
+} from '@pubstudio/shared/type-api-platform-site-asset'
 import { ICountryItem } from './i-billing-countries'
 
 /**
@@ -74,17 +77,7 @@ export function formatBytes(bytes: number, decimals = 1) {
 }
 
 export function contentTypeExt(contentType: AssetContentType): string {
-  return {
-    [AssetContentType.Jpeg]: 'jpg',
-    [AssetContentType.Png]: 'png',
-    [AssetContentType.Webp]: 'webp',
-    [AssetContentType.Svg]: 'svg',
-    [AssetContentType.Gif]: 'gif',
-    [AssetContentType.Mp4]: 'mp4',
-    [AssetContentType.Pdf]: 'pdf',
-    [AssetContentType.Wasm]: 'wasm',
-    [AssetContentType.Js]: 'js',
-  }[contentType]
+  return CONTENT_TYPE_EXTS[contentType]
 }
 
 export const BILLING_COUNTRIES: ICountryItem[] = [

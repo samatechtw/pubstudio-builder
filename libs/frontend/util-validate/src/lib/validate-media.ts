@@ -1,14 +1,22 @@
 import {
   AssetContentType,
+  CONTENT_TYPE_EXTS,
+  extFromContentType,
   MEDIA_CONTENT_TYPES,
 } from '@pubstudio/shared/type-api-platform-site-asset'
+
+function extContentType(ext: string | undefined): AssetContentType | undefined {
+  if (!ext) return undefined
+  return Object.fromEntries(
+    Object.entries(CONTENT_TYPE_EXTS).map(([key, value]) => [value, key]),
+  )[ext] as AssetContentType | undefined
+}
 
 export interface MediaRequirements {
   minWidth?: number
   minHeight?: number
   maxWidth?: number
   maxHeight?: number
-  ext?: string[]
   types?: AssetContentType[]
   size?: number
 }
@@ -34,13 +42,14 @@ export async function validateMedia(
   const validTypes = requirements.types ?? MEDIA_CONTENT_TYPES
   const type = file.type as AssetContentType
 
-  const { ext, size } = requirements
+  const { size } = requirements
   const reqSize = size ?? 0
   if (reqSize && file.size > reqSize) {
     errors.push('FILE_SIZE_BIG')
   }
   const fileExt = file.name.split('.').pop()
-  if ((ext && (!fileExt || !ext.includes(fileExt))) || !validTypes.includes(type)) {
+  const ext = validTypes.map(extFromContentType)
+  if (!fileExt || !(ext.includes(fileExt) || !validTypes.includes(type))) {
     errors.push('FILE_TYPE')
   }
   if (errors.length) {
@@ -51,7 +60,7 @@ export async function validateMedia(
   result.src = URL.createObjectURL(file)
 
   try {
-    const fileType = file.type || ''
+    const fileType = file.type || fileExt || ''
     if (fileType.includes('image')) {
       img = new Image()
       img.src = result.src
@@ -98,8 +107,12 @@ export async function validateMedia(
     } else if (
       fileType.includes('pdf') ||
       fileType.includes('wasm') ||
-      fileType.includes('javascript')
+      fileType.includes('javascript') ||
+      fileType.includes('ttf') ||
+      fileType.includes('otf') ||
+      fileType.includes('woff2')
     ) {
+      result.type = result.type || extContentType(fileExt)
       return result
     }
   } catch (error) {

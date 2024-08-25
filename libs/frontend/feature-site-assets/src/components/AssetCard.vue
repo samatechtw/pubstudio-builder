@@ -1,14 +1,8 @@
 <template>
   <div :id="asset.id" class="asset-card" :class="{ small }" v-bind="dndProps">
     <div class="asset-image">
-      <div v-if="asset.content_type === AssetContentType.Pdf" class="asset-preview">
-        <img :src="PdfPreview" />
-      </div>
-      <div v-else-if="asset.content_type === AssetContentType.Wasm" class="asset-preview">
-        <Wasm />
-      </div>
-      <div v-else-if="asset.content_type === AssetContentType.Js" class="asset-preview">
-        <Javascript />
+      <div v-if="assetPlaceholder" class="asset-preview">
+        <img :src="assetPlaceholder" />
       </div>
       <PSAsset v-else :asset="assetUrl" :canPlayVideo="false" :contentHash="asset.size" />
     </div>
@@ -59,11 +53,9 @@ import {
   CopyText,
   Cross,
   Edit,
-  Javascript,
   PSAsset,
   PSInput,
   Spinner,
-  Wasm,
 } from '@pubstudio/frontend/ui-widgets'
 import { isAssetDroppable, urlFromAsset } from '@pubstudio/frontend/util-asset'
 import { Keys } from '@pubstudio/shared/type-site'
@@ -73,9 +65,8 @@ import {
   ISiteAssetViewModel,
 } from '@pubstudio/shared/type-api-platform-site-asset'
 import { BuilderDragDataType } from '@pubstudio/frontend/type-builder'
-import PdfPreview from '@frontend-assets/icon/pdf.png'
 import AssetCardInfoBottom from './AssetCardInfoBottom.vue'
-import { useSiteAssets } from '../lib/use-site-assets'
+import { ASSET_PLACEHOLDERS, useSiteAssets } from '../lib/use-site-assets'
 
 const { updateAsset, loading } = useSiteAssets()
 const { site } = useSiteSource()
@@ -92,6 +83,10 @@ const emit = defineEmits<{
 }>()
 
 const { asset, small } = toRefs(props)
+
+const assetPlaceholder = computed(() => {
+  return ASSET_PLACEHOLDERS[asset.value.content_type]
+})
 
 const dndProps = computed(() => {
   if (!small.value || !isAssetDroppable(asset.value.content_type)) {
