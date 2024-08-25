@@ -15,6 +15,7 @@ export interface IThemeVariable {
 export enum ThemeFontSource {
   Native = 'native',
   Google = 'google',
+  Custom = 'custom',
 }
 
 export enum WebSafeFont {
@@ -32,6 +33,7 @@ export enum WebSafeFont {
 export type IThemeFont = {
   source: ThemeFontSource
   name: string
+  url?: string
   fallback?: WebSafeFont
 }
 

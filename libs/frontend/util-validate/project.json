@@ -19,5 +19,5 @@
       }
     }
   },
-  "tags": ["scope:shared", "type:util"]
+  "tags": ["scope:frontend", "type:util"]
 }

@@ -4,11 +4,13 @@ import { ThemeFontSource, WebSafeFont } from '@pubstudio/shared/type-site'
 export const mockAddThemeFontData = (
   source: ThemeFontSource,
   name: string,
+  url?: string,
   fallback?: WebSafeFont,
 ): IAddThemeFontData => {
   return {
     source,
     name,
+    url,
     fallback,
   }
 }

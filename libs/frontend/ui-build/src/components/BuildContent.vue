@@ -10,7 +10,7 @@
         <CustomStyle />
         <Mixins />
         <ComponentStyle />
-        <GoogleFontLink />
+        <FontLinks />
         <PageContent />
         <BuildDndOverlay />
       </div>
@@ -48,7 +48,7 @@ const {
   CustomStyle,
   Mixins,
   ComponentStyle,
-  GoogleFontLink,
+  FontLinks,
   PageContent,
   rootComponentMinHeight,
 } = useRenderBuilder({

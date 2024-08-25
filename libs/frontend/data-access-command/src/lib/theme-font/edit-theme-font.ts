@@ -15,6 +15,7 @@ export const applyEditThemeFont = (site: ISite, data: IEditThemeFontData) => {
   theme.fonts[newFont.name] = {
     source: newFont.source,
     name: newFont.name,
+    url: newFont.url,
     fallback: newFont.fallback,
   }
 }
@@ -28,6 +29,7 @@ export const undoEditThemeFont = (site: ISite, data: IEditThemeFontData) => {
   theme.fonts[oldFont.name] = {
     source: oldFont.source,
     name: oldFont.name,
+    url: oldFont.url,
     fallback: oldFont.fallback,
   }
 }

@@ -15,7 +15,7 @@
         <CustomStyle />
         <Mixins />
         <ComponentStyle />
-        <GoogleFontLink />
+        <FontLinks />
         <router-view class="app-router-view" />
       </template>
     </div>
@@ -70,7 +70,7 @@ const activePage = computed(() => {
   return page ?? notFoundPage.value
 })
 
-const { CustomStyle, Mixins, ComponentStyle, GoogleFontLink, PageContent } = useRender({
+const { CustomStyle, Mixins, ComponentStyle, FontLinks, PageContent } = useRender({
   site: site as Ref<ISite>,
   activePage,
   renderMode: RenderMode.Release,

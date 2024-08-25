@@ -5,7 +5,7 @@
       <CustomStyle />
       <Mixins />
       <ComponentStyle />
-      <GoogleFontLink />
+      <FontLinks />
       <PageContent />
     </template>
   </div>
@@ -38,7 +38,7 @@ const {
   CustomStyle,
   Mixins,
   ComponentStyle,
-  GoogleFontLink,
+  FontLinks,
   PageContent,
   rootComponentMinHeight,
 } = useRenderPreview({

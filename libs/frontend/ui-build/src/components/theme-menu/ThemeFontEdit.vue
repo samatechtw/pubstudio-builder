@@ -17,6 +17,11 @@
         {{ t('theme.font_name') }}
       </div>
       <WebSafeFontSelect v-if="isNativeFont" v-model="editingFont.name" class="item" />
+      <CustomFontSelect
+        v-else-if="editingFont.source === ThemeFontSource.Custom"
+        v-model:name="editingFont.name"
+        v-model:url="editingFont.url"
+      />
       <GoogleFontSelect
         v-else
         :modelValue="editingFont.name"
@@ -25,7 +30,7 @@
       />
     </div>
     <!-- Fallback -->
-    <div v-if="!isNativeFont" class="menu-row fallback-row">
+    <div v-if="isGoogleFont" class="menu-row fallback-row">
       <div class="label">
         {{ t('theme.fallback') }}
       </div>
@@ -61,17 +66,19 @@
 import { computed } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { ThemeFontSource } from '@pubstudio/shared/type-site'
-import { ErrorMessage, PSButton } from '@pubstudio/frontend/ui-widgets'
+import { ErrorMessage, PSButton, PSInput } from '@pubstudio/frontend/ui-widgets'
 import { useThemeMenuFonts, resetThemeMenuFonts } from '@pubstudio/frontend/feature-build'
 import FontSourceSelect from './FontSourceSelect.vue'
 import WebSafeFontSelect from './WebSafeFontSelect.vue'
 import GoogleFontSelect from './GoogleFontSelect.vue'
+import CustomFontSelect from './CustomFontSelect.vue'
 
 const { t } = useI18n()
 
 const { editingFont, selectedGoogleFonts, fontError, saveFont } = useThemeMenuFonts()
 
 const isNativeFont = computed(() => editingFont.source === ThemeFontSource.Native)
+const isGoogleFont = computed(() => editingFont.source === ThemeFontSource.Google)
 
 const quotedFont = computed(() => `"${editingFont.name}"`)
 

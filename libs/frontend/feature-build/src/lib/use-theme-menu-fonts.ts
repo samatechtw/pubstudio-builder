@@ -63,7 +63,7 @@ export const useThemeMenuFonts = (): IUseThemeMenuFontFeature => {
       editingFont.name in (site.value?.context.theme.fonts ?? {})
     ) {
       fontError.value = t('errors.font_name_unique')
-    } else if (editingFont.source !== ThemeFontSource.Native && !editingFont.fallback) {
+    } else if (editingFont.source === ThemeFontSource.Google && !editingFont.fallback) {
       fontError.value = t('errors.font_fallback_missing')
     }
     return !fontError.value

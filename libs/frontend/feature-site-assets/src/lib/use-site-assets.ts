@@ -1,8 +1,13 @@
+import FontPreview from '@frontend-assets/icon/font.png'
+import JsPreview from '@frontend-assets/icon/js.png'
+import PdfPreview from '@frontend-assets/icon/pdf.png'
+import WasmPreview from '@frontend-assets/icon/wasm.png'
 import { useSiteAssetApi } from '@pubstudio/frontend/data-access-api'
 import { ApiInjectionKey } from '@pubstudio/frontend/data-access-injection'
 import { PSApi } from '@pubstudio/frontend/util-api'
 import { IApiSiteAsset } from '@pubstudio/shared/type-api-interfaces'
 import {
+  AssetContentType,
   ICreatePlatformSiteAssetRequest,
   IListPlatformSiteAssetsRequest,
   IReplacePlatformSiteAssetRequest,
@@ -42,6 +47,15 @@ export interface ISiteAssetsFeature {
 const assets = ref<ISiteAssetViewModel[]>()
 const updateKey = ref(0)
 
+export const ASSET_PLACEHOLDERS: Record<string, string> = {
+  [AssetContentType.Pdf]: PdfPreview,
+  [AssetContentType.Wasm]: WasmPreview,
+  [AssetContentType.Js]: JsPreview,
+  [AssetContentType.Ttf]: FontPreview,
+  [AssetContentType.Otf]: FontPreview,
+  [AssetContentType.Woff2]: FontPreview,
+}
+
 export const useSiteAssets = (): ISiteAssetsFeature => {
   const rootApi = inject(ApiInjectionKey) as PSApi
   const api = useSiteAssetApi(rootApi)
@@ -78,7 +92,7 @@ export const useSiteAssets = (): ISiteAssetsFeature => {
     loading.value = true
     try {
       const updated = await api.updateSiteAsset(id, payload)
-      return { ...updated, version: 1 }
+      return { ...updated, version: 1 } as ISiteAssetViewModel
     } catch (e) {
       console.log('Update site asset error', e)
     } finally {

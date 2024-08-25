@@ -7,10 +7,11 @@ export interface AddThemeFont extends ICommand<IAddThemeFontData> {
 }
 
 export const applyAddThemeFont = (site: ISite, data: IAddThemeFontData) => {
-  const { source, name, fallback } = data
+  const { source, name, url, fallback } = data
   site.context.theme.fonts[name] = {
     source,
     name,
+    url,
     fallback,
   }
 }

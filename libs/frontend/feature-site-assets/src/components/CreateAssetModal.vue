@@ -44,14 +44,8 @@
         accept="image/*"
         @fileSelect="updateAsset"
       >
-        <template v-if="validatedFile?.type === AssetContentType.Pdf" #preview>
-          <img :src="PdfPreview" class="pdf-preview" />
-        </template>
-        <template v-else-if="validatedFile?.type === AssetContentType.Wasm" #preview>
-          <Wasm class="asset-preview" />
-        </template>
-        <template v-else-if="validatedFile?.type === AssetContentType.Js" #preview>
-          <Javascript class="asset-preview" />
+        <template v-if="assetPlaceholder" #preview>
+          <img :src="assetPlaceholder" class="asset-preview" />
         </template>
       </UploadFile>
     </div>
@@ -63,13 +57,11 @@ import { computed, onMounted, ref, toRefs, watch } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import {
   ErrorMessage,
-  Javascript,
   Modal,
   PSButton,
   PSInput,
   PSMultiselect,
   UploadFile,
-  Wasm,
 } from '@pubstudio/frontend/ui-widgets'
 import {
   ALL_CONTENT_TYPES,
@@ -88,9 +80,9 @@ import { ISiteViewModel } from '@pubstudio/shared/type-api-platform-site'
 import { useSites } from '@pubstudio/frontend/feature-sites'
 import { store } from '@pubstudio/frontend/data-access-web-store'
 import { DEFAULT_TEMPLATE_ID } from '@pubstudio/shared/type-api-platform-template'
-import PdfPreview from '@frontend-assets/icon/pdf.png'
 import { IUploadFileResult } from '../lib/upload-asset'
-import { useSiteAssets } from '../lib/use-site-assets'
+import { ASSET_PLACEHOLDERS, useSiteAssets } from '../lib/use-site-assets'
+import { isAssetDroppable } from '@pubstudio/frontend/util-asset'
 
 interface ISelectableSite {
   id: string
@@ -140,6 +132,11 @@ const name = ref('')
 const siteId = ref()
 const error = ref()
 
+const assetPlaceholder = computed(() => {
+  const type = validatedFile.value?.type
+  return type ? ASSET_PLACEHOLDERS[type] : undefined
+})
+
 const errorInterpolationKey = computed(() => {
   const key = 'errors.AssetUsageExceeded'
   if (error.value === t(key)) {
@@ -173,11 +170,16 @@ const resolvedSites = computed<ISelectableSite[]>(() => {
 const handleAssetSelect = (validFile: ValidatedFile) => {
   const file = validFile.file
   if (
-    file.type === AssetContentType.Pdf ||
-    file.type === AssetContentType.Wasm ||
-    file.type === AssetContentType.Js
+    [
+      AssetContentType.Pdf,
+      AssetContentType.Wasm,
+      AssetContentType.Js,
+      AssetContentType.Otf,
+      AssetContentType.Ttf,
+      AssetContentType.Woff2,
+    ].includes(validFile.type)
   ) {
-    // Handle PDF preview in UploadFile slot
+    // Handle these file types as preview in UploadFile slot
   } else {
     const reader = new FileReader()
     reader.readAsDataURL(file)
@@ -278,7 +280,7 @@ watch(initialName, () => {
 })
 
 watch(initialFile, () => {
-  if (initialFile.value) {
+  if (initialFile.value && isAssetDroppable(initialFile.value.type)) {
     name.value = initialFile.value.name ?? ''
     updateAsset(initialFile.value)
   }
@@ -363,12 +365,9 @@ onMounted(() => {
   .upload-wrap {
     margin-top: 16px;
   }
-  img.pdf-preview {
-    width: 40%;
-  }
   .asset-preview {
     width: 40%;
-    height: 40%;
+    background-color: white;
   }
 }
 </style>
