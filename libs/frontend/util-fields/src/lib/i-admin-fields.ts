@@ -10,6 +10,7 @@ import { ComputedRef, Ref } from 'vue'
 interface IAdminEntry {
   label: string
   subtext?: string
+  tooltip?: string
   sublabel?: string
   placeholder?: string
   required?: boolean
