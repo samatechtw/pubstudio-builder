@@ -19,6 +19,7 @@ export interface IUseThemeMenuFontFeature {
 const emptyFont = (): IThemeFont => ({
   source: ThemeFontSource.Native,
   name: '',
+  url: undefined,
   fallback: undefined,
 })
 

@@ -66,7 +66,7 @@
 import { computed } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { ThemeFontSource } from '@pubstudio/shared/type-site'
-import { ErrorMessage, PSButton, PSInput } from '@pubstudio/frontend/ui-widgets'
+import { ErrorMessage, PSButton } from '@pubstudio/frontend/ui-widgets'
 import { useThemeMenuFonts, resetThemeMenuFonts } from '@pubstudio/frontend/feature-build'
 import FontSourceSelect from './FontSourceSelect.vue'
 import WebSafeFontSelect from './WebSafeFontSelect.vue'
