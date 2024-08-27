@@ -39,14 +39,12 @@ import {
   IAddComponentMixinData,
   IAddCustomComponentData,
   IAddPageData,
-  IAddThemeFontData,
   IAddThemeVariableData,
   IChangePageData,
   ICommandGroupData,
   IEditComponentData,
   IEditComponentFields,
   IEditPageData,
-  IEditThemeFontData,
   IEditThemeVariableData,
   IMergeComponentStyleData,
   INewTranslations,
@@ -54,7 +52,6 @@ import {
   IRemoveComponentOverrideStyleData,
   IRemovePageData,
   IRemoveStyleMixinData,
-  IRemoveThemeFontData,
   IRemoveThemeVariableData,
   IReplaceComponentMixinData,
   IReplacePageRootData,
@@ -91,10 +88,7 @@ import {
   ISite,
   IStyle,
   IStyleEntry,
-  IThemeFont,
   Tag,
-  ThemeFontSource,
-  WebSafeFont,
 } from '@pubstudio/shared/type-site'
 import { computed, ComputedRef, Ref, ref, toRaw } from 'vue'
 import { pushCommandAndAddMissingMixins } from './add-builtin/add-builtin-component'
@@ -202,9 +196,6 @@ export interface IUseBuild {
   addThemeVariable: (data: IAddThemeVariableData) => void
   editThemeVariable: (data: IEditThemeVariableData) => void
   deleteThemeVariable: (themeVariable: IRemoveThemeVariableData) => void
-  addThemeFont: (source: ThemeFontSource, name: string, fallback?: WebSafeFont) => void
-  editThemeFont: (oldFont: IThemeFont, newFold: IThemeFont) => void
-  deleteThemeFont: (font: IThemeFont) => void
   addPage: (page: IPageMetadata, copyFrom?: string) => void
   editPage: (oldPage: IPageMetadata, newPage: IPageMetadata) => void
   updatePageOrder: (pos: number, newPos: number) => void
@@ -843,35 +834,6 @@ export const useBuild = (): IUseBuild => {
     pushCommand(site.value, CommandType.RemoveThemeVariable, data)
   }
 
-  const addThemeFont = (
-    source: ThemeFontSource,
-    name: string,
-    fallback?: WebSafeFont,
-  ) => {
-    const data: IAddThemeFontData = {
-      source,
-      name,
-      fallback,
-    }
-    pushCommand(site.value, CommandType.AddThemeFont, data)
-  }
-
-  const editThemeFont = (oldFont: IThemeFont, newFont: IThemeFont) => {
-    const data: IEditThemeFontData = {
-      oldFont,
-      newFont,
-    }
-    pushCommand(site.value, CommandType.EditThemeFont, data)
-  }
-
-  const deleteThemeFont = (font: IThemeFont) => {
-    const data: IRemoveThemeFontData = {
-      source: font.source,
-      name: font.name,
-    }
-    pushCommand(site.value, CommandType.RemoveThemeFont, data)
-  }
-
   const addPage = (metadata: IPageMetadata, copyFrom?: string) => {
     const { editor } = site.value
     if (editor) {
@@ -1124,9 +1086,6 @@ export const useBuild = (): IUseBuild => {
     addThemeVariable,
     editThemeVariable,
     deleteThemeVariable,
-    addThemeFont,
-    editThemeFont,
-    deleteThemeFont,
     addPage,
     editPage,
     updatePageOrder,

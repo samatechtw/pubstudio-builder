@@ -85,6 +85,7 @@ const quotedFont = computed(() => `"${editingFont.name}"`)
 const updateSource = (source: ThemeFontSource) => {
   editingFont.source = source
   editingFont.name = ''
+  editingFont.url = undefined
   editingFont.fallback = undefined
 }
 

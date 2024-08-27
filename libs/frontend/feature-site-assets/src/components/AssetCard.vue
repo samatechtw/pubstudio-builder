@@ -22,13 +22,24 @@
       </div>
       <div v-else class="asset-name-wrap">
         <div
+          ref="itemRef"
           class="asset-name"
-          @mouseenter="showEditIcon = true"
-          @mouseleave="showEditIcon = false"
+          @mouseenter="nameMouseEnter"
+          @mouseleave="nameMouseLeave"
           @click="showEditInput"
         >
           {{ asset.name }}
         </div>
+        <Teleport to="body">
+          <div
+            v-if="showNameTooltip"
+            ref="tooltipRef"
+            class="tooltip"
+            :style="tooltipStyle"
+          >
+            {{ asset.name }}
+          </div>
+        </Teleport>
         <Edit v-if="!small && showEditIcon" class="edit-icon" />
         <CopyText v-else :text="assetUrl" class="copy-text" />
       </div>
@@ -67,6 +78,7 @@ import {
 import { BuilderDragDataType } from '@pubstudio/frontend/type-builder'
 import AssetCardInfoBottom from './AssetCardInfoBottom.vue'
 import { ASSET_PLACEHOLDERS, useSiteAssets } from '../lib/use-site-assets'
+import { useTooltipDelay } from '@pubstudio/frontend/util-tooltip'
 
 const { updateAsset, loading } = useSiteAssets()
 const { site } = useSiteSource()
@@ -147,6 +159,33 @@ const updateName = async () => {
     }
   }
 }
+
+const {
+  itemRef,
+  tooltipMouseEnter,
+  tooltipMouseLeave,
+  tooltipRef,
+  tooltipStyle,
+  show: showNameTooltip,
+} = useTooltipDelay({ placement: 'top' })
+
+const nameMouseEnter = () => {
+  if (small.value && asset.value.name.length > 9) {
+    tooltipMouseEnter()
+  }
+  if (!small.value) {
+    showEditIcon.value = true
+  }
+}
+
+const nameMouseLeave = () => {
+  if (small.value && asset.value.name.length > 9) {
+    tooltipMouseLeave()
+  }
+  if (!small.value) {
+    showEditIcon.value = false
+  }
+}
 </script>
 
 <style lang="postcss" scoped>
@@ -161,6 +200,8 @@ const updateName = async () => {
     drop-shadow(4px 8px 24px rgba(16, 3, 70, 0.05));
   border-radius: 4px;
   &.small {
+    position: relative;
+    z-index: 1;
     .asset-info {
       padding: 0 4px 4px;
     }
@@ -170,11 +211,16 @@ const updateName = async () => {
     .asset-name {
       @mixin title 11px;
       cursor: unset;
+      position: relative;
     }
     .copy-text :deep(svg) {
       @mixin size 14px;
     }
   }
+}
+.tooltip {
+  @mixin tooltip;
+  z-index: 10;
 }
 .asset-image :deep(.ps-asset-image) {
   height: 100px;

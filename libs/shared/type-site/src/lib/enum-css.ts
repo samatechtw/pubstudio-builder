@@ -53,6 +53,7 @@ export enum Css {
   LineHeight = 'line-height',
   ListStyle = 'list-style',
   Margin = 'margin',
+  Mask = 'mask',
   MaxHeight = 'max-height',
   MaxWidth = 'max-width',
   MinHeight = 'min-height',

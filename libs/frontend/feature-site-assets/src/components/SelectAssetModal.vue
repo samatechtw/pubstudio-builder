@@ -71,7 +71,10 @@
         class="asset-item"
         :title="asset.name"
       >
-        <img class="asset-image" :src="urlFromAsset(asset)" :alt="asset.name" />
+        <div v-if="ASSET_PLACEHOLDERS[asset.content_type]" class="asset-preview">
+          <img :src="ASSET_PLACEHOLDERS[asset.content_type]" />
+        </div>
+        <img v-else class="asset-image" :src="urlFromAsset(asset)" :alt="asset.name" />
         <div class="asset-name">
           {{ asset.name }}
         </div>
@@ -118,6 +121,7 @@ import { useSiteAssetApi } from '@pubstudio/frontend/data-access-api'
 import { ILocalSiteRelationViewModel } from '@pubstudio/shared/type-api-platform-user'
 import { urlFromAsset } from '@pubstudio/frontend/util-asset'
 import CreateAssetModal from './CreateAssetModal.vue'
+import { ASSET_PLACEHOLDERS } from '../lib/use-site-assets'
 
 type ILocalOrApiSite = ILocalSiteRelationViewModel | ISiteViewModel
 
@@ -326,6 +330,7 @@ watch(show, async (modalShown) => {
     width: calc((100% - 24px) / 4);
     height: 100px;
     display: flex;
+    align-items: center;
     flex-direction: column;
     border: 2px solid $grey-300;
     cursor: pointer;
@@ -336,6 +341,15 @@ watch(show, async (modalShown) => {
   .asset-image {
     height: 100%;
     object-fit: cover;
+  }
+  .asset-preview {
+    width: 30%;
+    padding-top: 16px;
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
   }
   .asset-name {
     @mixin text 13px;
