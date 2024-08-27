@@ -30,7 +30,6 @@ export const containerHorizontal: IComponent = {
       [DEFAULT_BREAKPOINT_ID]: {
         default: {
           height: '120px',
-          width: '100%',
         },
       },
     },

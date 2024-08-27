@@ -38,6 +38,7 @@ export enum Css {
   Cursor = 'cursor',
   Display = 'display',
   Fill = 'fill',
+  Filter = 'filter',
   Float = 'float',
   Flex = 'flex',
   FlexDirection = 'flex-direction',
