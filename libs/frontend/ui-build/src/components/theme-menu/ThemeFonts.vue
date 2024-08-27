@@ -31,17 +31,18 @@
 import { useI18n } from 'petite-vue-i18n'
 import { Minus, Plus } from '@pubstudio/frontend/ui-widgets'
 import { IThemeFont } from '@pubstudio/shared/type-site'
-import { useBuild, useThemeMenuFonts } from '@pubstudio/frontend/feature-build'
+import { deleteThemeFont, useThemeMenuFonts } from '@pubstudio/frontend/feature-build'
+import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 
 const { t } = useI18n()
 
 const { fonts, newFont, setEditingFont } = useThemeMenuFonts()
-const { deleteThemeFont } = useBuild()
+const { site } = useSiteSource()
 
 const fontFamily = (name: string) => `"${name}"`
 
 const removeFont = (font: IThemeFont) => {
-  deleteThemeFont({
+  deleteThemeFont(site.value, {
     source: font.source,
     name: font.name,
   })

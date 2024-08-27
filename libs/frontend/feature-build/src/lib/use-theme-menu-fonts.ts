@@ -1,6 +1,7 @@
 import { IThemeFont, ThemeFontSource } from '@pubstudio/shared/type-site'
 import { useI18n } from 'petite-vue-i18n'
 import { computed, ComputedRef, reactive, Ref, ref, UnwrapNestedRefs } from 'vue'
+import { addThemeFont, editThemeFont } from './command-wrap/theme-font'
 import { useBuild } from './use-build'
 
 export interface IUseThemeMenuFontFeature {
@@ -36,7 +37,7 @@ export const resetThemeMenuFonts = () => {
 
 export const useThemeMenuFonts = (): IUseThemeMenuFontFeature => {
   const { t } = useI18n()
-  const { site, addThemeFont, editThemeFont } = useBuild()
+  const { site } = useBuild()
 
   const fonts = computed(() => {
     return Object.values(site.value.context.theme.fonts)
@@ -76,9 +77,14 @@ export const useThemeMenuFonts = (): IUseThemeMenuFontFeature => {
     const oldName = editingFontSource.name
     if (oldName in (site.value?.context.theme.fonts ?? {})) {
       // Pass in the copy of variables to avoid passing by reference issue
-      editThemeFont({ ...editingFontSource }, { ...editingFont })
+      editThemeFont(site.value, { ...editingFontSource }, { ...editingFont })
     } else {
-      addThemeFont(editingFont.source, editingFont.name, editingFont.fallback)
+      addThemeFont(site.value, {
+        source: editingFont.source,
+        name: editingFont.name,
+        url: editingFont.url,
+        fallback: editingFont.fallback,
+      })
     }
     resetThemeMenuFonts()
   }
