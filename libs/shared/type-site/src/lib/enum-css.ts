@@ -8,6 +8,7 @@ export enum Css {
   Animation = 'animation',
   AnimationDelay = 'animation-delay',
   AspectRatio = 'aspect-ratio',
+  BackdropFilter = 'backdrop-filter',
   Background = 'background',
   BackgroundColor = 'background-color',
   BackgroundImage = 'background-image',
