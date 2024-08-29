@@ -19,3 +19,9 @@ withDefaults(
   },
 )
 </script>
+
+<style lang="postcss" scoped>
+path {
+  stroke: none !important;
+}
+</style>
