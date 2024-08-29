@@ -1,28 +1,28 @@
 import { useCustomDataApi } from '@pubstudio/frontend/data-access-api'
-import { ApiInjectionKey } from '@pubstudio/frontend/data-access-injection'
-import { PSApi } from '@pubstudio/frontend/util-api'
-import { IApiCustomData } from '@pubstudio/shared/type-api-interfaces'
+import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import {
   IListRowsApiQuery,
   IListRowsResponse,
   IListTablesApiQuery,
   IListTablesResponse,
 } from '@pubstudio/shared/type-api-site-custom-data'
-import { inject } from 'vue'
+import { ComputedRef } from 'vue'
 
 export interface ICustomDataFeature {
-  api: IApiCustomData
   listTables: (query: IListTablesApiQuery) => Promise<IListTablesResponse | undefined>
   listRows: (query: IListRowsApiQuery) => Promise<IListRowsResponse | undefined>
 }
 
-export const useCustomData = (siteId: string): ICustomDataFeature => {
-  const rootApi = inject(ApiInjectionKey) as PSApi
-  const api = useCustomDataApi(rootApi, siteId)
+export const useCustomData = (siteId: ComputedRef<string>): ICustomDataFeature => {
+  const { apiSite } = useSiteSource()
 
   const listTables = async (
     query: IListTablesApiQuery,
   ): Promise<IListTablesResponse | undefined> => {
+    if (!apiSite) {
+      return
+    }
+    const api = useCustomDataApi(apiSite, siteId.value)
     try {
       const response = await api.listTables(query)
       return response
@@ -35,6 +35,10 @@ export const useCustomData = (siteId: string): ICustomDataFeature => {
   const listRows = async (
     query: IListRowsApiQuery,
   ): Promise<IListRowsResponse | undefined> => {
+    if (!apiSite) {
+      return
+    }
+    const api = useCustomDataApi(apiSite, siteId.value)
     try {
       const response = await api.listRows(query)
       return response
@@ -45,7 +49,6 @@ export const useCustomData = (siteId: string): ICustomDataFeature => {
   }
 
   return {
-    api,
     listTables,
     listRows,
   }

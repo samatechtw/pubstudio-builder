@@ -1,5 +1,6 @@
 <template>
   <Modal
+    :show="show"
     cls="custom-data-modal"
     :cancelByClickingOutside="false"
     escapeEvent="keyup"
@@ -12,9 +13,6 @@
       {{ t('custom_data.subtitle') }}
     </div>
     <div class="table-select-wrap">
-      <div class="label">
-        {{ t('build.table') }}
-      </div>
       <PSMultiselect
         :value="selectedTable"
         class="table-select"
@@ -26,7 +24,7 @@
     </div>
     <div class="table-wrap" :class="{ 'table-selected': !!selectedTable }">
       <div v-if="!selectedTable" class="table-placeholder">
-        {{ t('build.table_placeholder') }}
+        {{ tables?.length ? t('build.table_select') : t('build.table_placeholder') }}
       </div>
       <table v-else class="custom-data-table">
         <thead>
@@ -36,6 +34,7 @@
                 <span class="column-name"> {{ column.name }}</span>
                 <InfoBubble
                   class="column-type-info"
+                  placement="top"
                   :message="column.dataType.toString()"
                 />
               </div>
@@ -61,6 +60,7 @@
           :pageSize="pageSize"
           :offset="from"
           :total="total"
+          class="table-nav"
           @setPage="updatePage"
           @setPageSize="updatePageSize"
         />
@@ -70,7 +70,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, toRefs, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'petite-vue-i18n'
 import {
@@ -97,11 +97,22 @@ const { editor } = useBuild()
 
 const selectedTable = computed(() => editor.value?.selectedTable)
 
+const props = defineProps<{
+  show: boolean
+}>()
+const { show } = toRefs(props)
 const emit = defineEmits<{
   (e: 'cancel'): void
 }>()
 
-const { listTables: listTablesApi, listRows: listRowsApi } = useCustomData()
+const siteId = computed(() => {
+  if (route.name === 'BuildScratch') {
+    return 'scratch'
+  }
+  return route.params.siteId?.toString() ?? ''
+})
+
+const { listTables: listTablesApi, listRows: listRowsApi } = useCustomData(siteId)
 
 const loadingTables = ref(false)
 const tables = ref<ICustomTableViewModel[]>([])
@@ -116,11 +127,12 @@ const cancel = () => {
   emit('cancel')
 }
 
-const tableOptions = computed(() =>
-  tables.value.map((table) => ({
-    label: table.name,
-    value: table.name,
-  })),
+const tableOptions = computed(
+  () =>
+    tables.value?.map((table) => ({
+      label: table.name,
+      value: table.name,
+    })) ?? [],
 )
 
 const columns = computed(() => {
@@ -133,23 +145,16 @@ const columns = computed(() => {
     return []
   }
 
-  const record: Record<string, ICustomTableColumn> = JSON.parse(table.columns)
+  const record: Record<string, ICustomTableColumn> = table.columns
   return Object.entries(record).map(([name, column]) => ({
     name,
     dataType: column.data_type,
   }))
 })
 
-const siteId = computed(() => {
-  if (route.name === 'BuildScratch') {
-    return 'scratch'
-  }
-  return route.params.siteId?.toString() ?? ''
-})
-
 const listTables = async () => {
   loadingTables.value = true
-  const response = await listTablesApi(siteId.value, {})
+  const response = await listTablesApi({})
   if (response) {
     tables.value = response.results
   }
@@ -165,13 +170,13 @@ const selectTable = async (tableName: string | undefined) => {
 
 const listRows = async (tableName: string) => {
   loadingRows.value = true
-  const response = await listRowsApi(siteId.value, {
+  const response = await listRowsApi({
     table_name: tableName,
     from: from.value,
     to: to.value,
   })
   if (response) {
-    rows.value = response.results.map((row) => JSON.parse(row))
+    rows.value = response.results
     total.value = response.total
   }
   loadingRows.value = false
@@ -191,10 +196,16 @@ const updatePageSize = async (value: AdminTablePageSize) => {
   }
 }
 
-onMounted(async () => {
+watch(show, async () => {
   await listTables()
   if (selectedTable.value) {
     await listRows(selectedTable.value)
+  }
+})
+
+onMounted(async () => {
+  if (show.value) {
+    await listTables()
   }
 })
 </script>
@@ -204,6 +215,7 @@ onMounted(async () => {
 
 .custom-data-modal {
   .modal-inner {
+    @mixin flex-col;
     width: 90%;
     height: 90%;
     overflow-y: auto;
@@ -212,23 +224,17 @@ onMounted(async () => {
     @mixin flex-row;
     margin-top: 16px;
     align-items: center;
-    .label {
-      @mixin text-medium 16px;
-    }
-    .table-select {
-      margin-left: 16px;
-    }
+  }
+  .table-placeholder {
+    @mixin h5;
+    color: $color-disabled;
+    margin-top: 24px;
   }
   .table-wrap {
+    @mixin flex-col;
+    justify-content: space-between;
+    flex-grow: 1;
     margin-top: 16px;
-    .table-placeholder {
-      @mixin h4;
-      color: $color-disabled;
-    }
-    .custom-data-table {
-      width: 100%;
-      border-collapse: collapse;
-    }
     .th {
       @mixin text 15px;
       padding: 12px 24px;
@@ -262,6 +268,13 @@ onMounted(async () => {
     &.table-selected {
       border: 1px solid $grey-100;
     }
+  }
+  .custom-data-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .table-nav {
+    margin-top: auto;
   }
 }
 </style>

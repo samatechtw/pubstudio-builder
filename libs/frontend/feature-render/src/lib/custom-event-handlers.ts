@@ -136,11 +136,12 @@ const registerKeyEvents = (component: IComponent, customEventHandlers: ICustomEv
   const keyup = customEventHandlers[ComponentEventType.Keyup]
 
   if (keydown) {
-    runtimeContext.eventHandlers.keydown[component.id] = (event: Event) =>
+    runtimeContext.eventHandlers.keydown[component.id] = (event: Event | undefined) =>
       keydown[0](event)
   }
   if (keyup) {
-    runtimeContext.eventHandlers.keyup[component.id] = (event: Event) => keyup[0](event)
+    runtimeContext.eventHandlers.keyup[component.id] = (event: Event | undefined) =>
+      keyup[0](event)
   }
 }
 
