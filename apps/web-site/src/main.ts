@@ -43,6 +43,7 @@ declare global {
 
 window.Vue = {
   computed,
+  createApp,
   createBlock,
   createCommentVNode,
   createElementBlock,
