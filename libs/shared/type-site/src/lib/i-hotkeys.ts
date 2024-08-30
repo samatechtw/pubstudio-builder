@@ -80,6 +80,7 @@ export enum ComponentHotkeys {
   NewTextarea = 'nTa',
   NewDividerH = 'nDH',
   NewDividerV = 'nDV',
+  NewVue = 'nV',
 }
 
 export enum ComponentAdvancedHotkeys {

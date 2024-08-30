@@ -8,6 +8,7 @@ import {
   addCustomComponentAtSelection,
   resetPageMenu,
 } from '@pubstudio/frontend/feature-build'
+import { useVueComponent } from '@pubstudio/frontend/feature-vue-component'
 import { getOrderedPages } from '@pubstudio/frontend/util-builder'
 import { ISite, StyleTab } from '@pubstudio/shared/type-site'
 
@@ -33,4 +34,9 @@ export const toggleStyleEdit = (site: ISite) => {
   const currentTab = site.editor?.styleTab
   const newIndex = currentTab ? tabs.indexOf(currentTab) : -1
   setStyleTab(site.editor, tabs[(newIndex + 1) % tabs.length])
+}
+
+export const newVueComponent = () => {
+  const { showVueComponentModal } = useVueComponent()
+  showVueComponentModal.value = true
 }

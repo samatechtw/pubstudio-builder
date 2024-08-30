@@ -63,6 +63,7 @@ export const DefaultHotkeys: IHotkeys = {
     [Keys.x]: ComponentHotkeys.NewTextarea,
     [Keys.d]: ComponentHotkeys.NewDividerH,
     [Keys.f]: ComponentHotkeys.NewDividerV,
+    [Keys.Backtick]: ComponentHotkeys.NewVue,
   },
   [HotkeyStates.ComponentAdvanced]: {
     [Keys.a]: ComponentAdvancedHotkeys.Close,

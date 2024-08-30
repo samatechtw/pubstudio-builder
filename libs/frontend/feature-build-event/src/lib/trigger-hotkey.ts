@@ -60,6 +60,7 @@ import {
 } from '@pubstudio/shared/type-site'
 import {
   addCustomComponentAtIndex,
+  newVueComponent,
   setPageByIndex,
   toggleStyleEdit,
 } from './hotkey-actions'
@@ -199,6 +200,9 @@ export const triggerHotkey = (site: ISite, key: Keys) => {
         break
       case ComponentHotkeys.NewDividerV:
         addBuiltinComponent(site, { id: dividerVerticalId })
+        break
+      case ComponentHotkeys.NewVue:
+        newVueComponent()
         break
       // Advanced Components
       case ComponentAdvancedHotkeys.NewButton:
