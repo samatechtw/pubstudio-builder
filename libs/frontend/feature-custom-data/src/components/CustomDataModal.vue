@@ -14,7 +14,7 @@
     </div>
     <div class="table-select-wrap">
       <PSMultiselect
-        :value="selectedTable"
+        :value="selectedTableName"
         class="table-select"
         :options="tableOptions"
         :placeholder="t('build.table')"
@@ -22,49 +22,11 @@
         @click.stop
       />
     </div>
-    <div class="table-wrap" :class="{ 'table-selected': !!selectedTable }">
-      <div v-if="!selectedTable" class="table-placeholder">
+    <div class="table-wrap" :class="{ 'table-selected': !!selectedTableName }">
+      <div v-if="!selectedTableName" class="table-placeholder">
         {{ tables?.length ? t('build.table_select') : t('build.table_placeholder') }}
       </div>
-      <table v-else class="custom-data-table">
-        <thead>
-          <tr>
-            <th v-for="column in columns" :key="column.name" class="th">
-              <div class="th-content">
-                <span class="column-name"> {{ column.name }}</span>
-                <InfoBubble
-                  class="column-type-info"
-                  placement="top"
-                  :message="column.dataType.toString()"
-                />
-              </div>
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(row, index) in rows" :key="index">
-            <td v-for="column in columns" :key="column.name" class="td">
-              {{ row[column.name] }}
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <template v-if="selectedTable">
-        <Spinner v-if="loadingRows" class="rows-spinner" color="#2a17d6" :size="24" />
-        <div v-else-if="!rows.length" class="no-data">
-          {{ t('table.no_data') }}
-        </div>
-        <DataTableNav
-          :page="page"
-          :maxPage="maxPage"
-          :pageSize="pageSize"
-          :offset="from"
-          :total="total"
-          class="table-nav"
-          @setPage="updatePage"
-          @setPageSize="updatePageSize"
-        />
-      </template>
+      <CustomDataTable :table="selectedTable" :siteId="siteId" v-else />
     </div>
   </Modal>
 </template>
@@ -73,29 +35,27 @@
 import { computed, onMounted, ref, toRefs, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'petite-vue-i18n'
-import {
-  InfoBubble,
-  Modal,
-  PSMultiselect,
-  Spinner,
-  DataTableNav,
-} from '@pubstudio/frontend/ui-widgets'
+import { Modal, PSMultiselect } from '@pubstudio/frontend/ui-widgets'
 import { useBuild } from '@pubstudio/frontend/feature-build'
 import { setSelectedTable } from '@pubstudio/frontend/data-access-command'
-import {
-  ICustomTableViewModel,
-  ICustomTableColumn,
-} from '@pubstudio/shared/type-api-site-custom-data'
+import { ICustomTableViewModel } from '@pubstudio/shared/type-api-site-custom-data'
 import { useCustomData } from '../lib/use-custom-data'
-import { useDataTable } from '../lib/use-data-table'
-import { AdminTablePageSize } from '@pubstudio/frontend/util-fields'
+import CustomDataTable from './CustomDataTable.vue'
 
 const { t } = useI18n()
 const route = useRoute()
-
 const { editor } = useBuild()
 
-const selectedTable = computed(() => editor.value?.selectedTable)
+const loadingTables = ref(false)
+const tables = ref<ICustomTableViewModel[]>([])
+
+const selectedTableName = computed(() => editor.value?.selectedTable)
+const selectedTable = computed(() => {
+  if (!selectedTableName.value) {
+    return undefined
+  }
+  return tables.value.find((t) => t.name === selectedTableName.value)
+})
 
 const props = defineProps<{
   show: boolean
@@ -112,15 +72,7 @@ const siteId = computed(() => {
   return route.params.siteId?.toString() ?? ''
 })
 
-const { listTables: listTablesApi, listRows: listRowsApi } = useCustomData(siteId)
-
-const loadingTables = ref(false)
-const tables = ref<ICustomTableViewModel[]>([])
-
-const loadingRows = ref(false)
-const rows = ref<Record<string, unknown>[]>([])
-
-const { page, total, pageSize, maxPage, from, to, setPageSize } = useDataTable()
+const { listTables: listTablesApi } = useCustomData(siteId)
 
 const cancel = () => {
   setSelectedTable(editor.value, undefined)
@@ -135,23 +87,6 @@ const tableOptions = computed(
     })) ?? [],
 )
 
-const columns = computed(() => {
-  if (!selectedTable.value) {
-    return []
-  }
-
-  const table = tables.value.find((table) => table.name === selectedTable.value)
-  if (!table) {
-    return []
-  }
-
-  const record: Record<string, ICustomTableColumn> = table.columns
-  return Object.entries(record).map(([name, column]) => ({
-    name,
-    dataType: column.data_type,
-  }))
-})
-
 const listTables = async () => {
   loadingTables.value = true
   const response = await listTablesApi({})
@@ -163,44 +98,10 @@ const listTables = async () => {
 
 const selectTable = async (tableName: string | undefined) => {
   setSelectedTable(editor.value, tableName)
-  if (tableName) {
-    await listRows(tableName)
-  }
-}
-
-const listRows = async (tableName: string) => {
-  loadingRows.value = true
-  const response = await listRowsApi({
-    table_name: tableName,
-    from: from.value,
-    to: to.value,
-  })
-  if (response) {
-    rows.value = response.results
-    total.value = response.total
-  }
-  loadingRows.value = false
-}
-
-const updatePage = async (value: number) => {
-  page.value = value
-  if (selectedTable.value) {
-    await listRows(selectedTable.value)
-  }
-}
-
-const updatePageSize = async (value: AdminTablePageSize) => {
-  setPageSize(value)
-  if (selectedTable.value) {
-    await listRows(selectedTable.value)
-  }
 }
 
 watch(show, async () => {
   await listTables()
-  if (selectedTable.value) {
-    await listRows(selectedTable.value)
-  }
 })
 
 onMounted(async () => {
@@ -235,46 +136,9 @@ onMounted(async () => {
     justify-content: space-between;
     flex-grow: 1;
     margin-top: 16px;
-    .th {
-      @mixin text 15px;
-      padding: 12px 24px;
-      white-space: nowrap;
-      color: $color-primary;
-      background-color: $grey-200;
-      .th-content {
-        @mixin flex-row;
-        align-items: center;
-        .column-type-info {
-          margin-left: 6px;
-        }
-      }
-    }
-    .td {
-      @mixin body-small;
-      padding: 12px 24px;
-      border-top: 1px solid $grey-300;
-      background-color: white;
-    }
-    .rows-spinner {
-      @mixin flex-center;
-      padding: 48px 0;
-    }
-    .no-data {
-      @mixin h4;
-      padding: 32px 0;
-      color: $color-disabled;
-      text-align: center;
-    }
     &.table-selected {
       border: 1px solid $grey-100;
     }
-  }
-  .custom-data-table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  .table-nav {
-    margin-top: auto;
   }
 }
 </style>

@@ -6,14 +6,16 @@ import {
   IListTablesApiQuery,
   IListTablesResponse,
 } from '@pubstudio/shared/type-api-site-custom-data'
-import { ComputedRef } from 'vue'
+import { ComputedRef, Ref } from 'vue'
 
 export interface ICustomDataFeature {
   listTables: (query: IListTablesApiQuery) => Promise<IListTablesResponse | undefined>
   listRows: (query: IListRowsApiQuery) => Promise<IListRowsResponse | undefined>
 }
 
-export const useCustomData = (siteId: ComputedRef<string>): ICustomDataFeature => {
+export const useCustomData = (
+  siteId: ComputedRef<string> | Ref<string>,
+): ICustomDataFeature => {
   const { apiSite } = useSiteSource()
 
   const listTables = async (
