@@ -13,7 +13,7 @@ export { default as PSRouteTab } from './lib/PSRouteTab.vue'
 export { default as Spinner } from './lib/Spinner.vue'
 export { default as ImagePlaceholder } from './lib/ImagePlaceholder.vue'
 export { default as UsageProgress } from './lib/UsageProgress.vue'
-export { default as DataTableNav } from './lib/DataTableNav.vue'
+export { default as TableNav } from './lib/TableNav.vue'
 
 // svg
 export { default as ArrowShort } from './lib/svg/ArrowShort.vue'
