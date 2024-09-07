@@ -2,6 +2,6 @@ import { ICustomTableColumn, ICustomTableEvent } from './i-custom-table.view-mod
 
 export interface ICreateTableApiRequest {
   table_name: string
-  columns: Record<string, Omit<ICustomTableColumn, 'name'>>
+  columns: Record<string, ICustomTableColumn>
   events: ICustomTableEvent[]
 }

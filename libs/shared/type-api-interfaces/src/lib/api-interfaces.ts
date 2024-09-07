@@ -1,3 +1,4 @@
+import { ApiResponse } from '@pubstudio/shared/type-api'
 import {
   IGetLocalSiteApiRequest,
   IGetLocalSiteApiResponse,
@@ -35,19 +36,56 @@ import {
   IUpdatePlatformTemplateResponse,
 } from '@pubstudio/shared/type-api-platform-template'
 import {
+  IAddColumnApiRequest,
+  IAddRowApiRequest,
+  IAddRowApiResponse,
   ICreateTableApiRequest,
   ICreateTableResponse,
   IListRowsApiQuery,
   IListRowsResponse,
   IListTablesApiQuery,
   IListTablesResponse,
+  IModifyColumnApiRequest,
+  IRemoveRowApiRequest,
+  IUpdateRowApiRequest,
+  IUpdateRowResponse,
 } from '@pubstudio/shared/type-api-site-custom-data'
+import { FetchRequestConfig } from '@sampullman/fetch-api'
 import { EnumFileFormat, IImageJobConfig } from '@samatech/image-api-types'
 
+// Shim for PSApi, which is a utility class
+export interface PSApiShim {
+  authRequest<T = unknown>(config: FetchRequestConfig): Promise<ApiResponse<T>>
+  authOptRequest<T = unknown>(config: FetchRequestConfig): Promise<ApiResponse<T>>
+}
+
 export interface IApiCustomData {
-  listRows: (query: IListRowsApiQuery) => Promise<IListRowsResponse>
-  createTable: (payload: ICreateTableApiRequest) => Promise<ICreateTableResponse>
-  listTables: (query: IListTablesApiQuery) => Promise<IListTablesResponse>
+  listRows: (
+    api: PSApiShim | undefined,
+    query: IListRowsApiQuery,
+  ) => Promise<IListRowsResponse>
+  createTable: (
+    api: PSApiShim | undefined,
+    payload: ICreateTableApiRequest,
+  ) => Promise<ICreateTableResponse>
+  listTables: (
+    api: PSApiShim | undefined,
+    query: IListTablesApiQuery,
+  ) => Promise<IListTablesResponse>
+  addRow: (
+    api: PSApiShim | undefined,
+    payload: IAddRowApiRequest,
+  ) => Promise<IAddRowApiResponse>
+  updateRow: (
+    api: PSApiShim | undefined,
+    payload: IUpdateRowApiRequest,
+  ) => Promise<IUpdateRowResponse>
+  removeRow: (api: PSApiShim | undefined, payload: IRemoveRowApiRequest) => Promise<void>
+  addColumn: (api: PSApiShim | undefined, payload: IAddColumnApiRequest) => Promise<void>
+  modifyColumn: (
+    api: PSApiShim | undefined,
+    payload: IModifyColumnApiRequest,
+  ) => Promise<void>
 }
 
 export interface IApiLocalSite {

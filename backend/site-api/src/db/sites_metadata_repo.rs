@@ -13,6 +13,8 @@ use sqlx::{
 };
 use std::sync::Arc;
 
+use super::site_db_pool_manager::SqlitePoolConnection;
+
 pub type DynSitesMetadataRepo = Arc<dyn SitesMetadataRepoTrait + Send + Sync>;
 
 #[derive(Debug)]
@@ -26,7 +28,7 @@ pub struct SiteMetadataResult {
 
 #[async_trait]
 pub trait SitesMetadataRepoTrait {
-    fn get_db_pool(&self) -> &SqlitePool;
+    async fn get_db_conn(&self) -> Result<SqlitePoolConnection, Error>;
     async fn start_transaction(&self) -> Result<Transaction<'_, Sqlite>, Error>;
     async fn get_site_metadata(&self, site_id: &str) -> Result<SiteMetadataEntity, Error>;
     async fn create_site(&self, dto: CreateSiteMetadataDto) -> Result<String, Error>;
@@ -108,12 +110,12 @@ where
 
 #[async_trait]
 impl SitesMetadataRepoTrait for SitesMetadataRepo {
-    fn get_db_pool(&self) -> &SqlitePool {
-        return &self.metadata_db_pool;
+    async fn get_db_conn(&self) -> Result<SqlitePoolConnection, Error> {
+        return Ok(self.metadata_db_pool.acquire().await?);
     }
 
     async fn start_transaction(&self) -> Result<Transaction<'_, Sqlite>, Error> {
-        let transaction = self.get_db_pool().begin().await?;
+        let transaction = self.metadata_db_pool.begin().await?;
         Ok(transaction)
     }
 
@@ -129,7 +131,7 @@ impl SitesMetadataRepoTrait for SitesMetadataRepo {
         )
         .bind(site_id)
         .try_map(row_to_site_metadata)
-        .fetch_one(self.get_db_pool())
+        .fetch_one(&mut *self.get_db_conn().await?)
         .await?;
         Ok(site)
     }
@@ -145,7 +147,7 @@ impl SitesMetadataRepoTrait for SitesMetadataRepo {
     "#,
         )
         .try_map(row_to_site_metadata)
-        .fetch_all(self.get_db_pool())
+        .fetch_all(&mut *self.get_db_conn().await?)
         .await?;
         Ok(sites)
     }
@@ -167,7 +169,7 @@ impl SitesMetadataRepoTrait for SitesMetadataRepo {
         .bind(dto.owner_id)
         .bind(dto.owner_email)
         .bind(dto.site_type.to_string())
-        .fetch_one(self.get_db_pool())
+        .fetch_one(&mut *self.get_db_conn().await?)
         .await?;
 
         // Start an sqlx transaction
@@ -227,7 +229,7 @@ impl SitesMetadataRepoTrait for SitesMetadataRepo {
         "#,
         )
         .bind(id)
-        .execute(self.get_db_pool())
+        .execute(&mut *self.get_db_conn().await?)
         .await?;
 
         Ok(())
@@ -276,7 +278,7 @@ impl SitesMetadataRepoTrait for SitesMetadataRepo {
         "#,
         )
         .bind(hostname)
-        .fetch_one(self.get_db_pool())
+        .fetch_one(&mut *self.get_db_conn().await?)
         .await?;
 
         let (id,) = result;
@@ -288,12 +290,12 @@ impl SitesMetadataRepoTrait for SitesMetadataRepo {
 
         for table in tables.iter() {
             sqlx::query(&format!(r#"DROP TABLE {}"#, table))
-                .execute(self.get_db_pool())
+                .execute(&mut *self.get_db_conn().await?)
                 .await?;
         }
 
         sqlx::migrate!("./db/metadata/migrations")
-            .run(self.get_db_pool())
+            .run(&self.metadata_db_pool)
             .await?;
 
         Ok(())

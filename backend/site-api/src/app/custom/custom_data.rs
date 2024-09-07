@@ -25,8 +25,7 @@ use super::{
 };
 
 pub fn parse_request_data<T: DeserializeOwned>(data: serde_json::Value) -> Result<T, ApiError> {
-    serde_json::from_value(data)
-        .map_err(|_| ApiError::internal_error().message("Failed to parse request data"))
+    serde_json::from_value(data).map_err(|e| ApiError::bad_request().message(e.to_string()))
 }
 
 pub async fn custom_data(

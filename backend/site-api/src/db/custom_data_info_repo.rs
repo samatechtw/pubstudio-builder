@@ -11,16 +11,16 @@ use lib_shared_types::{
         CustomDataInfoEntity, CustomDataInfoEntityList,
     },
 };
-use sqlx::{sqlite::SqliteRow, Error, Row, SqlitePool};
+use sqlx::{sqlite::SqliteRow, Error, Row};
 
-use super::site_db_pool_manager::DbPoolManager;
+use super::site_db_pool_manager::{DbPoolManager, SqlitePoolConnection};
 
 pub type DynCustomDataInfoRepo = Arc<dyn CustomDataInfoRepoTrait + Send + Sync>;
 
 #[async_trait]
 pub trait CustomDataInfoRepoTrait {
     fn site_db_url(&self, id: &str) -> String;
-    async fn get_db_pool(&self, id: &str) -> Result<SqlitePool, DbError>;
+    async fn get_db_conn(&self, id: &str) -> Result<SqlitePoolConnection, DbError>;
     async fn add_info(
         &self,
         id: &str,
@@ -66,9 +66,9 @@ impl CustomDataInfoRepoTrait for CustomDataInfoRepo {
         format!("sqlite:{}/db/sites/site_{}.db", &self.manifest_dir, id)
     }
 
-    async fn get_db_pool(&self, id: &str) -> Result<SqlitePool, DbError> {
+    async fn get_db_conn(&self, id: &str) -> Result<SqlitePoolConnection, DbError> {
         self.db_pool_manager
-            .get_db_pool(id, &self.manifest_dir)
+            .get_db_conn(id, &self.manifest_dir)
             .await
     }
 
@@ -77,7 +77,7 @@ impl CustomDataInfoRepoTrait for CustomDataInfoRepo {
         id: &str,
         dto: CustomDataInfoDto,
     ) -> Result<CustomDataInfoEntity, DbError> {
-        let pool = self.get_db_pool(id).await?;
+        let mut conn = self.get_db_conn(id).await?;
 
         let result: CustomDataInfoEntity = sqlx::query(
             r#"
@@ -90,7 +90,7 @@ impl CustomDataInfoRepoTrait for CustomDataInfoRepo {
         .bind(dto.columns)
         .bind(dto.events)
         .try_map(map_to_custom_data_info_entity)
-        .fetch_one(&pool)
+        .fetch_one(&mut *conn)
         .await?;
 
         Ok(result)
@@ -101,7 +101,7 @@ impl CustomDataInfoRepoTrait for CustomDataInfoRepo {
         id: &str,
         dto: CustomDataUpdateColumns,
     ) -> Result<CustomDataInfoEntity, DbError> {
-        let pool = self.get_db_pool(id).await?;
+        let mut conn = self.get_db_conn(id).await?;
 
         let result: CustomDataInfoEntity = sqlx::query(
             r#"
@@ -114,7 +114,7 @@ impl CustomDataInfoRepoTrait for CustomDataInfoRepo {
         .bind(dto.columns)
         .bind(dto.name)
         .try_map(map_to_custom_data_info_entity)
-        .fetch_one(&pool)
+        .fetch_one(&mut *conn)
         .await?;
 
         Ok(result)
@@ -125,7 +125,7 @@ impl CustomDataInfoRepoTrait for CustomDataInfoRepo {
         id: &str,
         query: ListTablesQuery,
     ) -> Result<CustomDataInfoEntityList, DbError> {
-        let pool = self.get_db_pool(id).await?;
+        let mut conn = self.get_db_conn(id).await?;
 
         let result = sqlx::query(
             r#"
@@ -138,7 +138,7 @@ impl CustomDataInfoRepoTrait for CustomDataInfoRepo {
         .bind(query.to - query.from + 1)
         .bind(query.from - 1)
         .try_map(row_to_list_result)
-        .fetch_all(&pool)
+        .fetch_all(&mut *conn)
         .await?;
 
         let (results, total) = list_result(result);
@@ -147,7 +147,7 @@ impl CustomDataInfoRepoTrait for CustomDataInfoRepo {
     }
 
     async fn get_table(&self, id: &str, table_name: &str) -> Result<CustomDataInfoEntity, DbError> {
-        let pool = self.get_db_pool(id).await?;
+        let mut conn = self.get_db_conn(id).await?;
 
         let columns = sqlx::query(
             r#"
@@ -158,14 +158,14 @@ impl CustomDataInfoRepoTrait for CustomDataInfoRepo {
         )
         .bind(table_name)
         .try_map(map_to_custom_data_info_entity)
-        .fetch_one(&pool)
+        .fetch_one(&mut *conn)
         .await?;
 
         Ok(columns)
     }
 
     async fn get_custom_tables_size(&self, id: &str) -> Result<i64, DbError> {
-        let pool = self.get_db_pool(id).await?;
+        let mut conn = self.get_db_conn(id).await?;
 
         let row = sqlx::query(
             r#"
@@ -192,7 +192,7 @@ impl CustomDataInfoRepoTrait for CustomDataInfoRepo {
             );
             "#,
         )
-        .fetch_one(&pool)
+        .fetch_one(&mut *conn)
         .await?;
 
         Ok(row.try_get("size")?)

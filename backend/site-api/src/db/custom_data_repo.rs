@@ -18,16 +18,16 @@ use lib_shared_types::dto::custom_data::{
     list_rows_query::{ListRowsQuery, ListRowsResponse},
     update_row_dto::UpdateRow,
 };
-use sqlx::{sqlite::SqliteRow, Column, Error, QueryBuilder, Row, Sqlite, SqlitePool};
+use sqlx::{sqlite::SqliteRow, Column, Error, QueryBuilder, Row, Sqlite};
 
-use super::site_db_pool_manager::DbPoolManager;
+use super::site_db_pool_manager::{DbPoolManager, SqlitePoolConnection};
 
 pub type DynCustomDataRepo = Arc<dyn CustomDataRepoTrait + Send + Sync>;
 
 #[async_trait]
 pub trait CustomDataRepoTrait {
     fn site_db_url(&self, id: &str) -> String;
-    async fn get_db_pool(&self, id: &str) -> Result<SqlitePool, DbError>;
+    async fn get_db_conn(&self, id: &str) -> Result<SqlitePoolConnection, DbError>;
     async fn create_table(&self, id: &str, dto: CreateTable) -> Result<(), DbError>;
     async fn add_row(&self, id: &str, dto: AddRow) -> Result<CustomDataRow, DbError>;
     async fn remove_row(&self, id: &str, dto: RemoveRow) -> Result<(), DbError>;
@@ -126,14 +126,14 @@ impl CustomDataRepoTrait for CustomDataRepo {
         format!("sqlite:{}/db/sites/site_{}.db", &self.manifest_dir, id)
     }
 
-    async fn get_db_pool(&self, id: &str) -> Result<SqlitePool, DbError> {
+    async fn get_db_conn(&self, id: &str) -> Result<SqlitePoolConnection, DbError> {
         self.db_pool_manager
-            .get_db_pool(id, &self.manifest_dir)
+            .get_db_conn(id, &self.manifest_dir)
             .await
     }
 
     async fn create_table(&self, id: &str, dto: CreateTable) -> Result<(), DbError> {
-        let pool = self.get_db_pool(id).await?;
+        let mut conn = self.get_db_conn(id).await?;
 
         let table_name = dto.table_name;
 
@@ -147,13 +147,17 @@ impl CustomDataRepoTrait for CustomDataRepo {
 
         println!("SQL Query: {}", query.sql());
 
-        query.build().execute(&pool).await.map_err(map_sqlx_err)?;
+        query
+            .build()
+            .execute(&mut *conn)
+            .await
+            .map_err(map_sqlx_err)?;
 
         Ok(())
     }
 
     async fn add_row(&self, id: &str, dto: AddRow) -> Result<CustomDataRow, DbError> {
-        let pool = self.get_db_pool(id).await?;
+        let mut conn = self.get_db_conn(id).await?;
 
         let table_name = quote(&dto.table_name);
         let mut query = QueryBuilder::new(format!("INSERT INTO {} (", table_name));
@@ -178,7 +182,7 @@ impl CustomDataRepoTrait for CustomDataRepo {
         let row = query
             .build()
             .try_map(map_to_key_value)
-            .fetch_one(&pool)
+            .fetch_one(&mut *conn)
             .await
             .map_err(map_custom_data_sqlx_err)?;
 
@@ -186,13 +190,13 @@ impl CustomDataRepoTrait for CustomDataRepo {
     }
 
     async fn remove_row(&self, id: &str, dto: RemoveRow) -> Result<(), DbError> {
-        let pool = self.get_db_pool(id).await?;
+        let mut conn = self.get_db_conn(id).await?;
 
         let table_name = dto.table_name;
 
         sqlx::query(&format!("DELETE FROM {} WHERE id = ?1", table_name))
             .bind(dto.row_id)
-            .execute(&pool)
+            .execute(&mut *conn)
             .await?;
 
         Ok(())
@@ -204,7 +208,7 @@ impl CustomDataRepoTrait for CustomDataRepo {
         table_name: &str,
         entries: Vec<(String, String)>,
     ) -> Result<bool, DbError> {
-        let pool = self.get_db_pool(id).await?;
+        let mut conn = self.get_db_conn(id).await?;
         let mut count = 0;
 
         let mut query = QueryBuilder::new("SELECT id FROM ");
@@ -217,13 +221,13 @@ impl CustomDataRepoTrait for CustomDataRepo {
             count = result.1;
         }
 
-        let result = query.build().fetch_optional(&pool).await?;
+        let result = query.build().fetch_optional(&mut *conn).await?;
 
         return Ok(result.is_none());
     }
 
     async fn list_rows(&self, id: &str, query: ListRowsQuery) -> Result<ListRowsResponse, DbError> {
-        let pool = self.get_db_pool(id).await?;
+        let mut conn = self.get_db_conn(id).await?;
 
         let table_name = query.table_name;
 
@@ -240,7 +244,7 @@ impl CustomDataRepoTrait for CustomDataRepo {
         let results = q
             .build()
             .try_map(row_to_list_result)
-            .fetch_all(&pool)
+            .fetch_all(&mut *conn)
             .await?;
 
         let (results, total) = list_result(results);
@@ -253,7 +257,7 @@ impl CustomDataRepoTrait for CustomDataRepo {
         id: &str,
         dto: UpdateRow,
     ) -> Result<BTreeMap<String, String>, DbError> {
-        let pool = self.get_db_pool(id).await?;
+        let mut conn = self.get_db_conn(id).await?;
 
         let table_name = dto.table_name;
 
@@ -279,13 +283,13 @@ impl CustomDataRepoTrait for CustomDataRepo {
         Ok(query
             .build()
             .try_map(map_to_key_value)
-            .fetch_one(&pool)
+            .fetch_one(&mut *conn)
             .await
             .map_err(map_custom_data_sqlx_err)?)
     }
 
     async fn add_column(&self, id: &str, dto: AddColumn) -> Result<(), DbError> {
-        let pool = self.get_db_pool(id).await?;
+        let mut conn = self.get_db_conn(id).await?;
 
         let table_name = dto.table_name;
 
@@ -299,7 +303,7 @@ impl CustomDataRepoTrait for CustomDataRepo {
 
         query
             .build()
-            .execute(&pool)
+            .execute(&mut *conn)
             .await
             .map_err(map_custom_data_sqlx_err)?;
 
@@ -307,7 +311,7 @@ impl CustomDataRepoTrait for CustomDataRepo {
     }
 
     async fn remove_column(&self, id: &str, dto: &RemoveColumn) -> Result<(), DbError> {
-        let pool = self.get_db_pool(id).await?;
+        let mut conn = self.get_db_conn(id).await?;
 
         let table_name = dto.table_name.clone();
         let column = dto.column_name.clone();
@@ -317,7 +321,7 @@ impl CustomDataRepoTrait for CustomDataRepo {
             table_name,
             quote(&column)
         ))
-        .execute(&pool)
+        .execute(&mut *conn)
         .await?;
 
         Ok(())
@@ -330,7 +334,10 @@ impl CustomDataRepoTrait for CustomDataRepo {
         old_column: &str,
         new_column: &str,
     ) -> Result<(), DbError> {
-        let pool = self.get_db_pool(id).await?;
+        let pool = self
+            .db_pool_manager
+            .get_db_pool(id, &self.manifest_dir)
+            .await?;
 
         sqlx::query(&format!(
             "ALTER TABLE {} RENAME COLUMN {} TO {}",
@@ -340,6 +347,8 @@ impl CustomDataRepoTrait for CustomDataRepo {
         ))
         .execute(&pool)
         .await?;
+
+        pool.close().await;
 
         Ok(())
     }

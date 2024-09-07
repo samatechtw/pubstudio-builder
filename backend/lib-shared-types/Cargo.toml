@@ -15,7 +15,7 @@ lazy_static = { workspace = true }
 regex = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
-sqlx = { version = "0.7.4", features = ["runtime-tokio-rustls", "time", "uuid", "chrono"] }
+sqlx = { version = "0.8.1", features = ["runtime-tokio-rustls", "time", "uuid", "chrono"] }
 strum = { workspace = true }
 thiserror = { workspace = true }
 validator = { workspace = true }

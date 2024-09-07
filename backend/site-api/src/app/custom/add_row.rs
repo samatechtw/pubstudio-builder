@@ -61,10 +61,17 @@ pub async fn add_row(
             }
             _ => ApiError::internal_error().message(e),
         })?;
+    let id = row
+        .get("id")
+        .map(|id| id.to_string())
+        .unwrap_or("error".to_string());
 
     // Trigger AddRow table events
     let events = parse_event_info(&table.events)?;
     let triggered = trigger_add_row(context, &table.name, events, row).await?;
 
-    Ok(AddRowResponse { events: triggered })
+    Ok(AddRowResponse {
+        id,
+        events: triggered,
+    })
 }

@@ -23,7 +23,7 @@ jsonwebtoken = "9.3.0"
 reqwest = { version = "0.12.4", default-features = false, features = ["json", "rustls-tls"] }
 serde = { version = "1.0.201", features = ["derive"] }
 serde_json = "1.0.117"
-sqlx = { version = "0.7.4", features = ["runtime-tokio-rustls", "chrono"] }
+sqlx = { version = "0.8.1", features = ["runtime-tokio-rustls", "chrono"] }
 strum = { version = "0.26.2", features = ["derive"] }
 thiserror = "1.0.60"
 tokio = "1.37.0"

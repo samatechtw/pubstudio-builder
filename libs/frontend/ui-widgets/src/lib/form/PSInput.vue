@@ -55,10 +55,10 @@
     </InfoBubble>
     <span v-else-if="suffix" class="ps-input-suffix"> {{ suffix }}</span>
     <IconButtonWrap
-      v-if="clearable && !isEmpty"
+      v-if="clearable"
       class="clear-button-wrap"
       :disabled="isDisabled"
-      @click="emit('update:modelValue', '')"
+      @click="clear"
     >
       <Cross />
     </IconButtonWrap>
@@ -122,6 +122,7 @@ const emit = defineEmits<{
   (e: 'keyup', event: KeyboardEvent): void
   (e: 'keydown', event: KeyboardEvent): void
   (e: 'handle-enter'): void
+  (e: 'clear'): void
 }>()
 
 const { type, name, placeholder, maxLength, modelValue, required, datalistId } =
@@ -166,6 +167,11 @@ const handleInput = (e: Event) => {
   } else {
     emit('update:modelValue', value)
   }
+}
+
+const clear = () => {
+  emit('update:modelValue', '')
+  emit('clear')
 }
 </script>
 
@@ -249,7 +255,7 @@ const handleInput = (e: Event) => {
   }
 
   &.has-icon-button {
-    padding-right: 48px;
+    padding-right: 24px;
   }
 
   &:focus {
@@ -323,9 +329,10 @@ textarea.ps-input {
 }
 
 :deep(.icon-button-wrap) {
+  @mixin size 20px;
   position: absolute;
-  top: 11px;
-  right: 12px;
+  top: 9px;
+  right: 4px;
 }
 
 .bo {

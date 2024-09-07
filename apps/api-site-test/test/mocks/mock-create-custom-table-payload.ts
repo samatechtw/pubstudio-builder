@@ -7,6 +7,8 @@ export const mockCreateTablePayload = (
     table_name: tableName as string,
     columns: {
       name: {
+        name: 'name',
+        default: 'name-default',
         data_type: 'TEXT',
         validation_rules: [
           {
@@ -15,6 +17,7 @@ export const mockCreateTablePayload = (
         ],
       },
       phone: {
+        name: 'phone',
         data_type: 'TEXT',
         validation_rules: [
           {

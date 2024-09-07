@@ -2,6 +2,7 @@ import {
   CustomDataAction,
   ICreateTableResponse,
   ICustomDataApiRequest,
+  IListRowsResponse,
   IListTablesResponse,
 } from '@pubstudio/shared/type-api-site-custom-data'
 import { SiteApiResetService } from '@pubstudio/shared/util-test-reset'
@@ -9,6 +10,7 @@ import supertest from 'supertest'
 import TestAgent from 'supertest/lib/agent'
 import { adminAuthHeader, ownerAuthHeader } from '../helpers/auth-helpers'
 import { mockCreateTablePayload } from '../mocks/mock-create-custom-table-payload'
+import { mockListRowsPayload } from '../mocks/mock-list-rows-payload'
 import { mockListTablesPayload } from '../mocks/mock-list-tables-payload'
 import { SITE_SEEDS } from '../mocks/site-seeds'
 import { testConfig } from '../test.config'
@@ -57,6 +59,30 @@ describe('Create Custom Table', () => {
     expect(body2.results[1].id).toEqual('2')
     expect(body2.results[1].name).toEqual(tableName)
     expect(body2.results[1].events).toEqual([])
+
+    // Add row and check defaults
+    const addPayload = {
+      action: CustomDataAction.AddRow,
+      data: { table_name: 'custom_table', row: { phone: '123' } },
+    }
+    await api
+      .post(testEndpoint(siteId))
+      .set('Authorization', adminAuth)
+      .send(addPayload)
+      .expect(200)
+
+    const listPayload = {
+      action: CustomDataAction.ListRows,
+      data: mockListRowsPayload('custom_table'),
+    }
+    const res1 = await api
+      .post(testEndpoint(siteId))
+      .set('Authorization', adminAuth)
+      .send(listPayload)
+      .expect(200)
+    const body1: IListRowsResponse = res1.body
+    expect(body1.results[0].name).toEqual('name-default')
+    expect(body1.results[0].phone).toEqual('123')
   }
 
   it('creates table when requester is admin', async () => {
@@ -171,10 +197,10 @@ describe('Create Custom Table', () => {
         .post(testEndpoint(siteId))
         .set('Authorization', adminAuth)
         .send(payload)
-        .expect(500, {
+        .expect(400, {
           code: 'None',
-          message: 'Failed to parse request data',
-          status: 500,
+          message: 'missing field `table_name`',
+          status: 400,
         })
     })
   })
