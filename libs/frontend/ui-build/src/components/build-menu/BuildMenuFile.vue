@@ -1,6 +1,6 @@
 <template>
   <div class="file-menu">
-    <BuildMenuIconText :text="t('file.export')" @click="setShowExportModal(true)">
+    <BuildMenuIconText :text="t('export')" @click="setShowExportModal(true)">
       <Export></Export>
     </BuildMenuIconText>
     <SimpleFileUpload id="import" class="import" @selectFile="importSite">

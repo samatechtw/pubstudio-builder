@@ -1,6 +1,7 @@
 use lib_shared_site_api::error::{api_error::ApiError, helpers::check_bad_form};
 use lib_shared_types::{
     dto::custom_data::{
+        create_table_dto::ColumnInfo,
         custom_data_info_viewmodel::{to_api_response, CustomDataInfoViewModel},
         modify_column_dto::ModifyColumn,
     },
@@ -64,8 +65,25 @@ pub async fn modify_column(
         .remove(&old_column)
         .ok_or(ApiError::internal_error().message(format!("No column with name {}", old_column)))?;
 
-    let new_info = dto.new_column_info.unwrap_or(old_info);
-    column_info.insert(new_column.unwrap_or(old_column), new_info);
+    let column_name = new_column.unwrap_or(old_column);
+    let new_info = dto
+        .new_column_info
+        .and_then(|info| {
+            Some(ColumnInfo {
+                name: column_name.clone(),
+                default: old_info.default.clone(),
+                data_type: info.data_type,
+                validation_rules: info.validation_rules,
+            })
+        })
+        .unwrap_or(ColumnInfo {
+            name: column_name.clone(),
+            default: old_info.default,
+            data_type: old_info.data_type,
+            validation_rules: old_info.validation_rules,
+        });
+    println!("MOD {:?}", new_info);
+    column_info.insert(column_name, new_info);
 
     let result = save_column_info(context, site_id, &table, column_info).await?;
 

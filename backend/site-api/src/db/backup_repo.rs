@@ -5,6 +5,8 @@ use sqlx::{sqlite::SqliteRow, Error, Row, SqlitePool};
 use std::sync::Arc;
 use uuid::Uuid;
 
+use super::site_db_pool_manager::SqlitePoolConnection;
+
 pub type DynBackupRepo = Arc<dyn BackupRepoTrait + Send + Sync>;
 
 pub struct BackupEntityProps {
@@ -16,7 +18,7 @@ pub struct BackupEntityProps {
 
 #[async_trait]
 pub trait BackupRepoTrait {
-    fn get_db_pool(&self) -> &SqlitePool;
+    async fn get_db_conn(&self) -> Result<SqlitePoolConnection, Error>;
     async fn create_backup(
         &self,
         props: BackupEntityProps,
@@ -56,8 +58,8 @@ fn row_to_create_result(row: SqliteRow) -> Result<CreateBackupEntityResult, Erro
 
 #[async_trait]
 impl BackupRepoTrait for BackupRepo {
-    fn get_db_pool(&self) -> &SqlitePool {
-        return &self.metadata_db_pool;
+    async fn get_db_conn(&self) -> Result<SqlitePoolConnection, Error> {
+        return Ok(self.metadata_db_pool.acquire().await?);
     }
 
     async fn list_backups_by_site_id(&self, site_id: &str) -> Result<Vec<BackupEntity>, Error> {
@@ -71,7 +73,7 @@ impl BackupRepoTrait for BackupRepo {
         )
         .bind(site_id)
         .try_map(row_to_site_metadata)
-        .fetch_all(self.get_db_pool())
+        .fetch_all(&mut *self.get_db_conn().await?)
         .await?;
         Ok(sites)
     }
@@ -93,7 +95,7 @@ impl BackupRepoTrait for BackupRepo {
         .bind(site_id)
         .bind(offset)
         .try_map(row_to_site_metadata)
-        .fetch_all(self.get_db_pool())
+        .fetch_all(&mut *self.get_db_conn().await?)
         .await?;
         Ok(sites)
     }
@@ -113,7 +115,7 @@ impl BackupRepoTrait for BackupRepo {
         .bind(props.url)
         .bind(props.created_at)
         .try_map(row_to_create_result)
-        .fetch_one(self.get_db_pool())
+        .fetch_one(&mut *self.get_db_conn().await?)
         .await?;
 
         Ok(backup)
@@ -126,7 +128,7 @@ impl BackupRepoTrait for BackupRepo {
         "#,
         )
         .bind(id)
-        .execute(self.get_db_pool())
+        .execute(&mut *self.get_db_conn().await?)
         .await?;
 
         Ok(())
@@ -140,7 +142,7 @@ impl BackupRepoTrait for BackupRepo {
         )
         .bind(id)
         .try_map(row_to_site_metadata)
-        .fetch_one(self.get_db_pool())
+        .fetch_one(&mut *self.get_db_conn().await?)
         .await?;
 
         Ok(backup)

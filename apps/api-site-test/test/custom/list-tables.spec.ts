@@ -45,6 +45,7 @@ describe('List Custom Tables', () => {
     expect(body.total).toEqual(1)
     expect(body.results[0].id).toEqual('1')
     expect(body.results[0].name).toEqual('contact_form')
+    expect(body.results[0].columns['email'].name).toEqual('email')
   })
 
   it('list tables when requester is owner', async () => {

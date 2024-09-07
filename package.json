@@ -38,7 +38,7 @@
   "homepage": "https://github.com/samatechtw/pubstudio-builder#README",
   "author": "SamaTech",
   "dependencies": {
-    "@floating-ui/vue": "^1.1.1",
+    "@floating-ui/vue": "^1.1.4",
     "@samatech/vue-store": "^0.6.0",
     "@sampullman/fetch-api": "^0.12.1",
     "@unhead/vue": "^1.9.15",

@@ -6,8 +6,9 @@ import {
 import { store } from '@pubstudio/frontend/data-access-web-store'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { appendEvent, loadCustomTables } from '@pubstudio/frontend/feature-walkthrough'
-import { parseApiErrorKey, PSApi, toApiError } from '@pubstudio/frontend/util-api'
+import { parseApiErrorKey, toApiError } from '@pubstudio/frontend/util-api'
 import { makeRemoveComponentData } from '@pubstudio/frontend/util-command-data'
+import { makeColumnInfo } from '@pubstudio/frontend/util-custom-data'
 import { clearErrorBehaviorId, contactFormBehaviorId } from '@pubstudio/frontend/util-ids'
 import { resolveComponent } from '@pubstudio/frontend/util-resolve'
 import { IApiCustomData } from '@pubstudio/shared/type-api-interfaces'
@@ -69,7 +70,7 @@ const recipientKey = ref(0)
 export const useContactForm = (): IContactFormFeature => {
   const { apiSite, site, apiSiteId } = useSiteSource()
 
-  const api = useCustomDataApi(apiSite as PSApi, apiSiteId.value as string)
+  const api = useCustomDataApi(apiSiteId.value as string)
 
   const loadContactFormTables = async () => {
     resetContactTables()
@@ -172,22 +173,22 @@ export const useContactForm = (): IContactFormFeature => {
     const tablePayload: ICreateTableApiRequest = {
       table_name: tableName,
       columns: {
-        email: {
-          data_type: 'TEXT',
+        email: makeColumnInfo({
+          name: 'email',
           validation_rules: [
             { rule_type: 'Required' },
             { rule_type: 'Email' },
             { rule_type: 'Unique' },
           ],
-        },
-        message: {
-          data_type: 'TEXT',
+        }),
+        message: makeColumnInfo({
+          name: 'message',
           validation_rules: [
             { rule_type: 'Required' },
             { rule_type: 'MinLength', parameter: 5 },
             { rule_type: 'MaxLength', parameter: 800 },
           ],
-        },
+        }),
       },
       events: [
         {
@@ -198,16 +199,16 @@ export const useContactForm = (): IContactFormFeature => {
       ],
     }
     if (hasName) {
-      tablePayload.columns.name = {
-        data_type: 'TEXT',
+      tablePayload.columns.name = makeColumnInfo({
+        name: 'message',
         validation_rules: [
           { rule_type: 'MinLength', parameter: 2 },
           { rule_type: 'MaxLength', parameter: 100 },
         ],
-      }
+      })
     }
     try {
-      const table = await api.createTable(tablePayload)
+      const table = await api.createTable(apiSite, tablePayload)
       setupContactForm(table.name, hasName)
     } catch (e) {
       console.log('Failed to setup form:', e)

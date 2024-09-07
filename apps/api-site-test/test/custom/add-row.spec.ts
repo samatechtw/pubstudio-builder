@@ -52,6 +52,7 @@ describe('Add Row', () => {
       .expect(200)
 
     const body: IAddRowApiResponse = res.body
+    expect(body.id).toEqual('1')
     expect(body.events).toEqual(1)
   })
 
@@ -65,6 +66,7 @@ describe('Add Row', () => {
       .expect(200)
 
     const body: IAddRowApiResponse = res.body
+    expect(body.id).toEqual('1')
     expect(body.events).toEqual(1)
   })
 

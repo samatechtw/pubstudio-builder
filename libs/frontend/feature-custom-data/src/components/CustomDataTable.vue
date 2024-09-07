@@ -1,29 +1,48 @@
 <template>
   <table class="custom-data-table">
-    <thead>
-      <tr>
-        <th v-for="column in columns" :key="column.name" class="th">
-          <div class="th-content">
-            <span class="column-name"> {{ column.name }}</span>
-            <InfoBubble
-              class="column-type-info"
-              placement="top"
-              :message="column.dataType.toString()"
-            />
-          </div>
-        </th>
-      </tr>
-    </thead>
+    <CustomDataTableHead
+      :columns="columns"
+      :allSelected="allSelected"
+      :someSelected="someSelected"
+      :disableSelect="disableSelect"
+      @addRow="showAddRow"
+      @deleteRows="deleteRows"
+      @editColumn="confirmEditColumn"
+      @selectAll="selectAll"
+    />
     <tbody>
-      <tr v-for="(row, index) in rows" :key="index">
-        <td v-for="column in columns" :key="column.name" class="td">
-          {{ row[column.name] }}
-        </td>
-      </tr>
+      <EditTableRow
+        v-if="newRow"
+        :row="newRow"
+        :columns="columns"
+        class="new-row"
+        @confirm="confirmAddRow"
+        @cancel="cancelNewRow"
+      />
+      <template v-for="(row, index) in rows" :key="row.id">
+        <EditTableRow
+          v-if="row.id === editRow?.id"
+          :row="row"
+          :columns="columns"
+          @confirm="confirmUpdateRow($event)"
+          @cancel="cancelEditRow"
+        />
+        <ViewTableRow
+          v-else
+          :row="row"
+          :columns="columns"
+          :disableSelect="disableSelect"
+          :selected="selectedRows.has(index)"
+          @select="selectRow(index)"
+          @edit="showEditRow(row)"
+        />
+      </template>
     </tbody>
   </table>
   <template v-if="table">
-    <Spinner v-if="loadingRows" class="rows-spinner" color="#2a17d6" :size="24" />
+    <div v-if="loadingRows" class="spinner-wrap">
+      <Spinner class="rows-spinner" color="#2a17d6" :size="24" />
+    </div>
     <div v-else-if="!rows.length" class="no-data">
       {{ t('table.no_data') }}
     </div>
@@ -38,47 +57,62 @@
       @setPageSize="updatePageSize"
     />
   </template>
+  <ConfirmModal
+    :show="showConfirmDelete"
+    :title="t('build.confirm_delete')"
+    :text="t('custom_data.delete_rows')"
+    @confirm="confirmDeleteRows"
+    @cancel="showConfirmDelete = false"
+  />
 </template>
 
 <script lang="ts" setup>
-import { computed, ref, toRefs, watch } from 'vue'
+import { computed, onMounted, reactive, ref, toRefs, watch } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
-import { InfoBubble, Spinner, TableNav } from '@pubstudio/frontend/ui-widgets'
+import { ConfirmModal, Spinner, TableNav } from '@pubstudio/frontend/ui-widgets'
 import {
   ICustomTableColumn,
+  ICustomTableRow,
   ICustomTableViewModel,
 } from '@pubstudio/shared/type-api-site-custom-data'
 import { AdminTablePageSize } from '@pubstudio/frontend/util-fields'
 import { useDataTable } from '../lib/use-data-table'
-import { useCustomData } from '../lib/use-custom-data'
+import { defaultCustomRow } from '../lib/default-custom-row'
+import EditTableRow from './EditTableRow.vue'
+import ViewTableRow from './ViewTableRow.vue'
+import CustomDataTableHead from './CustomDataTableHead.vue'
+import { IEditColumnName } from '../lib/i-edit-column'
 
 const { t } = useI18n()
 
-const { page, total, pageSize, maxPage, from, to, setPageSize } = useDataTable()
-const loadingRows = ref(false)
-const rows = ref<Record<string, unknown>[]>([])
-
 const props = defineProps<{
   table: ICustomTableViewModel | undefined
+  columns: ICustomTableColumn[]
   siteId: string
 }>()
-const { table, siteId } = toRefs(props)
+const { table, siteId, columns } = toRefs(props)
 
-const { listRows: listRowsApi } = useCustomData(siteId)
-
-const listRows = async (tableName: string) => {
-  loadingRows.value = true
-  const response = await listRowsApi({
-    table_name: tableName,
-    from: from.value,
-    to: to.value,
-  })
-  if (response) {
-    rows.value = response.results
-    total.value = response.total
-  }
-  loadingRows.value = false
-}
+const {
+  page,
+  total,
+  pageSize,
+  maxPage,
+  from,
+  errorKey,
+  loadingRows,
+  rows,
+  editRow,
+  newRow,
+  listRows,
+  addRow,
+  updateRow,
+  deleteRow,
+  modifyColumn,
+  setPageSize,
+} = useDataTable(siteId)
+const allSelected = ref(false)
+const showConfirmDelete = ref(false)
+const selectedRows = reactive<Set<number>>(new Set())
 
 watch(table, async (newTable) => {
   if (newTable) {
@@ -86,17 +120,98 @@ watch(table, async (newTable) => {
   }
 })
 
-const columns = computed(() => {
-  if (!table.value) {
-    return []
+onMounted(async () => {
+  if (table.value?.name) {
+    await listRows(table.value.name)
   }
-
-  const record: Record<string, ICustomTableColumn> = table.value.columns
-  return Object.entries(record).map(([name, column]) => ({
-    name,
-    dataType: column.data_type,
-  }))
 })
+
+const disableSelect = computed(() => {
+  return !!newRow.value || !!editRow.value
+})
+
+const someSelected = computed(() => {
+  return selectedRows.size > 0
+})
+
+const selectRow = (rowIndex: number) => {
+  if (selectedRows.has(rowIndex)) {
+    selectedRows.delete(rowIndex)
+  } else {
+    selectedRows.add(rowIndex)
+  }
+}
+
+const deleteRows = async () => {
+  showConfirmDelete.value = true
+}
+
+const selectAll = () => {
+  allSelected.value = !allSelected.value
+  if (allSelected.value) {
+    for (let i = 0; i < rows.value.length; i += 1) {
+      selectedRows.add(i)
+    }
+  } else {
+    selectedRows.clear()
+  }
+}
+
+const showAddRow = () => {
+  newRow.value = defaultCustomRow(columns.value)
+}
+
+const confirmDeleteRows = async () => {
+  if (table.value) {
+    showConfirmDelete.value = false
+    // Sort row indexes in descending order so removing them doesn't cause issues
+    const rowIndexes = Array.from(selectedRows).sort((a, b) => b - a)
+    for (const rowIndex of rowIndexes) {
+      await deleteRow(table.value.name, rowIndex)
+    }
+    selectedRows.clear()
+    allSelected.value = false
+  }
+}
+
+const showEditRow = (row: ICustomTableRow) => {
+  editRow.value = { ...row }
+}
+const cancelEditRow = () => {
+  editRow.value = undefined
+  errorKey.value = undefined
+}
+
+const confirmAddRow = async (row: ICustomTableRow) => {
+  if (table.value) {
+    await addRow(table.value.name, row)
+  }
+}
+const cancelNewRow = () => {
+  newRow.value = undefined
+  errorKey.value = undefined
+}
+
+const confirmUpdateRow = async (row: ICustomTableRow) => {
+  if (table.value) {
+    await updateRow(table.value.name, row)
+  }
+}
+
+const confirmEditColumn = async (info: IEditColumnName) => {
+  if (table.value) {
+    await modifyColumn(table.value.name, info)
+    for (const row of rows.value) {
+      row[info.newName] = row[info.oldName]
+      delete row[info.oldName]
+    }
+    table.value.columns[info.newName] = {
+      ...table.value.columns[info.oldName],
+      name: info.newName,
+    }
+    delete table.value.columns[info.oldName]
+  }
+}
 
 const updatePage = async (value: number) => {
   page.value = value
@@ -116,30 +231,26 @@ const updatePageSize = async (value: AdminTablePageSize) => {
 <style lang="postcss" scoped>
 @import '@theme/css/mixins.postcss';
 
-.th {
-  @mixin text 15px;
-  padding: 12px 24px;
-  white-space: nowrap;
-  color: $color-primary;
-  background-color: $grey-200;
+.custom-data-table {
+  width: 100%;
+  border-collapse: collapse;
 }
-.th-content {
-  @mixin flex-row;
-  align-items: center;
+.action {
+  @mixin flex-center;
+  padding: 12px 8px;
+  width: 60px;
+  cursor: pointer;
 }
-.column-type-info {
-  margin-left: 6px;
+tbody tr:last-child {
+  border-bottom: 1px solid $grey-300;
 }
-
-.td {
-  @mixin body-small;
-  padding: 12px 24px;
-  border-top: 1px solid $grey-300;
-  background-color: white;
+.spinner-wrap {
+  @mixin overlay;
+  @mixin flex-center;
+  background-color: rgba(0, 0, 0, 0.15);
 }
 .rows-spinner {
   @mixin flex-center;
-  padding: 48px 0;
 }
 .no-data {
   @mixin h4;
@@ -147,12 +258,10 @@ const updatePageSize = async (value: AdminTablePageSize) => {
   color: $color-disabled;
   text-align: center;
 }
-
-.custom-data-table {
-  width: 100%;
-  border-collapse: collapse;
-}
 .table-nav {
   margin-top: auto;
+}
+tr:not(:first-child) {
+  border-top: 1px solid $grey-300;
 }
 </style>

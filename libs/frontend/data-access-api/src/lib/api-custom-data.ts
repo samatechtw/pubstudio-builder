@@ -1,7 +1,9 @@
-import { PSApi } from '@pubstudio/frontend/util-api'
-import { IApiCustomData } from '@pubstudio/shared/type-api-interfaces'
+import { IApiCustomData, PSApiShim } from '@pubstudio/shared/type-api-interfaces'
 import {
   CustomDataAction,
+  IAddColumnApiRequest,
+  IAddRowApiRequest,
+  IAddRowApiResponse,
   ICreateTableApiRequest,
   ICreateTableResponse,
   ICustomDataApiRequest,
@@ -9,54 +11,97 @@ import {
   IListRowsResponse,
   IListTablesApiQuery,
   IListTablesResponse,
+  IModifyColumnApiRequest,
+  IRemoveRowApiRequest,
+  IUpdateRowApiRequest,
+  IUpdateRowResponse,
 } from '@pubstudio/shared/type-api-site-custom-data'
-import { RequestParams } from '@sampullman/fetch-api'
 
-export const useCustomDataApi = (api: PSApi, siteId: string): IApiCustomData => {
-  const listTables = async (query: IListTablesApiQuery): Promise<IListTablesResponse> => {
-    const requestPayload: ICustomDataApiRequest = {
-      action: CustomDataAction.ListTables,
-      data: query,
+export const useCustomDataApi = (siteId: string): IApiCustomData => {
+  const customDataRequest = async <T = unknown>(
+    api: PSApiShim | undefined,
+    action: CustomDataAction,
+    payload: unknown,
+  ): Promise<T> => {
+    if (!api) {
+      throw 'errors.None'
     }
-    const { data } = await api.authOptRequest({
+    const reqPayload: ICustomDataApiRequest = {
+      action,
+      data: payload,
+    }
+    const { data } = await api.authRequest<T>({
       url: `sites/${siteId}/custom_data`,
       method: 'POST',
-      data: requestPayload as unknown as RequestParams,
+      data: reqPayload,
     })
-    return data as IListTablesResponse
+    return data
   }
 
-  const listRows = async (query: IListRowsApiQuery): Promise<IListRowsResponse> => {
-    const payload: ICustomDataApiRequest = {
-      action: CustomDataAction.ListRows,
-      data: query,
-    }
-    const { data } = await api.authRequest({
-      url: `sites/${siteId}/custom_data`,
-      method: 'POST',
-      data: payload,
-    })
-    return data as IListRowsResponse
+  const listTables = async (
+    api: PSApiShim | undefined,
+    query: IListTablesApiQuery,
+  ): Promise<IListTablesResponse> => {
+    return customDataRequest(api, CustomDataAction.ListTables, query)
+  }
+
+  const listRows = async (
+    api: PSApiShim | undefined,
+    query: IListRowsApiQuery,
+  ): Promise<IListRowsResponse> => {
+    return customDataRequest(api, CustomDataAction.ListRows, query)
   }
 
   const createTable = async (
+    api: PSApiShim | undefined,
     payload: ICreateTableApiRequest,
   ): Promise<ICreateTableResponse> => {
-    const requestPayload: ICustomDataApiRequest = {
-      action: CustomDataAction.CreateTable,
-      data: payload,
-    }
-    const { data } = await api.authRequest({
-      url: `sites/${siteId}/custom_data`,
-      method: 'POST',
-      data: requestPayload,
-    })
-    return data as ICreateTableResponse
+    return customDataRequest(api, CustomDataAction.CreateTable, payload)
+  }
+
+  const addRow = async (
+    api: PSApiShim | undefined,
+    payload: IAddRowApiRequest,
+  ): Promise<IAddRowApiResponse> => {
+    return customDataRequest(api, CustomDataAction.AddRow, payload)
+  }
+
+  const updateRow = async (
+    api: PSApiShim | undefined,
+    payload: IUpdateRowApiRequest,
+  ): Promise<IUpdateRowResponse> => {
+    return customDataRequest(api, CustomDataAction.UpdateRow, payload)
+  }
+
+  const removeRow = async (
+    api: PSApiShim | undefined,
+    payload: IRemoveRowApiRequest,
+  ): Promise<void> => {
+    await customDataRequest(api, CustomDataAction.RemoveRow, payload)
+  }
+
+  const addColumn = async (
+    api: PSApiShim | undefined,
+    payload: IAddColumnApiRequest,
+  ): Promise<void> => {
+    await customDataRequest(api, CustomDataAction.AddColumn, payload)
+  }
+
+  const modifyColumn = async (
+    api: PSApiShim | undefined,
+    payload: IModifyColumnApiRequest,
+  ): Promise<void> => {
+    await customDataRequest(api, CustomDataAction.ModifyColumn, payload)
   }
 
   return {
     listRows,
     createTable,
     listTables,
+    addRow,
+    updateRow,
+    removeRow,
+    addColumn,
+    modifyColumn,
   }
 }

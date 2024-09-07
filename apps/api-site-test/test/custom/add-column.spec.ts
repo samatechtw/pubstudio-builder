@@ -2,6 +2,7 @@ import {
   CustomDataAction,
   IAddColumnApiRequest,
   ICustomDataApiRequest,
+  IListRowsResponse,
   IUpdateColumnApiResponse,
 } from '@pubstudio/shared/type-api-site-custom-data'
 import { SiteApiResetService } from '@pubstudio/shared/util-test-reset'
@@ -14,6 +15,7 @@ import {
   mockAddRowPayload1,
   mockAddRowPayload4,
 } from '../mocks/mock-add-row-payload'
+import { mockListRowsPayload } from '../mocks/mock-list-rows-payload'
 import { SITE_SEEDS } from '../mocks/site-seeds'
 import { testConfig } from '../test.config'
 
@@ -70,6 +72,18 @@ describe('Add Column', () => {
   }
 
   it('add column when requester is admin', async () => {
+    // Add a row first to verify the new column default
+    const addPayload = {
+      action: CustomDataAction.AddRow,
+      data: mockAddRowPayload1(),
+    }
+    await api
+      .post(testEndpoint(siteId))
+      .set('Authorization', adminAuth)
+      .send(addPayload)
+      .expect(200)
+
+    // Add column
     const res = await api
       .post(testEndpoint(siteId))
       .set('Authorization', adminAuth)
@@ -81,6 +95,18 @@ describe('Add Column', () => {
     expect(body.id).toEqual('1')
     expect(body.name).toEqual('contact_form')
     expect(body.columns['phone']).toBeDefined()
+
+    const listPayload = {
+      action: CustomDataAction.ListRows,
+      data: mockListRowsPayload('contact_form'),
+    }
+    const res1 = await api
+      .post(testEndpoint(siteId))
+      .set('Authorization', adminAuth)
+      .send(listPayload)
+      .expect(200)
+    const body1: IListRowsResponse = res1.body
+    expect(body1.results[0].phone).toEqual('test-default')
 
     await verifyAddRow()
     await verifyAddInvalidRow()

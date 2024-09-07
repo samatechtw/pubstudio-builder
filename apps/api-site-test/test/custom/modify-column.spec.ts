@@ -63,6 +63,9 @@ describe('Modify Column', () => {
     if (modifyRequest.new_column_name) {
       expect(body.columns[modifyRequest.old_column_name]).toBe(undefined)
       expect(body.columns[modifyRequest.new_column_name]).toBeDefined()
+      expect(body.columns[modifyRequest.new_column_name].name).toEqual(
+        modifyRequest.new_column_name,
+      )
     } else {
       expect(body.columns[modifyRequest.old_column_name]).toBeDefined()
     }

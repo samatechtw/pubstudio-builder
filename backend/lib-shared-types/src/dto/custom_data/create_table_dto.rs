@@ -23,6 +23,16 @@ pub struct CreateTableResponse {
 #[derive(Deserialize, Serialize, Validate, Debug, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct ColumnInfo {
+    pub name: String,
+    pub data_type: DataType,
+    pub default: Option<String>,
+    pub validation_rules: Vec<ValidationRule>,
+}
+
+// When modifying a column, the name is included separately in the DTO
+#[derive(Deserialize, Serialize, Validate, Debug, Clone)]
+#[serde(deny_unknown_fields)]
+pub struct ModifyColumnInfo {
     pub data_type: DataType,
     pub validation_rules: Vec<ValidationRule>,
 }

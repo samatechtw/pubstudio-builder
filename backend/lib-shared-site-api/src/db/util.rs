@@ -179,6 +179,7 @@ pub fn append_column_info_to_query<'a, DB: Database>(
 ) -> QueryBuilder<'a, DB> {
     for (column_name, column_info) in columns.iter() {
         let column_type = column_info.data_type.to_string();
+        let default_val = column_info.default.clone().unwrap_or("".into());
         let quoted_column = quote(&column_name);
 
         match action_type {
@@ -194,12 +195,7 @@ pub fn append_column_info_to_query<'a, DB: Database>(
         query.push(" ");
         query.push(column_type);
 
-        match action_type {
-            Action::AddColumn => {
-                query.push(" DEFAULT ''");
-            }
-            _ => {}
-        }
+        query.push(format!(" DEFAULT '{}'", default_val));
     }
     query
 }

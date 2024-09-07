@@ -6,11 +6,13 @@ use lib_shared_site_api::cache::cache::SiteUsageCache;
 use lib_shared_types::entity::site_api::site_usage_entity::SiteUsageEntity;
 use sqlx::{sqlite::SqliteRow, Error, QueryBuilder, Row, Sqlite, SqlitePool};
 
+use super::site_db_pool_manager::SqlitePoolConnection;
+
 pub type DynUsageRepo = Arc<dyn UsageRepoTrait + Send + Sync>;
 
 #[async_trait]
 pub trait UsageRepoTrait {
-    fn get_db_pool(&self) -> &SqlitePool;
+    async fn get_db_conn(&self) -> Result<SqlitePoolConnection, Error>;
     async fn insert_usage(&self, cache: &SiteUsageCache) -> Result<(), Error>;
     async fn list_usages_by_site_id(&self, site_id: &str) -> Result<Vec<SiteUsageEntity>, Error>;
     async fn list_latest_usages(&self) -> Result<Vec<SiteUsageEntity>, Error>;
@@ -34,8 +36,8 @@ fn map_to_usage_entity(row: SqliteRow) -> Result<SiteUsageEntity, Error> {
 
 #[async_trait]
 impl UsageRepoTrait for UsageRepo {
-    fn get_db_pool(&self) -> &SqlitePool {
-        return &self.metadata_db_pool;
+    async fn get_db_conn(&self) -> Result<SqlitePoolConnection, Error> {
+        return Ok(self.metadata_db_pool.acquire().await?);
     }
 
     async fn insert_usage(&self, cache: &SiteUsageCache) -> Result<(), Error> {
@@ -53,7 +55,10 @@ impl UsageRepoTrait for UsageRepo {
                 .push_bind(Utc::now());
         });
 
-        query_builder.build().execute(self.get_db_pool()).await?;
+        query_builder
+            .build()
+            .execute(&mut *self.get_db_conn().await?)
+            .await?;
 
         Ok(())
     }
@@ -66,7 +71,7 @@ impl UsageRepoTrait for UsageRepo {
         )
         .bind(site_id)
         .try_map(map_to_usage_entity)
-        .fetch_all(self.get_db_pool())
+        .fetch_all(&mut *self.get_db_conn().await?)
         .await?;
 
         Ok(entity)
@@ -84,7 +89,7 @@ impl UsageRepoTrait for UsageRepo {
         "#,
         )
         .try_map(map_to_usage_entity)
-        .fetch_all(self.get_db_pool())
+        .fetch_all(&mut *self.get_db_conn().await?)
         .await?;
 
         Ok(entity)

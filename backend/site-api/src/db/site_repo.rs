@@ -30,7 +30,7 @@ use std::{
 
 use uuid::Uuid;
 
-use super::site_db_pool_manager::DbPoolManager;
+use super::site_db_pool_manager::{DbPoolManager, SqlitePoolConnection};
 
 pub type DynSiteRepo = Arc<dyn SiteRepoTrait + Send + Sync>;
 
@@ -41,7 +41,7 @@ const SITE_INFO_COLUMNS: &str = r#"id, name, updated_at, published"#;
 pub trait SiteRepoTrait {
     fn site_db_url(&self, id: &str) -> String;
     async fn create_db(&self, id: &str) -> Result<SqlitePool, DbError>;
-    async fn get_db_pool(&self, id: &str) -> Result<SqlitePool, DbError>;
+    async fn get_db_conn(&self, id: &str) -> Result<SqlitePoolConnection, DbError>;
     async fn delete_site(&self, id: &str) -> Result<(), DbError>;
     async fn create_site(&self, req: CreateSiteDto) -> Result<SiteEntity, DbError>;
     async fn migrate_db(&self, pool: &SqlitePool) -> Result<(), DbError>;
@@ -87,14 +87,15 @@ impl SiteRepoTrait for SiteRepo {
         format!("sqlite:{}/db/sites/site_{}.db", &self.manifest_dir, id)
     }
 
-    async fn get_db_pool(&self, id: &str) -> Result<SqlitePool, DbError> {
+    async fn get_db_conn(&self, id: &str) -> Result<SqlitePoolConnection, DbError> {
         self.db_pool_manager
-            .get_db_pool(id, &self.manifest_dir)
+            .get_db_conn(id, &self.manifest_dir)
             .await
     }
 
     async fn create_site(&self, req: CreateSiteDto) -> Result<SiteEntity, DbError> {
         let pool = self.create_db(&req.id).await?;
+        let mut conn = pool.acquire().await?;
 
         // Insert site info into sites table
         let site_response = sqlx::query(formatcp!(
@@ -116,7 +117,7 @@ impl SiteRepoTrait for SiteRepo {
         .bind(req.published)
         .bind(Utc::now().timestamp_millis())
         .try_map(map_to_site_entity)
-        .fetch_one(&pool)
+        .fetch_one(&mut *conn)
         .await
         .map_err(|e| DbError::Query(e.to_string()))?;
 
@@ -128,7 +129,7 @@ impl SiteRepoTrait for SiteRepo {
         id: &str,
         published: bool,
     ) -> Result<SiteEntity, DbError> {
-        let pool = self.get_db_pool(id).await?;
+        let mut conn = self.get_db_conn(id).await?;
 
         let query = if published {
             formatcp!(
@@ -144,7 +145,7 @@ impl SiteRepoTrait for SiteRepo {
 
         let site = sqlx::query(query)
             .try_map(map_to_site_entity)
-            .fetch_one(&pool)
+            .fetch_one(&mut *conn)
             .await
             .map_err(|e| DbError::Query(e.to_string()))?;
 
@@ -152,7 +153,7 @@ impl SiteRepoTrait for SiteRepo {
     }
 
     async fn get_site_by_version(&self, id: &str, version_id: &str) -> Result<SiteEntity, DbError> {
-        let pool = self.get_db_pool(id).await?;
+        let mut conn = self.get_db_conn(id).await?;
 
         let version_id_result = version_id.parse::<i64>();
 
@@ -163,7 +164,7 @@ impl SiteRepoTrait for SiteRepo {
             ))
             .bind(version_id)
             .try_map(map_to_site_entity)
-            .fetch_one(&pool)
+            .fetch_one(&mut *conn)
             .await
             .map_err(|e| DbError::Query(e.to_string()))?),
             Err(e) => Err(DbError::Query(e.to_string())),
@@ -175,7 +176,7 @@ impl SiteRepoTrait for SiteRepo {
         id: &str,
         preview_id: &str,
     ) -> Result<SiteEntity, DbError> {
-        let pool = self.get_db_pool(id).await?;
+        let mut conn = self.get_db_conn(id).await?;
 
         Ok(sqlx::query(formatcp!(
             r#"SELECT {} FROM site_versions WHERE preview_id = ?"#,
@@ -183,7 +184,7 @@ impl SiteRepoTrait for SiteRepo {
         ))
         .bind(preview_id)
         .try_map(map_to_site_entity)
-        .fetch_one(&pool)
+        .fetch_one(&mut *conn)
         .await
         .map_err(|e| DbError::Query(e.to_string()))?)
     }
@@ -193,7 +194,7 @@ impl SiteRepoTrait for SiteRepo {
         id: &str,
         req: UpdateSiteDtoWithContentUpdatedAt,
     ) -> Result<SiteEntity, DbError> {
-        let pool = self.get_db_pool(id).await?;
+        let mut conn = self.get_db_conn(id).await?;
 
         let query = QueryBuilder::new("UPDATE site_versions SET");
         let update_count = 0;
@@ -242,7 +243,7 @@ impl SiteRepoTrait for SiteRepo {
         Ok(query
             .build()
             .try_map(map_to_site_entity)
-            .fetch_one(&pool)
+            .fetch_one(&mut *conn)
             .await
             .map_err(map_sqlx_err)?)
     }
@@ -279,7 +280,10 @@ impl SiteRepoTrait for SiteRepo {
 
     async fn migrate_all(&self, sites: Vec<SiteMetadataEntity>) -> Result<(), DbError> {
         for site in sites {
-            let pool = self.get_db_pool(&site.id).await?;
+            let pool = self
+                .db_pool_manager
+                .get_db_pool(&site.id, &self.manifest_dir)
+                .await?;
             if let Err(e) = self.migrate_db(&pool).await {
                 println!("Failed to migrate site: {}", e.to_string());
             }
@@ -304,7 +308,7 @@ impl SiteRepoTrait for SiteRepo {
     }
 
     async fn create_draft(&self, id: &str, from_id: i64) -> Result<(), DbError> {
-        let pool = self.get_db_pool(id).await?;
+        let mut conn = self.get_db_conn(id).await?;
 
         sqlx::query(
             r#"INSERT INTO site_versions (name, version, context, defaults, editor, history, pages, content_updated_at)
@@ -312,14 +316,14 @@ impl SiteRepoTrait for SiteRepo {
             "#,
         )
         .bind(from_id)
-        .execute(&pool)
+        .execute(&mut *conn)
         .await?;
 
         Ok(())
     }
 
     async fn delete_draft(&self, id: &str) -> Result<(), DbError> {
-        let pool = self.get_db_pool(id).await?;
+        let mut conn = self.get_db_conn(id).await?;
 
         sqlx::query(
             r#"
@@ -327,14 +331,14 @@ impl SiteRepoTrait for SiteRepo {
                WHERE id = (SELECT MAX(id) FROM site_versions)
             "#,
         )
-        .execute(&pool)
+        .execute(&mut *conn)
         .await?;
 
         Ok(())
     }
 
     async fn publish_all_versions(&self, id: &str, published: bool) -> Result<(), DbError> {
-        let pool = self.get_db_pool(id).await?;
+        let mut conn = self.get_db_conn(id).await?;
 
         sqlx::query(
             r#"
@@ -343,13 +347,13 @@ impl SiteRepoTrait for SiteRepo {
             "#,
         )
         .bind(published)
-        .execute(&pool)
+        .execute(&mut *conn)
         .await?;
         Ok(())
     }
 
     async fn publish_site(&self, id: &str) -> Result<SiteEntity, DbError> {
-        let pool = self.get_db_pool(id).await?;
+        let mut conn = self.get_db_conn(id).await?;
 
         let mut sites = sqlx::query(formatcp!(
             r#"
@@ -361,7 +365,7 @@ impl SiteRepoTrait for SiteRepo {
             SITE_COLUMNS
         ))
         .try_map(map_to_site_entity)
-        .fetch_all(&pool)
+        .fetch_all(&mut *conn)
         .await
         .map_err(|e| DbError::Query(e.to_string()))?
         .into_iter();
@@ -403,7 +407,7 @@ impl SiteRepoTrait for SiteRepo {
         Ok(query
             .build()
             .try_map(map_to_site_entity)
-            .fetch_one(&pool)
+            .fetch_one(&mut *conn)
             .await
             .map_err(map_sqlx_err)?)
     }
@@ -413,7 +417,7 @@ impl SiteRepoTrait for SiteRepo {
         id: &str,
         query: ListQuery,
     ) -> Result<Vec<SiteInfoEntity>, DbError> {
-        let pool = self.get_db_pool(id).await?;
+        let mut conn = self.get_db_conn(id).await?;
 
         let result = sqlx::query(formatcp!(
             r#"
@@ -427,14 +431,14 @@ impl SiteRepoTrait for SiteRepo {
         .bind(query.to - query.from + 1)
         .bind(query.from - 1)
         .try_map(map_site_info_entity)
-        .fetch_all(&pool)
+        .fetch_all(&mut *conn)
         .await?;
 
         Ok(result)
     }
 
     async fn export_backup(&self, id: &str) -> Result<Vec<u8>, DbError> {
-        let pool = self.get_db_pool(id).await?;
+        let mut conn = self.get_db_conn(id).await?;
 
         let backup_file = format!("db/sites/backups/backup_{}.db", id);
 
@@ -444,7 +448,7 @@ impl SiteRepoTrait for SiteRepo {
 
         let _ = sqlx::query("VACUUM INTO ?1")
             .bind(&backup_file)
-            .fetch_all(&pool)
+            .fetch_all(&mut *conn)
             .await?;
 
         let file_content = fs::read(backup_file).map_err(|e| DbError::FileError(e.to_string()))?;

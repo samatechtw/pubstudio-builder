@@ -20,13 +20,13 @@
         </span>
       </div>
       <Caret
-        class="paging-info-go-prev-page-button"
+        class="prev-page-button"
         :color="atFirstPage ? '#d7d7db' : undefined"
         :disabled="atFirstPage"
         @click="prevPage"
       />
       <Caret
-        class="paging-info-go-next-page-button"
+        class="next-page-button"
         :color="atLastPage ? '#d7d7db' : undefined"
         :disabled="atLastPage"
         @click="nextPage"
@@ -117,60 +117,61 @@ const limit = computed(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 40px;
+  padding: 12px 24px;
   min-height: 66px;
   background-color: white;
-  border-top: 1px solid $grey-100;
-  .rows-per-page {
-    display: flex;
-    align-items: center;
-    .rows-per-page-label {
-      @mixin caption;
-      margin-right: 24px;
-    }
-    .rows-per-page-select {
-      padding: 4px 8px;
-      border-color: $grey-200;
-    }
+  border-top: 1px solid $grey-300;
+}
+.rows-per-page {
+  display: flex;
+  align-items: center;
+}
+.rows-per-page-label {
+  @mixin caption;
+  margin-right: 24px;
+}
+.rows-per-page-select {
+  padding: 4px 8px;
+  border-color: $grey-200;
+}
+.paging-info {
+  @mixin caption;
+  display: flex;
+  align-items: center;
+}
+.paging-info-range {
+  color: $color-primary;
+}
+.paging-info-total {
+  color: $color-disabled;
+}
+.prev-page-button {
+  margin-left: 24px;
+  transform: rotate(90deg);
+  cursor: pointer;
+  &[disabled='true'] {
+    cursor: default;
   }
-  .paging-info {
-    @mixin caption;
-    display: flex;
-    align-items: center;
-    .paging-info-range {
-      color: $color-primary;
-    }
-    .paging-info-total {
-      color: $color-disabled;
-    }
-    .paging-info-go-prev-page-button {
-      margin-left: 24px;
-      transform: rotate(90deg);
-      cursor: pointer;
-      &[disabled='true'] {
-        cursor: default;
-      }
-    }
-    .paging-info-go-next-page-button {
-      margin-left: 24px;
-      transform: rotate(-90deg);
-      cursor: pointer;
-      &[disabled='true'] {
-        cursor: default;
-      }
-    }
+}
+.next-page-button {
+  margin-left: 24px;
+  transform: rotate(-90deg);
+  cursor: pointer;
+  &[disabled='true'] {
+    cursor: default;
   }
-  .jump-to-page {
-    display: flex;
-    align-items: center;
-    .jump-to-page-label {
-      @mixin caption;
-      margin-right: 24px;
-    }
-    .jump-to-page-select {
-      padding: 4px 8px;
-      border-color: $grey-200;
-    }
-  }
+}
+
+.jump-to-page {
+  display: flex;
+  align-items: center;
+}
+.jump-to-page-label {
+  @mixin caption;
+  margin-right: 24px;
+}
+.jump-to-page-select {
+  padding: 4px 8px;
+  border-color: $grey-200;
 }
 </style>

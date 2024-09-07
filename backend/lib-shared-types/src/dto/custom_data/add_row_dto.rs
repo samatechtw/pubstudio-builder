@@ -12,5 +12,6 @@ pub struct AddRow {
 
 #[derive(Serialize)]
 pub struct AddRowResponse {
+    pub id: String,
     pub events: i32,
 }

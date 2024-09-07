@@ -14,6 +14,7 @@ export interface ICustomTableColumnRule {
 
 export interface ICustomTableColumn {
   name: string
+  default?: string
   data_type: ICustomTableDataType
   validation_rules: ICustomTableColumnRule[]
 }

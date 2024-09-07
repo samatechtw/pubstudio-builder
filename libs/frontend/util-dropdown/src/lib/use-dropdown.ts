@@ -13,7 +13,6 @@ import {
   ComponentPublicInstance,
   ComputedRef,
   CSSProperties,
-  onMounted,
   onUnmounted,
   ref,
   Ref,
@@ -61,13 +60,35 @@ export const useDropdown = (options: IUseDropdownOptions): IUseDropdown => {
     openChanged,
   } = options
 
+  const opened = ref()
+  let autoUpdateCleanup: (() => void) | undefined = undefined
+
+  const setOpened = (value: boolean) => {
+    opened.value = value
+    if (value) {
+      autoUpdateCleanup = autoUpdate(
+        toggleRef.value,
+        menuRef.value,
+        autoUpdateMenuPosition,
+        {
+          ancestorScroll: false,
+          ancestorResize: false,
+          elementResize: options.elementResize ?? false,
+          layoutShift: options.layoutShift ?? true,
+        },
+      )
+    } else {
+      autoUpdateCleanup?.()
+    }
+  }
+
   const toggleRef = ref()
   const menuRef = ref()
-  const opened = ref(openedInit ?? false)
+  setOpened(openedInit ?? false)
 
   if (openControl) {
     watch(openControl, async (isOpen: boolean) => {
-      opened.value = isOpen
+      setOpened(isOpen)
     })
   }
 
@@ -99,12 +120,9 @@ export const useDropdown = (options: IUseDropdownOptions): IUseDropdown => {
     }
   }
 
-  let autoUpdateCleanup: (() => void) | undefined = undefined
-
   const closeMenu = () => {
     if (!disableClose?.value) {
-      opened.value = false
-      autoUpdateCleanup?.()
+      setOpened(false)
       openChanged?.(opened.value)
     }
   }
@@ -115,7 +133,7 @@ export const useDropdown = (options: IUseDropdownOptions): IUseDropdown => {
     if (opened.value === value) {
       return
     }
-    opened.value = value
+    setOpened(value)
     if (value) {
       updateMenuPosition()
     } else {
@@ -126,25 +144,12 @@ export const useDropdown = (options: IUseDropdownOptions): IUseDropdown => {
 
   const toggleMenu = () => setMenuOpened(!opened.value)
 
-  const updateMenuPositionOnResize = () => {
-    if (opened.value) {
-      updateMenuPosition()
-    }
+  const autoUpdateMenuPosition = () => {
+    updateMenuPosition()
   }
-
-  onMounted(async () => {
-    autoUpdateCleanup = autoUpdate(toggleRef.value, menuRef.value, updateMenuPosition, {
-      ancestorScroll: false,
-      ancestorResize: false,
-      elementResize: options.elementResize ?? false,
-      layoutShift: options.layoutShift ?? true,
-    })
-    window.addEventListener('resize', updateMenuPositionOnResize)
-  })
 
   onUnmounted(() => {
     autoUpdateCleanup?.()
-    window.removeEventListener('resize', updateMenuPositionOnResize)
   })
 
   return {
