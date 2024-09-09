@@ -3,7 +3,11 @@ import { checkSiteNeedsUpdate, store } from '@pubstudio/frontend/data-access-web
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { initializeSiteStore } from '@pubstudio/frontend/feature-site-store-init'
 import { toApiError } from '@pubstudio/frontend/util-api'
+import { RenderMode } from '@pubstudio/frontend/util-render'
+import { overrideHelper } from '@pubstudio/frontend/util-resolve'
+import { INavigateOptions, useRouter } from '@pubstudio/frontend/util-router'
 import { ref, Ref } from 'vue'
+import { routeToPreviewPath } from './route-to-preview-path'
 
 export interface IUsePreviewPage {
   loading: Ref<boolean>
@@ -22,6 +26,7 @@ const API_RESTORE_TIMEOUT = 5
 
 export const usePreviewPage = (siteId: string | undefined): IUsePreviewPage => {
   const { site, siteStore, setRestoredSite } = useSiteSource()
+  const router = useRouter()
 
   const loading = ref(true)
   let apiRestoreCounter = 0
@@ -82,6 +87,16 @@ export const usePreviewPage = (siteId: string | undefined): IUsePreviewPage => {
     document.addEventListener('visibilitychange', pollOutdated)
     try {
       await initializeSiteStore({ siteId })
+      // Override routing for behavior-helper to retain URL properties
+      // like /preview prefix and ?siteId
+      overrideHelper('push', (options: INavigateOptions) => {
+        // TODO -- handle named routing
+        if ('path' in options && options.path) {
+          const path = routeToPreviewPath(options.path, RenderMode.Preview).url
+          console.log('PATH', path)
+          router.push({ path })
+        }
+      })
     } catch (err) {
       console.log('Preview load fail:', err)
       const e = err as Record<string, unknown>

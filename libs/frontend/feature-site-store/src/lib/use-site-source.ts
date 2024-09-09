@@ -1,5 +1,6 @@
 import { site } from '@pubstudio/frontend/feature-site-source'
 import { PSApi } from '@pubstudio/frontend/util-api'
+import { useRouter } from '@pubstudio/frontend/util-router'
 import { IUpdateSiteApiResponse } from '@pubstudio/shared/type-api-site-sites'
 import {
   CssPseudoClassType,

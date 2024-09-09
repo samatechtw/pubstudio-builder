@@ -229,3 +229,8 @@ export const behaviorHelpers: IBehaviorHelpers = {
   getRow,
   getPublicUsage,
 }
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const overrideHelper = (name: keyof IBehaviorHelpers, override: any) => {
+  behaviorHelpers[name] = override
+}

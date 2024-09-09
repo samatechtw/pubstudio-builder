@@ -8,13 +8,15 @@ export interface IRoute<M> {
   meta?: M
 }
 
+export type AnyComponent = Component | DefineComponent
+
 // TODO -- add scrollType for letting the component trigger scrolling
 export type ScrollType =
   | 'pollHeight' // Poll root scrollHeight until it changes
   | 'none' // Do not handle scroll
 
 export interface IRouteWithComponent<M> extends IRoute<M> {
-  component: Component | DefineComponent
+  component: AnyComponent
   children?: IRouteWithComponent<M>[]
   /**
    * @default false
