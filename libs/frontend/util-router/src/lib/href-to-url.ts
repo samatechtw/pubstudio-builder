@@ -1,4 +1,4 @@
-interface INormalizedUrl {
+export interface INormalizedUrl {
   url: string
   isExternal: boolean
 }

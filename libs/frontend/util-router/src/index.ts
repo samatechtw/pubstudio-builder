@@ -1,5 +1,5 @@
 // Components
-export { default as RouterLink } from './components/RouterLink.vue'
+export { RouterLink } from './components/RouterLink'
 export { RouterView } from './components/RouterView'
 
 // Library

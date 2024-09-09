@@ -4,12 +4,12 @@ import {
   removeListeners,
 } from '@pubstudio/frontend/feature-render'
 import { IContent, RenderMode, renderVueComponent } from '@pubstudio/frontend/util-render'
-import { hrefToUrl, RouterLink } from '@pubstudio/frontend/util-router'
+import { RouterLink } from '@pubstudio/frontend/util-router'
 import { IComponent, ISite } from '@pubstudio/shared/type-site'
 import { defineComponent, h, onMounted, onUnmounted, PropType, toRefs } from 'vue'
 import EmbedRouterLink from './EmbedRouterLink.vue'
-import { mergeSearch } from './merge-search'
 import { computePropsContent } from './render-preview'
+import { routeToPreviewPath } from './route-to-preview-path'
 
 export interface ILiveComponentProps {
   site: ISite
@@ -68,8 +68,7 @@ export const PreviewComponent = () => {
         if (tag === 'a') {
           // TODO: merge back with `live-component.ts` once the custom router is used for `web`
           const hrefProp = (props.href ?? '') as string
-          const pathPrefix = mode === RenderMode.PreviewEmbed ? '/' : '/preview'
-          const { url, isExternal } = hrefToUrl(hrefProp, pathPrefix)
+          const { url, isExternal } = routeToPreviewPath(hrefProp, mode)
           if (isExternal) {
             // Absolute path, use the `href` in renderProps as is (don't forward query string and hash).
             // We are unable to use router-link here because router-link treats any given link as a
@@ -77,36 +76,9 @@ export const PreviewComponent = () => {
             renderProps.href = url
             return h('a', renderProps, children)
           } else {
-            // Relative path, forward query string and hash.
-
-            // Since users may provide href with custom hash and query, we have to extract those values
-            // from the `href` prop and merge them with editor hash and query. User-provided hash&query
-            // will take precedence over editor hash&query.
-
-            const {
-              pathname: previewPathName,
-              search: userSearch,
-              hash: userHash,
-            } = new URL(url)
-            const { search: editorSearch, hash: editorHash } = window.location
-
-            const mergedSearchParams = mergeSearch(editorSearch, userSearch)
-            const uniqueSearchKeys = new Set(mergedSearchParams.keys())
-
-            let queryString = ''
-
-            const queryParams = Array.from(uniqueSearchKeys).flatMap((key) => {
-              const values = mergedSearchParams.getAll(key)
-              return values.map((value) => `${key}=${value}`)
-            })
-
-            if (queryParams.length) {
-              queryString = `?${queryParams.join('&')}`
-            }
-
             const copiedRenderProps = {
               ...renderProps,
-              to: `${previewPathName}${queryString}${userHash || editorHash}`,
+              to: url,
             }
             delete (copiedRenderProps as Record<string, unknown>).href
 

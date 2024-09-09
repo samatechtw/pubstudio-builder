@@ -1,19 +1,10 @@
-import {
-  App,
-  Component,
-  computed,
-  DefineComponent,
-  markRaw,
-  nextTick,
-  Plugin,
-  Ref,
-  ref,
-} from 'vue'
-import RouterLink from '../components/RouterLink.vue'
+import { App, computed, markRaw, nextTick, Plugin, Ref, ref } from 'vue'
+import { RouterLink } from '../components/RouterLink'
 import { RouterView } from '../components/RouterView'
 import { RouterNavigationType } from './enum-router-navigation-type'
 import { ILocationParts } from './i-location-parts'
 import {
+  AnyComponent,
   IResolvedRoute,
   IRouteWithComponent,
   IRouteWithPathRegex,
@@ -256,6 +247,7 @@ export const createRouter = <M = Record<string, unknown>>(
 
   const navigate = (options: INavigateOptions, navigationType: RouterNavigationType) => {
     const { path, route } = resolve(options)
+    console.log(path, options)
 
     if (navigationType === RouterNavigationType.Push) {
       history.pushState(undefined, '', path)
@@ -387,10 +379,7 @@ export const createRouter = <M = Record<string, unknown>>(
     return routesMetadata.value.routesMap.get(name)
   }
 
-  const overwriteRouteComponent = (
-    name: string,
-    component: Component | DefineComponent,
-  ) => {
+  const overwriteRouteComponent = (name: string, component: AnyComponent) => {
     const { routesMap } = routesMetadata.value
     const route = routesMap.get(name)
     if (!route) {
@@ -425,7 +414,8 @@ export const createRouter = <M = Record<string, unknown>>(
 
   const loadComponent = async (route: IResolvedRoute<M>) => {
     if (typeof route.component === 'function') {
-      const loaded = await route.component()
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const loaded = await (route.component as any)()
       route.component = loaded.default
     }
   }
