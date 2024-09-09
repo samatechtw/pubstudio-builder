@@ -1,4 +1,5 @@
 import { DEFAULT_BREAKPOINT_ID } from '@pubstudio/frontend/util-ids'
+import { INavigateOptions, useRouter } from '@pubstudio/frontend/util-router'
 import {
   CustomDataAction,
   IAddRowApiRequest,
@@ -37,6 +38,11 @@ export const requireArgs = (
     result[name] = args[name] as string
   }
   return result
+}
+
+export const push = (options: INavigateOptions) => {
+  const router = useRouter()
+  router.push(options)
 }
 
 export const getComponent = (
@@ -206,6 +212,7 @@ export const argArray = <T extends ComponentArgPrimitive>(arr: unknown): T[] => 
 
 export const behaviorHelpers: IBehaviorHelpers = {
   requireArgs,
+  push,
   getComponent,
   getState,
   setState,

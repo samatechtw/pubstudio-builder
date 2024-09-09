@@ -52,8 +52,15 @@ export const computeLocationParts = (
   sourcePathGroups.forEach((rawKey, index) => {
     if (rawKey.startsWith(':')) {
       // Remove the first : character to get param key
-      const key = rawKey.substring(1)
+      const optional = rawKey.endsWith('?')
+      let key: string
+      if (optional) {
+        key = rawKey.substring(1, rawKey.length - 1)
+      } else {
+        key = rawKey.substring(1)
+      }
       const value = pathGroups[index]
+
       if (!value) {
         throw new Error(`Param ${rawKey} is not present in ${path}`)
       }
@@ -102,11 +109,11 @@ export const computeLocationParts = (
 }
 
 export const computeResolvedPath = (
-  route: ISimpleRoute,
+  path: string | undefined,
   locationParts: Partial<ILocationParts>,
 ): string => {
   const { params, query, hash } = locationParts
-  let resolvedPath = route.path
+  let resolvedPath = path ?? ''
 
   if (params) {
     Object.entries(params).forEach(([key, value]) => {
