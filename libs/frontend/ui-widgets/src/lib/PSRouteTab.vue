@@ -7,9 +7,8 @@
 </template>
 
 <script lang="ts" setup>
-import { RouteLocationNamedRaw } from 'vue-router'
-
-export interface RouteTab extends RouteLocationNamedRaw {
+export interface RouteTab {
+  name: string
   text?: string
 }
 

@@ -77,7 +77,6 @@
 
 <script lang="ts" setup>
 import { computed, onMounted, ref, toRefs, watch } from 'vue'
-import { useRoute } from 'vue-router'
 import { useI18n } from 'petite-vue-i18n'
 import {
   DotsIcon,
@@ -101,6 +100,7 @@ import CreateTableModal from './CreateTableModal.vue'
 import { useDataTable } from '../lib/use-data-table'
 import ExportTableModal from './ExportTableModal.vue'
 import ImportTableModal from './ImportTableModal.vue'
+import { useRoute } from '@pubstudio/frontend/util-router'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -140,10 +140,10 @@ const emit = defineEmits<{
 }>()
 
 const siteId = computed(() => {
-  if (route.name === 'BuildScratch') {
+  if (route.value?.name === 'BuildScratch') {
     return 'scratch'
   }
-  return route.params.siteId?.toString() ?? ''
+  return route.value?.params.siteId?.toString() ?? ''
 })
 const api = useCustomDataApi(siteId.value)
 const { errorKey, addColumn } = useDataTable(siteId)

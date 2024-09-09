@@ -37,7 +37,7 @@ export default defineConfig({
     },
     rollupOptions: {
       // externalize deps that shouldn't be bundled
-      external: ['vue', 'vue-router', 'petite-vue-i18n'],
+      external: ['vue', 'petite-vue-i18n'],
       output: {
         // globals to use in the UMD build for externalized deps
         globals: {

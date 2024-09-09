@@ -10,7 +10,7 @@ import {
   ref,
 } from 'vue'
 import RouterLink from '../components/RouterLink.vue'
-import RouterView from '../components/RouterView.vue'
+import { RouterView } from '../components/RouterView'
 import { RouterNavigationType } from './enum-router-navigation-type'
 import { ILocationParts } from './i-location-parts'
 import {
@@ -195,8 +195,11 @@ export const createRouter = <M = Record<string, unknown>>(
     history.go(delta)
   }
 
-  const navigate = (options: INavigateOptions, navigationType: RouterNavigationType) => {
-    let [name, path] = ['', '']
+  const resolve = (
+    options: INavigateOptions,
+  ): { path: string; route: IRouteWithPathRegex<M> | undefined } => {
+    let name: string | undefined
+    let path: string | undefined
     let locationParts: Partial<ILocationParts> = {}
 
     if ('name' in options) {
@@ -241,18 +244,23 @@ export const createRouter = <M = Record<string, unknown>>(
     }
     route = route ?? notFoundRoute
 
-    let targetPath = ''
+    let targetPath: string
     if (!route || route.isNotFoundRoute) {
       // Don't resolve path in this case
       targetPath = path as string
     } else {
-      targetPath = computeResolvedPath(route, locationParts)
+      targetPath = computeResolvedPath(route.mergedPath, locationParts)
     }
+    return { path: targetPath, route }
+  }
+
+  const navigate = (options: INavigateOptions, navigationType: RouterNavigationType) => {
+    const { path, route } = resolve(options)
 
     if (navigationType === RouterNavigationType.Push) {
-      history.pushState(undefined, '', targetPath)
+      history.pushState(undefined, '', path)
     } else {
-      history.replaceState(undefined, '', targetPath)
+      history.replaceState(undefined, '', path)
     }
 
     if (!route) {
@@ -337,12 +345,19 @@ export const createRouter = <M = Record<string, unknown>>(
         parent: IRouteWithPathRegex<M>,
         resolvedParent: IResolvedRoute<M>,
       ) => {
-        const firstMatch = parent.children?.find((child) =>
-          child.mergedPathRegex.test(resolvedPath),
-        )
+        let firstMatch: IRouteWithPathRegex<M> | undefined = undefined
+        if (parent.children) {
+          for (const child of parent.children) {
+            if (child.mergedPathRegex.test(resolvedPath)) {
+              firstMatch = child
+              break
+            } else if (parent.alias && parent.alias === child.name) {
+              firstMatch = child
+            }
+          }
+        }
         if (firstMatch) {
           deepestMatchedRoute = resolvedRoute(firstMatch, resolvedPath, resolvedParent)
-
           recurse(firstMatch, deepestMatchedRoute)
         }
       }
@@ -398,6 +413,7 @@ export const createRouter = <M = Record<string, unknown>>(
     addRoute,
     push,
     replace,
+    resolve,
     go,
     resolvePath,
     findRouteByName,
@@ -405,6 +421,13 @@ export const createRouter = <M = Record<string, unknown>>(
     overwriteRouteComponent,
     beforeEach,
     afterEach,
+  }
+
+  const loadComponent = async (route: IResolvedRoute<M>) => {
+    if (typeof route.component === 'function') {
+      const loaded = await route.component()
+      route.component = loaded.default
+    }
   }
 
   const recomputeMatchedRoutes = (isPush: boolean) => {
@@ -420,7 +443,10 @@ export const createRouter = <M = Record<string, unknown>>(
     })
 
     if (newRoute) {
-      matchedRoutes.value = [...newRoute.matchedParentRoutes, newRoute]
+      const matched = [...newRoute.matchedParentRoutes, newRoute]
+      Promise.all(matched.map((route) => loadComponent(route))).then(() => {
+        matchedRoutes.value = matched
+      })
     } else {
       matchedRoutes.value = []
     }

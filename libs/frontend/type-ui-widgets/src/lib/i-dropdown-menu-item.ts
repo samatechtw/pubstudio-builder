@@ -1,10 +1,9 @@
-import { RouteLocationRaw } from 'vue-router'
-
 export interface IDropdownMenuItem {
   label?: string
   labelKey?: string
   class?: string
-  to?: RouteLocationRaw
+  // TODO -- replace with INavigateOptions once available in external package
+  to?: unknown
   linkTarget?: string
   loading?: boolean
   click?: () => void

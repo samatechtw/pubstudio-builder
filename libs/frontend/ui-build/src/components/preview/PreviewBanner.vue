@@ -13,8 +13,8 @@
 
 <script lang="ts" setup>
 import { useI18n } from 'petite-vue-i18n'
-import { useRoute, useRouter } from 'vue-router'
 import { Print } from '@pubstudio/frontend/ui-widgets'
+import { useRoute, useRouter } from '@pubstudio/frontend/util-router'
 
 const emit = defineEmits<{
   (e: 'print'): void
@@ -26,11 +26,8 @@ const route = useRoute()
 const router = useRouter()
 
 const goBack = () => {
-  const siteId = route.query.siteId as string | undefined
-  const { back } = router.options.history.state
-  if (back?.toString().startsWith('/build')) {
-    router.go(-1)
-  } else if (siteId) {
+  const siteId = route.value?.query.siteId as string | undefined
+  if (siteId) {
     router.replace({
       name: 'Build',
       params: { siteId },

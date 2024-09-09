@@ -1,14 +1,13 @@
 import { Component, DefineComponent } from 'vue'
 import { ILocationParts } from './i-location-parts'
-import {
-  IResolvedRoute,
-  IRoute,
-  IRouteWithComponent,
-  IRouteWithPathRegex,
-} from './i-route'
+import { IResolvedRoute, IRouteWithComponent, IRouteWithPathRegex } from './i-route'
 
 export interface IRouter<M> {
   addRoute: (route: IRouteWithComponent<M>) => IRouteWithPathRegex<M>
+  resolve: (options: INameNavigateOptions) => {
+    path: string
+    route: IRouteWithPathRegex<M> | undefined
+  }
   push: (options: INavigateOptions) => void
   replace: (options: INavigateOptions) => void
   /**
@@ -26,7 +25,7 @@ export interface IRouter<M> {
   ) => IResolvedRoute<M> | undefined
   findRouteByName: (name: string) => IRouteWithPathRegex<M> | undefined
   computeResolvedPath: (
-    route: IRoute<M>,
+    path: string | undefined,
     locationParts: Partial<ILocationParts>,
   ) => string
   overwriteRouteComponent: (name: string, component: Component | DefineComponent) => void
@@ -43,11 +42,11 @@ export interface IRouter<M> {
 export type INavigateOptions = INameNavigateOptions | IPathNavigateOptions
 
 export interface INameNavigateOptions extends Partial<ILocationParts> {
-  name: string
+  name: string | undefined
 }
 
 export interface IPathNavigateOptions {
-  path: string
+  path: string | undefined
 }
 
 export interface IResolveRouteOptions {
