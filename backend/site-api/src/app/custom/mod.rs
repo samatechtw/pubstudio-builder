@@ -2,6 +2,7 @@ pub mod add_column;
 pub mod add_row;
 pub mod create_table;
 pub mod custom_data;
+pub mod get_row;
 pub mod helpers;
 pub mod list_rows;
 pub mod list_tables;

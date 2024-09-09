@@ -1,6 +1,7 @@
 export enum CustomDataAction {
   CreateTable = 'CreateTable',
   AddRow = 'AddRow',
+  GetRow = 'GetRow',
   RemoveRow = 'RemoveRow',
   ListTables = 'ListTables',
   ListRows = 'ListRows',

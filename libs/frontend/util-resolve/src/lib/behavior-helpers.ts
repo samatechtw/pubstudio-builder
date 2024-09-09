@@ -3,6 +3,9 @@ import {
   CustomDataAction,
   IAddRowApiRequest,
   ICustomDataApiRequest,
+  ICustomTableRow,
+  IGetRowApiQuery,
+  IRowFilters,
 } from '@pubstudio/shared/type-api-site-custom-data'
 import { IGetPublicSiteUsageApiResponse } from '@pubstudio/shared/type-api-site-sites'
 import {
@@ -152,6 +155,15 @@ const setError = (
   return errorMsg
 }
 
+const tableRequest = async <T>(payload: ICustomDataApiRequest): Promise<T> => {
+  const { data } = await rootSiteApi.authOptRequest<T>({
+    url: `api/sites/${rootSiteApi.siteId.value}/custom_data`,
+    method: 'POST',
+    data: payload,
+  })
+  return data
+}
+
 const addRow = async (table: string, row: Record<string, string>) => {
   const addRow: IAddRowApiRequest = {
     table_name: table,
@@ -161,11 +173,22 @@ const addRow = async (table: string, row: Record<string, string>) => {
     action: CustomDataAction.AddRow,
     data: addRow,
   }
-  await rootSiteApi.authOptRequest({
-    url: `api/sites/${rootSiteApi.siteId.value}/custom_data`,
-    method: 'POST',
-    data: payload,
-  })
+  await tableRequest(payload)
+}
+
+const getRow = async (
+  table: string,
+  filters: IRowFilters,
+): Promise<ICustomTableRow | undefined> => {
+  const getRow: IGetRowApiQuery = {
+    table_name: table,
+    filters,
+  }
+  const payload: ICustomDataApiRequest = {
+    action: CustomDataAction.GetRow,
+    data: getRow,
+  }
+  return tableRequest<ICustomTableRow>(payload)
 }
 
 const getPublicUsage = async (site: ISite, options?: IQueryOptions) => {
@@ -196,5 +219,6 @@ export const behaviorHelpers: IBehaviorHelpers = {
   setLoading,
   setError,
   addRow,
+  getRow,
   getPublicUsage,
 }

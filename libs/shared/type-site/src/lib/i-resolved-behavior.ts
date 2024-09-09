@@ -1,3 +1,4 @@
+import { ICustomTableRow, IRowFilters } from '@pubstudio/shared/type-api-site-custom-data'
 import { IGetPublicSiteUsageApiResponse } from '@pubstudio/shared/type-api-site-sites'
 import { CssType } from './enum-css'
 import { IComponent, IComponentEventBehavior, IComponentState } from './i-component'
@@ -37,6 +38,7 @@ export interface IBehaviorHelpers {
   ): string
   setLoading(component: IComponent | undefined, loading: boolean): void
   addRow(table: string, row: Record<string, string>): Promise<void>
+  getRow(table: string, filters: IRowFilters): Promise<ICustomTableRow | undefined>
   getPublicUsage(site: ISite): Promise<IGetPublicSiteUsageApiResponse>
 }
 

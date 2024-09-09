@@ -19,9 +19,9 @@ use validator::Validate;
 use crate::{api_context::ApiContext, middleware::auth::verify_site_owner};
 
 use super::{
-    add_column::add_column, add_row::add_row, create_table::create_table, list_rows::list_rows,
-    list_tables::list_tables, modify_column::modify_column, remove_column::remove_column,
-    remove_row::remove_row, update_row::update_row,
+    add_column::add_column, add_row::add_row, create_table::create_table, get_row::get_row,
+    list_rows::list_rows, list_tables::list_tables, modify_column::modify_column,
+    remove_column::remove_column, remove_row::remove_row, update_row::update_row,
 };
 
 pub fn parse_request_data<T: DeserializeOwned>(data: serde_json::Value) -> Result<T, ApiError> {
@@ -35,10 +35,12 @@ pub async fn custom_data(
     PsJson(dto): PsJson<CustomDataDto>,
 ) -> Result<(StatusCode, Response), ApiError> {
     check_bad_form(dto.validate())?;
-    if dto.action != Action::AddRow && user.user_type == UserType::Anonymous {
+    let allow_anon = matches!(dto.action, Action::AddRow | Action::GetRow);
+
+    if !allow_anon && user.user_type == UserType::Anonymous {
         return Err(ApiError::forbidden());
     }
-    if dto.action != Action::AddRow {
+    if !allow_anon {
         verify_site_owner(&context, &user, &id).await?;
     }
 
@@ -68,6 +70,11 @@ pub async fn custom_data(
         }
         Action::ListRows => {
             let response = list_rows(&context, &id, dto.data).await?;
+
+            Ok((StatusCode::OK, Json(response).into_response()))
+        }
+        Action::GetRow => {
+            let response = get_row(&context, &id, dto.data).await?;
 
             Ok((StatusCode::OK, Json(response).into_response()))
         }

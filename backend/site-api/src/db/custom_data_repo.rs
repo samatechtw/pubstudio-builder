@@ -9,6 +9,7 @@ use lib_shared_site_api::db::{
 };
 use lib_shared_types::dto::custom_data::add_column_dto::AddColumn;
 use lib_shared_types::dto::custom_data::custom_data_dto::Action;
+use lib_shared_types::dto::custom_data::get_row_query::GetRowQuery;
 use lib_shared_types::dto::custom_data::remove_column_dto::RemoveColumn;
 use lib_shared_types::dto::custom_data::remove_row_dto::RemoveRow;
 use lib_shared_types::dto::custom_data::CustomDataRow;
@@ -38,6 +39,8 @@ pub trait CustomDataRepoTrait {
         entries: Vec<(String, String)>,
     ) -> Result<bool, DbError>;
     async fn list_rows(&self, id: &str, query: ListRowsQuery) -> Result<ListRowsResponse, DbError>;
+    async fn get_row(&self, id: &str, query: GetRowQuery)
+        -> Result<Option<CustomDataRow>, DbError>;
     async fn update_row(
         &self,
         id: &str,
@@ -250,6 +253,36 @@ impl CustomDataRepoTrait for CustomDataRepo {
         let (results, total) = list_result(results);
 
         Ok(ListRowsResponse { total, results })
+    }
+
+    async fn get_row(
+        &self,
+        id: &str,
+        query: GetRowQuery,
+    ) -> Result<Option<CustomDataRow>, DbError> {
+        let mut conn = self.get_db_conn(id).await?;
+
+        let table_name = query.table_name;
+        let mut q = QueryBuilder::new("SELECT * FROM ");
+
+        q.push(table_name);
+        if let Some(filters) = query.filters {
+            if let Some(field_eq) = filters.field_eq {
+                q.push(" WHERE ");
+                q.push(quote(&field_eq.field));
+                q.push(" = ");
+                q.push_bind(field_eq.value);
+            }
+        }
+        q.push(" LIMIT 1");
+        println!("SQL Query: {}", q.sql());
+
+        let row = q
+            .build()
+            .try_map(map_to_key_value)
+            .fetch_one(&mut *conn)
+            .await;
+        Ok(row.ok())
     }
 
     async fn update_row(
