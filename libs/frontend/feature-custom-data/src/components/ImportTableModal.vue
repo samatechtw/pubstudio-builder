@@ -35,6 +35,17 @@
         }"
         @checked="skipError = $event"
       />
+      <div class="import-option">
+        <Checkbox
+          class="skip-empty"
+          :item="{
+            label: t('custom_data.skip_empty'),
+            checked: skipEmpty,
+          }"
+          @checked="skipEmpty = $event"
+        />
+        <InfoBubble placement="right" :message="t('custom_data.skip_empty_text')" />
+      </div>
     </div>
     <div v-if="fileName" class="import-lines">
       <span>{{ t('custom_data.new_rows') }}</span>
@@ -70,6 +81,7 @@ import { loadFile } from '@pubstudio/frontend/util-doc'
 import {
   Checkbox,
   ErrorMessage,
+  InfoBubble,
   Minus,
   Modal,
   PSButton,
@@ -103,6 +115,7 @@ const invalidRows = ref()
 const error = ref()
 const loading = ref(false)
 const skipError = ref(false)
+const skipEmpty = ref(true)
 const rowsImported = ref()
 const rowData = ref<string[][]>([])
 
@@ -116,11 +129,13 @@ const defaultFileName = (): string => {
 }
 
 const parseRow = (rowStr: string, splitChar: string): string[] => {
+  let row: string[]
   if (splitChar === ',') {
-    return rowStr.split(splitChar)
+    row = rowStr.split(splitChar)
   } else {
-    return rowStr.slice(1, rowStr.length - 1).split(splitChar)
+    row = rowStr.slice(1, rowStr.length - 1).split(splitChar)
   }
+  return row.map((item) => item.trim())
 }
 
 const selectFile = async (file: File) => {
@@ -182,7 +197,8 @@ const importTable = async () => {
   rowsImported.value = 0
   for (let i = 0; i < rows.length; i += 1) {
     const row = rows[i]
-    const rowMap = Object.fromEntries(columns.map((c, i) => [c, row[i]]))
+    const defaultVal = skipEmpty.value ? undefined : ''
+    const rowMap = Object.fromEntries(columns.map((c, i) => [c, row[i] || defaultVal]))
     try {
       await api.addRow(apiSite, {
         table_name: tableName.value,
@@ -268,6 +284,13 @@ onMounted(() => {
       margin: 0 16px 0 0;
     }
   }
+  .import-option {
+    display: flex;
+    align-items: center;
+    .checkbox {
+      margin: 0 8px 0 0;
+    }
+  }
   .csv-select {
     font-size: 15px;
     padding: 6px 12px;
@@ -288,7 +311,7 @@ onMounted(() => {
     padding-top: 12px;
   }
   .modal-buttons {
-    margin-top: 12px;
+    margin-top: 16px;
   }
 }
 </style>
