@@ -40,9 +40,8 @@ export const requireArgs = (
   return result
 }
 
-export const push = (options: INavigateOptions) => {
-  const router = useRouter()
-  router.push(options)
+export const push = (_options: INavigateOptions) => {
+  // Will be replaced by application for access to router
 }
 
 export const getComponent = (

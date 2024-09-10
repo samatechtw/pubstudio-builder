@@ -45,7 +45,7 @@ pub async fn trigger_add_row(
     events: Vec<EventInfo>,
     row: CustomDataRow,
 ) -> Result<i32, ApiError> {
-    println!("EVENTS {:?}", events);
+    println!("Trigger AddRow {:?}", events);
     let mut triggered = 0;
 
     for event in events

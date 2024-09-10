@@ -24,7 +24,11 @@
 
 <script setup lang="ts">
 import { computed, ref, onMounted, Ref } from 'vue'
-import { useRoute, useRouter } from '@pubstudio/frontend/util-router'
+import {
+  INameNavigateOptions,
+  useRoute,
+  useRouter,
+} from '@pubstudio/frontend/util-router'
 import {
   setupRoutes,
   useNotFoundPage,
@@ -37,6 +41,7 @@ import { ISite } from '@pubstudio/shared/type-site'
 import { IGetSiteApiResponse } from '@pubstudio/shared/type-api-site-sites'
 import '@pubstudio/frontend/feature-builtin' // Ensure builtin behaviors loaded
 import NotFound from './components/NotFound.vue'
+import { overrideHelper } from '@pubstudio/frontend/util-resolve'
 
 const API_URL = '___SITE_API_URL___'
 
@@ -116,6 +121,9 @@ onMounted(async () => {
   if (userSite) {
     setupRoutes(router, userSite, PageContent)
     site.value = userSite
+    overrideHelper('push', (options: INameNavigateOptions) => {
+      router.push(options)
+    })
   }
   loading.value = false
 })
