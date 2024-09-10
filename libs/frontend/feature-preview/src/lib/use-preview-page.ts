@@ -93,7 +93,6 @@ export const usePreviewPage = (siteId: string | undefined): IUsePreviewPage => {
         // TODO -- handle named routing
         if ('path' in options && options.path) {
           const path = routeToPreviewPath(options.path, RenderMode.Preview).url
-          console.log('PATH', path)
           router.push({ path })
         }
       })

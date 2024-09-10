@@ -2,12 +2,20 @@ import { RenderMode } from '@pubstudio/frontend/util-render'
 import { hrefToUrl, INormalizedUrl } from '@pubstudio/frontend/util-router'
 import { mergeSearch } from './merge-search'
 
-export const routeToPreviewPath = (
+export const routeToPreviewRawPath = (
   route: string,
   renderMode: RenderMode,
 ): INormalizedUrl => {
   const pathPrefix = renderMode === RenderMode.PreviewEmbed ? '/' : '/preview'
-  const { url, isExternal } = hrefToUrl(route, pathPrefix)
+  return hrefToUrl(route, pathPrefix)
+}
+
+export const routeToPreviewPath = (
+  route: string,
+  renderMode: RenderMode,
+  extraQuery?: string[],
+): INormalizedUrl => {
+  const { url, isExternal } = routeToPreviewRawPath(route, renderMode)
   if (isExternal) {
     return { url, isExternal }
   }
@@ -32,7 +40,7 @@ export const routeToPreviewPath = (
   })
 
   if (queryParams.length) {
-    queryString = `?${queryParams.join('&')}`
+    queryString = `?${[...(extraQuery ?? []), ...queryParams].join('&')}`
   }
   return {
     url: `${previewPathName}${queryString}${userHash || editorHash}`,
