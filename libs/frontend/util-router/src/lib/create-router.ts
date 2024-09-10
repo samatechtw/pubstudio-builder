@@ -436,7 +436,6 @@ export const createRouter = <M = Record<string, unknown>>(
 
     if (newRoute) {
       const matched = [...newRoute.matchedParentRoutes, newRoute]
-      console.group(path, matched)
       Promise.all(matched.map((route) => loadComponent(route))).then(() => {
         matchedRoutes.value = matched
       })
