@@ -1,6 +1,6 @@
 import { computed, defineComponent, h, inject, PropType, Ref, toRefs } from 'vue'
 import { normalizeUrl } from '../lib/href-to-url'
-import { IResolvedRoute, IRoute } from '../lib/i-route'
+import { IResolvedRoute, IRouteWithPathRegex } from '../lib/i-route'
 import { INavigateOptions, IPathNavigateOptions } from '../lib/i-router'
 import { MatchedRoutesSymbol } from '../lib/router-injection-keys'
 import { useRouter } from '../lib/use-router'
@@ -27,7 +27,9 @@ export const RouterLink = defineComponent({
     const router = useRouter()
     const matchedRoutes = inject<Ref<IResolvedRoute[]>>(MatchedRoutesSymbol)
 
-    const targetRoute = computed<IRoute<unknown> | undefined>(() => {
+    const targetRoute = computed<
+      IResolvedRoute<unknown> | IRouteWithPathRegex<unknown> | undefined
+    >(() => {
       if (!to.value) {
         return undefined
       }
@@ -49,9 +51,9 @@ export const RouterLink = defineComponent({
       if (typeof toPath === 'string' || 'name' in toPath) {
         let url
         if (typeof toPath === 'string') {
-          url = router.computeResolvedPath(targetRoute.value?.path, {})
+          url = router.computeResolvedPath(targetRoute.value?.mergedPath, {})
         } else {
-          url = router.computeResolvedPath(targetRoute.value?.path, toPath)
+          url = router.computeResolvedPath(targetRoute.value?.mergedPath, toPath)
         }
         return { url, isExternal: false }
       } else {
@@ -84,7 +86,7 @@ export const RouterLink = defineComponent({
 
     const navigate = (e: MouseEvent) => {
       if (!link.value.isExternal && !e.ctrlKey && !e.metaKey && to.value) {
-        // e.preventDefault()
+        e.preventDefault()
         if (replace.value) {
           router.replace(pathOptions(to.value))
         } else {

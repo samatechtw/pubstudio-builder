@@ -34,6 +34,7 @@ export interface IRouteWithPathRegex<M> extends Omit<IRouteWithComponent<M>, 'ch
 export interface IResolvedRoute<M = undefined>
   extends Omit<IRouteWithComponent<M>, 'children'>,
     ILocationParts {
+  mergedPath: string
   resolvedPath: string
   matchedParentRoutes: IResolvedRoute<M>[]
 }

@@ -74,7 +74,7 @@ export const useContactForm = (): IContactFormFeature => {
 
   const loadContactFormTables = async () => {
     resetContactTables()
-    await loadCustomTables({ api, tables, loadingTables })
+    await loadCustomTables(apiSite, { api, tables, loadingTables })
     contactTables.value = tables.value?.filter(isContactTable) ?? []
   }
 
