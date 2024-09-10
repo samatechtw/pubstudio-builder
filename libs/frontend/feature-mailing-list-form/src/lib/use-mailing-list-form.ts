@@ -60,7 +60,7 @@ export const useMailingListForm = (): IMailingListFormFeature => {
 
   const loadMailingListTables = async () => {
     resetMailingListForm()
-    await loadCustomTables({ api, tables, loadingTables })
+    await loadCustomTables(apiSite, { api, tables, loadingTables })
     mailingListTables.value = tables.value?.filter(isMailingListTable) ?? []
   }
 

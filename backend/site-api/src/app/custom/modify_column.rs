@@ -82,7 +82,6 @@ pub async fn modify_column(
             data_type: old_info.data_type,
             validation_rules: old_info.validation_rules,
         });
-    println!("MOD {:?}", new_info);
     column_info.insert(column_name, new_info);
 
     let result = save_column_info(context, site_id, &table, column_info).await?;

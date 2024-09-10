@@ -1,4 +1,4 @@
-import { ILocationParts } from './i-location-parts'
+import { ILocationParams, ILocationParts } from './i-location-parts'
 import { IRoute } from './i-route'
 
 type ISimpleRoute = Omit<IRoute<unknown>, 'meta'>
@@ -39,6 +39,26 @@ export const computePathRegex = (path: string): RegExp => {
   return new RegExp(pattern)
 }
 
+// Strip path of query and hash
+export const stripPath = (path: string): string => {
+  const indexOfQuery = path.indexOf('?')
+  const indexOfFirstHash = path.indexOf('#')
+
+  if (indexOfQuery > -1 || indexOfFirstHash > -1) {
+    let splitAt
+    if (indexOfQuery === -1) {
+      splitAt = indexOfFirstHash
+    } else if (indexOfFirstHash === -1) {
+      splitAt = indexOfQuery
+    } else {
+      splitAt = Math.min(indexOfFirstHash, indexOfQuery)
+    }
+    return path.substring(0, splitAt)
+  } else {
+    return path
+  }
+}
+
 export const computeLocationParts = (
   route: ISimpleRoute,
   path: string,
@@ -47,7 +67,10 @@ export const computeLocationParts = (
   const params: Record<string, string> = {}
 
   const sourcePathGroups = route.path.split('/')
-  const pathGroups = path.split('/')
+  const indexOfQuery = path.indexOf('?')
+
+  const strippedPath = stripPath(path)
+  const pathGroups = strippedPath.split('/')
 
   sourcePathGroups.forEach((rawKey, index) => {
     if (rawKey.startsWith(':')) {
@@ -72,11 +95,10 @@ export const computeLocationParts = (
   const query: Record<string, string | string[] | undefined> = {}
 
   const lastIndexOfHash = path.lastIndexOf('#')
-  const indexOfQuestionMark = path.indexOf('?')
 
-  if (indexOfQuestionMark > 0) {
+  if (indexOfQuery > 0) {
     const end = lastIndexOfHash > 0 ? lastIndexOfHash : undefined
-    const queryString = path.substring(indexOfQuestionMark, end)
+    const queryString = path.substring(indexOfQuery, end)
     const searchParams = new URLSearchParams(queryString)
 
     for (const key of searchParams.keys()) {
@@ -108,20 +130,27 @@ export const computeLocationParts = (
   }
 }
 
+export const replaceParams = (
+  path: string,
+  params: ILocationParams | undefined,
+): string => {
+  let replaced = path
+  if (params) {
+    Object.entries(params).forEach(([key, value]) => {
+      if (value) {
+        replaced = path.replace(new RegExp(`:${key}`), value)
+      }
+    })
+  }
+  return replaced
+}
+
 export const computeResolvedPath = (
   path: string | undefined,
   locationParts: Partial<ILocationParts>,
 ): string => {
   const { params, query, hash } = locationParts
-  let resolvedPath = path ?? ''
-
-  if (params) {
-    Object.entries(params).forEach(([key, value]) => {
-      if (value) {
-        resolvedPath = resolvedPath.replace(new RegExp(`:${key}`), value)
-      }
-    })
-  }
+  let resolvedPath = replaceParams(path ?? '', params)
 
   if (query) {
     const keyValuePairs = Object.entries(query).map(([key, value]) => {

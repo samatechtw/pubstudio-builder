@@ -22,6 +22,7 @@ import {
   computeResolvedPath,
   getCurrentPath,
   mergePath,
+  replaceParams,
   validateRoute,
 } from './router-helpers'
 import {
@@ -247,7 +248,6 @@ export const createRouter = <M = Record<string, unknown>>(
 
   const navigate = (options: INavigateOptions, navigationType: RouterNavigationType) => {
     const { path, route } = resolve(options)
-    console.log(path, options)
 
     if (navigationType === RouterNavigationType.Push) {
       history.pushState(undefined, '', path)
@@ -298,10 +298,11 @@ export const createRouter = <M = Record<string, unknown>>(
     parent?: IResolvedRoute<M>,
   ): IResolvedRoute<M> => {
     const matchedParentRoutes = parent ? [...parent.matchedParentRoutes, parent] : []
+    const parts = computeLocationParts(route, resolvedPath)
     return {
       ...route,
-      ...computeLocationParts(route, resolvedPath),
-      path: route.alias ?? route.path,
+      ...parts,
+      path: replaceParams(route.alias ?? route.path, parts.params),
       resolvedPath,
       matchedParentRoutes,
     }
@@ -361,6 +362,7 @@ export const createRouter = <M = Record<string, unknown>>(
         path: notFoundRoute.path,
         name: notFoundRoute.name,
         meta: notFoundRoute.meta,
+        mergedPath: notFoundRoute.mergedPath,
         component: notFoundRoute.component,
         isNotFoundRoute: notFoundRoute.isNotFoundRoute,
         scrollType: notFoundRoute.scrollType,
@@ -434,6 +436,7 @@ export const createRouter = <M = Record<string, unknown>>(
 
     if (newRoute) {
       const matched = [...newRoute.matchedParentRoutes, newRoute]
+      console.group(path, matched)
       Promise.all(matched.map((route) => loadComponent(route))).then(() => {
         matchedRoutes.value = matched
       })
