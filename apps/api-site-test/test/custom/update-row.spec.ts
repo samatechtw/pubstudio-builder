@@ -89,6 +89,30 @@ describe('Update Row', () => {
     expect(body.updated_row['email']).toEqual('john_test@abc.com')
   })
 
+  it('when user is not authorized', async () => {
+    const res = await api
+      .post(testEndpoint(siteId))
+      .set('Authorization', adminAuth)
+      .send(payload)
+      .expect(200)
+
+    const body: IUpdateRowResponse = res.body
+
+    expect(body.updated_row['name']).toEqual('Jessie')
+    expect(body.updated_row['message']).toEqual('Hello there!')
+    expect(body.updated_row['email']).toEqual('jjj@abc.com')
+  })
+
+  it('when requester is anonymous', async () => {
+    const res = await api.post(testEndpoint(siteId)).send(payload).expect(200)
+
+    const body: IUpdateRowResponse = res.body
+
+    expect(body.updated_row['name']).toEqual('Jessie')
+    expect(body.updated_row['message']).toEqual('Hello there!')
+    expect(body.updated_row['email']).toEqual('jjj@abc.com')
+  })
+
   describe('when request is not valid', () => {
     it('when table_name is invalid', async () => {
       updateData.table_name = 'a'
@@ -120,42 +144,6 @@ describe('Update Row', () => {
           message: 'Invalid column name: a',
           status: 400,
         })
-    })
-
-    it('when user is other owner', () => {
-      const ownerAuth = ownerAuthHeader('0c069253-e45d-487c-b7c0-cbe467c33a10')
-
-      return api
-        .post(testEndpoint(siteId))
-        .set('Authorization', ownerAuth)
-        .send(payload)
-        .expect({
-          code: 'None',
-          message: 'Forbidden',
-          status: 403,
-        })
-    })
-
-    it('when user is not authorized', () => {
-      const ownerAuth = ownerAuthHeader('ecee2f88-024b-467b-81ec-bf92b06c86e1')
-
-      return api
-        .post(testEndpoint(siteId))
-        .set('Authorization', ownerAuth)
-        .send(payload)
-        .expect({
-          code: 'None',
-          message: 'Forbidden',
-          status: 403,
-        })
-    })
-
-    it('when requester is anonymous', () => {
-      return api.post(testEndpoint(siteId)).send(payload).expect(403, {
-        code: 'None',
-        message: 'Forbidden',
-        status: 403,
-      })
     })
 
     it('when updating a row with a duplicate unique constraint', async () => {

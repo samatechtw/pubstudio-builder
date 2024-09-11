@@ -35,7 +35,10 @@ pub async fn custom_data(
     PsJson(dto): PsJson<CustomDataDto>,
 ) -> Result<(StatusCode, Response), ApiError> {
     check_bad_form(dto.validate())?;
-    let allow_anon = matches!(dto.action, Action::AddRow | Action::GetRow);
+    let allow_anon = matches!(
+        dto.action,
+        Action::AddRow | Action::UpdateRow | Action::GetRow
+    );
 
     if !allow_anon && user.user_type == UserType::Anonymous {
         return Err(ApiError::forbidden());
