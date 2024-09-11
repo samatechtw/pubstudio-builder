@@ -195,7 +195,7 @@ const updateRow = async (
     row_id: id,
     new_row: row,
   }
-  const payload = { action: CustomDataAction.GetRow, data }
+  const payload = { action: CustomDataAction.UpdateRow, data }
   return tableRequest<IUpdateRowResponse>(payload)
 }
 
