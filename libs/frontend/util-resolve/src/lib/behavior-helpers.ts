@@ -1,5 +1,5 @@
 import { DEFAULT_BREAKPOINT_ID } from '@pubstudio/frontend/util-ids'
-import { INavigateOptions, useRouter } from '@pubstudio/frontend/util-router'
+import { INavigateOptions } from '@pubstudio/frontend/util-router'
 import {
   CustomDataAction,
   IAddRowApiRequest,
@@ -7,6 +7,8 @@ import {
   ICustomTableRow,
   IGetRowApiQuery,
   IRowFilters,
+  IUpdateRowApiRequest,
+  IUpdateRowResponse,
 } from '@pubstudio/shared/type-api-site-custom-data'
 import { IGetPublicSiteUsageApiResponse } from '@pubstudio/shared/type-api-site-sites'
 import {
@@ -181,6 +183,22 @@ const addRow = async (table: string, row: Record<string, string>) => {
   await tableRequest(payload)
 }
 
+const updateRow = async (
+  table: string,
+  rowId: string | number,
+  row: Record<string, string>,
+) => {
+  const id = typeof rowId === 'string' ? parseInt(rowId) : rowId
+
+  const data: IUpdateRowApiRequest = {
+    table_name: table,
+    row_id: id,
+    new_row: row,
+  }
+  const payload = { action: CustomDataAction.GetRow, data }
+  return tableRequest<IUpdateRowResponse>(payload)
+}
+
 const getRow = async (
   table: string,
   filters: IRowFilters,
@@ -226,6 +244,7 @@ export const behaviorHelpers: IBehaviorHelpers = {
   setError,
   addRow,
   getRow,
+  updateRow,
   getPublicUsage,
 }
 
