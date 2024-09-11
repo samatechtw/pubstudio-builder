@@ -34,7 +34,8 @@ export const mergePath = (parentPath: string, childPath: string): string => {
  * `/users/1?...`, `/users/1#...`, and `/users/1/some-other-chars`.
  */
 export const computePathRegex = (path: string): RegExp => {
-  const sourcePattern = path.replace(/:\w+/g, '[-_\\w]+')
+  const p = path.endsWith('*') ? path.slice(0, path.length - 1) : path
+  const sourcePattern = p.replace(/:\w+/g, '[-_\\w]+')
   const pattern = `(${sourcePattern}/?$)|(${sourcePattern}[/?#])`
   return new RegExp(pattern)
 }
@@ -76,13 +77,14 @@ export const computeLocationParts = (
     if (rawKey.startsWith(':')) {
       // Remove the first : character to get param key
       const optional = rawKey.endsWith('?')
+      const consume = rawKey.endsWith('*')
       let key: string
-      if (optional) {
+      if (optional || consume) {
         key = rawKey.substring(1, rawKey.length - 1)
       } else {
         key = rawKey.substring(1)
       }
-      const value = pathGroups[index]
+      const value = consume ? pathGroups.slice(index).join('/') : pathGroups[index]
 
       if (!value) {
         throw new Error(`Param ${rawKey} is not present in ${path}`)
@@ -138,7 +140,7 @@ export const replaceParams = (
   if (params) {
     Object.entries(params).forEach(([key, value]) => {
       if (value) {
-        replaced = path.replace(new RegExp(`:${key}`), value)
+        replaced = path.replace(new RegExp(`:${key}[*]?`), value)
       }
     })
   }
