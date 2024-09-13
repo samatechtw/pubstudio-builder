@@ -34,7 +34,14 @@ pub async fn update_row(
     validate_column_names(dto.new_row.keys())?;
 
     // Validate data by checking columns in custom_data_info
-    validate_row_data(context, site_id, &dto.table_name, &dto.new_row).await?;
+    validate_row_data(
+        context,
+        site_id,
+        &dto.table_name,
+        Some(dto.row_id),
+        &dto.new_row,
+    )
+    .await?;
 
     let updated_row = context
         .custom_data_repo

@@ -15,6 +15,7 @@ pub async fn validate_row_data(
     context: &ApiContext,
     site_id: &str,
     table: &str,
+    row_id: Option<i32>,
     values: &HashMap<String, String>,
 ) -> Result<CustomDataInfoEntity, ApiError> {
     let table_entity = context
@@ -34,6 +35,8 @@ pub async fn validate_row_data(
         }
     }
 
+    let is_create = row_id.is_none();
+
     // Check column validation rules
     let mut unique_entries = Vec::<(String, String)>::new();
     for (k, info) in column_info {
@@ -51,7 +54,15 @@ pub async fn validate_row_data(
                     }
                 }
                 RuleType::Required => {
-                    if val.is_none() {
+                    if let Some(v) = val {
+                        // Don't allow empty string when creating or updating row
+                        if v == "" {
+                            return Err(
+                                ApiError::bad_request().code(ApiErrorCode::CustomDataRequired)
+                            );
+                        }
+                        // A value is required when creating the row
+                    } else if is_create {
                         return Err(ApiError::bad_request().code(ApiErrorCode::CustomDataRequired));
                     }
                 }
@@ -84,7 +95,7 @@ pub async fn validate_row_data(
     }
     if !context
         .custom_data_repo
-        .verify_unique(site_id, table, unique_entries)
+        .verify_unique(site_id, table, row_id, unique_entries)
         .await
         .map_err(|e| ApiError::internal_error().message(e))?
     {
