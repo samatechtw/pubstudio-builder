@@ -36,6 +36,7 @@ pub trait CustomDataRepoTrait {
         &self,
         id: &str,
         table_name: &str,
+        row_id: Option<i32>,
         entries: Vec<(String, String)>,
     ) -> Result<bool, DbError>;
     async fn list_rows(&self, id: &str, query: ListRowsQuery) -> Result<ListRowsResponse, DbError>;
@@ -209,6 +210,7 @@ impl CustomDataRepoTrait for CustomDataRepo {
         &self,
         id: &str,
         table_name: &str,
+        row_id: Option<i32>,
         entries: Vec<(String, String)>,
     ) -> Result<bool, DbError> {
         let mut conn = self.get_db_conn(id).await?;
@@ -226,7 +228,13 @@ impl CustomDataRepoTrait for CustomDataRepo {
 
         let result = query.build().fetch_optional(&mut *conn).await?;
 
-        return Ok(result.is_none());
+        let has_dup = result.is_none();
+        if let (Some(id), Some(row)) = (row_id, result) {
+            // If the current row matches the found row ID, the entries don't need to be unique
+            Ok(i64::from(id) == row.try_get::<i64, _>("id").unwrap_or(-1))
+        } else {
+            Ok(has_dup)
+        }
     }
 
     async fn list_rows(&self, id: &str, query: ListRowsQuery) -> Result<ListRowsResponse, DbError> {

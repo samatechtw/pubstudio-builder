@@ -48,7 +48,7 @@ pub async fn add_row(
     validate_custom_data_allowance(context, site_id).await?;
 
     // Validate data by checking columns in custom_data_info
-    let table = validate_row_data(context, site_id, &dto.table_name, &dto.row).await?;
+    let table = validate_row_data(context, site_id, &dto.table_name, None, &dto.row).await?;
 
     // Save row to database
     let row = context
