@@ -1,6 +1,6 @@
 import { RenderMode } from '@pubstudio/frontend/util-render'
 import { hrefToUrl, INormalizedUrl } from '@pubstudio/frontend/util-router'
-import { mergeSearch } from './merge-search'
+import { mergeSearch, pathToSearchParams } from './merge-search'
 
 export const routeToPreviewRawPath = (
   route: string,
@@ -20,7 +20,7 @@ export const routeToPreviewPath = (
     return { url, isExternal }
   }
 
-  // Relative path, forward query string and hash.
+  // Relative path, forward query string and hash necessary for preview functionality.
 
   // Since users may provide href with custom hash and query, we have to extract those values
   // from the `href` prop and merge them with editor hash and query. User-provided hash&query
@@ -29,8 +29,9 @@ export const routeToPreviewPath = (
   const { pathname: previewPathName, search: userSearch, hash: userHash } = new URL(url)
   const { search: editorSearch, hash: editorHash } = window.location
 
+  const userParams = pathToSearchParams(userSearch)
   const mergedSearchParams = mergeSearch(editorSearch, userSearch)
-  const uniqueSearchKeys = new Set(mergedSearchParams.keys())
+  const uniqueSearchKeys = new Set(['siteId', ...userParams.keys()])
 
   let queryString = ''
 
