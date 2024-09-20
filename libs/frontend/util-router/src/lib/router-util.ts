@@ -36,7 +36,7 @@ export const mergePath = (parentPath: string, childPath: string): string => {
 export const computePathRegex = (path: string): RegExp => {
   const p = path.endsWith('*') ? path.slice(0, path.length - 1) : path
   const sourcePattern = p.replace(/:\w+/g, '[-_\\w]+')
-  const pattern = `(${sourcePattern}/?$)|(${sourcePattern}[/?#])`
+  const pattern = `^((${sourcePattern}/?$)|(${sourcePattern}[/?#]))`
   return new RegExp(pattern)
 }
 
