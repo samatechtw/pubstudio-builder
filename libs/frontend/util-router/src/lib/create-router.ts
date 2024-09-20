@@ -17,6 +17,11 @@ import {
   IRouter,
 } from './i-router'
 import {
+  MatchedRoutesSymbol,
+  RouteLevelSymbol,
+  RouterSymbol,
+} from './router-injection-keys'
+import {
   computeLocationParts,
   computePathRegex,
   computeResolvedPath,
@@ -24,12 +29,7 @@ import {
   mergePath,
   replaceParams,
   validateRoute,
-} from './router-helpers'
-import {
-  MatchedRoutesSymbol,
-  RouteLevelSymbol,
-  RouterSymbol,
-} from './router-injection-keys'
+} from './router-util'
 import {
   _ScrollPositionNormalized,
   computeScrollPosition,
@@ -322,10 +322,10 @@ export const createRouter = <M = Record<string, unknown>>(
       rootRoute = rootDefaultRoute
     } else {
       rootRoute = rootRoutes.value.find(
-        (rootRoute) =>
-          rootRoute !== rootDefaultRoute &&
-          rootRoute !== notFoundRoute &&
-          rootRoute.mergedPathRegex.test(resolvedPath),
+        (route) =>
+          route !== rootDefaultRoute &&
+          route !== notFoundRoute &&
+          route.mergedPathRegex.test(resolvedPath),
       )
     }
 
