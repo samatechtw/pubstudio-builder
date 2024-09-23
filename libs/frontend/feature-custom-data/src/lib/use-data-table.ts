@@ -28,6 +28,7 @@ export interface IUseDataTableFeature {
   deleteRow: (tableName: string, index: number) => Promise<void>
   modifyColumn: (tableName: string, info: IEditColumnName) => Promise<void>
   addColumn: (tableName: string, info: ICustomTableColumn) => Promise<void>
+  deleteTable: (tableName: string) => Promise<void>
 }
 
 const errorKey = ref()
@@ -173,6 +174,22 @@ export const useDataTable = (siteId: Ref<string>): IUseDataTableFeature => {
     loadingRows.value = false
   }
 
+  const deleteTable = async (tableName: string) => {
+    errorKey.value = undefined
+    if (!apiSite) {
+      return
+    }
+    loadingRows.value = true
+
+    try {
+      await api.deleteTable(apiSite, { table_name: tableName })
+      newRow.value = undefined
+    } catch (e) {
+      errorKey.value = parseApiErrorKey(toApiError(e))
+    }
+    loadingRows.value = false
+  }
+
   return {
     page,
     total,
@@ -192,5 +209,6 @@ export const useDataTable = (siteId: Ref<string>): IUseDataTableFeature => {
     deleteRow,
     modifyColumn,
     addColumn,
+    deleteTable,
   }
 }

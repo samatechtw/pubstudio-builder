@@ -9,4 +9,5 @@ export enum CustomDataAction {
   AddColumn = 'AddColumn',
   RemoveColumn = 'RemoveColumn',
   ModifyColumn = 'ModifyColumn',
+  DeleteTable = 'DeleteTable',
 }

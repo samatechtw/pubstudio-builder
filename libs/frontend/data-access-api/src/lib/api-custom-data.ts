@@ -7,6 +7,7 @@ import {
   ICreateTableApiRequest,
   ICreateTableResponse,
   ICustomDataApiRequest,
+  IDeleteTableApiRequest,
   IListRowsApiQuery,
   IListRowsResponse,
   IListTablesApiQuery,
@@ -94,6 +95,13 @@ export const useCustomDataApi = (siteId: string): IApiCustomData => {
     await customDataRequest(api, CustomDataAction.ModifyColumn, payload)
   }
 
+  const deleteTable = async (
+    api: PSApiShim | undefined,
+    payload: IDeleteTableApiRequest,
+  ): Promise<void> => {
+    await customDataRequest(api, CustomDataAction.DeleteTable, payload)
+  }
+
   return {
     listRows,
     createTable,
@@ -103,5 +111,6 @@ export const useCustomDataApi = (siteId: string): IApiCustomData => {
     removeRow,
     addColumn,
     modifyColumn,
+    deleteTable,
   }
 }

@@ -1,26 +1,25 @@
 import {
   CustomDataAction,
   ICustomDataApiRequest,
-  IListRowsResponse,
-  IRemoveRowApiRequest,
+  IDeleteTableApiRequest,
+  IModifyColumnApiRequest,
 } from '@pubstudio/shared/type-api-site-custom-data'
 import { SiteApiResetService } from '@pubstudio/shared/util-test-reset'
 import supertest from 'supertest'
 import TestAgent from 'supertest/lib/agent'
 import { adminAuthHeader, ownerAuthHeader } from '../helpers/auth-helpers'
 import { mockAddRowPayload1 } from '../mocks/mock-add-row-payload'
-import { mockListRowsPayload } from '../mocks/mock-list-rows-payload'
 import { SITE_SEEDS } from '../mocks/site-seeds'
 import { testConfig } from '../test.config'
 
-describe('Remove Row', () => {
+describe('Delete Table', () => {
   const testEndpoint = (siteId: string) => `/api/sites/${siteId}/custom_data`
   let api: TestAgent
   let resetService: SiteApiResetService
   let adminAuth: string
   let siteId: string
   let payload: ICustomDataApiRequest
-  let removeData: IRemoveRowApiRequest
+  let deleteData: IDeleteTableApiRequest
 
   beforeAll(() => {
     api = supertest(testConfig.get('apiUrl'))
@@ -32,49 +31,22 @@ describe('Remove Row', () => {
     siteId = '6d2c8359-6094-402c-bcbb-37202fd7c336'
     await resetService.reset()
 
-    removeData = { table_name: 'contact_form', row_id: '1' }
+    deleteData = { table_name: 'contact_form' }
     payload = {
-      action: CustomDataAction.RemoveRow,
-      data: removeData,
+      action: CustomDataAction.DeleteTable,
+      data: deleteData,
     }
-
-    // Add a row
-    await api
-      .post(testEndpoint(siteId))
-      .set('Authorization', adminAuth)
-      .send({
-        action: CustomDataAction.AddRow,
-        data: mockAddRowPayload1(),
-      })
-      .expect(200)
   })
 
-  const verifyRemoved = async () => {
-    const listPayload = {
-      action: CustomDataAction.ListRows,
-      data: mockListRowsPayload('contact_form'),
-    }
-    const res1 = await api
-      .post(testEndpoint(siteId))
-      .set('Authorization', adminAuth)
-      .send(listPayload)
-      .expect(200)
-
-    const body: IListRowsResponse = res1.body
-    expect(body.total).toEqual(0)
-  }
-
-  it('remove row when requester is admin', async () => {
+  it('delete table when requester is admin', async () => {
     await api
       .post(testEndpoint(siteId))
       .set('Authorization', adminAuth)
       .send(payload)
       .expect(204)
-
-    await verifyRemoved()
   })
 
-  it('remove row when requester is owner', async () => {
+  it('delete table when requester is owner', async () => {
     const ownerId = '903b3c28-deaa-45dc-a43f-511fe965d34e'
     const ownerAuth = ownerAuthHeader(ownerId)
 
@@ -84,12 +56,47 @@ describe('Remove Row', () => {
       .send(payload)
       .expect(204)
 
-    await verifyRemoved()
+    // Add row fails
+    await api
+      .post(testEndpoint(siteId))
+      .set('Authorization', adminAuth)
+      .send({
+        action: CustomDataAction.AddRow,
+        data: mockAddRowPayload1(),
+      })
+      .expect(400, {
+        code: 'CustomTableNotFound',
+        message: 'Failed to validate request',
+        status: 400,
+      })
+
+    // Modify column info fails
+    const modifyRequest: IModifyColumnApiRequest = {
+      table_name: 'contact_form',
+      old_column_name: 'name',
+      new_column_info: {
+        data_type: 'TEXT',
+        validation_rules: [{ rule_type: 'MinLength', parameter: 2 }],
+      },
+    }
+
+    await api
+      .post(testEndpoint(siteId))
+      .set('Authorization', ownerAuth)
+      .send({
+        action: CustomDataAction.ModifyColumn,
+        data: modifyRequest,
+      })
+      .expect(400, {
+        code: 'CustomTableNotFound',
+        message: 'Failed to validate request',
+        status: 400,
+      })
   })
 
   describe('when request is not valid', () => {
     it('when table_name is invalid', async () => {
-      removeData.table_name = 'a'
+      deleteData.table_name = 'a'
 
       await api
         .post(testEndpoint(siteId))
@@ -100,14 +107,6 @@ describe('Remove Row', () => {
           message: 'Restricted table name',
           status: 400,
         })
-    })
-
-    it('when removing a row with a duplicate unique constraint', async () => {
-      await api
-        .post(testEndpoint(siteId))
-        .set('Authorization', adminAuth)
-        .send(payload)
-        .expect(204)
     })
 
     it('when user is other owner', () => {

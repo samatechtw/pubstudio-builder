@@ -13,8 +13,14 @@
       :placeholder="t('enter')"
       @keydown.enter="exportTable"
     />
+    <ErrorMessage v-if="exportError" :error="exportError" />
     <div class="modal-buttons">
-      <PSButton class="confirm-button" :text="t('confirm')" @click="exportTable" />
+      <PSButton
+        class="confirm-button"
+        :text="t('confirm')"
+        :animate="exporting"
+        @click="exportTable"
+      />
       <PSButton
         class="cancel-button"
         :text="t('cancel')"
@@ -28,17 +34,12 @@
 <script lang="ts" setup>
 import { onMounted, ref, toRefs, watch } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
-import { format } from 'date-fns/format'
-import { saveFile } from '@pubstudio/frontend/util-doc'
-import { Modal, PSButton, PSInput } from '@pubstudio/frontend/ui-widgets'
-import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
+import { ErrorMessage, Modal, PSButton, PSInput } from '@pubstudio/frontend/ui-widgets'
 import { ICustomTableColumn } from '@pubstudio/shared/type-api-site-custom-data'
-import { parseApiError, toApiError } from '@pubstudio/frontend/util-api'
-import { useCustomDataApi } from '@pubstudio/frontend/data-access-api'
+import { defaultFileName, useExportTable } from '../lib/use-export-table'
 
 const i18n = useI18n()
 const { t } = i18n
-const { apiSite } = useSiteSource()
 
 const props = defineProps<{
   tableName: string | undefined
@@ -47,56 +48,32 @@ const props = defineProps<{
   show: boolean
 }>()
 const { columns, tableName, siteId, show } = toRefs(props)
+const {
+  exportTable: exportTableApi,
+  exporting,
+  exportError,
+} = useExportTable(siteId.value)
 
 const emit = defineEmits<{
   (e: 'cancel'): void
 }>()
 
-const api = useCustomDataApi(siteId.value)
 const fileName = ref('')
-const loading = ref(false)
-const error = ref()
-
-const defaultFileName = (): string => {
-  const date = format(new Date(), 'yyyyMMdd-HHmmss')
-  return `${tableName.value}-${date}.csv`
-}
 
 const exportTable = async () => {
-  if (!apiSite || !tableName.value) {
-    return
-  }
-  loading.value = true
-  let tableString = ''
-  try {
-    const response = await api.listRows(apiSite, {
-      table_name: tableName.value,
-      from: 1,
-      to: 100000,
-    })
-    const columnNames = columns.value.map((c) => c.name)
-    tableString = `"${columnNames.join('","')}"\n`
-    for (const row of response.results) {
-      const rowString = columnNames.map((col) => row[col]).join('","')
-      tableString += `"${rowString}"\n`
-    }
-  } catch (e) {
-    error.value = parseApiError(i18n, toApiError(e))
-  }
-  loading.value = false
-
-  saveFile(fileName.value, tableString, 'csv')
+  await exportTableApi(fileName.value, tableName.value, columns.value)
   emit('cancel')
 }
 
 watch(show, (newShow) => {
+  exportError.value = undefined
   if (newShow) {
-    defaultFileName()
+    fileName.value = defaultFileName(tableName.value)
   }
 })
 
 onMounted(() => {
-  fileName.value = defaultFileName()
+  fileName.value = defaultFileName(tableName.value)
 })
 </script>
 

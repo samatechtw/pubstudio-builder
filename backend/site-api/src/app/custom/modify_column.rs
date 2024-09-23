@@ -17,7 +17,7 @@ use crate::{
 
 use super::{
     custom_data::parse_request_data,
-    helpers::{validate_column_name, validate_table_name},
+    helpers::{map_custom_table_err, validate_column_name, validate_table_name},
 };
 
 /*
@@ -57,7 +57,7 @@ pub async fn modify_column(
             .custom_data_repo
             .modify_column(site_id, &table, &old_column, &new_column_name)
             .await
-            .map_err(|e| ApiError::internal_error().message(e))?;
+            .map_err(map_custom_table_err)?;
     }
 
     let mut column_info = get_column_info(context, site_id, &table).await?;

@@ -64,6 +64,14 @@
       :tableName="selectedTableName"
       @cancel="showExport = false"
     />
+    <DeleteTableModal
+      :show="showDeleteTable"
+      :siteId="siteId"
+      :columns="selectedColumns"
+      :tableName="selectedTableName"
+      @cancel="showDeleteTable = false"
+      @deleted="deleteComplete"
+    />
     <ImportTableModal
       :show="showImport"
       :siteId="siteId"
@@ -101,6 +109,7 @@ import { useDataTable } from '../lib/use-data-table'
 import ExportTableModal from './ExportTableModal.vue'
 import ImportTableModal from './ImportTableModal.vue'
 import { useRoute } from '@pubstudio/frontend/util-router'
+import DeleteTableModal from './DeleteTableModal.vue'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -112,6 +121,7 @@ const tables = ref<ICustomTableViewModel[]>([])
 const showNewColumn = ref(false)
 const showNewTable = ref(false)
 const showExport = ref(false)
+const showDeleteTable = ref(false)
 const showImport = ref(false)
 
 const selectedTableName = computed(() => editor.value?.selectedTable)
@@ -191,6 +201,11 @@ const tableActions = [
     class: 'table-export',
     click: () => (showExport.value = true),
   },
+  {
+    label: t('custom_data.delete_table'),
+    class: 'delete-table',
+    click: () => (showDeleteTable.value = true),
+  },
 ]
 
 const selectTable = async (tableName: string | undefined) => {
@@ -201,6 +216,12 @@ const importComplete = async (hasErrors: boolean) => {
   if (!hasErrors) {
     showImport.value = false
   }
+  await listTables()
+}
+
+const deleteComplete = async () => {
+  showDeleteTable.value = false
+  selectTable(undefined)
   await listTables()
 }
 
