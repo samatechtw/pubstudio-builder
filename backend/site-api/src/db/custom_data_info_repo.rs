@@ -1,7 +1,10 @@
 use std::sync::Arc;
 
 use axum::async_trait;
-use lib_shared_site_api::db::{db_error::DbError, db_result::list_result};
+use lib_shared_site_api::db::{
+    db_error::{map_sqlx_err, DbError},
+    db_result::list_result,
+};
 use lib_shared_types::{
     dto::custom_data::{
         custom_data_info_dto::{CustomDataInfoDto, CustomDataUpdateColumns},
@@ -38,6 +41,7 @@ pub trait CustomDataInfoRepoTrait {
     ) -> Result<CustomDataInfoEntityList, DbError>;
     async fn get_table(&self, id: &str, table_name: &str) -> Result<CustomDataInfoEntity, DbError>;
     async fn get_custom_tables_size(&self, id: &str) -> Result<i64, DbError>;
+    async fn remove_info(&self, id: &str, table_name: &str) -> Result<(), DbError>;
 }
 
 pub struct CustomDataInfoRepo {
@@ -115,7 +119,8 @@ impl CustomDataInfoRepoTrait for CustomDataInfoRepo {
         .bind(dto.name)
         .try_map(map_to_custom_data_info_entity)
         .fetch_one(&mut *conn)
-        .await?;
+        .await
+        .map_err(map_sqlx_err)?;
 
         Ok(result)
     }
@@ -159,7 +164,8 @@ impl CustomDataInfoRepoTrait for CustomDataInfoRepo {
         .bind(table_name)
         .try_map(map_to_custom_data_info_entity)
         .fetch_one(&mut *conn)
-        .await?;
+        .await
+        .map_err(map_sqlx_err)?;
 
         Ok(columns)
     }
@@ -196,5 +202,16 @@ impl CustomDataInfoRepoTrait for CustomDataInfoRepo {
         .await?;
 
         Ok(row.try_get("size")?)
+    }
+
+    async fn remove_info(&self, id: &str, table_name: &str) -> Result<(), DbError> {
+        let mut conn = self.get_db_conn(id).await?;
+
+        sqlx::query("DELETE FROM custom_data_info WHERE name = ?1")
+            .bind(table_name)
+            .execute(&mut *conn)
+            .await?;
+
+        Ok(())
     }
 }

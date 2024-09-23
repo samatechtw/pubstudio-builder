@@ -45,6 +45,9 @@ pub async fn validate_table_available(
             DbError::SqlxError(sqlx::Error::RowNotFound) => {
                 return Ok(());
             }
+            DbError::EntityNotFound() => {
+                return Ok(());
+            }
             _ => ApiError::internal_error().message(format!("Validation error: {:?}", e)),
         },
     };
@@ -128,7 +131,7 @@ pub async fn get_column_info(
         .custom_data_info_repo
         .get_table(site_id, table_name)
         .await
-        .map_err(|e| ApiError::internal_error().message(e))?;
+        .map_err(map_custom_table_err)?;
 
     Ok(parse_column_info(&table_info.columns)?)
 }
@@ -152,7 +155,16 @@ pub async fn save_column_info(
         .custom_data_info_repo
         .update_columns(site_id, metadata_dto)
         .await
-        .map_err(|e| ApiError::internal_error().message(e))?;
+        .map_err(map_custom_table_err)?;
 
     Ok(result)
+}
+
+pub fn map_custom_table_err(e: DbError) -> ApiError {
+    match e {
+        DbError::EntityNotFound() => {
+            ApiError::bad_request().code(ApiErrorCode::CustomTableNotFound)
+        }
+        _ => ApiError::internal_error().message(e),
+    }
 }

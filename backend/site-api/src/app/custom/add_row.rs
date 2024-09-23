@@ -1,11 +1,5 @@
-use lib_shared_site_api::{
-    db::db_error::DbError,
-    error::{api_error::ApiError, helpers::check_bad_form},
-};
-use lib_shared_types::{
-    dto::custom_data::add_row_dto::{AddRow, AddRowResponse},
-    error::api_error::ApiErrorCode,
-};
+use lib_shared_site_api::error::{api_error::ApiError, helpers::check_bad_form};
+use lib_shared_types::dto::custom_data::add_row_dto::{AddRow, AddRowResponse};
 use serde_json::Value;
 use validator::Validate;
 
@@ -14,8 +8,8 @@ use crate::api_context::ApiContext;
 use super::{
     custom_data::parse_request_data,
     helpers::{
-        parse_event_info, validate_column_names, validate_custom_data_allowance,
-        validate_table_name,
+        map_custom_table_err, parse_event_info, validate_column_names,
+        validate_custom_data_allowance, validate_table_name,
     },
     trigger_table_events::trigger_add_row,
     validate_row_data::validate_row_data,
@@ -55,12 +49,7 @@ pub async fn add_row(
         .custom_data_repo
         .add_row(site_id, dto)
         .await
-        .map_err(|e| match e {
-            DbError::EntityNotFound() => {
-                ApiError::bad_request().code(ApiErrorCode::CustomTableNotFound)
-            }
-            _ => ApiError::internal_error().message(e),
-        })?;
+        .map_err(map_custom_table_err)?;
     let id = row
         .get("id")
         .map(|id| id.to_string())

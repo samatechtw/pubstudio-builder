@@ -41,6 +41,7 @@ import {
   IAddRowApiResponse,
   ICreateTableApiRequest,
   ICreateTableResponse,
+  IDeleteTableApiRequest,
   IListRowsApiQuery,
   IListRowsResponse,
   IListTablesApiQuery,
@@ -85,6 +86,10 @@ export interface IApiCustomData {
   modifyColumn: (
     api: PSApiShim | undefined,
     payload: IModifyColumnApiRequest,
+  ) => Promise<void>
+  deleteTable: (
+    api: PSApiShim | undefined,
+    payload: IDeleteTableApiRequest,
   ) => Promise<void>
 }
 

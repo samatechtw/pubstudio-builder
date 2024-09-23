@@ -180,6 +180,20 @@ describe('Modify Column', () => {
         })
     })
 
+    it('when table does not exist', async () => {
+      modifyRequest.table_name = 'fake_table'
+
+      await api
+        .post(testEndpoint(siteId))
+        .set('Authorization', adminAuth)
+        .send(payload)
+        .expect(400, {
+          code: 'CustomTableNotFound',
+          message: 'Failed to validate request',
+          status: 400,
+        })
+    })
+
     it('when old_column_name is invalid', async () => {
       modifyRequest.old_column_name = 'a'
 

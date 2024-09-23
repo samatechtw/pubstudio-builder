@@ -23,4 +23,5 @@ pub enum Action {
     UpdateRow,
     ListRows,
     GetRow,
+    DeleteTable,
 }

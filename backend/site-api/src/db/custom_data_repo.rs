@@ -56,6 +56,7 @@ pub trait CustomDataRepoTrait {
         old_column: &str,
         new_column: &str,
     ) -> Result<(), DbError>;
+    async fn delete_table(&self, id: &str, table_name: &str) -> Result<(), DbError>;
 }
 
 pub struct CustomDataRepo {
@@ -115,6 +116,8 @@ fn map_custom_data_sqlx_err(e: sqlx::Error) -> DbError {
                     .map(|s| s.trim())
                     .unwrap_or("Unknown");
                 return DbError::CheckLengthFailed(failed_constraint.into());
+            } else if err_str.contains("no such table") {
+                return DbError::EntityNotFound();
             }
             DbError::Query(err_str)
         }
@@ -387,9 +390,20 @@ impl CustomDataRepoTrait for CustomDataRepo {
             quote(new_column)
         ))
         .execute(&pool)
-        .await?;
+        .await
+        .map_err(map_custom_data_sqlx_err)?;
 
         pool.close().await;
+
+        Ok(())
+    }
+
+    async fn delete_table(&self, id: &str, table_name: &str) -> Result<(), DbError> {
+        let mut conn = self.get_db_conn(id).await?;
+
+        sqlx::query(&format!("DROP TABLE {}", quote(table_name)))
+            .execute(&mut *conn)
+            .await?;
 
         Ok(())
     }

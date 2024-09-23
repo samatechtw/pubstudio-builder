@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use lib_shared_site_api::error::api_error::ApiError;
+use lib_shared_site_api::{db::db_error::DbError, error::api_error::ApiError};
 use lib_shared_types::{
     dto::custom_data::create_table_dto::RuleType,
     entity::site_api::site_custom_data_info_entity::CustomDataInfoEntity,
@@ -22,7 +22,12 @@ pub async fn validate_row_data(
         .custom_data_info_repo
         .get_table(site_id, table)
         .await
-        .map_err(|e| ApiError::internal_error().message(e))?;
+        .map_err(|e| match e {
+            DbError::EntityNotFound() => {
+                ApiError::bad_request().code(ApiErrorCode::CustomTableNotFound)
+            }
+            _ => ApiError::internal_error().message(e),
+        })?;
 
     let column_info = parse_column_info(&table_entity.columns)?;
 

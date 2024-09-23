@@ -19,9 +19,10 @@ use validator::Validate;
 use crate::{api_context::ApiContext, middleware::auth::verify_site_owner};
 
 use super::{
-    add_column::add_column, add_row::add_row, create_table::create_table, get_row::get_row,
-    list_rows::list_rows, list_tables::list_tables, modify_column::modify_column,
-    remove_column::remove_column, remove_row::remove_row, update_row::update_row,
+    add_column::add_column, add_row::add_row, create_table::create_table,
+    delete_table::delete_table, get_row::get_row, list_rows::list_rows, list_tables::list_tables,
+    modify_column::modify_column, remove_column::remove_column, remove_row::remove_row,
+    update_row::update_row,
 };
 
 pub fn parse_request_data<T: DeserializeOwned>(data: serde_json::Value) -> Result<T, ApiError> {
@@ -52,6 +53,14 @@ pub async fn custom_data(
             let response = create_table(&context, &id, dto.data).await?;
 
             Ok((StatusCode::CREATED, Json(response).into_response()))
+        }
+        Action::DeleteTable => {
+            delete_table(&context, &id, dto.data).await?;
+
+            Ok((
+                StatusCode::NO_CONTENT,
+                StatusCode::NO_CONTENT.into_response(),
+            ))
         }
         Action::AddRow => {
             let response = add_row(&context, &id, dto.data).await?;

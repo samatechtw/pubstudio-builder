@@ -185,6 +185,20 @@ describe('Add Row', () => {
         })
     })
 
+    it('when table does not exist', async () => {
+      rowData.table_name = 'fake_table'
+
+      await api
+        .post(testEndpoint(siteId))
+        .set('Authorization', adminAuth)
+        .send(payload)
+        .expect(400, {
+          code: 'CustomTableNotFound',
+          message: 'Failed to validate request',
+          status: 400,
+        })
+    })
+
     it('when column name is invalid', async () => {
       rowData.row['a'] = 'TEST'
 
