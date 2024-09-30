@@ -37,7 +37,9 @@ const options = computed(() => {
 })
 
 const setFontFamily = (family: string | undefined) => {
-  emit('select', family)
+  const fallback = family ? site.value.context.theme.fonts[family]?.fallback : undefined
+  const font = fallback ? `${family}, ${fallback}` : family
+  emit('select', font)
 }
 
 const font = (label: string) => {
