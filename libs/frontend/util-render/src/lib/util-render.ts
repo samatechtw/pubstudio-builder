@@ -21,26 +21,13 @@ export const rawStyleRecordToString = (
   return Object.entries(record).reduce((result, [selector, rawStyle]) => {
     const fields = Object.entries(rawStyle)
       .map(([prop, value]) => {
-        const computedValue = computeCssValue(prop as CssType, value, context)
+        const computedValue = resolveThemeVariables(context, value) ?? value
         const supportedValue = CSS.supports(prop, computedValue) ? computedValue : ''
         return `${prop}:${supportedValue};`
       })
       .join('')
     return `${result}${selector}{${fields}}`
   }, '')
-}
-
-const computeCssValue = (prop: CssType, value: string, context: ISiteContext): string => {
-  let computedValue = resolveThemeVariables(context, value) ?? value
-
-  if (prop === 'font-family') {
-    const appliedFont: IThemeFont | undefined = context.theme.fonts[value]
-    if (appliedFont?.fallback) {
-      computedValue = `"${appliedFont.name}", "${appliedFont.fallback}", sans-serif`
-    }
-  }
-
-  return computedValue
 }
 
 export const createQueryStyle = (context: ISiteContext): IQueryStyle => {

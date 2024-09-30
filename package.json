@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "description": "Page editor, renderer, and backend that powers https://pubstud.io",
   "engines": {
-    "node": ">=14.17.4",
-    "npm": ">=7.17.0"
+    "node": ">=18",
+    "npm": ">=8"
   },
   "type": "module",
   "scripts": {
