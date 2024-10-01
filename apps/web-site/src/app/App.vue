@@ -1,24 +1,22 @@
 <template>
   <div class="app">
-    <div id="scroll-container" class="app-content">
-      <div v-if="loading" class="sw c">
-        <span class="dot" />
-        <span class="dot" />
-        <span class="dot" />
-      </div>
-      <div v-else-if="error" class="emw c">
-        <div class="em c">
-          <span v-html="error" />
-        </div>
-      </div>
-      <template v-else>
-        <CustomStyle />
-        <Mixins />
-        <ComponentStyle />
-        <FontLinks />
-        <router-view class="app-router-view" />
-      </template>
+    <div v-if="loading" class="sw c">
+      <span class="dot" />
+      <span class="dot" />
+      <span class="dot" />
     </div>
+    <div v-else-if="error" class="emw c">
+      <div class="em c">
+        <span v-html="error" />
+      </div>
+    </div>
+    <template v-else>
+      <CustomStyle />
+      <Mixins />
+      <ComponentStyle />
+      <FontLinks />
+      <router-view class="_rv" />
+    </template>
   </div>
 </template>
 
@@ -170,21 +168,12 @@ a {
 
 #app {
   height: 100%;
-}
-
-.app {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  overflow-y: auto;
-}
-.app-content {
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
   flex-grow: 1;
 }
-.app-router-view {
+._rc {
   flex-grow: 1;
 }
 .c {

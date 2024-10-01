@@ -51,7 +51,7 @@ async fn main() {
     }
     // Notify auth mode
     if config.auth_bypass_api_key.is_some() {
-        println!("Auth mode: bypass (In production, make sure to generate a secure token.)");
+        println!("Auth mode: bypass (In production generate a secure token.)");
     } else {
         println!("Auth mode: public key");
     }
