@@ -238,8 +238,8 @@ const clear = () => {
   box-shadow: none;
   padding: 8px 10px;
   transition:
-    border-color 0.3,
-    background-color 0.3;
+    border-color 0.3s,
+    background-color 0.3s;
 
   &::placeholder {
     color: $color-title;

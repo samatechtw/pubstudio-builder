@@ -27,29 +27,14 @@
         {{ t('build.event_params') }}
       </div>
       <div class="event-row">
-        <MenuRow
+        <ComponentEventParam
           v-for="param in newEventParams"
           :key="param[0]"
           class="arg"
           :label="param[0]"
-          :value="(param[1]?.value ?? '').toString()"
-          :infoKey="param[1]?.infoKey"
-          :htmlInfo="true"
-          :forceEdit="true"
-          :immediateUpdate="true"
+          :param="param[1]"
           @update="setEventParam(param[0], $event)"
-        >
-          <template v-if="param[1].type === ComponentArgPrimitive.Boolean" #input>
-            <Checkbox
-              class="event-param-checkbox"
-              :item="{
-                label: '',
-                checked: ['true', true].includes(param[1].value),
-              }"
-              @checked="setEventParam(param[0], $event.toString())"
-            />
-          </template>
-        </MenuRow>
+        />
       </div>
     </div>
     <!-- Event Behaviors -->
@@ -114,7 +99,6 @@ import {
   useEditComponentEvent,
 } from '@pubstudio/frontend/feature-build'
 import {
-  Checkbox,
   ErrorMessage,
   PSButton,
   PSMultiselect,
@@ -129,11 +113,11 @@ import {
   IComponent,
   IComponentEvent,
 } from '@pubstudio/shared/type-site'
-import MenuRow from '../MenuRow.vue'
 import { IUpdateComponentArgPayload } from '../component-arg/i-update-component-arg-payload'
 import EditMenuTitle from '../EditMenuTitle.vue'
 import EventBehaviorRow from './EventBehaviorRow.vue'
 import BehaviorModal from './BehaviorModal.vue'
+import ComponentEventParam from './ComponentEventParam.vue'
 
 const { t } = useI18n()
 const { site, editor } = useBuild()
@@ -204,6 +188,7 @@ const updateEventName = (name: string | undefined) => {
       direction: {
         type: ComponentArgPrimitive.String,
         value: 'down',
+        options: ['down', 'up', 'both'],
         infoKey: 'build.event_params_info.scroll_into_view.direction',
       },
     }
@@ -334,9 +319,6 @@ const save = () => {
   }
   .event-params {
     margin-top: 16px;
-  }
-  .event-param-checkbox {
-    margin: 0;
   }
   .event-actions {
     @mixin menu-actions;
