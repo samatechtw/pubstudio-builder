@@ -30,7 +30,6 @@
       v-if="info || infoKey"
       :message="info || t(infoKey as string)"
       :showArrow="false"
-      :useHtml="htmlInfo"
       class="info-bubble"
     />
   </div>
@@ -51,7 +50,6 @@ const props = withDefaults(
     editable?: boolean
     info?: string
     infoKey?: string
-    htmlInfo?: boolean
     forceEdit?: boolean
     focusInput?: boolean
     placeholder?: string
@@ -66,7 +64,6 @@ const props = withDefaults(
     focusInput: true,
     info: undefined,
     infoKey: undefined,
-    htmlInfo: false,
     showCheck: false,
   },
 )

@@ -66,8 +66,11 @@ export type IEventParams = Record<string, IEventParamEntry>
 export type IEventParamEntry = {
   type: ComponentArgType
   value: string
+
+  // TODO -- infoKey and options should be editor-only, not included in the site data
   // An info bubble will show next to the param if `infoKey` is truthy
   infoKey?: string
+  options?: string[]
 }
 
 export interface IComponentEvent {

@@ -39,7 +39,7 @@ export const resolveBehaviorFunction = (
       'helpers',
       'behaviorContext',
       'args',
-      `"use strict";const {getState,setState,setIsInput}=helpers;const {site,component}=behaviorContext;${behavior.code};`,
+      `"use strict";const {getState,setState,setIsInput}=helpers;const {site,component,event}=behaviorContext;${behavior.code};`,
     ) as IResolvedBehavior
   }
   return undefined

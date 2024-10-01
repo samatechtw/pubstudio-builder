@@ -71,6 +71,8 @@ const registerScrollIntoViewEvent = (
     }
 
     let prevScrollTop = 0
+    const isDown = ['down', 'both'].includes(direction)
+    const isUp = ['up', 'both'].includes(direction)
 
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -78,21 +80,12 @@ const registerScrollIntoViewEvent = (
         const currentScrollTop = (root ?? document.documentElement).scrollTop
 
         // Scroll down
-        if (
-          isIntersecting &&
-          ['down', 'both'].includes(direction) &&
-          prevScrollTop < currentScrollTop
-        ) {
-          eventWithArgs[0]()
+        if (isIntersecting && isDown && prevScrollTop < currentScrollTop) {
+          eventWithArgs[0]({ direction: 'down' } as unknown as Event)
         }
-
         // Scroll up
-        if (
-          !isIntersecting &&
-          ['up', 'both'].includes(direction) &&
-          prevScrollTop > currentScrollTop
-        ) {
-          eventWithArgs[0]()
+        if (!isIntersecting && isUp && prevScrollTop > currentScrollTop) {
+          eventWithArgs[0]({ direction: 'up' } as unknown as Event)
         }
 
         prevScrollTop = currentScrollTop
