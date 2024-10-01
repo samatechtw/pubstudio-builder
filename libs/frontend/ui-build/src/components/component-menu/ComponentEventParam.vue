@@ -73,9 +73,12 @@ const selectValue = (val: string | undefined) => {
   setValue()
 }
 
-watch(param, (updatedParam) => {
-  newValue.value = (updatedParam.value ?? '').toString()
-})
+watch(
+  () => param,
+  (updatedParam) => {
+    newValue.value = (updatedParam.value ?? '').toString()
+  },
+)
 
 onMounted(async () => {
   await nextTick()
