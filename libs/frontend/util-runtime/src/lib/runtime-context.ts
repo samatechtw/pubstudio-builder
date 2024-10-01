@@ -68,8 +68,8 @@ const keydownHandler = (e: KeyboardEvent) => {
 }
 
 const scrollHandler = () => {
-  for (const event of Object.values(runtimeContext.eventHandlers.scroll)) {
-    event()
+  for (const handler of Object.values(runtimeContext.eventHandlers.scroll)) {
+    handler()
   }
 }
 

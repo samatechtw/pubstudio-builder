@@ -343,8 +343,6 @@ impl CustomDataRepoTrait for CustomDataRepo {
 
         let mut query = append_column_info_to_query(query, Action::AddColumn, &dto.column);
 
-        println!("SQL Query: {}", query.sql());
-
         query
             .build()
             .execute(&mut *conn)
