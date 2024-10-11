@@ -176,5 +176,61 @@ describe('Update Custom Table', () => {
           status: 400,
         })
     })
+
+    it('when table event includes EmailRow with too many recipients', async () => {
+      data.events = [
+        {
+          event_type: 'EmailRow',
+          trigger: 'AddRow',
+          options: {
+            recipients: [
+              'test@samatech.tw',
+              'test1@samatech.tw',
+              'test2@samatech.tw',
+              'test3@samatech.tw',
+              'test4@samatech.tw',
+              'test5@samatech.tw',
+              'test6@samatech.tw',
+              'test7@samatech.tw',
+              'test8@samatech.tw',
+              'test9@samatech.tw',
+              'test10@samatech.tw',
+            ],
+          },
+        },
+      ]
+      await api
+        .post(testEndpoint(siteId))
+        .set('Authorization', adminAuth)
+        .send(payload)
+        .expect(400, {
+          code: 'InvalidFormData',
+          message: 'Failed to validate request',
+          status: 400,
+        })
+    })
+
+    it('when table event includes EmailRow with invalid recipient', async () => {
+      data.events = [
+        {
+          event_type: 'EmailRow',
+          trigger: 'AddRow',
+          options: {
+            recipients: [
+              'testtesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttest12345@samatech.tw',
+            ],
+          },
+        },
+      ]
+      await api
+        .post(testEndpoint(siteId))
+        .set('Authorization', adminAuth)
+        .send(payload)
+        .expect(400, {
+          code: 'InvalidFormData',
+          message: 'Failed to validate request',
+          status: 400,
+        })
+    })
   })
 })

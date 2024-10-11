@@ -11,6 +11,7 @@ use super::custom_event_dto::EventInfo;
 pub struct CreateTable {
     pub table_name: String,
     pub columns: HashMap<String, ColumnInfo>,
+    #[validate(nested)]
     pub events: Vec<EventInfo>,
 }
 

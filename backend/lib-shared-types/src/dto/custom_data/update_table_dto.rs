@@ -8,5 +8,6 @@ use super::custom_event_dto::EventInfo;
 pub struct UpdateTable {
     pub old_name: String,
     pub new_name: Option<String>,
+    #[validate(nested)]
     pub events: Option<Vec<EventInfo>>,
 }

@@ -49,6 +49,7 @@ pub enum ApiErrorCode {
     CustomTableNotFound,
     CustomColumnNameInvalid,
     CustomDataRequired,
+    CustomDataRowNotFound,
     CustomDataInvalidColumn,
     CustomDataInvalidEmail,
     CustomDataMinLengthFail,

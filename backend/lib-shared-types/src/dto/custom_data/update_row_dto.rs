@@ -14,4 +14,5 @@ pub struct UpdateRow {
 #[derive(Serialize, Deserialize)]
 pub struct UpdateRowResponse {
     pub updated_row: BTreeMap<String, String>,
+    pub events: i32,
 }
