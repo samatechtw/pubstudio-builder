@@ -1,7 +1,7 @@
 use std::{collections::HashMap, sync::Arc};
 
 use lib_shared_site_api::db::db_error::DbError;
-use sqlx::{pool::PoolConnection, Sqlite, SqlitePool};
+use sqlx::{pool::PoolConnection, Sqlite, SqlitePool, Transaction};
 use tokio::sync::RwLock;
 
 pub type SiteDbPools = Arc<RwLock<HashMap<String, SqlitePool>>>;
@@ -25,6 +25,15 @@ impl DbPoolManager {
     ) -> Result<SqlitePoolConnection, DbError> {
         let pool = self.get_db_pool(id, manifest_dir).await?;
         Ok(pool.acquire().await?)
+    }
+
+    pub async fn start_transaction(
+        &self,
+        id: &str,
+        manifest_dir: &str,
+    ) -> Result<Transaction<'_, Sqlite>, DbError> {
+        let tx = self.get_db_pool(id, manifest_dir).await?;
+        Ok(tx.begin().await?)
     }
 
     pub async fn get_db_pool(&self, id: &str, manifest_dir: &str) -> Result<SqlitePool, DbError> {

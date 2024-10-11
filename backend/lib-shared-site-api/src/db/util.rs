@@ -124,24 +124,6 @@ pub fn append_comma<
     (query, count)
 }
 
-pub fn append_comma_str<'a, DB: Database, T: 'a + sqlx::Type<DB> + sqlx::Encode<'a, DB> + Send>(
-    mut query: QueryBuilder<'a, DB>,
-    arg_name: &str,
-    arg: Option<T>,
-    count: u32,
-) -> (QueryBuilder<'a, DB>, u32) {
-    if let Some(arg_val) = arg {
-        if count == 0 {
-            query.push(format!(" {} = ", arg_name));
-        } else {
-            query.push(format!(", {} = ", arg_name));
-        }
-        query.push_bind(arg_val);
-        return (query, count + 1);
-    }
-    (query, count)
-}
-
 pub fn append_order_by<'a, DB: Database>(
     mut query: QueryBuilder<'a, DB>,
     column: String,

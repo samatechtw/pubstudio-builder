@@ -19,6 +19,7 @@ use lib_shared_types::dto::custom_data::{
     list_rows_query::{ListRowsQuery, ListRowsResponse},
     update_row_dto::UpdateRow,
 };
+use sqlx::Transaction;
 use sqlx::{sqlite::SqliteRow, Column, Error, QueryBuilder, Row, Sqlite};
 
 use super::site_db_pool_manager::{DbPoolManager, SqlitePoolConnection};
@@ -29,6 +30,7 @@ pub type DynCustomDataRepo = Arc<dyn CustomDataRepoTrait + Send + Sync>;
 pub trait CustomDataRepoTrait {
     fn site_db_url(&self, id: &str) -> String;
     async fn get_db_conn(&self, id: &str) -> Result<SqlitePoolConnection, DbError>;
+    async fn start_transaction(&self, id: &str) -> Result<Transaction<'_, Sqlite>, DbError>;
     async fn create_table(&self, id: &str, dto: CreateTable) -> Result<(), DbError>;
     async fn add_row(&self, id: &str, dto: AddRow) -> Result<CustomDataRow, DbError>;
     async fn remove_row(&self, id: &str, dto: RemoveRow) -> Result<(), DbError>;
@@ -57,6 +59,12 @@ pub trait CustomDataRepoTrait {
         new_column: &str,
     ) -> Result<(), DbError>;
     async fn delete_table(&self, id: &str, table_name: &str) -> Result<(), DbError>;
+    async fn rename_table(
+        &self,
+        tx: &mut Transaction<'_, Sqlite>,
+        old_name: &str,
+        new_name: &str,
+    ) -> Result<(), DbError>;
 }
 
 pub struct CustomDataRepo {
@@ -137,6 +145,14 @@ impl CustomDataRepoTrait for CustomDataRepo {
         self.db_pool_manager
             .get_db_conn(id, &self.manifest_dir)
             .await
+    }
+
+    async fn start_transaction(&self, id: &str) -> Result<Transaction<'_, Sqlite>, DbError> {
+        let transaction = self
+            .db_pool_manager
+            .start_transaction(id, &self.manifest_dir)
+            .await?;
+        Ok(transaction)
     }
 
     async fn create_table(&self, id: &str, dto: CreateTable) -> Result<(), DbError> {
@@ -402,6 +418,23 @@ impl CustomDataRepoTrait for CustomDataRepo {
         sqlx::query(&format!("DROP TABLE {}", quote(table_name)))
             .execute(&mut *conn)
             .await?;
+
+        Ok(())
+    }
+
+    async fn rename_table(
+        &self,
+        tx: &mut Transaction<'_, Sqlite>,
+        old_name: &str,
+        new_name: &str,
+    ) -> Result<(), DbError> {
+        sqlx::query(&format!(
+            "ALTER TABLE {} RENAME TO {}",
+            quote(old_name),
+            quote(new_name)
+        ))
+        .execute(tx.as_mut())
+        .await?;
 
         Ok(())
     }

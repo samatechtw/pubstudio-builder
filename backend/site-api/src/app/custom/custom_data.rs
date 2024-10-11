@@ -22,7 +22,7 @@ use super::{
     add_column::add_column, add_row::add_row, create_table::create_table,
     delete_table::delete_table, get_row::get_row, list_rows::list_rows, list_tables::list_tables,
     modify_column::modify_column, remove_column::remove_column, remove_row::remove_row,
-    update_row::update_row,
+    update_row::update_row, update_table::update_table,
 };
 
 pub fn parse_request_data<T: DeserializeOwned>(data: serde_json::Value) -> Result<T, ApiError> {
@@ -53,6 +53,11 @@ pub async fn custom_data(
             let response = create_table(&context, &id, dto.data).await?;
 
             Ok((StatusCode::CREATED, Json(response).into_response()))
+        }
+        Action::UpdateTable => {
+            let response = update_table(&context, &id, dto.data).await?;
+
+            Ok((StatusCode::OK, Json(response).into_response()))
         }
         Action::DeleteTable => {
             delete_table(&context, &id, dto.data).await?;

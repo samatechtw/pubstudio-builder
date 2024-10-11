@@ -14,7 +14,8 @@ use lib_shared_types::{
         CustomDataInfoEntity, CustomDataInfoEntityList,
     },
 };
-use sqlx::{sqlite::SqliteRow, Error, Row};
+use serde_json::Value;
+use sqlx::{sqlite::SqliteRow, Error, Row, Sqlite, Transaction};
 
 use super::site_db_pool_manager::{DbPoolManager, SqlitePoolConnection};
 
@@ -29,6 +30,12 @@ pub trait CustomDataInfoRepoTrait {
         id: &str,
         dto: CustomDataInfoDto,
     ) -> Result<CustomDataInfoEntity, DbError>;
+    async fn update_table_name(
+        &self,
+        tx: &mut Transaction<'_, Sqlite>,
+        old_name: &str,
+        new_name: &str,
+    ) -> Result<CustomDataInfoEntity, DbError>;
     async fn update_columns(
         &self,
         id: &str,
@@ -41,6 +48,12 @@ pub trait CustomDataInfoRepoTrait {
     ) -> Result<CustomDataInfoEntityList, DbError>;
     async fn get_table(&self, id: &str, table_name: &str) -> Result<CustomDataInfoEntity, DbError>;
     async fn get_custom_tables_size(&self, id: &str) -> Result<i64, DbError>;
+    async fn update_events(
+        &self,
+        id: &str,
+        table_name: &str,
+        events: Value,
+    ) -> Result<CustomDataInfoEntity, DbError>;
     async fn remove_info(&self, id: &str, table_name: &str) -> Result<(), DbError>;
 }
 
@@ -117,6 +130,56 @@ impl CustomDataInfoRepoTrait for CustomDataInfoRepo {
         )
         .bind(dto.columns)
         .bind(dto.name)
+        .try_map(map_to_custom_data_info_entity)
+        .fetch_one(&mut *conn)
+        .await
+        .map_err(map_sqlx_err)?;
+
+        Ok(result)
+    }
+
+    async fn update_table_name(
+        &self,
+        tx: &mut Transaction<'_, Sqlite>,
+        old_name: &str,
+        new_name: &str,
+    ) -> Result<CustomDataInfoEntity, DbError> {
+        let result: CustomDataInfoEntity = sqlx::query(
+            r#"
+          UPDATE custom_data_info
+          SET name = ?1
+          WHERE name = ?2
+          RETURNING id, name, columns, events
+        "#,
+        )
+        .bind(new_name)
+        .bind(old_name)
+        .try_map(map_to_custom_data_info_entity)
+        .fetch_one(tx.as_mut())
+        .await
+        .map_err(map_sqlx_err)?;
+
+        Ok(result)
+    }
+
+    async fn update_events(
+        &self,
+        id: &str,
+        table_name: &str,
+        events: Value,
+    ) -> Result<CustomDataInfoEntity, DbError> {
+        let mut conn = self.get_db_conn(id).await?;
+
+        let result: CustomDataInfoEntity = sqlx::query(
+            r#"
+          UPDATE custom_data_info
+          SET events = ?1
+          WHERE name = ?2
+          RETURNING id, name, columns, events
+        "#,
+        )
+        .bind(events)
+        .bind(table_name)
         .try_map(map_to_custom_data_info_entity)
         .fetch_one(&mut *conn)
         .await

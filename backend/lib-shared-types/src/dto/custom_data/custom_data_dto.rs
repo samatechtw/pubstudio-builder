@@ -14,6 +14,7 @@ pub struct CustomDataDto {
 )]
 pub enum Action {
     CreateTable,
+    UpdateTable,
     ListTables,
     AddColumn,
     RemoveColumn,
