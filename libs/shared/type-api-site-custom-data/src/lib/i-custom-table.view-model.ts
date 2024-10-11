@@ -27,8 +27,12 @@ export interface ICustomTableEvent {
   options: unknown
 }
 
+export interface EmailRowOptions {
+  recipients: string[]
+}
+
 export type ICustomTableEventType = 'EmailRow'
-export type ICustomTableEventTrigger = 'AddRow'
+export type ICustomTableEventTrigger = 'AddRow' | 'UpdateRow'
 
 export interface ICustomTableViewModel {
   id: string

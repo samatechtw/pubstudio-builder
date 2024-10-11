@@ -15,5 +15,6 @@ pub mod modify_column_dto;
 pub mod remove_column_dto;
 pub mod remove_row_dto;
 pub mod update_row_dto;
+pub mod update_table_dto;
 
 pub type CustomDataRow = BTreeMap<String, String>;

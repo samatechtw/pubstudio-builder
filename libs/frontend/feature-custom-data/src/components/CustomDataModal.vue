@@ -29,11 +29,16 @@
         @click="showNewTable = true"
       />
       <ErrorMessage v-if="errorKey" :error="t(errorKey)" class="table-error" />
-      <PSMenu v-if="selectedTableName" :items="tableActions" class="table-actions">
-        <template #toggle>
-          <DotsIcon color="#000" />
-        </template>
-      </PSMenu>
+      <div class="table-actions">
+        <div class="edit-actions-text" @click="showEditActions = true">
+          {{ t('custom_data.edit_actions') }}
+        </div>
+        <PSMenu v-if="selectedTableName" :items="tableActions" class="actions-dropdown">
+          <template #toggle>
+            <DotsIcon color="#000" />
+          </template>
+        </PSMenu>
+      </div>
     </div>
     <div class="table-wrap" :class="{ 'table-selected': !!selectedTableName }">
       <div v-if="!selectedTableName" class="table-placeholder">
@@ -46,6 +51,13 @@
         :siteId="siteId"
       />
     </div>
+    <EditActionsModal
+      :show="showEditActions"
+      :siteId="siteId"
+      :tableName="selectedTableName"
+      :events="selectedTable?.events ?? []"
+      @cancel="showEditActions = false"
+    />
     <AddColumnModal
       :show="showNewColumn"
       :columns="selectedColumns"
@@ -110,6 +122,7 @@ import ExportTableModal from './ExportTableModal.vue'
 import ImportTableModal from './ImportTableModal.vue'
 import { useRoute } from '@pubstudio/frontend/util-router'
 import DeleteTableModal from './DeleteTableModal.vue'
+import EditActionsModal from './EditActionsModal.vue'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -119,6 +132,7 @@ const { apiSite } = useSiteSource()
 const loadingTables = ref(false)
 const tables = ref<ICustomTableViewModel[]>([])
 const showNewColumn = ref(false)
+const showEditActions = ref(false)
 const showNewTable = ref(false)
 const showExport = ref(false)
 const showDeleteTable = ref(false)
@@ -291,7 +305,17 @@ onMounted(async () => {
     }
   }
   .table-actions {
+    align-items: center;
+    display: flex;
     margin-left: auto;
+  }
+  .edit-actions-text {
+    @mixin title-medium 14px;
+    color: $color-primary;
+    cursor: pointer;
+  }
+  .actions-dropdown {
+    margin-left: 16px;
   }
 }
 </style>
