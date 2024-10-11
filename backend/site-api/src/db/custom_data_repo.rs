@@ -28,37 +28,50 @@ pub type DynCustomDataRepo = Arc<dyn CustomDataRepoTrait + Send + Sync>;
 
 #[async_trait]
 pub trait CustomDataRepoTrait {
-    fn site_db_url(&self, id: &str) -> String;
-    async fn get_db_conn(&self, id: &str) -> Result<SqlitePoolConnection, DbError>;
-    async fn start_transaction(&self, id: &str) -> Result<Transaction<'_, Sqlite>, DbError>;
-    async fn create_table(&self, id: &str, dto: CreateTable) -> Result<(), DbError>;
-    async fn add_row(&self, id: &str, dto: AddRow) -> Result<CustomDataRow, DbError>;
-    async fn remove_row(&self, id: &str, dto: RemoveRow) -> Result<(), DbError>;
+    fn site_db_url(&self, site_id: &str) -> String;
+    async fn get_db_conn(&self, site_id: &str) -> Result<SqlitePoolConnection, DbError>;
+    async fn start_transaction(&self, site_id: &str) -> Result<Transaction<'_, Sqlite>, DbError>;
+    async fn create_table(&self, site_id: &str, dto: CreateTable) -> Result<(), DbError>;
+    async fn add_row(&self, site_id: &str, dto: AddRow) -> Result<CustomDataRow, DbError>;
+    async fn remove_row(&self, site_id: &str, dto: RemoveRow) -> Result<(), DbError>;
     async fn verify_unique(
         &self,
-        id: &str,
+        site_id: &str,
         table_name: &str,
         row_id: Option<i32>,
         entries: Vec<(String, String)>,
     ) -> Result<bool, DbError>;
-    async fn list_rows(&self, id: &str, query: ListRowsQuery) -> Result<ListRowsResponse, DbError>;
-    async fn get_row(&self, id: &str, query: GetRowQuery)
-        -> Result<Option<CustomDataRow>, DbError>;
+    async fn list_rows(
+        &self,
+        site_id: &str,
+        query: ListRowsQuery,
+    ) -> Result<ListRowsResponse, DbError>;
+    async fn get_row(
+        &self,
+        site_id: &str,
+        query: GetRowQuery,
+    ) -> Result<Option<CustomDataRow>, DbError>;
+    async fn get_row_by_id(
+        &self,
+        site_id: &str,
+        table_name: &str,
+        id: i32,
+    ) -> Result<Option<CustomDataRow>, DbError>;
     async fn update_row(
         &self,
-        id: &str,
+        site_id: &str,
         dto: UpdateRow,
     ) -> Result<BTreeMap<String, String>, DbError>;
-    async fn add_column(&self, id: &str, dto: AddColumn) -> Result<(), DbError>;
-    async fn remove_column(&self, id: &str, dto: &RemoveColumn) -> Result<(), DbError>;
+    async fn add_column(&self, site_id: &str, dto: AddColumn) -> Result<(), DbError>;
+    async fn remove_column(&self, site_id: &str, dto: &RemoveColumn) -> Result<(), DbError>;
     async fn modify_column(
         &self,
-        id: &str,
+        site_id: &str,
         table: &str,
         old_column: &str,
         new_column: &str,
     ) -> Result<(), DbError>;
-    async fn delete_table(&self, id: &str, table_name: &str) -> Result<(), DbError>;
+    async fn delete_table(&self, site_id: &str, table_name: &str) -> Result<(), DbError>;
     async fn rename_table(
         &self,
         tx: &mut Transaction<'_, Sqlite>,
@@ -137,26 +150,26 @@ fn map_custom_data_sqlx_err(e: sqlx::Error) -> DbError {
 
 #[async_trait]
 impl CustomDataRepoTrait for CustomDataRepo {
-    fn site_db_url(&self, id: &str) -> String {
-        format!("sqlite:{}/db/sites/site_{}.db", &self.manifest_dir, id)
+    fn site_db_url(&self, site_id: &str) -> String {
+        format!("sqlite:{}/db/sites/site_{}.db", &self.manifest_dir, site_id)
     }
 
-    async fn get_db_conn(&self, id: &str) -> Result<SqlitePoolConnection, DbError> {
+    async fn get_db_conn(&self, site_id: &str) -> Result<SqlitePoolConnection, DbError> {
         self.db_pool_manager
-            .get_db_conn(id, &self.manifest_dir)
+            .get_db_conn(site_id, &self.manifest_dir)
             .await
     }
 
-    async fn start_transaction(&self, id: &str) -> Result<Transaction<'_, Sqlite>, DbError> {
+    async fn start_transaction(&self, site_id: &str) -> Result<Transaction<'_, Sqlite>, DbError> {
         let transaction = self
             .db_pool_manager
-            .start_transaction(id, &self.manifest_dir)
+            .start_transaction(site_id, &self.manifest_dir)
             .await?;
         Ok(transaction)
     }
 
-    async fn create_table(&self, id: &str, dto: CreateTable) -> Result<(), DbError> {
-        let mut conn = self.get_db_conn(id).await?;
+    async fn create_table(&self, site_id: &str, dto: CreateTable) -> Result<(), DbError> {
+        let mut conn = self.get_db_conn(site_id).await?;
 
         let table_name = dto.table_name;
 
@@ -179,8 +192,8 @@ impl CustomDataRepoTrait for CustomDataRepo {
         Ok(())
     }
 
-    async fn add_row(&self, id: &str, dto: AddRow) -> Result<CustomDataRow, DbError> {
-        let mut conn = self.get_db_conn(id).await?;
+    async fn add_row(&self, site_id: &str, dto: AddRow) -> Result<CustomDataRow, DbError> {
+        let mut conn = self.get_db_conn(site_id).await?;
 
         let table_name = quote(&dto.table_name);
         let mut query = QueryBuilder::new(format!("INSERT INTO {} (", table_name));
@@ -212,8 +225,8 @@ impl CustomDataRepoTrait for CustomDataRepo {
         Ok(row)
     }
 
-    async fn remove_row(&self, id: &str, dto: RemoveRow) -> Result<(), DbError> {
-        let mut conn = self.get_db_conn(id).await?;
+    async fn remove_row(&self, site_id: &str, dto: RemoveRow) -> Result<(), DbError> {
+        let mut conn = self.get_db_conn(site_id).await?;
 
         let table_name = dto.table_name;
 
@@ -227,12 +240,12 @@ impl CustomDataRepoTrait for CustomDataRepo {
 
     async fn verify_unique(
         &self,
-        id: &str,
+        site_id: &str,
         table_name: &str,
         row_id: Option<i32>,
         entries: Vec<(String, String)>,
     ) -> Result<bool, DbError> {
-        let mut conn = self.get_db_conn(id).await?;
+        let mut conn = self.get_db_conn(site_id).await?;
         let mut count = 0;
 
         let mut query = QueryBuilder::new("SELECT id FROM ");
@@ -256,8 +269,12 @@ impl CustomDataRepoTrait for CustomDataRepo {
         }
     }
 
-    async fn list_rows(&self, id: &str, query: ListRowsQuery) -> Result<ListRowsResponse, DbError> {
-        let mut conn = self.get_db_conn(id).await?;
+    async fn list_rows(
+        &self,
+        site_id: &str,
+        query: ListRowsQuery,
+    ) -> Result<ListRowsResponse, DbError> {
+        let mut conn = self.get_db_conn(site_id).await?;
 
         let table_name = query.table_name;
 
@@ -284,10 +301,10 @@ impl CustomDataRepoTrait for CustomDataRepo {
 
     async fn get_row(
         &self,
-        id: &str,
+        site_id: &str,
         query: GetRowQuery,
     ) -> Result<Option<CustomDataRow>, DbError> {
-        let mut conn = self.get_db_conn(id).await?;
+        let mut conn = self.get_db_conn(site_id).await?;
 
         let table_name = query.table_name;
         let mut q = QueryBuilder::new("SELECT * FROM ");
@@ -312,12 +329,36 @@ impl CustomDataRepoTrait for CustomDataRepo {
         Ok(row.ok())
     }
 
+    async fn get_row_by_id(
+        &self,
+        site_id: &str,
+        table_name: &str,
+        id: i32,
+    ) -> Result<Option<CustomDataRow>, DbError> {
+        let mut conn = self.get_db_conn(site_id).await?;
+
+        let row = sqlx::query(&format!(
+            r#"
+            SELECT *
+            FROM {}
+            WHERE id = ?1
+        "#,
+            table_name
+        ))
+        .bind(id)
+        .try_map(map_to_key_value)
+        .fetch_one(&mut *conn)
+        .await;
+
+        Ok(row.ok())
+    }
+
     async fn update_row(
         &self,
-        id: &str,
+        site_id: &str,
         dto: UpdateRow,
     ) -> Result<BTreeMap<String, String>, DbError> {
-        let mut conn = self.get_db_conn(id).await?;
+        let mut conn = self.get_db_conn(site_id).await?;
 
         let table_name = dto.table_name;
 
@@ -348,8 +389,8 @@ impl CustomDataRepoTrait for CustomDataRepo {
             .map_err(map_custom_data_sqlx_err)?)
     }
 
-    async fn add_column(&self, id: &str, dto: AddColumn) -> Result<(), DbError> {
-        let mut conn = self.get_db_conn(id).await?;
+    async fn add_column(&self, site_id: &str, dto: AddColumn) -> Result<(), DbError> {
+        let mut conn = self.get_db_conn(site_id).await?;
 
         let table_name = dto.table_name;
 
@@ -368,8 +409,8 @@ impl CustomDataRepoTrait for CustomDataRepo {
         Ok(())
     }
 
-    async fn remove_column(&self, id: &str, dto: &RemoveColumn) -> Result<(), DbError> {
-        let mut conn = self.get_db_conn(id).await?;
+    async fn remove_column(&self, site_id: &str, dto: &RemoveColumn) -> Result<(), DbError> {
+        let mut conn = self.get_db_conn(site_id).await?;
 
         let table_name = dto.table_name.clone();
         let column = dto.column_name.clone();
@@ -387,14 +428,14 @@ impl CustomDataRepoTrait for CustomDataRepo {
 
     async fn modify_column(
         &self,
-        id: &str,
+        site_id: &str,
         table: &str,
         old_column: &str,
         new_column: &str,
     ) -> Result<(), DbError> {
         let pool = self
             .db_pool_manager
-            .get_db_pool(id, &self.manifest_dir)
+            .get_db_pool(site_id, &self.manifest_dir)
             .await?;
 
         sqlx::query(&format!(
@@ -412,8 +453,8 @@ impl CustomDataRepoTrait for CustomDataRepo {
         Ok(())
     }
 
-    async fn delete_table(&self, id: &str, table_name: &str) -> Result<(), DbError> {
-        let mut conn = self.get_db_conn(id).await?;
+    async fn delete_table(&self, site_id: &str, table_name: &str) -> Result<(), DbError> {
+        let mut conn = self.get_db_conn(site_id).await?;
 
         sqlx::query(&format!("DROP TABLE {}", quote(table_name)))
             .execute(&mut *conn)

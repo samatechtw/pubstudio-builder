@@ -5,6 +5,7 @@ import {
   IModifyColumnApiRequest,
   IUpdateRowApiRequest,
   IUpdateRowResponse,
+  IUpdateTableApiRequest,
 } from '@pubstudio/shared/type-api-site-custom-data'
 import { SiteApiResetService } from '@pubstudio/shared/util-test-reset'
 import supertest from 'supertest'
@@ -109,6 +110,7 @@ describe('Update Row', () => {
 
     const body: IUpdateRowResponse = res.body
 
+    expect(body.events).toEqual(0)
     expect(body.updated_row['name']).toEqual('Jessie')
     expect(body.updated_row['message']).toEqual('Hello there!')
     expect(body.updated_row['email']).toEqual('jjj@abc.com')
@@ -133,7 +135,8 @@ describe('Update Row', () => {
   it('update a field to the same value when it is Unique', async () => {
     await addValidators(true)
     const name = 'John'
-    const payload = makePayload({ name })
+    const message = 'Testing123'
+    const payload = makePayload({ name, message })
 
     const res = await api
       .post(testEndpoint(siteId))
@@ -143,8 +146,8 @@ describe('Update Row', () => {
 
     const body: IUpdateRowResponse = res.body
 
-    expect(body.updated_row['name']).toEqual('John')
-    expect(body.updated_row['message']).toEqual('Hello there!')
+    expect(body.updated_row['name']).toEqual(name)
+    expect(body.updated_row['message']).toEqual(message)
     expect(body.updated_row['email']).toEqual('john_test@abc.com')
   })
 
@@ -198,9 +201,39 @@ describe('Update Row', () => {
 
     const body: IUpdateRowResponse = res.body
 
+    expect(body.events).toEqual(0)
     expect(body.updated_row['name']).toEqual('Albert')
     expect(body.updated_row['message']).toEqual('Hello there!')
     expect(body.updated_row['email']).toEqual('john_test@abc.com')
+  })
+
+  it('returns events count when table has UpdateRow event', async () => {
+    // Add UpdateRow event to table
+    const updateTable: IUpdateTableApiRequest = {
+      old_name: updateData.table_name,
+      events: [
+        {
+          event_type: 'EmailRow',
+          trigger: 'UpdateRow',
+          options: { recipients: ['test@samatech.tw'] },
+        },
+      ],
+    }
+    await api
+      .post(testEndpoint(siteId))
+      .set('Authorization', adminAuth)
+      .send({
+        action: CustomDataAction.UpdateTable,
+        data: updateTable,
+      })
+      .expect(200)
+
+    // Update row and check events
+    payload.data = mockUpdateRowPayload2()
+    const res = await api.post(testEndpoint(siteId)).send(payload).expect(200)
+
+    const body: IUpdateRowResponse = res.body
+    expect(body.events).toEqual(1)
   })
 
   it('when user is not authorized', async () => {
@@ -288,6 +321,20 @@ describe('Update Row', () => {
         .expect(400, {
           code: 'CustomDataInvalidEmail',
           message: 'Invalid email',
+          status: 400,
+        })
+    })
+
+    it('when no changes are made to the row', async () => {
+      const name = 'John'
+      const payload = makePayload({ name })
+      await api
+        .post(testEndpoint(siteId))
+        .set('Authorization', adminAuth)
+        .send(payload)
+        .expect(400, {
+          code: 'NoUpdates',
+          message: 'Failed to validate request',
           status: 400,
         })
     })

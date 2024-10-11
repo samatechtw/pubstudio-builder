@@ -4,12 +4,32 @@ use validator::{Validate, ValidationError};
 
 use crate::dto::validate::validate_vec_item_lengths;
 
-#[derive(Deserialize, Serialize, Validate, Debug, Clone)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 #[serde(deny_unknown_fields)]
-pub struct EventInfo {
-    pub event_type: EventType,
-    pub trigger: EventTrigger,
-    pub options: serde_json::Value,
+#[serde(tag = "event_type")]
+pub enum EventInfo {
+    EmailRow {
+        trigger: EventTrigger,
+        options: EmailRowOptions,
+    },
+}
+
+impl Validate for EventInfo {
+    #[allow(unused_mut)]
+    fn validate(&self) -> ::std::result::Result<(), ::validator::ValidationErrors> {
+        let mut errors = ::validator::ValidationErrors::new();
+        let mut result = if errors.is_empty() {
+            ::std::result::Result::Ok(())
+        } else {
+            ::std::result::Result::Err(errors)
+        };
+        match self {
+            #[allow(unused_variables)]
+            EventInfo::EmailRow { trigger, options } => {
+                ::validator::ValidationErrors::merge(result, "EmailRow", options.validate())
+            }
+        }
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq, Clone, Copy, EnumString, Display)]
