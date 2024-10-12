@@ -82,7 +82,6 @@ pub async fn update_table(
     } else {
         dto.old_name
     };
-    println!("SETTING EVENTS {:?}", dto.events);
 
     if dto.events.is_some() {
         // Update table events

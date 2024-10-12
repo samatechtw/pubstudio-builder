@@ -13,28 +13,21 @@
       {{ t('custom_data.actions_text') }}
     </div>
     <div class="edit-actions">
-      <div v-for="(event, index) in newEvents" class="edit-action">
-        <PSMultiselect
-          :value="event.trigger"
-          :options="triggers"
-          :clearable="false"
-          class="action-trigger"
-          @select="selectTrigger(event, $event?.value)"
-        />
-        <PSMultiselect
-          :value="event.event_type"
-          :options="eventTypes"
-          :clearable="false"
-          class="action-type"
-          @select="selectType(event, $event?.value)"
-        />
-        <Minus class="remove-action" @click="removeAction(index)" />
+      <EditActionRow
+        v-for="(event, index) in newEvents"
+        :label="`${t('action')} ${index + 1}`"
+        :triggers="triggers"
+        :eventTypes="eventTypes"
+        :action="event"
+        @removeAction="removeAction(index)"
+      />
+      <div class="add-action" @click="addAction">
+        {{ t('custom_data.add_action') }}
       </div>
-      <Plus class="add-action" @click="addAction" />
     </div>
     <ErrorMessage v-if="error" :error="error" />
     <div class="edit-actions-buttons">
-      <PSButton :text="t('save')" class="save-button" @click="save" />
+      <PSButton :text="t('save')" :animate="saving" class="save-button" @click="save" />
       <PSButton
         :text="t('cancel')"
         :secondary="true"
@@ -46,31 +39,24 @@
 </template>
 
 <script lang="ts" setup>
+import { ErrorMessage, Modal, PSButton } from '@pubstudio/frontend/ui-widgets'
 import {
-  ErrorMessage,
-  Minus,
-  Modal,
-  Plus,
-  PSButton,
-  PSMultiselect,
-} from '@pubstudio/frontend/ui-widgets'
-import {
+  EmailRowOptions,
   ICustomTableEvent,
-  ICustomTableEventTrigger,
-  ICustomTableEventType,
+  ICustomTableViewModel,
 } from '@pubstudio/shared/type-api-site-custom-data'
 import { useI18n } from 'petite-vue-i18n'
 import { ref, toRefs, watch } from 'vue'
 import { useDataTable } from '../lib/use-data-table'
-import { useCustomDataApi } from '@pubstudio/frontend/data-access-api'
+import EditActionRow from './EditActionRow.vue'
+import { checkRecipientsError } from '../lib/check-recipients-error'
 
 const props = defineProps<{
   show: boolean
-  events: ICustomTableEvent[]
   siteId: string
-  tableName: string
+  table: ICustomTableViewModel | undefined
 }>()
-const { events, show, siteId, tableName } = toRefs(props)
+const { table, show, siteId } = toRefs(props)
 const emit = defineEmits<{
   (e: 'cancel'): void
 }>()
@@ -79,6 +65,7 @@ const { t } = useI18n()
 
 const newEvents = ref<ICustomTableEvent[]>([])
 const error = ref()
+const saving = ref(false)
 
 const selectEntry = (key: string) => {
   return {
@@ -90,24 +77,11 @@ const selectEntry = (key: string) => {
 const triggers = [selectEntry('AddRow'), selectEntry('UpdateRow')]
 const eventTypes = [selectEntry('EmailRow')]
 
-watch(
-  () => events,
-  () => {
-    newEvents.value = [...events.value]
-  },
-)
-
-const selectTrigger = (event: ICustomTableEvent, trigger: string | undefined) => {
-  if (trigger) {
-    event.trigger = trigger as ICustomTableEventTrigger
+watch(table, (newTable) => {
+  if (newTable) {
+    newEvents.value = [...newTable.events]
   }
-}
-
-const selectType = (event: ICustomTableEvent, eventType: string | undefined) => {
-  if (eventType) {
-    event.event_type = eventType as ICustomTableEventType
-  }
-}
+})
 
 const addAction = () => {
   newEvents.value.push({
@@ -121,14 +95,53 @@ const removeAction = (index: number) => {
   newEvents.value.splice(index, 1)
 }
 
-const save = () => {
-  const api = useCustomDataApi(siteId.value)
-  const { errorKey, addColumn } = useDataTable(siteId)
+const validateEvents = (): boolean => {
+  if (newEvents.value.length > 10) {
+    error.value = t('errors.CustomDataMaxEvents')
+    return false
+  }
+  for (const event of newEvents.value) {
+    const options = event.options as EmailRowOptions
+    if (event.event_type === 'EmailRow' && options && 'recipients' in options) {
+      const err = checkRecipientsError(options.recipients)
+      if (err) {
+        error.value = t('errors.CustomDataInvalidEmail')
+        return false
+      }
+    }
+  }
+  return true
+}
+
+const save = async () => {
+  if (table.value) {
+    if (!validateEvents()) {
+      return
+    }
+    const { errorKey, updateTableEvents } = useDataTable(siteId)
+    saving.value = true
+    await updateTableEvents(table.value.name, newEvents.value)
+    saving.value = false
+    if (errorKey.value) {
+      error.value = t(errorKey.value)
+    } else {
+      emit('cancel')
+    }
+  }
 }
 </script>
 
 <style lang="postcss">
 @import '@theme/css/mixins.postcss';
+
+.edit-actions-modal {
+  .modal-inner {
+    max-height: 95%;
+    overflow-y: scroll;
+    max-width: 90%;
+    width: 480px;
+  }
+}
 
 .edit-actions {
   @mixin flex-col;
@@ -136,34 +149,11 @@ const save = () => {
   justify-content: center;
   margin-top: 16px;
 }
-.edit-action {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  padding: 12px 0;
-  border-bottom: 1px solid $grey-300;
-}
-.ps-multiselect.action-trigger {
-  width: 120px;
-  margin-right: 16px;
-}
-.ps-multiselect.action-type {
-  width: 130px;
-}
 .add-action {
-  @mixin size 28px;
+  @mixin text-medium 14px;
+  color: $color-primary;
   margin-top: 8px;
   cursor: pointer;
-}
-.remove-action {
-  @mixin size 24px;
-  margin-left: auto;
-  cursor: pointer;
-}
-
-.modal-inner {
-  max-width: 90%;
-  width: 480px;
 }
 .edit-actions-buttons {
   margin-top: 24px;

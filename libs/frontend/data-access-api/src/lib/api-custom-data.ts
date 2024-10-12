@@ -16,6 +16,7 @@ import {
   IRemoveRowApiRequest,
   IUpdateRowApiRequest,
   IUpdateRowResponse,
+  IUpdateTableApiRequest,
 } from '@pubstudio/shared/type-api-site-custom-data'
 
 export const useCustomDataApi = (siteId: string): IApiCustomData => {
@@ -95,6 +96,13 @@ export const useCustomDataApi = (siteId: string): IApiCustomData => {
     await customDataRequest(api, CustomDataAction.ModifyColumn, payload)
   }
 
+  const updateTable = async (
+    api: PSApiShim | undefined,
+    payload: IUpdateTableApiRequest,
+  ): Promise<void> => {
+    await customDataRequest(api, CustomDataAction.UpdateTable, payload)
+  }
+
   const deleteTable = async (
     api: PSApiShim | undefined,
     payload: IDeleteTableApiRequest,
@@ -111,6 +119,7 @@ export const useCustomDataApi = (siteId: string): IApiCustomData => {
     removeRow,
     addColumn,
     modifyColumn,
+    updateTable,
     deleteTable,
   }
 }

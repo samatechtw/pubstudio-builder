@@ -50,6 +50,7 @@ import {
   IRemoveRowApiRequest,
   IUpdateRowApiRequest,
   IUpdateRowResponse,
+  IUpdateTableApiRequest,
 } from '@pubstudio/shared/type-api-site-custom-data'
 import { FetchRequestConfig } from '@sampullman/fetch-api'
 import { EnumFileFormat, IImageJobConfig } from '@samatech/image-api-types'
@@ -86,6 +87,10 @@ export interface IApiCustomData {
   modifyColumn: (
     api: PSApiShim | undefined,
     payload: IModifyColumnApiRequest,
+  ) => Promise<void>
+  updateTable: (
+    api: PSApiShim | undefined,
+    payload: IUpdateTableApiRequest,
   ) => Promise<void>
   deleteTable: (
     api: PSApiShim | undefined,
