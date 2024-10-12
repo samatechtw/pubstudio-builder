@@ -40,7 +40,7 @@
     </tbody>
   </table>
   <template v-if="table">
-    <div v-if="loadingRows" class="spinner-wrap">
+    <div v-if="loading" class="spinner-wrap">
       <Spinner class="rows-spinner" color="#2a17d6" :size="24" />
     </div>
     <div v-else-if="!rows.length" class="no-data">
@@ -99,7 +99,7 @@ const {
   maxPage,
   from,
   errorKey,
-  loadingRows,
+  loading,
   rows,
   editRow,
   newRow,

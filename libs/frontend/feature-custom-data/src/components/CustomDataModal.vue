@@ -29,11 +29,11 @@
         @click="showNewTable = true"
       />
       <ErrorMessage v-if="errorKey" :error="t(errorKey)" class="table-error" />
-      <div class="table-actions">
+      <div v-if="selectedTableName" class="table-actions">
         <div class="edit-actions-text" @click="showEditActions = true">
           {{ t('custom_data.edit_actions') }}
         </div>
-        <PSMenu v-if="selectedTableName" :items="tableActions" class="actions-dropdown">
+        <PSMenu :items="tableActions" class="actions-dropdown">
           <template #toggle>
             <DotsIcon color="#000" />
           </template>
@@ -54,8 +54,7 @@
     <EditActionsModal
       :show="showEditActions"
       :siteId="siteId"
-      :tableName="selectedTableName"
-      :events="selectedTable?.events ?? []"
+      :table="selectedTable"
       @cancel="showEditActions = false"
     />
     <AddColumnModal

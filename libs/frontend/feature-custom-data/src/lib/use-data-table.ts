@@ -4,6 +4,7 @@ import { parseApiErrorKey, toApiError } from '@pubstudio/frontend/util-api'
 import { AdminTablePageSize } from '@pubstudio/frontend/util-fields'
 import {
   ICustomTableColumn,
+  ICustomTableEvent,
   ICustomTableRow,
 } from '@pubstudio/shared/type-api-site-custom-data'
 import { computed, ComputedRef, Ref, ref } from 'vue'
@@ -16,7 +17,7 @@ export interface IUseDataTableFeature {
   maxPage: ComputedRef<number>
   from: ComputedRef<number>
   to: ComputedRef<number>
-  loadingRows: Ref<boolean>
+  loading: Ref<boolean>
   errorKey: Ref<string | undefined>
   rows: Ref<ICustomTableRow[]>
   newRow: Ref<ICustomTableRow | undefined>
@@ -28,6 +29,7 @@ export interface IUseDataTableFeature {
   deleteRow: (tableName: string, index: number) => Promise<void>
   modifyColumn: (tableName: string, info: IEditColumnName) => Promise<void>
   addColumn: (tableName: string, info: ICustomTableColumn) => Promise<void>
+  updateTableEvents: (tableName: string, events: ICustomTableEvent[]) => Promise<void>
   deleteTable: (tableName: string) => Promise<void>
 }
 
@@ -39,7 +41,7 @@ export const useDataTable = (siteId: Ref<string>): IUseDataTableFeature => {
   const page = ref(1)
   const total = ref(0)
   const pageSize = ref<AdminTablePageSize>(25)
-  const loadingRows = ref(false)
+  const loading = ref(false)
   const newRow = ref<ICustomTableRow>()
   const editRow = ref<ICustomTableRow>()
   const rows = ref<ICustomTableRow[]>([])
@@ -59,7 +61,7 @@ export const useDataTable = (siteId: Ref<string>): IUseDataTableFeature => {
     if (!apiSite) {
       return
     }
-    loadingRows.value = true
+    loading.value = true
     try {
       const response = await api.listRows(apiSite, {
         table_name: tableName,
@@ -71,7 +73,7 @@ export const useDataTable = (siteId: Ref<string>): IUseDataTableFeature => {
     } catch (e) {
       errorKey.value = parseApiErrorKey(toApiError(e))
     }
-    loadingRows.value = false
+    loading.value = false
   }
 
   const addRow = async (tableName: string, row: ICustomTableRow) => {
@@ -79,7 +81,7 @@ export const useDataTable = (siteId: Ref<string>): IUseDataTableFeature => {
     if (!apiSite) {
       return
     }
-    loadingRows.value = true
+    loading.value = true
 
     try {
       const result = await api.addRow(apiSite, { table_name: tableName, row })
@@ -88,7 +90,7 @@ export const useDataTable = (siteId: Ref<string>): IUseDataTableFeature => {
     } catch (e) {
       errorKey.value = parseApiErrorKey(toApiError(e))
     }
-    loadingRows.value = false
+    loading.value = false
   }
 
   const updateRow = async (tableName: string, row: ICustomTableRow) => {
@@ -97,7 +99,7 @@ export const useDataTable = (siteId: Ref<string>): IUseDataTableFeature => {
     if (!apiSite || !id) {
       return
     }
-    loadingRows.value = true
+    loading.value = true
     const rowId = typeof id === 'number' ? id : parseInt(id)
 
     try {
@@ -114,7 +116,7 @@ export const useDataTable = (siteId: Ref<string>): IUseDataTableFeature => {
     } catch (e) {
       errorKey.value = parseApiErrorKey(toApiError(e))
     }
-    loadingRows.value = false
+    loading.value = false
   }
 
   const deleteRow = async (tableName: string, index: number) => {
@@ -123,7 +125,7 @@ export const useDataTable = (siteId: Ref<string>): IUseDataTableFeature => {
     if (!apiSite || !row) {
       return
     }
-    loadingRows.value = true
+    loading.value = true
 
     try {
       await api.removeRow(apiSite, { table_name: tableName, row_id: row.id.toString() })
@@ -132,7 +134,7 @@ export const useDataTable = (siteId: Ref<string>): IUseDataTableFeature => {
     } catch (e) {
       errorKey.value = parseApiErrorKey(toApiError(e))
     }
-    loadingRows.value = false
+    loading.value = false
   }
 
   const modifyColumn = async (tableName: string, info: IEditColumnName) => {
@@ -140,7 +142,7 @@ export const useDataTable = (siteId: Ref<string>): IUseDataTableFeature => {
     if (!apiSite) {
       return
     }
-    loadingRows.value = true
+    loading.value = true
 
     try {
       await api.modifyColumn(apiSite, {
@@ -152,7 +154,7 @@ export const useDataTable = (siteId: Ref<string>): IUseDataTableFeature => {
     } catch (e) {
       errorKey.value = parseApiErrorKey(toApiError(e))
     }
-    loadingRows.value = false
+    loading.value = false
   }
 
   const addColumn = async (tableName: string, info: ICustomTableColumn) => {
@@ -160,7 +162,7 @@ export const useDataTable = (siteId: Ref<string>): IUseDataTableFeature => {
     if (!apiSite) {
       return
     }
-    loadingRows.value = true
+    loading.value = true
 
     try {
       await api.addColumn(apiSite, {
@@ -171,7 +173,23 @@ export const useDataTable = (siteId: Ref<string>): IUseDataTableFeature => {
     } catch (e) {
       errorKey.value = parseApiErrorKey(toApiError(e))
     }
-    loadingRows.value = false
+    loading.value = false
+  }
+
+  const updateTableEvents = async (tableName: string, events: ICustomTableEvent[]) => {
+    errorKey.value = undefined
+    if (!apiSite) {
+      return
+    }
+    loading.value = true
+
+    try {
+      await api.updateTable(apiSite, { old_name: tableName, events })
+      newRow.value = undefined
+    } catch (e) {
+      errorKey.value = parseApiErrorKey(toApiError(e))
+    }
+    loading.value = false
   }
 
   const deleteTable = async (tableName: string) => {
@@ -179,7 +197,7 @@ export const useDataTable = (siteId: Ref<string>): IUseDataTableFeature => {
     if (!apiSite) {
       return
     }
-    loadingRows.value = true
+    loading.value = true
 
     try {
       await api.deleteTable(apiSite, { table_name: tableName })
@@ -187,7 +205,7 @@ export const useDataTable = (siteId: Ref<string>): IUseDataTableFeature => {
     } catch (e) {
       errorKey.value = parseApiErrorKey(toApiError(e))
     }
-    loadingRows.value = false
+    loading.value = false
   }
 
   return {
@@ -197,7 +215,7 @@ export const useDataTable = (siteId: Ref<string>): IUseDataTableFeature => {
     maxPage,
     from,
     to,
-    loadingRows,
+    loading,
     errorKey,
     newRow,
     editRow,
@@ -209,6 +227,7 @@ export const useDataTable = (siteId: Ref<string>): IUseDataTableFeature => {
     deleteRow,
     modifyColumn,
     addColumn,
+    updateTableEvents,
     deleteTable,
   }
 }

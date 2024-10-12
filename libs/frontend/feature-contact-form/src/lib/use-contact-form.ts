@@ -4,6 +4,7 @@ import {
   setContactFormWalkthrough,
 } from '@pubstudio/frontend/data-access-command'
 import { store } from '@pubstudio/frontend/data-access-web-store'
+import { IRecipientListItem } from '@pubstudio/frontend/feature-custom-data'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { appendEvent, loadCustomTables } from '@pubstudio/frontend/feature-walkthrough'
 import { parseApiErrorKey, toApiError } from '@pubstudio/frontend/util-api'
@@ -31,7 +32,7 @@ export interface IContactFormFeature {
   contactTables: Ref<ICustomTableViewModel[]>
   tableName: Ref<string>
   hasName: Ref<boolean>
-  recipients: Ref<[number, string][]>
+  recipients: Ref<IRecipientListItem[]>
   recipientKey: Ref<number>
   loadContactFormTables: () => Promise<void>
   showContactFormWalkthrough: (formId: string | undefined) => Promise<void>
@@ -56,7 +57,7 @@ const resetContactTables = () => {
   tableName.value = ''
   hasName.value = false
   recipientKey.value = 0
-  recipients.value = [[recipientKey.value, store.user.email.value ?? '']]
+  recipients.value = [{ key: recipientKey.value, email: store.user.email.value ?? '' }]
 }
 
 const tables = ref<ICustomTableViewModel[] | undefined>()
@@ -64,7 +65,7 @@ const contactTables = ref<ICustomTableViewModel[]>([])
 const loadingTables = ref(false)
 const tableName = ref('')
 const hasName = ref(false)
-const recipients = ref<[number, string][]>([])
+const recipients = ref<IRecipientListItem[]>([])
 const recipientKey = ref(0)
 
 export const useContactForm = (): IContactFormFeature => {
