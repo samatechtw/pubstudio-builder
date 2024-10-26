@@ -27,8 +27,9 @@
       <Redo />
     </ToolbarItem>
     <ToolbarPage class="toolbar-page" />
-    <ToolbarBreakpoint class="toolbar-breakpoint" />
     <ToolbarVersion />
+    <ToolbarBreakpoint class="toolbar-breakpoint" />
+    <ToolbarActiveI18n class="toolbar-i18n" />
     <ToolbarPseudoClass class="toolbar-pseudo-class" />
     <ToolbarBuilderWidth />
     <ToolbarItem
@@ -107,6 +108,7 @@ import BugReportModal from './BugReportModal.vue'
 import EditorPreferencesModal from './EditorPreferencesModal.vue'
 import ToolbarVersion from './ToolbarVersion.vue'
 import '@samatech/vue-color-picker/dist/style.css'
+import ToolbarActiveI18n from './ToolbarActiveI18n.vue'
 
 defineProps<{
   hideSettings?: boolean

@@ -192,7 +192,6 @@ export interface IUseBuild {
   flattenComponentMixin: (componentId: string, mixinId: string) => void
   deleteStyle: (style: IStyle) => void
   setTranslations: (props: ISetTranslationsProps) => void
-  setActiveI18n: (activeI18n: string) => void
   addThemeVariable: (data: IAddThemeVariableData) => void
   editThemeVariable: (data: IEditThemeVariableData) => void
   deleteThemeVariable: (themeVariable: IRemoveThemeVariableData) => void
@@ -818,10 +817,6 @@ export const useBuild = (): IUseBuild => {
     }
   }
 
-  const setActiveI18n = (activeI18n: string) => {
-    site.value.context.activeI18n = activeI18n
-  }
-
   const addThemeVariable = (data: IAddThemeVariableData) => {
     pushCommand(site.value, CommandType.AddThemeVariable, data)
   }
@@ -1082,7 +1077,6 @@ export const useBuild = (): IUseBuild => {
     flattenComponentMixin,
     deleteStyle,
     setTranslations,
-    setActiveI18n,
     addThemeVariable,
     editThemeVariable,
     deleteThemeVariable,

@@ -27,9 +27,12 @@ export const computePropsContent = (
   const data = computeAttrsInputsMixins(site.context, component, { renderMode })
   const events = computeEvents(site, component)
 
+  const active = site.context.activeI18n ?? 'en'
+  const translations = site.context.i18n[active] ?? {}
+
   const content: IContent = component.children?.length
     ? component.children.map((child) => renderComponent(site, child, renderMode))
-    : parseI18n(site, data.content)
+    : parseI18n(translations, data.content)
 
   const props = {
     ...data.attrs,

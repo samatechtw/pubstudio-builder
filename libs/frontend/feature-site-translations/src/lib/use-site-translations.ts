@@ -1,16 +1,24 @@
-import { showTranslations } from '@pubstudio/frontend/data-access-command'
+import {
+  setActiveLanguage,
+  showTranslations,
+} from '@pubstudio/frontend/data-access-command'
 import {
   createTranslationEditorView,
   IEditTranslation,
   useBuild,
 } from '@pubstudio/frontend/feature-build'
 import { IMultiselectObj } from '@pubstudio/frontend/type-ui-widgets'
+import {
+  DEFAULT_LANGUAGE,
+  getCurrentLanguages,
+  languageDict,
+  makeLanguageOption,
+} from '@pubstudio/frontend/util-site-translations'
 import { INewTranslations } from '@pubstudio/shared/type-command-data'
 import { ITranslations } from '@pubstudio/shared/type-site'
 import { useI18n } from 'petite-vue-i18n'
 import { EditorView } from 'prosemirror-view'
 import { computed, ComputedRef, nextTick, Ref, ref, watch } from 'vue'
-import { languageDict } from './supported-languages'
 
 export interface ISiteTranslationsFeature {
   editTranslation: Ref<IEditTranslation | undefined>
@@ -34,8 +42,6 @@ export interface ISiteTranslationsFeature {
   cancelTranslation: () => void
 }
 
-const DEFAULT_LANGUAGE = 'en'
-
 export const useSiteTranslations = (): ISiteTranslationsFeature => {
   const { t } = useI18n()
   const { editor, site, setTranslations } = useBuild()
@@ -52,8 +58,9 @@ export const useSiteTranslations = (): ISiteTranslationsFeature => {
   watch(
     () => editor.value?.translations,
     (show) => {
-      const { activeI18n, i18n } = site.value.context
-      if (show && activeI18n && !(activeI18n in i18n)) {
+      const { i18n } = site.value.context
+      const editorI18n = editor.value?.editorI18n
+      if (show && editorI18n && !(editorI18n in i18n)) {
         // Set the active language back to default if it does not exist
         // in the editor context. This is most likely to occur when the
         // language is removed using the undo command.
@@ -67,36 +74,28 @@ export const useSiteTranslations = (): ISiteTranslationsFeature => {
     },
   )
 
-  const makeOption = (key: string): IMultiselectObj => {
-    return { label: languageDict[key], value: key }
-  }
-
   const newLanguages = computed(() => {
     return Object.keys(languageDict)
       .filter((k) => k !== DEFAULT_LANGUAGE && !(k in site.value.context.i18n))
-      .map(makeOption)
+      .map(makeLanguageOption)
   })
 
   const currentLanguages = computed(() => {
-    let langs = Object.keys(site.value.context.i18n).map(makeOption)
-    if (!site.value.context.i18n[DEFAULT_LANGUAGE]) {
-      langs = [makeOption(DEFAULT_LANGUAGE), ...langs]
-    }
-    return langs
+    return getCurrentLanguages(site.value.context)
   })
 
   const confirmAddLanguage = () => {
     if (newLanguage.value && !site.value.context.i18n[newLanguage.value]) {
       setTranslations({ code: newLanguage.value, translations: {} })
+      setActiveLanguage(site.value, newLanguage.value)
     }
     newLanguage.value = undefined
     addLanguage.value = false
   }
 
-  // TODO -- should this be a command? We'll also need to control it somehow from the
-  // user/viewer perspective, maybe cached via localstorage
   const selectActiveLanguage = (option: IMultiselectObj | undefined) => {
-    site.value.context.activeI18n = option?.value as string
+    const lang = option?.value as string
+    setActiveLanguage(site.value, lang)
   }
 
   const activeTranslations = computed(() => {
@@ -135,7 +134,7 @@ export const useSiteTranslations = (): ISiteTranslationsFeature => {
   }
 
   const getActiveI18n = (): string => {
-    return site.value.context.activeI18n ?? DEFAULT_LANGUAGE
+    return editor.value?.editorI18n ?? DEFAULT_LANGUAGE
   }
 
   const confirmSaveTranslation = () => {

@@ -1,6 +1,11 @@
 import { NativeEvents, resolveComponent } from '@pubstudio/frontend/util-resolve'
 import { triggerEventBehaviors } from '@pubstudio/frontend/util-runtime'
-import { IComponent, IEventCollection, ISite } from '@pubstudio/shared/type-site'
+import {
+  IComponent,
+  IEventCollection,
+  ISite,
+  ITranslations,
+} from '@pubstudio/shared/type-site'
 
 export const computeEvents = (site: ISite, component: IComponent): IEventCollection => {
   const events: IEventCollection = {
@@ -39,15 +44,14 @@ export const computeEvents = (site: ISite, component: IComponent): IEventCollect
 const i18nVarRegex = /\$\{(.*?)\}/g
 
 export const parseI18n = (
-  site: ISite,
+  translations: ITranslations,
   content: string | undefined,
 ): string | undefined => {
   if (!content) {
     return content
   }
   return content.replace(i18nVarRegex, (_, variable: string) => {
-    const active = site.context.activeI18n ?? 'en'
-    const val = (site.context.i18n[active] ?? {})[variable]
+    const val = translations[variable]
     return val ?? content
   })
 }

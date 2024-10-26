@@ -40,7 +40,7 @@
     <div v-else class="translations-wrap">
       <div class="i18n-options">
         <PSMultiselect
-          :value="site.context.activeI18n ?? 'en'"
+          :value="editor?.editorI18n ?? 'en'"
           :options="currentLanguages"
           :disabled="currentLanguages.length <= 1"
           @select="selectActiveLanguage"
@@ -115,7 +115,7 @@ import { useSiteTranslations } from '../lib/use-site-translations'
 import { IMultiselectObj } from '@pubstudio/frontend/type-ui-widgets'
 
 const { t } = useI18n()
-const { editor, site } = useBuild()
+const { editor } = useBuild()
 const {
   editTranslation,
   editorRef,
