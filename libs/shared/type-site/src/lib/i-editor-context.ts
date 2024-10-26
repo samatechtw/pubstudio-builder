@@ -42,6 +42,7 @@ export enum EditorDropdown {
   FontWeight = 'fontWeight',
   Page = 'page',
   PseudoClass = 'pseudoClass',
+  ActiveLanguage = 'editorI18n',
   Version = 'version',
   Preview = 'preview',
 }
@@ -198,6 +199,8 @@ export interface IEditorContext {
   builderScale: number
   // Active pseudo class
   cssPseudoClass: CssPseudoClassType
+  // Active site language
+  editorI18n?: string
   // Custom hotkey map
   hotkeys: IHotkeys
   // If false/undefined, template selector is shown when the site is loaded

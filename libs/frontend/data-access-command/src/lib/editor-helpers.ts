@@ -356,6 +356,14 @@ export const setCssPseudoClass = (site: ISite, pseudoClass: CssPseudoClass) => {
   }
 }
 
+export const setActiveLanguage = (site: ISite, language: string | undefined) => {
+  const { editor } = site
+  if (editor) {
+    editor.editorI18n = language
+    editor.store?.saveEditor(editor)
+  }
+}
+
 const setWalkthroughState = <T extends IContactFormWalkthrough | IMailingListWalkthrough>(
   editor: IEditorContext | undefined,
   walkthroughKey: 'contactFormWalkthrough' | 'mailingListWalkthrough',

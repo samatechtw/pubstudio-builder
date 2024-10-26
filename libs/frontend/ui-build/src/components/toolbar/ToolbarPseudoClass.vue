@@ -48,6 +48,6 @@ onMounted(() => {
 
 <style lang="postcss" scoped>
 .style-pseudo-class {
-  width: 72px;
+  width: 70px;
 }
 </style>

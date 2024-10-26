@@ -50,6 +50,8 @@ export const deserializeEditor = (
         builderWidth: serializedEditor.builderWidth,
         builderScale: serializedEditor.builderScale,
         cssPseudoClass: serializedEditor.cssPseudoClass,
+        // Added 241026
+        editorI18n: serializedEditor.editorI18n,
         // Added 240617
         hotkeys: serializedEditor.hotkeys ?? {},
         templatesShown: serializedEditor.templatesShown,

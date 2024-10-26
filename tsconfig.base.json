@@ -214,6 +214,9 @@
       ],
       "@pubstudio/frontend/util-site-store": [
         "libs/frontend/util-site-store/src/index.ts"
+      ],
+      "@pubstudio/frontend/util-site-translations": [
+        "libs/frontend/util-site-translations/src/index.ts"
       ]
     }
   },
