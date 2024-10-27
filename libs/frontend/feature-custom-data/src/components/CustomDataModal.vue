@@ -14,7 +14,7 @@
       {{ t('custom_data.subtitle') }}
     </div>
     <div class="table-select-wrap">
-      <PSMultiselect
+      <STMultiselect
         :value="selectedTableName"
         class="table-select"
         :options="tableOptions"
@@ -97,13 +97,13 @@
 <script lang="ts" setup>
 import { computed, onMounted, ref, toRefs, watch } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
+import { STMultiselect } from '@samatech/vue-components'
 import {
   DotsIcon,
   ErrorMessage,
   Modal,
   PSButton,
   PSMenu,
-  PSMultiselect,
 } from '@pubstudio/frontend/ui-widgets'
 import { useBuild } from '@pubstudio/frontend/feature-build'
 import { setSelectedTable } from '@pubstudio/frontend/data-access-command'

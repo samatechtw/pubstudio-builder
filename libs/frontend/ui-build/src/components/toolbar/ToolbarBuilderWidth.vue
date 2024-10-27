@@ -13,7 +13,7 @@
         <div class="field-label label-title">
           {{ t('build.width') }}
         </div>
-        <PSInput
+        <STInput
           v-model="builderWidth"
           type="number"
           class="width-input"
@@ -26,7 +26,7 @@
         <div class="field-label label-title">
           {{ t('build.scale') }}
         </div>
-        <PSInput
+        <STInput
           :modelValue="scaleText"
           type="number"
           class="scale-input"
@@ -45,9 +45,8 @@
 <script lang="ts" setup>
 import { ref, computed, ComponentPublicInstance, watch } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
-import { useDropdown } from '@pubstudio/frontend/util-dropdown'
+import { STInput, useDropdown } from '@samatech/vue-components'
 import { ToolbarItem } from '@pubstudio/frontend/ui-widgets'
-import { PSInput } from '@pubstudio/frontend/ui-widgets'
 import { useBuild } from '@pubstudio/frontend/feature-build'
 import { setBuilderWidth, setBuilderScale } from '@pubstudio/frontend/data-access-command'
 
@@ -142,7 +141,7 @@ const updateBuilderScale = () => {
 .width-input,
 .scale-input {
   width: 60px;
-  :deep(.ps-input) {
+  :deep(.st-input) {
     height: 30px;
   }
 }

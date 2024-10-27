@@ -4,7 +4,7 @@
       <div class="label">
         {{ t('name') }}
       </div>
-      <PSInput
+      <STInput
         ref="nameRef"
         v-model="editingPage.name"
         class="item name-input"
@@ -23,7 +23,7 @@
         class="route-info"
       />
       <span class="route-slash">/</span>
-      <PSInput
+      <STInput
         ref="routeRef"
         :modelValue="editingPage.route"
         class="item route-input"
@@ -40,7 +40,7 @@
         {{ t('source') }}
       </div>
       <InfoBubble :message="t('build.source_info')" class="source-info" />
-      <PSMultiselect
+      <STMultiselect
         :value="editingPage.copyFrom"
         :options="pageOptions"
         :clearable="true"
@@ -82,13 +82,13 @@
 <script lang="ts" setup>
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
+import { STInput } from '@samatech/vue-components'
+import { STMultiselect } from '@samatech/vue-components'
 import {
   PSButton,
-  PSInput,
   Checkbox,
   ErrorMessage,
   InfoBubble,
-  PSMultiselect,
 } from '@pubstudio/frontend/ui-widgets'
 import { usePageMenu, resetPageMenu } from '@pubstudio/frontend/feature-build'
 
@@ -96,8 +96,8 @@ const { t } = useI18n()
 
 const { pageError, editingPage, pageOptions, isNew, savePage } = usePageMenu()
 
-const nameRef = ref<InstanceType<typeof PSInput> | undefined>()
-const routeRef = ref<InstanceType<typeof PSInput> | undefined>()
+const nameRef = ref<InstanceType<typeof STInput> | undefined>()
+const routeRef = ref<InstanceType<typeof STInput> | undefined>()
 
 const publicCheckboxData = computed(() => ({
   checked: editingPage.public,

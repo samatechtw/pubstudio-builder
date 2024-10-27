@@ -5,7 +5,7 @@
         {{ t('theme.favicon') }}
       </div>
       <div v-if="editingFavicon" class="favicon-info favicon-edit">
-        <PSInput
+        <STInput
           v-model="newFavicon"
           :placeholder="t('theme.favicon_url')"
           class="favicon-url-input"
@@ -55,6 +55,7 @@
 <script lang="ts" setup>
 import { ref, toRefs } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
+import { STInput } from '@samatech/vue-components'
 import { CreateAssetModal } from '@pubstudio/frontend/feature-site-assets'
 import { useSites } from '@pubstudio/frontend/feature-sites'
 import {
@@ -62,7 +63,6 @@ import {
   ConfirmModal,
   Edit,
   Minus,
-  PSInput,
   Plus,
   Spinner,
 } from '@pubstudio/frontend/ui-widgets'

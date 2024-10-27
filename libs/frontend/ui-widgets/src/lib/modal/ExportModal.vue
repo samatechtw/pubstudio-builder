@@ -18,7 +18,7 @@
         {{ data.label }}
       </label>
     </div>
-    <PSInput
+    <STInput
       v-model="fileName"
       name="export"
       class="export-filename"
@@ -40,13 +40,13 @@
 <script lang="ts" setup>
 import { onMounted, ref, toRefs } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
+import { STInput } from '@samatech/vue-components'
 import { ExportOptions } from '@pubstudio/frontend/type-ui-widgets'
 import { getPreviewLink } from '@pubstudio/frontend/util-site'
 import { saveSite } from '@pubstudio/frontend/util-doc-site'
 import { ISite } from '@pubstudio/shared/type-site'
 import { useRoute, useRouter } from '@pubstudio/frontend/util-router'
 import Modal from './Modal.vue'
-import PSInput from '../form/PSInput.vue'
 import PSButton from '../form/PSButton.vue'
 
 const { t } = useI18n()

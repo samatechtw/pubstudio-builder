@@ -22,8 +22,8 @@
 </template>
 
 <script lang="ts" setup>
+import { useDropdown } from '@samatech/vue-components'
 import { CssSizeUnit, CssSizeUnits, ICssSize } from '@pubstudio/frontend/util-component'
-import { useDropdown } from '@pubstudio/frontend/util-dropdown'
 import { computed, toRefs } from 'vue'
 
 const props = withDefaults(

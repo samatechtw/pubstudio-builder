@@ -53,9 +53,12 @@ import {
   FlexWrap,
   FlexRow,
 } from '@pubstudio/frontend/ui-widgets'
-import { colorToCssValue, GradientTypeValues } from '@samatech/vue-color-picker'
-import { parseGradientColors } from '@samatech/vue-color-picker'
-import { useControlledClickaway } from '@pubstudio/frontend/util-clickaway'
+import {
+  colorToCssValue,
+  GradientTypeValues,
+  parseGradientColors,
+} from '@samatech/vue-color-picker'
+import { useControlledClickaway } from '@samatech/vue-components'
 import { Css, EditorDropdown } from '@pubstudio/shared/type-site'
 import { ICommand } from '@pubstudio/shared/type-command'
 import { useBuild, useToolbar, useThemeColors } from '@pubstudio/frontend/feature-build'

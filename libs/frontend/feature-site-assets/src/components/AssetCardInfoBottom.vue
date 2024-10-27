@@ -42,13 +42,13 @@
 <script lang="ts" setup>
 import { toRefs } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
+import { useDropdown } from '@samatech/vue-components'
 import { InfoBubble, MenuHorizontal } from '@pubstudio/frontend/ui-widgets'
 import {
   ISiteAssetViewModel,
   SiteAssetState,
 } from '@pubstudio/shared/type-api-platform-site-asset'
 import { formatBytes } from '@pubstudio/shared/util-format'
-import { useDropdown } from '@pubstudio/frontend/util-dropdown'
 
 const { t } = useI18n()
 

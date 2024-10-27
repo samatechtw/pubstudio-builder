@@ -9,7 +9,7 @@
       :item="{ label: '', checked: value === 'true' }"
       @checked="emit('update', $event.toString())"
     />
-    <PSMultiselect
+    <STMultiselect
       v-else-if="param.options"
       :value="newValue"
       class="param-option"
@@ -19,7 +19,7 @@
       @select="selectValue"
       @click.stop
     />
-    <PSInput
+    <STInput
       v-else
       v-model="newValue"
       class="item"
@@ -41,12 +41,8 @@
 <script lang="ts" setup>
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
-import {
-  Checkbox,
-  InfoBubble,
-  PSInput,
-  PSMultiselect,
-} from '@pubstudio/frontend/ui-widgets'
+import { STInput, STMultiselect } from '@samatech/vue-components'
+import { Checkbox, InfoBubble } from '@pubstudio/frontend/ui-widgets'
 import { ComponentArgPrimitive, IEventParamEntry } from '@pubstudio/shared/type-site'
 
 const { t } = useI18n()
@@ -105,7 +101,7 @@ onMounted(async () => {
   margin-left: auto;
   height: 34px;
 }
-:deep(.ps-input) {
+:deep(.st-input) {
   padding: 0 10px;
   height: 32px;
 }

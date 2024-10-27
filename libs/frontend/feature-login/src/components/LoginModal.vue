@@ -13,7 +13,7 @@
     </div>
 
     <form @submit.prevent="login">
-      <PSInput
+      <STInput
         v-model="payload.email"
         name="email"
         class="email-input"
@@ -50,13 +50,13 @@
 <script lang="ts" setup>
 import { computed, inject, onMounted, onUnmounted, ref } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
+import { STInput } from '@samatech/vue-components'
 import {
   ArrowShort,
   ErrorMessage,
   Modal,
   PasswordInput,
   PSButton,
-  PSInput,
 } from '@pubstudio/frontend/ui-widgets'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { IFrontendStore } from '@pubstudio/frontend/data-access-state'

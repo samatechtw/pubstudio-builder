@@ -51,7 +51,7 @@
 <script lang="ts" setup>
 import { Placement } from '@floating-ui/vue'
 import { toRefs } from 'vue'
-import { useInfoBubble } from '@pubstudio/frontend/util-tooltip'
+import { useInfoBubble } from '@samatech/vue-components'
 
 const props = withDefaults(
   defineProps<{

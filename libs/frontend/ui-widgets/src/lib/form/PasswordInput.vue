@@ -1,5 +1,5 @@
 <template>
-  <PSInput
+  <PSInfoInput
     :modelValue="modelValue"
     :type="inputType"
     :placeholder="placeholder"
@@ -8,7 +8,7 @@
     :isDisabled="isDisabled"
     :inputClass="inputClass"
     :maxLength="maxLength"
-    class="has-icon-button"
+    :cls="(cls ? `${cls} ` : '') + 'has-icon-button'"
     @update:modelValue="emit('update:modelValue', $event)"
     @focusout="emit('focusout', $event)"
     @handle-enter="emit('handle-enter')"
@@ -23,21 +23,22 @@
       <Show v-if="showPasswordFlag" />
       <Hide v-else />
     </IconButtonWrap>
-  </PSInput>
+  </PSInfoInput>
 </template>
 
 <script lang="ts" setup>
 import { computed, ref } from 'vue'
-import PSInput from './PSInput.vue'
 import IconButtonWrap from '../IconButtonWrap.vue'
 import Show from '../svg/Show.vue'
 import Hide from '../svg/Hide.vue'
+import PSInfoInput from './PSInfoInput.vue'
 
 withDefaults(
   defineProps<{
     modelValue?: number | string
     placeholder?: string
     name?: string
+    cls?: string
     errorMessage?: string | undefined
     isDisabled?: boolean
     inputClass?: string | null
@@ -47,6 +48,7 @@ withDefaults(
     modelValue: '',
     placeholder: '',
     name: undefined,
+    cls: undefined,
     errorMessage: undefined,
     isDisabled: false,
     inputClass: null,

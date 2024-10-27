@@ -28,7 +28,6 @@ export default defineConfig({
     alias: makeAliases([
       'frontend/data-access-site-api',
       'frontend/util-api',
-      'frontend/util-clickaway',
       'frontend/util-router',
       'frontend/feature-builtin',
       'frontend/feature-site-source',

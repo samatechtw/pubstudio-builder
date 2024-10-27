@@ -19,7 +19,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useTooltip } from '@pubstudio/frontend/util-tooltip'
+import { useTooltip } from '@samatech/vue-components'
 
 defineProps<{
   text: string

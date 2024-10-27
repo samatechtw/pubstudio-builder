@@ -9,14 +9,14 @@
       </div>
     </div>
     <div class="action-items">
-      <PSMultiselect
+      <STMultiselect
         :value="action.trigger"
         :options="triggers"
         :clearable="false"
         class="action-trigger"
         @select="selectTrigger($event?.value)"
       />
-      <PSMultiselect
+      <STMultiselect
         :value="action.event_type"
         :options="eventTypes"
         :clearable="false"
@@ -42,7 +42,7 @@
 
 <script lang="ts" setup>
 import { useI18n } from 'petite-vue-i18n'
-import { PSMultiselect } from '@pubstudio/frontend/ui-widgets'
+import { STMultiselect } from '@samatech/vue-components'
 import {
   EmailRowOptions,
   ICustomTableEvent,
@@ -147,11 +147,11 @@ onMounted(() => {
   width: 100%;
   padding: 8px 0;
 }
-.ps-multiselect.action-trigger {
+.st-multiselect.action-trigger {
   width: 120px;
   margin-right: 16px;
 }
-.ps-multiselect.action-type {
+.st-multiselect.action-type {
   width: 130px;
 }
 .action-head {

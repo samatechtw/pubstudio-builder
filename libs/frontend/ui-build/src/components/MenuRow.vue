@@ -4,7 +4,7 @@
       {{ label }}
     </div>
     <slot v-if="editing || forceEdit" name="input">
-      <PSInput
+      <STInput
         ref="newValueRef"
         v-model="newValue"
         class="item"
@@ -38,7 +38,8 @@
 <script lang="ts" setup>
 import { nextTick, onMounted, ref, toRefs, watch } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
-import { Check, Copy, Edit, InfoBubble, PSInput } from '@pubstudio/frontend/ui-widgets'
+import { STInput } from '@samatech/vue-components'
+import { Check, Copy, Edit, InfoBubble } from '@pubstudio/frontend/ui-widgets'
 import { copy } from '@pubstudio/frontend/util-doc'
 
 const { t } = useI18n()
@@ -74,7 +75,7 @@ const emit = defineEmits<{
 }>()
 
 const newValue = ref()
-const newValueRef = ref<InstanceType<typeof PSInput> | undefined>()
+const newValueRef = ref<InstanceType<typeof STInput> | undefined>()
 const editing = ref(false)
 
 const editValue = async () => {
@@ -132,7 +133,7 @@ defineExpose({ newValueRef })
 .info-bubble {
   margin-left: 8px;
 }
-:deep(.ps-input) {
+:deep(.st-input) {
   padding: 0 10px;
   height: 32px;
 }

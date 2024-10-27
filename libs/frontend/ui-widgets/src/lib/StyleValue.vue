@@ -1,5 +1,5 @@
 <template>
-  <PSMultiselect
+  <STMultiselect
     ref="multiselectRef"
     :value="newVal"
     class="style-value"
@@ -15,7 +15,7 @@
 <script lang="ts" setup>
 import { ref, toRefs, watch } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
-import { PSMultiselect } from '@pubstudio/frontend/ui-widgets'
+import { STMultiselect } from '@samatech/vue-components'
 
 const { t } = useI18n()
 

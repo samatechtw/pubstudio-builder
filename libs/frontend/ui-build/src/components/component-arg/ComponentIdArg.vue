@@ -1,5 +1,5 @@
 <template>
-  <PSMultiselect
+  <STMultiselect
     :value="value?.toString()"
     :placeholder="t('build.component_id')"
     :options="components"
@@ -12,7 +12,7 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
-import { PSMultiselect } from '@pubstudio/frontend/ui-widgets'
+import { STMultiselect } from '@samatech/vue-components'
 import { IBehaviorArg, IComponentInput } from '@pubstudio/shared/type-site'
 import { useBuild } from '@pubstudio/frontend/feature-build'
 import { IUpdateComponentArgPayload } from './i-update-component-arg-payload'

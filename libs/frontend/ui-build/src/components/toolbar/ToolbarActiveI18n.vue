@@ -1,5 +1,5 @@
 <template>
-  <PSMultiselect
+  <STMultiselect
     v-if="languages.length > 1"
     :value="activeLanguage"
     class="style-i18n"
@@ -18,11 +18,11 @@
 <script lang="ts" setup>
 import { computed, onMounted } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
+import { STMultiselect } from '@samatech/vue-components'
 import {
   setEditorDropdown,
   setActiveLanguage,
 } from '@pubstudio/frontend/data-access-command'
-import { PSMultiselect } from '@pubstudio/frontend/ui-widgets'
 import { EditorDropdown } from '@pubstudio/shared/type-site'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import {

@@ -6,7 +6,7 @@
         :key="recipient.key"
         class="recipient walkthrough-row"
       >
-        <PSInput
+        <STInput
           :modelValue="recipient.email"
           :placeholder="t('email')"
           :isError="errorIndex === index"
@@ -30,7 +30,8 @@
 
 <script lang="ts" setup>
 import { useI18n } from 'petite-vue-i18n'
-import { Minus, PSInput, Plus } from '@pubstudio/frontend/ui-widgets'
+import { STInput } from '@samatech/vue-components'
+import { Minus, Plus } from '@pubstudio/frontend/ui-widgets'
 import {
   IRecipientListItem,
   IUpdateRecipientListItem,
@@ -65,7 +66,7 @@ const emit = defineEmits<{
 .recipient-input {
   width: 100%;
   max-width: 200px;
-  :deep(.ps-input) {
+  :deep(.st-input) {
     width: 100%;
   }
 }

@@ -38,7 +38,6 @@ import {
   Modal,
   NotFound,
   PSButton,
-  PSInput,
   PSToggle,
   SiteErrorModal,
   SiteSaveErrorModal,
@@ -54,7 +53,6 @@ import {
   uidSingleton,
   useListDrag,
 } from '@pubstudio/frontend/util-doc'
-import { useKeyListener } from '@pubstudio/frontend/util-key-listener'
 import { iteratePage, RenderMode } from '@pubstudio/frontend/util-render'
 import {
   computeLocationParts,
@@ -115,7 +113,6 @@ export {
   useDragDropData,
   useBuildEvent,
   hotkeysDisabled,
-  useKeyListener,
   useEditDomains,
   useSiteVersion,
   useSiteApi,
@@ -150,7 +147,6 @@ export {
   NotFound,
   PageMenu,
   PSButton,
-  PSInput,
   PSToggle,
   SiteToolbar,
   SiteErrorModal,

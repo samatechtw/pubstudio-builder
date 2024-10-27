@@ -25,7 +25,7 @@
       </div>
     </div>
     <div v-if="editValueData" class="edit-value">
-      <PSInput
+      <STInput
         :modelValue="editValueData.value"
         @update:modelValue="updateInputValue($event)"
         @keydown.enter="setValue(editValueData.inputValue)"
@@ -40,9 +40,10 @@
 <script lang="ts" setup>
 import { onUnmounted } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
+import { STInput } from '@samatech/vue-components'
 import { Css } from '@pubstudio/shared/type-site'
 import { usePaddingMarginEdit, DragSide } from '@pubstudio/frontend/feature-build'
-import { PSButton, PSInput } from '@pubstudio/frontend/ui-widgets'
+import { PSButton } from '@pubstudio/frontend/ui-widgets'
 import { stringToCssValue } from '@pubstudio/shared/util-parse'
 import IcX from '@frontend-assets/icon/x.svg'
 
@@ -129,7 +130,7 @@ $edit-height: 36px;
       height: 28px;
       min-width: 60px;
     }
-    :deep(.ps-input) {
+    :deep(.st-input) {
       height: 28px;
       width: 54px;
     }

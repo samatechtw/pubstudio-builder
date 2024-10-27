@@ -7,7 +7,7 @@
       {{ t('assets.new_text') }}
     </div>
     <div class="asset-name-wrap">
-      <PSMultiselect
+      <STMultiselect
         :value="siteId"
         valueKey="id"
         labelKey="name"
@@ -18,7 +18,7 @@
         class="site-select"
         @select="select"
       />
-      <PSInput
+      <STInput
         v-model="name"
         name="asset-name"
         class="asset-name"
@@ -55,14 +55,9 @@
 <script lang="ts" setup>
 import { computed, onMounted, ref, toRefs, watch } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
-import {
-  ErrorMessage,
-  Modal,
-  PSButton,
-  PSInput,
-  PSMultiselect,
-  UploadFile,
-} from '@pubstudio/frontend/ui-widgets'
+import { STInput } from '@samatech/vue-components'
+import { STMultiselect } from '@samatech/vue-components'
+import { ErrorMessage, Modal, PSButton, UploadFile } from '@pubstudio/frontend/ui-widgets'
 import {
   ALL_CONTENT_TYPES,
   AssetContentType,

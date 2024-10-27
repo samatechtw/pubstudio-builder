@@ -1,5 +1,5 @@
 <template>
-  <PSMultiselect
+  <STMultiselect
     v-slot="{ label }"
     :customLabel="true"
     :value="undefined"
@@ -15,13 +15,13 @@
     <div :style="{ 'font-family': font(label) }">
       {{ label }}
     </div>
-  </PSMultiselect>
+  </STMultiselect>
 </template>
 
 <script lang="ts" setup>
 import { computed } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
-import { PSMultiselect } from '@pubstudio/frontend/ui-widgets'
+import { STMultiselect } from '@samatech/vue-components'
 import { useBuild } from '@pubstudio/frontend/feature-build'
 
 const { t } = useI18n()

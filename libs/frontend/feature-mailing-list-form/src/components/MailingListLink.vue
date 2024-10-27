@@ -7,7 +7,7 @@
       {{ t('custom_data.link_text') }}
     </div>
     <div class="link-table">
-      <PSMultiselect
+      <STMultiselect
         :value="tableName"
         :options="mailingListTables.map((t) => t.name)"
         :placeholder="t('custom_data.table_name')"
@@ -31,8 +31,9 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
+import { STMultiselect } from '@samatech/vue-components'
 import { setMailingListWalkthrough } from '@pubstudio/frontend/data-access-command'
-import { PSButton, PSMultiselect } from '@pubstudio/frontend/ui-widgets'
+import { PSButton } from '@pubstudio/frontend/ui-widgets'
 import { MailingListWalkthroughState } from '@pubstudio/shared/type-site'
 import { useBuild } from '@pubstudio/frontend/feature-build'
 import { useMailingListForm } from '../lib/use-mailing-list-form'

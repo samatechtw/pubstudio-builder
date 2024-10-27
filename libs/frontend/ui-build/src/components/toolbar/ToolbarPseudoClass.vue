@@ -1,5 +1,5 @@
 <template>
-  <PSMultiselect
+  <STMultiselect
     :value="editor?.cssPseudoClass"
     class="style-pseudo-class"
     :placeholder="t('pseudo_class')"
@@ -18,11 +18,11 @@
 <script lang="ts" setup>
 import { onMounted } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
+import { STMultiselect } from '@samatech/vue-components'
 import {
   setEditorDropdown,
   setCssPseudoClass,
 } from '@pubstudio/frontend/data-access-command'
-import { PSMultiselect } from '@pubstudio/frontend/ui-widgets'
 import {
   CssPseudoClass,
   CssPseudoClassValues,

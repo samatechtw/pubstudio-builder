@@ -3,7 +3,7 @@
     <div class="label">
       {{ label }}
     </div>
-    <PSInput
+    <STInput
       v-if="editing"
       ref="newValueRef"
       v-model="newValue"
@@ -24,7 +24,8 @@
 // This is a simplified version of `MenuRow.vue` that is always editable,
 // and the editing state is controlled by the parent.
 import { nextTick, ref, toRefs } from 'vue'
-import { Edit, InfoBubble, PSInput } from '@pubstudio/frontend/ui-widgets'
+import { STInput } from '@samatech/vue-components'
+import { Edit, InfoBubble } from '@pubstudio/frontend/ui-widgets'
 
 const props = withDefaults(
   defineProps<{
@@ -49,7 +50,7 @@ const emit = defineEmits<{
 }>()
 
 const newValue = ref(value.value)
-const newValueRef = ref<InstanceType<typeof PSInput> | undefined>()
+const newValueRef = ref<InstanceType<typeof STInput> | undefined>()
 
 const editValue = async () => {
   if (editable.value) {
@@ -85,7 +86,7 @@ const setValue = () => {
   .info-bubble {
     margin-left: 8px;
   }
-  :deep(.ps-input) {
+  :deep(.st-input) {
     padding: 0 10px;
     height: 32px;
   }

@@ -1,6 +1,6 @@
 <template>
   <div class="asset-filters">
-    <PSInput
+    <STInput
       :modelValue="store.asset.search.value"
       :placeholder="t('search')"
       class="asset-search"
@@ -11,8 +11,8 @@
       <div @click="clearSearch">
         <Cross class="clear-icon" @click="clearSearch" />
       </div>
-    </PSInput>
-    <PSMultiselect
+    </STInput>
+    <STMultiselect
       :value="store.asset.contentType"
       valueKey="key"
       :options="Object.values(AssetContentType)"
@@ -22,7 +22,7 @@
       class="asset-content-type"
       @select="updateContentType"
     />
-    <PSMultiselect
+    <STMultiselect
       v-if="sites?.length"
       :value="store.asset.siteId"
       valueKey="id"
@@ -34,7 +34,7 @@
       class="asset-site"
       @select="updateSiteId"
     />
-    <PSMultiselect
+    <STMultiselect
       :value="store.asset.sort"
       valueKey="key"
       :options="sortOptions"
@@ -47,16 +47,18 @@
 </template>
 
 <script lang="ts" setup>
-import { SortDirection } from '@pubstudio/shared/type-sort'
+import { computed, onMounted } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
+import { STInput } from '@samatech/vue-components'
+import { STMultiselect } from '@samatech/vue-components'
 import {
   AssetContentType,
   IListPlatformSiteAssetsRequest,
 } from '@pubstudio/shared/type-api-platform-site-asset'
 import { store } from '@pubstudio/frontend/data-access-web-store'
-import { Cross, PSInput, PSMultiselect, Search } from '@pubstudio/frontend/ui-widgets'
+import { Cross, Search } from '@pubstudio/frontend/ui-widgets'
 import { ISiteViewModel } from '@pubstudio/shared/type-api-platform-site'
-import { computed, onMounted } from 'vue'
+import { SortDirection } from '@pubstudio/shared/type-sort'
 
 interface ISortOption {
   key: string
@@ -177,7 +179,7 @@ onMounted(() => {
   .asset-search {
     width: 100%;
     margin-bottom: 12px;
-    :deep(.ps-input) {
+    :deep(.st-input) {
       width: 100%;
     }
   }

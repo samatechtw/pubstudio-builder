@@ -1,10 +1,10 @@
 <template>
   <div v-if="editing" class="domain-row">
     <div class="label">
-      <PSInput
+      <PSInfoInput
         ref="valueInputRef"
         v-model="newDomain"
-        class="value-input"
+        cls="value-input"
         :placeholder="t('sites.domain')"
         :errorBubble="errorMessage"
         @keydown.enter="emitUpdate"
@@ -40,7 +40,7 @@
 <script lang="ts" setup>
 import { onMounted, ref, toRefs } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
-import { Check, Minus, PSInput, Reload, Spinner } from '@pubstudio/frontend/ui-widgets'
+import { Check, Minus, PSInfoInput, Spinner } from '@pubstudio/frontend/ui-widgets'
 import { ICustomDomainRelationViewModel } from '@pubstudio/shared/type-api-shared'
 
 const { t } = useI18n()
@@ -92,7 +92,7 @@ const removeDomain = () => {
 
 onMounted(() => {
   if (editing.value) {
-    valueInputRef.value?.inputRef.focus()
+    valueInputRef.value?.focus()
   }
 })
 </script>
@@ -143,7 +143,7 @@ onMounted(() => {
 .value-input {
   width: 200px;
   margin-left: 6px;
-  :deep(.ps-input) {
+  :deep(.st-input) {
     height: 36px;
   }
 }

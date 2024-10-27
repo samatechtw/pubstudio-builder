@@ -1,5 +1,5 @@
 <template>
-  <PSMultiselect
+  <STMultiselect
     :value="value?.toString()"
     :placeholder="t('build.location')"
     :options="locations"
@@ -12,8 +12,8 @@
 <script lang="ts" setup>
 import { computed, toRefs } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
+import { STMultiselect } from '@samatech/vue-components'
 import { IBehaviorArg, IComponentInput } from '@pubstudio/shared/type-site'
-import { PSMultiselect } from '@pubstudio/frontend/ui-widgets'
 import { useBuild } from '@pubstudio/frontend/feature-build'
 import { IUpdateComponentArgPayload } from './i-update-component-arg-payload'
 

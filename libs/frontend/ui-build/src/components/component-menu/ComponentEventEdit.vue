@@ -9,7 +9,7 @@
         {{ t('build.event_type') }}
       </div>
       <div class="item">
-        <PSMultiselect
+        <STMultiselect
           :value="newEvent.name"
           class="event-type"
           :placeholder="t('build.event_type')"
@@ -91,6 +91,7 @@
 <script lang="ts" setup>
 import { computed, ref, toRefs } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
+import { STMultiselect } from '@samatech/vue-components'
 import {
   IResolvedComponentEvent,
   IResolvedComponentEventBehavior,
@@ -98,12 +99,7 @@ import {
   useEditComponentEditorEvent,
   useEditComponentEvent,
 } from '@pubstudio/frontend/feature-build'
-import {
-  ErrorMessage,
-  PSButton,
-  PSMultiselect,
-  Plus,
-} from '@pubstudio/frontend/ui-widgets'
+import { ErrorMessage, PSButton, Plus } from '@pubstudio/frontend/ui-widgets'
 import { noBehavior } from '@pubstudio/frontend/feature-builtin'
 import { setEditBehavior } from '@pubstudio/frontend/data-access-command'
 import {

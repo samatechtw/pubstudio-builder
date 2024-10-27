@@ -1,14 +1,14 @@
 <template>
   <div class="state-row-wrap">
     <div v-if="editing" class="state-edit menu-row">
-      <PSInput
+      <STInput
         v-model="editKey"
         class="key-input"
         :placeholder="t('key')"
         @keydown.enter="saveState"
         @keyup.esc="saveState"
       />
-      <PSInput
+      <STInput
         v-model="editValue"
         class="value-input"
         :placeholder="t('value')"
@@ -43,7 +43,8 @@
 <script lang="ts" setup>
 import { computed, ref, toRefs } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
-import { Check, Edit, Minus, PSInput, PSToggle } from '@pubstudio/frontend/ui-widgets'
+import { STInput } from '@samatech/vue-components'
+import { Check, Edit, Minus, PSToggle } from '@pubstudio/frontend/ui-widgets'
 import { IComponentState } from '@pubstudio/shared/type-site'
 import { IEditComponentState } from './i-edit-component-state'
 
@@ -122,7 +123,7 @@ const saveState = () => {
 .value-input {
   margin-left: 6px;
 }
-:deep(.ps-input) {
+:deep(.st-input) {
   height: 34px;
 }
 .edit-wrap {
@@ -131,7 +132,7 @@ const saveState = () => {
   .value-input {
     margin: 6px 0 0 0;
   }
-  :deep(.ps-input-wrap.search) {
+  :deep(.st-input-wrap.search) {
     flex-grow: 1;
   }
 }

@@ -13,7 +13,7 @@
         class="is-toggle"
         @toggle="newValue = $event.toString()"
       />
-      <PSInput
+      <STInput
         v-else
         ref="valueInputRef"
         v-model="newValue"
@@ -46,7 +46,8 @@
 <script lang="ts" setup>
 import { computed, ref, toRefs } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
-import { Check, PSToggle, Edit, Minus, PSInput } from '@pubstudio/frontend/ui-widgets'
+import { STInput } from '@samatech/vue-components'
+import { Check, PSToggle, Edit, Minus } from '@pubstudio/frontend/ui-widgets'
 import { IDatalistOption } from '@pubstudio/frontend/type-ui-widgets'
 import { Settings } from '@pubstudio/frontend/ui-widgets'
 import { ComponentArgType, ComponentArgPrimitive, Tag } from '@pubstudio/shared/type-site'
@@ -68,7 +69,7 @@ const props = withDefaults(
     value: string
     argType: ComponentArgType
     tag: Tag
-    // For datalist in PSInput
+    // For datalist in STInput
     componentId?: string
     showEditInput?: boolean
     showReset?: boolean
@@ -89,7 +90,7 @@ const emit = defineEmits<{
 }>()
 
 const newValue = ref(value.value)
-const valueInputRef = ref<InstanceType<typeof PSInput> | undefined>()
+const valueInputRef = ref<InstanceType<typeof STInput> | undefined>()
 
 const editing = computed(() => {
   return editor.value?.componentTab.editInputValue === property.value
@@ -143,7 +144,7 @@ const datalist = computed<IDatalistOption[] | undefined>(() => {
   max-width: 140px;
   width: 140px;
   margin-left: 6px;
-  :deep(.ps-input) {
+  :deep(.st-input) {
     height: 34px;
   }
 }

@@ -172,12 +172,11 @@ const forceSave = async () => {
   background-color: $color-toolbar-bg;
 }
 
-:deep(.ps-input),
-:deep(.multiselect),
-:deep(.ps-multiselect) {
+:deep(.st-input),
+:deep(.st-multiselect) {
   height: calc($site-toolbar-height - 2px);
 }
-:deep(.ps-multiselect .dropdown) {
+:deep(.st-multiselect .dropdown) {
   z-index: $z-index-site-toolbar;
 }
 .toolbar-section {

@@ -2,10 +2,10 @@
   <div class="edit-breakpoint-row">
     <div class="cols-wrap">
       <div class="col name-col">
-        <PSInput v-model="breakpoint.name" :placeholder="t('name')" />
+        <STInput v-model="breakpoint.name" :placeholder="t('name')" />
       </div>
       <div class="col min-width-col">
-        <PSInput
+        <STInput
           :modelValue="breakpoint.minWidth"
           type="number"
           :placeholder="t('build.breakpoint.min_width')"
@@ -13,7 +13,7 @@
         />
       </div>
       <div class="col max-width-col">
-        <PSInput
+        <STInput
           :modelValue="breakpoint.maxWidth"
           type="number"
           :placeholder="t('build.breakpoint.max_width')"
@@ -27,8 +27,9 @@
 
 <script lang="ts" setup>
 import { useI18n } from 'petite-vue-i18n'
+import { STInput } from '@samatech/vue-components'
 import { IBreakpoint } from '@pubstudio/shared/type-site'
-import { ErrorMessage, PSInput } from '@pubstudio/frontend/ui-widgets'
+import { ErrorMessage } from '@pubstudio/frontend/ui-widgets'
 import { toRefs } from 'vue'
 
 const { t } = useI18n()

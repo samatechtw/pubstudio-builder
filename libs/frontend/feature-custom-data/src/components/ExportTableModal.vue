@@ -6,7 +6,7 @@
     <div class="modal-text">
       {{ t('custom_data.export_text') }}
     </div>
-    <PSInput
+    <STInput
       v-model="fileName"
       name="export"
       class="export-filename"
@@ -34,7 +34,8 @@
 <script lang="ts" setup>
 import { onMounted, ref, toRefs, watch } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
-import { ErrorMessage, Modal, PSButton, PSInput } from '@pubstudio/frontend/ui-widgets'
+import { STInput } from '@samatech/vue-components'
+import { ErrorMessage, Modal, PSButton } from '@pubstudio/frontend/ui-widgets'
 import { ICustomTableColumn } from '@pubstudio/shared/type-api-site-custom-data'
 import { defaultFileName, useExportTable } from '../lib/use-export-table'
 

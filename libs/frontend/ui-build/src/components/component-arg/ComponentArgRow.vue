@@ -41,7 +41,7 @@ defineProps<{
   margin-top: 6px;
 }
 .label {
-  @mixin text 15px;
+  @mixin text 14px;
   width: 50%;
   display: flex;
   align-items: center;

@@ -15,13 +15,13 @@
       />
       <div class="save-data" :class="{ loading: listLoading }">
         <div class="save-data-input">
-          <PSInput
+          <STInput
             v-model="name"
             name="name"
             class="template-name"
             :placeholder="t('name')"
           />
-          <PSMultiselect
+          <STMultiselect
             v-if="templates"
             :value="selectedTemplate?.id"
             class="update-template"
@@ -63,6 +63,7 @@
 <script lang="ts" setup>
 import { ref, toRefs, watch } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
+import { STMultiselect, STInput } from '@samatech/vue-components'
 import { useTemplate } from '@pubstudio/frontend/feature-template'
 import {
   GLOBAL_TEMPLATE_COLLECTION_ID,
@@ -71,9 +72,7 @@ import {
 import { ISerializedSite } from '@pubstudio/shared/type-site'
 import { ICreatePlatformTemplateRequest } from '@pubstudio/shared/type-api-platform-template'
 import Modal from './Modal.vue'
-import PSInput from '../form/PSInput.vue'
 import PSButton from '../form/PSButton.vue'
-import PSMultiselect from '../form/PSMultiselect.vue'
 import ErrorMessage from '../ErrorMessage.vue'
 import Spinner from '../Spinner.vue'
 
@@ -179,7 +178,7 @@ watch(template, async (template: ISerializedSite | undefined) => {
   }
   .template-name {
     width: 50%;
-    .ps-input {
+    .st-input {
       height: 38px;
     }
   }

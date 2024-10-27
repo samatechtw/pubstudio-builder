@@ -1,6 +1,6 @@
 <template>
   <div class="menu-row">
-    <PSMultiselect
+    <STMultiselect
       ref="multiselectRef"
       :value="mixin?.id"
       class="edit-item"
@@ -27,13 +27,13 @@
 <script lang="ts" setup>
 import { computed, ref, toRefs } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
+import { STMultiselect } from '@samatech/vue-components'
 import { IStyle } from '@pubstudio/shared/type-site'
 import {
   Edit,
   IconTooltipDelay,
   InfoBubble,
   Minus,
-  PSMultiselect,
   ScaleOut,
 } from '@pubstudio/frontend/ui-widgets'
 import { useBuild } from '@pubstudio/frontend/feature-build'
@@ -90,7 +90,7 @@ defineExpose({ multiselectRef })
 @import '@theme/css/mixins.postcss';
 
 .menu-row {
-  :deep(.ps-multiselect) {
+  :deep(.st-multiselect) {
     width: 100%;
     margin-right: 16px;
     max-width: 200px;

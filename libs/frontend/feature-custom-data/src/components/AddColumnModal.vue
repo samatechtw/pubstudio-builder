@@ -34,7 +34,7 @@
 <script lang="ts" setup>
 import { ref, toRefs, watch } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
-import { ErrorMessage, Modal, PSButton, PSInput } from '@pubstudio/frontend/ui-widgets'
+import { ErrorMessage, Modal, PSButton } from '@pubstudio/frontend/ui-widgets'
 import { ICustomTableColumn } from '@pubstudio/shared/type-api-site-custom-data'
 import ColumnForm from './ColumnForm.vue'
 import { IEditTableColumn } from '../lib/i-edit-column'
