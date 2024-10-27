@@ -108,11 +108,10 @@ export { default as PSMenu } from './lib/menu/PSMenu.vue'
 export { default as PSButton } from './lib/form/PSButton.vue'
 export { default as PSToggle } from './lib/form/PSToggle.vue'
 export { default as PSToggleButton } from './lib/form/PSToggleButton.vue'
-export { default as PSInput } from './lib/form/PSInput.vue'
+export { default as PSInfoInput } from './lib/form/PSInfoInput.vue'
 export { default as PasswordInput } from './lib/form/PasswordInput.vue'
 export { default as UploadFile } from './lib/form/UploadFile.vue'
 export { default as SimpleFileUpload } from './lib/form/SimpleFileUpload.vue'
-export { default as PSMultiselect } from './lib/form/PSMultiselect.vue'
 
 // modal
 export { default as Modal } from './lib/modal/Modal.vue'

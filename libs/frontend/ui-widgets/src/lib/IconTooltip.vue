@@ -17,7 +17,7 @@
 
 <script lang="ts" setup>
 import { toRefs } from 'vue'
-import { useTooltip } from '@pubstudio/frontend/util-tooltip'
+import { useTooltip } from '@samatech/vue-components'
 
 const props = defineProps<{
   tip: string

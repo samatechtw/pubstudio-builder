@@ -4,7 +4,7 @@
       {{ t('custom_data.delete_table') }}
     </div>
     <div class="modal-text" v-html="t('custom_data.delete_text', { tableName })" />
-    <PSInput
+    <STInput
       v-model="confirmTableName"
       name="delete"
       class="delete-tablename"
@@ -41,7 +41,8 @@
 <script lang="ts" setup>
 import { ref, toRefs, watch } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
-import { ErrorMessage, Modal, PSButton, PSInput } from '@pubstudio/frontend/ui-widgets'
+import { STInput } from '@samatech/vue-components'
+import { ErrorMessage, Modal, PSButton } from '@pubstudio/frontend/ui-widgets'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { ICustomTableColumn } from '@pubstudio/shared/type-api-site-custom-data'
 import { parseApiError, toApiError } from '@pubstudio/frontend/util-api'

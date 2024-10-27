@@ -1,10 +1,10 @@
-import { createClickawayListener } from '@pubstudio/frontend/util-clickaway'
 import { registerScroll, runtimeContext } from '@pubstudio/frontend/util-runtime'
 import {
   ComponentEventType,
   IComponent,
   ICustomEvents,
 } from '@pubstudio/shared/type-site'
+import { createClickawayListener } from '@samatech/vue-components'
 
 const toInt = (thing: string | undefined, fallback: number): number => {
   if (thing === undefined) {

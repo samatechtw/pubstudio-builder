@@ -18,7 +18,7 @@
           @keyup="checkEscape"
           @update:modelValue="updateValue"
         />
-        <PSInput
+        <STInput
           v-else
           ref="valueInputRef"
           :modelValue="style.value"
@@ -79,15 +79,9 @@
 <script lang="ts" setup>
 import { computed, nextTick, onMounted, ref, toRefs } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
+import { STInput } from '@samatech/vue-components'
 import { StyleProperty, StyleValue } from '@pubstudio/frontend/ui-widgets'
-import {
-  Assets,
-  Check,
-  Edit,
-  InfoBubble,
-  Minus,
-  PSInput,
-} from '@pubstudio/frontend/ui-widgets'
+import { Assets, Check, Edit, InfoBubble, Minus } from '@pubstudio/frontend/ui-widgets'
 import {
   Css,
   CssPseudoClass,
@@ -166,7 +160,7 @@ const emit = defineEmits<{
   (e: 'remove'): void
 }>()
 
-const valueInputRef = ref<InstanceType<typeof PSInput> | undefined>()
+const valueInputRef = ref<InstanceType<typeof STInput> | undefined>()
 const valueSelectRef = ref()
 
 const valueOptions = computed(() => {
@@ -314,7 +308,7 @@ onMounted(() => {
   padding: 8px 0;
 }
 .style-row {
-  :deep(.ps-multiselect:hover) {
+  :deep(.st-multiselect:hover) {
     border: 1px solid $color-primary;
   }
   .label {
@@ -360,7 +354,7 @@ onMounted(() => {
   max-width: 110px;
   width: 110px;
   margin-left: 6px;
-  :deep(.ps-input) {
+  :deep(.st-input) {
     height: 34px;
   }
 }
@@ -380,7 +374,7 @@ onMounted(() => {
   .value-input {
     margin: 6px 0 0 0;
   }
-  :deep(.ps-input-wrap.search) {
+  :deep(.st-input-wrap.search) {
     flex-grow: 1;
   }
 }

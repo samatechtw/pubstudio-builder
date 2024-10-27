@@ -15,7 +15,7 @@
     <div class="column-label">
       {{ t('custom_data.table_name') }}
     </div>
-    <PSInput v-model="tableName" :placeholder="t('name')" class="table-name" />
+    <STInput v-model="tableName" :placeholder="t('name')" class="table-name" />
     <div class="labels-wrap">
       <div class="column-label">
         {{ t('custom_data.columns') }}
@@ -50,13 +50,8 @@
 <script lang="ts" setup>
 import { ref, toRefs, watch } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
-import {
-  ErrorMessage,
-  Modal,
-  Plus,
-  PSButton,
-  PSInput,
-} from '@pubstudio/frontend/ui-widgets'
+import { STInput } from '@samatech/vue-components'
+import { ErrorMessage, Modal, Plus, PSButton } from '@pubstudio/frontend/ui-widgets'
 import { makeColumnInfo } from '@pubstudio/frontend/util-custom-data'
 import { ICreateTableApiRequest } from '@pubstudio/shared/type-api-site-custom-data'
 import { useCustomDataApi } from '@pubstudio/frontend/data-access-api'

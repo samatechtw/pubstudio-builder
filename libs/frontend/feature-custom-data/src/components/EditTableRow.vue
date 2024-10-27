@@ -2,7 +2,7 @@
   <tr>
     <td class="select-wrap"></td>
     <td v-for="column in columns" :key="column.name">
-      <PSInput v-model="newRow[column.name]" class="row-input" />
+      <STInput v-model="newRow[column.name]" class="row-input" />
     </td>
     <td class="action">
       <Check class="check" color="#009879" @click="confirm" />
@@ -13,7 +13,8 @@
 
 <script lang="ts" setup>
 import { onMounted, ref, toRefs } from 'vue'
-import { Cross, Check, PSInput } from '@pubstudio/frontend/ui-widgets'
+import { STInput } from '@samatech/vue-components'
+import { Cross, Check } from '@pubstudio/frontend/ui-widgets'
 import {
   ICustomTableColumn,
   ICustomTableRow,
@@ -71,7 +72,7 @@ td.select-wrap {
   width: 60px;
   cursor: pointer;
 }
-.row-input :deep(.ps-input) {
+.row-input :deep(.st-input) {
   height: 38px;
 }
 .cancel {

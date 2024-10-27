@@ -134,7 +134,7 @@ const setRole = (value: AriaRole | undefined) => {
 }
 .tag-role {
   display: flex;
-  :deep(.ps-multiselect) {
+  :deep(.st-multiselect) {
     width: auto;
     flex-grow: 1;
   }

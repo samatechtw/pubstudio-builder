@@ -1,5 +1,5 @@
 <template>
-  <PSMultiselect
+  <STMultiselect
     :options="options"
     :value="fontWeight?.value"
     :placeholder="t('toolbar.font_weight')"
@@ -17,8 +17,8 @@
 <script lang="ts" setup>
 import { computed, onMounted, toRefs } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
+import { STMultiselect } from '@samatech/vue-components'
 import { Css, EditorDropdown, ThemeFontSource } from '@pubstudio/shared/type-site'
-import { PSMultiselect } from '@pubstudio/frontend/ui-widgets'
 import { useBuild, useToolbar } from '@pubstudio/frontend/feature-build'
 import { setEditorDropdown } from '@pubstudio/frontend/data-access-command'
 

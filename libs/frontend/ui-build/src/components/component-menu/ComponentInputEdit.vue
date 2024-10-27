@@ -19,7 +19,7 @@
       @update="newInput.type = $event as ComponentArgPrimitive"
     >
       <template #input>
-        <PSMultiselect
+        <STMultiselect
           class="input-type-multiselect"
           :value="newInput.type"
           :placeholder="t('type')"
@@ -45,7 +45,7 @@
           class="default-toggle"
           @toggle="newInput.default = $event"
         />
-        <PSInput
+        <STInput
           v-else
           :modelValue="newInput.default?.toString()"
           class="default-text"
@@ -97,6 +97,7 @@
 <script lang="ts" setup>
 import { ref, toRefs } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
+import { STMultiselect, STInput } from '@samatech/vue-components'
 import { ComponentArgPrimitive, IComponentInput } from '@pubstudio/shared/type-site'
 import {
   Checkbox,
@@ -104,8 +105,6 @@ import {
   InfoBubble,
   PSButton,
   PSToggle,
-  PSMultiselect,
-  PSInput,
 } from '@pubstudio/frontend/ui-widgets'
 import MenuRow from '../MenuRow.vue'
 

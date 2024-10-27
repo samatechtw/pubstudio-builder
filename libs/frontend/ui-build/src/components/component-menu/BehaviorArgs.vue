@@ -9,20 +9,20 @@
     </div>
     <div v-if="editArg" class="edit-arg-wrap">
       <div class="edit-arg">
-        <PSInput v-model="editArg.name" class="name" :placeholder="t('name')" />
-        <PSMultiselect
+        <STInput v-model="editArg.name" class="name" :placeholder="t('name')" />
+        <STMultiselect
           :value="editArg.type"
           :placeholder="t('type')"
           :options="Object.values(ComponentArgPrimitive)"
           @select="selectType"
         />
-        <PSInput v-model="editArg.default" class="default" :placeholder="t('default')" />
+        <STInput v-model="editArg.default" class="default" :placeholder="t('default')" />
         <div class="edit-actions">
           <Check class="save" color="#009879" @click="saveArg" />
           <Cross class="cancel" @click="cancel" />
         </div>
       </div>
-      <PSInput v-model="editArg.help" class="edit-help" :placeholder="t('help')" />
+      <STInput v-model="editArg.help" class="edit-help" :placeholder="t('help')" />
     </div>
     <div
       v-for="(arg, index) in Object.values(behavior?.args || {})"
@@ -47,6 +47,8 @@
 <script lang="ts" setup>
 import { ref, toRefs } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
+import { STInput } from '@samatech/vue-components'
+import { STMultiselect } from '@samatech/vue-components'
 import {
   ComponentArgPrimitive,
   ComponentArgType,
@@ -57,8 +59,6 @@ import {
   Check,
   InfoBubble,
   Minus,
-  PSInput,
-  PSMultiselect,
   Plus,
   Edit,
   ErrorMessage,
@@ -173,13 +173,13 @@ const addArg = () => {
   margin-left: 6px;
 }
 
-:deep(.ps-input) {
+:deep(.st-input) {
   height: 36px;
 }
 .edit-arg {
   @mixin flex-row;
   align-items: center;
-  :deep(.ps-multiselect) {
+  :deep(.st-multiselect) {
     height: 36px;
     width: 120px;
   }

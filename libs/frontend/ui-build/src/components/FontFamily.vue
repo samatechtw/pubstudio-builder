@@ -1,5 +1,5 @@
 <template>
-  <PSMultiselect
+  <STMultiselect
     v-slot="{ label }"
     :customLabel="true"
     :value="fontFamily?.value"
@@ -23,13 +23,13 @@
     >
       {{ label }}
     </div>
-  </PSMultiselect>
+  </STMultiselect>
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted } from 'vue'
+import { computed, nextTick, onMounted } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
-import { PSMultiselect } from '@pubstudio/frontend/ui-widgets'
+import { STMultiselect } from '@samatech/vue-components'
 import {
   Css,
   EditorDropdown,
@@ -66,8 +66,10 @@ const inherited = computed(() => {
   return fontFamily.value?.sourceType !== StyleSourceType.Custom
 })
 
-const showFontMenu = () => {
+const showFontMenu = async () => {
+  setEditorDropdown(editor.value, undefined)
   toggleEditorMenu(editor.value, EditorMode.Theme, true)
+  await nextTick()
   setThemeTab(editor.value, ThemeTab.Fonts)
 }
 
@@ -112,7 +114,7 @@ onMounted(() => {
   color: $grey-700;
 }
 .inherited {
-  :deep(.label-text) {
+  :deep(.st-ms-label-text) {
     color: $color-disabled;
   }
 }

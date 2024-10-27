@@ -35,7 +35,7 @@
       >
         <FontColor :color="iconColor" />
       </ToolbarColorPicker>
-      <PSInput
+      <STInput
         ref="fontSizeRef"
         v-model="fontSize.size"
         type="number"
@@ -44,13 +44,13 @@
         @keyup.enter.stop="setFontSize"
         @mousedown="fontSizeTextFocus.toolbarButtonMouseDown"
       >
-        <PSMultiselect
+        <STMultiselect
           :value="fontSize.unit"
           :options="fontUnits"
           class="font-unit"
           @select="setFontUnit"
         />
-      </PSInput>
+      </STInput>
     </div>
   </div>
 </template>
@@ -58,15 +58,8 @@
 <script lang="ts" setup>
 import { computed, onMounted } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
-import {
-  FontColor,
-  Italic,
-  PSMultiselect,
-  ToolbarItem,
-  Underline,
-} from '@pubstudio/frontend/ui-widgets'
-import { PSInput } from '@pubstudio/frontend/ui-widgets'
-import { useControlledClickaway } from '@pubstudio/frontend/util-clickaway'
+import { STInput, STMultiselect, useControlledClickaway } from '@samatech/vue-components'
+import { FontColor, Italic, ToolbarItem, Underline } from '@pubstudio/frontend/ui-widgets'
 import { colorToCssValue } from '@samatech/vue-color-picker'
 import { Css, EditorDropdown } from '@pubstudio/shared/type-site'
 import { isTextGradient, parseGradientColors } from '@samatech/vue-color-picker'
@@ -299,7 +292,7 @@ onMounted(() => {
 .font-size {
   display: flex;
   margin-left: 16px;
-  :deep(.ps-input) {
+  :deep(.st-input) {
     border: 1px solid $color-light1;
     width: 100px;
     height: 36px;
@@ -315,13 +308,13 @@ onMounted(() => {
   height: 32px;
   border: none;
   background: transparent;
-  :deep(.label-text) {
+  :deep(.st-ms-label-text) {
     overflow: visible;
   }
   :deep(.ms-item) {
     padding: 4px 4px 3px;
   }
-  :deep(.label) {
+  :deep(.st-ms-label) {
     padding: 4px 4px 3px 5px;
   }
 }

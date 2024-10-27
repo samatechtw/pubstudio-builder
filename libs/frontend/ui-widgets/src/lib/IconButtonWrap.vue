@@ -27,10 +27,10 @@ const emit = defineEmits<{
 </script>
 
 <style lang="postcss" scoped>
-@import '@theme/css/mixins.postcss';
-
 .icon-button-wrap {
-  @mixin flex-center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: v-bind(buttonSize + 'px');
   height: v-bind(buttonSize + 'px');
   cursor: pointer;
@@ -44,17 +44,17 @@ const emit = defineEmits<{
 
   &:not(.icon-button-wrap--disabled) {
     &:hover {
-      background-color: $color-light1;
+      background-color: var(--st-component-light1, #5d99b6);
     }
     &:active {
-      background-color: $color-light2;
+      background-color: var(--st-component-light2, #a69cd4);
     }
   }
 
   &.icon-button-wrap--disabled {
     cursor: default;
     :slotted(svg) {
-      fill: $color-disabled;
+      fill: var(--st-component-disabled, #a1a1aa);
     }
   }
 }

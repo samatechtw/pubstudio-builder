@@ -1,5 +1,5 @@
 <template>
-  <PSMultiselect
+  <STMultiselect
     ref="multiselectRef"
     :value="newVal"
     :placeholder="t('property')"
@@ -16,7 +16,7 @@
 <script lang="ts" setup>
 import { computed, onMounted, ref, toRefs, watch } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
-import { PSMultiselect } from '@pubstudio/frontend/ui-widgets'
+import { STMultiselect } from '@samatech/vue-components'
 import { Css } from '@pubstudio/shared/type-site'
 
 const CssValues: Css[] = Object.values(Css).filter((css) => css !== Css.Empty)

@@ -3,7 +3,7 @@
     <div class="label">
       {{ label }}
     </div>
-    <PSInput
+    <STInput
       :modelValue="modelValue"
       class="item"
       :placeholder="placeholder"
@@ -14,8 +14,8 @@
 </template>
 
 <script lang="ts" setup>
-import { PSInput } from '@pubstudio/frontend/ui-widgets'
 import { toRefs } from 'vue'
+import { STInput } from '@samatech/vue-components'
 
 const props = withDefaults(
   defineProps<{
@@ -46,7 +46,7 @@ const emit = defineEmits<{
     @mixin truncate;
     margin-left: auto;
   }
-  :deep(.ps-input) {
+  :deep(.st-input) {
     padding: 0 10px;
     height: 32px;
   }

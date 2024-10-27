@@ -28,7 +28,7 @@
       class="item"
       @update:arg="emit('update:arg', $event)"
     />
-    <PSInput
+    <STInput
       v-else
       :modelValue="(value ?? '').toString()"
       class="item"
@@ -40,12 +40,12 @@
 
 <script lang="ts" setup>
 import { computed, toRefs } from 'vue'
+import { STInput } from '@samatech/vue-components'
 import {
   ComponentArgPrimitive,
   IBehaviorArg,
   IComponentInput,
 } from '@pubstudio/shared/type-site'
-import { PSInput } from '@pubstudio/frontend/ui-widgets'
 import { IUpdateComponentArgPayload } from './i-update-component-arg-payload'
 import LocationArg from './LocationArg.vue'
 import ArrayArg from './ArrayArg.vue'

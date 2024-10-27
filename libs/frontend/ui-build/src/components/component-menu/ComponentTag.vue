@@ -3,7 +3,7 @@
     <div class="label">
       {{ t('tag') }}
     </div>
-    <PSMultiselect
+    <STMultiselect
       :value="tag"
       class="component-tag"
       :options="TagValues"
@@ -17,8 +17,8 @@
 <script lang="ts" setup>
 import { toRefs } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
+import { STMultiselect } from '@samatech/vue-components'
 import { Tag } from '@pubstudio/shared/type-site'
-import { PSMultiselect } from '@pubstudio/frontend/ui-widgets'
 
 const TagValues: Tag[] = Object.values(Tag)
 

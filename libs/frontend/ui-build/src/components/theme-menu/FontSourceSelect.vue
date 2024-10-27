@@ -1,5 +1,5 @@
 <template>
-  <PSMultiselect
+  <STMultiselect
     ref="multiselectRef"
     :value="modelValue"
     class="font-source-select"
@@ -14,7 +14,7 @@
 <script lang="ts" setup>
 import { computed, ref } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
-import { PSMultiselect } from '@pubstudio/frontend/ui-widgets'
+import { STMultiselect } from '@samatech/vue-components'
 import { IMultiselectObj } from '@pubstudio/frontend/type-ui-widgets'
 import { ThemeFontSource } from '@pubstudio/shared/type-site'
 

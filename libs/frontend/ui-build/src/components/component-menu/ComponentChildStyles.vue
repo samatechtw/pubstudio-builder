@@ -8,7 +8,7 @@
       @toggleCollapse="toggleCollapse"
     >
       <InfoBubble :message="t('style.child_info')" placement="top" class="info" />
-      <PSMultiselect
+      <STMultiselect
         v-slot="{ label }"
         :value="selector"
         :options="selectors"
@@ -29,7 +29,7 @@
         >
           {{ label }}
         </div>
-      </PSMultiselect>
+      </STMultiselect>
       <template v-if="selector !== undefined && isMissingSelector(selector)">
         <InfoBubble
           :message="t('style.child_missing_current')"
@@ -68,7 +68,8 @@
 <script lang="ts" setup>
 import { computed, toRefs } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
-import { InfoBubble, PSMultiselect, Minus } from '@pubstudio/frontend/ui-widgets'
+import { STMultiselect } from '@samatech/vue-components'
+import { InfoBubble, Minus } from '@pubstudio/frontend/ui-widgets'
 import { ComponentMenuCollapsible, Css, IComponent } from '@pubstudio/shared/type-site'
 import { useBuild, useEditComponentChildStyles } from '@pubstudio/frontend/feature-build'
 import { setComponentMenuCollapses } from '@pubstudio/frontend/data-access-command'
@@ -179,10 +180,10 @@ const removeSelector = () => {
     border-color: $color-error;
   }
   &.current-selector-missing {
-    :deep(.label-text) {
+    :deep(.st-ms-label-text) {
       color: $color-error;
     }
-    :deep(.caret) {
+    :deep(.st-ms-caret) {
       background-color: $color-error;
     }
   }

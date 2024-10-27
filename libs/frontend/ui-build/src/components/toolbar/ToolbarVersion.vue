@@ -1,6 +1,6 @@
 <template>
   <div class="toolbar-version-wrap">
-    <PSMultiselect
+    <STMultiselect
       v-if="hasVersions"
       :value="value"
       :forceLabel="t(`toolbar.version.${value}`)"
@@ -61,11 +61,11 @@
 <script lang="ts" setup>
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
+import { STMultiselect, useClickaway } from '@samatech/vue-components'
 import { useBuild } from '@pubstudio/frontend/feature-build'
 import { setEditorDropdown } from '@pubstudio/frontend/data-access-command'
 import { siteSaveAlert } from '@pubstudio/frontend/feature-site-store-init'
 import {
-  PSMultiselect,
   Link,
   PSToggle,
   Publish,
@@ -80,7 +80,6 @@ import { copy } from '@pubstudio/frontend/util-doc'
 import { WEB_URL } from '@pubstudio/frontend/util-config'
 import { IMergedSiteData, useGetSite } from '@pubstudio/frontend/feature-sites'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
-import { useClickaway } from '@pubstudio/frontend/util-clickaway'
 
 const { t } = useI18n()
 const { site, editor } = useBuild()

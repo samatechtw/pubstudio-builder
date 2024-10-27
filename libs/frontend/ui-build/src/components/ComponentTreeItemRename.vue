@@ -1,5 +1,5 @@
 <template>
-  <PSInput
+  <STInput
     ref="psInputRef"
     v-model="name"
     class="tree-item-rename"
@@ -18,8 +18,8 @@ enum UpdateNameEventSource {
 
 <script lang="ts" setup>
 import { onMounted, ref, toRefs } from 'vue'
+import { STInput } from '@samatech/vue-components'
 import { IComponent } from '@pubstudio/shared/type-site'
-import { PSInput } from '@pubstudio/frontend/ui-widgets'
 import { Keys } from '@pubstudio/shared/type-site'
 import { useBuild } from '@pubstudio/frontend/feature-build'
 import { builderContext } from '@pubstudio/frontend/util-builder'
@@ -48,9 +48,9 @@ const keyup = (e: KeyboardEvent) => {
 }
 
 const updateName = (eventSource: UpdateNameEventSource) => {
-  // Pressing enter will emit the keyup event on PSInput, which will turn the rename input back to
+  // Pressing enter will emit the keyup event on STInput, which will turn the rename input back to
   // text after component name is updated. If the input is currently focused, that'll also cause the
-  // focusout event on PSInput to be emitted. Since we want to update component name in both focusout
+  // focusout event on STInput to be emitted. Since we want to update component name in both focusout
   // and enter-press events, we have to do an extra check here to prevent updating component name twice
   // when the focusout event is triggered due to enter-press.
   if (
@@ -84,7 +84,7 @@ onMounted(() => {
 
 <style lang="postcss" scoped>
 .tree-item-rename {
-  :deep(.ps-input) {
+  :deep(.st-input) {
     height: 24px;
   }
 }

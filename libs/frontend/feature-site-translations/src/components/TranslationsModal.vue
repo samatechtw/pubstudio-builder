@@ -13,7 +13,7 @@
     </div>
     <div v-if="editTranslation" class="i18n-edit">
       <div class="i18n-edit-top">
-        <PSInput
+        <STInput
           v-model="editTranslation.key"
           :placeholder="t('key')"
           class="i18n-edit-key"
@@ -39,17 +39,18 @@
     </div>
     <div v-else class="translations-wrap">
       <div class="i18n-options">
-        <PSMultiselect
+        <STMultiselect
           :value="editor?.editorI18n ?? 'en'"
           :options="currentLanguages"
           :disabled="currentLanguages.length <= 1"
           @select="selectActiveLanguage"
         />
         <div v-if="addLanguage" class="i18n-new">
-          <PSMultiselect
+          <STMultiselect
             :value="newLanguage"
             :options="newLanguages"
             :openInitial="true"
+            :searchable="true"
             @select="selectNewLanguage"
           />
           <Cross class="i18n-new-cancel" @click="confirmAddLanguage" />
@@ -99,6 +100,8 @@
 
 <script lang="ts" setup>
 import { useI18n } from 'petite-vue-i18n'
+import { STMultiselect } from '@samatech/vue-components'
+import { STInput } from '@samatech/vue-components'
 import {
   Check,
   Cross,
@@ -106,8 +109,6 @@ import {
   ErrorMessage,
   Minus,
   PSButton,
-  PSInput,
-  PSMultiselect,
   ConfirmModal,
 } from '@pubstudio/frontend/ui-widgets'
 import { useBuild } from '@pubstudio/frontend/feature-build'

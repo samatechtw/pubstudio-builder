@@ -1,5 +1,5 @@
 <template>
-  <PSMultiselect
+  <STMultiselect
     :value="activePage?.route"
     :forceLabel="activePage?.name"
     class="page-multiselect"
@@ -20,13 +20,13 @@
         {{ t('history.command.addP') }}
       </div>
     </template>
-  </PSMultiselect>
+  </STMultiselect>
 </template>
 
 <script lang="ts" setup>
 import { computed, onMounted } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
-import { PSMultiselect } from '@pubstudio/frontend/ui-widgets'
+import { STMultiselect } from '@samatech/vue-components'
 import { EditorDropdown } from '@pubstudio/shared/type-site'
 import { useBuild, newPage } from '@pubstudio/frontend/feature-build'
 import { setEditorDropdown } from '@pubstudio/frontend/data-access-command'

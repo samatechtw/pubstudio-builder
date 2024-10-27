@@ -8,7 +8,7 @@
     </div>
     <div class="create-table">
       <div class="walkthrough-row">
-        <PSInput
+        <STInput
           v-model="tableName"
           :label="t('custom_data.table_name')"
           class="name-input"
@@ -46,9 +46,10 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
+import { STInput } from '@samatech/vue-components'
 import { setContactFormWalkthrough } from '@pubstudio/frontend/data-access-command'
 import { ContactFormWalkthroughState } from '@pubstudio/shared/type-site'
-import { Checkbox, ErrorMessage, PSButton, PSInput } from '@pubstudio/frontend/ui-widgets'
+import { Checkbox, ErrorMessage, PSButton } from '@pubstudio/frontend/ui-widgets'
 import { useBuild } from '@pubstudio/frontend/feature-build'
 import { useContactForm } from '../lib/use-contact-form'
 
@@ -82,7 +83,7 @@ const goRecipients = async () => {
 .name-input {
   width: 100%;
   max-width: 200px;
-  :deep(.ps-input) {
+  :deep(.st-input) {
     width: 100%;
   }
 }

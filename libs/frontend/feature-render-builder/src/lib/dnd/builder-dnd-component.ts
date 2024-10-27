@@ -42,6 +42,7 @@ const renderImageHover = (
     ).margin ?? ''
 
   if (imgElement) {
+    console.log('TEST', imgElement)
     const imgComputedStyle = getComputedStyle(imgElement)
 
     position = imgComputedStyle.position

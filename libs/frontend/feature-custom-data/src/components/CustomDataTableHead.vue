@@ -11,7 +11,7 @@
       </th>
       <th v-for="column in columns" :key="column.name" class="th">
         <div v-if="editColumn && editColumn?.oldName === column.name" class="th-content">
-          <PSInput v-model="editColumn.newName" class="name-input" />
+          <STInput v-model="editColumn.newName" class="name-input" />
           <Check class="check" color="#009879" @click="confirmEditName" />
           <Cross class="cancel" @click="editColumn = undefined" />
         </div>
@@ -41,15 +41,8 @@
 </template>
 
 <script lang="ts" setup>
-import {
-  Check,
-  Checkbox,
-  Cross,
-  Edit,
-  Plus,
-  PSInput,
-  Trash,
-} from '@pubstudio/frontend/ui-widgets'
+import { STInput } from '@samatech/vue-components'
+import { Check, Checkbox, Cross, Edit, Plus, Trash } from '@pubstudio/frontend/ui-widgets'
 import { ICustomTableColumn } from '@pubstudio/shared/type-api-site-custom-data'
 import { ref } from 'vue'
 import { IEditColumnName } from '../lib/i-edit-column'
@@ -139,7 +132,7 @@ th.select-all-wrap {
   margin-left: 6px;
   cursor: pointer;
 }
-.name-input :deep(.ps-input) {
+.name-input :deep(.st-input) {
   height: 36px;
 }
 </style>

@@ -8,7 +8,7 @@
     </div>
     <div class="asset-info">
       <div v-if="showEdit" class="asset-name-edit">
-        <PSInput
+        <STInput
           v-model="newName"
           class="edit-name"
           :maxLength="50"
@@ -57,6 +57,7 @@
 
 <script lang="ts" setup>
 import { computed, ref, toRefs } from 'vue'
+import { STInput, useTooltipDelay, useKeyListener } from '@samatech/vue-components'
 import { useDragDrop } from '@pubstudio/frontend/feature-render-builder'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import {
@@ -65,12 +66,10 @@ import {
   Cross,
   Edit,
   PSAsset,
-  PSInput,
   Spinner,
 } from '@pubstudio/frontend/ui-widgets'
 import { isAssetDroppable, urlFromAsset } from '@pubstudio/frontend/util-asset'
 import { Keys } from '@pubstudio/shared/type-site'
-import { useKeyListener } from '@pubstudio/frontend/util-key-listener'
 import {
   AssetContentType,
   ISiteAssetViewModel,
@@ -78,7 +77,6 @@ import {
 import { BuilderDragDataType } from '@pubstudio/frontend/type-builder'
 import AssetCardInfoBottom from './AssetCardInfoBottom.vue'
 import { ASSET_PLACEHOLDERS, useSiteAssets } from '../lib/use-site-assets'
-import { useTooltipDelay } from '@pubstudio/frontend/util-tooltip'
 
 const { updateAsset, loading } = useSiteAssets()
 const { site } = useSiteSource()
@@ -245,7 +243,7 @@ const nameMouseLeave = () => {
     @mixin size 22px;
   }
 }
-.edit-name :deep(.ps-input) {
+.edit-name :deep(.st-input) {
   height: 32px;
 }
 .edit-actions {

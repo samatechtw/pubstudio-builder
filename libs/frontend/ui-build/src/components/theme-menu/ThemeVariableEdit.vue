@@ -73,6 +73,7 @@
 <script lang="ts" setup>
 import { computed, ref } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
+import { useClickaway } from '@samatech/vue-components'
 import { ErrorMessage, PSButton, Theme } from '@pubstudio/frontend/ui-widgets'
 import {
   IThemeVariableEditState,
@@ -88,7 +89,6 @@ import {
   IThemedGradient,
 } from '@samatech/vue-color-picker'
 import { resolveThemeVariables } from '@pubstudio/frontend/util-resolve'
-import { useClickaway } from '@pubstudio/frontend/util-clickaway'
 import ThemeVariableFont from './ThemeVariableFont.vue'
 import { BuildMenuIcon } from '../..'
 

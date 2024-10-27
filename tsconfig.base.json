@@ -62,24 +62,18 @@
       "@pubstudio/frontend/ui-widgets": ["libs/frontend/ui-widgets/src/index.ts"],
       "@pubstudio/frontend/util-api": ["libs/frontend/util-api/src/index.ts"],
       "@pubstudio/frontend/util-asset": ["libs/frontend/util-asset/src/index.ts"],
-      "@pubstudio/frontend/util-clickaway": ["libs/frontend/util-clickaway/src/index.ts"],
       "@pubstudio/frontend/util-config": ["libs/frontend/util-config/src/index.ts"],
       "@pubstudio/frontend/util-custom-data": [
         "libs/frontend/util-custom-data/src/index.ts"
       ],
       "@pubstudio/frontend/util-doc": ["libs/frontend/util-doc/src/index.ts"],
       "@pubstudio/frontend/util-doc-site": ["libs/frontend/util-doc-site/src/index.ts"],
-      "@pubstudio/frontend/util-dropdown": ["libs/frontend/util-dropdown/src/index.ts"],
       "@pubstudio/frontend/util-i18n": ["libs/frontend/util-i18n/src/index.ts"],
       "@pubstudio/frontend/util-fields": ["libs/frontend/util-fields/src/index.ts"],
       "@pubstudio/frontend/util-identicon": ["libs/frontend/util-identicon/src/index.ts"],
-      "@pubstudio/frontend/util-key-listener": [
-        "libs/frontend/util-key-listener/src/index.ts"
-      ],
       "@pubstudio/frontend/util-router": ["libs/frontend/util-router/src/index.ts"],
       "@pubstudio/frontend/util-test": ["libs/frontend/util-test/src/index.ts"],
       "@pubstudio/frontend/util-test-mock": ["libs/frontend/util-test-mock/src/index.ts"],
-      "@pubstudio/frontend/util-tooltip": ["libs/frontend/util-tooltip/src/index.ts"],
       "@pubstudio/frontend/util-translations": [
         "libs/frontend/util-translations/src/index.ts"
       ],

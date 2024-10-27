@@ -2,7 +2,7 @@
   <div class="behavior-row">
     <div class="menu-row">
       <div class="label">
-        <PSMultiselect
+        <STMultiselect
           :value="eventBehavior.behavior.name"
           :placeholder="t('build.behavior')"
           :options="behaviorOptions"
@@ -44,8 +44,9 @@
 <script lang="ts" setup>
 import { computed, toRefs } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
+import { STMultiselect } from '@samatech/vue-components'
 import { IBehavior } from '@pubstudio/shared/type-site'
-import { Edit, InfoBubble, Minus, PSMultiselect } from '@pubstudio/frontend/ui-widgets'
+import { Edit, InfoBubble, Minus } from '@pubstudio/frontend/ui-widgets'
 import ComponentArgRow from '../component-arg/ComponentArgRow.vue'
 import { IUpdateComponentArgPayload } from '../component-arg/i-update-component-arg-payload'
 import { IResolvedComponentEventBehavior } from '@pubstudio/frontend/feature-build'

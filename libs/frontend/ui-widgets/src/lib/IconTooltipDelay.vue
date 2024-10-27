@@ -17,7 +17,7 @@
 
 <script lang="ts" setup>
 import { toRefs } from 'vue'
-import { useTooltipDelay } from '@pubstudio/frontend/util-tooltip'
+import { useTooltipDelay } from '@samatech/vue-components'
 
 const props = defineProps<{
   tip: string

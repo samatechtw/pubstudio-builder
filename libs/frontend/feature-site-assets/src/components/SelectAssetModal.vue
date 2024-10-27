@@ -13,7 +13,7 @@
       {{ t('build.asset_text') }}
     </div>
     <div class="asset-filter-row">
-      <PSInput
+      <STInput
         v-model="externalUrl"
         name="external-url"
         class="external-url"
@@ -28,7 +28,7 @@
     </div>
     <div class="divider" />
     <div class="asset-filter-row">
-      <PSMultiselect
+      <STMultiselect
         :value="filter.site_id"
         valueKey="id"
         labelKey="name"
@@ -38,7 +38,7 @@
         class="site-select"
         @select="updateSite"
       />
-      <PSMultiselect
+      <STMultiselect
         v-if="contentTypes?.length"
         :value="filter.content_type"
         valueKey="key"
@@ -49,7 +49,7 @@
         class="asset-content-type"
         @select="updateContentType"
       />
-      <PSInput
+      <STInput
         v-model="filter.search"
         name="asset-name"
         class="asset-name-input"
@@ -97,13 +97,9 @@
 <script lang="ts" setup>
 import { computed, inject, ref, toRefs, watch } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
-import {
-  Modal,
-  PSButton,
-  PSInput,
-  PSMultiselect,
-  Spinner,
-} from '@pubstudio/frontend/ui-widgets'
+import { STInput } from '@samatech/vue-components'
+import { STMultiselect } from '@samatech/vue-components'
+import { Modal, PSButton, Spinner } from '@pubstudio/frontend/ui-widgets'
 import { ISiteViewModel } from '@pubstudio/shared/type-api-platform-site'
 import { useSites } from '@pubstudio/frontend/feature-sites'
 import { store } from '@pubstudio/frontend/data-access-web-store'

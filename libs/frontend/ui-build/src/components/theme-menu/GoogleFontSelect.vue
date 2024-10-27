@@ -1,5 +1,5 @@
 <template>
-  <PSMultiselect
+  <STMultiselect
     ref="multiselectRef"
     :value="modelValue"
     class="google-font-select"
@@ -17,13 +17,13 @@
         {{ label }}
       </div>
     </template>
-  </PSMultiselect>
+  </STMultiselect>
 </template>
 
 <script lang="ts" setup>
 import { ref, toRefs } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
-import { PSMultiselect } from '@pubstudio/frontend/ui-widgets'
+import { STMultiselect } from '@samatech/vue-components'
 import { GoogleFontNames } from '@pubstudio/shared/type-site'
 
 const { t } = useI18n()

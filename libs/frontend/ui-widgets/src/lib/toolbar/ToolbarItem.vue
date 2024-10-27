@@ -25,11 +25,8 @@
 </template>
 
 <script lang="ts" setup>
+import { IUseTooltipDelayOptions, useTooltipDelay } from '@samatech/vue-components'
 import { toRefs } from 'vue'
-import {
-  IUseTooltipDelayOptions,
-  useTooltipDelay,
-} from '@pubstudio/frontend/util-tooltip'
 
 const props = withDefaults(
   defineProps<{

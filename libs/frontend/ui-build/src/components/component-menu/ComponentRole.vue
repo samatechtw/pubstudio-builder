@@ -4,7 +4,7 @@
       {{ t('build.role') }}
       <InfoBubble :message="t('build.role_info')" :showArrow="false" class="bubble" />
     </div>
-    <PSMultiselect
+    <STMultiselect
       :value="role"
       class="component-role"
       :placeholder="t('build.no_role')"
@@ -19,8 +19,9 @@
 <script lang="ts" setup>
 import { toRefs } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
+import { STMultiselect } from '@samatech/vue-components'
 import { AriaRole } from '@pubstudio/shared/type-site'
-import { InfoBubble, PSMultiselect } from '@pubstudio/frontend/ui-widgets'
+import { InfoBubble } from '@pubstudio/frontend/ui-widgets'
 
 const AriaRoleValues: AriaRole[] = Object.values(AriaRole)
 

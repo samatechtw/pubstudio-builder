@@ -8,7 +8,7 @@
       @mousedown.stop
     >
       <div v-if="editing" class="link-input-wrap">
-        <PSInput
+        <STInput
           v-if="mode === LinkTooltipMode.ProseMirror"
           v-model="editedText"
           :label="t('text')"
@@ -18,7 +18,7 @@
           @keyup.enter="updateLink"
           @keyup.esc="($event.target as HTMLInputElement)?.blur()"
         />
-        <PSInput
+        <STInput
           ref="linkInput"
           v-model="editedLink"
           class="link-input"
@@ -78,6 +78,7 @@ import {
   watch,
 } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
+import { STInput, useTooltip } from '@samatech/vue-components'
 import { EditorView } from 'prosemirror-view'
 import { EditorState, TextSelection } from 'prosemirror-state'
 import { ResolvedPos } from 'prosemirror-model'
@@ -87,11 +88,9 @@ import {
   IconTooltip,
   CopyText,
   Edit,
-  PSInput,
   Trash,
 } from '@pubstudio/frontend/ui-widgets'
 import { useBuild, getLinkDatalistOptions } from '@pubstudio/frontend/feature-build'
-import { useTooltip } from '@pubstudio/frontend/util-tooltip'
 import { resolveComponent } from '@pubstudio/frontend/util-resolve'
 import { ComponentArgPrimitive } from '@pubstudio/shared/type-site'
 import { createLinkNode, schemaText } from '@pubstudio/frontend/util-edit-text'
@@ -357,12 +356,12 @@ onUnmounted(() => {
   height: 100%;
   width: 100%;
   margin: 3px 8px 0 0;
-  :deep(.ps-input) {
+  :deep(.st-input) {
     height: 100%;
     width: 100%;
     padding: 6px 8px 5px;
   }
-  :deep(.ps-input-label) {
+  :deep(.st-input-label) {
     top: 7px;
   }
 }

@@ -15,6 +15,7 @@
     <div class="description">
       <textarea
         v-if="editing"
+        ref="newValueRef"
         v-model="newValue"
         class="item meta-description"
         :placeholder="t('description')"
@@ -31,7 +32,7 @@
 <script lang="ts" setup>
 import { nextTick, ref, toRefs, watch } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
-import { Check, Edit, InfoBubble, PSInput } from '@pubstudio/frontend/ui-widgets'
+import { Check, Edit, InfoBubble } from '@pubstudio/frontend/ui-widgets'
 
 const { t } = useI18n()
 
@@ -50,14 +51,14 @@ const emit = defineEmits<{
 }>()
 
 const newValue = ref()
-const newValueRef = ref<InstanceType<typeof PSInput> | undefined>()
+const newValueRef = ref<HTMLElement | undefined>()
 const editing = ref(false)
 
 const editValue = async () => {
   editing.value = true
   newValue.value = value.value ?? ''
   await nextTick()
-  newValueRef.value?.inputRef?.focus()
+  newValueRef.value?.focus()
 }
 
 const setValue = () => {

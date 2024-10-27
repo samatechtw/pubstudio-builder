@@ -1,7 +1,7 @@
 <template>
   <div class="custom-font-select">
-    <PSInput v-model="nameModel" :placeholder="t('theme.font_name')" class="item" />
-    <PSInput
+    <STInput v-model="nameModel" :placeholder="t('theme.font_name')" class="item" />
+    <STInput
       v-model="urlModel"
       :placeholder="t('theme.font_url')"
       class="item font-url"
@@ -10,8 +10,8 @@
 </template>
 
 <script lang="ts" setup>
-import { PSInput } from '@pubstudio/frontend/ui-widgets'
 import { useI18n } from 'petite-vue-i18n'
+import { STInput } from '@samatech/vue-components'
 
 const { t } = useI18n()
 

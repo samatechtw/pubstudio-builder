@@ -28,9 +28,7 @@
 
 <script lang="ts" setup>
 import { computed, toRefs } from 'vue'
-import { useDropdown } from '@pubstudio/frontend/util-dropdown'
-import { useKeyListener } from '@pubstudio/frontend/util-key-listener'
-import { useClickaway } from '@pubstudio/frontend/util-clickaway'
+import { useKeyListener, useDropdown, useClickaway } from '@samatech/vue-components'
 import { uidSingleton } from '@pubstudio/frontend/util-doc'
 import { Keys } from '@pubstudio/shared/type-site'
 import { IToolbarDropdownItem } from './i-toolbar-dropdown'

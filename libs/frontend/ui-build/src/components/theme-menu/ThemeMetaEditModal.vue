@@ -12,7 +12,7 @@
           <div class="label">
             {{ t('tag') }}
           </div>
-          <PSMultiselect
+          <STMultiselect
             :value="data.tag || ''"
             class="tag"
             :placeholder="t('tag')"
@@ -21,13 +21,13 @@
           />
         </div>
         <div v-if="data.tag === 'base'" class="meta-row">
-          <PSInput
+          <STInput
             :modelValue="data.meta.href || ''"
             name="href"
             placeholder="href"
             @update:modelValue="update('href', $event)"
           />
-          <PSInput
+          <STInput
             :modelValue="data.meta.target || ''"
             name="target"
             placeholder="target"
@@ -35,7 +35,7 @@
           />
         </div>
         <div v-else-if="data.tag === 'title'" class="meta-row">
-          <PSInput
+          <STInput
             :modelValue="data.meta"
             name="title"
             placeholder="title"
@@ -44,13 +44,13 @@
         </div>
         <div v-else-if="data.tag === 'link'">
           <div class="meta-row">
-            <PSInput
+            <STInput
               :modelValue="data.meta.href || ''"
               name="href"
               placeholder="href"
               @update:modelValue="update('href', $event)"
             />
-            <PSInput
+            <STInput
               :modelValue="data.meta.rel || ''"
               name="rel"
               placeholder="rel"
@@ -58,13 +58,13 @@
             />
           </div>
           <div class="meta-row">
-            <PSInput
+            <STInput
               :modelValue="data.meta.title || ''"
               name="title"
               placeholder="title"
               @update:modelValue="update('title', $event)"
             />
-            <PSInput
+            <STInput
               :modelValue="data.meta.id || ''"
               name="id"
               placeholder="id"
@@ -72,13 +72,13 @@
             />
           </div>
           <div class="meta-row">
-            <PSInput
+            <STInput
               :modelValue="data.meta.sizes || ''"
               name="sizes"
               placeholder="sizes"
               @update:modelValue="update('sizes', $event)"
             />
-            <PSInput
+            <STInput
               :modelValue="data.meta.imagesizes || ''"
               name="imagesizes"
               placeholder="imagesizes"
@@ -86,13 +86,13 @@
             />
           </div>
           <div class="meta-row">
-            <PSInput
+            <STInput
               :modelValue="data.meta.media || ''"
               name="media"
               placeholder="media"
               @update:modelValue="update('media', $event)"
             />
-            <PSInput
+            <STInput
               :modelValue="data.meta.type || ''"
               name="type"
               placeholder="type"
@@ -100,19 +100,19 @@
             />
           </div>
           <div class="meta-row">
-            <PSInput
+            <STInput
               :modelValue="data.meta.as || ''"
               name="as"
               placeholder="as"
               @update:modelValue="update('as', $event)"
             />
-            <PSInput
+            <STInput
               :modelValue="data.meta.blocking || ''"
               name="blocking"
               placeholder="blocking"
               @update:modelValue="update('blocking', $event)"
             />
-            <PSInput
+            <STInput
               :modelValue="data.meta.crossorigin || ''"
               name="crossorigin"
               placeholder="crossorigin"
@@ -122,13 +122,13 @@
         </div>
         <div v-else-if="data.tag === 'meta'">
           <div class="meta-row">
-            <PSInput
+            <STInput
               :modelValue="data.meta.content || ''"
               name="content"
               placeholder="content"
               @update:modelValue="update('content', $event)"
             />
-            <PSInput
+            <STInput
               :modelValue="data.meta['http-equiv'] || ''"
               name="http-equiv"
               placeholder="http-equiv"
@@ -136,13 +136,13 @@
             />
           </div>
           <div class="meta-row">
-            <PSInput
+            <STInput
               :modelValue="data.meta.name || ''"
               name="name"
               placeholder="name"
               @update:modelValue="update('name', $event)"
             />
-            <PSInput
+            <STInput
               :modelValue="data.meta.property || ''"
               name="property"
               placeholder="property"
@@ -152,13 +152,13 @@
         </div>
         <div v-else-if="data.tag === 'script'">
           <div class="meta-row">
-            <PSInput
+            <STInput
               :modelValue="data.meta.src || ''"
               name="src"
               placeholder="src"
               @update:modelValue="update('src', $event)"
             />
-            <PSInput
+            <STInput
               :modelValue="data.meta.type || ''"
               name="type"
               placeholder="type"
@@ -166,25 +166,25 @@
             />
           </div>
           <div class="meta-row">
-            <PSInput
+            <STInput
               :modelValue="data.meta.async || ''"
               name="async"
               placeholder="async"
               @update:modelValue="update('async', $event)"
             />
-            <PSInput
+            <STInput
               :modelValue="data.meta.crossorigin || ''"
               name="crossorigin"
               placeholder="crossorigin"
               @update:modelValue="update('crossorigin', $event)"
             />
-            <PSInput
+            <STInput
               :modelValue="data.meta.blocking || ''"
               name="blocking"
               placeholder="blocking"
               @update:modelValue="update('blocking', $event)"
             />
-            <PSInput
+            <STInput
               :modelValue="data.meta.id || ''"
               name="id"
               placeholder="id"
@@ -204,7 +204,8 @@
 <script lang="ts" setup>
 import { computed, ref, toRefs, watch } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
-import { Modal, PSButton, PSInput, PSMultiselect } from '@pubstudio/frontend/ui-widgets'
+import { STInput, STMultiselect } from '@samatech/vue-components'
+import { Modal, PSButton } from '@pubstudio/frontend/ui-widgets'
 import { IHeadObject, IHeadTagStr } from '@pubstudio/shared/type-site'
 import { IThemeMetaEditData } from './i-theme-meta-edit-data'
 

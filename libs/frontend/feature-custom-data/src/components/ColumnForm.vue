@@ -1,8 +1,8 @@
 <template>
   <div class="column-info">
     <div class="column-info-left">
-      <PSInput v-model="info.name" :placeholder="t('name')" class="col-name" />
-      <PSInput v-model="info.default" :placeholder="t('default')" class="col-default" />
+      <STInput v-model="info.name" :placeholder="t('name')" class="col-name" />
+      <STInput v-model="info.default" :placeholder="t('default')" class="col-default" />
       <Minus v-if="showDelete" class="col-remove" @click="emit('remove')" />
     </div>
     <div class="column-info-right">
@@ -34,7 +34,7 @@
         />
       </div>
       <div class="col-input-wrap">
-        <PSInput
+        <STInput
           v-if="info.validators.MinLength"
           v-model="info.validators.MinLength.parameter"
           :clearable="true"
@@ -47,7 +47,7 @@
         </div>
       </div>
       <div class="col-input-wrap">
-        <PSInput
+        <STInput
           v-if="info.validators.MaxLength"
           v-model="info.validators.MaxLength.parameter"
           :clearable="true"
@@ -64,11 +64,12 @@
 </template>
 
 <script lang="ts" setup>
+import { toRefs } from 'vue'
+import { STInput } from '@samatech/vue-components'
 import { useI18n } from 'petite-vue-i18n'
 import { IEditTableColumn, IEditTableColumnRule } from '../lib/i-edit-column'
-import { Checkbox, Minus, PSInput } from '@pubstudio/frontend/ui-widgets'
+import { Checkbox, Minus } from '@pubstudio/frontend/ui-widgets'
 import { ICustomTableColumnRuleType } from '@pubstudio/shared/type-api-site-custom-data'
-import { toRefs } from 'vue'
 
 const props = defineProps<{
   info: IEditTableColumn
@@ -136,7 +137,7 @@ const toggleValidator = (validator: ICustomTableColumnRuleType, param?: string) 
   width: calc(50% - 4px);
   height: 40px;
   margin-top: 12px;
-  .ps-input-wrap .ps-input {
+  .st-input-wrap .st-input {
     height: 38px;
   }
 }
