@@ -5,8 +5,9 @@ import {
 import {
   createTranslationEditorView,
   IEditTranslation,
-  useBuild,
+  setTranslations,
 } from '@pubstudio/frontend/feature-build'
+import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { IMultiselectObj } from '@pubstudio/frontend/type-ui-widgets'
 import {
   DEFAULT_LANGUAGE,
@@ -44,7 +45,7 @@ export interface ISiteTranslationsFeature {
 
 export const useSiteTranslations = (): ISiteTranslationsFeature => {
   const { t } = useI18n()
-  const { editor, site, setTranslations } = useBuild()
+  const { editor, site } = useSiteSource()
 
   const addLanguage = ref(false)
   const newLanguage = ref()
@@ -86,7 +87,7 @@ export const useSiteTranslations = (): ISiteTranslationsFeature => {
 
   const confirmAddLanguage = () => {
     if (newLanguage.value && !site.value.context.i18n[newLanguage.value]) {
-      setTranslations({ code: newLanguage.value, translations: {} })
+      setTranslations(site.value, { code: newLanguage.value, translations: {} })
       setActiveLanguage(site.value, newLanguage.value)
     }
     newLanguage.value = undefined
@@ -147,7 +148,7 @@ export const useSiteTranslations = (): ISiteTranslationsFeature => {
     if (edit.key !== edit.originalKey) {
       updates[edit.originalKey ?? ''] = undefined
     }
-    setTranslations({
+    setTranslations(site.value, {
       code: getActiveI18n(),
       translations: updates,
       replace: true,
@@ -204,7 +205,11 @@ export const useSiteTranslations = (): ISiteTranslationsFeature => {
     const key = confirmDeleteTranslation.value
     if (key !== undefined) {
       const code = getActiveI18n()
-      setTranslations({ code, translations: { [key]: undefined }, replace: false })
+      setTranslations(site.value, {
+        code,
+        translations: { [key]: undefined },
+        replace: false,
+      })
       confirmDeleteTranslation.value = undefined
     }
   }

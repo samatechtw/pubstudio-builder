@@ -3,6 +3,7 @@ import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { parseApiError, toApiError } from '@pubstudio/frontend/util-api'
 import { saveFile } from '@pubstudio/frontend/util-doc'
 import { ICustomTableColumn } from '@pubstudio/shared/type-api-site-custom-data'
+import { formatRow } from '@pubstudio/shared/util-format'
 import { format } from 'date-fns/format'
 import { useI18n } from 'petite-vue-i18n'
 import { ref, Ref } from 'vue'
@@ -46,10 +47,10 @@ export const useExportTable = (siteId: string): IUseExportTable => {
         to: 100000,
       })
       const columnNames = columns.map((c) => c.name)
-      tableString = `"${columnNames.join('","')}"\n`
+      tableString = formatRow(columnNames)
       for (const row of response.results) {
-        const rowString = columnNames.map((col) => row[col]).join('","')
-        tableString += `"${rowString}"\n`
+        const rowArr = columnNames.map((col) => row[col])
+        tableString += formatRow(rowArr)
       }
     } catch (e) {
       exportError.value = parseApiError(i18n, toApiError(e))
