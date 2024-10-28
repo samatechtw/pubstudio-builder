@@ -41,6 +41,7 @@ import { applyRemoveThemeFont } from './theme-font/remove-theme-font'
 import { applyAddThemeVariable } from './theme-variable/add-theme-variable'
 import { applyEditThemeVariable } from './theme-variable/edit-theme-variable'
 import { applyRemoveThemeVariable } from './theme-variable/remove-theme-variable'
+import { applyReplaceTranslations } from './translations/replace-translations'
 import { applySetTranslations } from './translations/set-translations'
 import { applyUpdateUi } from './update-ui/update-ui'
 
@@ -73,6 +74,7 @@ export const applyCommand = (
     [CommandType.SetComponentEditorEvent]: applySetComponentEditorEvent,
     [CommandType.SetBehavior]: applySetBehavior,
     [CommandType.SetBehaviorArg]: applySetBehaviorArg,
+    [CommandType.ReplaceTranslations]: applyReplaceTranslations,
     [CommandType.SetTranslations]: applySetTranslations,
     [CommandType.AddStyleMixin]: applyAddStyleMixin,
     [CommandType.EditStyleMixin]: applyEditStyleMixin,

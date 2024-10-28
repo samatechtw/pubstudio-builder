@@ -68,6 +68,11 @@
           size="small"
           @click="showEditTranslation(undefined)"
         />
+        <PSMenu :items="tableActions" class="actions-dropdown">
+          <template #toggle>
+            <DotsIcon color="#000" />
+          </template>
+        </PSMenu>
       </div>
       <div class="translations">
         <div v-if="activeKeys.length === 0" class="i18n-empty">
@@ -95,6 +100,8 @@
       @confirm="confirmSaveTranslation"
       @cancel="confirmSaveTranslationKey = undefined"
     />
+    <ImportTranslations :show="showImport" @cancel="showImport = false" />
+    <ExportTranslations :show="showExport" @cancel="showExport = false" />
   </Modal>
 </template>
 
@@ -110,10 +117,15 @@ import {
   Minus,
   PSButton,
   ConfirmModal,
+  PSMenu,
+  DotsIcon,
 } from '@pubstudio/frontend/ui-widgets'
 import { useBuild } from '@pubstudio/frontend/feature-build'
 import { useSiteTranslations } from '../lib/use-site-translations'
 import { IMultiselectObj } from '@pubstudio/frontend/type-ui-widgets'
+import { ref } from 'vue'
+import ExportTranslations from './ExportTranslations.vue'
+import ImportTranslations from './ImportTranslations.vue'
 
 const { t } = useI18n()
 const { editor } = useBuild()
@@ -139,6 +151,9 @@ const {
   cancelTranslation,
 } = useSiteTranslations()
 
+const showExport = ref(false)
+const showImport = ref(false)
+
 const showAddLanguage = () => {
   addLanguage.value = true
 }
@@ -147,6 +162,19 @@ const selectNewLanguage = (lang: IMultiselectObj | undefined) => {
   newLanguage.value = lang?.value as string
   confirmAddLanguage()
 }
+
+const tableActions = [
+  {
+    label: t('export'),
+    class: 'export-i18n',
+    click: () => (showExport.value = true),
+  },
+  {
+    label: t('import'),
+    class: 'import-i18n',
+    click: () => (showImport.value = true),
+  },
+]
 </script>
 
 <style lang="postcss">
@@ -187,7 +215,7 @@ const selectNewLanguage = (lang: IMultiselectObj | undefined) => {
     cursor: pointer;
   }
   .translation-new {
-    margin-left: auto;
+    margin-left: 24px;
   }
   .item-add {
     margin-left: 6px;
@@ -231,6 +259,9 @@ const selectNewLanguage = (lang: IMultiselectObj | undefined) => {
   .cancel-delete {
     @mixin size 18px;
     margin-left: 6px;
+  }
+  .actions-dropdown {
+    margin-left: auto;
   }
   .i18n-key {
     width: 180px;

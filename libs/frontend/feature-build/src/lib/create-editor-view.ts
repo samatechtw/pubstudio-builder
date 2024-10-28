@@ -1,3 +1,4 @@
+import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import {
   editorStateToHtml,
   IProsemirrorSetupOptions,
@@ -9,6 +10,7 @@ import {
 import { keymap } from 'prosemirror-keymap'
 import { EditorView } from 'prosemirror-view'
 import { ref, Ref } from 'vue'
+import { setTranslations } from './command-wrap/translations'
 import { useBuild } from './use-build'
 
 // Use to detect updates in the ProseMirror component edit view
@@ -66,7 +68,7 @@ export function createTranslationEditorView(
   options: ITranslationEditorViewOptions,
   container: HTMLElement,
 ): EditorView | undefined {
-  const { setTranslations } = useBuild()
+  const { site } = useSiteSource()
   if (!container) {
     return undefined
   }
@@ -82,7 +84,7 @@ export function createTranslationEditorView(
       const content = editorStateToHtml(schema, newState)
       if (translation.value) {
         translation.value.text = content || ''
-        setTranslations({
+        setTranslations(site.value, {
           code: translation.value.code,
           translations: { [translation.value.originalKey ?? '']: content },
           replace: !first,

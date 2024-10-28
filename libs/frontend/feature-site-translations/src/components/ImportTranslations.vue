@@ -1,19 +1,19 @@
 <template>
-  <Modal :show="show" cls="import-table-modal" @cancel="emit('cancel')">
+  <Modal :show="show" cls="import-i18n-modal" @cancel="emit('cancel')">
     <div class="modal-title">
-      {{ t('import') }}
+      {{ t('i18n.import') }}
     </div>
     <div class="modal-text">
-      {{ t('custom_data.import_text') }}
+      {{ t('i18n.import_text') }}
     </div>
-    <div class="modal-text table-warning">
+    <div class="modal-text i18n-warning">
       <img src="@frontend-assets/icon/warning.png" class="warn" />
-      <div>{{ t('custom_data.import_warn') }}</div>
+      <div>{{ t('i18n.import_alpha') }}</div>
     </div>
     <div class="import-wrap">
       <SimpleFileUpload
-        id="table-import"
-        class="table-import"
+        id="i18n-import"
+        class="i18n-import"
         accept="text/csv"
         @selectFile="selectFile"
       >
@@ -21,12 +21,13 @@
           {{ t('custom_data.select') }}
         </div>
       </SimpleFileUpload>
-      <div class="table-file">
+      <div class="i18n-file">
         {{ fileName }}
       </div>
       <Minus v-if="fileName" class="remove" @click="clearFile" />
     </div>
     <div v-if="fileName" class="import-options">
+      <!--
       <Checkbox
         class="skip-error"
         :item="{
@@ -35,24 +36,22 @@
         }"
         @checked="skipError = $event"
       />
+      -->
       <div class="import-option">
         <Checkbox
           class="skip-empty"
           :item="{
-            label: t('custom_data.skip_empty'),
-            checked: skipEmpty,
+            label: t('i18n.include_empty'),
+            checked: includeEmpty,
           }"
-          @checked="skipEmpty = $event"
+          @checked="includeEmpty = $event"
         />
-        <InfoBubble placement="right" :message="t('custom_data.skip_empty_text')" />
+        <InfoBubble placement="right" :message="t('i18n.empty_text')" />
       </div>
     </div>
     <div v-if="fileName" class="import-lines">
       <span>{{ t('custom_data.new_rows') }}</span>
-      <span v-if="rowsImported !== undefined" class="new-rows">{{
-        `${rowsImported} / ${rowData.length - 1}`
-      }}</span>
-      <span v-else class="new-rows">{{ rowData.length - 1 }}</span>
+      <span class="new-rows">{{ rowCount }}</span>
     </div>
     <ErrorMessage v-if="error" :error="error" class="import-error" />
     <ErrorMessage v-if="invalidRows" :error="invalidRows" class="import-error" />
@@ -61,7 +60,7 @@
         class="confirm-button"
         :text="t('confirm')"
         :animate="loading"
-        @click="importTable"
+        @click="importI18n"
       />
       <PSButton
         class="cancel-button"
@@ -74,9 +73,8 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref, toRefs, watch } from 'vue'
+import { ref, toRefs, watch } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
-import { format } from 'date-fns/format'
 import { loadFile } from '@pubstudio/frontend/util-doc'
 import {
   Checkbox,
@@ -87,81 +85,81 @@ import {
   PSButton,
   SimpleFileUpload,
 } from '@pubstudio/frontend/ui-widgets'
-import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
-import { parseApiError, toApiError } from '@pubstudio/frontend/util-api'
-import { useCustomDataApi } from '@pubstudio/frontend/data-access-api'
-import { ICustomTableColumn } from '@pubstudio/shared/type-api-site-custom-data'
 import { getSplitChar, parseCsvRow } from '@pubstudio/shared/util-parse'
+import { ITranslations } from '@pubstudio/shared/type-site'
+import { replaceAllTranslations } from '@pubstudio/frontend/feature-build'
+import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 
 const i18n = useI18n()
 const { t } = i18n
-const { apiSite } = useSiteSource()
+const { site } = useSiteSource()
 
 const props = defineProps<{
-  tableName: string | undefined
-  siteId: string
-  columns: ICustomTableColumn[]
   show: boolean
 }>()
-const { tableName, columns, siteId, show } = toRefs(props)
+const { show } = toRefs(props)
 
 const emit = defineEmits<{
-  (e: 'imported', hasErrors: boolean): void
   (e: 'cancel'): void
 }>()
 
-const api = useCustomDataApi(siteId.value)
 const fileName = ref()
 const invalidRows = ref()
+const duplicates = ref(0)
 const error = ref()
 const loading = ref(false)
-const skipError = ref(false)
-const skipEmpty = ref(true)
-const rowsImported = ref()
-const rowData = ref<string[][]>([])
-
-watch(show, () => {
-  clearFile()
-})
-
-const defaultFileName = (): string => {
-  const date = format(new Date(), 'yyyyMMdd-HHmmss')
-  return `${tableName.value}-${date}.csv`
-}
+// const skipError = ref(false)
+const includeEmpty = ref(true)
+const rowCount = ref(0)
+const translations = ref<Record<string, ITranslations>>({})
 
 const selectFile = async (file: File) => {
   clearFile()
-  const tableString = await loadFile(file)
-  const columnNames = columns.value.map((c) => c.name)
-  if (tableString) {
-    const rows = tableString.split('\n')
+  const i18nString = await loadFile(file)
+  if (i18nString) {
+    const rows = i18nString.split('\n')
     const row1 = rows[0]
     if (!row1) {
       error.value = t('errors.rows_missing')
       return
     }
     const splitChar = getSplitChar(row1)
-    for (const colName of parseCsvRow(row1, splitChar)) {
-      if (!columnNames.includes(colName)) {
-        error.value = `${t('errors.CustomDataInvalidColumn')}: ${colName}`
-        return
-      }
+    const langs = parseCsvRow(row1, splitChar).slice(1)
+    const trans: Record<string, ITranslations> = {}
+    const keys = new Set()
+    for (const lang of langs) {
+      trans[lang] = {}
     }
-    const newData: string[][] = []
-    for (let i = 0; i < rows.length; i += 1) {
+    for (let i = 1; i < rows.length; i += 1) {
       const row = rows[i]
       // Skip blank lines
       if (!row) {
         continue
       }
-      const newRow = parseCsvRow(row, splitChar)
-      if (newRow.length !== columnNames.length) {
+      const [key, ...values] = parseCsvRow(row, splitChar)
+      if (keys.has(key)) {
+        error.value = `${t('errors.duplicate_key')}${i + 1}`
+        duplicates.value += 1
+        continue
+      }
+      keys.add(key)
+      if (values.length !== langs.length) {
         error.value = `${t('errors.row_length')} ${i + 1}`
         return
       }
-      newData.push(newRow)
+      for (let langIndex = 0; langIndex < values.length; langIndex += 1) {
+        const value = values[langIndex]
+        const lang = langs[langIndex]
+        if (!includeEmpty.value || value) {
+          trans[lang][key] = value
+        }
+      }
+      rowCount.value += 1
     }
-    rowData.value = newData
+    translations.value = trans
+    if (duplicates.value > 0) {
+      error.value += `, ${duplicates.value} total`
+    }
     fileName.value = file.name
   }
 }
@@ -170,64 +168,24 @@ const clearFile = () => {
   fileName.value = undefined
   invalidRows.value = undefined
   error.value = undefined
-  rowsImported.value = undefined
+  duplicates.value = 0
+  rowCount.value = 0
 }
 
-const importTable = async () => {
-  if (!apiSite || !tableName.value) {
-    return
-  }
-  loading.value = true
-
-  const columns = rowData.value[0]
-  const rows = rowData.value.slice(1)
-  let errorStr = ''
-  rowsImported.value = 0
-  for (let i = 0; i < rows.length; i += 1) {
-    const row = rows[i]
-    const defaultVal = skipEmpty.value ? undefined : ''
-    const rowMap = Object.fromEntries(columns.map((c, i) => [c, row[i] || defaultVal]))
-    try {
-      await api.addRow(apiSite, {
-        table_name: tableName.value,
-        row: rowMap,
-      })
-    } catch (e) {
-      if (skipError.value) {
-        if (errorStr) errorStr += ','
-        errorStr += ` ${i + 1}`
-      } else {
-        error.value = parseApiError(i18n, toApiError(e))
-        loading.value = false
-        emit('imported', true)
-        return
-      }
-    }
-    rowsImported.value = i + 1
-  }
-  loading.value = false
-  if (errorStr) {
-    invalidRows.value = `${t('errors.invalid_rows')}${errorStr}`
-  } else {
-    emit('imported', false)
-  }
+const importI18n = async () => {
+  replaceAllTranslations(site.value, translations.value)
+  emit('cancel')
 }
 
-watch(show, (newShow) => {
-  if (newShow) {
-    defaultFileName()
-  }
-})
-
-onMounted(() => {
-  fileName.value = defaultFileName()
+watch(show, () => {
+  clearFile()
 })
 </script>
 
 <style lang="postcss">
 @import '@theme/css/mixins.postcss';
 
-.import-table-modal {
+.import-i18n-modal {
   .modal-inner {
     display: flex;
     flex-direction: column;
@@ -244,7 +202,7 @@ onMounted(() => {
       margin-left: 8px;
     }
   }
-  .table-warning {
+  .i18n-warning {
     display: flex;
     align-items: center;
   }
@@ -258,10 +216,10 @@ onMounted(() => {
     margin-top: 16px;
     font-size: 14px;
   }
-  .table-import {
+  .i18n-import {
     margin-right: 8px;
   }
-  .table-file {
+  .i18n-file {
     @mixin truncate;
     max-width: 240px;
   }
@@ -299,7 +257,7 @@ onMounted(() => {
     padding-top: 12px;
   }
   .modal-buttons {
-    margin-top: 16px;
+    margin-top: 24px;
   }
 }
 </style>

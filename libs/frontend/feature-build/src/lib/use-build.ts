@@ -21,7 +21,6 @@ import {
   makeEditComponentData,
   makeRemoveComponentData,
   makeSetInputData,
-  makeSetTranslationsData,
   selectAddParent,
 } from '@pubstudio/frontend/util-command-data'
 import {
@@ -47,7 +46,6 @@ import {
   IEditPageData,
   IEditThemeVariableData,
   IMergeComponentStyleData,
-  INewTranslations,
   IRemoveComponentMixinData,
   IRemoveComponentOverrideStyleData,
   IRemovePageData,
@@ -104,13 +102,6 @@ import { resetThemeMenuVariables } from './use-theme-menu-variables'
 export type IOldNewStyleEntry = {
   oldStyle?: IStyleEntry
   newStyle?: IStyleEntry
-}
-
-export type ISetTranslationsProps = {
-  code: string
-  translations: INewTranslations
-  replace?: boolean
-  forceSave?: boolean
 }
 
 // The element id of build content window
@@ -191,7 +182,6 @@ export interface IUseBuild {
   ) => void
   flattenComponentMixin: (componentId: string, mixinId: string) => void
   deleteStyle: (style: IStyle) => void
-  setTranslations: (props: ISetTranslationsProps) => void
   addThemeVariable: (data: IAddThemeVariableData) => void
   editThemeVariable: (data: IEditThemeVariableData) => void
   deleteThemeVariable: (themeVariable: IRemoveThemeVariableData) => void
@@ -803,20 +793,6 @@ export const useBuild = (): IUseBuild => {
     pushCommand(site.value, CommandType.RemoveStyleMixin, data)
   }
 
-  const setTranslations = (props: ISetTranslationsProps) => {
-    const { code, translations, replace, forceSave } = props
-    const data = makeSetTranslationsData(site.value.context, code, translations)
-    if (replace) {
-      replaceLastCommand(
-        site.value,
-        { type: CommandType.SetTranslations, data },
-        forceSave ?? false,
-      )
-    } else {
-      pushCommand(site.value, CommandType.SetTranslations, data)
-    }
-  }
-
   const addThemeVariable = (data: IAddThemeVariableData) => {
     pushCommand(site.value, CommandType.AddThemeVariable, data)
   }
@@ -1076,7 +1052,6 @@ export const useBuild = (): IUseBuild => {
     setBehaviorArg,
     flattenComponentMixin,
     deleteStyle,
-    setTranslations,
     addThemeVariable,
     editThemeVariable,
     deleteThemeVariable,
