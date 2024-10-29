@@ -102,6 +102,7 @@
     />
     <ImportTranslations :show="showImport" @cancel="showImport = false" />
     <ExportTranslations :show="showExport" @cancel="showExport = false" />
+    <ConvertTranslations :show="showConvert" @cancel="showConvert = false" />
   </Modal>
 </template>
 
@@ -126,6 +127,7 @@ import { IMultiselectObj } from '@pubstudio/frontend/type-ui-widgets'
 import { ref } from 'vue'
 import ExportTranslations from './ExportTranslations.vue'
 import ImportTranslations from './ImportTranslations.vue'
+import ConvertTranslations from './ConvertTranslations.vue'
 
 const { t } = useI18n()
 const { editor } = useBuild()
@@ -153,6 +155,7 @@ const {
 
 const showExport = ref(false)
 const showImport = ref(false)
+const showConvert = ref(false)
 
 const showAddLanguage = () => {
   addLanguage.value = true
@@ -173,6 +176,11 @@ const tableActions = [
     label: t('import'),
     class: 'import-i18n',
     click: () => (showImport.value = true),
+  },
+  {
+    label: t('i18n.convert'),
+    class: 'convert-i18n',
+    click: () => (showConvert.value = true),
   },
 ]
 </script>

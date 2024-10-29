@@ -61,11 +61,16 @@ import {
 import { useControlledClickaway } from '@samatech/vue-components'
 import { Css, EditorDropdown } from '@pubstudio/shared/type-site'
 import { ICommand } from '@pubstudio/shared/type-command'
-import { useBuild, useToolbar, useThemeColors } from '@pubstudio/frontend/feature-build'
+import {
+  useToolbar,
+  useThemeColors,
+  pushGroupCommands,
+} from '@pubstudio/frontend/feature-build'
 import { setEditorDropdown } from '@pubstudio/frontend/data-access-command'
 
 import ToolbarColorPicker from './ToolbarColorPicker.vue'
 import { IToolbarPickerColor, IToolbarThemedGradient } from './i-toolbar-color-picker'
+import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 
 const { t } = useI18n()
 
@@ -80,7 +85,7 @@ const {
   setProseMirrorStyle,
   refocusSelection,
 } = useToolbar()
-const { editor, pushGroupCommands } = useBuild()
+const { editor, site } = useSiteSource()
 const { selectedThemeColors } = useThemeColors()
 
 const setBackgroundColor = (pickerColor: IToolbarPickerColor) => {
@@ -137,7 +142,7 @@ const setBackgroundColor = (pickerColor: IToolbarPickerColor) => {
     }
 
     const commands = cmdList.filter((c) => !!c) as ICommand[]
-    pushGroupCommands({ commands })
+    pushGroupCommands(site.value, commands)
   }
 
   setEditorDropdown(editor.value, undefined)
@@ -177,7 +182,7 @@ const setGradientBackground = (pickerGradient: IToolbarThemedGradient) => {
     }
 
     const commands = cmdList.filter((c) => !!c) as ICommand[]
-    pushGroupCommands({ commands })
+    pushGroupCommands(site.value, commands)
   }
 
   setEditorDropdown(editor.value, undefined)

@@ -41,7 +41,7 @@ export const computeEvents = (site: ISite, component: IComponent): IEventCollect
   return events
 }
 
-const i18nVarRegex = /\$\{(.*?)\}/g
+export const i18nVarRegex = /\$\{(.*?)\}/g
 
 export const parseI18n = (
   translations: ITranslations,

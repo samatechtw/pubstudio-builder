@@ -9,7 +9,6 @@ import {
   IRawStylesWithSource,
   ISiteContext,
   ITheme,
-  IThemeFont,
 } from '@pubstudio/shared/type-site'
 import { breakpointSortFn } from './sort-breakpoint-fn'
 import { IQueryStyle, IRawStyleRecord } from './util-render-types'

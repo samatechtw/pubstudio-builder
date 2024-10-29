@@ -1,5 +1,6 @@
 export * from './lib/command-wrap/component-state'
 export * from './lib/command-wrap/global-style'
+export * from './lib/command-wrap/group'
 export * from './lib/command-wrap/mixins'
 export * from './lib/command-wrap/move-component'
 export * from './lib/command-wrap/custom-component'
