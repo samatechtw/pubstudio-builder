@@ -65,16 +65,17 @@ import { Css, EditorDropdown } from '@pubstudio/shared/type-site'
 import { isTextGradient, parseGradientColors } from '@samatech/vue-color-picker'
 import { ICommand } from '@pubstudio/shared/type-command'
 import {
-  useBuild,
   useToolbar,
   useThemeColors,
   useToolbarFontSize,
+  pushGroupCommands,
 } from '@pubstudio/frontend/feature-build'
 import { setEditorDropdown } from '@pubstudio/frontend/data-access-command'
 import ToolbarColorPicker from './ToolbarColorPicker.vue'
 import { IToolbarPickerColor, IToolbarThemedGradient } from './i-toolbar-color-picker'
 import FontFamily from '../FontFamily.vue'
 import FontWeight from '../FontWeight.vue'
+import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 
 const { t } = useI18n()
 const {
@@ -88,7 +89,7 @@ const {
   createSetComponentCustomStyleCommand,
   refocusSelection,
 } = useToolbar()
-const { editor, pushGroupCommands } = useBuild()
+const { editor, site } = useSiteSource()
 const { selectedThemeColors } = useThemeColors()
 const { fontSize, setFontSize, setFontUnit, fontSizeTextFocus } = useToolbarFontSize()
 const { toolbarItemRef: fontSizeRef } = fontSizeTextFocus
@@ -151,7 +152,7 @@ const setFontColor = (pickerColor: IToolbarPickerColor) => {
     }
 
     const commands = cmdList.filter((c) => !!c) as ICommand[]
-    pushGroupCommands({ commands })
+    pushGroupCommands(site.value, commands)
   }
 
   setEditorDropdown(editor.value, undefined)
@@ -188,7 +189,7 @@ const setGradient = (pickerGradient: IToolbarThemedGradient) => {
     ].filter((c) => !!c) as ICommand[]
 
     if (commands.length > 0) {
-      pushGroupCommands({ commands })
+      pushGroupCommands(site.value, commands)
     }
   }
 
