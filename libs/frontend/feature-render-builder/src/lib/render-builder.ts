@@ -261,12 +261,11 @@ export const computePropsContent = (
       content.push(h(ProseMirrorEditor, { component: cmpWithDefaultContent, editor }))
     } else {
       const active = site.editor?.editorI18n ?? 'en'
-      const translations = site.context.i18n[active] ?? {}
 
       content.push(
         h('div', {
           class: 'component-content-container',
-          innerHTML: parseI18n(translations, cmpContent),
+          innerHTML: parseI18n(site.context.i18n, active, cmpContent),
         }),
       )
     }

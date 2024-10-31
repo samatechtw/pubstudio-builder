@@ -1,6 +1,6 @@
 import { site } from '@pubstudio/frontend/feature-site-source'
 import { PSApi } from '@pubstudio/frontend/util-api'
-import { useRouter } from '@pubstudio/frontend/util-router'
+import { loadSiteLanguage } from '@pubstudio/frontend/util-site-deserialize'
 import { IUpdateSiteApiResponse } from '@pubstudio/shared/type-api-site-sites'
 import {
   CssPseudoClassType,
@@ -80,6 +80,7 @@ export const useSiteSource = (): IUseSiteSource => {
   }
 
   const replaceSite = (newSite: ISite) => {
+    loadSiteLanguage(newSite)
     site.value = newSite
     if (site.value.editor) {
       site.value.editor.store = siteStore.value

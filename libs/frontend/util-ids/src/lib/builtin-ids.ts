@@ -20,6 +20,15 @@ export const setupLoaderBehaviorId = behaviorId(globalContext.namespace, 'setupL
 export const navItemBehaviorId = behaviorId(globalContext.namespace, 'navItem')
 export const homeLinkBehaviorId = behaviorId(globalContext.namespace, 'homeLink')
 
+export const selectLanguageBehaviorId = behaviorId(
+  globalContext.namespace,
+  'selectLanguage',
+)
+export const setupLanguageBehaviorId = behaviorId(
+  globalContext.namespace,
+  'setupLanguage',
+)
+
 // Builtin components and styles
 export const buttonStyleId = nextStyleId(globalContext)
 export const buttonId = componentId(globalContext.namespace, 'button')
@@ -106,5 +115,13 @@ export const loadingDotStyleId = styleId(globalContext.namespace, 'loadingdot')
 export const viewCounterId = componentId(globalContext.namespace, 'viewcounter')
 export const viewCounterBehaviorId = behaviorId(globalContext.namespace, 'viewcounter')
 export const vueComponentId = componentId(globalContext.namespace, 'vuecomponent')
+export const languagesId = componentId(globalContext.namespace, 'languages')
+export const langDisplayStyleId = nextStyleId(globalContext)
+export const langTextStyleId = nextStyleId(globalContext)
+export const caretRightStyleId = nextStyleId(globalContext)
+export const caretBubbleStyleId = nextStyleId(globalContext)
+export const langOptionStyleId = nextStyleId(globalContext)
+export const langOptionsStyleId = nextStyleId(globalContext)
+
 // Placeholder for children of builtin components that aren't used independently
 export const tempChildId = componentId(globalContext.namespace, 'tempchild')

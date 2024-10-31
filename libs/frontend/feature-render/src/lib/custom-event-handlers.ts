@@ -1,10 +1,14 @@
+import { resolveComponent } from '@pubstudio/frontend/util-resolve'
 import { registerScroll, runtimeContext } from '@pubstudio/frontend/util-runtime'
 import {
   ComponentEventType,
   IComponent,
   ICustomEvents,
+  ISite,
 } from '@pubstudio/shared/type-site'
-import { createClickawayListener } from '@samatech/vue-components'
+// import { createClickawayListener } from '@samatech/vue-components'
+import { ClickawayCallback } from '@samatech/vue-components'
+import { computeEvents } from './render-helpers'
 
 const toInt = (thing: string | undefined, fallback: number): number => {
   if (thing === undefined) {
@@ -13,7 +17,26 @@ const toInt = (thing: string | undefined, fallback: number): number => {
   return parseInt(thing)
 }
 
+const createClickawayListener = (
+  site: ISite,
+  ignoreId: string,
+  callback: ClickawayCallback,
+) => {
+  return (event: Event) => {
+    const eventEl = event.target as Element
+    let cmp = resolveComponent(site.context, eventEl.id)
+    while (cmp) {
+      if (cmp.id === ignoreId) {
+        return null
+      }
+      cmp = cmp.parent
+    }
+    return callback(event)
+  }
+}
+
 const registerClickOutsideEvent = (
+  site: ISite,
   component: IComponent,
   customEventHandlers: ICustomEvents,
 ) => {
@@ -21,7 +44,8 @@ const registerClickOutsideEvent = (
 
   if (eventWithArgs?.[0]) {
     runtimeContext.eventHandlers.click[component.id] = createClickawayListener(
-      `#${component.id}`,
+      site,
+      component.id,
       eventWithArgs[0],
     )
   }
@@ -173,14 +197,15 @@ const handleOnAppearEvent = (customEventHandlers: ICustomEvents) => {
 }
 
 export const registerCustomEvents = (
+  site: ISite,
   component: IComponent,
-  customEventHandlers: ICustomEvents,
-  root: HTMLElement | null,
   isMounted: boolean,
 ) => {
-  registerClickOutsideEvent(component, customEventHandlers)
+  const { custom: customEventHandlers } = computeEvents(site, component)
+
+  registerClickOutsideEvent(site, component, customEventHandlers)
   registerPeriodicEvent(component, customEventHandlers)
-  registerScrollIntoViewEvent(component, customEventHandlers, root)
+  registerScrollIntoViewEvent(component, customEventHandlers, null)
   registerKeyEvents(component, customEventHandlers)
   registerScrollEvent(component, customEventHandlers)
   if (isMounted) {

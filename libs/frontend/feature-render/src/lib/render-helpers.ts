@@ -44,14 +44,15 @@ export const computeEvents = (site: ISite, component: IComponent): IEventCollect
 export const i18nVarRegex = /\$\{(.*?)\}/g
 
 export const parseI18n = (
-  translations: ITranslations,
+  i18n: Record<string, ITranslations>,
+  lang: string,
   content: string | undefined,
 ): string | undefined => {
   if (!content) {
     return content
   }
   return content.replace(i18nVarRegex, (_, variable: string) => {
-    const val = translations[variable]
+    const val = i18n[lang]?.[variable] || i18n['en'][variable]
     return val ?? content
   })
 }

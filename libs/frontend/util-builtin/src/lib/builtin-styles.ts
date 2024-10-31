@@ -23,6 +23,14 @@ import {
 } from './components/builtin-image'
 import { inputStyle } from './components/builtin-input'
 import { labelStyle } from './components/builtin-label'
+import {
+  caretBubbleStyle,
+  caretRightStyle,
+  langDisplayStyle,
+  langOptionsStyle,
+  langOptionStyle,
+  langTextStyle,
+} from './components/builtin-languages'
 import { linkStyle } from './components/builtin-link'
 import { listItemStyle, listStyle } from './components/builtin-list'
 import { loadingDotStyle, loadingStyle } from './components/builtin-loading'
@@ -59,5 +67,10 @@ export const builtinStyles: Record<string, IStyle> = {
   [listStyle.id]: listStyle,
   [listItemStyle.id]: listItemStyle,
   [dividerHorizontalStyle.id]: dividerHorizontalStyle,
-  [dividerVerticalStyle.id]: dividerVerticalStyle,
+  [caretBubbleStyle.id]: caretBubbleStyle,
+  [caretRightStyle.id]: caretRightStyle,
+  [langDisplayStyle.id]: langDisplayStyle,
+  [langOptionStyle.id]: langOptionStyle,
+  [langOptionsStyle.id]: langOptionsStyle,
+  [langTextStyle.id]: langTextStyle,
 }

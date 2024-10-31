@@ -64,6 +64,14 @@
         :text="t('build.view_counter')"
         :builtinComponentId="viewCounter.id"
       />
+      <NewComponent
+        v-if="showLanguageSelect"
+        class="new-language-select"
+        :text="t('build.lang_select')"
+        builtinComponentId=""
+        :skipAdd="true"
+        @add="addLanguageSelect(site)"
+      />
     </div>
     <div class="new-right">
       <NewComponent
@@ -128,6 +136,7 @@
 </template>
 
 <script lang="ts" setup>
+import { computed } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import {
   containerHorizontal,
@@ -175,12 +184,17 @@ import {
 import NewComponent from './NewComponent.vue'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { store } from '@pubstudio/frontend/data-access-web-store'
+import { addLanguageSelect } from '@pubstudio/frontend/feature-build'
 
 const { t } = useI18n()
 const { showContactFormWalkthrough } = useContactForm()
 const { showMailingListWalkthrough } = useMailingListForm()
 const { showVueComponentModal } = useVueComponent()
-const { isSiteApi } = useSiteSource()
+const { isSiteApi, site } = useSiteSource()
+
+const showLanguageSelect = computed(() => {
+  return Object.keys(site.value.context.i18n).length > 1
+})
 </script>
 
 <style lang="postcss" scoped>

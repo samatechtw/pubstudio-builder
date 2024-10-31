@@ -25,11 +25,10 @@ export const computePropsContent = (
   const events = computeEvents(site, component)
 
   const active = site.context.activeI18n ?? 'en'
-  const translations = site.context.i18n[active] ?? {}
 
   const content: IContent = component.children?.length
     ? component.children.map((child) => renderComponent(site, child, renderMode))
-    : parseI18n(translations, data.content)
+    : parseI18n(site.context.i18n, active, data.content)
 
   const props = {
     ...data.attrs,
