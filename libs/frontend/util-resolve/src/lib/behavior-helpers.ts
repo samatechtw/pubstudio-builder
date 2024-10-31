@@ -1,4 +1,4 @@
-import { DEFAULT_BREAKPOINT_ID } from '@pubstudio/frontend/util-ids'
+import { DEFAULT_BREAKPOINT_ID, LANG_STORAGE_ID } from '@pubstudio/frontend/util-ids'
 import { INavigateOptions } from '@pubstudio/frontend/util-router'
 import {
   CustomDataAction,
@@ -116,6 +116,11 @@ export const setCustomStyle = (
   } else if (component?.style.custom) {
     component.style.custom[DEFAULT_BREAKPOINT_ID] = { default: { [prop]: value } }
   }
+}
+
+export const setLanguage = (site: ISite, lang: string): void => {
+  site.context.activeI18n = lang
+  localStorage.setItem(LANG_STORAGE_ID, lang)
 }
 
 export const getCustomStyle = (
@@ -240,6 +245,7 @@ export const behaviorHelpers: IBehaviorHelpers = {
   getEventBehavior,
   getCustomStyle,
   setCustomStyle,
+  setLanguage,
   setLoading,
   setError,
   addRow,

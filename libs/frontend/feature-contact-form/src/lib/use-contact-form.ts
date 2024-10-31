@@ -1,12 +1,13 @@
 import { useCustomDataApi } from '@pubstudio/frontend/data-access-api'
 import {
+  appendEvent,
   appendLastCommand,
   setContactFormWalkthrough,
 } from '@pubstudio/frontend/data-access-command'
 import { store } from '@pubstudio/frontend/data-access-web-store'
 import { IRecipientListItem } from '@pubstudio/frontend/feature-custom-data'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
-import { appendEvent, loadCustomTables } from '@pubstudio/frontend/feature-walkthrough'
+import { loadCustomTables } from '@pubstudio/frontend/feature-walkthrough'
 import { parseApiErrorKey, toApiError } from '@pubstudio/frontend/util-api'
 import { makeRemoveComponentData } from '@pubstudio/frontend/util-command-data'
 import { makeColumnInfo } from '@pubstudio/frontend/util-custom-data'
@@ -145,9 +146,7 @@ export const useContactForm = (): IContactFormFeature => {
           behaviors: [
             {
               behaviorId: clearErrorBehaviorId,
-              args: {
-                errorId: error?.id ?? '',
-              },
+              args: { errorId: error?.id ?? '' },
             },
           ],
         }

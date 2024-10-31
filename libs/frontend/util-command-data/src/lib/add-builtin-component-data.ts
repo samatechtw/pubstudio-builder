@@ -4,6 +4,29 @@ import { IAddComponentData } from '@pubstudio/shared/type-command-data'
 import { IComponent } from '@pubstudio/shared/type-site'
 import { selectAddParent } from './select-add-parent'
 
+// Generate new component data from an existing component
+// Used for complex builtin components that need some pre-processing/dynamic children
+export const makeAddComponentData = (
+  component: IComponent,
+  parent: IComponent | undefined,
+  selectedComponentId: string | undefined,
+): IAddComponentData | undefined => {
+  const data: IAddComponentData = {
+    name: component.name,
+    tag: component.tag,
+    content: component.content,
+    ...selectAddParent(parent, undefined),
+    sourceId: component.id,
+    children: component.children,
+    style: clone(component.style),
+    inputs: clone(component.inputs),
+    events: clone(component.events),
+    editorEvents: clone(component.editorEvents),
+    selectedComponentId,
+  }
+  return data
+}
+
 // Generate new component data from a builtin component
 export const makeAddBuiltinComponentData = (
   builtinComponentId: string,
@@ -14,18 +37,5 @@ export const makeAddBuiltinComponentData = (
   if (!builtinComponent) {
     return undefined
   }
-  const data: IAddComponentData = {
-    name: builtinComponent.name,
-    tag: builtinComponent.tag,
-    content: builtinComponent.content,
-    ...selectAddParent(parent, undefined),
-    sourceId: builtinComponent.id,
-    children: builtinComponent.children,
-    style: clone(builtinComponent.style),
-    inputs: clone(builtinComponent.inputs),
-    events: clone(builtinComponent.events),
-    editorEvents: clone(builtinComponent.editorEvents),
-    selectedComponentId,
-  }
-  return data
+  return makeAddComponentData(builtinComponent, parent, selectedComponentId)
 }

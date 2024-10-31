@@ -1,6 +1,5 @@
 import { setComponentEditEditorEvent } from '@pubstudio/frontend/data-access-command'
-import { noBehavior } from '@pubstudio/frontend/feature-builtin'
-import { builtinEditorBehaviors } from '@pubstudio/frontend/util-resolve'
+import { builtinEditorBehaviors, noBehavior } from '@pubstudio/frontend/util-resolve'
 import {
   EditorEventName,
   IComponentEvent,

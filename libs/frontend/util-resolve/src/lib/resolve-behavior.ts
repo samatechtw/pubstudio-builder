@@ -1,8 +1,51 @@
-import { globalContext } from '@pubstudio/frontend/util-ids'
-import { IBehavior, IResolvedBehavior, ISiteContext } from '@pubstudio/shared/type-site'
+import {
+  globalContext,
+  noBehaviorId,
+  selectLanguageBehaviorId,
+  setupLanguageBehaviorId,
+} from '@pubstudio/frontend/util-ids'
+import {
+  ComponentArgPrimitive,
+  IBehavior,
+  IResolvedBehavior,
+  ISiteContext,
+} from '@pubstudio/shared/type-site'
+
+export const noBehavior: IBehavior = { id: noBehaviorId, name: 'None', code: '' }
+
+export const selectLanguage: IBehavior = {
+  id: selectLanguageBehaviorId,
+  name: 'SelectLanguage',
+  args: {
+    language: {
+      name: 'language',
+      type: ComponentArgPrimitive.String,
+      default: 'en',
+      help: 'Language code',
+    },
+  },
+  code: 'helpers.setLanguage(site, args.language)',
+}
+
+export const setupLanguage: IBehavior = {
+  id: setupLanguageBehaviorId,
+  name: 'SetupLanguage',
+  args: {
+    default: {
+      name: 'default',
+      type: ComponentArgPrimitive.String,
+      default: 'en',
+      help: 'Language code',
+    },
+  },
+  code: 'helpers.setContent(component, site.context.activeI18n ?? args.default)',
+}
 
 export const builtinBehaviors: Record<string, IBehavior> = {
   // Populated by '@pubstudio/frontend/feature-builtin' to avoid circular dependencies
+  [noBehaviorId]: noBehavior,
+  [selectLanguageBehaviorId]: selectLanguage,
+  [setupLanguageBehaviorId]: setupLanguage,
 }
 
 export const builtinEditorBehaviors: Record<string, IBehavior> = {

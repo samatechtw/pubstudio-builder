@@ -1,10 +1,11 @@
 import { useCustomDataApi } from '@pubstudio/frontend/data-access-api'
 import {
+  appendEvent,
   appendLastCommand,
   setMailingListWalkthrough,
 } from '@pubstudio/frontend/data-access-command'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
-import { appendEvent, loadCustomTables } from '@pubstudio/frontend/feature-walkthrough'
+import { loadCustomTables } from '@pubstudio/frontend/feature-walkthrough'
 import { parseApiErrorKey, toApiError } from '@pubstudio/frontend/util-api'
 import { makeRemoveComponentData } from '@pubstudio/frontend/util-command-data'
 import { makeColumnInfo } from '@pubstudio/frontend/util-custom-data'

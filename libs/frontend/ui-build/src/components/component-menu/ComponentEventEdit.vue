@@ -100,7 +100,7 @@ import {
   useEditComponentEvent,
 } from '@pubstudio/frontend/feature-build'
 import { ErrorMessage, PSButton, Plus } from '@pubstudio/frontend/ui-widgets'
-import { noBehavior } from '@pubstudio/frontend/feature-builtin'
+import { noBehavior } from '@pubstudio/frontend/util-resolve'
 import { setEditBehavior } from '@pubstudio/frontend/data-access-command'
 import {
   ComponentArgPrimitive,
@@ -322,6 +322,7 @@ const save = () => {
     > button {
       width: 31%;
       min-width: 31%;
+      margin: 0;
     }
   }
 }

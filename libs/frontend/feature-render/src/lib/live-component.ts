@@ -30,12 +30,11 @@ export const LiveComponent = () => {
     },
     setup(props: ILiveComponentProps) {
       const { site, component, renderMode } = toRefs(props)
-      const { custom } = computeEvents(site.value, component.value)
-      registerCustomEvents(component.value, custom, null, false)
+      registerCustomEvents(site.value, component.value, false)
 
       onMounted(() => {
         const { custom } = computeEvents(site.value, component.value)
-        registerCustomEvents(component.value, custom, null, true)
+        registerCustomEvents(site.value, component.value, true)
       })
       onUnmounted(() => {
         removeListeners(component.value)

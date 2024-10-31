@@ -13,7 +13,7 @@ export const scrollToComponent = (site: ISite, component: IComponent) => {
     // Switch to the target page before scrolling
     const componentPage = findComponentPage(site, component)
     if (!componentPage) {
-      throw new Error(`Cannot find page for component with ID ${component.id}`)
+      console.error(`Cannot find page for component with ID ${component.id}`)
     } else if (editor.active !== componentPage.route) {
       setActivePage(editor, componentPage.route)
     }

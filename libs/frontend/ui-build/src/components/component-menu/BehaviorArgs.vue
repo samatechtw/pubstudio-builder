@@ -17,7 +17,7 @@
           @select="selectType"
         />
         <STInput v-model="editArg.default" class="default" :placeholder="t('default')" />
-        <div class="edit-actions">
+        <div class="args-actions">
           <Check class="save" color="#009879" @click="saveArg" />
           <Cross class="cancel" @click="cancel" />
         </div>
@@ -188,7 +188,7 @@ const addArg = () => {
   cursor: pointer;
   margin-left: 6px;
 }
-.edit-actions {
+.args-actions {
   display: flex;
   align-items: center;
 }

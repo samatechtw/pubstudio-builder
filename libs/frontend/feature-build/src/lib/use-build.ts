@@ -9,6 +9,7 @@ import {
   replaceLastCommand,
   setSelectedComponent,
 } from '@pubstudio/frontend/data-access-command'
+import '@pubstudio/frontend/feature-builtin' // Ensure builtin behaviors loaded
 import '@pubstudio/frontend/feature-builtin-editor' // Ensure editor events loaded
 import {
   activeBreakpoint,
@@ -89,7 +90,7 @@ import {
   Tag,
 } from '@pubstudio/shared/type-site'
 import { computed, ComputedRef, Ref, ref, toRaw } from 'vue'
-import { pushCommandAndAddMissingMixins } from './add-builtin/add-builtin-component'
+import { pushCommandWithBuiltins } from './add-builtin/add-builtin-component'
 import {
   IRemoveStyleEntry,
   removeComponentCustomStyleCommand,
@@ -523,9 +524,9 @@ export const useBuild = (): IUseBuild => {
       componentId: selected.id,
       mixinId,
     }
-    pushCommandAndAddMissingMixins(site.value, CommandType.AddComponentMixin, data, [
-      mixinId,
-    ])
+    pushCommandWithBuiltins(site.value, CommandType.AddComponentMixin, data, {
+      mixinIds: [mixinId],
+    })
   }
 
   const removeComponentMixin = (mixinId: string) => {
@@ -556,11 +557,11 @@ export const useBuild = (): IUseBuild => {
       oldMixinId,
       newMixinId,
     }
-    pushCommandAndAddMissingMixins(
+    pushCommandWithBuiltins(
       site.value,
       CommandType.ReplaceComponentMixin,
       replaceComponentMixinData,
-      [newMixinId],
+      { mixinIds: [newMixinId] },
     )
   }
 

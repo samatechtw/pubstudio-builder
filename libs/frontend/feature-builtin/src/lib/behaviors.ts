@@ -3,7 +3,6 @@ import {
   contactFormBehaviorId,
   homeLinkBehaviorId,
   mailingListBehaviorId,
-  noBehaviorId,
   setHiddenId,
   toggleHiddenId,
   viewCounterBehaviorId,
@@ -21,15 +20,6 @@ import {
   IBehaviorHelpers,
   IComponent,
 } from '@pubstudio/shared/type-site'
-
-export const noBehavior: IBehavior = {
-  id: noBehaviorId,
-  name: 'None',
-  builtin: (_helpers: IBehaviorHelpers, _behaviorContext: IBehaviorContext) => {
-    // No operation
-  },
-}
-registerBuiltinBehavior(noBehavior)
 
 export const toggleHidden: IBehavior = {
   id: toggleHiddenId,

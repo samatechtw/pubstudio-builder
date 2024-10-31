@@ -1,6 +1,9 @@
 import { setComponentEditEvent } from '@pubstudio/frontend/data-access-command'
-import { noBehavior } from '@pubstudio/frontend/feature-builtin'
-import { builtinBehaviors, resolveComponent } from '@pubstudio/frontend/util-resolve'
+import {
+  builtinBehaviors,
+  noBehavior,
+  resolveComponent,
+} from '@pubstudio/frontend/util-resolve'
 import { ComponentEventType, IComponentEvent, ISite } from '@pubstudio/shared/type-site'
 import { computed } from 'vue'
 import { useBuild } from '../use-build'

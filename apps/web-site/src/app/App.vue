@@ -33,7 +33,7 @@ import {
   useRender,
 } from '@pubstudio/frontend/feature-render'
 import { RenderMode } from '@pubstudio/frontend/util-render'
-import { unstoreSite } from '@pubstudio/frontend/util-site-deserialize'
+import { unstoreSite, loadSiteLanguage } from '@pubstudio/frontend/util-site-deserialize'
 import { rootSiteApi } from '@pubstudio/shared/util-web-site-api'
 import { ISite } from '@pubstudio/shared/type-site'
 import { IGetSiteApiResponse } from '@pubstudio/shared/type-api-site-sites'
@@ -117,6 +117,7 @@ const getUserSite = async () => {
 onMounted(async () => {
   const userSite = await getUserSite()
   if (userSite) {
+    loadSiteLanguage(userSite)
     setupRoutes(router, userSite, PageContent)
     site.value = userSite
     overrideHelper('push', (options: INameNavigateOptions) => {

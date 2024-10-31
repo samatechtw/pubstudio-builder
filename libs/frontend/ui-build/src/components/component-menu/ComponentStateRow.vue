@@ -132,7 +132,7 @@ const saveState = () => {
   .value-input {
     margin: 6px 0 0 0;
   }
-  :deep(.st-input-wrap.search) {
+  :deep(.st-input-wrap.st-ms-search) {
     flex-grow: 1;
   }
 }

@@ -37,6 +37,7 @@ export interface IBehaviorHelpers {
     prop: CssType,
     value: string,
   ): string | undefined
+  setLanguage(site: ISite, lang: string): void
   setError(
     errorCmp: IComponent | undefined,
     error: unknown,
