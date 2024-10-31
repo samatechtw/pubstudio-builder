@@ -1,8 +1,5 @@
-import {
-  DEFAULT_BREAKPOINT_ID,
-  inputId,
-  inputStyleId,
-} from '@pubstudio/frontend/util-ids'
+import { DEFAULT_BREAKPOINT_ID } from '@pubstudio/frontend/util-defaults'
+import { inputId, inputStyleId } from '@pubstudio/frontend/util-ids'
 import { IComponent, IStyle, Tag } from '@pubstudio/shared/type-site'
 import { defaultInputInputs } from '../default-inputs'
 

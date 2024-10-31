@@ -1,7 +1,5 @@
-import {
-  builtinThemeVariables,
-  DEFAULT_BREAKPOINT_ID,
-} from '@pubstudio/frontend/util-ids'
+import { DEFAULT_BREAKPOINT_ID } from '@pubstudio/frontend/util-defaults'
+import { builtinThemeVariables } from '@pubstudio/frontend/util-ids'
 import {
   ComponentMenuCollapsible,
   CssPseudoClass,

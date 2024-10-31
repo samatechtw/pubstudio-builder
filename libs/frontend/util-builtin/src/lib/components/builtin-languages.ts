@@ -1,7 +1,7 @@
+import { DEFAULT_BREAKPOINT_ID } from '@pubstudio/frontend/util-defaults'
 import {
   caretBubbleStyleId,
   caretRightStyleId,
-  DEFAULT_BREAKPOINT_ID,
   langDisplayStyleId,
   langOptionsStyleId,
   langOptionStyleId,

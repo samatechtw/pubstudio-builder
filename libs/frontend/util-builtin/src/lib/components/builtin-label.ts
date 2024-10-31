@@ -1,8 +1,5 @@
-import {
-  DEFAULT_BREAKPOINT_ID,
-  labelId,
-  labelStyleId,
-} from '@pubstudio/frontend/util-ids'
+import { DEFAULT_BREAKPOINT_ID } from '@pubstudio/frontend/util-defaults'
+import { labelId, labelStyleId } from '@pubstudio/frontend/util-ids'
 import {
   ComponentArgPrimitive,
   IComponent,

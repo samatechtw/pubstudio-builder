@@ -1,5 +1,6 @@
 import { verticalStyle } from '@pubstudio/frontend/util-builtin'
-import { componentId, DEFAULT_BREAKPOINT_ID, nextId } from '@pubstudio/frontend/util-ids'
+import { DEFAULT_BREAKPOINT_ID } from '@pubstudio/frontend/util-defaults'
+import { componentId, nextId } from '@pubstudio/frontend/util-ids'
 import {
   IComponent,
   IPage,

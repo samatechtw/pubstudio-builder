@@ -1,7 +1,7 @@
+import { DEFAULT_BREAKPOINT_ID } from '@pubstudio/frontend/util-defaults'
 import {
   buttonId,
   buttonStyleId,
-  DEFAULT_BREAKPOINT_ID,
   noBehaviorId,
   setupLoaderBehaviorId,
   tempChildId,

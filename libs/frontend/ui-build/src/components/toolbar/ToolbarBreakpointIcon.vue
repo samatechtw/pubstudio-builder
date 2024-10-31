@@ -5,7 +5,7 @@
 <script lang="ts" setup>
 import { IBreakpoint } from '@pubstudio/shared/type-site'
 import { Desktop, Mobile, TabletLarge, TabletSmall } from '@pubstudio/frontend/ui-widgets'
-import { DEFAULT_BREAKPOINT_ID } from '@pubstudio/frontend/util-ids'
+import { DEFAULT_BREAKPOINT_ID } from '@pubstudio/frontend/util-defaults'
 import { computed, h, toRefs } from 'vue'
 
 const props = defineProps<{

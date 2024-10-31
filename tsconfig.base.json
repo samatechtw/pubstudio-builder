@@ -136,9 +136,6 @@
       "@pubstudio/frontend/data-access-web-store": [
         "libs/frontend/data-access-web-store/src/index.ts"
       ],
-      "@pubstudio/frontend/feature-builtin": [
-        "libs/frontend/feature-builtin/src/index.ts"
-      ],
       "@pubstudio/frontend/feature-builtin-editor": [
         "libs/frontend/feature-builtin-editor/src/index.ts"
       ],
@@ -194,6 +191,7 @@
         "libs/frontend/util-command-data/src/index.ts"
       ],
       "@pubstudio/frontend/util-component": ["libs/frontend/util-component/src/index.ts"],
+      "@pubstudio/frontend/util-defaults": ["libs/frontend/util-defaults/src/index.ts"],
       "@pubstudio/frontend/util-edit-text": ["libs/frontend/util-edit-text/src/index.ts"],
       "@pubstudio/frontend/util-ids": ["libs/frontend/util-ids/src/index.ts"],
       "@pubstudio/frontend/util-render": ["libs/frontend/util-render/src/index.ts"],

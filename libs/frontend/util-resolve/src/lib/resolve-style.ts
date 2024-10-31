@@ -1,4 +1,4 @@
-import { globalContext } from '@pubstudio/frontend/util-ids'
+import { globalContext } from '@pubstudio/frontend/util-defaults'
 import { ISiteContext, IStyle } from '@pubstudio/shared/type-site'
 
 export const resolveStyle = (

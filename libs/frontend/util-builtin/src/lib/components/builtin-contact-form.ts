@@ -1,8 +1,8 @@
+import { DEFAULT_BREAKPOINT_ID } from '@pubstudio/frontend/util-defaults'
 import {
   contactFormId,
   containerHorizontalId,
   containerVerticalId,
-  DEFAULT_BREAKPOINT_ID,
   horizontalStyleId,
   inputId,
   inputStyleId,

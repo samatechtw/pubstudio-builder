@@ -1,8 +1,5 @@
-import {
-  containerVerticalId,
-  DEFAULT_BREAKPOINT_ID,
-  verticalStyleId,
-} from '@pubstudio/frontend/util-ids'
+import { DEFAULT_BREAKPOINT_ID } from '@pubstudio/frontend/util-defaults'
+import { containerVerticalId, verticalStyleId } from '@pubstudio/frontend/util-ids'
 import { IComponent, IStyle, Tag } from '@pubstudio/shared/type-site'
 
 export const verticalStyle: IStyle = {

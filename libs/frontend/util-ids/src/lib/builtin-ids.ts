@@ -1,6 +1,5 @@
+import { globalContext } from '@pubstudio/frontend/util-defaults'
 // Pre-define builtin IDs to avoid circular reference
-
-import { globalContext } from './global-context'
 import { behaviorId, componentId, nextStyleId, styleId } from './make-ids'
 
 // Public behaviors

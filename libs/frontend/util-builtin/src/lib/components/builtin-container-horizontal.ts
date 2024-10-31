@@ -1,8 +1,5 @@
-import {
-  containerHorizontalId,
-  DEFAULT_BREAKPOINT_ID,
-  horizontalStyleId,
-} from '@pubstudio/frontend/util-ids'
+import { DEFAULT_BREAKPOINT_ID } from '@pubstudio/frontend/util-defaults'
+import { containerHorizontalId, horizontalStyleId } from '@pubstudio/frontend/util-ids'
 import { IComponent, IStyle, Tag } from '@pubstudio/shared/type-site'
 
 export const horizontalStyle: IStyle = {

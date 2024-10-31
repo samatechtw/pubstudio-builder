@@ -1,8 +1,5 @@
-import {
-  componentId,
-  DEFAULT_BREAKPOINT_ID,
-  verticalStyleId,
-} from '@pubstudio/frontend/util-ids'
+import { DEFAULT_BREAKPOINT_ID } from '@pubstudio/frontend/util-defaults'
+import { componentId, verticalStyleId } from '@pubstudio/frontend/util-ids'
 import { ISerializedComponent, ISite, Tag } from '@pubstudio/shared/type-site'
 
 export const mockSerializedComponent = (
