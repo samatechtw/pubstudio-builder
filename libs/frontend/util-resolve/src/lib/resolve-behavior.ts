@@ -1,59 +1,8 @@
-import {
-  globalContext,
-  noBehaviorId,
-  selectLanguageBehaviorId,
-  setupLanguageBehaviorId,
-} from '@pubstudio/frontend/util-ids'
-import {
-  ComponentArgPrimitive,
-  IBehavior,
-  IResolvedBehavior,
-  ISiteContext,
-} from '@pubstudio/shared/type-site'
-
-export const noBehavior: IBehavior = { id: noBehaviorId, name: 'None', code: '' }
-
-export const selectLanguage: IBehavior = {
-  id: selectLanguageBehaviorId,
-  name: 'SelectLanguage',
-  args: {
-    language: {
-      name: 'language',
-      type: ComponentArgPrimitive.String,
-      default: 'en',
-      help: 'Language code',
-    },
-  },
-  code: 'helpers.setLanguage(site, args.language)',
-}
-
-export const setupLanguage: IBehavior = {
-  id: setupLanguageBehaviorId,
-  name: 'SetupLanguage',
-  args: {
-    default: {
-      name: 'default',
-      type: ComponentArgPrimitive.String,
-      default: 'en',
-      help: 'Language code',
-    },
-  },
-  code: 'helpers.setContent(component, site.context.activeI18n ?? args.default)',
-}
-
-export const builtinBehaviors: Record<string, IBehavior> = {
-  // Populated by '@pubstudio/frontend/feature-builtin' to avoid circular dependencies
-  [noBehaviorId]: noBehavior,
-  [selectLanguageBehaviorId]: selectLanguage,
-  [setupLanguageBehaviorId]: setupLanguage,
-}
+import { globalContext } from '@pubstudio/frontend/util-defaults'
+import { IBehavior, IResolvedBehavior, ISiteContext } from '@pubstudio/shared/type-site'
 
 export const builtinEditorBehaviors: Record<string, IBehavior> = {
-  // Populated by '@pubstudio/frontend/feature-builtin' to avoid circular dependencies
-}
-
-export const registerBuiltinBehavior = (behavior: IBehavior) => {
-  builtinBehaviors[behavior.id] = behavior
+  // Populated by '@pubstudio/frontend/feature-builtin-editor' to avoid circular dependencies
 }
 
 export const registerEditorBehavior = (behavior: IBehavior) => {
@@ -92,14 +41,8 @@ export const resolveBehavior = (
   context: ISiteContext,
   behaviorId: string,
 ): IBehavior | undefined => {
-  let behavior: IBehavior | undefined
-  if (behaviorId.startsWith(context.namespace)) {
-    behavior = context.behaviors[behaviorId]
-  } else if (behaviorId.startsWith(globalContext.namespace)) {
-    // Builtins are native code and don't need to be eval'd
-    return builtinBehaviors[behaviorId] ?? builtinEditorBehaviors[behaviorId]
-  } else {
-    // TODO -- resolve external namespaces
+  if (!behaviorId) {
+    return undefined
   }
-  return behavior
+  return context.behaviors[behaviorId] ?? builtinEditorBehaviors[behaviorId]
 }

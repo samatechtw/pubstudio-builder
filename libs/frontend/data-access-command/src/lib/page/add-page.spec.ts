@@ -1,5 +1,5 @@
+import { builtinBehaviors } from '@pubstudio/frontend/util-builtin'
 import { noBehaviorId } from '@pubstudio/frontend/util-ids'
-import { builtinBehaviors } from '@pubstudio/frontend/util-resolve'
 import { deserializeSite } from '@pubstudio/frontend/util-site-deserialize'
 import { setupMockBehavior } from '@pubstudio/frontend/util-test'
 import { mockAddPageData, mockSerializedSite } from '@pubstudio/frontend/util-test-mock'

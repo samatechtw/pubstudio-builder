@@ -37,7 +37,6 @@ import { unstoreSite, loadSiteLanguage } from '@pubstudio/frontend/util-site-des
 import { rootSiteApi } from '@pubstudio/shared/util-web-site-api'
 import { ISite } from '@pubstudio/shared/type-site'
 import { IGetSiteApiResponse } from '@pubstudio/shared/type-api-site-sites'
-import '@pubstudio/frontend/feature-builtin' // Ensure builtin behaviors loaded
 import NotFound from './components/NotFound.vue'
 import { overrideHelper } from '@pubstudio/frontend/util-resolve'
 

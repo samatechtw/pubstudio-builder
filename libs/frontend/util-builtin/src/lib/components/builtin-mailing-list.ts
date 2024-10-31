@@ -1,5 +1,5 @@
+import { DEFAULT_BREAKPOINT_ID } from '@pubstudio/frontend/util-defaults'
 import {
-  DEFAULT_BREAKPOINT_ID,
   inputId,
   inputStyleId,
   mailingListId,

@@ -1,4 +1,4 @@
-import { DEFAULT_BREAKPOINT_ID } from '@pubstudio/frontend/util-ids'
+import { DEFAULT_BREAKPOINT_ID } from '@pubstudio/frontend/util-defaults'
 import { breakpointSortFn } from '@pubstudio/frontend/util-render'
 import { IBreakpointStyles, IPseudoStyle } from '@pubstudio/shared/type-site'
 import { computed } from 'vue'

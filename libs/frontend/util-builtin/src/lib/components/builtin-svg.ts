@@ -1,4 +1,5 @@
-import { DEFAULT_BREAKPOINT_ID, svgId, svgStyleId } from '@pubstudio/frontend/util-ids'
+import { DEFAULT_BREAKPOINT_ID } from '@pubstudio/frontend/util-defaults'
+import { svgId, svgStyleId } from '@pubstudio/frontend/util-ids'
 import { IComponent, IStyle, Tag } from '@pubstudio/shared/type-site'
 
 export const svgStyle: IStyle = {

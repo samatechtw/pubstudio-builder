@@ -1,9 +1,9 @@
+import { DEFAULT_BREAKPOINT_ID } from '@pubstudio/frontend/util-defaults'
 import {
   backgroundImageId,
   backgroundImageStyleId,
   captionedImageId,
   captionedImageStyleId,
-  DEFAULT_BREAKPOINT_ID,
   imageId,
   imageStyleId,
   textId,

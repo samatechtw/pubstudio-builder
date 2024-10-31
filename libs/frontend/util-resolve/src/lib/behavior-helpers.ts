@@ -1,4 +1,4 @@
-import { DEFAULT_BREAKPOINT_ID, LANG_STORAGE_ID } from '@pubstudio/frontend/util-ids'
+import { DEFAULT_BREAKPOINT_ID, LANG_STORAGE_ID } from '@pubstudio/frontend/util-defaults'
 import { INavigateOptions } from '@pubstudio/frontend/util-router'
 import {
   CustomDataAction,

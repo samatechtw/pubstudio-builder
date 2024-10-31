@@ -1,13 +1,9 @@
-import { DEFAULT_BREAKPOINT_ID } from '@pubstudio/frontend/util-ids'
+import { DEFAULT_BREAKPOINT_ID } from '@pubstudio/frontend/util-defaults'
 import { deserializeSite } from '@pubstudio/frontend/util-site-deserialize'
-import {
-  mockRemoveStyleMixinData,
-  mockSerializedSite,
-} from '@pubstudio/frontend/util-test-mock'
+import { mockSerializedSite } from '@pubstudio/frontend/util-test-mock'
 import { IUpdateMixinOrderData } from '@pubstudio/shared/type-command-data'
 import { ISite } from '@pubstudio/shared/type-site'
 import { applyAddStyleMixin } from './add-style-mixin'
-import { applyRemoveStyleMixin, undoRemoveStyleMixin } from './remove-style-mixin'
 import { applyUpdateMixinOrder, undoUpdateMixinOrder } from './update-mixin-order'
 
 describe('Update Style Mixin Order', () => {

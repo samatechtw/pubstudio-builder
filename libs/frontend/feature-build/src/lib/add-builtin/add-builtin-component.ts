@@ -1,7 +1,11 @@
 import { pushCommand } from '@pubstudio/frontend/data-access-command'
 import { getActivePage } from '@pubstudio/frontend/feature-site-store'
 import { BuilderDragDataType } from '@pubstudio/frontend/type-builder'
-import { builtinStyles, getBuiltinComponent } from '@pubstudio/frontend/util-builtin'
+import {
+  builtinBehaviors,
+  builtinStyles,
+  getBuiltinComponent,
+} from '@pubstudio/frontend/util-builtin'
 import {
   makeAddBuiltinComponentData,
   makeAddCustomComponentData,
@@ -10,7 +14,6 @@ import {
 } from '@pubstudio/frontend/util-command-data'
 import { clone } from '@pubstudio/frontend/util-component'
 import {
-  builtinBehaviors,
   resolveBehavior,
   resolveComponent,
   resolveStyle,

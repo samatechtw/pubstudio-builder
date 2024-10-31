@@ -1,9 +1,5 @@
-import {
-  DEFAULT_BREAKPOINT_ID,
-  footerId,
-  footerStyleId,
-  tempChildId,
-} from '@pubstudio/frontend/util-ids'
+import { DEFAULT_BREAKPOINT_ID } from '@pubstudio/frontend/util-defaults'
+import { footerId, footerStyleId, tempChildId } from '@pubstudio/frontend/util-ids'
 import { IComponent, IStyle, Tag } from '@pubstudio/shared/type-site'
 
 export const footerStyle: IStyle = {

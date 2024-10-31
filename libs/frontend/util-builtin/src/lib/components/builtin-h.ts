@@ -1,5 +1,5 @@
+import { DEFAULT_BREAKPOINT_ID } from '@pubstudio/frontend/util-defaults'
 import {
-  DEFAULT_BREAKPOINT_ID,
   h1Id,
   h1StyleId,
   h2Id,

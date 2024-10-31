@@ -3,23 +3,44 @@ import {
   contactFormBehaviorId,
   homeLinkBehaviorId,
   mailingListBehaviorId,
+  noBehaviorId,
+  selectLanguageBehaviorId,
   setHiddenId,
+  setupLanguageBehaviorId,
   toggleHiddenId,
   viewCounterBehaviorId,
 } from '@pubstudio/frontend/util-ids'
-import { findComponent } from '@pubstudio/frontend/util-render'
-import {
-  registerBuiltinBehavior,
-  resolveComponent,
-} from '@pubstudio/frontend/util-resolve'
-import {
-  ComponentArgPrimitive,
-  IBehavior,
-  IBehaviorContext,
-  IBehaviorCustomArgs,
-  IBehaviorHelpers,
-  IComponent,
-} from '@pubstudio/shared/type-site'
+import { ComponentArgPrimitive, IBehavior } from '@pubstudio/shared/type-site'
+
+export const noBehavior: IBehavior = { id: noBehaviorId, name: 'None', code: '' }
+
+export const selectLanguage: IBehavior = {
+  id: selectLanguageBehaviorId,
+  name: 'SelectLanguage',
+  args: {
+    language: {
+      name: 'language',
+      type: ComponentArgPrimitive.String,
+      default: 'en',
+      help: 'Language code',
+    },
+  },
+  code: 'helpers.setLanguage(site, args.language)',
+}
+
+export const setupLanguage: IBehavior = {
+  id: setupLanguageBehaviorId,
+  name: 'SetupLanguage',
+  args: {
+    default: {
+      name: 'default',
+      type: ComponentArgPrimitive.String,
+      default: 'en',
+      help: 'Language code',
+    },
+  },
+  code: 'helpers.setContent(component, site.context.activeI18n ?? args.default)',
+}
 
 export const toggleHidden: IBehavior = {
   id: toggleHiddenId,
@@ -31,21 +52,15 @@ export const toggleHidden: IBehavior = {
       help: 'The ID of the component which will be toggled.',
     },
   },
-  builtin: (
-    helpers: IBehaviorHelpers,
-    behaviorContext: IBehaviorContext,
-    args?: IBehaviorCustomArgs,
-  ) => {
-    const { site } = behaviorContext
+  code: `const { site } = behaviorContext
     const { getState, setState } = helpers
-    let cmp: IComponent | undefined = undefined
+    let cmp = undefined
     if (args?.id) {
-      cmp = resolveComponent(site.context, args.id as string)
+      cmp = resolveComponent(site.context, args.id)
     }
     setState(cmp, 'hide', !getState(cmp, 'hide'))
-  },
+  `,
 }
-registerBuiltinBehavior(toggleHidden)
 
 export const setHidden: IBehavior = {
   id: setHiddenId,
@@ -62,52 +77,31 @@ export const setHidden: IBehavior = {
       help: 'Set true to hide, false to show',
     },
   },
-  builtin: (
-    helpers: IBehaviorHelpers,
-    behaviorContext: IBehaviorContext,
-    args?: IBehaviorCustomArgs,
-  ) => {
-    const { site } = behaviorContext
-    let cmp: IComponent | undefined = undefined
+  code: `let cmp = undefined
     if (args?.id) {
-      cmp = resolveComponent(site.context, args.id as string)
+      cmp = resolveComponent(site.context, args.id)
     }
     helpers.setState(cmp, 'hide', !!args?.hide)
-  },
+  `,
 }
-registerBuiltinBehavior(setHidden)
 
 export const viewCounterBehavior: IBehavior = {
   id: viewCounterBehaviorId,
   name: 'View Counter',
-  builtin: async (
-    helpers: IBehaviorHelpers,
-    behaviorContext: IBehaviorContext,
-    _args?: IBehaviorCustomArgs,
-  ) => {
-    const { site, component } = behaviorContext
-    const usage = await helpers.getPublicUsage(site)
+  code: `const usage = await helpers.getPublicUsage(site)
     helpers.setContent(component, usage.request_count.toString())
-  },
+  `,
 }
-registerBuiltinBehavior(viewCounterBehavior)
 
 export const homeLinkBehavior: IBehavior = {
   id: homeLinkBehaviorId,
   name: 'Home Link',
-  builtin: (
-    helpers: IBehaviorHelpers,
-    behaviorContext: IBehaviorContext,
-    _args?: IBehaviorCustomArgs,
-  ) => {
-    const { site, component } = behaviorContext
-    const homeRoute = site.defaults.homePage
+  code: `const homeRoute = site.defaults.homePage
     if (component.inputs?.href?.is !== homeRoute) {
       helpers.setInput(component, 'href', homeRoute)
     }
-  },
+  `,
 }
-registerBuiltinBehavior(homeLinkBehavior)
 
 export const clearFormErrorBehavior: IBehavior = {
   id: clearErrorBehaviorId,
@@ -119,20 +113,13 @@ export const clearFormErrorBehavior: IBehavior = {
       help: 'The ID of the error component',
     },
   },
-  builtin: async (
-    helpers: IBehaviorHelpers,
-    behaviorContext: IBehaviorContext,
-    args?: IBehaviorCustomArgs,
-  ) => {
-    const { site } = behaviorContext
-    if (args?.errorId) {
-      const errorCmp = helpers.getComponent(site, args.errorId as string)
+  code: `if (args?.errorId) {
+      const errorCmp = helpers.getComponent(site, args.errorId)
       helpers.setContent(errorCmp, '')
       helpers.setCustomStyle(errorCmp, 'opacity', '0')
     }
-  },
+  `,
 }
-registerBuiltinBehavior(clearFormErrorBehavior)
 
 export const contactFormBehavior: IBehavior = {
   id: contactFormBehaviorId,
@@ -179,13 +166,7 @@ export const contactFormBehavior: IBehavior = {
       help: 'The column to store the contact name in the API table (optional)',
     },
   },
-  builtin: async (
-    helpers: IBehaviorHelpers,
-    behaviorContext: IBehaviorContext,
-    args?: IBehaviorCustomArgs,
-  ) => {
-    const { site, event, component } = behaviorContext
-    event?.preventDefault()
+  code: `event?.preventDefault()
     const { error: argError, ...resolvedArgs } = helpers.requireArgs(args, [
       'tableName',
       'emailId',
@@ -199,25 +180,25 @@ export const contactFormBehavior: IBehavior = {
       console.warn(argError)
       helpers.setContent(errorCmp, 'Unknown form error')
     } else {
-      let name: string | undefined
+      let name
       const email = helpers.getValue(resolvedArgs.emailId)
       const message = helpers.getValue(resolvedArgs.messageId)
       if (args?.nameId) {
-        name = helpers.getValue(args.nameId as string)
+        name = helpers.getValue(args.nameId)
       }
       const button = findComponent(component, (cmp) => cmp.tag === 'button')
       try {
         helpers.setLoading(button, true)
-        const row: Record<string, string> = {
+        const row = {
           [resolvedArgs.apiEmailField]: email ?? '',
           [resolvedArgs.apiMessageField]: message ?? '',
         }
         if (args?.apiNameField && name) {
-          row[args?.apiNameField as string] = name
+          row[args?.apiNameField] = name
         }
         await helpers.addRow(resolvedArgs.tableName, row)
         helpers.setCustomStyle(errorCmp, 'opacity', '1')
-        helpers.setCustomStyle(errorCmp, 'color', '${color-success}')
+        helpers.setCustomStyle(errorCmp, 'color', '\${color-success}')
         helpers.setContent(errorCmp, 'Contact request sent!')
       } catch (e) {
         helpers.setError(errorCmp, e, {
@@ -226,9 +207,8 @@ export const contactFormBehavior: IBehavior = {
       }
       helpers.setLoading(button, false)
     }
-  },
+  `,
 }
-registerBuiltinBehavior(contactFormBehavior)
 
 export const mailingListBehavior: IBehavior = {
   id: mailingListBehaviorId,
@@ -265,13 +245,7 @@ export const mailingListBehavior: IBehavior = {
       help: 'The column to store the contact name in the API table (optional)',
     },
   },
-  builtin: async (
-    helpers: IBehaviorHelpers,
-    behaviorContext: IBehaviorContext,
-    args?: IBehaviorCustomArgs,
-  ) => {
-    const { site, event, component } = behaviorContext
-    event?.preventDefault()
+  code: `event?.preventDefault()
     const { error: argError, ...resolvedArgs } = helpers.requireArgs(args, [
       'tableName',
       'emailId',
@@ -283,23 +257,23 @@ export const mailingListBehavior: IBehavior = {
       console.warn(argError)
       helpers.setContent(errorCmp, 'Unknown form error')
     } else {
-      let name: string | undefined
+      let name
       const email = helpers.getValue(resolvedArgs.emailId)
       if (args?.nameId) {
-        name = helpers.getValue(args.nameId as string)
+        name = helpers.getValue(args.nameId)
       }
       const button = findComponent(component, (cmp) => cmp.tag === 'button')
       try {
         helpers.setLoading(button, true)
-        const row: Record<string, string> = {
+        const row = {
           [resolvedArgs.apiEmailField]: email ?? '',
         }
         if (args?.apiNameField && name) {
-          row[args?.apiNameField as string] = name
+          row[args?.apiNameField] = name
         }
         await helpers.addRow(resolvedArgs.tableName, row)
         helpers.setCustomStyle(errorCmp, 'opacity', '1')
-        helpers.setCustomStyle(errorCmp, 'color', '${color-success}')
+        helpers.setCustomStyle(errorCmp, 'color', '\${color-success}')
         helpers.setContent(errorCmp, 'Subscribed!')
       } catch (e) {
         helpers.setError(errorCmp, e, {
@@ -308,6 +282,18 @@ export const mailingListBehavior: IBehavior = {
       }
       helpers.setLoading(button, false)
     }
-  },
+  `,
 }
-registerBuiltinBehavior(mailingListBehavior)
+
+export const builtinBehaviors: Record<string, IBehavior> = {
+  [noBehavior.id]: noBehavior,
+  [selectLanguage.id]: selectLanguage,
+  [setupLanguage.id]: setupLanguage,
+  [toggleHidden.id]: toggleHidden,
+  [setHidden.id]: setHidden,
+  [viewCounterBehavior.id]: viewCounterBehavior,
+  [homeLinkBehavior.id]: homeLinkBehavior,
+  [clearFormErrorBehavior.id]: clearFormErrorBehavior,
+  [contactFormBehavior.id]: contactFormBehavior,
+  [mailingListBehavior.id]: mailingListBehavior,
+}

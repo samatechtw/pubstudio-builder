@@ -1,4 +1,4 @@
-import { DEFAULT_BREAKPOINT_ID } from '@pubstudio/frontend/util-ids'
+import { DEFAULT_BREAKPOINT_ID } from '@pubstudio/frontend/util-defaults'
 import { CommandType } from '@pubstudio/shared/type-command'
 import {
   CssPseudoClass,

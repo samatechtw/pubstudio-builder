@@ -1,4 +1,5 @@
-import { DEFAULT_BREAKPOINT_ID, textId, textStyleId } from '@pubstudio/frontend/util-ids'
+import { DEFAULT_BREAKPOINT_ID } from '@pubstudio/frontend/util-defaults'
+import { textId, textStyleId } from '@pubstudio/frontend/util-ids'
 import { IBreakpointStyles, IComponent, IStyle, Tag } from '@pubstudio/shared/type-site'
 
 export const textStyle: IStyle = {

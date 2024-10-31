@@ -1,4 +1,5 @@
-import { DEFAULT_BREAKPOINT_ID, linkId, linkStyleId } from '@pubstudio/frontend/util-ids'
+import { DEFAULT_BREAKPOINT_ID } from '@pubstudio/frontend/util-defaults'
+import { linkId, linkStyleId } from '@pubstudio/frontend/util-ids'
 import { IComponent, IStyle, Tag } from '@pubstudio/shared/type-site'
 import { defaultLinkInputs } from '../default-inputs'
 

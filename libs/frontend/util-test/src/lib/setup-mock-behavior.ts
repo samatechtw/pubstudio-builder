@@ -1,5 +1,5 @@
 import { noBehaviorId } from '@pubstudio/frontend/util-ids'
-import { builtinBehaviors } from '@pubstudio/frontend/util-resolve'
+import { resolveBehavior } from '@pubstudio/frontend/util-resolve'
 import { mockSerializedComponent } from '@pubstudio/frontend/util-test-mock'
 import { IAddComponentData } from '@pubstudio/shared/type-command-data'
 import {
@@ -23,9 +23,9 @@ export const setupMockBehavior = (
 ): IMockedComponentBehavior => {
   const events = editorEvents ?? []
   // Mock builtin "noBehavior"
-  const oldBehavior = builtinBehaviors[noBehaviorId]
+  const oldBehavior = resolveBehavior(site.context, noBehaviorId) as IBehavior
   const noBehaviorMock = jest.fn()
-  builtinBehaviors[noBehaviorId] = {
+  site.context.behaviors[noBehaviorId] = {
     id: noBehaviorId,
     name: noBehaviorId,
     builtin: noBehaviorMock,

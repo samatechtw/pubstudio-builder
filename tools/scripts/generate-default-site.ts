@@ -2,7 +2,7 @@ import { createSite } from '@pubstudio/frontend/data-access-command'
 import { addBuiltinComponent, useBuild } from '@pubstudio/frontend/feature-build'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { containerVertical, h1 } from '@pubstudio/frontend/util-builtin'
-import { DEFAULT_BREAKPOINT_ID } from '@pubstudio/frontend/util-ids'
+import { DEFAULT_BREAKPOINT_ID } from '@pubstudio/frontend/util-defaults'
 import { storeSite } from '@pubstudio/frontend/util-site-store'
 import {
   ISiteRestore,
