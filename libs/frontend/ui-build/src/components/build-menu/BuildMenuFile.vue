@@ -113,11 +113,7 @@ const importSite = async (file: File) => {
   if (siteString) {
     const site = deserializeSite(siteString)
     if (site) {
-      parseError.value = validateSite(site)
-      if (!parseError.value) {
-        pendingSiteImport.value = site
-        return
-      }
+      pendingSiteImport.value = site
     }
   }
   parseError.value = 'Failed to parse site data from file.'

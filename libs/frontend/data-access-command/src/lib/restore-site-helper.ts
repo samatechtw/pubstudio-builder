@@ -1,4 +1,3 @@
-import { validateSite } from '@pubstudio/frontend/util-doc-site'
 import { unstoreSite } from '@pubstudio/frontend/util-site-deserialize'
 import { ISiteRestore, IStoredSite } from '@pubstudio/shared/type-site'
 import { createSite } from './create-site'
@@ -10,10 +9,6 @@ export const restoreSiteHelper = (data: IStoredSite): ISiteRestore => {
   }
   if (!site) {
     return restoreSiteError('errors.site_restore_fail')
-  }
-  const validateError = validateSite(site)
-  if (validateError) {
-    return restoreSiteError(validateError)
   }
   return { site, error: undefined }
 }

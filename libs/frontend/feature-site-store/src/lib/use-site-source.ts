@@ -14,6 +14,7 @@ import {
 import { plainResponseInterceptors } from '@pubstudio/shared/util-web-site-api'
 import { computed, ComputedRef, Ref, ref } from 'vue'
 import { getActivePage } from './get-active-page'
+import { migrateSite } from './migrate-site'
 
 // This file is here, instead of frontend/feature-site-source, to decouple the `site`
 // instance from the dependencies required by this lib.
@@ -76,6 +77,10 @@ export const useSiteSource = (): IUseSiteSource => {
       restoredSite = restored
       replaceSite(restoredSite.site)
       siteError.value = restoredSite.error
+      // Migrate site version if necessary
+      if (site.value) {
+        migrateSite(site.value)
+      }
     }
   }
 

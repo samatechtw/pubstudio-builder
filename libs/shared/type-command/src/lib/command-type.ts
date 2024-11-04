@@ -49,4 +49,5 @@ export enum CommandType {
   UpdateUi = 'uUi',
   AddCustomComponent = 'addR',
   SetComponentState = 'sCS',
+  MigrateSite = 'mS',
 }
