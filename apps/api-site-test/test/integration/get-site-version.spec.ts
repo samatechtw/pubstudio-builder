@@ -31,7 +31,7 @@ describe('Get Site Version', () => {
     // Perform assertions on the response body
     expect(body.id).toEqual(1)
     expect(body.name).toEqual('Test Site 2')
-    expect(body.version).toEqual('0.1')
+    expect(body.version).toEqual('2')
     expect(body.context).toBeDefined()
     expect(body.defaults).toBeDefined()
     expect(body.editor).toBeDefined()
@@ -105,7 +105,7 @@ describe('Get Site Version', () => {
       expect(body.id).toEqual(1)
       expect(body.name).toEqual('Test Site 2')
       expect(body.published).toEqual(false)
-      expect(body.version).toEqual('0.1')
+      expect(body.version).toEqual('2')
       expect(body.context).toBeDefined()
       expect(body.defaults).toBeDefined()
       expect(body.editor).toBeDefined()

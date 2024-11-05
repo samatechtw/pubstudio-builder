@@ -6,7 +6,7 @@ export const mockCreateSitePayload = (): ICreateSiteApiRequest => ({
   owner_email: 'user1@samatech.tw',
   name: 'Test Site',
   published: false,
-  version: '0.1',
+  version: '2',
   context: '{"some":"stringified_json"}',
   defaults: '{"some":"stringified_json"}',
   editor: '{"some":"stringified_json"}',
