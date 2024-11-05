@@ -127,10 +127,6 @@ impl AppCache {
         if data.total_bandwidth != 0 && data.total_bandwidth > data.bandwidth_allowance {
             return Err(ApiError::bandwidth_exceeded());
         }
-        println!(
-            "UPD {} {} {}",
-            data.request_count, data.total_bandwidth, data.bandwidth_allowance
-        );
 
         Ok(())
     }

@@ -4,6 +4,7 @@ export interface IUpdatePlatformSiteRequest {
   name?: string
   subdomain?: string
   type?: SiteType
+  version?: string
   owner_id?: string
   owner_email?: string
 }

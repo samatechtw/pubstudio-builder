@@ -28,6 +28,7 @@ RUN ../limit-workspace.sh ../Cargo.toml site-api lib-shared-site-api lib-shared-
 COPY ./backend/lib-shared-site-api ../lib-shared-site-api/
 COPY ./backend/lib-shared-types ../lib-shared-types/
 COPY ./dist/apps/web-site/index.html ./
+COPY ./dist/apps/archive/index_v1.html ./
 # Make sure backup dir is available
 RUN mkdir -p ./db/sites/backups
 # Copy backup file for testing in dev/CI

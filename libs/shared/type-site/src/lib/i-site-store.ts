@@ -33,11 +33,16 @@ export enum SiteSaveState {
   Error = 'error',
 }
 
+export interface ISiteStoreInitializeResult {
+  serverAddress: string
+  siteVersion: string
+}
+
 export interface ISiteStore {
   saveState: Ref<SiteSaveState> | ComputedRef<SiteSaveState>
   siteId: Ref<string>
   saveError: Ref<IApiError | undefined>
-  initialize(): Promise<string | undefined>
+  initialize(): Promise<ISiteStoreInitializeResult | undefined>
   save(site: ISite, options?: ISiteSaveOptions): Promise<void>
   saveEditor(editor: IEditorContext): Promise<void>
   restore(updateKey?: number): Promise<ISiteRestore | undefined>
