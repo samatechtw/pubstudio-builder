@@ -21,6 +21,7 @@ import { applyReplacePageRoot } from './component/replace-page-root'
 import { applyAddCustomComponent } from './custom-component/add-custom-component'
 import { applySetDefaultsHead } from './defaults/set-defaults-head'
 import { applyCommandGroup } from './group/command-group'
+import { applyMigrateSite } from './migration/migrate-site'
 import { applyMoveComponent } from './move-component/move-component'
 import { noop } from './noop'
 import { applyAddPage } from './page/add-page'
@@ -100,6 +101,7 @@ export const applyCommand = (
     [CommandType.UpdateUi]: applyUpdateUi,
     [CommandType.AddCustomComponent]: applyAddCustomComponent,
     [CommandType.SetComponentState]: applySetComponentState,
+    [CommandType.MigrateSite]: applyMigrateSite,
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   applyFunctions[command.type](site, command.data as any, isRedo)

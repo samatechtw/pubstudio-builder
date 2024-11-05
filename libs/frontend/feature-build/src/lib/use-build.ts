@@ -7,6 +7,7 @@ import {
   pushOrReplaceCommand,
   registerComponentEditorEvents,
   replaceLastCommand,
+  setComponentEventWithMissingBehaviors,
   setSelectedComponent,
 } from '@pubstudio/frontend/data-access-command'
 import '@pubstudio/frontend/feature-builtin-editor' // Ensure editor events loaded
@@ -156,9 +157,16 @@ export interface IUseBuild {
     component: IComponent,
     newEvent: IComponentEvent,
   ) => ISetComponentEventData
-  addSelectedComponentEvent: (newEvent: IComponentEvent) => void
+  addSelectedComponentEvent: (
+    newEvent: IComponentEvent,
+    missingBehaviorIds: string[],
+  ) => void
   removeSelectedComponentEvent: (name: string) => void
-  updateSelectedComponentEvent: (oldEventName: string, newEvent: IComponentEvent) => void
+  updateSelectedComponentEvent: (
+    oldEventName: string,
+    newEvent: IComponentEvent,
+    missingBehaviorIds: string[],
+  ) => void
   addSelectedComponentEditorEvent: (newEvent: IEditorEvent) => void
   removeSelectedComponentEditorEvent: (name: string) => void
   updateSelectedComponentEditorEvent: (
@@ -569,18 +577,25 @@ export const useBuild = (): IUseBuild => {
     pushCommand(site.value, CommandType.UpdateMixinOrder, data)
   }
 
-  const addSelectedComponentEvent = (newEvent: IComponentEvent) => {
+  const addSelectedComponentEvent = (
+    newEvent: IComponentEvent,
+    missingBehaviorIds: string[],
+  ) => {
     const selected = site.value.editor?.selectedComponent
     if (!selected) {
       return
     }
     const data = addComponentEventData(selected, newEvent)
-    pushCommand(site.value, CommandType.SetComponentEvent, data)
+    pushCommandObject(
+      site.value,
+      setComponentEventWithMissingBehaviors(data, missingBehaviorIds),
+    )
   }
 
   const updateSelectedComponentEvent = (
     oldEventName: string,
     newEvent: IComponentEvent,
+    missingBehaviorIds: string[],
   ) => {
     // TODO -- don't update if event is unchanged
     const selected = site.value.editor?.selectedComponent
@@ -593,7 +608,10 @@ export const useBuild = (): IUseBuild => {
       oldEvent,
       newEvent,
     }
-    pushCommand(site.value, CommandType.SetComponentEvent, data)
+    pushCommandObject(
+      site.value,
+      setComponentEventWithMissingBehaviors(data, missingBehaviorIds),
+    )
   }
 
   const removeSelectedComponentEvent = (name: string) => {

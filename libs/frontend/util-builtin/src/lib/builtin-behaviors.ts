@@ -52,14 +52,12 @@ export const toggleHidden: IBehavior = {
       help: 'The ID of the component which will be toggled.',
     },
   },
-  code: `const { site } = behaviorContext
-    const { getState, setState } = helpers
-    let cmp = undefined
-    if (args?.id) {
-      cmp = resolveComponent(site.context, args.id)
-    }
-    setState(cmp, 'hide', !getState(cmp, 'hide'))
-  `,
+  code: `let cmp = undefined
+if (args?.id) {
+  cmp = getComponent(site, args.id)
+}
+setState(cmp, 'hide', !getState(cmp, 'hide'))
+`,
 }
 
 export const setHidden: IBehavior = {
@@ -78,11 +76,11 @@ export const setHidden: IBehavior = {
     },
   },
   code: `let cmp = undefined
-    if (args?.id) {
-      cmp = resolveComponent(site.context, args.id)
-    }
-    helpers.setState(cmp, 'hide', !!args?.hide)
-  `,
+if (args?.id) {
+  cmp = getComponent(site, args.id)
+}
+setState(cmp, 'hide', !!args?.hide)
+`,
 }
 
 export const viewCounterBehavior: IBehavior = {
@@ -97,10 +95,10 @@ export const homeLinkBehavior: IBehavior = {
   id: homeLinkBehaviorId,
   name: 'Home Link',
   code: `const homeRoute = site.defaults.homePage
-    if (component.inputs?.href?.is !== homeRoute) {
-      helpers.setInput(component, 'href', homeRoute)
-    }
-  `,
+if (component.inputs?.href?.is !== homeRoute) {
+  helpers.setInput(component, 'href', homeRoute)
+}
+`,
 }
 
 export const clearFormErrorBehavior: IBehavior = {
@@ -114,11 +112,11 @@ export const clearFormErrorBehavior: IBehavior = {
     },
   },
   code: `if (args?.errorId) {
-      const errorCmp = helpers.getComponent(site, args.errorId)
-      helpers.setContent(errorCmp, '')
-      helpers.setCustomStyle(errorCmp, 'opacity', '0')
-    }
-  `,
+  const errorCmp = getComponent(site, args.errorId)
+  helpers.setContent(errorCmp, '')
+  helpers.setCustomStyle(errorCmp, 'opacity', '0')
+}
+`,
 }
 
 export const contactFormBehavior: IBehavior = {
@@ -167,47 +165,47 @@ export const contactFormBehavior: IBehavior = {
     },
   },
   code: `event?.preventDefault()
-    const { error: argError, ...resolvedArgs } = helpers.requireArgs(args, [
-      'tableName',
-      'emailId',
-      'messageId',
-      'errorId',
-      'apiEmailField',
-      'apiMessageField',
-    ])
-    const errorCmp = helpers.getComponent(site, resolvedArgs.errorId)
-    if (argError) {
-      console.warn(argError)
-      helpers.setContent(errorCmp, 'Unknown form error')
-    } else {
-      let name
-      const email = helpers.getValue(resolvedArgs.emailId)
-      const message = helpers.getValue(resolvedArgs.messageId)
-      if (args?.nameId) {
-        name = helpers.getValue(args.nameId)
-      }
-      const button = findComponent(component, (cmp) => cmp.tag === 'button')
-      try {
-        helpers.setLoading(button, true)
-        const row = {
-          [resolvedArgs.apiEmailField]: email ?? '',
-          [resolvedArgs.apiMessageField]: message ?? '',
-        }
-        if (args?.apiNameField && name) {
-          row[args?.apiNameField] = name
-        }
-        await helpers.addRow(resolvedArgs.tableName, row)
-        helpers.setCustomStyle(errorCmp, 'opacity', '1')
-        helpers.setCustomStyle(errorCmp, 'color', '\${color-success}')
-        helpers.setContent(errorCmp, 'Contact request sent!')
-      } catch (e) {
-        helpers.setError(errorCmp, e, {
-          CustomDataUniqueFail: 'Contact request already submitted',
-        })
-      }
-      helpers.setLoading(button, false)
+const { error: argError, ...resolvedArgs } = helpers.requireArgs(args, [
+  'tableName',
+  'emailId',
+  'messageId',
+  'errorId',
+  'apiEmailField',
+  'apiMessageField',
+])
+const errorCmp = getComponent(site, resolvedArgs.errorId)
+if (argError) {
+  console.warn(argError)
+  helpers.setContent(errorCmp, 'Unknown form error')
+} else {
+  let name
+  const email = helpers.getValue(resolvedArgs.emailId)
+  const message = helpers.getValue(resolvedArgs.messageId)
+  if (args?.nameId) {
+    name = helpers.getValue(args.nameId)
+  }
+  const button = findComponent(component, (cmp) => cmp.tag === 'button')
+  try {
+    helpers.setLoading(button, true)
+    const row = {
+      [resolvedArgs.apiEmailField]: email ?? '',
+      [resolvedArgs.apiMessageField]: message ?? '',
     }
-  `,
+    if (args?.apiNameField && name) {
+      row[args?.apiNameField] = name
+    }
+    await helpers.addRow(resolvedArgs.tableName, row)
+    helpers.setCustomStyle(errorCmp, 'opacity', '1')
+    helpers.setCustomStyle(errorCmp, 'color', '\${color-success}')
+    helpers.setContent(errorCmp, 'Contact request sent!')
+  } catch (e) {
+    helpers.setError(errorCmp, e, {
+      CustomDataUniqueFail: 'Contact request already submitted',
+    })
+  }
+  helpers.setLoading(button, false)
+}
+`,
 }
 
 export const mailingListBehavior: IBehavior = {
@@ -246,43 +244,43 @@ export const mailingListBehavior: IBehavior = {
     },
   },
   code: `event?.preventDefault()
-    const { error: argError, ...resolvedArgs } = helpers.requireArgs(args, [
-      'tableName',
-      'emailId',
-      'errorId',
-      'apiEmailField',
-    ])
-    const errorCmp = helpers.getComponent(site, resolvedArgs.errorId)
-    if (argError) {
-      console.warn(argError)
-      helpers.setContent(errorCmp, 'Unknown form error')
-    } else {
-      let name
-      const email = helpers.getValue(resolvedArgs.emailId)
-      if (args?.nameId) {
-        name = helpers.getValue(args.nameId)
-      }
-      const button = findComponent(component, (cmp) => cmp.tag === 'button')
-      try {
-        helpers.setLoading(button, true)
-        const row = {
-          [resolvedArgs.apiEmailField]: email ?? '',
-        }
-        if (args?.apiNameField && name) {
-          row[args?.apiNameField] = name
-        }
-        await helpers.addRow(resolvedArgs.tableName, row)
-        helpers.setCustomStyle(errorCmp, 'opacity', '1')
-        helpers.setCustomStyle(errorCmp, 'color', '\${color-success}')
-        helpers.setContent(errorCmp, 'Subscribed!')
-      } catch (e) {
-        helpers.setError(errorCmp, e, {
-          CustomDataUniqueFail: "You're already subscribed!",
-        })
-      }
-      helpers.setLoading(button, false)
+const { error: argError, ...resolvedArgs } = helpers.requireArgs(args, [
+  'tableName',
+  'emailId',
+  'errorId',
+  'apiEmailField',
+])
+const errorCmp = getComponent(site, resolvedArgs.errorId)
+if (argError) {
+  console.warn(argError)
+  helpers.setContent(errorCmp, 'Unknown form error')
+} else {
+  let name
+  const email = helpers.getValue(resolvedArgs.emailId)
+  if (args?.nameId) {
+    name = helpers.getValue(args.nameId)
+  }
+  const button = findComponent(component, (cmp) => cmp.tag === 'button')
+  try {
+    helpers.setLoading(button, true)
+    const row = {
+      [resolvedArgs.apiEmailField]: email ?? '',
     }
-  `,
+    if (args?.apiNameField && name) {
+      row[args?.apiNameField] = name
+    }
+    await helpers.addRow(resolvedArgs.tableName, row)
+    helpers.setCustomStyle(errorCmp, 'opacity', '1')
+    helpers.setCustomStyle(errorCmp, 'color', '\${color-success}')
+    helpers.setContent(errorCmp, 'Subscribed!')
+  } catch (e) {
+    helpers.setError(errorCmp, e, {
+      CustomDataUniqueFail: "You're already subscribed!",
+    })
+  }
+  helpers.setLoading(button, false)
+}
+`,
 }
 
 export const builtinBehaviors: Record<string, IBehavior> = {

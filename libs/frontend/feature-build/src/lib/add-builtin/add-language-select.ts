@@ -24,7 +24,7 @@ export const addLanguageSelect = (site: ISite): string | undefined => {
     makeAddComponentData(languages, parent, site.editor?.selectedComponent?.id),
   )
   if (data) {
-    const missing = getMissingComponentFields(languages)
+    const missing = getMissingComponentFields(site, languages)
     pushCommandWithBuiltins(site, CommandType.AddComponent, data, missing)
 
     const langWrap = resolveComponent(site.context, data.id)
