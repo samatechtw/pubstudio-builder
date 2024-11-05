@@ -1,7 +1,13 @@
-import { IComponent, IPage } from '@pubstudio/shared/type-site'
+import { IComponent, IPage, ISite } from '@pubstudio/shared/type-site'
 
 export type ComponentIterFn = (component: IComponent) => void
 export type ComponentFindFn = (component: IComponent) => boolean
+
+export const iterateSite = (site: ISite, fn: ComponentIterFn) => {
+  for (const page of Object.values(site.pages)) {
+    iteratePage(page, fn)
+  }
+}
 
 export const iteratePage = (page: IPage | undefined, fn: ComponentIterFn) => {
   if (page) {

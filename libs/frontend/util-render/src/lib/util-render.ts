@@ -125,7 +125,7 @@ export type MixinIterFn = (
 
 export const iterateMixin = (context: ISiteContext, mixinId: string, fn: MixinIterFn) => {
   const mixin = context.styles[mixinId]
-  Object.entries(mixin.breakpoints ?? {}).forEach(([bpId, pseudoStyle]) => {
+  Object.entries(mixin?.breakpoints ?? {}).forEach(([bpId, pseudoStyle]) => {
     Object.entries(pseudoStyle).forEach(([pseudoClass, rawStyle]) => {
       const pseudoValue =
         (pseudoClass as CssPseudoClassType) === 'default' ? '' : pseudoClass

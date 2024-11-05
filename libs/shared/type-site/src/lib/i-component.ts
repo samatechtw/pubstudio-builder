@@ -56,6 +56,7 @@ export interface IBehavior {
   args?: Record<string, IBehaviorArg>
   code?: string
   // Pre-resolved builtin behavior, to avoid the need for `eval`
+  // Deprecated: https://github.com/samatechtw/pubstudio-builder/issues/673
   builtin?: IResolvedBehavior
 }
 

@@ -5,6 +5,7 @@ jest.mock('@pubstudio/frontend/data-access-web-store', () => ({
     misc: {},
     auth: {},
     user: {},
+    version: { editingEnabled: { value: true } },
     site: { setSite: () => ({}), site: { value: {} } },
     editor: { setEditor: () => ({}) },
   },

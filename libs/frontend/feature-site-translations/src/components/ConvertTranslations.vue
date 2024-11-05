@@ -41,7 +41,7 @@ import { useI18n } from 'petite-vue-i18n'
 import { ErrorMessage, Modal, PSButton } from '@pubstudio/frontend/ui-widgets'
 import { pushGroupCommands } from '@pubstudio/frontend/feature-build'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
-import { iteratePage } from '@pubstudio/frontend/util-render'
+import { iterateSite } from '@pubstudio/frontend/util-render'
 import { clone } from '@pubstudio/frontend/util-component'
 import { i18nVarRegex } from '@pubstudio/frontend/feature-render'
 import { CommandType, ICommand } from '@pubstudio/shared/type-command'
@@ -83,35 +83,34 @@ const scanI18n = async () => {
   const newTranslations = clone(site.value.context.i18n)
   const contentMap: Record<string, string> = {}
   const newCommands: ICommand[] = []
-  for (const page of Object.values(site.value.pages)) {
-    iteratePage(page, (component) => {
-      const { content } = component
-      if (content) {
-        if (i18nVarRegex.test(content) || content.includes('<svg')) {
-          skipped.value += 1
-          return
-        }
-        // Strip outer html, but only if there is a single div wrapper
-        let parsedContent = content.trim()
-        const divCount = (parsedContent.match(/<\/div>/g) || []).length
-        if (divCount === 1) {
-          parsedContent = parsedContent.replace(/<div.*?>(.*)<\/div>/, '$1')
-        }
-        if (contentMap[parsedContent]) {
-          duplicates.value += 1
-        } else {
-          translationCount.value += 1
-          contentMap[parsedContent] = component.id
-        }
-        const data: IEditComponentData = {
-          id: component.id,
-          new: { content: '${' + contentMap[parsedContent] + '}' },
-          old: { content: component.content },
-        }
-        newCommands.push({ type: CommandType.EditComponent, data })
+  iterateSite(site.value, (component) => {
+    const { content } = component
+    if (content) {
+      if (i18nVarRegex.test(content) || content.includes('<svg')) {
+        skipped.value += 1
+        return
       }
-    })
-  }
+      // Strip outer html, but only if there is a single div wrapper
+      let parsedContent = content.trim()
+      const divCount = (parsedContent.match(/<\/div>/g) || []).length
+      if (divCount === 1) {
+        parsedContent = parsedContent.replace(/<div.*?>(.*)<\/div>/, '$1')
+      }
+      if (contentMap[parsedContent]) {
+        duplicates.value += 1
+      } else {
+        translationCount.value += 1
+        contentMap[parsedContent] = component.id
+      }
+      const data: IEditComponentData = {
+        id: component.id,
+        new: { content: '${' + contentMap[parsedContent] + '}' },
+        old: { content: component.content },
+      }
+      newCommands.push({ type: CommandType.EditComponent, data })
+    }
+  })
+
   if (newCommands.length) {
     if (!newTranslations[defaultLang.value]) {
       newTranslations[defaultLang.value] = {}

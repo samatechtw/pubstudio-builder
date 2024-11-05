@@ -77,10 +77,6 @@ export const useSiteSource = (): IUseSiteSource => {
       restoredSite = restored
       replaceSite(restoredSite.site)
       siteError.value = restoredSite.error
-      // Migrate site version if necessary
-      if (site.value) {
-        migrateSite(site.value)
-      }
     }
   }
 
@@ -89,6 +85,10 @@ export const useSiteSource = (): IUseSiteSource => {
     site.value = newSite
     if (site.value.editor) {
       site.value.editor.store = siteStore.value
+    }
+    // Migrate site version if necessary
+    if (site.value) {
+      migrateSite(site.value)
     }
   }
 

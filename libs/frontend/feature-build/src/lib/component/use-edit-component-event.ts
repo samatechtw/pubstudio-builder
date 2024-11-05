@@ -1,6 +1,9 @@
-import { setComponentEditEvent } from '@pubstudio/frontend/data-access-command'
+import {
+  getMissingBehaviorIds,
+  setComponentEditEvent,
+} from '@pubstudio/frontend/data-access-command'
 import { builtinBehaviors, noBehavior } from '@pubstudio/frontend/util-builtin'
-import { resolveComponent } from '@pubstudio/frontend/util-resolve'
+import { resolveBehavior, resolveComponent } from '@pubstudio/frontend/util-resolve'
 import { ComponentEventType, IComponentEvent, ISite } from '@pubstudio/shared/type-site'
 import { computed } from 'vue'
 import { useBuild } from '../use-build'
@@ -71,14 +74,15 @@ export const useEditComponentEvent = (): IUseEditComponentEventFeature => {
   const upsertEvent = (event: IComponentEvent, oldEventName?: string) => {
     const selectedComponent = editor.value?.selectedComponent
     if (selectedComponent) {
+      const missingBehaviorIds = getMissingBehaviorIds(site.value, event)
       if (
         oldEventName &&
         selectedComponent.events &&
         oldEventName in selectedComponent.events
       ) {
-        updateSelectedComponentEvent(oldEventName, event)
+        updateSelectedComponentEvent(oldEventName, event, missingBehaviorIds)
       } else {
-        addSelectedComponentEvent(event)
+        addSelectedComponentEvent(event, missingBehaviorIds)
       }
       setEditedEvent(undefined)
     }
