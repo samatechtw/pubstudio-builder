@@ -15,6 +15,7 @@ LABEL com.centurylinklabs.watchtower.lifecycle.pre-update="../pre-update.sh"
 
 COPY --chmod=755 ./backend/target/${PLATFORM_FOLDER}release/site-api ./
 COPY --chmod=755 ./dist/apps/web-site/index.html ./
+COPY --chmod=755 ./dist/apps/archive/index_v1.html ./
 COPY --chmod=755 ./backend/pre-update.sh ../
 COPY ./backend/site-api/db/metadata/migrations/* ./db/metadata/migrations/
 COPY ./backend/site-api/db/sites/migrations/* ./db/sites/migrations/

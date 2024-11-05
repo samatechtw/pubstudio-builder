@@ -10,6 +10,7 @@ import {
   store,
 } from '@pubstudio/frontend/data-access-web-store'
 import { parseApiErrorKey, PSApi, toApiError } from '@pubstudio/frontend/util-api'
+import { builderConfig } from '@pubstudio/frontend/util-config'
 import { serializeEditor, storeSite } from '@pubstudio/frontend/util-site-store'
 import { IApiError } from '@pubstudio/shared/type-api'
 import {
@@ -22,6 +23,7 @@ import {
   ISiteRestore,
   ISiteSaveOptions,
   ISiteStore,
+  ISiteStoreInitializeResult,
   IStoredSiteDirty,
   SiteSaveState,
 } from '@pubstudio/shared/type-site'
@@ -85,8 +87,9 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
 
   // Set up the get/update functions for syncing to the Platform API (local site)
   // or Site API (free/paid site)
-  const initialize = async (): Promise<string | undefined> => {
+  const initialize = async (): Promise<ISiteStoreInitializeResult | undefined> => {
     let serverAddress: string | undefined
+    let siteVersion = builderConfig.siteFormatVersion
     if (siteId.value === 'identity') {
       const platformSiteApi = useLocalSiteApi(platformApi)
       siteId.value = store.user.identity.value.id
@@ -100,6 +103,7 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
         const { getSite } = usePlatformSiteApi(platformApi)
         const site = await getSite(siteId.value)
         serverAddress = site.site_server.address
+        siteVersion = site.site_version
       }
       // Convert cluster URLs for dev/CI
       serverAddress =
@@ -117,7 +121,10 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
       const siteApi = useSiteApi(api)
       getFn = siteApi.getSiteVersion
       updateFn = siteApi.updateSite
-      return serverAddress
+      return {
+        serverAddress,
+        siteVersion,
+      }
     }
     return undefined
   }

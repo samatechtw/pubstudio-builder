@@ -6,6 +6,7 @@
 !libs/
 !backend/
 !dist/apps/web-site/
+!dist/apps/archive/
 !**/tsconfig*.json
 !subset.config.js
 !package*.json

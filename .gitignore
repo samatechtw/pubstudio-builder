@@ -1,5 +1,9 @@
 build/
-dist/
+dist/*
+!dist/apps
+dist/apps/builder-demo
+dist/apps/web-site
+!dist/apps/archive
 tmp/
 out-tsc/
 node_modules/

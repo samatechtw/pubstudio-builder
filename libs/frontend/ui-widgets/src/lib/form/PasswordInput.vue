@@ -67,3 +67,11 @@ const inputType = computed(() => {
   return showPasswordFlag.value ? 'text' : 'password'
 })
 </script>
+
+<style lang="postcss" scoped>
+.eye-button-wrap {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+}
+</style>

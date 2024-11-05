@@ -29,6 +29,7 @@ pub struct PlatformSiteEntity {
     pub owner_id: Uuid,
     #[serde(rename = "type")]
     pub site_type: SiteType,
+    pub site_version: String,
     pub published: bool,
     pub disabled: bool,
     pub subdomain: String,
@@ -44,6 +45,7 @@ pub struct GetPlatformSiteEntity {
     pub owner_id: Uuid,
     #[serde(rename = "type")]
     pub site_type: SiteType,
+    pub site_version: String,
     pub published: bool,
     pub disabled: bool,
     pub subdomain: String,

@@ -1,3 +1,5 @@
+import { usePlatformSiteApi } from '@pubstudio/frontend/data-access-api'
+import { ApiInjectionKey } from '@pubstudio/frontend/data-access-injection'
 import { site } from '@pubstudio/frontend/feature-site-source'
 import { PSApi } from '@pubstudio/frontend/util-api'
 import { loadSiteLanguage } from '@pubstudio/frontend/util-site-deserialize'
@@ -12,7 +14,7 @@ import {
   SiteSaveState,
 } from '@pubstudio/shared/type-site'
 import { plainResponseInterceptors } from '@pubstudio/shared/util-web-site-api'
-import { computed, ComputedRef, Ref, ref } from 'vue'
+import { computed, ComputedRef, inject, Ref, ref } from 'vue'
 import { getActivePage } from './get-active-page'
 import { migrateSite } from './migrate-site'
 
@@ -72,6 +74,8 @@ const isSiteApi = computed(() => {
 })
 
 export const useSiteSource = (): IUseSiteSource => {
+  const platformApi = inject(ApiInjectionKey) as PSApi
+
   const setRestoredSite = (restored: ISiteRestore | undefined) => {
     if (restored) {
       restoredSite = restored
@@ -88,7 +92,12 @@ export const useSiteSource = (): IUseSiteSource => {
     }
     // Migrate site version if necessary
     if (site.value) {
-      migrateSite(site.value)
+      const migrated = migrateSite(site.value)
+      // If a paid site was migrated to a new version, sync with the platform API
+      if (apiSiteId.value && isSiteApi.value && migrated) {
+        const { updateSite } = usePlatformSiteApi(platformApi)
+        updateSite(apiSiteId.value, { version: site.value.version })
+      }
     }
   }
 
@@ -99,17 +108,17 @@ export const useSiteSource = (): IUseSiteSource => {
     apiSiteId.value = siteId
     siteStore.value = store
 
-    const serverAddress = await siteStore.value.initialize()
-    if (serverAddress) {
+    const initInfo = await siteStore.value.initialize()
+    if (initInfo) {
       apiSite = new PSApi({
-        baseUrl: `${serverAddress}/api/`,
+        baseUrl: `${initInfo.serverAddress}/api/`,
         userToken,
         responseInterceptors: [...plainResponseInterceptors],
       })
     }
     const restored = await siteStore.value.restore()
     setRestoredSite(restored)
-    return serverAddress
+    return initInfo?.serverAddress
   }
 
   // When a site is updated outside the siteStore, the update_key needs to be synced.
