@@ -123,7 +123,7 @@ const save = async () => {
     description: description.value,
     public: true,
     name: name.value,
-    version: '0.1',
+    version: '2',
     context,
     defaults,
     pages,

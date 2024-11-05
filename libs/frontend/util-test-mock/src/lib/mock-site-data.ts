@@ -9,7 +9,7 @@ import {
 
 export const mockSerializedSite: ISerializedSite = {
   name: 'test',
-  version: '0.1',
+  version: '2',
   editor: {
     selectedComponentId: 'test-c-0',
     active: '/home',

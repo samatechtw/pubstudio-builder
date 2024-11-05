@@ -148,7 +148,7 @@ describe('Get Current Site', () => {
 
       const body: IGetSiteApiResponse = response.body
       expect(body.name).toEqual('Test Site 3')
-      expect(body.version).toEqual('0.1')
+      expect(body.version).toEqual('2')
       expect(body.context).toBeDefined()
       expect(body.defaults).toBeDefined()
       expect(body.pages).toBeDefined()

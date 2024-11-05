@@ -9,7 +9,7 @@ The following is a minimal Site representation in serialized JSON form, with com
   // Site name, mainly used for builder display
   "name": "test",
   // Format version, to indicate serialization/rendering features
-  "version": "0.1",
+  "version": "2",
   // TBD
   "defaults": {
     // Default document metadata

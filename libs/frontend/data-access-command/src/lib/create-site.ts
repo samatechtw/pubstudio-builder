@@ -105,7 +105,7 @@ export const createSite = (_namespace: string): ISite => {
   return {
     context,
     name: namespace,
-    version: '0.1',
+    version: '2',
     defaults: {
       head: {},
       homePage: homePageMetadata.route,
