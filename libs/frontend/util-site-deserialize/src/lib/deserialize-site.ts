@@ -28,7 +28,6 @@ export const deserializeEditor = (
         selectedComponent: selectedId ? context.components[selectedId] : undefined,
         active: serializedEditor.active,
         editorEvents: {},
-        debugBounding: serializedEditor.debugBounding,
         buildSubmenu: serializedEditor.buildSubmenu,
         editorDropdown: serializedEditor.editorDropdown,
         editBehavior: serializedEditor.editBehavior,
@@ -54,6 +53,8 @@ export const deserializeEditor = (
         editorI18n: serializedEditor.editorI18n,
         // Added 240617
         hotkeys: serializedEditor.hotkeys ?? {},
+        // Added 241118
+        prefs: serializedEditor.prefs ?? {},
         templatesShown: serializedEditor.templatesShown,
         // Added 231201
         componentMenuCollapses: serializedEditor.componentMenuCollapses ?? {},

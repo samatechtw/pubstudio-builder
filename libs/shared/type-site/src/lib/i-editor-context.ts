@@ -129,6 +129,15 @@ export interface IEditingMixinData {
   originComponentId?: string
 }
 
+export interface IEditorPreferences {
+  // Show component bounding boxes
+  debugBounding: boolean
+  // Force opacity to 1
+  overrideOpacity?: boolean
+  // Force transform to default/initial
+  overrideTransform?: boolean
+}
+
 export interface IEditorContext {
   // Reference to store used to save/restore the site, populated on initialization
   store?: ISiteStore
@@ -142,8 +151,6 @@ export interface IEditorContext {
   active: string
   // Editor events bound to components that trigger behaviors
   editorEvents: IEditorEvents
-  // Show component bounding boxes
-  debugBounding: boolean
   // Determines active menu
   mode: EditorMode
   // Active editing page route
@@ -203,6 +210,8 @@ export interface IEditorContext {
   editorI18n?: string
   // Custom hotkey map
   hotkeys: IHotkeys
+  // General preferences
+  prefs: IEditorPreferences
   // If false/undefined, template selector is shown when the site is loaded
   templatesShown?: boolean
   // State of contact form walkthrough modal

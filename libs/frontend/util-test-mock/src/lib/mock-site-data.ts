@@ -13,7 +13,6 @@ export const mockSerializedSite: ISerializedSite = {
   editor: {
     selectedComponentId: 'test-c-0',
     active: '/home',
-    debugBounding: false,
     mode: EditorMode.SelectedComponent,
     showComponentTree: true,
     componentTreeExpandedItems: {
@@ -29,6 +28,11 @@ export const mockSerializedSite: ISerializedSite = {
     builderScale: 1,
     cssPseudoClass: CssPseudoClass.Default,
     hotkeys: {},
+    prefs: {
+      debugBounding: false,
+      overrideOpacity: false,
+      overrideTransform: false,
+    },
   },
   context: {
     namespace: 'test',

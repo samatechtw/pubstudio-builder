@@ -40,14 +40,6 @@
       <slot name="preview" />
     </ToolbarItem>
     <ToolbarItem
-      :active="editor?.debugBounding"
-      :tooltip="t('toolbar.bounding')"
-      class="bounding"
-      @click="setDebugBounding(editor, !editor?.debugBounding)"
-    >
-      <BoundingBox />
-    </ToolbarItem>
-    <ToolbarItem
       :tooltip="t('toolbar.bug_title')"
       class="bug"
       @click="setShowBugReportModal(true)"
@@ -83,10 +75,7 @@
 import { ref, unref } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { useBuild, useHistory } from '@pubstudio/frontend/feature-build'
-import {
-  setDebugBounding,
-  setShowComponentTree,
-} from '@pubstudio/frontend/data-access-command'
+import { setPref, setShowComponentTree } from '@pubstudio/frontend/data-access-command'
 import {
   BoundingBox,
   Bug,
@@ -105,10 +94,10 @@ import ToolbarPseudoClass from './ToolbarPseudoClass.vue'
 import ToolbarBuilderWidth from './ToolbarBuilderWidth.vue'
 import ToolbarBreakpoint from './ToolbarBreakpoint.vue'
 import BugReportModal from './BugReportModal.vue'
-import EditorPreferencesModal from './EditorPreferencesModal.vue'
 import ToolbarVersion from './ToolbarVersion.vue'
 import '@samatech/vue-color-picker/dist/style.css'
 import ToolbarActiveI18n from './ToolbarActiveI18n.vue'
+import EditorPreferencesModal from '../preferences/EditorPreferencesModal.vue'
 
 defineProps<{
   hideSettings?: boolean
