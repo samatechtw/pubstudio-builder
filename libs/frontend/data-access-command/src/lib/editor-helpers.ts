@@ -16,6 +16,7 @@ import {
   IEditGlobalStyle,
   IEditingMixinData,
   IEditorContext,
+  IEditorPreferences,
   IEditSvg,
   IMailingListWalkthrough,
   ISite,
@@ -244,13 +245,6 @@ export const setEditGlobalStyle = (
   }
 }
 
-export const setDebugBounding = (editor: IEditorContext | undefined, enable: boolean) => {
-  if (editor) {
-    editor.debugBounding = enable
-    editor.store?.saveEditor(editor)
-  }
-}
-
 export const toggleComponentHidden = (
   editor: IEditorContext | undefined,
   componentId: string,
@@ -400,6 +394,17 @@ export const setMailingListWalkthrough = (
   formId?: string,
 ) => {
   setWalkthroughState(editor, 'mailingListWalkthrough', state, formId)
+}
+
+export const setPref = (
+  editor: IEditorContext | undefined,
+  key: keyof IEditorPreferences,
+  val: boolean,
+) => {
+  if (editor) {
+    editor.prefs[key] = val
+    editor.store?.saveEditor(editor)
+  }
 }
 
 export const setTemplatesShown = (editor: IEditorContext | undefined, shown: boolean) => {

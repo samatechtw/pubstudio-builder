@@ -189,8 +189,14 @@ const computeBuilderStyleProps = (
     ])
   }
 
-  if (editor?.debugBounding) {
+  if (editor?.prefs.debugBounding) {
     builderStyle.border = '1.5px dashed #999'
+  }
+  if (editor?.prefs.overrideOpacity) {
+    builderStyle.opacity = '1'
+  }
+  if (editor?.prefs.overrideTransform) {
+    builderStyle.transform = 'none'
   }
   if (dndState) {
     // Drag

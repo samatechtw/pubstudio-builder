@@ -44,7 +44,6 @@ export const serializeEditor = (
     ? {
         selectedComponentId: editor.selectedComponent?.id,
         active: editor.active,
-        debugBounding: editor.debugBounding,
         buildSubmenu: editor.buildSubmenu,
         editorDropdown: editor.editorDropdown,
         editBehavior: editor.editBehavior,
@@ -66,6 +65,7 @@ export const serializeEditor = (
         cssPseudoClass: editor.cssPseudoClass,
         editorI18n: editor.editorI18n,
         hotkeys: editor.hotkeys,
+        prefs: editor.prefs,
         templatesShown: editor.templatesShown,
         componentMenuCollapses: editor.componentMenuCollapses,
         contactFormWalkthrough: editor.contactFormWalkthrough,

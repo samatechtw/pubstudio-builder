@@ -1,8 +1,5 @@
 <template>
-  <div class="editor-preferences">
-    <div class="modal-title">
-      {{ t('toolbar.prefs') }}
-    </div>
+  <div class="editor-hotkeys">
     <div class="modal-text" v-html="t('toolbar.prefs_text')"></div>
     <div class="states">
       <EditorHotkeyColumn :states="col1States" />
@@ -65,6 +62,10 @@ onUnmounted(() => {
   flex-wrap: wrap;
   color: black;
   margin-bottom: 24px;
+}
+.modal-text {
+  @mixin text-medium 16px;
+  color: $grey-700;
 }
 .modal-buttons {
   @mixin flex-row;

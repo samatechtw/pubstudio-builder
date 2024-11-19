@@ -17,7 +17,6 @@ export const createEditorContext = (homePage: IPage): IEditorContext => {
     selectedComponent: homePage.root,
     active: homePage.route,
     editorEvents: {},
-    debugBounding: false,
     mode: EditorMode.None,
     editPageRoute: undefined,
     showComponentTree: true,
@@ -31,6 +30,11 @@ export const createEditorContext = (homePage: IPage): IEditorContext => {
     builderScale: 1,
     cssPseudoClass: CssPseudoClass.Default,
     hotkeys: {},
+    prefs: {
+      debugBounding: false,
+      overrideOpacity: false,
+      overrideTransform: false,
+    },
     componentMenuCollapses: {
       [ComponentMenuCollapsible.Dimensions]: false,
       [ComponentMenuCollapsible.Styles]: false,
