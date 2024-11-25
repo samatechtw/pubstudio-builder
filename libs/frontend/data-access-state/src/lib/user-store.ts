@@ -68,7 +68,7 @@ export const userModule = useModule<
   ReturnType<typeof userMutations>
 >({
   name: 'user',
-  version: 1,
+  version: 2,
   stateInit: userInit,
   mutations: userMutations,
   getters: userGetters,
