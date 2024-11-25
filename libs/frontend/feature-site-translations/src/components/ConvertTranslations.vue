@@ -15,6 +15,8 @@
       <span class="new-translations">{{ translationCount }}</span>
       <span>{{ t('i18n.duplicate') }}</span>
       <span class="duplicates">{{ duplicates }}</span>
+      <span>{{ t('i18n.skipped') }}</span>
+      <span class="skipped">{{ skipped }}</span>
     </div>
     <ErrorMessage v-if="error" :error="error" class="convert-error" />
     <div class="modal-buttons">
@@ -43,7 +45,7 @@ import { pushGroupCommands } from '@pubstudio/frontend/feature-build'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { iterateSite } from '@pubstudio/frontend/util-render'
 import { clone } from '@pubstudio/frontend/util-component'
-import { i18nVarRegex } from '@pubstudio/frontend/feature-render'
+import { varIsI18n } from '@pubstudio/frontend/feature-render'
 import { CommandType, ICommand } from '@pubstudio/shared/type-command'
 import {
   IEditComponentData,
@@ -83,10 +85,14 @@ const scanI18n = async () => {
   const newTranslations = clone(site.value.context.i18n)
   const contentMap: Record<string, string> = {}
   const newCommands: ICommand[] = []
+  const i18nToIds: Record<string, string> = {}
+  for (const [id, content] of Object.entries(newTranslations[defaultLang.value])) {
+    i18nToIds[content] = id
+  }
   iterateSite(site.value, (component) => {
     const { content } = component
     if (content) {
-      if (i18nVarRegex.test(content) || content.includes('<svg')) {
+      if (varIsI18n(content) || content.includes('<svg')) {
         skipped.value += 1
         return
       }
@@ -96,15 +102,21 @@ const scanI18n = async () => {
       if (divCount === 1) {
         parsedContent = parsedContent.replace(/<div.*?>(.*)<\/div>/, '$1')
       }
+      let newContent = '${' + contentMap[parsedContent] + '}'
+      // If content is already mapped to a new translation ID
       if (contentMap[parsedContent]) {
         duplicates.value += 1
+        // If content exists in current translations
+      } else if (i18nToIds[parsedContent]) {
+        duplicates.value += 1
+        newContent = '${' + i18nToIds[parsedContent] + '}'
       } else {
         translationCount.value += 1
         contentMap[parsedContent] = component.id
       }
       const data: IEditComponentData = {
         id: component.id,
-        new: { content: '${' + contentMap[parsedContent] + '}' },
+        new: { content: newContent },
         old: { content: component.content },
       }
       newCommands.push({ type: CommandType.EditComponent, data })
@@ -199,6 +211,10 @@ watch(show, () => {
     margin: 0 8px 0 4px;
   }
   .duplicates {
+    font-weight: 700;
+    margin: 0 8px 0 4px;
+  }
+  .skipped {
     font-weight: 700;
     margin-left: 4px;
   }
