@@ -79,9 +79,9 @@ const { t } = useI18n()
 const { site } = useSiteSource()
 const { setEditedEvent } = useEditComponentEvent()
 
-const events = computed(() =>
-  Object.values(computeComponentEvents(site.value, component.value)),
-)
+const events = computed(() => {
+  return Object.values(computeComponentEvents(site.value, component.value))
+})
 </script>
 
 <style lang="postcss" scoped>

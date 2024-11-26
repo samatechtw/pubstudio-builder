@@ -17,7 +17,7 @@ export const makeAddComponentData = (
     content: component.content,
     ...selectAddParent(parent, undefined),
     sourceId: component.id,
-    children: component.children,
+    children: clone(component.children),
     style: clone(component.style),
     inputs: clone(component.inputs),
     events: clone(component.events),

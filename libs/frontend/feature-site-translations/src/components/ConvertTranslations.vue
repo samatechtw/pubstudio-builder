@@ -86,7 +86,7 @@ const scanI18n = async () => {
   const contentMap: Record<string, string> = {}
   const newCommands: ICommand[] = []
   const i18nToIds: Record<string, string> = {}
-  for (const [id, content] of Object.entries(newTranslations[defaultLang.value])) {
+  for (const [id, content] of Object.entries(newTranslations[defaultLang.value] ?? {})) {
     i18nToIds[content] = id
   }
   iterateSite(site.value, (component) => {
@@ -102,10 +102,11 @@ const scanI18n = async () => {
       if (divCount === 1) {
         parsedContent = parsedContent.replace(/<div.*?>(.*)<\/div>/, '$1')
       }
-      let newContent = '${' + contentMap[parsedContent] + '}'
+      let newContent: string
       // If content is already mapped to a new translation ID
       if (contentMap[parsedContent]) {
         duplicates.value += 1
+        newContent = '${' + contentMap[parsedContent] + '}'
         // If content exists in current translations
       } else if (i18nToIds[parsedContent]) {
         duplicates.value += 1
@@ -113,6 +114,7 @@ const scanI18n = async () => {
       } else {
         translationCount.value += 1
         contentMap[parsedContent] = component.id
+        newContent = '${' + component.id + '}'
       }
       const data: IEditComponentData = {
         id: component.id,
