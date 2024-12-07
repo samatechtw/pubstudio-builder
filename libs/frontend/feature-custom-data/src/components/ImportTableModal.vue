@@ -140,8 +140,7 @@ const selectFile = async (file: File) => {
       error.value = t('errors.rows_missing')
       return
     }
-    const splitChar = getSplitChar(row1)
-    for (const colName of parseCsvRow(row1, splitChar)) {
+    for (const colName of parseCsvRow(row1)) {
       if (!columnNames.includes(colName)) {
         error.value = `${t('errors.CustomDataInvalidColumn')}: ${colName}`
         return
@@ -154,7 +153,7 @@ const selectFile = async (file: File) => {
       if (!row) {
         continue
       }
-      const newRow = parseCsvRow(row, splitChar)
+      const newRow = parseCsvRow(row)
       if (newRow.length !== columnNames.length) {
         error.value = `${t('errors.row_length')} ${i + 1}`
         return

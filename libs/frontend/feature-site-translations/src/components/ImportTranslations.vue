@@ -123,8 +123,7 @@ const selectFile = async (file: File) => {
       error.value = t('errors.rows_missing')
       return
     }
-    const splitChar = getSplitChar(row1)
-    const langs = parseCsvRow(row1, splitChar).slice(1)
+    const langs = parseCsvRow(row1).slice(1)
     const trans: Record<string, ITranslations> = {}
     const keys = new Set()
     for (const lang of langs) {
@@ -136,19 +135,20 @@ const selectFile = async (file: File) => {
       if (!row) {
         continue
       }
-      const [key, ...values] = parseCsvRow(row, splitChar)
+      const [key, ...values] = parseCsvRow(row)
       if (keys.has(key)) {
         error.value = `${t('errors.duplicate_key')}${i + 1}`
         duplicates.value += 1
         continue
       }
       keys.add(key)
-      if (values.length !== langs.length) {
+      if (values.length > langs.length) {
+        console.log('IT', values, langs)
         error.value = `${t('errors.row_length')} ${i + 1}`
         return
       }
       for (let langIndex = 0; langIndex < values.length; langIndex += 1) {
-        const value = values[langIndex]
+        const value = values[langIndex] ?? ''
         const lang = langs[langIndex]
         if (!includeEmpty.value || value) {
           trans[lang][key] = value
