@@ -248,7 +248,8 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
         content_updated_at: siteData?.content_updated_at,
       }
       setLocalContentUpdatedAt(siteData?.content_updated_at)
-      return restoreSiteHelper(data)
+      const site = restoreSiteHelper(data)
+      return site
     } catch (e) {
       console.log('Restore failed:', e)
       const err = toApiError(e)
