@@ -37,8 +37,8 @@ import { unstoreSite, loadSiteLanguage } from '@pubstudio/frontend/util-site-des
 import { rootSiteApi } from '@pubstudio/shared/util-web-site-api'
 import { ISite } from '@pubstudio/shared/type-site'
 import { IGetSiteApiResponse } from '@pubstudio/shared/type-api-site-sites'
-import NotFound from './components/NotFound.vue'
 import { overrideHelper } from '@pubstudio/frontend/util-resolve'
+import NotFound from './components/NotFound.vue'
 
 const API_URL = '___SITE_API_URL___'
 

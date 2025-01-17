@@ -30,17 +30,12 @@ export const parseCsvRow = (rowStr: string): string[] => {
       continue
     }
 
-    // If it's a newline (CRLF) and we're not in a quoted field, skip the next character
-    // and move on to the next row and move to column 0 of that new row
+    // A newline (CRLF) and not in a quoted field, skip the next character and return
     if (cc == '\r' && nc == '\n' && !quote) {
-      ++row
-      col = 0
-      ++c
-      continue
+      return arr
     }
 
-    // If it's a newline (LF or CR) and we're not in a quoted field,
-    // move on to the next row and move to column 0 of that new row
+    // If it's a newline (LF or CR) and we're not in a quoted field, return
     if ((cc == '\n' && !quote) || (cc == '\r' && !quote)) {
       return arr
     }
