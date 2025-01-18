@@ -38,7 +38,7 @@ describe('Persist Site Usage', () => {
       .expect(201)
   }
 
-  it.only('persists custom data usage', async () => {
+  it('persists custom data usage', async () => {
     // Check initial usage
     const res1 = await api
       .get(usageEndpoint(siteId))
