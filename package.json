@@ -59,9 +59,9 @@
     "vue": "^3.5.13"
   },
   "devDependencies": {
-    "@commitlint/config-conventional": "^19.5.0",
+    "@commitlint/config-conventional": "^19.6.0",
     "@jest/globals": "^29.7.0",
-    "@laynezh/vite-plugin-lib-assets": "^0.5.24",
+    "@laynezh/vite-plugin-lib-assets": "^1.0.0",
     "@nx/eslint": "19.8.3",
     "@nx/eslint-plugin": "19.8.3",
     "@nx/jest": "19.8.3",

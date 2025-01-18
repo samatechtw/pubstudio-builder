@@ -67,14 +67,14 @@ importers:
         version: 3.5.13(typescript@5.6.2)
     devDependencies:
       '@commitlint/config-conventional':
-        specifier: ^19.5.0
-        version: 19.5.0
+        specifier: ^19.6.0
+        version: 19.6.0
       '@jest/globals':
         specifier: ^29.7.0
         version: 29.7.0
       '@laynezh/vite-plugin-lib-assets':
-        specifier: ^0.5.24
-        version: 0.5.24(vite@5.4.10(@types/node@22.7.4)(lightningcss@1.27.0)(sugarss@4.0.1(postcss@8.4.47))(terser@5.34.1))
+        specifier: ^1.0.0
+        version: 1.0.0(vite@5.4.10(@types/node@22.7.4)(lightningcss@1.27.0)(sugarss@4.0.1(postcss@8.4.47))(terser@5.34.1))
       '@nx/eslint':
         specifier: 19.8.3
         version: 19.8.3(@babel/traverse@7.23.2)(@types/node@22.7.4)(@zkochan/js-yaml@0.0.7)(eslint@8.57.0)(nx@19.8.3)
@@ -851,8 +851,8 @@ packages:
     engines: {node: '>=v18'}
     hasBin: true
 
-  '@commitlint/config-conventional@19.5.0':
-    resolution: {integrity: sha512-OBhdtJyHNPryZKg0fFpZNOBM1ZDbntMvqMuSmpfyP86XSfwzGw4CaoYRG4RutUPg0BTK07VMRIkNJT6wi2zthg==}
+  '@commitlint/config-conventional@19.6.0':
+    resolution: {integrity: sha512-DJT40iMnTYtBtUfw9ApbsLZFke1zKh6llITVJ+x9mtpHD08gsNXaIRqHTmwTZL3dNX5+WoyK7pCN/5zswvkBCQ==}
     engines: {node: '>=v18'}
 
   '@commitlint/config-validator@19.5.0':
@@ -1383,10 +1383,10 @@ packages:
   '@jridgewell/trace-mapping@0.3.9':
     resolution: {integrity: sha512-3Belt6tdc8bPgAtbcmdtNJlirVoTmEb5e2gC94PnkwEW9jI6CAHUeoG85tjWP5WquqfavoMtMwiG4P926ZKKuQ==}
 
-  '@laynezh/vite-plugin-lib-assets@0.5.24':
-    resolution: {integrity: sha512-z1M8reWte/xP7xw+aFN0Euh9OinCjCzJ8HhLkvpz+6h6MSTyyA54xrxGmECx5QNd3bCwQlkGd7WAgkozjublCg==}
+  '@laynezh/vite-plugin-lib-assets@1.0.0':
+    resolution: {integrity: sha512-r0k8ThZC5wcMjJz34euD8QDJ0PEFdt6q3Zfkx6+bPHLmgocrv87IkzydAG2rTfW2onSyIp/1umkj3aw17bt/zg==}
     peerDependencies:
-      vite: ^3.0.0 || ^4.0.0 || ^5.0.0
+      vite: ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0
 
   '@microsoft/api-extractor-model@7.29.6':
     resolution: {integrity: sha512-gC0KGtrZvxzf/Rt9oMYD2dHvtN/1KPEYsrQPyMKhLHnlVuO/f4AFN3E4toqZzD2pt4LhkKoYmL2H9tX3yCOyRw==}
@@ -5650,7 +5650,7 @@ snapshots:
       - '@types/node'
       - typescript
 
-  '@commitlint/config-conventional@19.5.0':
+  '@commitlint/config-conventional@19.6.0':
     dependencies:
       '@commitlint/types': 19.5.0
       conventional-changelog-conventionalcommits: 7.0.2
@@ -6190,12 +6190,12 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.1
       '@jridgewell/sourcemap-codec': 1.5.0
 
-  '@laynezh/vite-plugin-lib-assets@0.5.24(vite@5.4.10(@types/node@22.7.4)(lightningcss@1.27.0)(sugarss@4.0.1(postcss@8.4.47))(terser@5.34.1))':
+  '@laynezh/vite-plugin-lib-assets@1.0.0(vite@5.4.10(@types/node@22.7.4)(lightningcss@1.27.0)(sugarss@4.0.1(postcss@8.4.47))(terser@5.34.1))':
     dependencies:
       escape-string-regexp: 4.0.0
       loader-utils: 3.2.1
       mrmime: 1.0.1
-      semver: 7.6.0
+      semver: 7.6.3
       vite: 5.4.10(@types/node@22.7.4)(lightningcss@1.27.0)(sugarss@4.0.1(postcss@8.4.47))(terser@5.34.1)
 
   '@microsoft/api-extractor-model@7.29.6(@types/node@22.7.4)':
