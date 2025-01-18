@@ -132,7 +132,7 @@ pub async fn backup_site(
     match context.backup_repo.create_backup(props).await {
         Ok(created_backup) => {
             // Delete extra backups if needed
-            if created_backup.count > 10 {
+            if created_backup.count > context.config.max_backups {
                 // Get oldest backups starting with the 10th
                 match context
                     .backup_repo

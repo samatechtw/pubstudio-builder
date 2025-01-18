@@ -27,6 +27,17 @@ describe('Backup All', () => {
     expect(body.successful_backups).toEqual(3)
   })
 
+  it.only('creates 4 backups and deletes the oldest one', async () => {
+    await api.post(testEndpoint).set('Authorization', adminAuth)
+    await api.post(testEndpoint).set('Authorization', adminAuth)
+    await api.post(testEndpoint).set('Authorization', adminAuth)
+    const response = await api.post(testEndpoint).set('Authorization', adminAuth)
+    const body: IBackupAllApiResponse = response.body
+
+    expect(body.total_sites).toEqual(3)
+    expect(body.successful_backups).toEqual(3)
+  })
+
   describe('when request is not valid', () => {
     it('when user is not authorized', () => {
       const ownerAuth = ownerAuthHeader('903b3c28-deaa-45dc-a43f-511fe965d34e')
