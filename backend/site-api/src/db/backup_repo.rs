@@ -89,7 +89,7 @@ impl BackupRepoTrait for BackupRepo {
         FROM backups
         WHERE site_id = ?1
         ORDER BY created_at
-        OFFSET ?2
+        LIMIT 10 OFFSET ?2
     "#,
         )
         .bind(site_id)

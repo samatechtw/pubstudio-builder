@@ -51,6 +51,10 @@ pub struct Config {
     #[clap(long, env = "S3_SECRET_ACCESS_KEY")]
     pub s3_secret_access_key: String,
 
+    /// Maximum number of backups stored
+    #[clap(long, env = "MAX_BACKUPS", default_value_t = 10)]
+    pub max_backups: u32,
+
     /// API key for sending email via SendGrid
     #[clap(long, env = "SENDGRID_API_KEY")]
     pub sendgrid_api_key: String,
