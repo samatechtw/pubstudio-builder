@@ -11,7 +11,7 @@ ARG TARGETPLATFORM
 ARG PLATFORM_FOLDER=${TARGETPLATFORM}/
 
 # Add LABEL to set pre-update hook
-LABEL com.centurylinklabs.watchtower.lifecycle.pre-update="../pre-update.sh"
+LABEL com.centurylinklabs.watchtower.lifecycle.pre-update="/usr/src/backend/pre-update.sh"
 
 COPY --chmod=755 ./backend/target/${PLATFORM_FOLDER}release/site-api ./
 COPY --chmod=755 ./dist/apps/web-site/index.html ./

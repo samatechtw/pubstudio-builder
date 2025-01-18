@@ -6,7 +6,7 @@ ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini-stati
 RUN chmod +x /tini
 
 # Add LABEL to set pre-update hook
-LABEL com.centurylinklabs.watchtower.lifecycle.pre-update="../pre-update.sh"
+LABEL com.centurylinklabs.watchtower.lifecycle.pre-update="/usr/src/backend/pre-update.sh"
 
 FROM base as dev
 
