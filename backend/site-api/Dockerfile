@@ -13,6 +13,10 @@ ARG PLATFORM_FOLDER=${TARGETPLATFORM}/
 # Add LABEL to set pre-update hook
 LABEL com.centurylinklabs.watchtower.lifecycle.pre-update="/usr/src/backend/pre-update.sh"
 
+RUN apt-get update -yq \
+  && apt-get install -yq \
+  curl
+
 COPY --chmod=755 ./backend/target/${PLATFORM_FOLDER}release/site-api ./
 COPY --chmod=755 ./dist/apps/web-site/index.html ./
 COPY --chmod=755 ./dist/apps/archive/index_v1.html ./
