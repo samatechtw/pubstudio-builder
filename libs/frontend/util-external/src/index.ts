@@ -1,4 +1,4 @@
-/* eslint-disable @nrwl/nx/enforce-module-boundaries */
+/* eslint-disable @nx/enforce-module-boundaries */
 
 import { iteratePage, RenderMode } from '@pubstudio/frontend/util-render'
 import {
@@ -21,7 +21,7 @@ import { EditorMode } from '@pubstudio/shared/type-site'
 
 import type { IPage, ISite } from '@pubstudio/shared/type-site'
 import type { IRouteWithPathRegex } from '@pubstudio/frontend/util-router'
-/* eslint-enable @nrwl/nx/enforce-module-boundaries */
+/* eslint-enable @nx/enforce-module-boundaries */
 
 export {
   computeLocationParts,

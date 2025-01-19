@@ -11,7 +11,7 @@
       }
     },
     "test": {
-      "executor": "@nrwl/jest:jest",
+      "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/libs/frontend/util-custom-data"],
       "options": {
         "jestConfig": "libs/frontend/util-custom-data/jest.config.ts",

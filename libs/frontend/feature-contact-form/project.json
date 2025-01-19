@@ -13,7 +13,7 @@
       }
     },
     "test": {
-      "executor": "@nrwl/jest:jest",
+      "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/libs/frontend/feature-contact-form"],
       "options": {
         "jestConfig": "libs/frontend/feature-contact-form/jest.config.ts",

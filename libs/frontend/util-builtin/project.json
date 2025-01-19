@@ -11,7 +11,7 @@
       }
     },
     "test": {
-      "executor": "@nrwl/jest:jest",
+      "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/libs/frontend/util-builtin"],
       "options": {
         "jestConfig": "libs/frontend/util-builder/jest.config.ts",

@@ -11,7 +11,7 @@
       }
     },
     "req-test": {
-      "executor": "@nrwl/jest:jest",
+      "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/apps/api-site-test"],
       "options": {
         "jestConfig": "apps/api-site-test/jest.config.ts",
