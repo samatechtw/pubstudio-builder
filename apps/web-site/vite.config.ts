@@ -4,7 +4,7 @@ import { visualizer } from 'rollup-plugin-visualizer'
 import { defineConfig, PluginOption } from 'vite'
 import { viteSingleFile } from 'vite-plugin-singlefile'
 // TODO -- is it possible to get tsconfig paths to work in vite.config.ts?
-// eslint-disable-next-line @nrwl/nx/enforce-module-boundaries
+// eslint-disable-next-line @nx/enforce-module-boundaries
 import {
   appConfigBuild,
   appConfigServer,

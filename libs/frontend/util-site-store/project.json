@@ -12,7 +12,7 @@
       }
     },
     "test": {
-      "executor": "@nrwl/jest:jest",
+      "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/libs/frontend/util-site-store"],
       "options": {
         "jestConfig": "libs/frontend/util-site-store/jest.config.ts",

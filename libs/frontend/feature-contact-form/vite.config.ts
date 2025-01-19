@@ -2,7 +2,7 @@ import Vue from '@vitejs/plugin-vue'
 import { tsconfigBaseAliases } from 'nx-vue3-vite'
 import path from 'path'
 import { defineConfig } from 'vite'
-// eslint-disable-next-line @nrwl/nx/enforce-module-boundaries
+// eslint-disable-next-line @nx/enforce-module-boundaries
 import { assetsInclude } from '../../../libs/frontend/util-vite-config/src'
 
 const resolve = (p: string): string => path.resolve(__dirname, p)

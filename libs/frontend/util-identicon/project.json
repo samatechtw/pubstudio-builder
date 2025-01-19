@@ -12,7 +12,7 @@
       }
     },
     "test": {
-      "executor": "@nrwl/jest:jest",
+      "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/libs/frontend/util-identicon"],
       "options": {
         "jestConfig": "libs/frontend/util-identicon/jest.config.ts",
