@@ -38,7 +38,7 @@ fn api_router(context: &ApiContext) -> Router<ApiContext> {
                 .layer(from_fn_with_state(context.clone(), auth_admin)),
         )
         .route(
-            "/sites_metadata/:site_id",
+            "/sites_metadata/{site_id}",
             patch(
                 site::update_site_metadata::update_site_metadata
                     .layer(from_fn_with_state(context.clone(), auth_admin_owner)),
@@ -49,7 +49,7 @@ fn api_router(context: &ApiContext) -> Router<ApiContext> {
             ),
         )
         .route(
-            "/sites/:site_id",
+            "/sites/{site_id}",
             patch(
                 site::update_site::update_site
                     .layer(from_fn_with_state(context.clone(), auth_admin_owner))
@@ -61,7 +61,7 @@ fn api_router(context: &ApiContext) -> Router<ApiContext> {
             ),
         )
         .route(
-            "/sites/:site_id/head",
+            "/sites/{site_id}/head",
             get(site::get_site_head::get_site_head),
         )
         .route(
@@ -83,44 +83,44 @@ fn api_router(context: &ApiContext) -> Router<ApiContext> {
             get(site::get_current_site::get_current_site),
         )
         .route(
-            "/sites/:site_id/versions/:version_id",
+            "/sites/{site_id}/versions/{version_id}",
             get(site::get_site_version::get_site_version)
                 .route_layer(from_fn_with_state(context.clone(), auth_admin_owner)),
         )
         .route(
-            "/sites/:site_id/versions",
+            "/sites/{site_id}/versions",
             get(site::list_site_versions::list_site_versions)
                 .route_layer(from_fn_with_state(context.clone(), auth_admin_owner)),
         )
         .route(
-            "/sites/:site_id/domains",
+            "/sites/{site_id}/domains",
             get(site::get_site_domains::get_site_domains
                 .layer(from_fn_with_state(context.clone(), auth_admin_owner))),
         )
         .route(
-            "/sites/:site_id/actions/publish",
+            "/sites/{site_id}/actions/publish",
             post(publish::publish_site::publish_site)
                 .route_layer(from_fn_with_state(context.clone(), auth_admin_owner)),
         )
         .route(
-            "/sites/:site_id/actions/create_draft",
+            "/sites/{site_id}/actions/create_draft",
             post(publish::create_draft::create_draft)
                 .route_layer(from_fn_with_state(context.clone(), auth_admin_owner)),
         )
         .route(
-            "/sites/:site_id/actions/delete_draft",
+            "/sites/{site_id}/actions/delete_draft",
             delete(publish::delete_draft::delete_draft)
                 .route_layer(from_fn_with_state(context.clone(), auth_admin_owner)),
         )
         .route(
-            "/sites/:site_id/custom_data",
+            "/sites/{site_id}/custom_data",
             post(custom::custom_data::custom_data).route_layer(from_fn_with_state(
                 context.clone(),
                 auth_admin_owner_anonymous,
             )),
         )
         .route(
-            "/sites/:site_id/backups",
+            "/sites/{site_id}/backups",
             post(
                 backup::create_backup::create_backup
                     .layer(from_fn_with_state(context.clone(), auth_admin)),
@@ -131,22 +131,22 @@ fn api_router(context: &ApiContext) -> Router<ApiContext> {
             ),
         )
         .route(
-            "/sites/:site_id/backups/:backup_id",
+            "/sites/{site_id}/backups/{backup_id}",
             delete(backup::delete_backup::delete_backup)
                 .route_layer(from_fn_with_state(context.clone(), auth_admin_owner)),
         )
         .route(
-            "/sites/:site_id/backups/:backup_id/actions/restore",
+            "/sites/{site_id}/backups/{backup_id}/actions/restore",
             post(backup::restore_backup::restore_backup)
                 .route_layer(from_fn_with_state(context.clone(), auth_admin_owner)),
         )
         .route(
-            "/sites/:site_id/usage",
+            "/sites/{site_id}/usage",
             get(site::get_site_usage::get_site_usage)
                 .route_layer(from_fn_with_state(context.clone(), auth_admin_owner)),
         )
         .route(
-            "/sites/:site_id/public_usage",
+            "/sites/{site_id}/public_usage",
             get(site::get_site_usage::get_public_site_usage),
         )
         .route(
@@ -158,7 +158,7 @@ fn api_router(context: &ApiContext) -> Router<ApiContext> {
             get(usage::reset_cache::reset_cache
                 .layer(from_fn_with_state(context.clone(), auth_admin))),
         )
-        .route("/*path", get(handler_400)) // Handle unknown routes under /api
+        .route("/{*path}", get(handler_400)) // Handle unknown routes under /api
 }
 
 async fn handler_400() -> impl IntoResponse {

@@ -1,4 +1,4 @@
-use axum::async_trait;
+use async_trait::async_trait;
 use chrono::{DateTime, Utc};
 use lib_shared_types::entity::site_api::backup_entity::{BackupEntity, CreateBackupEntityResult};
 use sqlx::{sqlite::SqliteRow, Error, Row, SqlitePool};

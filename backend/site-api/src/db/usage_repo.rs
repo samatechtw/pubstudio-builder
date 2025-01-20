@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use axum::async_trait;
+use async_trait::async_trait;
 use chrono::Utc;
 use lib_shared_site_api::cache::cache::SiteUsageCache;
 use lib_shared_types::entity::site_api::site_usage_entity::SiteUsageEntity;

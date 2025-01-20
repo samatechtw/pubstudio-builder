@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use axum::async_trait;
+use async_trait::async_trait;
 use lib_shared_site_api::db::{
     db_error::{map_sqlx_err, DbError},
     db_result::list_result,
