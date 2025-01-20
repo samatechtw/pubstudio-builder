@@ -1,4 +1,4 @@
-use axum::async_trait;
+use async_trait::async_trait;
 use lib_shared_site_api::db::{db_error::DbError, util::append_comma};
 use lib_shared_types::{
     dto::site_api::create_metadata_dto::CreateSiteMetadataDto,

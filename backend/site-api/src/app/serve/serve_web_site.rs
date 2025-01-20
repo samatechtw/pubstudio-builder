@@ -1,7 +1,8 @@
 use axum::{
-    extract::{Host, Query, State},
+    extract::{Query, State},
     response::Html,
 };
+use axum_extra::extract::Host;
 use lib_shared_site_api::{
     db::sites_seed_data::SITE_SEED_VERSION,
     error::api_error::ApiError,

@@ -1,7 +1,7 @@
 use std::borrow::Cow::Borrowed;
 use std::{collections::BTreeMap, sync::Arc};
 
-use axum::async_trait;
+use async_trait::async_trait;
 use lib_shared_site_api::db::util::{append_column_info_to_query, append_or_eq, quote};
 use lib_shared_site_api::db::{
     db_error::{map_sqlx_err, DbError},

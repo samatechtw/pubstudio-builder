@@ -27,7 +27,7 @@ describe('Backup All', () => {
     expect(body.successful_backups).toEqual(3)
   })
 
-  it.only('creates 4 backups and deletes the oldest one', async () => {
+  it('creates 4 backups and deletes the oldest one', async () => {
     await api.post(testEndpoint).set('Authorization', adminAuth)
     await api.post(testEndpoint).set('Authorization', adminAuth)
     await api.post(testEndpoint).set('Authorization', adminAuth)

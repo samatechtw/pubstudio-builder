@@ -1,7 +1,8 @@
 use axum::{
-    extract::{Host, Query, State},
+    extract::{Query, State},
     Json,
 };
+use axum_extra::extract::Host;
 use lib_shared_site_api::{error::api_error::ApiError, util::domains::domain_without_port};
 use lib_shared_types::dto::site_api::get_current_site_dto::{
     GetCurrentSiteQuery, GetCurrentSiteResponse,
