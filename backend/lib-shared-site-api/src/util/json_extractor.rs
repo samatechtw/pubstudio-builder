@@ -5,6 +5,7 @@ use axum::{
 use axum_macros::FromRequest;
 use lib_shared_types::error::api_error::ApiErrorCode;
 use regex::Regex;
+use std::error::Error;
 
 use crate::error::api_error::ApiError;
 
@@ -30,6 +31,17 @@ impl From<JsonRejection> for ApiError {
                 let err_str = e.to_string();
                 if let Some(field) = field_from_error(&e.body_text()) {
                     format!("missing field {}", field)
+                } else if let Some(err) =
+                    find_error_source::<serde_path_to_error::Error<serde_json::Error>>(&e)
+                {
+                    // TODO -- more specific error handling
+                    let serde_json_err = err.inner().to_string();
+                    let is_line = serde_json_err.find(" at ");
+                    if let Some(line_loc) = is_line {
+                        serde_json_err[0..line_loc].to_string()
+                    } else {
+                        serde_json_err
+                    }
                 } else {
                     err_str
                 }
@@ -50,5 +62,20 @@ impl From<JsonRejection> for ApiError {
             message,
             code: ApiErrorCode::InvalidFormData,
         }
+    }
+}
+
+// attempt to downcast `err` into a `T` and if that fails recursively try and
+// downcast `err`'s source
+fn find_error_source<'a, T>(err: &'a (dyn Error + 'static)) -> Option<&'a T>
+where
+    T: Error + 'static,
+{
+    if let Some(err) = err.downcast_ref::<T>() {
+        Some(err)
+    } else if let Some(source) = err.source() {
+        find_error_source(source)
+    } else {
+        None
     }
 }
