@@ -1384,6 +1384,7 @@ dependencies = [
  "rusty-s3",
  "serde",
  "serde_json",
+ "serde_path_to_error",
  "sqlx",
  "strum",
  "thiserror 2.0.11",
