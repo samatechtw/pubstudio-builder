@@ -27,9 +27,9 @@ pub fn setup_cron_jobs(context: &ApiContext) {
     }));
 
     // Monthly reset site usage cron
-    // At 00:00:00am, on the 1st day, every month between January and December
+    // At 00:01:00am, on the 1st day, every month between January and December
     let job_context = context.clone();
-    scheduler.add(Job::new("0 0 0 1 1-12 ? *", move || {
+    scheduler.add(Job::new("0 1 0 1 1-12 ? *", move || {
         reset_cache_helper(job_context.clone())
     }));
 }

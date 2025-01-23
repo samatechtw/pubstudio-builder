@@ -207,6 +207,9 @@ describe('Get Current Site', () => {
         .send(payload)
         .expect(200)
 
+      // Query the site twice to exceed bandwidth
+      await api.get(testEndpoint).set('Host', 'www.myblog.org').expect(200)
+
       return api.get(testEndpoint).set('Host', 'www.myblog.org').expect(509, {
         code: 'None',
         message: 'Bandwidth exceeded',

@@ -44,8 +44,10 @@ describe('Get Site Usage', () => {
 
       const body1: IGetSiteUsageApiResponse = res1.body
       expect(body1.request_count).toEqual(1)
+      expect(body1.total_request_count).toEqual(1)
       expect(body1.request_error_count).toEqual(0)
-      expect(body1.site_size).toEqual(body1.total_bandwidth)
+      expect(body1.total_bandwidth).toEqual(body1.site_size)
+      expect(body1.current_monthly_bandwidth).toEqual(body1.site_size)
       expect(body1.max_context_length).toEqual(500 * KB)
       expect(body1.max_history_length).toEqual(500 * KB)
       expect(body1.max_pages_length).toEqual(10 * MB)
@@ -64,10 +66,12 @@ describe('Get Site Usage', () => {
 
       const body2: IGetSiteUsageApiResponse = res2.body
       expect(body2.request_count).toEqual(2)
+      expect(body2.total_request_count).toEqual(2)
       expect(body2.request_error_count).toEqual(0)
       expect(body2.custom_data_usage).toEqual(0)
       expect(body2.custom_data_allowance).toEqual(20 * MB)
       expect(body2.total_bandwidth).toEqual(body2.site_size * 2)
+      expect(body2.current_monthly_bandwidth).toEqual(body2.site_size * 2)
     })
 
     it('tracks failed site request for site usage', async () => {
@@ -79,6 +83,7 @@ describe('Get Site Usage', () => {
 
       const body1: IGetSiteUsageApiResponse = res1.body
       expect(body1.request_count).toEqual(1)
+      expect(body1.total_request_count).toEqual(1)
       expect(body1.request_error_count).toEqual(0)
       expect(body1.site_size).toEqual(body1.total_bandwidth)
 
@@ -98,6 +103,7 @@ describe('Get Site Usage', () => {
       const body2: IGetSiteUsageApiResponse = res2.body
 
       expect(body2.request_count).toEqual(1)
+      expect(body2.total_request_count).toEqual(1)
       expect(body2.request_error_count).toEqual(1)
       expect(body2.site_size).toEqual(body2.total_bandwidth)
     })
@@ -120,6 +126,7 @@ describe('Get Site Usage', () => {
       const body2: IGetSiteUsageApiResponse = res2.body
       expect(body2.site_size).toEqual(body2.total_bandwidth)
       expect(body2.request_count).toEqual(1)
+      expect(body2.total_request_count).toEqual(1)
       expect(body2.request_error_count).toEqual(0)
     })
 
@@ -131,11 +138,14 @@ describe('Get Site Usage', () => {
         .expect(200)
 
       const body1: IGetSiteUsageApiResponse = res1.body
+      const initialSiteSize = body1.site_size
       expect(body1.request_count).toEqual(1)
+      expect(body1.total_request_count).toEqual(1)
       expect(body1.request_error_count).toEqual(0)
       expect(body1.custom_data_usage).toEqual(0)
       expect(body1.custom_data_allowance).toEqual(0)
-      expect(body1.site_size).toEqual(body1.total_bandwidth)
+      expect(body1.total_bandwidth).toEqual(initialSiteSize)
+      expect(body1.current_monthly_bandwidth).toEqual(initialSiteSize)
 
       // Update a site
       const res2 = await api
@@ -144,7 +154,7 @@ describe('Get Site Usage', () => {
         .send(mockUpdateSitePayload())
         .expect(200)
       const body: ISiteViewModel = res2.body
-      const siteSize = body.context.length + body.defaults.length + body.pages.length
+      const newSiteSize = body.context.length + body.defaults.length + body.pages.length
 
       // Verify site usage after successful update
       const res3 = await api
@@ -153,12 +163,14 @@ describe('Get Site Usage', () => {
         .expect(200)
 
       const body2: IGetSiteUsageApiResponse = res3.body
-      expect(body2.site_size).toEqual(siteSize)
+      expect(body2.site_size).toEqual(newSiteSize)
       expect(body2.request_count).toEqual(2)
+      expect(body2.total_request_count).toEqual(2)
       expect(body2.request_error_count).toEqual(0)
       expect(body2.custom_data_usage).toEqual(0)
       expect(body2.custom_data_allowance).toEqual(0)
-      expect(body2.total_bandwidth).toEqual(siteSize * 2)
+      expect(body2.total_bandwidth).toEqual(initialSiteSize + newSiteSize)
+      expect(body2.current_monthly_bandwidth).toEqual(initialSiteSize + newSiteSize)
     })
   })
 

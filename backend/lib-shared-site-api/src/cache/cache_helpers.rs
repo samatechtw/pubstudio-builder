@@ -10,7 +10,6 @@ pub fn get_site_defaults(site: &GetCurrentSiteResponse) -> Option<SiteHeadDefaul
     } else {
         return None;
     };
-
     let site_defaults: Option<SiteHeadDefaults> = match serde_json::from_str(&unwrapped_defaults) {
         Err(e) => {
             println!("Failed to get site defaults: {:?}", e);

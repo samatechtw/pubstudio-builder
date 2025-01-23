@@ -13,6 +13,7 @@ use crate::{
     api_context::ApiContext,
     app::{
         custom::create_table::create_custom_table_helper, site::create_site::create_site_helper,
+        usage::helpers::populate_usage_cache,
     },
 };
 
@@ -75,11 +76,14 @@ pub async fn reset_all(
     }
 
     // Reset usage
+    let _ = populate_usage_cache(&context).await;
+    /*
     context
         .usage_repo
         .insert_usage(&context.cache.cache)
         .await
         .map_err(|e| ApiError::internal_error().message(e))?;
+    */
 
     Ok(())
 }

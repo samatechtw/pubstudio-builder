@@ -2,7 +2,7 @@ use std::{borrow::Borrow, future::Future};
 
 use lib_shared_types::{
     cache::site_usage_data::SiteUsageData,
-    entity::site_api::site_usage_entity::SiteUsageEntity,
+    entity::site_api::site_usage_entity::SiteUsageEntityWithTotals,
     shared::{core::ExecEnv, js_date::JsDate, site::SiteType},
 };
 use moka::future::Cache;
@@ -60,8 +60,10 @@ impl AppCache {
                 SiteUsageData {
                     site_size,
                     request_count: 0,
+                    total_request_count: 0,
                     request_error_count: 0,
                     total_bandwidth: 0,
+                    current_monthly_bandwidth: 0,
                     last_updated: JsDate::now(),
                     bandwidth_allowance: site_type.get_bandwidth_allowance(self.exec_env),
                 }
@@ -86,7 +88,9 @@ impl AppCache {
 
         data.site_size = site_size;
         data.request_count += 1;
-        data.total_bandwidth = data.site_size * data.request_count;
+        data.total_request_count += 1;
+        data.current_monthly_bandwidth += site_size;
+        data.total_bandwidth += site_size;
         data.last_updated = JsDate::now();
 
         self.cache.insert(site_id.to_string(), data).await;
@@ -96,7 +100,9 @@ impl AppCache {
         let mut data = self.get_with_usage(site_id, site_size, site_type).await;
 
         data.request_count += 1;
-        data.total_bandwidth = data.site_size * data.request_count;
+        data.total_request_count += 1;
+        data.current_monthly_bandwidth += data.site_size;
+        data.total_bandwidth += data.site_size;
         data.last_updated = JsDate::now();
 
         self.cache.insert(site_id.to_string(), data).await;
@@ -123,31 +129,42 @@ impl AppCache {
         site_type: SiteType,
     ) -> Result<(), ApiError> {
         let data = self.get_with_usage(site_id, site_size, site_type).await;
-
-        if data.total_bandwidth != 0 && data.total_bandwidth > data.bandwidth_allowance {
+        if data.current_monthly_bandwidth != 0
+            && data.current_monthly_bandwidth > data.bandwidth_allowance
+        {
             return Err(ApiError::bandwidth_exceeded());
         }
 
         Ok(())
     }
 
-    pub async fn reset_bandwidth(&self) {
+    pub async fn reset_bandwidth(&self, clear_monthly: bool) {
         for (site_id, mut usage_data) in self.cache.iter() {
             usage_data.request_count = 0;
             usage_data.request_error_count = 0;
             usage_data.total_bandwidth = 0;
+            if clear_monthly {
+                usage_data.current_monthly_bandwidth = 0;
+            }
             usage_data.last_updated = JsDate::now();
 
             self.cache.insert(site_id.to_string(), usage_data).await;
         }
     }
 
-    pub async fn reset_usage(&self, usage: &SiteUsageEntity, site_size: u64, site_type: SiteType) {
+    pub async fn reset_usage(
+        &self,
+        usage: &SiteUsageEntityWithTotals,
+        site_size: u64,
+        site_type: SiteType,
+    ) {
         let data = SiteUsageData {
             site_size,
             request_count: usage.request_count as u64,
+            total_request_count: usage.total_request_count as u64,
             request_error_count: usage.request_error_count as u64,
             total_bandwidth: usage.total_bandwidth as u64,
+            current_monthly_bandwidth: usage.current_monthly_bandwidth as u64,
             last_updated: JsDate::now(),
             bandwidth_allowance: site_type.get_bandwidth_allowance(self.exec_env),
         };
