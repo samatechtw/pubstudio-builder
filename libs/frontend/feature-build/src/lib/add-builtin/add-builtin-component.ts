@@ -27,17 +27,17 @@ import {
 } from '@pubstudio/shared/type-command-data'
 import { IComponent, ISite } from '@pubstudio/shared/type-site'
 
-// Get builtin mixins from a component & children that have not
+// Get builtin mixins and behaviors from a component & children that have not
 // been added to the site
-const getMissingBuiltinMixins = (
+const getMissingBuiltinFields = (
   site: ISite,
   componentId: string | undefined,
-): string[] => {
+): IMissingComponentFields => {
   const builtinComponent = getBuiltinComponent(componentId)
   if (!builtinComponent) {
-    return []
+    return { mixinIds: [], behaviorIds: [] }
   }
-  return getMissingComponentFields(site, builtinComponent).mixinIds
+  return getMissingComponentFields(site, builtinComponent)
 }
 
 const removeDuplicates = (arr: string[]): string[] => {
@@ -73,7 +73,7 @@ export const getMissingComponentFields = (
   return {
     mixinIds: removeDuplicates(mixins.filter((id) => !resolveStyle(site.context, id))),
     behaviorIds: removeDuplicates(
-      behaviors.filter((id) => resolveBehavior(site.context, id)),
+      behaviors.filter((id) => !resolveBehavior(site.context, id)),
     ),
   }
 }
@@ -86,8 +86,8 @@ export interface IAddComponentOptions {
 }
 
 export const addBuiltinComponentData = (site: ISite, data: IAddComponentData) => {
-  const mixinIds = getMissingBuiltinMixins(site, data.sourceId)
-  pushCommandWithBuiltins(site, CommandType.AddComponent, data, { mixinIds })
+  const missing = getMissingBuiltinFields(site, data.sourceId)
+  pushCommandWithBuiltins(site, CommandType.AddComponent, data, missing)
 }
 
 export const addCustomComponentData = (site: ISite, data: IAddComponentData) => {
