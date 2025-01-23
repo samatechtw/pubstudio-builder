@@ -16,9 +16,6 @@ export const plainResponseInterceptors = [
         console.log('500 error:', e)
       }
       throw new Error('NETWORK_FAILURE')
-    } else if (status === 403) {
-      // Permission denied
-      throw res
     }
     let data: IJsonObject
     try {
@@ -28,7 +25,7 @@ export const plainResponseInterceptors = [
       data = {}
     }
 
-    if (status === 400 || status === 404) {
+    if (status === 400 || status === 403 || status === 404) {
       throw data
     }
     const apiRes = res as ApiResponse
