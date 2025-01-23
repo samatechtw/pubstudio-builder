@@ -76,7 +76,7 @@ const computeBuilderStyleProps = (
   // Force builder container to be relative position
   const forceRelative = () => {
     const pos = getPosition()
-    if (pos !== 'absolute' && pos !== 'relative') {
+    if (!pos) {
       builderClass.push('force-relative')
     }
   }
@@ -139,9 +139,9 @@ const computeBuilderStyleProps = (
 
   if (hoveredInComponentTree) {
     builderClass.push('hover-in-tree')
-
-    if (getPosition() === 'absolute') {
-      builderClass.push('hover-in-tree--absolute')
+    const pos = getPosition()
+    if (pos && pos !== 'relative') {
+      builderClass.push(`hover-in-tree--${pos}`)
     }
 
     extraChildren = (extraChildren ?? []).concat(h('div', { class: 'hover-overlay' }))
@@ -153,7 +153,7 @@ const computeBuilderStyleProps = (
     builderClass.push('hover')
 
     getPosition()
-    if (position !== 'absolute' && position !== 'relative') {
+    if (!position) {
       builderClass.push('force-relative')
     }
 

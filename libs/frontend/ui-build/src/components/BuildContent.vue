@@ -178,6 +178,12 @@ $border-offset: 0px;
       &--absolute {
         position: absolute;
       }
+      &--fixed {
+        position: fixed;
+      }
+      &--sticky {
+        position: sticky;
+      }
     }
     :deep(.force-relative) {
       position: relative;

@@ -57,7 +57,7 @@ export const parseI18n = (
     return content
   }
   return content.replace(i18nVarRegex, (_, variable: string) => {
-    const val = i18n[lang]?.[variable] || i18n['en'][variable]
+    const val = i18n[lang]?.[variable] || i18n['en']?.[variable]
     return val ?? content
   })
 }

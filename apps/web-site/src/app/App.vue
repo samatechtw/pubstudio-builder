@@ -199,6 +199,7 @@ a {
 .sw {
   width: 100%;
   height: 100%;
+  position: absolute;
 }
 .dot {
   width: 32px;

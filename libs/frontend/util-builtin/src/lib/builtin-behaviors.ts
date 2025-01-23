@@ -86,8 +86,11 @@ setState(cmp, 'hide', !!args?.hide)
 export const viewCounterBehavior: IBehavior = {
   id: viewCounterBehaviorId,
   name: 'View Counter',
-  code: `const usage = await helpers.getPublicUsage(site)
-    helpers.setContent(component, usage.total_request_count.toString())
+  code: `const getUsage = async () => {
+  const usage = await helpers.getPublicUsage(site)
+  helpers.setContent(component, usage.total_request_count.toString())
+}
+getUsage()
   `,
 }
 
