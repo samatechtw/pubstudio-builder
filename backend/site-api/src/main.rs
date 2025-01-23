@@ -7,6 +7,7 @@ use lib_shared_site_api::log::{create_trace_layer, setup_logging};
 use clap::Parser;
 use site_api::api_context::ApiContext;
 use site_api::app::app_router::app_router;
+use site_api::app::usage::helpers::populate_usage_cache;
 use site_api::config::Config;
 use site_api::cron::setup_cron_jobs;
 use site_api::db::backup_repo::{BackupRepo, DynBackupRepo};
@@ -109,6 +110,7 @@ async fn main() {
         custom_data_repo,
         cache,
     };
+    let _ = populate_usage_cache(&context).await;
 
     // Setup CORS
     let cors = CorsLayer::new()

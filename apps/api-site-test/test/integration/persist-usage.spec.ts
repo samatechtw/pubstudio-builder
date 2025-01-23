@@ -38,6 +38,77 @@ describe('Persist Site Usage', () => {
       .expect(201)
   }
 
+  const getUsage = async () => {
+    const res = await api
+      .get(`/api/sites/${siteId}/usage`)
+      .set('Authorization', adminAuth)
+      .expect(200)
+
+    return res.body as IGetSiteUsageApiResponse
+  }
+
+  it('persists request count and bandwidth', async () => {
+    // Use site with custom domain
+    siteId = '870aafc9-36e9-476a-b38c-c1aaaad9d9fe'
+
+    // Verify initial usage
+    const body1 = await getUsage()
+    const initialSiteSize = body1.site_size
+    expect(body1.request_count).toEqual(1)
+    expect(body1.total_request_count).toEqual(1)
+    expect(body1.total_bandwidth).toEqual(initialSiteSize)
+    expect(body1.current_monthly_bandwidth).toEqual(initialSiteSize)
+
+    // Make site requests
+    await api.get('/api/sites/current').set('Host', 'test3.localhost').expect(200)
+    await api.get('/api/sites/current').set('Host', 'test3.localhost').expect(200)
+
+    // Verify
+    const body2 = await getUsage()
+    expect(body2.request_count).toEqual(3)
+    expect(body2.total_request_count).toEqual(3)
+    expect(body2.total_bandwidth).toEqual(initialSiteSize * 3)
+    expect(body2.current_monthly_bandwidth).toEqual(initialSiteSize * 3)
+
+    // Persist usage
+    await api.get('/api/actions/persist-usage').expect(200)
+
+    // Verify usage reset
+    const body3 = await getUsage()
+    expect(body3.request_count).toEqual(0)
+    expect(body3.total_request_count).toEqual(3)
+    expect(body3.total_bandwidth).toEqual(0)
+    expect(body3.current_monthly_bandwidth).toEqual(initialSiteSize * 3)
+
+    // Update site to trigger cache reset
+    await api
+      .patch(`/api/sites/${siteId}`)
+      .set('Authorization', adminAuth)
+      .send({ name: 'NEW NAME' })
+      .expect(200)
+
+    // Verify usage after update
+    const body4 = await getUsage()
+    expect(body4.request_count).toEqual(1)
+    expect(body4.total_request_count).toEqual(4)
+    expect(body4.total_bandwidth).toEqual(initialSiteSize)
+    expect(body4.current_monthly_bandwidth).toEqual(initialSiteSize * 4)
+
+    // Make site requests
+    await api.get('/api/sites/current').set('Host', 'test3.localhost').expect(200)
+    await api.get('/api/sites/current').set('Host', 'test3.localhost').expect(200)
+
+    // Persist again
+    await api.get('/api/actions/persist-usage').expect(200)
+
+    // Verify usage reset
+    const body5 = await getUsage()
+    expect(body5.request_count).toEqual(0)
+    expect(body5.total_request_count).toEqual(6)
+    expect(body5.total_bandwidth).toEqual(0)
+    expect(body5.current_monthly_bandwidth).toEqual(initialSiteSize * 6)
+  })
+
   it('persists custom data usage', async () => {
     // Check initial usage
     const res1 = await api

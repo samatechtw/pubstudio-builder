@@ -12,8 +12,10 @@ pub struct SiteUsageViewModel {
     pub max_history_length: u64,
     pub max_pages_length: u64,
     pub request_count: u64,
+    pub total_request_count: u64,
     pub request_error_count: u64,
     pub total_bandwidth: u64,
+    pub current_monthly_bandwidth: u64,
     pub bandwidth_allowance: u64,
     pub custom_data_usage: i64,
     pub custom_data_allowance: i64,
@@ -32,8 +34,10 @@ pub fn from_usage_data(
         max_history_length: site_type.get_max_history_length(),
         max_pages_length: site_type.get_max_pages_length(),
         request_count: data.request_count,
+        total_request_count: data.total_request_count,
         request_error_count: data.request_error_count,
         total_bandwidth: data.total_bandwidth,
+        current_monthly_bandwidth: data.current_monthly_bandwidth,
         bandwidth_allowance: data.bandwidth_allowance,
         custom_data_usage,
         custom_data_allowance,
@@ -43,14 +47,14 @@ pub fn from_usage_data(
 
 #[derive(Debug, Clone, Serialize)]
 pub struct PublicSiteUsageViewModel {
-    pub request_count: u64,
+    pub total_request_count: u64,
     pub last_updated: JsDate,
 }
 
 impl From<SiteUsageData> for PublicSiteUsageViewModel {
     fn from(value: SiteUsageData) -> Self {
         PublicSiteUsageViewModel {
-            request_count: value.request_count,
+            total_request_count: value.total_request_count,
             last_updated: value.last_updated,
         }
     }
