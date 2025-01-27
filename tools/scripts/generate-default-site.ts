@@ -14,7 +14,6 @@ import { ref } from 'vue'
 
 export const makeMockStore = (): ISiteStore => {
   const siteId = ref('')
-  const saveError = ref()
   const saveState = ref(SiteSaveState.Saved)
 
   const initialize = async () => undefined
@@ -27,7 +26,7 @@ export const makeMockStore = (): ISiteStore => {
   return {
     siteId,
     saveState,
-    saveError,
+    saveError: undefined,
     initialize,
     save,
     saveEditor,

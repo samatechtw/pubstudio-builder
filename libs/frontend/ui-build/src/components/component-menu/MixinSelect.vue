@@ -24,6 +24,13 @@
   </div>
 </template>
 
+<script lang="ts">
+export interface ISetMixinEmit {
+  oldMixinId?: string
+  newMixinId: string
+}
+</script>
+
 <script lang="ts" setup>
 import { computed, ref, toRefs } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
@@ -50,11 +57,6 @@ const props = defineProps<{
 const { sourceCustomComponentId } = toRefs(props)
 
 const isInherited = computed(() => !!sourceCustomComponentId.value)
-
-interface ISetMixinEmit {
-  oldMixinId?: string
-  newMixinId: string
-}
 
 const emit = defineEmits<{
   (e: 'set', data: ISetMixinEmit): void

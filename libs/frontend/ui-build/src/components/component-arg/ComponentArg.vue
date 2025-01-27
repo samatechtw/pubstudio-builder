@@ -33,7 +33,7 @@
       :modelValue="(value ?? '').toString()"
       class="item"
       @update:modelValue="update"
-      @keydown.enter="update"
+      @keydown.enter="emit('submit')"
     />
   </div>
 </template>
@@ -54,6 +54,7 @@ import BooleanArg from './BooleanArg.vue'
 
 const emit = defineEmits<{
   (e: 'update:arg', payload: IUpdateComponentArgPayload): void
+  (e: 'submit'): void
 }>()
 const props = defineProps<{
   arg: IComponentInput | IBehaviorArg
@@ -69,6 +70,6 @@ const isBoolean = computed(() => arg.value.type === ComponentArgPrimitive.Boolea
 const isArray = computed(() => arg.value.type.slice(-2) === '[]')
 
 const update = (value: string) => {
-  emit('update:arg', { name: arg.value.name, value: value })
+  emit('update:arg', { name: arg.value.name, value })
 }
 </script>

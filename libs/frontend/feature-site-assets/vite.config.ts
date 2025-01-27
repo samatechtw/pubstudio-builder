@@ -12,7 +12,8 @@ module.exports = defineConfig({
   plugins: [Vue()],
   resolve: {
     alias: {
-      '@theme/': `${resolve('../../../pubstudio-builder/libs/ui-theme/src')}/`,
+      '@theme/': `${resolve('../ui-theme/src')}/`,
+      '@frontend-assets/': `${resolve('../ui-assets/src')}/`,
       ...tsconfigBaseAliases(__dirname),
     },
   },

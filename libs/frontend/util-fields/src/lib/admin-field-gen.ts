@@ -100,7 +100,7 @@ export const validateFields = <T extends IAdminForm>(form: T): ValidateResult | 
       }
       const error = checkError(
         field.label,
-        field.input.toString(),
+        field.input?.toString(),
         field.validators as Validator[],
       )
       if (error) {

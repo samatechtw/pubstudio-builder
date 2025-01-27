@@ -26,7 +26,7 @@
     </div>
     <div v-if="editValueData" class="edit-value">
       <STInput
-        :modelValue="editValueData.value"
+        :modelValue="editValueComputed"
         @update:modelValue="updateInputValue($event)"
         @keydown.enter="setValue(editValueData.inputValue)"
       />
@@ -54,6 +54,7 @@ const {
   editValue,
   setValue,
   editValueData,
+  editValueComputed,
   startDrag,
   stopDrag,
   padding,

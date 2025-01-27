@@ -50,7 +50,11 @@ import { STInput } from '@samatech/vue-components'
 import { Check, PSToggle, Edit, Minus } from '@pubstudio/frontend/ui-widgets'
 import { IDatalistOption } from '@pubstudio/frontend/type-ui-widgets'
 import { Settings } from '@pubstudio/frontend/ui-widgets'
-import { ComponentArgType, ComponentArgPrimitive, Tag } from '@pubstudio/shared/type-site'
+import {
+  ComponentArgType,
+  ComponentArgPrimitive,
+  TagType,
+} from '@pubstudio/shared/type-site'
 import {
   useBuild,
   validateComponentArg,
@@ -68,7 +72,7 @@ const props = withDefaults(
     property: string
     value: string
     argType: ComponentArgType
-    tag: Tag
+    tag: TagType
     // For datalist in STInput
     componentId?: string
     showEditInput?: boolean
@@ -115,7 +119,7 @@ const updateValue = () => {
 }
 
 const datalist = computed<IDatalistOption[] | undefined>(() => {
-  if (tag.value === Tag.A && property.value === 'href') {
+  if (tag.value === 'a' && property.value === 'href') {
     return getLinkDatalistOptions(site.value, componentId.value ?? '')
   }
   return undefined

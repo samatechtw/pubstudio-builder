@@ -8,7 +8,7 @@
     :caret="false"
     :clearable="false"
     :openInitial="openInitial"
-    @select="emit('update:modelValue', $event)"
+    @select="update"
     @click.stop
   />
 </template>
@@ -55,6 +55,12 @@ const options = computed(() => {
 })
 
 defineExpose({ multiselectRef })
+
+const update = (prop: string | undefined) => {
+  if (prop) {
+    emit('update:modelValue', prop as Css)
+  }
+}
 
 onMounted(() => {
   newVal.value = modelValue.value

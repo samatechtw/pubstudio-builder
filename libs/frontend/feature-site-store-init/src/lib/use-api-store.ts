@@ -12,7 +12,6 @@ import {
 import { parseApiErrorKey, PSApi, toApiError } from '@pubstudio/frontend/util-api'
 import { builderConfig } from '@pubstudio/frontend/util-config'
 import { serializeEditor, storeSite } from '@pubstudio/frontend/util-site-store'
-import { IApiError } from '@pubstudio/shared/type-api'
 import {
   IUpdateSiteApiRequest,
   IUpdateSiteApiResponse,
@@ -46,13 +45,16 @@ interface IUpdateApiOptions {
 // of the update key and the next update-site call fails. It would be better to find a way
 // to refresh the key or ignore it for the next update-site call after HMR.
 if (import.meta.hot) {
-  import.meta.hot.decline()
+  import.meta.hot.accept(() => {
+    if (import.meta.hot) {
+      import.meta.hot.invalidate('Reject HMR for API store')
+    }
+  })
 }
 
 export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
   const platformApi = inject(ApiInjectionKey) as PSApi
   const siteId = ref(props.siteId)
-  const saveError = ref<IApiError | undefined>()
   let saveTimer: ReturnType<typeof setTimeout> | undefined
   let getFn: GetSiteVersionFn
   let updateFn: (
@@ -103,7 +105,7 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
         const { getSite } = usePlatformSiteApi(platformApi)
         const site = await getSite(siteId.value)
         serverAddress = site.site_server.address
-        siteVersion = site.site_version
+        siteVersion = site.version
       }
       // Convert cluster URLs for dev/CI
       serverAddress =
@@ -132,7 +134,7 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
   // Post the updated Site fields to the API
   const updateApi = async (options: IUpdateApiOptions) => {
     const { keepalive } = options
-    saveError.value = undefined
+    siteStore.saveError = undefined
     const site = store.site.getSite.value
     try {
       const payload: IUpdateSiteApiRequest = {}
@@ -157,7 +159,7 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
       }
       dirty.value = dirtyDefault()
     } catch (e) {
-      saveError.value = toApiError(e)
+      siteStore.saveError = toApiError(e)
       console.log('Save site API call fail:', e)
     }
   }
@@ -265,14 +267,15 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
     updateKey.value = key
   }
 
-  return {
+  const siteStore: ISiteStore = {
     siteId,
     saveState,
-    saveError,
+    saveError: undefined,
     initialize,
     save,
     saveEditor,
     restore,
     setUpdateKey,
   }
+  return siteStore
 }

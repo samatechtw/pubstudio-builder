@@ -22,20 +22,20 @@
       "import": "./dist/pubstudio-util.es.js",
       "require": "./dist/pubstudio-util.umd.js"
     },
-    "./dist/style.css": {
-      "import": "./dist/style.css",
-      "require": "./dist/style.css"
+    "./dist/builder.css": {
+      "import": "./dist/builder.css",
+      "require": "./dist/builder.css"
     }
   },
   "keywords": [],
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "vue": "^3.4.19"
+    "vue": "^3.5.13"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^5.0.4",
-    "vite": "^5.1.2",
-    "vite-plugin-singlefile": "^2.0.0"
+    "@vitejs/plugin-vue": "^5.2.1",
+    "vite": "^6.0.11",
+    "vite-plugin-singlefile": "^2.1.0"
   }
 }

@@ -11,7 +11,7 @@
     <div class="modal-text">
       {{ t('build.site_error_text_1') }}
     </div>
-    <div class="site-error-detail">
+    <div v-if="siteError" class="site-error-detail">
       {{ t(siteError) }}
     </div>
     <div class="modal-text">

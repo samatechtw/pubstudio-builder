@@ -46,7 +46,7 @@
         :clearable="true"
         class="item copy-from"
         :placeholder="t('build.page')"
-        @select="editingPage.copyFrom = $event?.value"
+        @select="updateCopyFrom($event as IMultiselectObj)"
       />
     </div>
     <div class="menu-row route-row">
@@ -82,7 +82,7 @@
 <script lang="ts" setup>
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
-import { STInput } from '@samatech/vue-components'
+import { IMultiselectObj, STInput } from '@samatech/vue-components'
 import { STMultiselect } from '@samatech/vue-components'
 import {
   PSButton,
@@ -118,6 +118,10 @@ const updateRoute = (route: string) => {
 const notFoundRoute = '/not-found'
 
 const predefinedRoutes = [{ label: notFoundRoute, value: notFoundRoute }]
+
+const updateCopyFrom = (obj: IMultiselectObj | undefined) => {
+  editingPage.copyFrom = obj?.value as string | undefined
+}
 
 onMounted(() => {
   if (isNew.value) {

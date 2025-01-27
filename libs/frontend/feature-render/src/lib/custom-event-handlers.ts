@@ -2,6 +2,7 @@ import { resolveComponent } from '@pubstudio/frontend/util-resolve'
 import { registerScroll, runtimeContext } from '@pubstudio/frontend/util-runtime'
 import {
   ComponentEventType,
+  EventHandler,
   IComponent,
   ICustomEvents,
   ISite,
@@ -21,13 +22,13 @@ const createClickawayListener = (
   site: ISite,
   ignoreId: string,
   callback: ClickawayCallback,
-) => {
-  return (event: Event) => {
-    const eventEl = event.target as Element
-    let cmp = resolveComponent(site.context, eventEl.id)
+): EventHandler => {
+  return (event: Event | undefined) => {
+    const eventEl = event?.target as Element | undefined
+    let cmp = resolveComponent(site.context, eventEl?.id)
     while (cmp) {
       if (cmp.id === ignoreId) {
-        return null
+        return
       }
       cmp = cmp.parent
     }

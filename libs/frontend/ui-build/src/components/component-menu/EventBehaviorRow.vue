@@ -5,7 +5,7 @@
         <STMultiselect
           :value="eventBehavior.behavior.name"
           :placeholder="t('build.behavior')"
-          :options="behaviorOptions"
+          :options="behaviorOptions as any"
           labelKey="name"
           valueKey="name"
           :searchable="true"

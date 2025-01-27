@@ -96,9 +96,9 @@ const { t } = useI18n()
 
 const props = defineProps<{
   domains: ICustomDomainRelationViewModel[] | undefined
-  server: ISiteServerRelationViewModel
+  server: ISiteServerRelationViewModel | undefined
   newDomain: string | undefined
-  updating: string | undefined
+  updating: boolean | undefined
   verifying: string | undefined
 }>()
 const { domains, server } = toRefs(props)
@@ -113,7 +113,7 @@ const emit = defineEmits<{
 const serverAddress = computed(() => {
   const address = server.value?.address
   if (!address) {
-    return undefined
+    return ''
   }
   return address.replace(/^https?:\/\//i, '')
 })

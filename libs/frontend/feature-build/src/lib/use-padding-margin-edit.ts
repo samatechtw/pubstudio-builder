@@ -18,6 +18,7 @@ export interface IUsePaddingMarginEdit {
   padding: ComputedRef<CssArr>
   margin: ComputedRef<CssArr>
   editValueData: Ref<IEditValueData | undefined>
+  editValueComputed: ComputedRef<CssValue | undefined>
   editMousedown: (e: MouseEvent, css: Css, side: DragSide) => void
   editValue: () => void
   setValue: (value: CssValue) => void
@@ -46,7 +47,6 @@ export interface IDragData {
 export interface IEditValueData {
   css: Css
   side: DragSide
-  value: ComputedRef<CssValue>
   inputValue: CssValue
 }
 
@@ -138,11 +138,18 @@ const drag = (e: MouseEvent) => {
   }
 }
 
+const editValueComputed = computed(() => {
+  if (editValueData.value) {
+    const { css, side } = editValueData.value
+    return parseSides(getStyleValue(css))[side]
+  }
+  return undefined
+})
+
 const editValue = () => {
   if (maybeEdit.value) {
     const { css, side } = maybeEdit.value
-    const value = computed(() => parseSides(getStyleValue(css))[side])
-    editValueData.value = { css, side, value, inputValue: value.value }
+    editValueData.value = { css, side, inputValue: parseSides(getStyleValue(css))[side] }
     maybeEdit.value = undefined
   }
 }
@@ -184,6 +191,7 @@ export const usePaddingMarginEdit = (): IUsePaddingMarginEdit => {
     padding,
     margin,
     editValueData,
+    editValueComputed,
     editMousedown,
     editValue,
     setValue,

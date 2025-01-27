@@ -212,7 +212,7 @@ const getLinkPosition = (pos: ResolvedPos): number[] => {
       break
     }
     nodeOffset += 1
-    end = end + node.nodeSize ?? 0
+    end = end + node.nodeSize || 0
   }
   // Check nodes before the cursor to get the link's start pos
   nodeOffset = 1
@@ -224,7 +224,7 @@ const getLinkPosition = (pos: ResolvedPos): number[] => {
       break
     }
     nodeOffset += 1
-    start = start - node.nodeSize ?? 0
+    start = start - node.nodeSize || 0
   }
   return [start, end]
 }

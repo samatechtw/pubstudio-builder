@@ -18,12 +18,12 @@
 import { toRefs } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { STMultiselect } from '@samatech/vue-components'
-import { Tag } from '@pubstudio/shared/type-site'
+import { Tag, TagType } from '@pubstudio/shared/type-site'
 
 const TagValues: Tag[] = Object.values(Tag)
 
 const props = defineProps<{
-  tag: Tag
+  tag: TagType
 }>()
 const { tag } = toRefs(props)
 const emit = defineEmits<{

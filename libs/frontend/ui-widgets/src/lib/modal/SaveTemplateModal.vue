@@ -28,9 +28,9 @@
             :placeholder="t('new')"
             labelKey="name"
             valueKey="id"
-            :options="templates.results"
+            :options="templates.results as any"
             :clearable="true"
-            @select="setTemplateId"
+            @select="setTemplateId($event as ITemplateViewModel | undefined)"
           />
         </div>
         <textarea
