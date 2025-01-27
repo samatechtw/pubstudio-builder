@@ -13,7 +13,7 @@
       </div>
     </STInput>
     <STMultiselect
-      :value="store.asset.contentType"
+      :value="store.asset.contentType.value"
       valueKey="key"
       :options="Object.values(AssetContentType)"
       :clearable="true"
@@ -24,24 +24,24 @@
     />
     <STMultiselect
       v-if="sites?.length"
-      :value="store.asset.siteId"
+      :value="store.asset.siteId.value"
       valueKey="id"
       labelKey="name"
-      :options="sites"
+      :options="sites as any"
       :clearable="true"
       :caret="true"
       :placeholder="t('site')"
       class="asset-site"
-      @select="updateSiteId"
+      @select="updateSiteId($event as ISiteViewModel | undefined)"
     />
     <STMultiselect
-      :value="store.asset.sort"
+      :value="store.asset.sort.value"
       valueKey="key"
-      :options="sortOptions"
+      :options="sortOptions as any"
       :clearable="false"
       :caret="true"
       class="asset-sort"
-      @select="updateSort"
+      @select="updateSort($event as ISortOption | undefined)"
     />
   </div>
 </template>
@@ -105,9 +105,11 @@ const sortOptions = computed(() => [
   makeSortOption('size', SortDirection.Asc),
 ])
 
-const updateSort = (sort: ISortOption) => {
-  store.asset.updateSort(sort.key)
-  updateFilter()
+const updateSort = (sort: ISortOption | undefined) => {
+  if (sort !== undefined) {
+    store.asset.updateSort(sort.key)
+    updateFilter()
+  }
 }
 
 const updateContentType = (contentType: AssetContentType | undefined) => {

@@ -9,7 +9,7 @@
     :clearable="false"
     :allowAny="true"
     :customLabel="true"
-    @select="emit('update:modelValue', $event)"
+    @select="update"
     @click.stop
   >
     <template #default="{ label }">
@@ -41,6 +41,12 @@ const emit = defineEmits<{
 const multiselectRef = ref(null)
 
 const quotedFont = (fontName: string) => `"${fontName}"`
+
+const update = (font: string | undefined) => {
+  if (font) {
+    emit('update:modelValue', font)
+  }
+}
 
 defineExpose({ multiselectRef })
 </script>

@@ -4,7 +4,6 @@ import { IComponent, ISite } from '@pubstudio/shared/type-site'
 import { defineComponent, h, onMounted, onUnmounted, PropType, toRefs } from 'vue'
 import { registerCustomEvents, removeListeners } from './custom-event-handlers'
 import { computePropsContent } from './render'
-import { computeEvents } from './render-helpers'
 
 export interface ILiveComponentProps {
   site: ISite
@@ -33,7 +32,8 @@ export const LiveComponent = () => {
       registerCustomEvents(site.value, component.value, false)
 
       onMounted(() => {
-        const { custom } = computeEvents(site.value, component.value)
+        // TODO -- remove this or trigger specific custom events in editor
+        // const { custom } = computeEvents(site.value, component.value)
         registerCustomEvents(site.value, component.value, true)
       })
       onUnmounted(() => {
@@ -68,7 +68,8 @@ export const LiveComponent = () => {
           const linkProps = {
             ...renderProps,
             to: { path },
-          }
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          } as Record<string, any>
           return h(RouterLink, linkProps, () => children)
         } else if (tag === 'vue') {
           return renderVueComponent(site.value.context, component.value, renderProps)

@@ -12,7 +12,7 @@
       {{ errorText }}
     </div>
     <div v-if="!isStale" class="site-error-detail">
-      {{ error?.message }}
+      {{ siteError?.message }}
     </div>
     <div class="modal-text">
       {{ t('build.site_error_text_2') }}
@@ -82,7 +82,7 @@ const isValidateError = computed(() => {
 })
 
 const siteError = computed<IApiError | undefined>(() => {
-  return siteStore.value.saveError as unknown as IApiError | undefined
+  return siteStore.value.saveError
 })
 
 watch(siteError, (newError: IApiError | undefined) => {

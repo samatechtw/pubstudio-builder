@@ -8,7 +8,7 @@
         :placeholder="t('sites.domain')"
         :errorBubble="errorMessage"
         @keydown.enter="emitUpdate"
-        @keyup.esc="$event.srcElement.blur()"
+        @keyup.esc="($event.target as HTMLInputElement)?.blur()"
       />
     </div>
     <div class="item">

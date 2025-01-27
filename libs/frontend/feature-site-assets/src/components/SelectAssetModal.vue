@@ -33,10 +33,10 @@
         valueKey="id"
         labelKey="name"
         :placeholder="t('site')"
-        :options="resolvedSites"
+        :options="resolvedSites as any"
         :clearable="!!filter.site_id"
         class="site-select"
-        @select="updateSite"
+        @select="updateSite($event as ILocalOrApiSite | undefined)"
       />
       <STMultiselect
         v-if="contentTypes?.length"

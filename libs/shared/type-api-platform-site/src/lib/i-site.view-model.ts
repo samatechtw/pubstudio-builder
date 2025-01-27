@@ -20,7 +20,7 @@ export interface ISiteCheckoutRelationViewModel {
 export interface ISiteViewModel {
   id: string
   name: string
-  site_version: string
+  version: string
   owner_id: string
   site_type: SiteType
   published: boolean

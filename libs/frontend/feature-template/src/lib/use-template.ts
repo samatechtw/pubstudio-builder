@@ -1,9 +1,10 @@
-import { IApiTemplate, useTemplateApi } from '@pubstudio/frontend/data-access-api'
+import { useTemplateApi } from '@pubstudio/frontend/data-access-api'
 import { createEditorContext } from '@pubstudio/frontend/data-access-command'
 import { ApiInjectionKey } from '@pubstudio/frontend/data-access-injection'
 import { parseApiErrorKey, PSApi, toApiError } from '@pubstudio/frontend/util-api'
 import { S3_TEMPLATE_PREVIEWS_URL } from '@pubstudio/frontend/util-config'
 import { serializeEditor } from '@pubstudio/frontend/util-site-store'
+import { IApiTemplate } from '@pubstudio/shared/type-api-interfaces'
 import {
   GLOBAL_TEMPLATE_COLLECTION_ID,
   ICreatePlatformTemplateRequest,

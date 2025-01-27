@@ -20,14 +20,14 @@
 import { toRefs } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { STMultiselect } from '@samatech/vue-components'
-import { AriaRole } from '@pubstudio/shared/type-site'
+import { AriaRole, AriaRoleType } from '@pubstudio/shared/type-site'
 import { InfoBubble } from '@pubstudio/frontend/ui-widgets'
 
 const AriaRoleValues: AriaRole[] = Object.values(AriaRole)
 
 const props = withDefaults(
   defineProps<{
-    role?: AriaRole | undefined
+    role?: AriaRoleType | undefined
   }>(),
   {
     role: undefined,

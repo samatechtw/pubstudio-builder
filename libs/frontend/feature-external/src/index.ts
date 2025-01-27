@@ -11,15 +11,16 @@ import { useBuild, useHistory } from '@pubstudio/frontend/feature-build'
 import { hotkeysDisabled, useBuildEvent } from '@pubstudio/frontend/feature-build-event'
 import { useRender } from '@pubstudio/frontend/feature-render'
 import { useDragDropData } from '@pubstudio/frontend/feature-render-builder'
+import { SiteSaveErrorModal } from '@pubstudio/frontend/feature-site-error'
 import {
   CustomDomains,
   DeleteDraftModal,
-  useEditDomains,
+  useSiteResources,
 } from '@pubstudio/frontend/feature-site-settings'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { initializeSiteStore } from '@pubstudio/frontend/feature-site-store-init'
 import { useSiteVersion } from '@pubstudio/frontend/feature-site-version'
-import { useSites } from '@pubstudio/frontend/feature-sites'
+import { useSiteDomains, useSites } from '@pubstudio/frontend/feature-sites'
 import {
   BuildContent,
   BuildMenu,
@@ -40,7 +41,7 @@ import {
   PSButton,
   PSToggle,
   SiteErrorModal,
-  SiteSaveErrorModal,
+  UsageProgress,
 } from '@pubstudio/frontend/ui-widgets'
 import { PSApi } from '@pubstudio/frontend/util-api'
 import { builderConfig, setConfig } from '@pubstudio/frontend/util-config'
@@ -56,6 +57,7 @@ import {
 import { iteratePage, RenderMode } from '@pubstudio/frontend/util-render'
 import {
   computeLocationParts,
+  createRouter,
   getCurrentPath,
   useRoute,
   useRouter,
@@ -79,8 +81,10 @@ import type {
   ISiteMetadata,
   IUpdateSiteApiRequest,
 } from '@pubstudio/shared/type-api-site-sites'
+import type { ICustomDomainRelationViewModel } from '@pubstudio/shared/type-api-shared'
 import type { IPage, ISite } from '@pubstudio/shared/type-site'
 import type { IRouteWithPathRegex } from '@pubstudio/frontend/util-router'
+import type { IMergedSiteData } from '@pubstudio/frontend/feature-sites'
 /* eslint-enable @nx/enforce-module-boundaries */
 
 export {
@@ -99,6 +103,7 @@ export {
   replaceNamespace,
   useBuild,
   useHistory,
+  createRouter,
   useRoute,
   useRouter,
   useRender,
@@ -113,11 +118,14 @@ export {
   useDragDropData,
   useBuildEvent,
   hotkeysDisabled,
-  useEditDomains,
   useSiteVersion,
   useSiteApi,
+  useSiteDomains,
+  useSiteResources,
   useSites,
+  ICustomDomainRelationViewModel,
   ISiteMetadata,
+  IMergedSiteData,
   IUpdateSiteApiRequest,
   Keys,
   EditorMode,
@@ -154,4 +162,5 @@ export {
   SiteSaveErrorModal,
   StyleMenu,
   ThemeMenu,
+  UsageProgress,
 }

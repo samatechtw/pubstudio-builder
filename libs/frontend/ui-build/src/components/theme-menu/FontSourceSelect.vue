@@ -6,7 +6,7 @@
     :placeholder="t('source')"
     :options="options"
     :clearable="false"
-    @select="updateValue"
+    @select="updateValue($event as IMultiselectObj)"
     @click.stop
   />
 </template>

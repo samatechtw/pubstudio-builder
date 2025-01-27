@@ -101,6 +101,7 @@ import {
 } from '@pubstudio/frontend/feature-build'
 import { ErrorMessage, PSButton, Plus } from '@pubstudio/frontend/ui-widgets'
 import { setEditBehavior } from '@pubstudio/frontend/data-access-command'
+import { noBehavior } from '@pubstudio/frontend/util-builtin'
 import {
   ComponentArgPrimitive,
   ComponentEventType,
@@ -113,7 +114,6 @@ import EditMenuTitle from '../EditMenuTitle.vue'
 import EventBehaviorRow from './EventBehaviorRow.vue'
 import BehaviorModal from './BehaviorModal.vue'
 import ComponentEventParam from './ComponentEventParam.vue'
-import { noBehaviorId } from '@pubstudio/frontend/util-ids'
 
 const { t } = useI18n()
 const { site, editor } = useBuild()
@@ -151,7 +151,7 @@ const canDelete = computed(() => {
 
 const addEventBehavior = () => {
   newEvent.value.behaviors.push({
-    behavior: noBehaviorId,
+    behavior: noBehavior,
   })
 }
 
@@ -266,7 +266,7 @@ const setOrAddBehavior = (behavior: IBehavior) => {
     (b) => b.behavior.id === behavior.id,
   )
   const overrideBehavior = newEvent.value.behaviors.find(
-    (b) => b.behavior.id === noBehaviorId,
+    (b) => b.behavior.id === noBehavior.id,
   )
   if (updatedBehavior) {
     updatedBehavior.behavior = behavior

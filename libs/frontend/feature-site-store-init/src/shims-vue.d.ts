@@ -1,7 +1,2 @@
-interface ImportMeta {
-  readonly hot?: ViteHotContext
-}
-
-interface ViteHotContext {
-  decline(): void
-}
+/// <reference types="vite/client" />
+/// <reference types="vite/types/importMeta.d.ts" />

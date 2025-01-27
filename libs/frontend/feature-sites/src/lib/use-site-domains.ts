@@ -8,7 +8,7 @@ import { inject, Ref, ref } from 'vue'
 export interface ISiteDomainsFeature {
   api: IApiPlatformSite
   updating: Ref<boolean>
-  verifying: Ref<string>
+  verifying: Ref<string | undefined>
   error: Ref<string | undefined>
   addSiteDomain: (siteId: string, domain: string) => Promise<void>
   deleteSiteDomain: (siteId: string, domain: string) => Promise<void>

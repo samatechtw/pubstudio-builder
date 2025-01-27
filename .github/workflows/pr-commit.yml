@@ -27,7 +27,7 @@ jobs:
           paths: '[".github/workflows/pr-commit.yml", "apps/**", "backend/**", "libs/**", "*"]'
           paths_ignore: '["**/README.md", "skaffold*.yaml"]'
 
-  check-format:
+  check-frontend:
     needs: pre_job
     if: ${{ needs.pre_job.outputs.should_skip != 'true' }}
     name: Format, Lint, Unit Test
@@ -49,6 +49,9 @@ jobs:
       - name: Run unit tests
         if: success() || failure()
         run: npx nx affected:test --base=origin/main --parallel=3
+      - name: Build external lib
+        if: success() || failure()
+        run: npm run build:feature-external
 
   build-apps:
     needs: pre_job

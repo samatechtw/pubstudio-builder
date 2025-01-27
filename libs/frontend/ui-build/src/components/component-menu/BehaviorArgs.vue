@@ -16,7 +16,11 @@
           :options="Object.values(ComponentArgPrimitive)"
           @select="selectType"
         />
-        <STInput v-model="editArg.default" class="default" :placeholder="t('default')" />
+        <STInput
+          v-model="editArg.default as string"
+          class="default"
+          :placeholder="t('default')"
+        />
         <div class="args-actions">
           <Check class="save" color="#009879" @click="saveArg" />
           <Cross class="cancel" @click="cancel" />

@@ -1,3 +1,6 @@
+
+set -e
+
 rm -rf ../../../dist/libs/feature-external
 mkdir -p ../../../dist/libs/feature-external
 npx vite build

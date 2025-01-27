@@ -1,5 +1,5 @@
 import { IComponentPosition } from '@pubstudio/shared/type-command-data'
-import { IComponent, ISite, Tag } from '@pubstudio/shared/type-site'
+import { IComponent, ISite } from '@pubstudio/shared/type-site'
 import { IDraggedComponent, IDropProps } from './builder-dnd'
 import {
   handleColumnLayoutHover,
@@ -87,10 +87,10 @@ export const onDrag = (options: IOnDragOptions): IDropProps => {
       if (
         addNewComponentToRoot ||
         // Set image URL
-        (hoverCmp.tag === Tag.Img && isFile) ||
+        (hoverCmp.tag === 'img' && isFile) ||
         (hoverCmp.id !== dragCmpParentId &&
           !hoverCmp.content &&
-          ![Tag.Img, Tag.Vue].includes(hoverCmp.tag) &&
+          !['img', 'vue'].includes(hoverCmp.tag) &&
           !hoverCmp.customSourceId)
       ) {
         dropProps.hoverSelf = true

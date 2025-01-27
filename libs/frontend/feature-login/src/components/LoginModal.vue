@@ -62,7 +62,6 @@ import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { IFrontendStore } from '@pubstudio/frontend/data-access-state'
 import { StoreInjectionKey } from '@pubstudio/frontend/data-access-injection'
 import { usePlatformLogin } from '../lib/use-platform-login'
-import { IApiError } from '@pubstudio/shared/type-api'
 
 const { t } = useI18n()
 const store = inject(StoreInjectionKey) as IFrontendStore
@@ -72,7 +71,7 @@ const { site, siteStore } = useSiteSource()
 const loading = ref(false)
 
 const show = computed(() => {
-  const error = siteStore.value.saveError as unknown as IApiError | undefined
+  const error = siteStore.value.saveError
   return error?.status === 401
 })
 

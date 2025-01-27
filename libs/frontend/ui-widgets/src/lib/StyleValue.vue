@@ -7,39 +7,46 @@
     :options="options"
     :caret="false"
     :clearable="false"
-    @select="emit('update:modelValue', $event)"
+    @select="update"
     @click.stop
   />
 </template>
 
 <script lang="ts" setup>
-import { ref, toRefs, watch } from 'vue'
+import { ref, watch } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { STMultiselect } from '@samatech/vue-components'
 
 const { t } = useI18n()
 
-const props = defineProps<{
+const { modelValue } = defineProps<{
   modelValue: string
   options: string[]
 }>()
 
-const { modelValue } = toRefs(props)
-
-watch(modelValue, (val) => {
-  newVal.value = val
-})
+watch(
+  () => modelValue,
+  (val) => {
+    newVal.value = val
+  },
+)
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: string): void
 }>()
 
-const newVal = ref(modelValue.value)
+const newVal = ref(modelValue)
 
 const multiselectRef = ref()
 
 const toggleDropdown = () => {
   multiselectRef.value?.toggleDropdown()
+}
+
+const update = (val: string | undefined) => {
+  if (val) {
+    emit('update:modelValue', val)
+  }
 }
 
 defineExpose({ multiselectRef, toggleDropdown })
