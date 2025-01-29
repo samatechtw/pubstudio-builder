@@ -1,16 +1,16 @@
 use lib_shared_site_api::{
     error::api_error::ApiError,
-    mail::{send_mails, Email, SendgridError},
+    mail::{send_mails, Email, MailParams, SendgridError},
 };
 use lib_shared_types::dto::custom_data::{
     custom_event_dto::{EmailRowOptions, EventInfo, EventTrigger},
     CustomDataRow,
 };
 
-use crate::api_context::ApiContext;
+use crate::{api_context::ApiContext, config::Config};
 
 async fn send_add_row_mail(
-    api_key: &str,
+    config: &Config,
     table_name: &str,
     options: EmailRowOptions,
     row: &CustomDataRow,
@@ -20,10 +20,14 @@ async fn send_add_row_mail(
         text.push_str(&format!("\n{}: {}\n", key, val));
     }
     let recipients = options.recipients.iter().map(|r| Email::new(r)).collect();
-    send_mails(
-        Email::new("donotreply@pubstud.io"),
+    let params = MailParams {
+        sender: Email::new("donotreply@pubstud.io"),
         recipients,
-        api_key,
+        api_key: config.sendgrid_api_key.clone(),
+        env: config.exec_env,
+    };
+    send_mails(
+        params,
         &format!("PubStudio row added: {}", table_name),
         Some(text.into()),
         None,
@@ -52,14 +56,9 @@ pub async fn trigger_add_row(
         match event {
             EventInfo::EmailRow { trigger, options } => {
                 if trigger == EventTrigger::AddRow {
-                    let _ = send_add_row_mail(
-                        &context.config.sendgrid_api_key,
-                        table_name,
-                        options,
-                        &row,
-                    )
-                    .await
-                    .map_err(|e| println!("Failed to send AddRow: {}", e));
+                    let _ = send_add_row_mail(&context.config, table_name, options, &row)
+                        .await
+                        .map_err(|e| println!("Failed to send AddRow: {}", e));
                     triggered += 1;
                 }
             }
@@ -69,7 +68,7 @@ pub async fn trigger_add_row(
 }
 
 async fn send_update_row_mail(
-    api_key: &str,
+    config: &Config,
     table_name: &str,
     options: EmailRowOptions,
     old_row: &CustomDataRow,
@@ -84,10 +83,14 @@ async fn send_update_row_mail(
         text.push_str(&format!("\n{}: {}\n", key, val));
     }
     let recipients = options.recipients.iter().map(|r| Email::new(r)).collect();
-    send_mails(
-        Email::new("donotreply@pubstud.io"),
+    let params = MailParams {
+        sender: Email::new("donotreply@pubstud.io"),
         recipients,
-        api_key,
+        api_key: config.sendgrid_api_key.clone(),
+        env: config.exec_env,
+    };
+    send_mails(
+        params,
         &format!("PubStudio row updated: {}", table_name),
         Some(text.into()),
         None,
@@ -110,7 +113,7 @@ pub async fn trigger_update_row(
             EventInfo::EmailRow { trigger, options } => {
                 if trigger == EventTrigger::UpdateRow {
                     let _ = send_update_row_mail(
-                        &context.config.sendgrid_api_key,
+                        &context.config,
                         table_name,
                         options,
                         old_row,

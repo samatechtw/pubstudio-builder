@@ -83,7 +83,7 @@ export const ProseMirrorEditor = defineComponent({
 
     const exitProsemirror = () => {
       if (store.version.editingEnabled.value) {
-        siteStore.value.save(site.value)
+        siteStore.save(site.value)
       }
       editor.value.editView?.destroy()
       editor.value.editView = undefined

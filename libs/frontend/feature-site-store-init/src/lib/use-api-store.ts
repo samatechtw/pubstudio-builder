@@ -55,6 +55,7 @@ if (import.meta.hot) {
 export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
   const platformApi = inject(ApiInjectionKey) as PSApi
   const siteId = ref(props.siteId)
+  const saveError = ref()
   let saveTimer: ReturnType<typeof setTimeout> | undefined
   let getFn: GetSiteVersionFn
   let updateFn: (
@@ -134,7 +135,7 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
   // Post the updated Site fields to the API
   const updateApi = async (options: IUpdateApiOptions) => {
     const { keepalive } = options
-    siteStore.saveError = undefined
+    saveError.value = undefined
     const site = store.site.getSite.value
     try {
       const payload: IUpdateSiteApiRequest = {}
@@ -159,7 +160,7 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
       }
       dirty.value = dirtyDefault()
     } catch (e) {
-      siteStore.saveError = toApiError(e)
+      saveError.value = toApiError(e)
       console.log('Save site API call fail:', e)
     }
   }
@@ -267,15 +268,14 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
     updateKey.value = key
   }
 
-  const siteStore: ISiteStore = {
+  return {
     siteId,
     saveState,
-    saveError: undefined,
+    saveError,
     initialize,
     save,
     saveEditor,
     restore,
     setUpdateKey,
   }
-  return siteStore
 }

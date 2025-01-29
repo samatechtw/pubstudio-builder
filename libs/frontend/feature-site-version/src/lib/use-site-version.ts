@@ -92,7 +92,7 @@ export const useSiteVersion = (options?: IUseSiteVersionOptions): IUseSiteVersio
       versions.value = await api.createDraft(siteId as string)
       // Set the update key, since the new draft's `updated_at` will be different
       if (versions.value[0]) {
-        siteStore.value.setUpdateKey(versions.value[0].updated_at.toString())
+        siteStore.setUpdateKey(versions.value[0].updated_at.toString())
       }
     } catch (e) {
       console.log('Failed to create draft', e)
@@ -110,10 +110,10 @@ export const useSiteVersion = (options?: IUseSiteVersionOptions): IUseSiteVersio
       await listVersions()
       // Set the update key, since the live version's `updated_at` will be different
       if (versions.value[0]) {
-        siteStore.value.setUpdateKey(versions.value[0].updated_at.toString())
+        siteStore.setUpdateKey(versions.value[0].updated_at.toString())
       }
       store.version.setActiveVersion(undefined)
-      const restored = await siteStore.value.restore()
+      const restored = await siteStore.restore()
       setRestoredSite(restored)
     } catch (e) {
       console.log('Failed to create draft', e)
@@ -130,7 +130,7 @@ export const useSiteVersion = (options?: IUseSiteVersionOptions): IUseSiteVersio
     const platformApi = usePlatformSiteApi(rootApi)
     loading.value = true
     try {
-      await siteStore.value.save(site.value, {
+      await siteStore.save(site.value, {
         immediate: true,
         ignoreUpdateKey: true,
       })
@@ -144,13 +144,13 @@ export const useSiteVersion = (options?: IUseSiteVersionOptions): IUseSiteVersio
 
   const setVersion = async (version: string | undefined) => {
     store.version.setActiveVersion(version)
-    const restored = await siteStore.value.restore(site.value.content_updated_at)
+    const restored = await siteStore.restore(site.value.content_updated_at)
     setRestoredSite(restored)
   }
 
   const setActiveVersion = async (version: VersionOption) => {
     if (version === VersionOption.Live) {
-      await siteStore.value.save(site.value, {
+      await siteStore.save(site.value, {
         immediate: true,
         ignoreUpdateKey: true,
       })
