@@ -59,7 +59,7 @@ export const usePreviewPage = (siteId: string | undefined): IUsePreviewPage => {
     }
     // If not updated locally for more than 5 seconds, check the API
     try {
-      const restored = await siteStore.value.restore(site.value.content_updated_at)
+      const restored = await siteStore.restore(site.value.content_updated_at)
       setRestoredSite(restored)
       if (restored) {
         console.log('Site updated:', site.value.content_updated_at)

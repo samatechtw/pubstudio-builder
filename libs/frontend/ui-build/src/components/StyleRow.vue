@@ -199,7 +199,7 @@ const { siteStore } = useSiteSource()
 const siteId = computed(
   () =>
     // `siteId` is unwrapped by ref, so it's actually a string instead of a Ref<string>.
-    siteStore.value.siteId as unknown as string,
+    siteStore.siteId as unknown as string,
 )
 
 const focusValue = async () => {

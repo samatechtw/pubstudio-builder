@@ -1,4 +1,4 @@
-use crate::app::usage::notify::notify_allowance_exceeded;
+use crate::{app::usage::notify::notify_allowance_exceeded, util::mail_helpers::make_mail_params};
 use chrono::Utc;
 use lib_shared_site_api::db::db_error::DbError;
 use lib_shared_types::entity::site_api::{
@@ -70,13 +70,8 @@ async fn persist_custom_data_usage(context: &ApiContext) -> Result<i64, DbError>
                                 .site_type
                                 .get_custom_data_allowance(context.config.exec_env)
                         {
-                            notify_allowance_exceeded(
-                                &meta.owner_email,
-                                &context.config.sendgrid_api_key,
-                                &context.config.platform_web_url,
-                                &site,
-                            )
-                            .await;
+                            let params = make_mail_params(&context.config, &meta.owner_email);
+                            notify_allowance_exceeded(params, &site).await;
                         }
                     }
                     Err(e) => result = Err(e),

@@ -264,7 +264,7 @@ export const useBuild = (): IUseBuild => {
       registerComponentEditorEvents(newSite, component)
     }
     replaceSiteSource(newSite)
-    return siteStore.value.save(site.value, {
+    return siteStore.save(site.value, {
       immediate: true,
       forceUpdate: true,
       ignoreUpdateKey: true,

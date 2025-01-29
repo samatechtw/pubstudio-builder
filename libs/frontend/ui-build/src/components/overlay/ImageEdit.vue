@@ -42,7 +42,7 @@ const props = defineProps<{
 const { componentId } = toRefs(props)
 
 const getSiteId = () => {
-  return siteStore.value.siteId as unknown as string
+  return siteStore.siteId as unknown as string
 }
 
 const onAssetSelected = (asset: ISiteAssetViewModel) => {

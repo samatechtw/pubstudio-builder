@@ -139,8 +139,8 @@ const historyAction = (e: Event, action: () => void) => {
 }
 
 const forceSave = async () => {
-  if (unref(siteStore.value.saveState) !== SiteSaveState.Saved) {
-    await siteStore.value.save(site.value, {
+  if (unref(siteStore.saveState) !== SiteSaveState.Saved) {
+    await siteStore.save(site.value, {
       immediate: true,
       ignoreUpdateKey: true,
       forceUpdate: true,
