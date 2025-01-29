@@ -129,7 +129,7 @@ export const useBuildEvent = () => {
     setBuildSubmenu(editor.value, undefined)
     if (site.value.editor?.resizeData) {
       site.value.editor.resizeData = undefined
-      siteStore.value.saveEditor(site.value.editor)
+      siteStore.saveEditor(site.value.editor)
     } else {
       const componentId =
         target?.id ||
@@ -509,7 +509,7 @@ export const useBuildEvent = () => {
     const editor = site.value.editor
     if (editor?.resizeData) {
       editor.resizeData = undefined
-      siteStore.value.saveEditor(editor)
+      siteStore.saveEditor(editor)
     }
     if (paddingMarginDragData.value) {
       stopDrag(e)

@@ -71,12 +71,12 @@ const { site, siteStore } = useSiteSource()
 const loading = ref(false)
 
 const show = computed(() => {
-  const error = siteStore.value.saveError
+  const error = siteStore.saveError
   return error?.status === 401
 })
 
 const closeModal = () => {
-  siteStore.value.saveError = undefined
+  siteStore.saveError = undefined
 }
 
 const login = async () => {
@@ -94,7 +94,7 @@ const login = async () => {
 }
 
 const forceSave = () => {
-  return siteStore.value.save(site.value, {
+  return siteStore.save(site.value, {
     immediate: true,
     ignoreUpdateKey: true,
     forceUpdate: true,
@@ -104,7 +104,7 @@ const forceSave = () => {
 const checkLoggedIn = async () => {
   // If the user is already logged in, and there's an auth redirect, follow it
   if (store.auth.loggedIn.value) {
-    if (siteStore.value.saveError) {
+    if (siteStore.saveError) {
       await forceSave()
     }
     closeModal()

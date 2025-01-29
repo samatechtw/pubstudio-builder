@@ -82,7 +82,7 @@ const isValidateError = computed(() => {
 })
 
 const siteError = computed<IApiError | undefined>(() => {
-  return siteStore.value.saveError
+  return siteStore.saveError
 })
 
 watch(siteError, (newError: IApiError | undefined) => {
@@ -113,7 +113,7 @@ const errorText = computed(() => {
 
 const contactSupport = () => {
   const subject = `Site Error for Site: ${site.value.name}`
-  const url = `mailto:support@pubstud.io?subject=${subject}&body=${siteStore.value.saveError}`
+  const url = `mailto:support@pubstud.io?subject=${subject}&body=${siteStore.saveError}`
   window.open(url, '_blank')
 }
 
@@ -122,7 +122,7 @@ const exportSite = () => {
 }
 
 const overwriteData = () => {
-  siteStore.value.save(site.value, { immediate: true, ignoreUpdateKey: true })
+  siteStore.save(site.value, { immediate: true, ignoreUpdateKey: true })
   cancel()
 }
 
@@ -136,7 +136,7 @@ const refreshPage = () => {
 }
 
 const cancel = () => {
-  siteStore.value.saveError = undefined
+  siteStore.saveError = undefined
 }
 </script>
 

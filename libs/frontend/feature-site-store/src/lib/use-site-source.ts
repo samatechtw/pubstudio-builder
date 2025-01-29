@@ -14,7 +14,7 @@ import {
   SiteSaveState,
 } from '@pubstudio/shared/type-site'
 import { plainResponseInterceptors } from '@pubstudio/shared/util-web-site-api'
-import { computed, ComputedRef, inject, Ref, ref } from 'vue'
+import { computed, ComputedRef, inject, reactive, Reactive, Ref, ref } from 'vue'
 import { getActivePage } from './get-active-page'
 import { migrateSite } from './migrate-site'
 
@@ -29,7 +29,7 @@ export interface IUseSiteSource {
   siteError: Ref<string | undefined>
   apiSiteId: Ref<string | undefined>
   apiSite: PSApi | undefined
-  siteStore: Ref<ISiteStore>
+  siteStore: Reactive<ISiteStore>
   isSaving: ComputedRef<boolean>
   isSiteApi: ComputedRef<boolean>
   initializeSite: (options: IInitializeSiteOptions) => Promise<string | undefined>
@@ -44,7 +44,7 @@ export interface IInitializeSiteOptions {
   userToken?: Ref<string | null>
 }
 
-const siteStore = ref() as Ref<ISiteStore>
+const siteStore = reactive({}) as Reactive<ISiteStore>
 let restoredSite: ISiteRestore
 const siteError = ref<string>()
 const apiSiteId = ref<string>()
@@ -56,7 +56,7 @@ const editor = computed(() => {
 
 const isSaving = computed(() => {
   // TODO -- figure out how to avoid nested ComputedRef in `siteStore` Ref
-  const saveState = siteStore.value.saveState as unknown as SiteSaveState
+  const saveState = siteStore.saveState as unknown as SiteSaveState
   return saveState === SiteSaveState.Saving || saveState === SiteSaveState.SavingEditor
 })
 
@@ -88,7 +88,7 @@ export const useSiteSource = (): IUseSiteSource => {
     loadSiteLanguage(newSite)
     site.value = newSite
     if (site.value.editor) {
-      site.value.editor.store = siteStore.value
+      site.value.editor.store = siteStore as unknown as ISiteStore
     }
     // Migrate site version if necessary
     if (site.value) {
@@ -106,9 +106,9 @@ export const useSiteSource = (): IUseSiteSource => {
   ): Promise<string | undefined> => {
     const { siteId, store, userToken } = options
     apiSiteId.value = siteId
-    siteStore.value = store
+    Object.assign(siteStore, store)
 
-    const initInfo = await siteStore.value.initialize()
+    const initInfo = await siteStore.initialize()
     if (initInfo) {
       apiSite = new PSApi({
         baseUrl: `${initInfo.serverAddress}/api/`,
@@ -116,7 +116,7 @@ export const useSiteSource = (): IUseSiteSource => {
         responseInterceptors: [...plainResponseInterceptors],
       })
     }
-    const restored = await siteStore.value.restore()
+    const restored = await siteStore.restore()
     setRestoredSite(restored)
     return initInfo?.serverAddress
   }
@@ -125,7 +125,7 @@ export const useSiteSource = (): IUseSiteSource => {
   // Otherwise, the next `save` call will fail with the outdated update_key
   const syncUpdateKey = (updateBody: IUpdateSiteApiResponse) => {
     site.value.preview_id = updateBody.preview_id
-    siteStore.value.setUpdateKey(updateBody.updated_at.toString())
+    siteStore.setUpdateKey(updateBody.updated_at.toString())
   }
 
   return {

@@ -63,7 +63,7 @@ export const useLocalStore = (storeName?: StoreKey): ISiteStore => {
   return {
     siteId,
     saveState,
-    saveError: undefined,
+    saveError: ref(),
     initialize,
     save,
     saveEditor,

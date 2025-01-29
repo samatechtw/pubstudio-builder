@@ -26,7 +26,7 @@ export const makeMockStore = (): ISiteStore => {
   return {
     siteId,
     saveState,
-    saveError: undefined,
+    saveError: ref(),
     initialize,
     save,
     saveEditor,
