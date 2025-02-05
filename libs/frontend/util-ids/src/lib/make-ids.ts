@@ -7,8 +7,13 @@ export const nextId = (context: ISiteContext): string => {
   return id.toString()
 }
 
-export const behaviorId = (namespace: string, id: string): string => {
+export const behaviorId = (namespace: string, id: string | number): string => {
   return `${namespace}-b-${id}`
+}
+
+// Get the latest behavior ID in the namespace
+export const latestBehaviorId = (context: ISiteContext): string => {
+  return behaviorId(context.namespace, context.nextId - 1)
 }
 
 export const nextBehaviorId = (context: ISiteContext) => {

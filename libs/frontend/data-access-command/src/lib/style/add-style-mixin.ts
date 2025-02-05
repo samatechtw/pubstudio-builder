@@ -10,8 +10,8 @@ export interface AddStyle extends ICommand<IAddStyleMixinData> {
 
 export const applyAddStyleMixin = (site: ISite, data: IAddStyleMixinData): string => {
   const context = site.context
-  const { id: builtinId, name, breakpoints } = data
-  const styleId = builtinId ?? nextStyleId(context)
+  const { id, name, breakpoints } = data
+  const styleId = id ?? nextStyleId(context)
   const newStyle: IStyle = {
     id: styleId,
     name: name ?? styleId,
@@ -24,14 +24,14 @@ export const applyAddStyleMixin = (site: ISite, data: IAddStyleMixinData): strin
 
 export const undoAddStyleMixin = (site: ISite, data: IAddStyleMixinData) => {
   const context = site.context
-  const { id: builtinId } = data
-  const styleId = builtinId ?? latestStyleId(context)
+  const { id, isBuiltin } = data
+  const styleId = id ?? latestStyleId(context)
   context.styleOrder = context.styleOrder.filter((id) => id !== styleId)
   const style = resolveStyle(context, styleId)
   if (style) {
     delete context.styles[styleId]
     // Don't restore nextId if the style was copied from a builtin
-    if (!builtinId) {
+    if (!isBuiltin) {
       context.nextId -= 1
     }
     // TODO -- should we delete all references here?

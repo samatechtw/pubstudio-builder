@@ -28,7 +28,7 @@
 
 <script lang="ts" setup>
 import { computed, ref } from 'vue'
-import IconButtonWrap from '../IconButtonWrap.vue'
+import { IconButtonWrap } from '@samatech/vue-components'
 import Show from '../svg/Show.vue'
 import Hide from '../svg/Hide.vue'
 import PSInfoInput from './PSInfoInput.vue'

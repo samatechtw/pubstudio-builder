@@ -1,6 +1,5 @@
 // widget
 export { default as ErrorMessage } from './lib/ErrorMessage.vue'
-export { default as IconButtonWrap } from './lib/IconButtonWrap.vue'
 export { default as CopyText } from './lib/CopyText.vue'
 export { default as Checkbox } from './lib/Checkbox.vue'
 export { default as IconTooltip } from './lib/IconTooltip.vue'

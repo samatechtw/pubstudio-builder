@@ -32,10 +32,7 @@ export const useEditComponentEvent = (): IUseEditComponentEventFeature => {
 
   // Builtin behaviors + custom behaviors
   const behaviorOptions = computed(() => {
-    return [
-      ...Object.values(site.value.context.behaviors),
-      ...Object.values(builtinBehaviors),
-    ]
+    return Object.values({ ...site.value.context.behaviors, ...builtinBehaviors })
   })
 
   const editedEvent = computed(() => {

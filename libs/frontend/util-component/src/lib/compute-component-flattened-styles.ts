@@ -31,7 +31,10 @@ export const computeFlattenedStyles = (
 
   const currentPseudoClass: CssPseudoClassType = editor?.cssPseudoClass ?? 'default'
 
-  if (activeBreakpoint.id === DEFAULT_BREAKPOINT_ID && currentPseudoClass === 'default') {
+  if (
+    activeBreakpoint?.id === DEFAULT_BREAKPOINT_ID &&
+    currentPseudoClass === 'default'
+  ) {
     return result
   }
 

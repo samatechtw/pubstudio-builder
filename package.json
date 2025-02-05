@@ -42,7 +42,7 @@
     "@samatech/vue-store": "^0.6.0",
     "@sampullman/fetch-api": "^0.12.1",
     "@unhead/vue": "^1.11.18",
-    "@samatech/vue-components": "1.2.5",
+    "@samatech/vue-components": "1.2.6",
     "date-fns": "^4.1.0",
     "highlight.js": "^11.11.1",
     "jwt-decode": "^4.0.0",

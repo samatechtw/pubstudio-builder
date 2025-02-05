@@ -26,17 +26,17 @@
 </template>
 
 <script lang="ts" setup>
+import { toRefs } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { STInput } from '@samatech/vue-components'
-import { IBreakpoint } from '@pubstudio/shared/type-site'
 import { ErrorMessage } from '@pubstudio/frontend/ui-widgets'
-import { toRefs } from 'vue'
+import { IAddBreakpoint } from '@pubstudio/shared/type-command-data'
 
 const { t } = useI18n()
 
 const props = withDefaults(
   defineProps<{
-    breakpoint: IBreakpoint
+    breakpoint: IAddBreakpoint
     errorKey?: string
   }>(),
   {

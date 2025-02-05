@@ -48,13 +48,13 @@ import { ref } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { ConfirmModal, Modal, Plus, PSButton } from '@pubstudio/frontend/ui-widgets'
 import EditBreakpointRow from './EditBreakpointRow.vue'
-import { IBreakpoint } from '@pubstudio/shared/type-site'
 import { useEditBreakpoints } from '@pubstudio/frontend/feature-build'
+import { IAddBreakpoint } from '@pubstudio/shared/type-command-data'
 
 const { t } = useI18n()
 
 const emit = defineEmits<{
-  (e: 'save', newBreakpoints: IBreakpoint[]): void
+  (e: 'save', newBreakpoints: IAddBreakpoint[]): void
   (e: 'cancel'): void
 }>()
 

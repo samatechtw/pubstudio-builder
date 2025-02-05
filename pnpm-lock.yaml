@@ -12,8 +12,8 @@ importers:
         specifier: ^1.1.6
         version: 1.1.6(vue@3.5.13(typescript@5.7.3))
       '@samatech/vue-components':
-        specifier: 1.2.5
-        version: 1.2.5(typescript@5.7.3)
+        specifier: 1.2.6
+        version: 1.2.6(typescript@5.7.3)
       '@samatech/vue-store':
         specifier: ^0.6.0
         version: 0.6.0(vue@3.5.13(typescript@5.7.3))
@@ -1625,8 +1625,8 @@ packages:
   '@samatech/vue-color-picker@1.0.1':
     resolution: {integrity: sha512-WUgsvrF05Ls/6udE95S9N9uQbvYcgzk91I4YZFvCUxLtYjLJl5hY6pZkMyHKzzLkBjsRknVyfaoEBJAHz0JE9Q==}
 
-  '@samatech/vue-components@1.2.5':
-    resolution: {integrity: sha512-H8UakPVqmemUkVVThH/0cT1VsuOeWeyAgszrvfO84QgLUigsrMxy5N61FYG0Ft7NAVYgi5EpbbcQzdf1kA1LEw==}
+  '@samatech/vue-components@1.2.6':
+    resolution: {integrity: sha512-qWrrNj0LgbitDo15Wm5HgVh4z0MSU4HLJjRQWHTzUXNNwD80DuLUHKTl79Q6hX3K8zzmvAtJkr21qX3Cz2Nejw==}
     bundledDependencies:
       - '@samatech/st-input'
       - '@samatech/st-multiselect'
@@ -6412,7 +6412,7 @@ snapshots:
     transitivePeerDependencies:
       - typescript
 
-  '@samatech/vue-components@1.2.5(typescript@5.7.3)':
+  '@samatech/vue-components@1.2.6(typescript@5.7.3)':
     dependencies:
       vue: 3.5.13(typescript@5.7.3)
     transitivePeerDependencies:

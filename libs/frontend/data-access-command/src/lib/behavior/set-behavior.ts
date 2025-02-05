@@ -1,23 +1,35 @@
-import { ISetBehaviorData } from '@pubstudio/shared/type-command-data'
-import { IBehavior, ISite, ISiteContext } from '@pubstudio/shared/type-site'
+import { latestBehaviorId, nextBehaviorId } from '@pubstudio/frontend/util-ids'
+import { INewBehavior, ISetBehaviorData } from '@pubstudio/shared/type-command-data'
+import { ISite, ISiteContext } from '@pubstudio/shared/type-site'
 
-const removeBehavior = (context: ISiteContext, behavior: IBehavior | undefined) => {
+const removeBehavior = (context: ISiteContext, behavior: INewBehavior | undefined) => {
   if (behavior) {
-    delete context.behaviors[behavior.id]
+    // The ID is only missing when undoing an add-behavior, so it's safe to assume
+    // the latest generated ID belongs to the behavior.
+    const id = behavior.id ?? latestBehaviorId(context)
+    delete context.behaviors[id]
+    if (!behavior.id) {
+      context.nextId -= 1
+    }
   }
 }
 
-const addBehavior = (context: ISiteContext, behavior: IBehavior) => {
+const addBehavior = (context: ISiteContext, behavior: INewBehavior) => {
   if (!context.behaviors) {
     context.behaviors = {}
   }
-  context.behaviors[behavior.id] = behavior
+  const id = behavior.id ?? nextBehaviorId(context)
+
+  context.behaviors[id] = {
+    ...behavior,
+    id,
+  }
 }
 
 const setBehavior = (
   context: ISiteContext,
-  oldBehavior: IBehavior | undefined,
-  newBehavior: IBehavior | undefined,
+  oldBehavior: INewBehavior | undefined,
+  newBehavior: INewBehavior | undefined,
 ) => {
   // Add or change
   if (newBehavior !== undefined) {

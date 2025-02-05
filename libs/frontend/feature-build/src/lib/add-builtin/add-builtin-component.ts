@@ -1,11 +1,10 @@
-import { pushCommand } from '@pubstudio/frontend/data-access-command'
+import {
+  makeAddBuiltinStyleMixin,
+  pushCommand,
+} from '@pubstudio/frontend/data-access-command'
 import { getActivePage } from '@pubstudio/frontend/feature-site-store'
 import { BuilderDragDataType } from '@pubstudio/frontend/type-builder'
-import {
-  builtinBehaviors,
-  builtinStyles,
-  getBuiltinComponent,
-} from '@pubstudio/frontend/util-builtin'
+import { builtinBehaviors, getBuiltinComponent } from '@pubstudio/frontend/util-builtin'
 import {
   makeAddBuiltinComponentData,
   makeAddCustomComponentData,
@@ -21,7 +20,6 @@ import {
 import { CommandType, ICommand } from '@pubstudio/shared/type-command'
 import {
   IAddComponentData,
-  IAddStyleMixinData,
   ICommandGroupData,
   ISetBehaviorData,
 } from '@pubstudio/shared/type-command-data'
@@ -184,14 +182,9 @@ export const pushCommandWithBuiltins = <Data>(
   const commands: ICommand[] = [{ type, data }]
 
   builtins.mixinIds?.forEach((mixinId) => {
-    const builtinStyle = builtinStyles[mixinId]
-    const alreadyExists = !!resolveStyle(site.context, mixinId)
-    if (!alreadyExists) {
-      const addMixinData: IAddStyleMixinData = clone(builtinStyle)
-      commands.push({
-        type: CommandType.AddStyleMixin,
-        data: addMixinData,
-      })
+    const styleCmd = makeAddBuiltinStyleMixin(site.context, mixinId)
+    if (styleCmd) {
+      commands.push(styleCmd)
     }
   })
   builtins.behaviorIds?.forEach((behaviorId) => {

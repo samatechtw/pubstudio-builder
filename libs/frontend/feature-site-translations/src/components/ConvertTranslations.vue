@@ -45,7 +45,7 @@ import { pushGroupCommands } from '@pubstudio/frontend/feature-build'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { iterateSite } from '@pubstudio/frontend/util-render'
 import { clone } from '@pubstudio/frontend/util-component'
-import { varIsI18n } from '@pubstudio/frontend/feature-render'
+import { i18nVarRegex } from '@pubstudio/frontend/feature-render'
 import { CommandType, ICommand } from '@pubstudio/shared/type-command'
 import {
   IEditComponentData,
@@ -78,6 +78,11 @@ const clearData = () => {
   skipped.value = 0
   translationCount.value = 0
   commands.value = undefined
+}
+
+const varIsI18n = (str: string): boolean => {
+  i18nVarRegex.lastIndex = 0
+  return i18nVarRegex.test(str)
 }
 
 const scanI18n = async () => {

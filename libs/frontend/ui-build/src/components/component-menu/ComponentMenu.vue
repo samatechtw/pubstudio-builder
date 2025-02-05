@@ -110,7 +110,7 @@ const isEditingEvent = computed(() => {
 const debugComponent = () => {
   if (editor.value?.selectedComponent) {
     const serialized = serializeComponent(editor.value.selectedComponent)
-    console.log(JSON.parse(JSON.stringify(serialized)))
+    console.log(site.value.context.nextId, JSON.parse(JSON.stringify(serialized)))
   }
 }
 

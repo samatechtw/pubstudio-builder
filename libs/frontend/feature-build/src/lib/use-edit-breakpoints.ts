@@ -1,8 +1,7 @@
 import { sortedBreakpoints } from '@pubstudio/frontend/feature-site-source'
-import { nextBreakpointId } from '@pubstudio/frontend/util-ids'
+import { IAddBreakpoint } from '@pubstudio/shared/type-command-data'
 import { IBreakpoint } from '@pubstudio/shared/type-site'
 import { computed, ref, Ref, toRaw } from 'vue'
-import { useBuild } from './use-build'
 
 export interface IUseEditBreakpoints {
   breakpoints: Ref<IBreakpoint[]>
@@ -18,7 +17,7 @@ interface BreakpointRange {
   maxWidth: number
 }
 
-const breakpoints = ref<IBreakpoint[]>([])
+const breakpoints = ref<IAddBreakpoint[]>([])
 
 const errorKeys = computed<string[]>(() => {
   const ranges: BreakpointRange[] = []
@@ -54,7 +53,7 @@ const errorKeys = computed<string[]>(() => {
   })
 })
 
-const isBetweenRange = (range: BreakpointRange, breakpoint: IBreakpoint): boolean => {
+const isBetweenRange = (range: BreakpointRange, breakpoint: IAddBreakpoint): boolean => {
   if (breakpoint.minWidth === undefined || breakpoint.maxWidth === undefined) {
     return false
   }
@@ -65,8 +64,6 @@ const isBetweenRange = (range: BreakpointRange, breakpoint: IBreakpoint): boolea
 }
 
 export const useEditBreakpoints = () => {
-  const { site } = useBuild()
-
   const initBreakpoints = () => {
     breakpoints.value = sortedBreakpoints.value.map((breakpoint) =>
       structuredClone(toRaw(breakpoint)),
@@ -74,10 +71,9 @@ export const useEditBreakpoints = () => {
   }
 
   const addBreakpoint = () => {
-    const breakpointId = nextBreakpointId(site.value.context)
     breakpoints.value.push({
-      id: breakpointId,
-      name: breakpointId,
+      id: undefined,
+      name: undefined,
       minWidth: undefined,
       maxWidth: undefined,
     })

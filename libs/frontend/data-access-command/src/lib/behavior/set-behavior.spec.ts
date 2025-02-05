@@ -1,7 +1,7 @@
-import { nextBehaviorId } from '@pubstudio/frontend/util-ids'
+import { latestBehaviorId } from '@pubstudio/frontend/util-ids'
 import { deserializeSite } from '@pubstudio/frontend/util-site-deserialize'
 import { mockSerializedSite } from '@pubstudio/frontend/util-test-mock'
-import { ISetBehaviorData } from '@pubstudio/shared/type-command-data'
+import { INewBehavior, ISetBehaviorData } from '@pubstudio/shared/type-command-data'
 import { IBehavior, ISite, ISiteContext } from '@pubstudio/shared/type-site'
 import { applySetBehavior, undoSetBehavior } from './set-behavior'
 
@@ -9,14 +9,19 @@ describe('Set Component Input', () => {
   let siteString: string
   let site: ISite
   let context: ISiteContext
-  let behavior: IBehavior
+  let behavior: INewBehavior
 
   beforeEach(() => {
     siteString = JSON.stringify(mockSerializedSite)
     site = deserializeSite(siteString) as ISite
     context = site.context
-    behavior = { id: nextBehaviorId(site.context), name: 'text', code: '{}' }
+    behavior = { id: undefined, name: 'text', code: '{}' }
   })
+
+  const verifyNewBehavior = (behavior: IBehavior, newB: INewBehavior) => {
+    expect(behavior.name).toEqual(newB.name)
+    expect(behavior.code).toEqual(newB.code)
+  }
 
   it('should add behavior and undo', () => {
     // Assert no behaviors in site context
@@ -28,7 +33,8 @@ describe('Set Component Input', () => {
     }
     applySetBehavior(site, data)
     // Assert behavior is added
-    expect(context.behaviors[behavior.id]).toEqual(behavior)
+    const id = latestBehaviorId(context)
+    verifyNewBehavior(context.behaviors[id], behavior)
 
     undoSetBehavior(site, data)
     // Assert new behavior is removed
@@ -42,9 +48,10 @@ describe('Set Component Input', () => {
     }
     applySetBehavior(site, data)
 
-    // Set behavior and undo
+    // Remove behavior and undo
+    const id = latestBehaviorId(context)
     const removeData: ISetBehaviorData = {
-      oldBehavior: behavior,
+      oldBehavior: { id, ...behavior },
     }
     applySetBehavior(site, removeData)
     // Assert behavior is removed
@@ -52,7 +59,7 @@ describe('Set Component Input', () => {
 
     undoSetBehavior(site, removeData)
     // Assert behavior added again
-    expect(context.behaviors[behavior.id]).toEqual(behavior)
+    verifyNewBehavior(context.behaviors[id], behavior)
   })
 
   it('should edit behavior', () => {
@@ -63,17 +70,18 @@ describe('Set Component Input', () => {
     applySetBehavior(site, data)
 
     // Set behavior and undo
-    const newBehavior = { id: behavior.id, name: 'newname', code: '1+1' }
+    const id = latestBehaviorId(context)
+    const newBehavior = { id, name: 'newname', code: '1+1' }
     const removeData: ISetBehaviorData = {
-      oldBehavior: behavior,
+      oldBehavior: { id, ...behavior },
       newBehavior,
     }
     applySetBehavior(site, removeData)
-    // Assert behavior is removed
-    expect(context.behaviors[behavior.id]).toEqual(newBehavior)
+    // Assert behavior is updated
+    expect(context.behaviors[id]).toEqual(newBehavior)
 
     undoSetBehavior(site, removeData)
-    // Assert behavior added again
-    expect(context.behaviors[behavior.id]).toEqual(behavior)
+    // Assert behavior set back to initial values
+    verifyNewBehavior(context.behaviors[id], behavior)
   })
 })

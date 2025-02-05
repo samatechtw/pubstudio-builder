@@ -43,11 +43,6 @@ export const computeEvents = (site: ISite, component: IComponent): IEventCollect
 
 export const i18nVarRegex = /\$\{(.*?)\}/g
 
-export const varIsI18n = (str: string): boolean => {
-  i18nVarRegex.lastIndex = 0
-  return i18nVarRegex.test(str)
-}
-
 export const parseI18n = (
   i18n: Record<string, ITranslations>,
   lang: string,

@@ -22,10 +22,10 @@ import { useI18n } from 'petite-vue-i18n'
 import { Edit } from '@pubstudio/frontend/ui-widgets'
 import { ToolbarItem } from '@pubstudio/frontend/ui-widgets'
 import { useBreakpoint } from '@pubstudio/frontend/feature-breakpoint'
-import { IBreakpoint } from '@pubstudio/shared/type-site'
+import { useBuild, useEditBreakpoints } from '@pubstudio/frontend/feature-build'
+import { IAddBreakpoint } from '@pubstudio/shared/type-command-data'
 import ToolbarBreakpointOption from './ToolbarBreakpointOption.vue'
 import EditBreakpointModal from './EditBreakpointModal.vue'
-import { useBuild, useEditBreakpoints } from '@pubstudio/frontend/feature-build'
 
 const { t } = useI18n()
 
@@ -41,11 +41,9 @@ const openEditBreakpointMenu = () => {
   setShowEditModal(true)
 }
 
-const saveBreakpoints = (newBreakpoints: IBreakpoint[]) => {
-  const breakpointRecord = Object.fromEntries(
-    newBreakpoints.map((breakpoint) => [breakpoint.id, breakpoint]),
-  )
-  setBreakpoint(breakpointRecord)
+const saveBreakpoints = (newBreakpoints: IAddBreakpoint[]) => {
+  // TODO -- only save modified breakpoints
+  setBreakpoint(newBreakpoints)
   setShowEditModal(false)
 }
 
