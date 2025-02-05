@@ -51,7 +51,7 @@ const props = defineProps<{
   eventBehavior: IResolvedComponentEventBehavior
   behaviorOptions: IBehavior[]
 }>()
-const { eventBehavior } = toRefs(props)
+const { eventBehavior, behaviorOptions } = toRefs(props)
 
 const emit = defineEmits<{
   (e: 'update:behavior', behavior: IBehavior): void

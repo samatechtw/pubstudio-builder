@@ -22,19 +22,23 @@ import {
   makeEditComponentData,
   makeRemoveComponentData,
   makeSetInputData,
+  makeSetTranslationsData,
   selectAddParent,
 } from '@pubstudio/frontend/util-command-data'
 import {
+  clone,
   computeComponentBreakpointStyles,
   computeFlattenedStyles,
   flattenedComponentStyle,
 } from '@pubstudio/frontend/util-component'
 import { DEFAULT_BREAKPOINT_ID } from '@pubstudio/frontend/util-defaults'
+import { breakpointId } from '@pubstudio/frontend/util-ids'
 import { resolveComponent } from '@pubstudio/frontend/util-resolve'
 import { serializePage } from '@pubstudio/frontend/util-site-store'
 import { uiAlert } from '@pubstudio/frontend/util-ui-alert'
 import { CommandType, ICommand } from '@pubstudio/shared/type-command'
 import {
+  IAddBreakpoint,
   IAddComponentData,
   IAddComponentMixinData,
   IAddCustomComponentData,
@@ -47,6 +51,7 @@ import {
   IEditPageData,
   IEditThemeVariableData,
   IMergeComponentStyleData,
+  INewBehavior,
   IRemoveComponentMixinData,
   IRemoveComponentOverrideStyleData,
   IRemovePageData,
@@ -71,12 +76,12 @@ import {
   Css,
   CssPseudoClass,
   EditorEventName,
-  IBehavior,
   IBehaviorArg,
-  IBreakpoint,
+  IBreakpointStyles,
   IComponent,
   IComponentEvent,
   IComponentInput,
+  ICopiedComponent,
   IEditorContext,
   IEditorEvent,
   IHeadObject,
@@ -120,6 +125,7 @@ export interface IUseBuild {
   addComponent: (data?: Partial<IAddComponentData>) => void
   duplicateComponent: () => void
   pasteComponent: (component: ISerializedComponent, parent: IComponent) => void
+  pasteExternalComponent: (copiedComponent: ICopiedComponent, parent: IComponent) => void
   replacePageRoot: (copiedComponentId: string, pageRoute: string) => void
   editSelectedComponent: (fields: IEditComponentFields) => void
   editComponent: (component: IComponent, fields: IEditComponentFields) => void
@@ -181,7 +187,7 @@ export interface IUseBuild {
   addOrUpdateSelectedInput: (property: string, payload: Partial<IComponentInput>) => void
   removeComponentInput: (name: string) => void
   setSelectedIsInput: (prop: string, newValue: unknown) => void
-  setBehavior: (behavior: IBehavior) => void
+  setBehavior: (behavior: INewBehavior) => void
   removeBehavior: (id: string) => void
   setBehaviorArg: (
     id: string,
@@ -210,7 +216,7 @@ export interface IUseBuild {
   ) => void
   removePageHead: (route: string, tag: IPageHeadTag, index: number) => void
   setPageFavicon: (route: string, newFavicon: string | undefined) => void
-  setBreakpoint: (newBreakpoints: Record<string, IBreakpoint>) => void
+  setBreakpoint: (newBreakpoints: IAddBreakpoint[]) => void
   updateUi: <Action extends UiAction>(
     action: Action,
     params: IUpdateUiParams[Action],
@@ -358,17 +364,147 @@ export const useBuild = (): IUseBuild => {
     pushCommand(site.value, CommandType.AddComponent, data)
   }
 
-  const pasteComponent = (component: ISerializedComponent, parent: IComponent) => {
-    const copiedComponent = resolveComponent(site.value.context, component.id)
-
+  const makePastComponentData = (
+    component: ISerializedComponent,
+    parent: IComponent,
+    sourceId: string | undefined,
+  ) => {
     const data: IAddComponentData = {
       tag: component.tag,
       content: component.content,
-      sourceId: copiedComponent?.id,
+      sourceId,
       customComponentId: component.customSourceId,
       name: component.name,
       ...selectAddParent(parent, activePage.value?.root.id),
     }
+    return data
+  }
+
+  const matchDelta = (
+    target: number | undefined,
+    val: number | undefined,
+    delta: number,
+  ): boolean => {
+    if (target === undefined || val === undefined) {
+      return false
+    }
+    return Math.abs(val - target) <= delta
+  }
+
+  const convertBreakpointIds = (
+    bpMap: Record<string, string>,
+    bpStyles: IBreakpointStyles,
+  ) => {
+    const newBreakpoints: IBreakpointStyles = {}
+    for (const [bpId, bpStyle] of Object.entries(bpStyles)) {
+      const newBpId = bpMap[bpId] ?? bpId
+      newBreakpoints[newBpId] = bpStyle
+    }
+    return newBreakpoints
+  }
+
+  const pasteExternalComponent = (
+    copiedComponent: ICopiedComponent,
+    parent: IComponent,
+  ) => {
+    const { component, breakpoints, behaviors, styles, translations, theme } =
+      copiedComponent
+    const context = site.value.context
+    const commands: ICommand[] = []
+    // Breakpoints from external component are merged with current site breakpoints
+    // Breakpoint commands are first, so we can guess new breakpoint IDs, which is
+    // necessary when mapping them to source site breakpoints. This solution may be fragile,
+    // if ID generation ever changes, but should otherwise be reliable.
+    let newBreakpointId = context.nextId
+    // Map source site breakpoints to target site
+    const bpMap: Record<string, string> = {
+      [DEFAULT_BREAKPOINT_ID]: DEFAULT_BREAKPOINT_ID,
+    }
+    if (breakpoints) {
+      const targetBpList = Object.values(context.breakpoints)
+      const targetBreakpoints: IAddBreakpoint[] = clone(targetBpList)
+      for (const sourceBp of Object.values(breakpoints)) {
+        // Match breakpoint by name, then minWidth/maxWidth
+        let targetBp = targetBpList.find((bp) => bp.name === sourceBp.name)
+        if (!targetBp) {
+          targetBp = targetBpList.find(
+            (bp) =>
+              matchDelta(sourceBp.minWidth, bp.minWidth, 50) ||
+              matchDelta(sourceBp.maxWidth, bp.maxWidth, 50),
+          )
+        }
+        // If there's no match, we need to add the breakpoint
+        if (!targetBp) {
+          targetBreakpoints.push({ ...sourceBp, id: undefined })
+          const newId = breakpointId(context.namespace, newBreakpointId.toString())
+          newBreakpointId += 1
+          bpMap[sourceBp.id] = newId
+        } else {
+          bpMap[sourceBp.id] = targetBp.id
+        }
+      }
+      const breakpointsData: ISetBreakpointData = {
+        oldBreakpoints: clone(context.breakpoints),
+        newBreakpoints: targetBreakpoints,
+      }
+      commands.push({
+        type: CommandType.SetBreakpoint,
+        data: breakpointsData,
+      })
+    }
+    // Behaviors and styles are de-duplicated, and can be added directly to the site
+    for (const behavior of behaviors) {
+      const behaviorData: ISetBehaviorData = {
+        oldBehavior: undefined,
+        newBehavior: behavior,
+      }
+      commands.push({ type: CommandType.SetBehavior, data: behaviorData })
+    }
+    for (const style of styles) {
+      // Update style breakpoint IDs
+      style.breakpoints = convertBreakpointIds(bpMap, style.breakpoints)
+      commands.push({ type: CommandType.AddStyleMixin, data: style })
+    }
+    // Add translations
+    for (const [lang, i18n] of Object.entries(translations)) {
+      const i18nData = makeSetTranslationsData(context, lang, i18n)
+      commands.push({ type: CommandType.SetTranslations, data: i18nData })
+    }
+    // Add theme variables
+    for (const [key, value] of Object.entries(theme.variables)) {
+      if (context.theme.variables[key] === undefined) {
+        const varData: IAddThemeVariableData = { key, value }
+        commands.push({ type: CommandType.AddThemeVariable, data: varData })
+      }
+    }
+    // Update component style breakpoint IDs
+    component.style.custom = convertBreakpointIds(bpMap, component.style.custom)
+
+    // Add component
+    const addComponent: IAddComponentData = {
+      name: component.name,
+      tag: component.tag,
+      content: component.content,
+      state: component.state,
+      inputs: component.inputs,
+      events: component.events,
+      editorEvents: component.editorEvents,
+      customComponentId: undefined,
+      style: component.style,
+      children: component.children,
+      ...selectAddParent(parent, activePage.value?.root.id),
+    }
+    commands.push({
+      type: CommandType.AddComponent,
+      data: addComponent,
+    })
+    const cmd = { type: CommandType.Group, data: { commands } }
+    pushCommandObject(site.value, cmd)
+  }
+
+  const pasteComponent = (component: ISerializedComponent, parent: IComponent) => {
+    const copiedComponent = resolveComponent(site.value.context, component.id)
+    const data = makePastComponentData(component, parent, copiedComponent?.id)
     pushCommand(site.value, CommandType.AddComponent, data)
   }
 
@@ -701,8 +837,10 @@ export const useBuild = (): IUseBuild => {
     pushCommand(site.value, CommandType.SetComponentInput, data)
   }
 
-  const setBehavior = (behavior: IBehavior) => {
-    const oldBehavior = site.value.context.behaviors[behavior.id]
+  const setBehavior = (behavior: INewBehavior) => {
+    const oldBehavior = behavior.id
+      ? site.value.context.behaviors[behavior.id]
+      : undefined
     const data: ISetBehaviorData = {
       oldBehavior,
       newBehavior: behavior,
@@ -985,18 +1123,9 @@ export const useBuild = (): IUseBuild => {
     }
   }
 
-  const setBreakpoint = (newBreakpoints: Record<string, IBreakpoint>) => {
-    const oldBreakpoints = Object.keys(site.value.context.breakpoints).reduce(
-      (record, breakpointId) => {
-        record[breakpointId] = structuredClone(
-          toRaw(site.value.context.breakpoints[breakpointId]),
-        )
-        return record
-      },
-      {} as Record<string, IBreakpoint>,
-    )
+  const setBreakpoint = (newBreakpoints: IAddBreakpoint[]) => {
     const data: ISetBreakpointData = {
-      oldBreakpoints,
+      oldBreakpoints: clone(site.value.context.breakpoints),
       newBreakpoints,
     }
     pushCommand(site.value, CommandType.SetBreakpoint, data)
@@ -1030,6 +1159,7 @@ export const useBuild = (): IUseBuild => {
     addComponent,
     duplicateComponent,
     pasteComponent,
+    pasteExternalComponent,
     replacePageRoot,
     editComponent,
     editSelectedComponent,

@@ -1,9 +1,10 @@
 import {
   appendLastCommand,
+  makeAddBuiltinStyleMixin,
   mergeLastCommand,
   toggleComponentTreeHidden,
 } from '@pubstudio/frontend/data-access-command'
-import { builtinStyles, defaultNavMenuItemInputs } from '@pubstudio/frontend/util-builtin'
+import { defaultNavMenuItemInputs } from '@pubstudio/frontend/util-builtin'
 import {
   makeAddBuiltinComponentData,
   makeEditComponentData,
@@ -19,12 +20,9 @@ import {
   navMenuRemoveBehaviorId,
   setupLoaderBehaviorId,
 } from '@pubstudio/frontend/util-ids'
-import { registerEditorBehavior, resolveStyle } from '@pubstudio/frontend/util-resolve'
+import { registerEditorBehavior } from '@pubstudio/frontend/util-resolve'
 import { CommandType, ICommand } from '@pubstudio/shared/type-command'
-import {
-  IAddStyleMixinData,
-  ISetGlobalStyleData,
-} from '@pubstudio/shared/type-command-data'
+import { ISetGlobalStyleData } from '@pubstudio/shared/type-command-data'
 import {
   ComponentArgPrimitive,
   IBehavior,
@@ -49,11 +47,9 @@ const navMenuAddPage = (site: ISite, cmp: IComponent) => {
         addData.inputs = defaultNavMenuItemInputs(route, pages[route].name, true)
         addData.content = pages[route].name
         commands.push({ type: CommandType.AddComponent, data: addData })
-        const builtinStyle = builtinStyles[navMenuItemStyleId]
-        const alreadyExists = resolveStyle(site.context, navMenuItemStyleId)
-        if (builtinStyle && !alreadyExists) {
-          const addMixinData: IAddStyleMixinData = structuredClone(builtinStyle)
-          commands.push({ type: CommandType.AddStyleMixin, data: addMixinData })
+        const styleCmd = makeAddBuiltinStyleMixin(site.context, navMenuItemStyleId)
+        if (styleCmd) {
+          commands.push(styleCmd)
         }
       }
     }

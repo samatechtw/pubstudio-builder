@@ -70,13 +70,14 @@ import js from 'highlight.js/lib/languages/javascript'
 import { EditorView } from 'prosemirror-view'
 import { Modal, PSButton } from '@pubstudio/frontend/ui-widgets'
 import { setOrCreate } from '@pubstudio/shared/type-utils'
-import { nextBehaviorId } from '@pubstudio/frontend/util-ids'
 import { IBehavior, IBehaviorArg, IEditBehavior } from '@pubstudio/shared/type-site'
-import MenuRow from '../MenuRow.vue'
-import BehaviorArgs from './BehaviorArgs.vue'
 import { useBuild, createCodeEditorView } from '@pubstudio/frontend/feature-build'
 import { setEditBehavior } from '@pubstudio/frontend/data-access-command'
+import { latestBehaviorId } from '@pubstudio/frontend/util-ids'
+import { INewBehavior } from '@pubstudio/shared/type-command-data'
 import BehaviorContextVars from './BehaviorContextVars.vue'
+import MenuRow from '../MenuRow.vue'
+import BehaviorArgs from './BehaviorArgs.vue'
 
 hljs.registerLanguage('javascript', js)
 
@@ -186,14 +187,15 @@ watch(behaviorCodeEditor, (domElement) => {
 })
 
 const saveBehavior = () => {
-  const behavior = {
-    id: newBehavior.value.id ?? nextBehaviorId(site.value.context),
+  const behavior: INewBehavior = {
+    id: newBehavior.value.id,
     name: newBehavior.value.name,
     code: newBehavior.value.code,
     args: newBehavior.value.args,
   }
   setBehavior(behavior)
-  emit('saved', behavior)
+  const id = newBehavior.value.id ?? latestBehaviorId(site.value.context)
+  emit('saved', { id, ...behavior })
   clearBehavior()
 }
 

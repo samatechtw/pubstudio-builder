@@ -67,6 +67,7 @@ export const builtinStyles: Record<string, IStyle> = {
   [listStyle.id]: listStyle,
   [listItemStyle.id]: listItemStyle,
   [dividerHorizontalStyle.id]: dividerHorizontalStyle,
+  [dividerVerticalStyle.id]: dividerVerticalStyle,
   [caretBubbleStyle.id]: caretBubbleStyle,
   [caretRightStyle.id]: caretRightStyle,
   [langDisplayStyle.id]: langDisplayStyle,

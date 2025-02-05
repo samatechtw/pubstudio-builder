@@ -36,7 +36,6 @@ export const activeBreakpoint = computed(() => {
       break
     }
   }
-
   return matchedBreakpoint
 })
 

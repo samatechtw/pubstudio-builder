@@ -1,8 +1,11 @@
-import { IComponent } from './i-component'
+import { IBreakpoint } from './i-breakpoint'
+import { IBehavior, IComponent } from './i-component'
 import { IEditorContext } from './i-editor-context'
 import { IPage } from './i-page'
 import { ISite } from './i-site'
-import { ISiteContext } from './i-site-context'
+import { ISiteContext, ITranslations } from './i-site-context'
+import { IStyle } from './i-style'
+import { ITheme } from './i-theme'
 
 // Internal type for serialization
 export interface ISerializedSite extends Omit<ISite, 'context' | 'pages' | 'editor'> {
@@ -33,4 +36,13 @@ export interface ISerializedPage extends Omit<IPage, 'root'> {
 export interface ISerializedComponent extends Omit<IComponent, 'parent' | 'children'> {
   parentId?: string
   children?: ISerializedComponent[]
+}
+
+export interface ICopiedComponent {
+  component: ISerializedComponent
+  breakpoints: Record<string, IBreakpoint>
+  translations: Record<string, ITranslations>
+  behaviors: IBehavior[]
+  styles: IStyle[]
+  theme: ITheme
 }
