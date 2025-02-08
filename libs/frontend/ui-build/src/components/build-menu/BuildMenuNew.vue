@@ -206,7 +206,6 @@ const showLanguageSelect = computed(() => {
   width: $left-menu-width;
   padding-top: 12px;
   background-color: $blue-100;
-  overflow: auto;
 }
 .new-left,
 .new-right {

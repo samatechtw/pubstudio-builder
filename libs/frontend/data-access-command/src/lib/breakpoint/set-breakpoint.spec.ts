@@ -1,3 +1,4 @@
+import { breakpointId } from '@pubstudio/frontend/util-ids'
 import { deserializeSite } from '@pubstudio/frontend/util-site-deserialize'
 import { mockSerializedSite } from '@pubstudio/frontend/util-test-mock'
 import { IAddBreakpoint, ISetBreakpointData } from '@pubstudio/shared/type-command-data'
@@ -41,6 +42,34 @@ describe('Set Breakpoint', () => {
     expect(Object.values(site.context.breakpoints).map((bp) => bp.name)).toContain(
       newBreakpoint.name,
     )
+  })
+
+  it('should set two breakpoints', () => {
+    const breakpointCountBefore = Object.keys(site.context.breakpoints).length
+    const expectedId1 = breakpointId(
+      site.context.namespace,
+      site.context.nextId.toString(),
+    )
+    const expectedId2 = breakpointId(
+      site.context.namespace,
+      (site.context.nextId + 1).toString(),
+    )
+
+    applySetBreakpoint(site, data)
+    const data2 = {
+      oldBreakpoints: structuredClone(site.context.breakpoints),
+      newBreakpoints: [
+        ...Object.values(structuredClone(site.context.breakpoints)),
+        { id: undefined, name: 'bp2', maxWidth: 700 },
+      ],
+    }
+    applySetBreakpoint(site, data2)
+
+    const breakpointCountAfter = Object.keys(site.context.breakpoints).length
+    expect(breakpointCountAfter).toEqual(breakpointCountBefore + 2)
+
+    expect(site.context.breakpoints[expectedId1]?.name).toEqual(newBreakpoint.name)
+    expect(site.context.breakpoints[expectedId2]?.name).toEqual('bp2')
   })
 
   it('should set breakpoint and undo', () => {

@@ -85,7 +85,6 @@ const clearHistory = () => {
 .history-menu {
   @mixin flex-col;
   height: 100%;
-  overflow-y: scroll;
   width: $left-menu-width;
   background-color: $blue-100;
   padding: 16px 8px 0;
