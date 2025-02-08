@@ -40,7 +40,7 @@ export const miscModule = useModule<
   ReturnType<typeof mutations>
 >({
   name: 'misc-store',
-  version: 4,
+  version: 5,
   stateInit: () => ({
     cookiesAccepted: false,
     scratchPopupViewed: false,

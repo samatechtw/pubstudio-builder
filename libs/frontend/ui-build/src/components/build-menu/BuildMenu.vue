@@ -225,6 +225,8 @@ const showCustomDataModal = ref(false)
   top: 0;
   left: $build-menu-width;
   z-index: 1;
+  overflow-y: auto;
+  padding-bottom: 16px;
 }
 
 .submenu-enter-active,

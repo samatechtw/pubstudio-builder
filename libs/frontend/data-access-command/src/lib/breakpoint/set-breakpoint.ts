@@ -11,7 +11,7 @@ export const applySetBreakpoint = (site: ISite, data: ISetBreakpointData) => {
     if (!newBp.name) {
       newBp.name = newBp.id
     }
-    return [bp.id, newBp]
+    return [newBp.id, newBp]
   })
   site.context.breakpoints = Object.fromEntries(newBreakpoints)
 }
