@@ -20,9 +20,6 @@ importers:
       '@sampullman/fetch-api':
         specifier: ^0.12.1
         version: 0.12.1
-      '@unhead/vue':
-        specifier: ^1.11.18
-        version: 1.11.18(vue@3.5.13(typescript@5.7.3))
       date-fns:
         specifier: ^4.1.0
         version: 4.1.0
@@ -1844,20 +1841,6 @@ packages:
   '@ungap/structured-clone@1.2.1':
     resolution: {integrity: sha512-fEzPV3hSkSMltkw152tJKNARhOupqbH96MZWyRjNaYZOMIzbrTeQDG+MTc6Mr2pgzFQzFxAfmhGDNP5QK++2ZA==}
 
-  '@unhead/dom@1.11.18':
-    resolution: {integrity: sha512-zQuJUw/et9zYEV0SZWTDX23IgurwMaXycAuxt4L6OgNL0T4TWP3a0J/Vm3Q02hmdNo/cPKeVBrwBdnFUXjGU4w==}
-
-  '@unhead/schema@1.11.18':
-    resolution: {integrity: sha512-a3TA/OJCRdfbFhcA3Hq24k1ZU1o9szicESrw8DZcGyQFacHnh84mVgnyqSkMnwgCmfN4kvjSiTBlLEHS6+wATw==}
-
-  '@unhead/shared@1.11.18':
-    resolution: {integrity: sha512-OsupRQRxJqqnuKiL1Guqipjbl7MndD5DofvmGa3PFGu2qNPmOmH2mxGFjRBBgq2XxY1KalIHl/2I9HV6gbK8cw==}
-
-  '@unhead/vue@1.11.18':
-    resolution: {integrity: sha512-Jfi7t/XNBnlcauP9UTH3VHBcS69G70ikFd2e5zdgULLDRWpOlLs1sSTH1V2juNptc93DOk9RQfC5jLWbLcivFw==}
-    peerDependencies:
-      vue: '>=2.7 || >=3'
-
   '@videojs/themes@1.0.1':
     resolution: {integrity: sha512-2b6YIIIz5x+/eSFdkSZ2RZJfHIMfP7bGODR3wDzLTqFF2kEKnJVIXxBUNzdZC/qiVETqAA2Ba6mCp+iXTUYt4A==}
 
@@ -2957,9 +2940,6 @@ packages:
     resolution: {integrity: sha512-Xwwo44whKBVCYoliBQwaPvtd/2tYFkRQtXDWj1nackaV2JPXx3L0+Jvd8/qCJ2p+ML0/XVkJ2q+Mr+UVdpJK5w==}
     engines: {node: '>=12.0.0'}
 
-  hookable@5.5.3:
-    resolution: {integrity: sha512-Yc+BQe8SvoXH1643Qez1zqLRmbA5rCL+sSmk6TVos0LWVfNIB7PGncdlId77WzLGSIB5KaWgTaNTs2lNVEI6VQ==}
-
   hosted-git-info@7.0.2:
     resolution: {integrity: sha512-puUZAUKT5m8Zzvs72XWy3HtvVbTWljRE66cP60bxJzAqf2DgICo7lYTY2IHUmLnNpjYvw5bvmoHvPc0QO2a62w==}
     engines: {node: ^16.14.0 || >=18.0.0}
@@ -3818,9 +3798,6 @@ packages:
     resolution: {integrity: sha512-R4nPAVTAU0B9D35/Gk3uJf/7XYbQcyohSKdvAxIRSNghFl4e71hVoGnBNQz9cWaXxO2I10KTC+3jMdvvoKw6dQ==}
     engines: {node: '>=6'}
 
-  packrup@0.1.2:
-    resolution: {integrity: sha512-ZcKU7zrr5GlonoS9cxxrb5HVswGnyj6jQvwFBa6p5VFw7G71VAHcUKL5wyZSU/ECtPM/9gacWxy2KFQKt1gMNA==}
-
   parent-module@1.0.1:
     resolution: {integrity: sha512-GQ2EWRpQV8/o+Aw8YqtfZZPfNRWZYkbidE9k5rpl/hC3vtHHBfGm2Ifi6qWV+coDGkrUKZAxE3Lot5kcsRlh+g==}
     engines: {node: '>=6'}
@@ -4456,9 +4433,6 @@ packages:
   undici-types@6.20.0:
     resolution: {integrity: sha512-Ny6QZ2Nju20vw1SRHe3d9jVu6gJ+4e3+MMpqu7pqE5HT6WsTSlce++GQmK5UXS8mzV8DSYHrQH+Xrf2jVcuKNg==}
 
-  unhead@1.11.18:
-    resolution: {integrity: sha512-TWgGUoZMpYe2yJwY6jZ0/9kpQT18ygr2h5lI6cUXdfD9UzDc0ytM9jGaleSYkj9guJWXkk7izYBnzJvxl8mRvQ==}
-
   unicode-canonical-property-names-ecmascript@2.0.1:
     resolution: {integrity: sha512-dA8WbNeb2a6oQzAQ55YlT5vQAWGV9WXOsi3SskE3bcCdM0P4SDd+24zS/OCacdRq5BkdsRj9q3Pg6YyQoxIGqg==}
     engines: {node: '>=4'}
@@ -4681,9 +4655,6 @@ packages:
   yocto-queue@1.1.1:
     resolution: {integrity: sha512-b4JR1PFR10y1mKjhHY9LaGo6tmrgjit7hxVIeAmyMw3jegXR4dhYqLaQF5zMXZxY7tLpMyJeLjr1C4rLmkVe8g==}
     engines: {node: '>=12.20'}
-
-  zhead@2.2.4:
-    resolution: {integrity: sha512-8F0OI5dpWIA5IGG5NHUg9staDwz/ZPxZtvGVf01j7vHqSyZ0raHY+78atOVxRqb73AotX22uV1pXt3gYSstGag==}
 
 snapshots:
 
@@ -6694,29 +6665,6 @@ snapshots:
 
   '@ungap/structured-clone@1.2.1': {}
 
-  '@unhead/dom@1.11.18':
-    dependencies:
-      '@unhead/schema': 1.11.18
-      '@unhead/shared': 1.11.18
-
-  '@unhead/schema@1.11.18':
-    dependencies:
-      hookable: 5.5.3
-      zhead: 2.2.4
-
-  '@unhead/shared@1.11.18':
-    dependencies:
-      '@unhead/schema': 1.11.18
-      packrup: 0.1.2
-
-  '@unhead/vue@1.11.18(vue@3.5.13(typescript@5.7.3))':
-    dependencies:
-      '@unhead/schema': 1.11.18
-      '@unhead/shared': 1.11.18
-      hookable: 5.5.3
-      unhead: 1.11.18
-      vue: 3.5.13(typescript@5.7.3)
-
   '@videojs/themes@1.0.1':
     dependencies:
       postcss-inline-svg: 4.1.0
@@ -8038,8 +7986,6 @@ snapshots:
 
   highlight.js@11.11.1: {}
 
-  hookable@5.5.3: {}
-
   hosted-git-info@7.0.2:
     dependencies:
       lru-cache: 10.4.3
@@ -9065,8 +9011,6 @@ snapshots:
 
   p-try@2.2.0: {}
 
-  packrup@0.1.2: {}
-
   parent-module@1.0.1:
     dependencies:
       callsites: 3.1.0
@@ -9776,13 +9720,6 @@ snapshots:
 
   undici-types@6.20.0: {}
 
-  unhead@1.11.18:
-    dependencies:
-      '@unhead/dom': 1.11.18
-      '@unhead/schema': 1.11.18
-      '@unhead/shared': 1.11.18
-      hookable: 5.5.3
-
   unicode-canonical-property-names-ecmascript@2.0.1: {}
 
   unicode-match-property-ecmascript@2.0.0:
@@ -9989,5 +9926,3 @@ snapshots:
   yocto-queue@0.1.0: {}
 
   yocto-queue@1.1.1: {}
-
-  zhead@2.2.4: {}

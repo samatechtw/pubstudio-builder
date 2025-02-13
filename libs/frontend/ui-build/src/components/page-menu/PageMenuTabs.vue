@@ -22,7 +22,7 @@ import PageMenuView from './PageMenuView.vue'
 
 enum PageTab {
   Info = 'info',
-  Meta = 'theme.meta',
+  Meta = 'meta',
 }
 
 const { t } = useI18n()

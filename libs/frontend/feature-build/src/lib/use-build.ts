@@ -66,7 +66,6 @@ import {
   ISetComponentEventData,
   ISetComponentInputData,
   ISetHomePageData,
-  ISetPageHeadData,
   IUpdateMixinOrderData,
   IUpdateUiData,
   IUpdateUiParams,
@@ -84,8 +83,6 @@ import {
   ICopiedComponent,
   IEditorContext,
   IEditorEvent,
-  IHeadObject,
-  IPageHeadTag,
   IPageMetadata,
   IRawStylesWithSource,
   ISerializedComponent,
@@ -207,15 +204,6 @@ export interface IUseBuild {
   setHomePage: (route: string) => void
   deleteSelected: () => void
   selectComponentParent: () => void
-  addPageHead: (route: string, tag: IPageHeadTag, value: IHeadObject | string) => void
-  setPageHead: (
-    route: string,
-    tag: IPageHeadTag,
-    index: number,
-    value: IHeadObject | string,
-  ) => void
-  removePageHead: (route: string, tag: IPageHeadTag, index: number) => void
-  setPageFavicon: (route: string, newFavicon: string | undefined) => void
   setBreakpoint: (newBreakpoints: IAddBreakpoint[]) => void
   updateUi: <Action extends UiAction>(
     action: Action,
@@ -1052,77 +1040,6 @@ export const useBuild = (): IUseBuild => {
     setSelectedComponent(site.value, parent)
   }
 
-  const addPageHead = (route: string, tag: IPageHeadTag, value: IHeadObject | string) => {
-    const data: ISetPageHeadData = {
-      route,
-      tag,
-      index: 0,
-      newValue: value,
-    }
-    pushCommand(site.value, CommandType.SetPageHead, data)
-  }
-
-  const setPageHead = (
-    route: string,
-    tag: IPageHeadTag,
-    index: number,
-    value: IHeadObject | string,
-  ) => {
-    let oldValue: IHeadObject | string | undefined
-    const head = site.value.pages[route]?.head
-    if (tag === 'title') {
-      oldValue = head.title
-    } else {
-      oldValue = (head[tag] as unknown[])?.[index] as IHeadObject
-    }
-
-    const data: ISetPageHeadData = {
-      route,
-      tag,
-      index,
-      oldValue,
-      newValue: value,
-    }
-    pushCommand(site.value, CommandType.SetPageHead, data)
-  }
-
-  const removePageHead = (route: string, tag: IPageHeadTag, index: number) => {
-    let oldValue: IHeadObject | string | undefined
-    const head = site.value.pages[route]?.head
-    if (tag === 'title') {
-      oldValue = head.title
-    } else {
-      oldValue = (head[tag] as unknown[])?.[index] as IHeadObject
-    }
-
-    const data: ISetPageHeadData = {
-      route,
-      tag,
-      index,
-      oldValue,
-    }
-    pushCommand(site.value, CommandType.SetPageHead, data)
-  }
-
-  const setPageFavicon = (route: string, newFavicon: string | undefined) => {
-    const page = site.value.pages[route]
-    if (page) {
-      const index = page.head.link?.findIndex((link) => link.rel === 'icon') ?? 0
-      const oldValue = index === -1 ? undefined : page.head.link?.[index]
-      const data: ISetPageHeadData = {
-        route: page.route,
-        tag: 'link',
-        index: index === -1 ? 0 : index,
-        oldValue,
-        newValue: {
-          href: newFavicon,
-          rel: 'icon',
-        },
-      }
-      pushCommand(site.value, CommandType.SetPageHead, data)
-    }
-  }
-
   const setBreakpoint = (newBreakpoints: IAddBreakpoint[]) => {
     const data: ISetBreakpointData = {
       oldBreakpoints: clone(site.value.context.breakpoints),
@@ -1203,10 +1120,6 @@ export const useBuild = (): IUseBuild => {
     removePage,
     changePage,
     setHomePage,
-    addPageHead,
-    setPageHead,
-    removePageHead,
-    setPageFavicon,
     setBreakpoint,
     updateUi,
     addCustomComponent,

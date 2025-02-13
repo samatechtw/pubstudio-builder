@@ -254,7 +254,6 @@ export const createRouter = <M = Record<string, unknown>>(
     } else {
       history.replaceState(undefined, '', path)
     }
-
     if (!route) {
       matchedRoutes.value = []
     } else {

@@ -2,7 +2,7 @@
   <div class="theme-fonts-wrap">
     <div class="fonts-title">
       <div class="label">
-        {{ t('theme.fonts') }}
+        {{ t('fonts') }}
       </div>
       <div class="item new-font-button" @click.stop="newFont">
         <Plus class="item-add" />

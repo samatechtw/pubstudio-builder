@@ -28,6 +28,7 @@ import {
   useRouter,
 } from '@pubstudio/frontend/util-router'
 import {
+  replaceHead,
   setupRoutes,
   useNotFoundPage,
   useRender,
@@ -113,12 +114,18 @@ const getUserSite = async () => {
   }
 }
 
+router.afterEach((newRoute, oldRoute) => {
+  const page = site.value?.pages[newRoute?.path ?? '']
+  const oldPage = site.value?.pages[oldRoute?.path ?? '']
+  replaceHead(site.value, page, oldPage)
+})
+
 onMounted(async () => {
   const userSite = await getUserSite()
   if (userSite) {
     loadSiteLanguage(userSite)
-    setupRoutes(router, userSite, PageContent)
     site.value = userSite
+    setupRoutes(router, userSite, PageContent)
     overrideHelper('push', (options: INameNavigateOptions) => {
       router.push(options)
     })
