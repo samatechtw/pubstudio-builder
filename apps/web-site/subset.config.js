@@ -18,7 +18,6 @@ export default {
       'typescript',
       'vite',
       '@samatech/vue-store',
-      '@unhead/vue',
     ],
   },
 }

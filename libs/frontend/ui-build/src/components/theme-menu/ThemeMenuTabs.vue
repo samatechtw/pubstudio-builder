@@ -13,7 +13,7 @@
         :class="['ps-tab', `ps-tab-${tab}`, activeTab === tab && 'ps-tab-active']"
         @click="setThemeTab(editor, tab)"
       >
-        {{ t(`theme.${tab}`) }}
+        {{ t(tab) }}
       </div>
     </div>
     <component :is="tabContent" class="theme-tab-content" />

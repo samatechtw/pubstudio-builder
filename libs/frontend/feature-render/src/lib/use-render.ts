@@ -9,7 +9,6 @@ import {
   themeToCssVars,
 } from '@pubstudio/frontend/util-render'
 import { IPage, ISite, ThemeFontSource } from '@pubstudio/shared/type-site'
-import { Link, Meta, Script, useHead } from '@unhead/vue'
 import { Component, computed, defineComponent, h, Ref, VNode } from 'vue'
 import {
   getGlobalStyle,
@@ -137,46 +136,6 @@ export const useRender = (options: IUseRenderOptions): IUseRender => {
       return pageContent.value
     },
   })
-
-  const activePageName = computed(() => {
-    const pageName = activePage.value?.name || ''
-    if (!pageName || !activePage.value?.public) {
-      return 'Pub Studio'
-    }
-    return pageName
-  })
-
-  const headData = computed(() => {
-    const link = [
-      ...(site.value?.defaults.head.link ?? []),
-      ...(activePage.value?.head.link ?? []),
-    ].map((l) => (l.rel === 'icon' ? { ...l, key: 'favicon' } : l))
-
-    const activePageTitle = activePage.value?.head.title || activePageName
-
-    const script = [
-      ...(site.value?.defaults.head.script ?? []),
-      ...(activePage.value?.head.script ?? []),
-    ] as Script[]
-    return {
-      title: activePageTitle,
-      meta: [
-        {
-          name: 'og:title',
-          content: activePageTitle,
-        },
-        {
-          name: 'twitter:title',
-          content: activePageTitle,
-        },
-        ...((site.value?.defaults.head.meta ?? []) as Meta[]),
-        ...((activePage.value?.head.meta ?? []) as Meta[]),
-      ],
-      link: link as Link[],
-      script,
-    }
-  })
-  useHead(headData)
 
   return {
     CustomStyle,

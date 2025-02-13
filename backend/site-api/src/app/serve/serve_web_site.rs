@@ -6,9 +6,14 @@ use axum_extra::extract::Host;
 use lib_shared_site_api::{
     db::sites_seed_data::SITE_SEED_VERSION,
     error::api_error::ApiError,
-    util::{domains::domain_without_port, get_site_html::get_site_html},
+    util::{
+        domains::domain_without_port,
+        get_site_html::{get_site_html, get_site_html_dev},
+    },
 };
-use lib_shared_types::dto::site_api::get_current_site_dto::GetCurrentSiteQuery;
+use lib_shared_types::{
+    dto::site_api::get_current_site_dto::GetCurrentSiteQuery, shared::core::ExecEnv,
+};
 
 use crate::{
     api_context::ApiContext,
@@ -29,7 +34,11 @@ pub async fn serve_web_site_helper(
 
     let site = get_site_or_preview(&context, &site_id, query.p).await?;
 
-    let html = get_site_html(&site.site.version);
+    let html = if context.config.exec_env == ExecEnv::Dev {
+        &get_site_html_dev()
+    } else {
+        get_site_html(&site.site.version)
+    };
     Ok(Html(
         html.replacen("Pub Studio", &site.meta.title, 3).replacen(
             "DESCRIPTION",

@@ -1,4 +1,3 @@
-import { createHead } from '@unhead/vue'
 import {
   computed,
   createApp,
@@ -94,6 +93,4 @@ window.Vue = {
 }
 
 const app = createApp(App)
-const head = createHead()
-app.use(head)
 app.use(router).mount('#app')
