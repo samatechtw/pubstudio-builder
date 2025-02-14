@@ -4,12 +4,10 @@ import {
   IComponent,
   IComponentStyleOverrides,
   ICopiedComponent,
-  ISerializedComponent,
   ISite,
   ISiteContext,
   IStyle,
 } from '@pubstudio/shared/type-site'
-import { parseNamespace } from './parse-namespace'
 
 const makeReplaceId = (oldNamespace: string, namespace: string) => {
   return (id: string) => id.replace(oldNamespace, namespace)
@@ -152,7 +150,6 @@ export const replaceNamespace = (site: ISite, namespace: string): ISite => {
       editor.componentsHidden[newId] = hidden
     }
     editor.editBehavior = undefined
-    editor.copiedComponent = undefined
     editor.hoveredComponent = undefined
     editor.selectedComponent = undefined
   }
@@ -166,7 +163,7 @@ export const replacePastedComponentNamespace = (
   copiedComponent: ICopiedComponent,
   oldNamespace: string,
 ): boolean => {
-  const { component, styles, breakpoints } = copiedComponent
+  const { component } = copiedComponent
   const namespace = context.namespace
 
   // Replace component IDs

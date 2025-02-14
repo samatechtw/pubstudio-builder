@@ -42,18 +42,6 @@
           :secondary="true"
           @click="toCustomComponent"
         />
-        <div v-if="showPasteReplaceButton" className="paste-replace-wrap">
-          <PSButton
-            class="paste-replace-button"
-            size="small"
-            :text="t('build.paste_replace')"
-            @click="replaceRootWithCopiedComponent"
-          />
-          <InfoBubble
-            class="paste-replace-info"
-            :message="t('build.paste_replace_info')"
-          />
-        </div>
       </div>
     </template>
   </div>
@@ -62,11 +50,10 @@
 <script lang="ts" setup>
 import { computed, toRefs } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
-import { PSButton, InfoBubble } from '@pubstudio/frontend/ui-widgets'
+import { PSButton } from '@pubstudio/frontend/ui-widgets'
 import { prosemirrorEditing } from '@pubstudio/frontend/util-edit-text'
 import { BuildSubmenu, ComponentTabState, IComponent } from '@pubstudio/shared/type-site'
 import { serializeComponent } from '@pubstudio/frontend/util-site-store'
-import { useToast } from '@pubstudio/frontend/util-ui-alert'
 import { isDev } from '@pubstudio/frontend/util-config'
 import ComponentTabInfo from './ComponentTabInfo.vue'
 import ComponentDimensions from './ComponentDimensions.vue'
@@ -90,9 +77,8 @@ import ToolbarText from '../toolbar/ToolbarText.vue'
 import ComponentState from './ComponentState.vue'
 
 const { t } = useI18n()
-const { site, editor, replacePageRoot, addCustomComponent } = useBuild()
+const { site, editor, addCustomComponent } = useBuild()
 const { isEditingMixin } = useMixinMenu()
-const { addHUD } = useToast()
 
 const props = defineProps<{
   component: IComponent
@@ -111,25 +97,6 @@ const debugComponent = () => {
   if (editor.value?.selectedComponent) {
     const serialized = serializeComponent(editor.value.selectedComponent)
     console.log(site.value.context.nextId, JSON.parse(JSON.stringify(serialized)))
-  }
-}
-
-const showPasteReplaceButton = computed(() => {
-  const { selectedComponent, copiedComponent } = editor.value ?? {}
-  return (
-    !!selectedComponent &&
-    !selectedComponent.parent &&
-    copiedComponent &&
-    selectedComponent.id !== copiedComponent.id
-  )
-})
-
-const replaceRootWithCopiedComponent = () => {
-  const { active, copiedComponent } = editor.value ?? {}
-  if (active && copiedComponent && editor.value) {
-    replacePageRoot(copiedComponent.id, active)
-    addHUD({ text: t('build.replaced') })
-    editor.value.copiedComponent = undefined
   }
 }
 
