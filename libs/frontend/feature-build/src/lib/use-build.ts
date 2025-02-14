@@ -120,7 +120,7 @@ export interface IUseBuild {
   resetSite: () => void
   replaceSite: (newSite: ISite) => Promise<void>
   addComponent: (data?: Partial<IAddComponentData>) => void
-  duplicateComponent: () => void
+  duplicateComponent: (content?: string) => void
   pasteComponent: (componentId: string, parent: IComponent) => void
   pasteExternalComponent: (copiedComponent: ICopiedComponent, parent: IComponent) => void
   replacePageRoot: (copiedComponentId: string, pageRoute: string) => void
@@ -333,7 +333,8 @@ export const useBuild = (): IUseBuild => {
     editComponent(component, fields)
   }
 
-  const duplicateComponent = () => {
+  // Duplicate current selected component with option to override content
+  const duplicateComponent = (content?: string) => {
     const component = site.value.editor?.selectedComponent
     if (!activePage.value || !component) {
       return
@@ -343,7 +344,7 @@ export const useBuild = (): IUseBuild => {
     const data: IAddComponentData = {
       name: component.name,
       tag: component.tag,
-      content: component.content,
+      content: content ?? component.content,
       sourceId: component.id,
       parentId: parent?.id ?? activePage.value.root.id,
       // Place after selected component
