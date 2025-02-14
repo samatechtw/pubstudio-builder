@@ -21,6 +21,7 @@ import {
 } from '@pubstudio/frontend/util-edit-text'
 import { resolveComponent, resolveThemeVariables } from '@pubstudio/frontend/util-resolve'
 import { Css, IComponent, IEditorContext } from '@pubstudio/shared/type-site'
+import { DOMSerializer, Fragment, Slice } from 'prosemirror-model'
 import { EditorState, Plugin, TextSelection, Transaction } from 'prosemirror-state'
 import { Decoration, DecorationSet } from 'prosemirror-view'
 import {
@@ -53,7 +54,7 @@ export const ProseMirrorEditor = defineComponent({
   },
   setup(props) {
     const { component, editor } = toRefs(props)
-    const { site } = useBuild()
+    const { site, editSelectedComponent, duplicateComponent } = useBuild()
     const { siteStore } = useSiteSource()
     const { getStyleValue } = useToolbar()
 
@@ -79,6 +80,29 @@ export const ProseMirrorEditor = defineComponent({
         fallbackStyle,
       )
       return cmd(state, dispatch)
+    }
+
+    const fragmentContent = (state: EditorState, fragment: Fragment): string => {
+      const selection = new Slice(fragment, 0, 0)
+
+      const serialized = DOMSerializer.fromSchema(state.schema).serializeFragment(
+        selection.content,
+      )
+      return [].map.call(serialized.children, (e: HTMLElement) => e.outerHTML).join('')
+    }
+
+    const splitComponent = (
+      state: EditorState,
+      _dispatch?: (tr: Transaction) => void,
+    ) => {
+      const { $head } = state.selection as TextSelection
+      const content1 = state.doc.content.cut(0, $head.pos)
+      const content2 = state.doc.content.cut($head.pos, state.doc.content.size)
+      const text1 = fragmentContent(state, content1)
+      const text2 = fragmentContent(state, content2)
+      editSelectedComponent({ content: text1 })
+      duplicateComponent(text2)
+      return true
     }
 
     const exitProsemirror = () => {
@@ -144,6 +168,7 @@ export const ProseMirrorEditor = defineComponent({
             mapKeys: {
               'Mod-b': markStrong,
               'Mod-B': markStrong,
+              'Mod-/': splitComponent,
               //Escape: exitProsemirror,
               Escape: () => {
                 return false
