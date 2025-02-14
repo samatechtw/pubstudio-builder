@@ -1,8 +1,8 @@
 import { makeAddBuiltinStyleMixin } from '@pubstudio/frontend/data-access-command'
 import { i18nVarRegex } from '@pubstudio/frontend/feature-render'
+import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { builtinBehaviors, builtinStyles } from '@pubstudio/frontend/util-builtin'
-import { clone } from '@pubstudio/frontend/util-component'
-import { behaviorId, nextBehaviorId, nextStyleId } from '@pubstudio/frontend/util-ids'
+import { nextBehaviorId, nextStyleId } from '@pubstudio/frontend/util-ids'
 import { iterateComponent } from '@pubstudio/frontend/util-render'
 import {
   resolveBehavior,
@@ -15,7 +15,6 @@ import {
 } from '@pubstudio/frontend/util-site-deserialize'
 import { serializeComponent } from '@pubstudio/frontend/util-site-store'
 import { useToast } from '@pubstudio/frontend/util-ui-alert'
-import { ISetBehaviorData } from '@pubstudio/shared/type-command-data'
 import {
   IBehavior,
   IBreakpoint,
@@ -27,16 +26,26 @@ import {
   ITheme,
   ITranslations,
 } from '@pubstudio/shared/type-site'
-import { CssValue } from '@pubstudio/shared/util-parse'
+import { Ref, ref } from 'vue'
 import { useBuild } from './use-build'
 
 // Export functions for testing
 export interface IUseCopyPaste {
+  showReplaceRootModal: Ref<boolean>
   pressCopy(evt: KeyboardEvent): void
   pressPaste(evt: KeyboardEvent): Promise<void>
   pasteStyle(copiedComponent: ISerializedComponent): void
   pasteComponent(copiedComponent: ISerializedComponent): void
+  replaceRootWithCopiedComponent(): Promise<void>
 }
+
+type ClipboardData =
+  | {
+      text: string | undefined
+      copiedComponent: ICopiedComponent | undefined
+      isLocal: boolean
+    }
+  | undefined
 
 function componentI18n(component: IComponent): string[] {
   const { content } = component
@@ -73,14 +82,19 @@ function getBreakpointStyleThemeVars(
   }
 }
 
+const showReplaceRootModal = ref(false)
+
 export const useCopyPaste = (): IUseCopyPaste => {
   const {
     site,
     editor,
+    editSelectedComponent,
     mergeComponentStyle,
     pasteComponent: executePasteComponent,
     pasteExternalComponent,
+    replacePageRoot,
   } = useBuild()
+  const { apiSiteId } = useSiteSource()
   const { addHUD } = useToast()
 
   const pressCopy = (evt: KeyboardEvent) => {
@@ -133,6 +147,7 @@ export const useCopyPaste = (): IUseCopyPaste => {
         getBreakpointStyleThemeVars(context.theme, theme, style.breakpoints)
       }
       const copyData: ICopiedComponent = {
+        siteId: apiSiteId.value ?? 'unknown',
         component: serialized,
         breakpoints: context.breakpoints,
         translations,
@@ -140,7 +155,6 @@ export const useCopyPaste = (): IUseCopyPaste => {
         styles,
         theme,
       }
-      site.value.editor.copiedComponent = serialized
       addHUD({ text: 'Copied' })
 
       // Firefox doesn't support clipboard.write ^_^
@@ -157,25 +171,9 @@ export const useCopyPaste = (): IUseCopyPaste => {
     }
   }
 
-  const pasteStyle = (copiedComponent: ISerializedComponent): void => {
-    mergeComponentStyle(copiedComponent)
+  const pasteStyle = (component: ISerializedComponent): void => {
+    mergeComponentStyle(component)
     addHUD({ text: 'Style Pasted' })
-  }
-
-  const pasteComponent = (copiedComponent: ISerializedComponent): void => {
-    const { selectedComponent } = site.value.editor ?? {}
-    if (!selectedComponent) return
-
-    // If the copied component is still selected, paste to its parent
-    if (copiedComponent.id === selectedComponent.id) {
-      const parent = selectedComponent.parent
-      if (parent) {
-        executePasteComponent(copiedComponent, parent)
-      }
-    } else {
-      executePasteComponent(copiedComponent, selectedComponent)
-    }
-    addHUD({ text: 'Component Pasted' })
   }
 
   const deduplicateExternalComponent = (
@@ -258,6 +256,7 @@ export const useCopyPaste = (): IUseCopyPaste => {
       }
     })
     return {
+      siteId: copiedComponent.siteId,
       component,
       breakpoints: newBreakpoints,
       translations,
@@ -267,76 +266,127 @@ export const useCopyPaste = (): IUseCopyPaste => {
     }
   }
 
-  // Attempt to paste a component from the clipboard. Return true if successful
-  const pasteClipboardComponent = async (): Promise<boolean> => {
+  const getClipboardData = async (): Promise<ClipboardData> => {
     const { selectedComponent } = site.value.editor ?? {}
-    if (!selectedComponent) return false
+    if (!selectedComponent) return undefined
     try {
+      let text: string | undefined
+      let copiedComponent: ICopiedComponent | undefined
+      let isLocal = true
       // Iterate over all clipboard items.
       const clipboardItems = await navigator.clipboard.read()
       for (const clipboardItem of clipboardItems) {
-        for (const type of clipboardItem.types) {
-          // Discard any types that are not pubstudio's custom format
-          if (type !== 'web text/pubstudio') {
-            continue
-          }
-          const blob = await clipboardItem.getType(type)
-          let copiedComponent = JSON.parse(await blob.text()) as ICopiedComponent
-          const oldNamespace = parseNamespace(copiedComponent.component.id)
-          if (!oldNamespace) {
-            return false
-          }
-          copiedComponent = deduplicateExternalComponent(copiedComponent)
-          const replaced = replacePastedComponentNamespace(
-            site.value.context,
-            copiedComponent,
-            oldNamespace,
-          )
-          if (!replaced) {
-            return false
-          }
-          pasteExternalComponent(copiedComponent, selectedComponent)
-          addHUD({ text: 'Component Pasted' })
-          return true
+        if (clipboardItem.types.includes('text/html')) {
+          const blob = await clipboardItem.getType('text/html')
+          text = await blob.text()
+        } else if (clipboardItem.types.includes('text/plain')) {
+          const blob = await clipboardItem.getType('text/plain')
+          text = await blob.text()
         }
+        if (clipboardItem.types.includes('web text/pubstudio')) {
+          const blob = await clipboardItem.getType('web text/pubstudio')
+          copiedComponent = JSON.parse(await blob.text()) as ICopiedComponent
+          isLocal = copiedComponent.siteId === apiSiteId.value
+          if (!isLocal) {
+            const oldNamespace = parseNamespace(copiedComponent.component.id)
+            if (!oldNamespace) {
+              return undefined
+            }
+            copiedComponent = deduplicateExternalComponent(copiedComponent)
+            const replaced = replacePastedComponentNamespace(
+              site.value.context,
+              copiedComponent,
+              oldNamespace,
+            )
+            if (!replaced) {
+              return undefined
+            }
+          }
+        }
+        return { text, copiedComponent, isLocal }
       }
     } catch (err) {
       console.error('Failed to paste from clipboard', err)
     }
-    return false
+    return undefined
+  }
+
+  const pasteComponent = (component: ISerializedComponent): void => {
+    const sel = site.value.editor?.selectedComponent
+    if (!sel) return
+
+    // If the copied component is still selected, paste to its parent
+    const parent = component.id === sel.id ? sel.parent : sel
+    if (parent) {
+      executePasteComponent(component.id, parent)
+    }
+    addHUD({ text: 'Component Pasted' })
   }
 
   const pressPaste = async (evt: KeyboardEvent) => {
     evt.stopImmediatePropagation()
-    if (await pasteClipboardComponent()) {
+    const pasteData = await getClipboardData()
+    if (!pasteData) {
       return
     }
     const selectedComponent = site.value.editor?.selectedComponent
-    const copiedComponent = site.value.editor?.copiedComponent
-    if (selectedComponent && copiedComponent) {
+    const { isLocal, copiedComponent, text } = pasteData
+    if (selectedComponent) {
+      const component = copiedComponent?.component
       if (evt.shiftKey) {
         // Make sure we don't paste style to the same component
-        if (selectedComponent.id !== copiedComponent.id) {
-          pasteStyle(copiedComponent)
+        if (component && selectedComponent.id !== component.id) {
+          pasteStyle(component)
         }
-      } else {
-        if (!copiedComponent.parentId) {
-          // Root component should not be pasted through paste hotkey.
-          addHUD({
-            text: 'Root component can only be used to replace another root component',
-            duration: 2000,
-          })
-        } else {
-          pasteComponent(copiedComponent)
+      } else if (copiedComponent) {
+        const isRoot =
+          !!selectedComponent &&
+          !selectedComponent.parent &&
+          selectedComponent.id !== copiedComponent.component.id
+        if (isRoot) {
+          // Show a warning before replacing the root component
+          // Components from an external site currently cannot replace root components
+          if (isLocal) {
+            showReplaceRootModal.value = true
+          }
+          return
         }
+        const component = copiedComponent.component
+        if (isLocal) {
+          if (!component.parentId) {
+            // Root component should not be pasted through paste hotkey.
+            addHUD({
+              text: 'Root component can only be used to replace another root component',
+              duration: 2000,
+            })
+          } else {
+            pasteComponent(component)
+          }
+        } else if (copiedComponent) {
+          pasteExternalComponent(copiedComponent, selectedComponent)
+          addHUD({ text: 'Component Pasted' })
+        }
+      } else if (text) {
+        editSelectedComponent({ content: text })
       }
     }
   }
 
+  const replaceRootWithCopiedComponent = async () => {
+    const pasteData = await getClipboardData()
+    if (editor.value?.active && pasteData?.copiedComponent && pasteData?.isLocal) {
+      const component = pasteData.copiedComponent.component
+      replacePageRoot(component.id, editor.value?.active)
+      addHUD({ text: 'Replaced' })
+    }
+  }
+
   return {
+    showReplaceRootModal,
     pressCopy,
     pressPaste,
     pasteStyle,
     pasteComponent,
+    replaceRootWithCopiedComponent,
   }
 }

@@ -39,6 +39,7 @@ export interface ISerializedComponent extends Omit<IComponent, 'parent' | 'child
 }
 
 export interface ICopiedComponent {
+  siteId: string
   component: ISerializedComponent
   breakpoints: Record<string, IBreakpoint>
   translations: Record<string, ITranslations>

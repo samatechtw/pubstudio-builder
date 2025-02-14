@@ -121,7 +121,7 @@ export interface IUseBuild {
   replaceSite: (newSite: ISite) => Promise<void>
   addComponent: (data?: Partial<IAddComponentData>) => void
   duplicateComponent: () => void
-  pasteComponent: (component: ISerializedComponent, parent: IComponent) => void
+  pasteComponent: (componentId: string, parent: IComponent) => void
   pasteExternalComponent: (copiedComponent: ICopiedComponent, parent: IComponent) => void
   replacePageRoot: (copiedComponentId: string, pageRoute: string) => void
   editSelectedComponent: (fields: IEditComponentFields) => void
@@ -352,22 +352,6 @@ export const useBuild = (): IUseBuild => {
     pushCommand(site.value, CommandType.AddComponent, data)
   }
 
-  const makePastComponentData = (
-    component: ISerializedComponent,
-    parent: IComponent,
-    sourceId: string | undefined,
-  ) => {
-    const data: IAddComponentData = {
-      tag: component.tag,
-      content: component.content,
-      sourceId,
-      customComponentId: component.customSourceId,
-      name: component.name,
-      ...selectAddParent(parent, activePage.value?.root.id),
-    }
-    return data
-  }
-
   const matchDelta = (
     target: number | undefined,
     val: number | undefined,
@@ -490,9 +474,19 @@ export const useBuild = (): IUseBuild => {
     pushCommandObject(site.value, cmd)
   }
 
-  const pasteComponent = (component: ISerializedComponent, parent: IComponent) => {
-    const copiedComponent = resolveComponent(site.value.context, component.id)
-    const data = makePastComponentData(component, parent, copiedComponent?.id)
+  const pasteComponent = (componentId: string, parent: IComponent) => {
+    const component = resolveComponent(site.value.context, componentId)
+    if (!component) {
+      return
+    }
+    const data: IAddComponentData = {
+      tag: component.tag,
+      content: component.content,
+      sourceId: component.id,
+      customComponentId: component.customSourceId,
+      name: component.name,
+      ...selectAddParent(parent, activePage.value?.root.id),
+    }
     pushCommand(site.value, CommandType.AddComponent, data)
   }
 

@@ -141,7 +141,6 @@ export interface IEditorPreferences {
 export interface IEditorContext {
   // Reference to store used to save/restore the site, populated on initialization
   store?: ISiteStore
-  copiedComponent?: ISerializedComponent
   hoveredComponent?: IComponent
   selectedComponent?: IComponent
   // ProseMirror EditView object
