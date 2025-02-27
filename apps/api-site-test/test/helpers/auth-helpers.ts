@@ -1,5 +1,6 @@
 import { UserType } from '@pubstudio/shared/type-api-platform-user'
 import jwt from 'jsonwebtoken'
+import { StringValue } from 'ms'
 import { testConfig } from '../test.config'
 
 export const adminAuthHeader = () => {
@@ -19,7 +20,7 @@ export const generateAuthToken = (userId: string, userType: UserType): string =>
   const siteAdminTokenExpiresIn: string = testConfig.get('authToken.adminExpiresIn')
   return jwt.sign({ sub: userId, user_type: userType }, privateKey, {
     algorithm: 'RS256',
-    expiresIn: siteAdminTokenExpiresIn,
+    expiresIn: siteAdminTokenExpiresIn as StringValue,
   })
 }
 
