@@ -18,6 +18,7 @@ import { useRenderPreview } from '@pubstudio/frontend/feature-preview'
 import { NotFound, Spinner } from '@pubstudio/frontend/ui-widgets'
 import { useBuild } from '@pubstudio/frontend/feature-build'
 import { IPage } from '@pubstudio/shared/type-site'
+import { useRouter } from '@pubstudio/frontend/util-router'
 
 const { site } = useBuild()
 
