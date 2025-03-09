@@ -116,7 +116,12 @@ const getUserSite = async () => {
 
 router.afterEach((newRoute, oldRoute) => {
   const page = site.value?.pages[newRoute?.path ?? '']
-  const oldPage = site.value?.pages[oldRoute?.path ?? '']
+  let oldPage = undefined
+  // TODO -- this is a hack to solve an issue where the NotFound route is matched before
+  // the site is loaded. Ideally the site initialization should be modified to avoid this
+  if (oldRoute && oldRoute.name !== 'NotFound') {
+    oldPage = site.value?.pages[oldRoute?.path ?? '']
+  }
   replaceHead(site.value, page, oldPage)
 })
 

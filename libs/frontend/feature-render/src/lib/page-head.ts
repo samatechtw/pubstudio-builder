@@ -30,23 +30,32 @@ const metaKey = (meta: IHeadMeta) => {
   return `${keySel('http-equiv', equiv)}${keySel('property', property)}${keySel('name', name)}`
 }
 
-export const getHead = (
+function getHead(site: ISite | undefined, activePage: IPage): IRenderSiteHead
+function getHead(
   site: ISite | undefined,
   activePage: IPage | undefined,
-): IRenderSiteHead => {
-  const link = [
-    ...(site?.defaults.head.link ?? []),
-    ...(activePage?.head.link ?? []),
-  ].map((l) => (l.rel === 'icon' ? { ...l, key: 'favicon' } : l))
+): IRenderSiteHead | undefined
 
-  const activePageTitle = activePage?.head.title || activePageName(activePage)
+function getHead(
+  site: ISite | undefined,
+  activePage: IPage | undefined,
+): IRenderSiteHead | undefined {
+  if (activePage === undefined) {
+    return undefined
+  }
+  const link = [...(site?.defaults.head.link ?? []), ...(activePage.head.link ?? [])].map(
+    (l) => (l.rel === 'icon' ? { ...l, key: 'favicon' } : l),
+  )
+
+  const activePageTitle = activePage.head.title || activePageName(activePage)
 
   const script: IHeadScript[] = [
     ...(site?.defaults.head.script ?? []),
-    ...(activePage?.head.script ?? []),
+    ...(activePage.head.script ?? []),
   ]
   // Merge meta
-  const description = activePage?.head.description ?? site?.defaults.head.description
+  const description =
+    activePage.head.description ?? site?.defaults.head.description ?? 'PubStudio Site'
   const meta = [
     {
       name: 'description',
@@ -65,7 +74,7 @@ export const getHead = (
       content: activePageTitle,
     },
     ...(site?.defaults.head.meta ?? []),
-    ...(activePage?.head.meta ?? []),
+    ...(activePage.head.meta ?? []),
   ]
   const metaDedup = new Map()
   for (const m of meta) {
@@ -121,7 +130,14 @@ function updateTags(
   })
 }
 
-export const replaceHead = (site: ISite, page: IPage, oldPage: IPage | undefined) => {
+export const replaceHead = (
+  site: ISite | undefined,
+  page: IPage | undefined,
+  oldPage: IPage | undefined,
+) => {
+  if (!site || !page) {
+    return
+  }
   const head = getHead(site, page)
   const oldHead = getHead(site, oldPage)
   document.title = head.title
