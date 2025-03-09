@@ -1,13 +1,13 @@
 import {
   computeAttrsInputsMixins,
   computeEvents,
+  LiveComponent,
   parseI18n,
 } from '@pubstudio/frontend/feature-render'
 import { IContent, IPropsContent, RenderMode } from '@pubstudio/frontend/util-render'
 import { resetRuntimeContext } from '@pubstudio/frontend/util-runtime'
 import { IComponent, IPage, ISite } from '@pubstudio/shared/type-site'
 import { h, VNode } from 'vue'
-import { PreviewComponent } from './preview-component'
 
 export const renderPage = (
   site: ISite,
@@ -54,7 +54,7 @@ export const renderComponent = (
   if (component.state?.hide) {
     return undefined
   }
-  return h(PreviewComponent(), {
+  return h(LiveComponent(), {
     site,
     component,
     renderMode,

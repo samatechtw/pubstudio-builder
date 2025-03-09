@@ -18,15 +18,12 @@ export const useRenderPreview = (
   const render = useRender(options)
   const renderUtil = useRenderBuilderHelper({ site, activePage })
 
-  const getPageContent = () => {
+  const pageContent = computed(() => {
     if (!site.value || !activePage.value) {
       return h(NotFound)
     }
     const page = renderPage(site.value, activePage.value, renderMode)
     return h(page ?? 'div')
-  }
-  const pageContent = computed(() => {
-    return getPageContent()
   })
 
   const PageContent = defineComponent({

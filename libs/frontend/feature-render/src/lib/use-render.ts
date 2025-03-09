@@ -115,7 +115,7 @@ export const useRender = (options: IUseRenderOptions): IUseRender => {
     },
   })
 
-  const getPageContent = () => {
+  const pageContent = computed(() => {
     if (
       !site.value ||
       !activePage.value ||
@@ -126,9 +126,6 @@ export const useRender = (options: IUseRenderOptions): IUseRender => {
     }
     const page = renderPage(site.value, activePage.value, renderMode)
     return h(page ?? 'div')
-  }
-  const pageContent = computed(() => {
-    return getPageContent()
   })
 
   const PageContent = defineComponent({
