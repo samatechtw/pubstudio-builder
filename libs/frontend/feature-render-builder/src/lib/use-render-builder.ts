@@ -48,15 +48,12 @@ export const useRenderBuilder = (
     },
   })
 
-  const getPageContent = () => {
+  const pageContent = computed(() => {
     if (!site.value || !activePage.value) {
       return h(NotFound)
     }
     const page = renderPage(site.value, activePage.value)
     return h(page ?? 'div')
-  }
-  const pageContent = computed(() => {
-    return getPageContent()
   })
 
   const PageContent = defineComponent({
