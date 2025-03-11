@@ -11,20 +11,17 @@
       <div class="asset-title">
         {{ t('assets.assets') }}
       </div>
-      <PSButton
+      <router-link :to="{ name: 'Assets' }" target="_blank" class="assets-link">
+        <Launch class="asset-manager" />
+      </router-link>
+      <Plus
         v-if="siteStore.siteId.value !== 'scratch'"
-        class="add-button"
-        size="small"
+        class="button-plus"
         @click="emit('showCreate')"
-      >
-        <div class="button-content">
-          <Plus color="white" plusColor="#6a5cf5" class="button-plus" />
-          {{ t('add') }}
-        </div>
-      </PSButton>
+      />
     </div>
     <div class="asset-list">
-      <AssetCard
+      <AssetCardSmall
         v-for="(asset, index) in assets"
         :key="asset.id"
         :asset="asset"
@@ -32,22 +29,45 @@
         class="asset-card"
         :style="{ 'z-index': (assets?.length ?? 1) - index }"
         @update="updateAssetList"
+        @delete="deletedAssetId = asset.id"
+        @preview="previewAssetUrl = $event"
+        @replace="showReplace(asset)"
       />
       <Spinner v-if="loadingAssets" class="assets-spinner" :size="14" color="#2a17d6" />
       <div v-else-if="assets?.length === 0" class="assets-empty">
         {{ t('assets.no_assets') }}
       </div>
     </div>
+    <DeleteAssetModal
+      :show="!!deletedAssetId"
+      :assetId="deletedAssetId ?? ''"
+      @deleted="removeDeletedAsset"
+      @cancel="deletedAssetId = undefined"
+    />
+    <PreviewAssetModal
+      :show="!!previewAssetUrl"
+      :assetUrl="previewAssetUrl ?? ''"
+      @cancel="previewAssetUrl = undefined"
+    />
   </div>
 </template>
 
 <script lang="ts" setup>
 import { onMounted, ref, watch } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
-import { PSButton, Plus, Spinner } from '@pubstudio/frontend/ui-widgets'
-import { useSiteAssets, AssetCard } from '@pubstudio/frontend/feature-site-assets'
+import { Launch, Plus, Spinner } from '@pubstudio/frontend/ui-widgets'
+import {
+  useSiteAssets,
+  AssetCardSmall,
+  DeleteAssetModal,
+  PreviewAssetModal,
+  showCreateAssetModal,
+  IUploadFileResult,
+  updateAsset,
+} from '@pubstudio/frontend/feature-site-assets'
 import { store } from '@pubstudio/frontend/data-access-web-store'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
+import { ISiteAssetViewModel } from '@pubstudio/shared/type-api-platform-site-asset'
 
 const { siteStore } = useSiteSource()
 const {
@@ -73,6 +93,28 @@ watch(updateKey, () => {
 onMounted(() => {
   listAssets({ user_id: store.auth.userId.value })
 })
+
+const deletedAssetId = ref<string>()
+const previewAssetUrl = ref<string>()
+
+const showReplace = (asset: ISiteAssetViewModel) => {
+  showCreateAssetModal.value = true
+  updateAsset.value = asset
+}
+
+const removeDeletedAsset = () => {
+  if (deletedAssetId.value) {
+    const deletedAsset = assets.value?.find((asset) => asset.id === deletedAssetId.value)
+    assets.value = assets.value?.filter((asset) => asset !== deletedAsset)
+    deletedAssetId.value = undefined
+  }
+}
+
+const uploadComplete = (asset: IUploadFileResult) => {
+  updateAssetList(asset)
+  updateAsset.value = undefined
+  showCreateAssetModal.value = false
+}
 
 const handleFileSelect = (e: Event) => {
   if (e && e.type === 'drop') {
@@ -129,7 +171,6 @@ const dropUploadImage = (e: Event) => {
 .assets-top {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   width: 100%;
   padding: 0 8px 0 16px;
 }
@@ -137,18 +178,20 @@ const dropUploadImage = (e: Event) => {
   @mixin title-semibold 18px;
   color: $color-text;
 }
-.add-button {
-  padding: 0 12px 0 8px;
-  min-width: 0;
-  margin-left: 8px;
-}
 .button-content {
   @mixin flex-row;
   align-items: center;
 }
 .button-plus {
-  @mixin size 18px;
-  margin-right: 6px;
+  @mixin size 24px;
+  margin-left: auto;
+  cursor: pointer;
+}
+.assets-link {
+  margin: 4px 8px 0;
+}
+.asset-manager {
+  @mixin size 17px;
 }
 .assets-empty {
   @mixin title-medium 15px;

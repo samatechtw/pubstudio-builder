@@ -68,7 +68,7 @@ import AssetsHeader from './AssetsHeader.vue'
 import AssetFilters from './AssetFilters.vue'
 import PreviewAssetModal from './PreviewAssetModal.vue'
 import { IUploadFileResult } from '../lib/upload-asset'
-import { showCreateAssetModal } from '../lib/use-build-menu-assets'
+import { showCreateAssetModal, updateAsset } from '../lib/use-build-menu-assets'
 
 const { t } = useI18n()
 const {
@@ -82,7 +82,6 @@ const { listSites, sites, usageAllowance, loading: loadingSites } = useSites()
 
 const deletedAssetId = ref<string>()
 const previewAssetUrl = ref<string>()
-const updateAsset = ref<ISiteAssetViewModel | undefined>()
 
 const showCreate = () => {
   updateAsset.value = undefined

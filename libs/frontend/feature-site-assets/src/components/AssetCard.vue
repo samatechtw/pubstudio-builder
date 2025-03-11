@@ -1,11 +1,6 @@
 <template>
-  <div :id="asset.id" class="asset-card" :class="{ small }" v-bind="dndProps">
-    <div class="asset-image">
-      <div v-if="assetPlaceholder" class="asset-preview">
-        <img :src="assetPlaceholder" />
-      </div>
-      <PSAsset v-else :asset="assetUrl" :canPlayVideo="false" :contentHash="asset.size" />
-    </div>
+  <div :id="asset.id" class="asset-card">
+    <AssetCardImage :asset="asset" :assetUrl="assetUrl" />
     <div class="asset-info">
       <div v-if="showEdit" class="asset-name-edit">
         <STInput
@@ -30,21 +25,10 @@
         >
           {{ asset.name }}
         </div>
-        <Teleport to="body">
-          <div
-            v-if="showNameTooltip"
-            ref="tooltipRef"
-            class="tooltip"
-            :style="tooltipStyle"
-          >
-            {{ asset.name }}
-          </div>
-        </Teleport>
-        <Edit v-if="!small && showEditIcon" class="edit-icon" />
+        <Edit v-if="showEditIcon" class="edit-icon" />
         <CopyText v-else :text="assetUrl" class="copy-text" />
       </div>
       <AssetCardInfoBottom
-        v-if="!small"
         :asset="asset"
         :assetUrl="assetUrl"
         @delete="emit('delete')"
@@ -56,34 +40,20 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref, toRefs } from 'vue'
-import { STInput, useTooltipDelay, useKeyListener } from '@samatech/vue-components'
-import { useDragDrop } from '@pubstudio/frontend/feature-render-builder'
-import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
-import {
-  Check,
-  CopyText,
-  Cross,
-  Edit,
-  PSAsset,
-  Spinner,
-} from '@pubstudio/frontend/ui-widgets'
-import { isAssetDroppable, urlFromAsset } from '@pubstudio/frontend/util-asset'
+import { computed, ref } from 'vue'
+import { STInput, useKeyListener } from '@samatech/vue-components'
+import { Check, CopyText, Cross, Edit, Spinner } from '@pubstudio/frontend/ui-widgets'
+import { urlFromAsset } from '@pubstudio/frontend/util-asset'
 import { Keys } from '@pubstudio/shared/type-site'
-import {
-  AssetContentType,
-  ISiteAssetViewModel,
-} from '@pubstudio/shared/type-api-platform-site-asset'
-import { BuilderDragDataType } from '@pubstudio/frontend/type-builder'
+import { ISiteAssetViewModel } from '@pubstudio/shared/type-api-platform-site-asset'
 import AssetCardInfoBottom from './AssetCardInfoBottom.vue'
-import { ASSET_PLACEHOLDERS, useSiteAssets } from '../lib/use-site-assets'
+import { useSiteAssets } from '../lib/use-site-assets'
+import AssetCardImage from './AssetCardImage.vue'
 
 const { updateAsset, loading } = useSiteAssets()
-const { site } = useSiteSource()
 
-const props = defineProps<{
+const { asset } = defineProps<{
   asset: ISiteAssetViewModel
-  small?: boolean
 }>()
 const emit = defineEmits<{
   (e: 'update', asset: ISiteAssetViewModel): void
@@ -91,42 +61,6 @@ const emit = defineEmits<{
   (e: 'preview', assetUrl: string): void
   (e: 'replace'): void
 }>()
-
-const { asset, small } = toRefs(props)
-
-const assetPlaceholder = computed(() => {
-  return ASSET_PLACEHOLDERS[asset.value.content_type]
-})
-
-const dndProps = computed(() => {
-  if (!small.value || !isAssetDroppable(asset.value.content_type)) {
-    return
-  }
-  let dragType: BuilderDragDataType
-  if (asset.value.content_type === AssetContentType.Pdf) {
-    dragType = BuilderDragDataType.LinkAsset
-  } else {
-    dragType = BuilderDragDataType.ImageAsset
-  }
-  const dnd = useDragDrop({
-    site: site.value,
-    componentId: assetUrl.value,
-    getParentId: () => undefined,
-    getComponentIndex: () => 0,
-    isParent: false,
-    addData: { id: assetUrl.value, type: dragType, content: asset.value.name },
-  })
-  return {
-    draggable: true,
-    ...dnd.dndState,
-    onDragstart: dnd.dragstart,
-    onDrag: dnd.drag,
-    onDragenter: dnd.dragenter,
-    onDragover: dnd.dragover,
-    onDragleave: dnd.dragleave,
-    onDragend: dnd.dragend,
-  }
-})
 
 const showEditIcon = ref(false)
 const showEdit = ref(false)
@@ -137,20 +71,18 @@ useKeyListener(Keys.Escape, () => {
 })
 
 const showEditInput = () => {
-  if (!small.value) {
-    showEdit.value = true
-    newName.value = asset.value.name
-  }
+  showEdit.value = true
+  newName.value = asset.name
 }
 
 const assetUrl = computed(() => {
-  return urlFromAsset(asset.value)
+  return urlFromAsset(asset)
 })
 
 const updateName = async () => {
   showEdit.value = false
   if (newName.value) {
-    const result = await updateAsset(asset.value.id, { name: newName.value })
+    const result = await updateAsset(asset.id, { name: newName.value })
     // TODO -- check errors
     if (result) {
       emit('update', result)
@@ -158,31 +90,12 @@ const updateName = async () => {
   }
 }
 
-const {
-  itemRef,
-  tooltipMouseEnter,
-  tooltipMouseLeave,
-  tooltipRef,
-  tooltipStyle,
-  show: showNameTooltip,
-} = useTooltipDelay({ placement: 'top' })
-
 const nameMouseEnter = () => {
-  if (small.value && asset.value.name.length > 9) {
-    tooltipMouseEnter()
-  }
-  if (!small.value) {
-    showEditIcon.value = true
-  }
+  showEditIcon.value = true
 }
 
 const nameMouseLeave = () => {
-  if (small.value && asset.value.name.length > 9) {
-    tooltipMouseLeave()
-  }
-  if (!small.value) {
-    showEditIcon.value = false
-  }
+  showEditIcon.value = false
 }
 </script>
 
@@ -197,32 +110,10 @@ const nameMouseLeave = () => {
   filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.15))
     drop-shadow(4px 8px 24px rgba(16, 3, 70, 0.05));
   border-radius: 4px;
-  &.small {
-    position: relative;
-    z-index: 1;
-    .asset-info {
-      padding: 0 4px 4px;
-    }
-    .asset-name-wrap {
-      padding: 8px 0 0;
-    }
-    .asset-name {
-      @mixin title 11px;
-      cursor: unset;
-      position: relative;
-    }
-    .copy-text :deep(svg) {
-      @mixin size 14px;
-    }
-  }
 }
 .tooltip {
   @mixin tooltip;
   z-index: 10;
-}
-.asset-image :deep(.ps-asset-image) {
-  height: 100px;
-  object-fit: cover;
 }
 .asset-info {
   @mixin flex-col;
@@ -264,13 +155,5 @@ const nameMouseLeave = () => {
   @mixin truncate;
   cursor: pointer;
   color: $color-text;
-}
-.asset-preview {
-  @mixin flex-center;
-  height: 100px;
-  img,
-  svg {
-    width: 40%;
-  }
 }
 </style>

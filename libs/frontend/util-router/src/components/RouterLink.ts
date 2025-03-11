@@ -109,7 +109,8 @@ export const RouterLink = defineComponent({
           class: cls.value,
           href: link.value.url,
           target: target.value,
-          onClick: navigate,
+          // router.replace not supported when target="_blank"
+          onClick: target.value === '_blank' ? undefined : navigate,
         },
         children,
       )
