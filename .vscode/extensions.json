@@ -1,0 +1,17 @@
+{
+  "recommendations": [
+    "EditorConfig.EditorConfig",
+    "ms-azuretools.vscode-docker",
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint",
+    "redhat.vscode-yaml",
+    "redhat.vscode-xml",
+    "streetsidesoftware.code-spell-checker",
+    "firsttris.vscode-jest-runner",
+    "vue.volar",
+    "eamodio.gitlens",
+    "mike-co.import-sorter",
+    "cpylua.language-postcss",
+    "humao.rest-client"
+  ]
+}

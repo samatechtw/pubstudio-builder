@@ -1,0 +1,42 @@
+{
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "yaml.format.enable": false,
+  "javascript.suggestionActions.enabled": false,
+  "typescript.suggestionActions.enabled": false,
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "files.exclude": {
+    "**/.git": true,
+    "**/target": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/CVS": true,
+    "**/.DS_Store": true,
+    "**/dist": true,
+    "**/Thumbs.db": true,
+    "**/node_modules": true,
+    "**/.nx": true
+  },
+  "[xml]": {
+    "editor.defaultFormatter": "redhat.vscode-xml"
+  },
+  "[rust]": {
+    "editor.tabSize": 4,
+    "editor.defaultFormatter": "rust-lang.rust-analyzer"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "search.useIgnoreFiles": false,
+  "cSpell.words": ["postcss", "pubstudio"],
+  "rust-analyzer.linkedProjects": [
+    "./backend/Cargo.toml",
+    "./backend/lib-shared-types/Cargo.toml",
+    "./backend/lib-shared-types/Cargo.toml",
+    "./backend/lib-shared-site-api/Cargo.toml"
+  ],
+  "[sql]": {
+    "editor.tabSize": 4
+  },
+  "rust-analyzer.showUnlinkedFileNotification": false
+}

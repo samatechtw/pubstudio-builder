@@ -29,7 +29,6 @@ log
 /playwright/.cache/
 
 # IDE
-.vscode/
 .idea/
 
 *lang.postcss.json
