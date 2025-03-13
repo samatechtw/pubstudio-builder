@@ -1,7 +1,6 @@
 <template>
   <STMultiselect
     :value="editor?.cssPseudoClass"
-    class="style-pseudo-class"
     :placeholder="t('pseudo_class')"
     :options="CssPseudoClassValues"
     :caret="false"
@@ -45,9 +44,3 @@ onMounted(() => {
   }
 })
 </script>
-
-<style lang="postcss" scoped>
-.style-pseudo-class {
-  width: 70px;
-}
-</style>

@@ -20,6 +20,10 @@ export interface IBehaviorHelpers {
   // TODO -- move route types to a shared (or external) lib
   push(options: unknown): void
   getComponent(site: ISite, componentId: string): IComponent | undefined
+  findComponent(
+    component: IComponent | undefined,
+    fn: (component: IComponent) => boolean,
+  ): IComponent | undefined
   getValue(componentId: string, defaultVal?: string): string | undefined
   setContent(component: IComponent | undefined, content: string | undefined): void
   setState(component: IComponent | undefined, field: string, value: IComponentState): void

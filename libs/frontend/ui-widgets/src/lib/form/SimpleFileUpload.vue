@@ -1,18 +1,18 @@
 <template>
-  <div class="file-upload-wrap">
+  <div class="simple-upload-wrap">
     <form
       :id="id"
-      class="file-upload-form"
+      class="simple-upload-form"
       action=""
       enctype="multipart/form-data"
       @input="handleFileSelect"
     >
-      <label class="file-upload-area" :for="`image-upload-input${id}`">
+      <label class="simple-upload-area" :for="inputId">
         <slot> </slot>
       </label>
       <input
-        :id="`file-upload-input${id}`"
-        class="file-upload"
+        :id="inputId"
+        class="simple-upload"
         type="file"
         :accept="accept"
         :disabled="isDisabled"
@@ -23,25 +23,24 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 
-withDefaults(
-  defineProps<{
-    id?: string
-    isDisabled?: boolean
-    accept?: string
-  }>(),
-  {
-    id: '',
-    isDisabled: false,
-    accept: 'application/json',
-  },
-)
+const {
+  id = '',
+  isDisabled = false,
+  accept = 'application/json',
+} = defineProps<{
+  id?: string
+  isDisabled?: boolean
+  accept?: string
+}>()
 const emit = defineEmits<{
   (e: 'selectFile', value: File): void
 }>()
 
 const selectedFile = ref<File>()
+
+const inputId = computed(() => `simple-upload-input${id}`)
 
 const handleFileSelect = (e: InputEvent | Event) => {
   if (e && e.target && e.type === 'input') {
@@ -68,15 +67,14 @@ const clickInputFile = (e: MouseEvent) => {
 <style lang="postcss">
 @import '@theme/css/mixins.postcss';
 
-.file-upload-wrap {
+.simple-upload-wrap {
   @mixin flex-center;
-  .file-upload-form {
+  .simple-upload-form {
     position: relative;
     height: 100%;
     width: 100%;
   }
-  .file-upload {
-    position: absolute;
+  .simple-upload {
     @mixin overlay;
     cursor: pointer;
     opacity: 0;

@@ -28,21 +28,25 @@
       </div>
       <STInput v-model="editArg.help" class="edit-help" :placeholder="t('help')" />
     </div>
-    <div
-      v-for="(arg, index) in Object.values(behavior?.args || {})"
-      v-else
-      :key="index"
-      class="arg"
-    >
-      <div class="arg-name">
-        {{ arg.name }}
+    <div v-else class="args">
+      <div
+        v-for="(arg, index) in Object.values(behavior?.args || {})"
+        :key="index"
+        class="arg"
+      >
+        <div class="arg-name">
+          {{ arg.name }}
+        </div>
+        <div class="arg-type">
+          {{ arg.type }}
+        </div>
+        <InfoBubble
+          :message="arg.help || t('behavior_context.no_help')"
+          class="arg-help"
+        />
+        <Edit class="edit-icon" @click="edit(arg)" />
+        <Minus class="remove-icon" @click="removeArg(arg)" />
       </div>
-      <div class="arg-type">
-        {{ arg.type }}
-      </div>
-      <InfoBubble :message="arg.help || t('behavior_context.no_help')" class="arg-help" />
-      <Edit class="edit-icon" @click="edit(arg)" />
-      <Minus class="remove-icon" @click="removeArg(arg)" />
     </div>
     <ErrorMessage :error="error" />
   </div>
@@ -157,6 +161,10 @@ const addArg = () => {
   > div:first-child {
     margin-right: 6px;
   }
+}
+.args {
+  max-height: 130px;
+  overflow-y: scroll;
 }
 .add-icon,
 .edit-icon,
