@@ -181,7 +181,9 @@ const forceSave = async () => {
   margin-right: auto;
 }
 .toolbar-pseudo-class {
+  width: 70px;
   margin-left: 8px;
+  z-index: $z-index-site-toolbar;
 }
 .save-state {
   @mixin size 14px;

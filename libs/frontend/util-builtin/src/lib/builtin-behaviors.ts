@@ -187,7 +187,7 @@ if (argError) {
   if (args?.nameId) {
     name = helpers.getValue(args.nameId)
   }
-  const button = findComponent(component, (cmp) => cmp.tag === 'button')
+  const button = helpers.findComponent(component, (cmp) => cmp.tag === 'button')
   try {
     helpers.setLoading(button, true)
     const row = {
@@ -197,16 +197,18 @@ if (argError) {
     if (args?.apiNameField && name) {
       row[args?.apiNameField] = name
     }
-    await helpers.addRow(resolvedArgs.tableName, row)
-    helpers.setCustomStyle(errorCmp, 'opacity', '1')
-    helpers.setCustomStyle(errorCmp, 'color', '\${color-success}')
-    helpers.setContent(errorCmp, 'Contact request sent!')
+    helpers.addRow(resolvedArgs.tableName, row).then(() => {
+      helpers.setCustomStyle(errorCmp, 'opacity', '1')
+      helpers.setCustomStyle(errorCmp, 'color', '\${color-success}')
+      helpers.setContent(errorCmp, 'Contact request sent!')
+      helpers.setLoading(button, false)
+    })
   } catch (e) {
     helpers.setError(errorCmp, e, {
       CustomDataUniqueFail: 'Contact request already submitted',
     })
+    helpers.setLoading(button, false)
   }
-  helpers.setLoading(button, false)
 }
 `,
 }
@@ -263,7 +265,7 @@ if (argError) {
   if (args?.nameId) {
     name = helpers.getValue(args.nameId)
   }
-  const button = findComponent(component, (cmp) => cmp.tag === 'button')
+  const button = helpers.findComponent(component, (cmp) => cmp.tag === 'button')
   try {
     helpers.setLoading(button, true)
     const row = {
@@ -272,16 +274,18 @@ if (argError) {
     if (args?.apiNameField && name) {
       row[args?.apiNameField] = name
     }
-    await helpers.addRow(resolvedArgs.tableName, row)
-    helpers.setCustomStyle(errorCmp, 'opacity', '1')
-    helpers.setCustomStyle(errorCmp, 'color', '\${color-success}')
-    helpers.setContent(errorCmp, 'Subscribed!')
+    helpers.addRow(resolvedArgs.tableName, row).then(() => {
+      helpers.setCustomStyle(errorCmp, 'opacity', '1')
+      helpers.setCustomStyle(errorCmp, 'color', '\${color-success}')
+      helpers.setContent(errorCmp, 'Subscribed!')
+      helpers.setLoading(button, false)
+    })
   } catch (e) {
     helpers.setError(errorCmp, e, {
       CustomDataUniqueFail: "You're already subscribed!",
     })
+    helpers.setLoading(button, false)
   }
-  helpers.setLoading(button, false)
 }
 `,
 }

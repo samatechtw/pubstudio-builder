@@ -343,12 +343,10 @@ export const useCopyPaste = (): IUseCopyPaste => {
           !!selectedComponent &&
           !selectedComponent.parent &&
           selectedComponent.id !== copiedComponent.component.id
-        if (isRoot) {
+        if (isRoot && isLocal) {
           // Show a warning before replacing the root component
           // Components from an external site currently cannot replace root components
-          if (isLocal) {
-            showReplaceRootModal.value = true
-          }
+          showReplaceRootModal.value = true
           return
         }
         const component = copiedComponent.component

@@ -78,6 +78,7 @@ import { DEFAULT_TEMPLATE_ID } from '@pubstudio/shared/type-api-platform-templat
 import { IUploadFileResult } from '../lib/upload-asset'
 import { ASSET_PLACEHOLDERS, useSiteAssets } from '../lib/use-site-assets'
 import { isAssetDroppable } from '@pubstudio/frontend/util-asset'
+import { sleep } from '@pubstudio/shared/util-core'
 
 interface ISelectableSite {
   id: string

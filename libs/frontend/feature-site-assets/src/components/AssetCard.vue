@@ -10,9 +10,9 @@
           @handle-enter="updateName"
         />
         <Spinner v-if="loading" :size="6" color="#2a17d6" class="edit-spinner" />
-        <div v-else class="edit-actions">
-          <Check class="check-icon" @click="updateName" />
-          <Cross class="x-icon" @click="showEdit = false" />
+        <div v-else class="asset-name-actions">
+          <Check color="#009879" class="check-icon" @click="updateName" />
+          <Cross color="#606470" class="x-icon" @click="hideEdit" />
         </div>
       </div>
       <div v-else class="asset-name-wrap">
@@ -75,6 +75,11 @@ const showEditInput = () => {
   newName.value = asset.name
 }
 
+const hideEdit = () => {
+  showEdit.value = false
+  showEditIcon.value = false
+}
+
 const assetUrl = computed(() => {
   return urlFromAsset(asset)
 })
@@ -88,6 +93,7 @@ const updateName = async () => {
       emit('update', result)
     }
   }
+  showEditIcon.value = false
 }
 
 const nameMouseEnter = () => {
@@ -118,12 +124,13 @@ const nameMouseLeave = () => {
 .asset-info {
   @mixin flex-col;
   padding: 0 8px 8px;
+  min-height: 74px;
 }
 .asset-name-edit {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 2px 0 6px;
+  padding: 4px 0 6px;
   .x-icon,
   .check-icon {
     @mixin size 16px;
@@ -135,15 +142,22 @@ const nameMouseLeave = () => {
   }
 }
 .edit-name :deep(.st-input) {
-  height: 32px;
+  height: 28px;
 }
-.edit-actions {
+.asset-name-actions {
   @mixin flex-center;
+  flex-shrink: 0;
 }
 .asset-name-wrap {
   display: flex;
   justify-content: space-between;
-  padding: 12px 0 8px;
+  align-items: center;
+  padding: 8px 0 8px;
+}
+.edit-icon,
+.copy-text {
+  position: relative;
+  top: 3px;
 }
 .copy-text {
   :deep(svg) {

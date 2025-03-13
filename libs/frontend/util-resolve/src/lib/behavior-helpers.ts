@@ -22,6 +22,7 @@ import {
   ISite,
 } from '@pubstudio/shared/type-site'
 import { rootSiteApi } from '@pubstudio/shared/util-web-site-api'
+import { findComponent } from './find-component'
 import { resolveComponent } from './resolve-component'
 
 export interface IQueryOptions {
@@ -236,6 +237,7 @@ export const behaviorHelpers: IBehaviorHelpers = {
   requireArgs,
   push,
   getComponent,
+  findComponent,
   getState,
   setState,
   setContent,
