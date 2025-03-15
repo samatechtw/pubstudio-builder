@@ -231,7 +231,7 @@ describe('Modify Column', () => {
         .send(payload)
         .expect(400, {
           code: 'CustomColumnNameExists',
-          message: 'Duplicate column name: a',
+          message: 'Duplicate column name: email',
           status: 400,
         })
     })
