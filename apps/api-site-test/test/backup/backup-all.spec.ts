@@ -19,6 +19,9 @@ describe('Backup All', () => {
     api = supertest(testConfig.get('apiUrl'))
     adminAuth = adminAuthHeader()
     resetService = new SiteApiResetService('http://127.0.0.1:3100', adminAuth, SITE_SEEDS)
+  })
+
+  beforeEach(async () => {
     await resetService.reset()
   })
 
