@@ -201,15 +201,17 @@ const confirmUpdateRow = async (row: ICustomTableRow) => {
 const confirmEditColumn = async (info: IEditColumnName) => {
   if (table.value) {
     await modifyColumn(table.value.name, info)
-    for (const row of rows.value) {
-      row[info.newName] = row[info.oldName]
-      delete row[info.oldName]
+    if (!errorKey.value) {
+      for (const row of rows.value) {
+        row[info.newName] = row[info.oldName]
+        delete row[info.oldName]
+      }
+      table.value.columns[info.newName] = {
+        ...table.value.columns[info.oldName],
+        name: info.newName,
+      }
+      delete table.value.columns[info.oldName]
     }
-    table.value.columns[info.newName] = {
-      ...table.value.columns[info.oldName],
-      name: info.newName,
-    }
-    delete table.value.columns[info.oldName]
   }
 }
 

@@ -50,8 +50,16 @@ pub async fn modify_column(
     let old_column = dto.old_column_name.clone();
     let new_column = dto.new_column_name.clone();
 
+    let mut column_info = get_column_info(context, site_id, &table).await?;
+
     if let Some(new_column_name) = dto.new_column_name {
         validate_column_name(&new_column_name)?;
+        // Avoid duplicate column name
+        if column_info.contains_key(&new_column_name) {
+            return Err(ApiError::bad_request()
+                .code(ApiErrorCode::CustomColumnNameExists)
+                .message(format!("Duplicate column name: {}", new_column_name)));
+        }
 
         context
             .custom_data_repo
@@ -59,8 +67,6 @@ pub async fn modify_column(
             .await
             .map_err(map_custom_table_err)?;
     }
-
-    let mut column_info = get_column_info(context, site_id, &table).await?;
     let old_info = column_info
         .remove(&old_column)
         .ok_or(ApiError::internal_error().message(format!("No column with name {}", old_column)))?;

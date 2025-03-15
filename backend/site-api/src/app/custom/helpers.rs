@@ -67,17 +67,9 @@ pub fn validate_column_names<'a, I>(names: I) -> Result<(), ApiError>
 where
     I: IntoIterator<Item = &'a String>,
 {
-    let bad_name = names.into_iter().find(|name| {
-        let key: &str = Into::<&String>::into(*name);
-        !REGEX_TABLE_NAME.is_match(key)
-    });
-
-    if let Some(name) = bad_name {
-        return Err(ApiError::bad_request()
-            .code(ApiErrorCode::CustomColumnNameInvalid)
-            .message(format!("Invalid column name: {}", name)));
-    }
-    Ok(())
+    names
+        .into_iter()
+        .try_for_each(|name| validate_column_name(name))
 }
 
 pub async fn validate_custom_data_allowance(

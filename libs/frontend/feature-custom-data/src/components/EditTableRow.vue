@@ -73,12 +73,13 @@ td.select-wrap {
   cursor: pointer;
 }
 .row-input :deep(.st-input) {
-  height: 38px;
+  height: 34px;
 }
 .cancel {
   margin-left: 8px;
 }
 td {
+  padding: 0 8px;
   .action {
     border-top: 1px solid $grey-300;
   }
