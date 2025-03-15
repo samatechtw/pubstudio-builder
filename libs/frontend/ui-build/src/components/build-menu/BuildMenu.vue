@@ -84,10 +84,7 @@
       </BuildMenuIcon>
     </div>
     <TranslationsModal :show="!!editor?.translations" />
-    <CustomDataModal
-      :show="showCustomDataModal || !!editor?.selectedTable"
-      @cancel="showCustomDataModal = false"
-    />
+    <CustomDataModal :show="showCustomDataModal" @cancel="showCustomDataModal = false" />
     <Transition name="submenu">
       <component
         :is="submenu"

@@ -200,7 +200,7 @@ export const useContactForm = (): IContactFormFeature => {
     }
     if (hasName) {
       tablePayload.columns.name = makeColumnInfo({
-        name: 'message',
+        name: 'name',
         validation_rules: [
           { rule_type: 'MinLength', parameter: 2 },
           { rule_type: 'MaxLength', parameter: 100 },

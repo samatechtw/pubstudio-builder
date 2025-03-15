@@ -172,7 +172,6 @@ const api = useCustomDataApi(siteId.value)
 const { errorKey, addColumn } = useDataTable(siteId)
 
 const cancel = () => {
-  setSelectedTable(editor.value, undefined)
   emit('cancel')
 }
 

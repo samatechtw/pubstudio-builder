@@ -10,7 +10,10 @@
         />
       </th>
       <th v-for="column in columns" :key="column.name" class="th">
-        <div v-if="editColumn && editColumn?.oldName === column.name" class="th-content">
+        <div
+          v-if="editColumn && editColumn?.oldName === column.name"
+          class="th-content th-edit"
+        >
           <STInput v-model="editColumn.newName" class="name-input" />
           <Check class="check" color="#009879" @click="confirmEditName" />
           <Cross class="cancel" @click="editColumn = undefined" />
@@ -66,8 +69,11 @@ const editName = (name: string) => {
 }
 
 const confirmEditName = () => {
-  if (editColumn.value?.newName) {
-    emit('editColumn', editColumn.value)
+  const col = editColumn.value
+  if (col?.newName) {
+    if (col.newName !== col.oldName) {
+      emit('editColumn', col)
+    }
     editColumn.value = undefined
   }
 }
@@ -78,7 +84,7 @@ const confirmEditName = () => {
 
 th {
   @mixin text 15px;
-  padding: 12px 16px;
+  padding: 6px 16px;
   white-space: nowrap;
   color: $color-primary;
   background-color: $grey-200;
@@ -102,6 +108,10 @@ th.select-all-wrap {
 .th-content {
   @mixin flex-row;
   align-items: center;
+  padding: 6px 0;
+}
+.th-edit {
+  padding: 0;
 }
 .column-type-info {
   @mixin size 18px;
@@ -133,6 +143,6 @@ th.select-all-wrap {
   cursor: pointer;
 }
 .name-input :deep(.st-input) {
-  height: 36px;
+  height: 34px;
 }
 </style>
