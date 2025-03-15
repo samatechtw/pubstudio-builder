@@ -136,7 +136,7 @@ pub async fn backup_site(
                 // Get oldest backups starting with the 10th
                 match context
                     .backup_repo
-                    .list_backups_after(&created_backup.site_id, 10)
+                    .list_backups_after(&created_backup.site_id, context.config.max_backups as i32)
                     .await
                 {
                     Ok(sites_to_delete) => {

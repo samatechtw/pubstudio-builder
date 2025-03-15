@@ -88,7 +88,7 @@ impl BackupRepoTrait for BackupRepo {
         SELECT id, site_id, url, created_at, updated_at
         FROM backups
         WHERE site_id = ?1
-        ORDER BY created_at
+        ORDER BY created_at DESC
         LIMIT 10 OFFSET ?2
     "#,
         )
