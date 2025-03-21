@@ -176,17 +176,19 @@ export const useBuildEvent = () => {
   }
   const clickComponentTree = (componentTreeItemId: string) => {
     setBuildSubmenu(editor.value, undefined)
-    builderContext.componentTreeItemRenameData.value.treeItemId = componentTreeItemId
+    if (editor.value) {
+      editor.value.componentTreeRenameData.itemId = componentTreeItemId
+    }
   }
   const handleClick = (event: Event) => {
     const target = event.target as HTMLElement | undefined
     const clickedComponentTreeItemId = findClickedComponentTreeItemId(target)
 
     if (
-      clickedComponentTreeItemId !==
-      builderContext.componentTreeItemRenameData.value.treeItemId
+      editor.value &&
+      clickedComponentTreeItemId !== editor.value.componentTreeRenameData?.itemId
     ) {
-      builderContext.resetComponentTreeItemRenameData()
+      editor.value.componentTreeRenameData = { itemId: undefined, renaming: false }
     }
     builderContext.rightMenuFocused.value = false
 
@@ -207,16 +209,15 @@ export const useBuildEvent = () => {
     } else if (clickedComponentTreeItemId) {
       clickComponentTree(clickedComponentTreeItemId)
     }
-
     mouseDownOnTextEditableComponent = false
   }
 
   const pressEscape = () => {
-    if (builderContext.componentTreeItemRenameData.value.renaming) {
+    if (editor?.value?.componentTreeRenameData.renaming) {
       // This is for the case where rename input is still visible in the tree, but
       // the input has lost focus. i.e. clicking on the hide/show button of the
       // same component in the tree during rename.
-      builderContext.componentTreeItemRenameData.value.renaming = false
+      editor.value.componentTreeRenameData.renaming = false
     } else if (editor.value?.editorDropdown) {
       setEditorDropdown(editor.value, undefined)
     } else if (editor.value?.buildSubmenu) {
@@ -243,9 +244,11 @@ export const useBuildEvent = () => {
   }
 
   const pressEnter = () => {
-    const { treeItemId, renaming } = builderContext.componentTreeItemRenameData.value
-    if (treeItemId && !renaming) {
-      builderContext.componentTreeItemRenameData.value.renaming = true
+    const data = editor.value?.componentTreeRenameData
+    if (data?.itemId && !data?.renaming) {
+      if (editor.value) {
+        editor.value.componentTreeRenameData.renaming = true
+      }
     }
   }
 
@@ -257,6 +260,9 @@ export const useBuildEvent = () => {
     }
     const { selectedComponent } = editor.value ?? {}
     if (selectedComponent) {
+      if (editor.value?.componentTreeRenameData.renaming) {
+        editor.value.componentTreeRenameData.renaming = false
+      }
       if (e.shiftKey) {
         selectPreviousComponent(site.value, selectedComponent)
       } else {

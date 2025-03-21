@@ -7,7 +7,6 @@ import {
 } from './enum-walkthrough-state'
 import { IBehavior, IComponent, IComponentEvent } from './i-component'
 import { IHotkeys } from './i-hotkeys'
-import { ISerializedComponent } from './i-serialized-site'
 import { ISiteStore } from './i-site-store'
 
 export enum EditorMode {
@@ -129,6 +128,11 @@ export interface IEditingMixinData {
   originComponentId?: string
 }
 
+export interface IComponentTreeRenameData {
+  itemId: string | undefined
+  renaming: boolean
+}
+
 export interface IEditorPreferences {
   // Show component bounding boxes
   debugBounding: boolean
@@ -193,6 +197,8 @@ export interface IEditorContext {
   showComponentTree: boolean
   // Record of expanded components in the component tree
   componentTreeExpandedItems: Record<string, boolean>
+  // Rename component in tree data
+  componentTreeRenameData: IComponentTreeRenameData
   // Record of components hidden in the editor
   componentsHidden: Record<string, boolean>
   // Ids of theme variables (colors) to show in color picker

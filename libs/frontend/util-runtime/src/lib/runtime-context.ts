@@ -31,7 +31,7 @@ export interface IBuildDndState {
   hoverCmpParentIsRow: boolean
 }
 
-export interface IComponentTreeItemRenameData {
+export interface IComponentTreeRenameData {
   treeItemId: string | undefined
   renaming: boolean
 }

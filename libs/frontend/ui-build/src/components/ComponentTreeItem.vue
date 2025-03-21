@@ -159,8 +159,7 @@ const toggleExpanded = () => {
 }
 
 const isRenaming = computed(() => {
-  const { treeItemId: contextTreeItemId, renaming } =
-    builderContext.componentTreeItemRenameData.value
-  return renaming && contextTreeItemId === treeItemId.value
+  const data = editor?.value?.componentTreeRenameData
+  return data?.renaming && data?.itemId === treeItemId.value
 })
 </script>

@@ -7,9 +7,11 @@ export const expectSiteWithoutComponentTree = (
 ) => {
   const originalNoTree = JSON.parse(JSON.stringify(original))
   delete originalNoTree.editor.componentTreeExpandedItems
+  delete originalNoTree.editor.componentTreeRenameData
 
   const siteNoTree = JSON.parse(stringifySite(site))
   delete siteNoTree.editor.componentTreeExpandedItems
+  delete siteNoTree.editor.componentTreeRenameData
 
   expect(siteNoTree).toEqual(originalNoTree)
 }

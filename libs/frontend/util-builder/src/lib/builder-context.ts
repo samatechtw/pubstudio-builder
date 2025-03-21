@@ -5,8 +5,6 @@ export interface IBuilderContext {
   buildContentWindowSize: Ref<ISize>
   hoveredComponentIdInComponentTree: Ref<string | undefined>
   buildDndState: Ref<IBuildDndState | undefined>
-  componentTreeItemRenameData: Ref<IComponentTreeItemRenameData>
-  resetComponentTreeItemRenameData: () => void
   rightMenuFocused: Ref<boolean>
 }
 
@@ -25,26 +23,12 @@ export interface IBuildDndState {
   hoverCmpParentIsRow: boolean
 }
 
-export interface IComponentTreeItemRenameData {
-  treeItemId: string | undefined
-  renaming: boolean
-}
-
 export type EventHandler = (e: Event) => void
-
-const defaultComponentTreItemRenameData = (): IComponentTreeItemRenameData => ({
-  treeItemId: undefined,
-  renaming: false,
-})
 
 export const builderContext: IBuilderContext = {
   buildContentWindowSize: ref<ISize>({ width: 0, height: 0 }),
   hoveredComponentIdInComponentTree: ref<string>(),
   buildDndState: ref<IBuildDndState>(),
-  componentTreeItemRenameData: ref(defaultComponentTreItemRenameData()),
-  resetComponentTreeItemRenameData: () => {
-    builderContext.componentTreeItemRenameData.value = defaultComponentTreItemRenameData()
-  },
   rightMenuFocused: ref(false),
 }
 
@@ -53,7 +37,6 @@ export const resetBuilderContext = () => {
   // will be re-calculated by resize observer.
   builderContext.hoveredComponentIdInComponentTree.value = undefined
   builderContext.buildDndState.value = undefined
-  builderContext.componentTreeItemRenameData.value = defaultComponentTreItemRenameData()
   builderContext.rightMenuFocused.value = false
   resetRuntimeContext()
 }
