@@ -23,7 +23,7 @@ export const deserializeEditor = (
   serializedEditor: ISerializedEditorContext | undefined | null,
 ): IEditorContext | undefined => {
   const selectedId = serializedEditor?.selectedComponentId
-  const editor = serializedEditor
+  const editor: IEditorContext | undefined = serializedEditor
     ? {
         selectedComponent: selectedId ? context.components[selectedId] : undefined,
         active: serializedEditor.active,
@@ -42,6 +42,11 @@ export const deserializeEditor = (
         editPageRoute: serializedEditor.editPageRoute,
         showComponentTree: serializedEditor.showComponentTree,
         componentTreeExpandedItems: serializedEditor.componentTreeExpandedItems,
+        // Added 250321
+        componentTreeRenameData: serializedEditor.componentTreeRenameData ?? {
+          itemId: undefined,
+          renaming: false,
+        },
         // Added 231125
         componentsHidden: serializedEditor.componentsHidden ?? {},
         selectedThemeColors: new Set(serializedEditor.selectedThemeColors),

@@ -19,6 +19,10 @@ export const mockSerializedSite: ISerializedSite = {
       'test-c-0': true,
       'test-c-1': false,
     },
+    componentTreeRenameData: {
+      itemId: undefined,
+      renaming: false,
+    },
     componentMenuCollapses: {},
     componentsHidden: {},
     componentTab: {},

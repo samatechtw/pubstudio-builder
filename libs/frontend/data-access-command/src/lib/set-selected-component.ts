@@ -6,6 +6,7 @@ import {
 } from '@pubstudio/shared/type-site'
 import { expandComponentTreeItem } from './component-tree-item-util'
 import { editStylesCancelEdit } from './edit-styles-data'
+import { getComponentTreeItemId } from './editor-helpers'
 import { scrollToComponent } from './scroll-to-component'
 
 export const clearComponentTabState = (editor: IEditorContext | undefined) => {
@@ -52,6 +53,7 @@ export const setSelectedComponent = (
       if (expandTree) {
         expandComponentTreeItem(editor, component)
       }
+      editor.componentTreeRenameData.itemId = getComponentTreeItemId(component)
       if (shouldScrollToComponent) {
         scrollToComponent(site, component)
       }

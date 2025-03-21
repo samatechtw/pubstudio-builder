@@ -57,6 +57,7 @@ export const serializeEditor = (
         editPageRoute: editor.editPageRoute,
         showComponentTree: editor.showComponentTree,
         componentTreeExpandedItems: editor.componentTreeExpandedItems,
+        componentTreeRenameData: editor.componentTreeRenameData,
         componentsHidden: editor.componentsHidden,
         selectedThemeColors: Array.from(editor.selectedThemeColors),
         editingMixinData: editor.editingMixinData,

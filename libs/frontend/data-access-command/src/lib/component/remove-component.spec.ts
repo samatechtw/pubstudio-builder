@@ -3,7 +3,7 @@ import { makeRemoveComponentData } from '@pubstudio/frontend/util-command-data'
 import { noBehaviorId } from '@pubstudio/frontend/util-ids'
 import { resolveComponent } from '@pubstudio/frontend/util-resolve'
 import { deserializeSite } from '@pubstudio/frontend/util-site-deserialize'
-import { stringifySite } from '@pubstudio/frontend/util-site-store'
+import { serializeSite, stringifySite } from '@pubstudio/frontend/util-site-store'
 import {
   addComponentDataWithSelected,
   expectSiteWithoutComponentTree,
@@ -19,8 +19,10 @@ import {
   IComponent,
   IComponentEditorEvents,
   IEditorEvent,
+  ISerializedSite,
   ISite,
 } from '@pubstudio/shared/type-site'
+import { setSelectedComponent } from '../set-selected-component'
 import { applyAddComponent } from './add-component'
 import { applyRemoveComponent, undoRemoveComponent } from './remove-component'
 
@@ -118,7 +120,7 @@ describe('Remove Component', () => {
   })
 
   describe('with `is`/children', () => {
-    let siteCheckpoint: string
+    let siteCheckpoint: ISerializedSite
 
     beforeEach(() => {
       // Add two children to a component
@@ -127,13 +129,11 @@ describe('Remove Component', () => {
       applyAddComponent(site, childData)
       // Select the component that will be deleted, so undo matches
       if (site.editor) {
-        site.editor.selectedComponent = resolveComponent(
-          site.context,
-          'test-c-1',
-        ) as IComponent
+        const cmp = resolveComponent(site.context, 'test-c-1')
+        setSelectedComponent(site, cmp)
       }
       // Save the state to compare later
-      siteCheckpoint = stringifySite(site)
+      siteCheckpoint = serializeSite(site)
       componentCount = Object.keys(site.context.components).length
     })
 
@@ -151,7 +151,7 @@ describe('Remove Component', () => {
       undoRemoveComponent(site, data)
       newComponentCount = Object.keys(site.context.components).length
       expect(newComponentCount).toEqual(componentCount)
-      expect(JSON.parse(stringifySite(site))).toEqual(JSON.parse(siteCheckpoint))
+      expect(JSON.parse(stringifySite(site))).toEqual(siteCheckpoint)
     })
   })
 })

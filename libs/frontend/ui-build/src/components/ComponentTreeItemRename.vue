@@ -31,7 +31,7 @@ const props = defineProps<{
 
 const { component } = toRefs(props)
 
-const { editComponent } = useBuild()
+const { editComponent, editor } = useBuild()
 
 const name = ref(component.value.name)
 
@@ -41,7 +41,9 @@ const keyup = (e: KeyboardEvent) => {
   // This is for the keyup events when the input is focused.
   if (e.key === Keys.Escape) {
     // Cancel rename when escape is pressed.
-    builderContext.componentTreeItemRenameData.value.renaming = false
+    if (editor.value) {
+      editor.value.componentTreeRenameData.renaming = false
+    }
   } else if (e.key === Keys.Enter) {
     updateName(UpdateNameEventSource.EnterPress)
   }
@@ -55,17 +57,18 @@ const updateName = (eventSource: UpdateNameEventSource) => {
   // when the focusout event is triggered due to enter-press.
   if (
     eventSource === UpdateNameEventSource.FocusOut &&
-    !builderContext.componentTreeItemRenameData.value.renaming
+    !editor.value?.componentTreeRenameData.renaming
   ) {
     // The component is not being renamed anymore when this function is trigged by focusout event.
-    // This means there was rename event prior to this one, which is triggered by an enter pess.
+    // This means there was rename event prior to this one, which is triggered by an enter press.
     // We don't have to do anything in this case.
     return
   } else if (eventSource === UpdateNameEventSource.EnterPress) {
     // Manually change `renaming` to false because no click event has happened in this case.
-    builderContext.componentTreeItemRenameData.value.renaming = false
+    if (editor.value) {
+      editor.value.componentTreeRenameData.renaming = false
+    }
   }
-
   if (name.value && component.value.name !== name.value) {
     // Only update component name when value is not empty & name is different.
     editComponent(component.value, {
