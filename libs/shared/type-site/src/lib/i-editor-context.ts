@@ -140,6 +140,7 @@ export interface IEditorPreferences {
   overrideOpacity?: boolean
   // Force transform to default/initial
   overrideTransform?: boolean
+  selectedComponentOutlineColor?: string
 }
 
 export interface IEditorContext {

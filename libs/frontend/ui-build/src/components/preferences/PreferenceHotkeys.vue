@@ -69,10 +69,8 @@ onUnmounted(() => {
 }
 .modal-buttons {
   @mixin flex-row;
-}
-.modal-buttons {
-  display: flex;
   justify-content: center;
   margin-top: auto;
+  padding-bottom: 24px;
 }
 </style>
