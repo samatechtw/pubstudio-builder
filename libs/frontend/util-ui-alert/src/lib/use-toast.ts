@@ -38,56 +38,50 @@ export interface IToastFeature {
 const allToasts: Ref<IToast[]> = ref([])
 let toastCount = 0
 
-export const useToast = (): IToastFeature => {
-  const toastById = (id: string) => {
-    return allToasts.value.find((t) => t.id === id)
+const toastById = (id: string) => {
+  return allToasts.value.find((t) => t.id === id)
+}
+export const addToast = (toast: IToastOptions) => {
+  let durationTimeout = undefined
+  let id = toast.id
+  if (id) {
+    // If a toast with the same ID exists, don't make a new one
+    if (toastById(id)) return
+  } else {
+    // Generate a unique ID
+    id = `__toast_${toastCount.toString()}`
+    toastCount += 1
   }
-  const addToast = (toast: IToastOptions) => {
-    let durationTimeout = undefined
-    let id = toast.id
-    if (id) {
-      // If a toast with the same ID exists, don't make a new one
-      if (toastById(id)) return
-    } else {
-      // Generate a unique ID
-      id = `__toast_${toastCount.toString()}`
-      toastCount += 1
-    }
-    if (toast.duration) {
-      // Hide the toast after a duration
-      durationTimeout = setTimeout(() => {
-        allToasts.value = allToasts.value.filter((toast) => toast.id !== id)
-      }, toast.duration)
-    }
-    allToasts.value.push({
-      ...toast,
-      type: toast.type ?? ToastType.Toast,
-      id,
-      durationTimeout,
-    })
+  if (toast.duration) {
+    // Hide the toast after a duration
+    durationTimeout = setTimeout(() => {
+      allToasts.value = allToasts.value.filter((toast) => toast.id !== id)
+    }, toast.duration)
   }
-  const addHUD = (options: IHUDOptions) => {
-    addToast({
-      text: options.text,
-      duration: options.duration ?? 1500,
-      type: ToastType.Hud,
-    })
-  }
-  const toasts = computed(() => allToasts.value.filter((t) => t.type !== ToastType.Hud))
-  const huds = computed(() => allToasts.value.filter((t) => t.type === ToastType.Hud))
+  allToasts.value.push({
+    ...toast,
+    type: toast.type ?? ToastType.Toast,
+    id,
+    durationTimeout,
+  })
+}
+export const addHUD = (options: IHUDOptions) => {
+  addToast({
+    text: options.text,
+    duration: options.duration ?? 1500,
+    type: ToastType.Hud,
+  })
+}
+export const toasts = computed(() =>
+  allToasts.value.filter((t) => t.type !== ToastType.Hud),
+)
+export const huds = computed(() =>
+  allToasts.value.filter((t) => t.type === ToastType.Hud),
+)
 
-  const removeToast = (index: number) => {
-    const toast = allToasts.value.splice(index, 1)[0]
-    if (toast?.durationTimeout) {
-      clearTimeout(toast?.durationTimeout)
-    }
-  }
-
-  return {
-    toasts,
-    huds,
-    addToast,
-    addHUD,
-    removeToast,
+export const removeToast = (index: number) => {
+  const toast = allToasts.value.splice(index, 1)[0]
+  if (toast?.durationTimeout) {
+    clearTimeout(toast?.durationTimeout)
   }
 }

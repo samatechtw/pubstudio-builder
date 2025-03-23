@@ -26,6 +26,7 @@ export interface Column<TableItem = any> {
   width?: string
   sortable?: boolean
   isKey?: boolean
+  class?: string
   display?: (item: TableItem) => string
 }
 

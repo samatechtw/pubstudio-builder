@@ -28,10 +28,8 @@
 </template>
 
 <script lang="ts" setup>
-import { useToast } from '@pubstudio/frontend/util-ui-alert'
+import { toasts, huds, removeToast } from '@pubstudio/frontend/util-ui-alert'
 import IcX from '@frontend-assets/icon/x.svg'
-
-const { toasts, huds, removeToast } = useToast()
 </script>
 
 <style lang="postcss" scoped>
