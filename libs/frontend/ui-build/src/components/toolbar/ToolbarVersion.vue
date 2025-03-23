@@ -72,7 +72,7 @@ import {
   Spinner,
   ToolbarItem,
 } from '@pubstudio/frontend/ui-widgets'
-import { useToast } from '@pubstudio/frontend/util-ui-alert'
+import { addToast, copyWithToast } from '@pubstudio/frontend/util-ui-alert'
 import { EditorDropdown } from '@pubstudio/shared/type-site'
 import { useSiteVersion, VersionOption } from '@pubstudio/frontend/feature-site-version'
 import { IMultiselectObj } from '@pubstudio/frontend/type-ui-widgets'
@@ -96,7 +96,6 @@ const {
 } = useSiteVersion()
 const { apiSiteId } = useSiteSource()
 const { getSiteInfo } = useGetSite()
-const { addToast } = useToast()
 
 const siteData = ref<IMergedSiteData>()
 
@@ -172,8 +171,8 @@ const toggleShowPreview = async () => {
 const copyLink = () => {
   const subdomain = siteData.value?.subdomain
   if (site.value.preview_id && subdomain) {
-    copy(`https://${subdomain}.${WEB_URL}?p=${site.value.preview_id}`)
-    addToast({ text: t('copied'), duration: 2500, id: 'preview-link-copied' })
+    const link = `https://${subdomain}.${WEB_URL}?p=${site.value.preview_id}`
+    copyWithToast(link, { duration: 2500, id: 'preview-link-copied' })
     setEditorDropdown(editor.value, undefined)
   }
 }

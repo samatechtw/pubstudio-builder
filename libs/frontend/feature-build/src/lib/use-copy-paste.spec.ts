@@ -12,7 +12,8 @@ import { IUseCopyPaste, useCopyPaste } from './use-copy-paste'
 
 jest.mock('petite-vue-i18n', () => ({ useI18n: () => ({ t: jest.fn() }) }))
 jest.mock('@pubstudio/frontend/util-ui-alert', () => ({
-  useToast: () => ({ addToast: jest.fn(), addHUD: jest.fn() }),
+  addToast: jest.fn(),
+  addHUD: jest.fn(),
   uiAlert: jest.fn(),
 }))
 

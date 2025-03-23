@@ -14,7 +14,7 @@ import {
   replacePastedComponentNamespace,
 } from '@pubstudio/frontend/util-site-deserialize'
 import { serializeComponent } from '@pubstudio/frontend/util-site-store'
-import { useToast } from '@pubstudio/frontend/util-ui-alert'
+import { addHUD } from '@pubstudio/frontend/util-ui-alert'
 import {
   IBehavior,
   IBreakpoint,
@@ -95,7 +95,6 @@ export const useCopyPaste = (): IUseCopyPaste => {
     replacePageRoot,
   } = useBuild()
   const { apiSiteId } = useSiteSource()
-  const { addHUD } = useToast()
 
   const pressCopy = (evt: KeyboardEvent) => {
     evt.stopImmediatePropagation()
