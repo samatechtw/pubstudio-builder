@@ -150,11 +150,12 @@ const selectComponent = () => {
   })
 }
 
-const toggleExpanded = () => {
+const toggleExpanded = (e: MouseEvent) => {
+  const expandChildren = e.shiftKey
   if (expanded.value) {
-    collapseComponentTreeItem(site.value.editor, component.value)
+    collapseComponentTreeItem(site.value.editor, component.value, expandChildren)
   } else {
-    expandComponentTreeItem(site.value.editor, component.value)
+    expandComponentTreeItem(site.value.editor, component.value, expandChildren)
   }
 }
 

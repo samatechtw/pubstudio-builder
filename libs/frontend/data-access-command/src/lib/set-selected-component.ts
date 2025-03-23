@@ -51,7 +51,7 @@ export const setSelectedComponent = (
         editor.mode = EditorMode.SelectedComponent
       }
       if (expandTree) {
-        expandComponentTreeItem(editor, component)
+        expandComponentTreeItem(editor, component, false)
       }
       editor.componentTreeRenameData.itemId = getComponentTreeItemId(component)
       if (shouldScrollToComponent) {
