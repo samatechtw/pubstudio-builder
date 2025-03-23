@@ -135,7 +135,7 @@ const cssValues = new Map<Css, string[]>([
   [Css.Visibility, ['hidden', 'visible']],
   [Css.WebkitBackgroundClip, ['border-box', 'padding-box', 'content-box', 'text']],
   [Css.WhiteSpace, ['normal', 'nowrap', 'pre', 'pre-line', 'pre-wrap']],
-  [Css.WordBreak, ['break-all', 'keep-all', 'normal']],
+  [Css.WordBreak, ['break-word', 'break-all', 'keep-all', 'auto-phrase', 'normal']],
   [Css.WordWrap, ['break-word', 'normal']],
 ])
 
