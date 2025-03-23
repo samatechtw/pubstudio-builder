@@ -1,4 +1,4 @@
-import { builderContext } from '@pubstudio/frontend/util-builder'
+import { builderContext, DEFAULT_EDITOR_PREFS } from '@pubstudio/frontend/util-builder'
 import { iterateComponent } from '@pubstudio/frontend/util-render'
 import { resolveComponent } from '@pubstudio/frontend/util-resolve'
 import {
@@ -396,15 +396,22 @@ export const setMailingListWalkthrough = (
   setWalkthroughState(editor, 'mailingListWalkthrough', state, formId)
 }
 
-export const setPref = (
+export const setPref = <K extends keyof IEditorPreferences>(
   editor: IEditorContext | undefined,
-  key: keyof IEditorPreferences,
-  val: boolean,
+  key: K,
+  val: IEditorPreferences[K],
 ) => {
   if (editor) {
     editor.prefs[key] = val
     editor.store?.saveEditor(editor)
   }
+}
+
+export const getPref = <K extends keyof IEditorPreferences>(
+  editor: IEditorContext | undefined,
+  key: K,
+): IEditorPreferences[K] => {
+  return editor?.prefs[key] ?? DEFAULT_EDITOR_PREFS[key]
 }
 
 export const setTemplatesShown = (editor: IEditorContext | undefined, shown: boolean) => {

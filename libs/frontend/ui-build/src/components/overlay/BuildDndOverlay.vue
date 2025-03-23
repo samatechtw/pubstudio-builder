@@ -23,6 +23,7 @@ import { findStyles } from '@pubstudio/frontend/util-component'
 import { computeHoverOverlayStyle } from './hover-overlay-style'
 import { ISelectionOverlay, computeSelectionOverlay } from './selection-overlay-style'
 import ImageEdit from './ImageEdit.vue'
+import { getPref } from '@pubstudio/frontend/data-access-command'
 
 const { site, editor } = useBuild()
 
@@ -63,12 +64,13 @@ const setSelectionOverlayStyle = async (component: IComponent | undefined) => {
   const dim = await computeSelectionOverlay(editor.value, component)
   selectionDimensions.value = dim
   if (dim) {
+    const outlineColor = getPref(editor.value, 'selectedComponentOutlineColor')
     selectionOverlayStyle.value = {
       top: `${dim.top - 1}px`,
       left: `${dim.left - 1}px`,
       width: `${dim.width}px`,
       height: `${dim.height}px`,
-      border: '2px solid #3768FF',
+      border: `2px solid ${outlineColor}`,
     }
   } else {
     selectionOverlayStyle.value = undefined

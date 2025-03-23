@@ -59,6 +59,7 @@ const tabContent = computed(() => {
     max-height: 95%;
     height: 95%;
     overflow-y: scroll;
+    padding: 24px 24px 0;
   }
   .modal-title {
     @mixin title 26px;
