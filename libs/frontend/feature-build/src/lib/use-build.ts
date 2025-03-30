@@ -95,6 +95,7 @@ import { computed, ComputedRef, Ref, ref, toRaw } from 'vue'
 import { pushCommandWithBuiltins } from './add-builtin/add-builtin-component'
 import {
   IRemoveStyleEntry,
+  ISetCustomStyleOptions,
   removeComponentCustomStyleCommand,
   removeComponentOverrideStyleEntryCommand,
   setCustomStyleCommand,
@@ -131,17 +132,17 @@ export interface IUseBuild {
     component: IComponent,
     oldStyle: IStyleEntry | undefined,
     newStyle: IStyleEntry,
-    replace?: boolean,
+    options?: ISetCustomStyleOptions,
   ) => void
   setActiveCustomStyle: (
     component: IComponent,
     newStyle: IStyleEntry,
-    replace?: boolean,
+    options?: ISetCustomStyleOptions,
   ) => void
   setCustomStyles: (
     component: IComponent,
     styles: IOldNewStyleEntry[],
-    replace?: boolean,
+    options?: ISetCustomStyleOptions,
   ) => void
   removeComponentCustomStyle: (style: IRemoveStyleEntry) => void
   setOverrideStyle: (
@@ -526,22 +527,22 @@ export const useBuild = (): IUseBuild => {
     component: IComponent,
     oldStyle: IStyleEntry | undefined,
     newStyle: IStyleEntry,
-    replace = false,
+    options?: ISetCustomStyleOptions,
   ) => {
     const command = setCustomStyleCommand(
       site.value,
       component,
       oldStyle,
       newStyle,
-      replace,
+      options,
     )
-    pushOrReplaceCommand(site.value, command, replace)
+    pushOrReplaceCommand(site.value, command, !!options?.replace)
   }
 
   const setActiveCustomStyle = (
     component: IComponent,
     newStyle: IStyleEntry,
-    replace = false,
+    options?: ISetCustomStyleOptions,
   ) => {
     const oldValue =
       component.style.custom[activeBreakpoint.value.id]?.[newStyle.pseudoClass]?.[
@@ -559,15 +560,15 @@ export const useBuild = (): IUseBuild => {
       component,
       oldStyle,
       newStyle,
-      replace,
+      options,
     )
-    pushOrReplaceCommand(site.value, command, replace)
+    pushOrReplaceCommand(site.value, command, !!options?.replace)
   }
 
   const setCustomStyles = (
     component: IComponent,
     styles: IOldNewStyleEntry[],
-    replace?: boolean,
+    options?: ISetCustomStyleOptions,
   ) => {
     const data: ICommandGroupData = {
       commands: styles.map((style) => {
@@ -576,6 +577,7 @@ export const useBuild = (): IUseBuild => {
           breakpointId: activeBreakpoint.value.id,
           oldStyle: style.oldStyle,
           newStyle: style.newStyle,
+          select: options?.select,
         }
         return {
           type: CommandType.SetComponentCustomStyle,
@@ -584,7 +586,7 @@ export const useBuild = (): IUseBuild => {
       }),
     }
     const cmd = { type: CommandType.Group, data }
-    pushOrReplaceCommand(site.value, cmd, !!replace)
+    pushOrReplaceCommand(site.value, cmd, !!options?.replace)
   }
 
   const removeComponentCustomStyle = (style: IRemoveStyleEntry) => {

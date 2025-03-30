@@ -149,6 +149,9 @@
       "@pubstudio/frontend/feature-build-event": [
         "libs/frontend/feature-build-event/src/index.ts"
       ],
+      "@pubstudio/frontend/feature-build-overlay": [
+        "libs/frontend/feature-build-overlay/src/index.ts"
+      ],
       "@pubstudio/frontend/feature-login": ["libs/frontend/feature-login/src/index.ts"],
       "@pubstudio/frontend/feature-preview": [
         "libs/frontend/feature-preview/src/index.ts"

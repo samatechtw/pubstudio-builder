@@ -5,7 +5,6 @@
         :id="buildContentWindowInnerId"
         class="build-content-window-inner scrollbar-small"
         :style="innerStyle"
-        @click="selectRoot"
       >
         <CustomStyle />
         <Mixins />
@@ -32,14 +31,11 @@ import {
   buildContentWindowId,
   buildContentWindowInnerId,
 } from '@pubstudio/frontend/feature-build'
-import {
-  setBuilderWidth,
-  setSelectedComponent,
-} from '@pubstudio/frontend/data-access-command'
+import { setBuilderWidth } from '@pubstudio/frontend/data-access-command'
 import { useRenderBuilder } from '@pubstudio/frontend/feature-render-builder'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { builderContext } from '@pubstudio/frontend/util-builder'
-import BuildDndOverlay from './overlay/BuildDndOverlay.vue'
+import { BuildDndOverlay } from '@pubstudio/frontend/feature-build-overlay'
 
 const { site, activePage } = useSiteSource()
 const { editor } = useBuild()
@@ -84,7 +80,6 @@ const innerStyle = computed<StyleValue>(() => {
       activeBreakpoint.value,
     )
   }
-
   return {
     width: `${innerWidth}px`,
     height: `${innerHeight}px`,
@@ -104,16 +99,8 @@ const resizeObserver = new ResizeObserver(
       // Update builder scale by setting builder width
       setBuilderWidth(editor.value, editor.value.builderWidth)
     }
-  }, 200),
+  }, 150),
 )
-
-// If the root component doesn't extend to the whole editor width/height,
-// select it when the build window is clicked
-const selectRoot = (e: MouseEvent) => {
-  if ((e.target as HTMLElement)?.id === buildContentWindowInnerId) {
-    setSelectedComponent(site.value, activePage.value?.root)
-  }
-}
 
 onMounted(() => {
   if (contentWindowRef.value) {
@@ -128,8 +115,6 @@ onUnmounted(() => {
 
 <style lang="postcss" scoped>
 @import '@theme/css/mixins.postcss';
-
-$border-offset: 0px;
 
 .build-content {
   @mixin flex-col;
@@ -147,6 +132,7 @@ $border-offset: 0px;
   min-height: 100%;
   max-height: 100%;
   margin: auto;
+  position: relative;
   .build-content-window-inner {
     position: relative;
     margin: auto;
@@ -187,47 +173,6 @@ $border-offset: 0px;
     }
     :deep(.force-relative) {
       position: relative;
-    }
-    :deep(.hover) {
-      &.hover-wrap-absolute {
-        position: absolute;
-      }
-      .hover-edge {
-        position: absolute;
-      }
-      .top,
-      .bottom {
-        left: 0;
-        height: 5px;
-        width: 100%;
-        cursor: ns-resize;
-      }
-      .top {
-        top: $border-offset;
-      }
-      .bottom {
-        bottom: $border-offset;
-      }
-      .left,
-      .right {
-        width: 5px;
-        height: 100%;
-        top: 0;
-        cursor: ew-resize;
-      }
-      .left {
-        left: $border-offset;
-      }
-      .right {
-        right: $border-offset;
-      }
-      .bottom-right {
-        width: 5px;
-        height: 5px;
-        bottom: $border-offset;
-        right: $border-offset;
-        cursor: nwse-resize;
-      }
     }
   }
 }

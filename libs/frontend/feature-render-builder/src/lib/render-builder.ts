@@ -147,48 +147,6 @@ const computeBuilderStyleProps = (
     extraChildren = (extraChildren ?? []).concat(h('div', { class: 'hover-overlay' }))
   }
 
-  const hoveredInEditor = editor?.hoveredComponent?.id === component.id
-
-  if (hoveredInEditor) {
-    builderClass.push('hover')
-
-    getPosition()
-    if (!position) {
-      builderClass.push('force-relative')
-    }
-
-    const onDragstart = (e: DragEvent) => {
-      e.preventDefault()
-      e.stopPropagation()
-    }
-    extraChildren = (extraChildren ?? []).concat([
-      h('div', {
-        class: 'hover-edge right',
-        /* When resizing an absolute-position img, both div.hover-wrap and img (first child of hover-wrap)
-          are absolute-position, and we haven't found a way match hover-wrap to the component size in CSS.
-          So, `data-component-id` is used to adjust the size of the wrapper on mousemove events.
-          */
-        'data-component-id': component.id,
-        draggable: true,
-        onDragstart,
-      }),
-      h('div', {
-        class: 'hover-edge bottom',
-        'data-component-id': component.id,
-        draggable: true,
-        onDragstart,
-      }),
-      h('div', {
-        class: 'hover-edge bottom-right',
-        'data-component-id': component.id,
-        draggable: true,
-        onDragstart,
-      }),
-      // h('div', { class: 'hover-edge left' }),
-      // h('div', { class: 'hover-edge top', draggable: true, onDragstart }),
-    ])
-  }
-
   if (editor?.prefs.debugBounding) {
     builderStyle.border = '1.5px dashed #999'
   }
@@ -292,7 +250,9 @@ export const computePropsContent = (
       content.push(
         h('div', {
           class: 'pm-p pm-p-placeholder',
-          onclick: () => setSelectedComponent(site, component),
+          onclick: () => {
+            setSelectedComponent(site, component)
+          },
         }),
       )
     }

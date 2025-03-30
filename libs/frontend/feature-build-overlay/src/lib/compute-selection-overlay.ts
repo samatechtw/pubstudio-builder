@@ -1,23 +1,13 @@
 import { buildContentWindowInnerId } from '@pubstudio/frontend/feature-build'
+import { IComponentOverlay } from '@pubstudio/frontend/type-ui-widgets'
 import { IComponent, IEditorContext } from '@pubstudio/shared/type-site'
-import { sleep } from '@pubstudio/shared/util-core'
 import { normalizeDimensions } from './overlay-util'
 
-export interface ISelectionOverlay {
-  top: number
-  left: number
-  width: number
-  height: number
-}
-
-export const computeSelectionOverlay = async (
+export const computeSelectionOverlay = (
   editor: IEditorContext | undefined,
   selectedComponent: IComponent | undefined,
-): Promise<ISelectionOverlay | undefined> => {
+): IComponentOverlay | undefined => {
   if (selectedComponent) {
-    // This sleep is necessary for buildContentWindowInner and componentElement
-    await sleep(1)
-
     const buildContentWindowInner = document.getElementById(buildContentWindowInnerId)
     let componentElement = document.getElementById(selectedComponent.id)
     // Container size might be different from the actual component

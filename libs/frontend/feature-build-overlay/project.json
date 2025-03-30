@@ -1,0 +1,25 @@
+{
+  "name": "frontend-feature-build-overlay",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/frontend/feature-build-overlay/src",
+  "projectType": "library",
+  "targets": {
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/frontend/feature-build-overlay/**/*.ts"],
+        "eslintConfig": "libs/frontend/feature-build-overlay/.eslintrc.cjs"
+      }
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/libs/frontend/feature-build-overlay"],
+      "options": {
+        "jestConfig": "libs/frontend/feature-build-overlay/jest.config.ts",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": ["scope:frontend", "type:feature"]
+}
