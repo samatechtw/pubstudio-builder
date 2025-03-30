@@ -255,7 +255,7 @@ export const useToolbar = (): IUseToolbar => {
         property,
         value,
       },
-      replace,
+      { replace },
     )
   }
 

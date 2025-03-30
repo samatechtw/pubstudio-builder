@@ -12,20 +12,26 @@ import { Css, IComponent, ISite, IStyleEntry } from '@pubstudio/shared/type-site
 
 export type IRemoveStyleEntry = Omit<IStyleEntry, 'value'>
 
+export interface ISetCustomStyleOptions {
+  replace?: boolean
+  select?: boolean
+}
+
 export const setCustomStyleCommand = (
   site: ISite,
   component: IComponent,
   oldStyle: IStyleEntry | undefined,
   newStyle: IStyleEntry,
-  replace = false,
+  options?: ISetCustomStyleOptions,
 ): ICommand => {
   const data: ISetComponentCustomStyleData = {
     componentId: component.id,
     breakpointId: activeBreakpoint.value.id,
     oldStyle,
     newStyle,
+    select: options?.select,
   }
-  if (replace) {
+  if (options?.replace) {
     // Keep the original "old" data in a chain of commands
     const lastCommand = getLastCommand(site)
     const oldStyle = (lastCommand?.data as ISetComponentCustomStyleData | undefined)
@@ -46,11 +52,11 @@ export const setComponentCustomStyleCommand = (
   site: ISite,
   oldStyle: IStyleEntry | undefined,
   newStyle: IStyleEntry,
-  replace = false,
+  options?: ISetCustomStyleOptions,
 ): ICommand | undefined => {
   const selected = site.editor?.selectedComponent
   if (selected) {
-    return setCustomStyleCommand(site, selected, oldStyle, newStyle, replace)
+    return setCustomStyleCommand(site, selected, oldStyle, newStyle, options)
   }
   return undefined
 }

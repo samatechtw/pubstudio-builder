@@ -40,6 +40,11 @@ import { isTextGradient } from '@samatech/vue-color-picker'
 import { LinkTooltipMode } from '../lib/enum-link-tooltip-mode'
 import LinkTooltip from './LinkTooltip.vue'
 
+const cancelDrag = (e: DragEvent) => {
+  e.preventDefault()
+  e.stopPropagation()
+}
+
 export const ProseMirrorEditor = defineComponent({
   name: 'ProseMirrorEditor',
   props: {
@@ -287,6 +292,8 @@ export const ProseMirrorEditor = defineComponent({
           id: containerId.value,
           ref: container,
           class: 'prose-mirror-editor-container',
+          draggable: true,
+          onDragstart: cancelDrag,
         },
         cursorLinkAttrs.value
           ? h(LinkTooltip, {

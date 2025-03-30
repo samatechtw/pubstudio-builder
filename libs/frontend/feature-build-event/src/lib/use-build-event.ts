@@ -4,9 +4,11 @@ import {
   isEditingStyles,
   setBuildSubmenu,
   setEditorDropdown,
+  setSelectedComponent,
   toggleEditorMenu,
 } from '@pubstudio/frontend/data-access-command'
 import {
+  buildContentWindowInnerId,
   useBuild,
   useCopyPaste,
   useDuplicateComponent,
@@ -14,16 +16,14 @@ import {
   useMixinMenuUi,
   usePaddingMarginEdit,
 } from '@pubstudio/frontend/feature-build'
-import { activeBreakpoint } from '@pubstudio/frontend/feature-site-source'
+import { setBuildOverlays } from '@pubstudio/frontend/feature-build-overlay'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { builderContext } from '@pubstudio/frontend/util-builder'
-import { resolvedComponentStyle } from '@pubstudio/frontend/util-component'
 import { resolveComponent } from '@pubstudio/frontend/util-resolve'
 import {
   BuildSubmenu,
   Css,
   CssPseudoClass,
-  CssUnit,
   EditorMode,
   IStyleEntry,
   Keys,
@@ -36,13 +36,7 @@ import {
 } from './select-component'
 import { triggerHotkey } from './trigger-hotkey'
 import { hotkeysDisabled, prosemirrorActive } from './util-build-event'
-import {
-  calcNextHeight,
-  calcNextWidth,
-  getHeightPxPerPercent,
-  getWidthPxPerPercent,
-  isLengthValue,
-} from './util-resize'
+import { calcNextHeight, calcNextWidth } from './util-resize'
 
 const clickEventType = document.ontouchstart !== null ? 'click' : 'touchend'
 
@@ -90,10 +84,6 @@ const isStyleToolbar = (target: HTMLElement | undefined): boolean => {
   return !!target?.closest('.style-toolbar')
 }
 
-const isResizeDiv = (el: HTMLElement | undefined | null): boolean => {
-  return !!el?.classList.contains('hover-edge')
-}
-
 let mouseDownOnTextEditableComponent = false
 let manualDisableHotkeys = false
 
@@ -116,7 +106,7 @@ export const useBuildEvent = () => {
     setCustomStyle,
     setCustomStyles,
   } = useBuild()
-  const { siteStore } = useSiteSource()
+  const { siteStore, activePage } = useSiteSource()
   const { pressCopy, pressPaste } = useCopyPaste()
   const { undo, redo } = useHistory()
   const { pressDuplicate } = useDuplicateComponent()
@@ -133,11 +123,17 @@ export const useBuildEvent = () => {
     } else {
       const componentId =
         target?.id ||
+        target?.dataset?.componentId ||
         target?.closest('.component-content-container, .svg-container')?.parentElement?.id
       if (componentId) {
         const component = site.value.context.components[componentId]
         if (component) {
           selectComponent(site.value, component)
+        }
+        // If the root component doesn't extend to the whole editor width/height,
+        // select it when the build window is clicked
+        else if (target?.id === buildContentWindowInnerId) {
+          setSelectedComponent(site.value, activePage.value?.root)
         }
       }
     }
@@ -192,7 +188,10 @@ export const useBuildEvent = () => {
     }
     builderContext.rightMenuFocused.value = false
 
-    if (isRenderer(target)) {
+    if (editor.value?.resizeData) {
+      editor.value.resizeData = undefined
+      siteStore.saveEditor(editor.value)
+    } else if (isRenderer(target)) {
       if (!mouseDownOnTextEditableComponent) {
         clickRenderer(target)
       }
@@ -331,13 +330,16 @@ export const useBuildEvent = () => {
       return
     }
     const target = e.target as HTMLElement
+
+    const componentId =
+      target?.id ||
+      target?.dataset?.componentId ||
+      target?.closest(
+        '.component-content-container, .svg-container, .prose-mirror-editor-container',
+      )?.parentElement?.id
     const component =
-      resolveComponent(site.value.context, target?.id) ??
-      // This is for elements that use an additional wrapper for hover edges, such as img.
-      // Kebab case "component-id" will be converted to camel case "componentId".
-      // See https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/dataset#name_conversion
-      resolveComponent(site.value.context, target?.dataset.componentId) ??
-      editor?.resizeData?.component
+      editor?.resizeData?.component ?? resolveComponent(site.value.context, componentId)
+
     if (editor) {
       const data = editor.resizeData
       if (component && data) {
@@ -369,23 +371,17 @@ export const useBuildEvent = () => {
           value: calcNextWidth(e, data),
         }
 
-        // Get hover wrap
-        let hoverWrap: HTMLElement | undefined = undefined
-        if (target.classList.contains('hover-wrap')) {
-          hoverWrap = target
-        } else if (target.parentElement?.classList.contains('hover-wrap')) {
-          hoverWrap = target.parentElement
-        }
-
         // Update component styles
+        const options = {
+          replace: !data.firstMove,
+          select: false,
+        }
         if (data.side === 'bottom') {
-          setCustomStyle(data.component, oldHeightStyle, newHeightStyle, !data.firstMove)
+          setCustomStyle(data.component, oldHeightStyle, newHeightStyle, options)
           // Update the height of hover wrap, if it exists
-          hoverWrap?.style.setProperty('height', newHeightStyle.value)
         } else if (data.side === 'right') {
-          setCustomStyle(data.component, oldWidthStyle, newWidthStyle, !data.firstMove)
+          setCustomStyle(data.component, oldWidthStyle, newWidthStyle, options)
           // Update the width of hover wrap, if it exists
-          hoverWrap?.style.setProperty('width', newWidthStyle.value)
         } else if (data.side === 'bottom-right') {
           setCustomStyles(
             data.component,
@@ -399,15 +395,11 @@ export const useBuildEvent = () => {
                 newStyle: newWidthStyle,
               },
             ],
-            !data.firstMove,
+            options,
           )
-
-          // Update the width & height of hover wrap, if it exists
-          hoverWrap?.style.setProperty('width', newWidthStyle.value)
-          hoverWrap?.style.setProperty('height', newHeightStyle.value)
         }
         data.firstMove = false
-      } else if (!isResizeDiv(target)) {
+      } else {
         editor.hoveredComponent = component
       }
     }
@@ -426,97 +418,9 @@ export const useBuildEvent = () => {
       (mousedownComponent !== undefined &&
         editView !== undefined &&
         mousedownComponent.id === selectedComponent?.id)
-
-    let resizeCmp = target.parentElement
-    if (resizeCmp?.classList.contains('hover-wrap')) {
-      // This is for elements that use an additional wrapper for hover edges, such as img.
-      resizeCmp = resizeCmp.children[0] as HTMLElement
-    }
-    const component = resolveComponent(site.value.context, resizeCmp?.id)
-    const side = target.classList[target.classList.length - 1]
-    if (
-      parent &&
-      site.value.editor &&
-      resizeCmp &&
-      component &&
-      ['bottom', 'right', 'bottom-right'].includes(side)
-    ) {
-      const initialHeightProp = resolvedComponentStyle(
-        site.value.context,
-        component,
-        CssPseudoClass.Default,
-        Css.Height,
-        activeBreakpoint.value.id,
-      )
-      const initialWidthProp = resolvedComponentStyle(
-        site.value.context,
-        component,
-        CssPseudoClass.Default,
-        Css.Width,
-        activeBreakpoint.value.id,
-      )
-
-      const resizeCmpRect = resizeCmp.getBoundingClientRect()
-      const parentRect = (resizeCmp.parentElement as HTMLElement).getBoundingClientRect()
-
-      let startHeight = initialHeightProp || `${resizeCmpRect.height}px`
-      if (!isLengthValue(startHeight)) {
-        // Use the current height (px) of the resized component as the initial height
-        startHeight = `${resizeCmpRect.height}px`
-      }
-
-      let startWidth = initialWidthProp
-      if (!startWidth) {
-        const resizeCmpIsAbsolute =
-          resizeCmp?.classList.contains('hover-wrap-absolute') ||
-          resizeCmp?.classList.contains('hover-absolute')
-
-        if (resizeCmpIsAbsolute) {
-          startWidth = `${resizeCmpRect.width}px`
-        } else {
-          startWidth = '100%'
-        }
-      } else if (!isLengthValue(startWidth)) {
-        // Use the current width (px) of the resized component as the initial width
-        startWidth = `${resizeCmpRect.width}px`
-      }
-
-      const heightUnit = startHeight.replace(/[-\d.]/g, '') as CssUnit
-      const widthUnit = startWidth.replace(/[-\d.]/g, '') as CssUnit
-
-      const resizeHeight = ['bottom', 'bottom-right'].includes(side)
-      const resizeWidth = ['right', 'bottom-right'].includes(side)
-
-      const heightPxPerPercent = getHeightPxPerPercent(parentRect, heightUnit)
-      const widthPxPerPercent = getWidthPxPerPercent(parentRect, widthUnit)
-
-      if (resizeHeight || resizeWidth) {
-        site.value.editor.resizeData = {
-          component,
-          hasWidthProp: !!initialWidthProp,
-          hasHeightProp: !!initialHeightProp,
-          startX: e.clientX,
-          startY: e.clientY,
-          startWidth: parseInt(startWidth ?? '0'),
-          startHeight: parseInt(startHeight ?? '0'),
-          widthUnit,
-          heightUnit,
-          firstMove: true,
-          side,
-          widthPxPerPercent,
-          heightPxPerPercent,
-        }
-        e.preventDefault()
-      }
-    }
   }
 
   const handleMouseup = (e: MouseEvent) => {
-    const editor = site.value.editor
-    if (editor?.resizeData) {
-      editor.resizeData = undefined
-      siteStore.saveEditor(editor)
-    }
     if (paddingMarginDragData.value) {
       stopDrag(e)
       return
@@ -530,6 +434,10 @@ export const useBuildEvent = () => {
     stopDrag()
   }
 
+  const handleFocus = (_e: FocusEvent) => {
+    setBuildOverlays(editor.value, activePage.value)
+  }
+
   onMounted(() => {
     buildWindow = document.getElementById('build-content-window')
     document.addEventListener('mousemove', handleMousemove)
@@ -540,6 +448,7 @@ export const useBuildEvent = () => {
     document.addEventListener(clickEventType, handleClick)
     document.addEventListener('keyup', handleKeyup)
     document.addEventListener('keydown', handleKeydown)
+    window.addEventListener('focus', handleFocus)
   })
   onUnmounted(() => {
     document.removeEventListener(clickEventType, handleClick)
@@ -550,5 +459,6 @@ export const useBuildEvent = () => {
     document.removeEventListener('mouseleave', handleMouseleave)
     document.removeEventListener('keyup', handleKeyup)
     document.removeEventListener('keydown', handleKeydown)
+    window.removeEventListener('focus', handleFocus)
   })
 }
