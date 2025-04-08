@@ -1,5 +1,6 @@
 import { IContent, RenderMode, renderVueComponent } from '@pubstudio/frontend/util-render'
 import { RouterLink } from '@pubstudio/frontend/util-router'
+import { getSiteRouter } from '@pubstudio/frontend/util-runtime'
 import { IComponent, ISite } from '@pubstudio/shared/type-site'
 import { defineComponent, h, onMounted, onUnmounted, PropType, toRefs } from 'vue'
 import { registerCustomEvents, removeListeners } from './custom-event-handlers'
@@ -30,6 +31,7 @@ export const LiveComponent = () => {
     setup(props: ILiveComponentProps) {
       const { site, component, renderMode } = toRefs(props)
       registerCustomEvents(site.value, component.value, false)
+      const router = getSiteRouter()
 
       onMounted(() => {
         // TODO -- remove this or trigger specific custom events in editor
@@ -64,10 +66,13 @@ export const LiveComponent = () => {
           children = content
         }
         if (tag === 'a') {
-          const path = props.href ?? ''
+          const path = router.pathTransform((props.href as string) ?? '')
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          const { href, ...otherProps } = renderProps
           const linkProps = {
-            ...renderProps,
+            ...otherProps,
             to: { path },
+            routerOverride: router,
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
           } as Record<string, any>
           return h(RouterLink, linkProps, () => children)

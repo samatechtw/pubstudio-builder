@@ -31,6 +31,7 @@ export default defineConfig({
       'frontend/util-router',
       'frontend/feature-site-source',
       'frontend/feature-render',
+      'frontend/ui-runtime',
       'frontend/util-defaults',
       'frontend/util-resolve',
       'frontend/util-runtime',

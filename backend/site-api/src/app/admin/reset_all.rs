@@ -17,10 +17,7 @@ use crate::{
     },
 };
 
-pub async fn reset_all(
-    State(context): State<ApiContext>,
-    PsJson(dto): PsJson<ResetAllDto>,
-) -> Result<(), ApiError> {
+async fn reset_all_helper(context: ApiContext, dto: ResetAllDto) -> Result<(), ApiError> {
     let env = context.config.exec_env;
     if env != ExecEnv::Dev && env != ExecEnv::Ci {
         return Err(ApiError::forbidden());
@@ -86,4 +83,12 @@ pub async fn reset_all(
     */
 
     Ok(())
+}
+
+pub async fn reset_all(
+    State(context): State<ApiContext>,
+    PsJson(dto): PsJson<ResetAllDto>,
+) -> Result<(), ApiError> {
+    let res = reset_all_helper(context, dto).await;
+    res
 }

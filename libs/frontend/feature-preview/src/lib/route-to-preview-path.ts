@@ -27,7 +27,7 @@ export const routeToPreviewPath = (
   // will take precedence over editor hash&query.
 
   const { pathname: previewPathName, search: userSearch, hash: userHash } = new URL(url)
-  const { search: editorSearch, hash: editorHash } = window.location
+  const { search: editorSearch } = window.location
 
   const userParams = pathToSearchParams(userSearch)
   const mergedSearchParams = mergeSearch(editorSearch, userSearch)
@@ -44,7 +44,7 @@ export const routeToPreviewPath = (
     queryString = `?${[...(extraQuery ?? []), ...queryParams].join('&')}`
   }
   return {
-    url: `${previewPathName}${queryString}${userHash || editorHash}`,
+    url: `${previewPathName}${queryString}${userHash || ''}`,
     isExternal,
   }
 }

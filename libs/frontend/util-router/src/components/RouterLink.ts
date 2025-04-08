@@ -1,8 +1,7 @@
-import { computed, defineComponent, h, inject, PropType, Ref, toRefs } from 'vue'
+import { computed, defineComponent, h, PropType, toRefs } from 'vue'
 import { normalizeUrl } from '../lib/href-to-url'
 import { IResolvedRoute, IRouteWithPathRegex } from '../lib/i-route'
-import { INavigateOptions, IPathNavigateOptions } from '../lib/i-router'
-import { MatchedRoutesSymbol } from '../lib/router-injection-keys'
+import { INavigateOptions, IPathNavigateOptions, IRouter } from '../lib/i-router'
 import { useRouter } from '../lib/use-router'
 
 export const RouterLink = defineComponent({
@@ -20,17 +19,21 @@ export const RouterLink = defineComponent({
       required: false,
       default: false,
     },
+    routerOverride: {
+      type: Object as PropType<IRouter<unknown>>,
+      required: false,
+    },
   },
   setup(props, { slots }) {
-    const { to, replace, target } = toRefs(props)
+    const { to, replace, target, routerOverride } = toRefs(props)
 
-    const router = useRouter()
-    const matchedRoutes = inject<Ref<IResolvedRoute[]>>(MatchedRoutesSymbol)
+    const router = routerOverride.value ?? useRouter()
+    const matchedRoutes = router.matchedRoutes
 
     const targetRoute = computed<
       IResolvedRoute<unknown> | IRouteWithPathRegex<unknown> | undefined
     >(() => {
-      if (!to.value) {
+      if (to.value === undefined) {
         return undefined
       }
       if (typeof to.value === 'string') {
@@ -48,13 +51,11 @@ export const RouterLink = defineComponent({
 
     const link = computed(() => {
       const toPath = to.value ?? ''
-      if (typeof toPath === 'string' || 'name' in toPath) {
-        let url
-        if (typeof toPath === 'string') {
-          url = router.computeResolvedPath(targetRoute.value?.mergedPath, {})
-        } else {
-          url = router.computeResolvedPath(targetRoute.value?.mergedPath, toPath)
-        }
+      if (typeof toPath === 'string') {
+        const url = router.computeResolvedPath(targetRoute.value?.mergedPath, {})
+        return { url, isExternal: false }
+      } else if ('name' in toPath) {
+        const url = router.computeResolvedPath(targetRoute.value?.mergedPath, toPath)
         return { url, isExternal: false }
       } else {
         const rawUrl =

@@ -187,6 +187,7 @@
       "@pubstudio/web/type-builtins": ["libs/web/type-builtins/src/index.ts"],
       "@pubstudio/frontend/ui-build": ["libs/frontend/ui-build/src/index.ts"],
       "@pubstudio/frontend/ui-theme": ["libs/frontend/ui-theme/src"],
+      "@pubstudio/frontend/ui-runtime": ["libs/frontend/ui-runtime/src/index.ts"],
       "@pubstudio/frontend/data-access-command": [
         "libs/frontend/data-access-command/src/index.ts"
       ],

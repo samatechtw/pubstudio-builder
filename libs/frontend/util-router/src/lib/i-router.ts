@@ -1,8 +1,13 @@
-import { Component, DefineComponent } from 'vue'
+import { Component, ComputedRef, DefineComponent, Ref } from 'vue'
 import { ILocationParts } from './i-location-parts'
 import { IResolvedRoute, IRouteWithComponent, IRouteWithPathRegex } from './i-route'
 
+export type PathTransform = (path: string | undefined) => string | undefined
+
 export interface IRouter<M> {
+  matchedRoutes: Ref<IResolvedRoute<M>[]>
+  route: ComputedRef<IResolvedRoute<M> | undefined>
+  initialize: () => void
   addRoute: (route: IRouteWithComponent<M>) => IRouteWithPathRegex<M>
   resolve: (options: INameNavigateOptions) => {
     path: string
@@ -37,7 +42,13 @@ export interface IRouter<M> {
    * Returns a function that removes the registered hook.
    */
   afterEach: (callback: INavGuardCallback<M>) => () => void
+  /**
+   * Optional transform function for modifying router paths
+   */
+  pathTransform: PathTransform
 }
+
+export type IDefaultRouteType = Record<string, unknown>
 
 export type INavigateOptions = INameNavigateOptions | IPathNavigateOptions
 

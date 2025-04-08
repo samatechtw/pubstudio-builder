@@ -34,7 +34,7 @@ export const footer: IComponent = {
       id: tempChildId,
       name: 'Copyright',
       tag: Tag.Div,
-      content: '© 2024 MyCompany',
+      content: '© 2025 MyCompany',
       style: { custom: {}, mixins: [] },
     },
   ],

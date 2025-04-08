@@ -15,18 +15,14 @@
       <Mixins />
       <ComponentStyle />
       <FontLinks />
-      <router-view class="_rv" />
+      <PageContent />
     </template>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, ref, onMounted, Ref } from 'vue'
-import {
-  INameNavigateOptions,
-  useRoute,
-  useRouter,
-} from '@pubstudio/frontend/util-router'
+import { INameNavigateOptions } from '@pubstudio/frontend/util-router'
 import {
   replaceHead,
   setupRoutes,
@@ -39,12 +35,13 @@ import { rootSiteApi } from '@pubstudio/shared/util-web-site-api'
 import { ISite } from '@pubstudio/shared/type-site'
 import { IGetSiteApiResponse } from '@pubstudio/shared/type-api-site-sites'
 import { overrideHelper } from '@pubstudio/frontend/util-resolve'
-import NotFound from './components/NotFound.vue'
+import { setSiteRouter } from '@pubstudio/frontend/util-runtime'
+import { NotFound } from '@pubstudio/frontend/ui-runtime'
 
 const API_URL = '___SITE_API_URL___'
 
-const router = useRouter()
-const route = useRoute()
+const router = setSiteRouter(NotFound)
+router.initialize()
 
 const site = ref<ISite | undefined>()
 const { notFoundPage } = useNotFoundPage(site)
@@ -69,7 +66,7 @@ const getSite = async (url: string): Promise<ISite | undefined> => {
 }
 
 const activePage = computed(() => {
-  const page = site.value?.pages[route.value?.path ?? '']
+  const page = site.value?.pages[router.route.value?.path ?? '']
   return page ?? notFoundPage.value
 })
 
@@ -130,7 +127,7 @@ onMounted(async () => {
   if (userSite) {
     loadSiteLanguage(userSite)
     site.value = userSite
-    setupRoutes(router, userSite, PageContent)
+    setupRoutes(userSite, PageContent)
     overrideHelper('push', (options: INameNavigateOptions) => {
       router.push(options)
     })

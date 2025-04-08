@@ -1,0 +1,25 @@
+{
+  "name": "frontend-ui-runtime",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/frontend/ui-runtime/src",
+  "projectType": "library",
+  "targets": {
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/frontend/ui-runtime/**/*.ts"],
+        "eslintConfig": "libs/frontend/ui-runtime/.eslintrc.cjs"
+      }
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/libs/frontend/ui-runtime"],
+      "options": {
+        "jestConfig": "libs/frontend/ui-runtime/jest.config.ts",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": ["scope:frontend", "type:ui"]
+}
