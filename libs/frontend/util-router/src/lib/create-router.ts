@@ -11,16 +11,14 @@ import {
   ScrollType,
 } from './i-route'
 import {
+  IDefaultRouteType,
   INavGuardCallback,
   INavigateOptions,
   IResolveRouteOptions,
   IRouter,
+  PathTransform,
 } from './i-router'
-import {
-  MatchedRoutesSymbol,
-  RouteLevelSymbol,
-  RouterSymbol,
-} from './router-injection-keys'
+import { RouteLevelSymbol, RouterSymbol } from './router-injection-keys'
 import {
   computeLocationParts,
   computePathRegex,
@@ -61,12 +59,13 @@ export interface ICreateRouterOptions<M> {
   scrollBehavior?: RouterScrollBehavior<M>
   scrollRoot?: string
   defaultScrollType?: ScrollType
+  pathTransform?: PathTransform
 }
 
 // Matches "/" with optional query and hash
-const rootDefaultRouteRegex = new RegExp(/\/(\?.*)?(#.*)?$/)
+const rootDefaultRouteRegex = new RegExp(/^\/(\?.*)?(#.*)?$/)
 
-export const createRouter = <M = Record<string, unknown>>(
+export const createRouter = <M = IDefaultRouteType>(
   options: ICreateRouterOptions<M>,
 ): Plugin & IRouter<M> => {
   const {
@@ -74,6 +73,7 @@ export const createRouter = <M = Record<string, unknown>>(
     scrollBehavior,
     scrollRoot = 'html',
     defaultScrollType,
+    pathTransform = (p) => p,
   } = options
 
   const rootRoutes = ref([]) as Ref<IRouteWithPathRegex<M>[]>
@@ -207,7 +207,7 @@ export const createRouter = <M = Record<string, unknown>>(
 
     const { routesMap, notFoundRoute } = routesMetadata.value
 
-    if (!name && !path) {
+    if (!name && path === undefined) {
       throw new Error('Either name or path must be provided in router navigation')
     } else if (name && path) {
       throw new Error('name and path cannot be used simultaneously in router navigation')
@@ -327,12 +327,10 @@ export const createRouter = <M = Record<string, unknown>>(
           route.mergedPathRegex.test(resolvedPath),
       )
     }
-
     if (rootRoute) {
       const resolvedRootRoute = resolvedRoute(rootRoute, resolvedPath)
       deepestMatchedRoute = resolvedRootRoute
 
-      // Declare recurse function
       const recurse = (
         parent: IRouteWithPathRegex<M>,
         resolvedParent: IResolvedRoute<M>,
@@ -399,7 +397,25 @@ export const createRouter = <M = Record<string, unknown>>(
     return () => afterEachHooks.delete(callback)
   }
 
+  const route = computed(() => {
+    const { length } = matchedRoutes.value
+    return matchedRoutes.value[length - 1]
+  })
+
+  // Use without installing as a Vue app plugin
+  const initialize = () => {
+    // Use browser scroll behavior if no scrollBehavior is provided
+    if (scrollBehavior && 'scrollRestoration' in history) {
+      history.scrollRestoration = 'manual'
+    }
+
+    rootRoutes.value = routesOption.map((route) => addRoute(route))
+    // Initialize matched routes
+    recomputeMatchedRoutes(false)
+  }
+
   const router: IRouter<M> = {
+    initialize,
     addRoute,
     push,
     replace,
@@ -411,6 +427,9 @@ export const createRouter = <M = Record<string, unknown>>(
     overwriteRouteComponent,
     beforeEach,
     afterEach,
+    pathTransform,
+    matchedRoutes,
+    route,
   }
 
   const loadComponent = async (route: IResolvedRoute<M>) => {
@@ -453,19 +472,11 @@ export const createRouter = <M = Record<string, unknown>>(
 
   const install = (app: App) => {
     app.provide<number>(RouteLevelSymbol, 0)
-    app.provide<Ref<IResolvedRoute<M>[]>>(MatchedRoutesSymbol, matchedRoutes)
     app.provide<IRouter<M>>(RouterSymbol, router)
     app.component('router-link', RouterLink)
     app.component('router-view', RouterView)
 
-    // Use browser scroll behavior if no scrollBehavior is provided
-    if (scrollBehavior && 'scrollRestoration' in history) {
-      history.scrollRestoration = 'manual'
-    }
-
-    rootRoutes.value = routesOption.map((route) => addRoute(route))
-    // Initialize matched routes
-    recomputeMatchedRoutes(false)
+    initialize()
   }
 
   window.addEventListener('popstate', () => {

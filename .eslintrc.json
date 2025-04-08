@@ -123,7 +123,7 @@
               },
               {
                 "sourceTag": "type:util",
-                "onlyDependOnLibsWithTags": ["type:util", "type:type"]
+                "onlyDependOnLibsWithTags": ["type:ui", "type:util", "type:type"]
               },
               { "sourceTag": "type:type", "onlyDependOnLibsWithTags": ["type:type"] }
             ]

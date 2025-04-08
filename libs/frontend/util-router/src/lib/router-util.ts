@@ -35,8 +35,16 @@ export const mergePath = (parentPath: string, childPath: string): string => {
  */
 export const computePathRegex = (path: string): RegExp => {
   const p = path.endsWith('*') ? path.slice(0, path.length - 1) : path
-  const sourcePattern = p.replace(/:\w+/g, '[-_\\w]+')
-  const pattern = `^((${sourcePattern}/?$)|(${sourcePattern}[/?#]))`
+  // If `path` starts with a variable, the first parameter should be non-empty.
+  let firstParameter = p.startsWith('/:')
+  const sourcePattern = p.replace(/:\w+/g, () => {
+    if (firstParameter) {
+      firstParameter = false
+      return '[-_\\w]+' // Non-empty for first segment
+    }
+    return '[-_\\w]*' // Allow empty for subsequent parameters
+  })
+  const pattern = `^${sourcePattern}(?:/(?=$|[?#]))?(?:[?#].*)?$`
   return new RegExp(pattern)
 }
 

@@ -62,13 +62,17 @@ export function scrollToPosition(
   scrollRoot: Element | null | undefined,
 ): void {
   if ('el' in position) {
-    const positionEl = position.el
+    const elStr = position.el
 
-    const el =
-      typeof positionEl === 'string' ? document.querySelector(positionEl) : positionEl
+    let el: Element | undefined | null
+    if (typeof elStr === 'string') {
+      el = document.querySelector(elStr)
+    } else {
+      el = elStr
+    }
 
     if (!el) {
-      console.log(`No el with selector: ${position.el} in scrollBehavior.`)
+      console.log(`No el: ${position.el}`)
       return
     }
 

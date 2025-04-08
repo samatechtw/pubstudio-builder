@@ -12,27 +12,47 @@
 </template>
 
 <script lang="ts" setup>
-import { toRefs } from 'vue'
+import { computed, onMounted } from 'vue'
 import { RenderMode } from '@pubstudio/frontend/util-render'
-import { useRenderPreview } from '@pubstudio/frontend/feature-preview'
+import { routeToPreviewPath, useRenderPreview } from '@pubstudio/frontend/feature-preview'
 import { NotFound, Spinner } from '@pubstudio/frontend/ui-widgets'
-import { useBuild } from '@pubstudio/frontend/feature-build'
-import { IPage } from '@pubstudio/shared/type-site'
+import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
+import { setupRoutes, useNotFoundPage } from '@pubstudio/frontend/feature-render'
+import { setSiteRouter } from '@pubstudio/frontend/util-runtime'
 
-const { site } = useBuild()
+const router = setSiteRouter(NotFound, {
+  pathTransform: (path: string | undefined) => {
+    if (!path) {
+      return path
+    }
+    const transformed = routeToPreviewPath(path, RenderMode.Preview).url
+    return transformed
+  },
+})
+const { site } = useSiteSource()
+const { notFoundPage } = useNotFoundPage(site)
 
-const props = withDefaults(
+const { renderMode } = withDefaults(
   defineProps<{
     renderMode?: RenderMode
-    // Active page allows user to control routing scheme
-    activePage: IPage | undefined
     loading?: boolean
   }>(),
   {
     renderMode: RenderMode.Preview,
   },
 )
-const { renderMode, activePage } = toRefs(props)
+
+const activePage = computed(() => {
+  if (!site.value) {
+    return undefined
+  }
+  const path = router.route.value?.path.replace('/preview', '') || '/'
+  const pages = site.value.pages
+  if (!pages[path]) {
+    return pages[site.value.defaults.homePage] ?? notFoundPage.value
+  }
+  return pages[path]
+})
 
 const {
   CustomStyle,
@@ -44,8 +64,13 @@ const {
 } = useRenderPreview({
   site,
   activePage,
-  renderMode: renderMode.value,
+  renderMode: renderMode,
   notFoundComponent: NotFound,
+})
+
+onMounted(() => {
+  router.initialize()
+  setupRoutes(site.value, PageContent, '/preview')
 })
 </script>
 

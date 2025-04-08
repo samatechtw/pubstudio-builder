@@ -5,7 +5,8 @@ import { initializeSiteStore } from '@pubstudio/frontend/feature-site-store-init
 import { toApiError } from '@pubstudio/frontend/util-api'
 import { RenderMode } from '@pubstudio/frontend/util-render'
 import { overrideHelper } from '@pubstudio/frontend/util-resolve'
-import { INavigateOptions, useRouter } from '@pubstudio/frontend/util-router'
+import { INavigateOptions } from '@pubstudio/frontend/util-router'
+import { getSiteRouter } from '@pubstudio/frontend/util-runtime'
 import { ref, Ref } from 'vue'
 import { routeToPreviewPath } from './route-to-preview-path'
 
@@ -26,7 +27,6 @@ const API_RESTORE_TIMEOUT = 5
 
 export const usePreviewPage = (siteId: string | undefined): IUsePreviewPage => {
   const { site, siteStore, setRestoredSite } = useSiteSource()
-  const router = useRouter()
 
   const loading = ref(true)
   let apiRestoreCounter = 0
@@ -90,6 +90,7 @@ export const usePreviewPage = (siteId: string | undefined): IUsePreviewPage => {
       // Override routing for behavior-helper to retain URL properties
       // like /preview prefix and ?siteId
       overrideHelper('push', (options: INavigateOptions) => {
+        const router = getSiteRouter()
         // TODO -- handle named routing
         if ('path' in options && options.path) {
           const path = routeToPreviewPath(options.path, RenderMode.Preview).url

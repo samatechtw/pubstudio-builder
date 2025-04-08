@@ -21,9 +21,13 @@ describe('Router util - ', () => {
       expect(regex.test('/?test=123')).toBe(false)
       expect(regex.test('/#test')).toBe(false)
       expect(regex.test('/?test=123#test')).toBe(false)
+      expect(regex.test('/test/anotherpart')).toBe(false)
+      expect(regex.test('/test/anotherpart?123')).toBe(false)
 
       expect(regex.test('/test')).toBe(true)
       expect(regex.test('/test?test=123')).toBe(true)
+      expect(regex.test('/test?test=123&test2=1234')).toBe(true)
+      expect(regex.test('/test?test=1&test2=2#3')).toBe(true)
       expect(regex.test('/test#123')).toBe(true)
       expect(regex.test('/test/')).toBe(true)
       expect(regex.test('/test/?test=123')).toBe(true)
@@ -51,6 +55,8 @@ describe('Router util - ', () => {
 
       expect(regex.test('/test')).toBe(false)
       expect(regex.test('/test/')).toBe(false)
+      expect(regex.test('/test/anotherpart')).toBe(false)
+      expect(regex.test('/test/anotherpart?123')).toBe(false)
       expect(regex.test('/test?test=123')).toBe(false)
       expect(regex.test('/#test')).toBe(false)
       expect(regex.test('/?test=123#test')).toBe(false)
@@ -69,11 +75,11 @@ describe('Router util - ', () => {
       // Glob is handled outside the regex matcher,
       // so it should be treated as a regular multipart path
       expect(regex.test('/test')).toBe(false)
-      expect(regex.test('/test/')).toBe(false)
       expect(regex.test('/test?test=123')).toBe(false)
       expect(regex.test('/#test')).toBe(false)
       expect(regex.test('/?test=123#test')).toBe(false)
 
+      expect(regex.test('/test/')).toBe(true)
       expect(regex.test('/test/part')).toBe(true)
       expect(regex.test('/test/part?test=123')).toBe(true)
       expect(regex.test('/test/part#123')).toBe(true)

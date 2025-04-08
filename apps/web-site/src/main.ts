@@ -49,7 +49,6 @@ import {
   withModifiers,
 } from 'vue'
 import App from './app/App.vue'
-import router from './app/router'
 
 declare global {
   interface Window {
@@ -109,4 +108,4 @@ window.Vue = {
 }
 
 const app = createApp(App)
-app.use(router).mount('#app')
+app.mount('#app')

@@ -1,5 +1,5 @@
 <template>
-  <div class="f">
+  <div class="nf">
     <div class="nf1">
       {{ notFoundTitle }}
     </div>
@@ -30,7 +30,7 @@ const notFoundText = "Sorry, we can't find what you're looking for."
 .nf2 {
   font-size: 16px;
   font-weight: 500;
-  color: rgba(black, 0.6);
+  color: rgba(0, 0, 0, 0.6);
   margin-top: 24px;
 }
 </style>

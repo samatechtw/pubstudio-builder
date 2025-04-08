@@ -1,16 +1,17 @@
 import { computed, ComputedRef, inject, Ref } from 'vue'
 import { IResolvedRoute } from './i-route'
-import { MatchedRoutesSymbol } from './router-injection-keys'
+import { IRouter } from './i-router'
+import { RouterSymbol } from './router-injection-keys'
 
 export const ensureMatchedRoutes = <M = unknown>(
   from: string,
 ): Ref<IResolvedRoute<M>[]> => {
-  const routes = inject<Ref<IResolvedRoute<M>[]>>(MatchedRoutesSymbol)
-  if (!routes) {
+  const router = inject<IRouter<M>>(RouterSymbol)
+  if (!router?.matchedRoutes) {
     throw new Error(`No matchedRoutes. Use \`app.use(router)\` before ${from}`)
   }
 
-  return routes
+  return router.matchedRoutes
 }
 
 /**
