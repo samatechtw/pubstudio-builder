@@ -24,6 +24,7 @@ import {
   computePathRegex,
   computeResolvedPath,
   getCurrentPath,
+  matchRoute,
   mergePath,
   replaceParams,
   validateRoute,
@@ -61,9 +62,6 @@ export interface ICreateRouterOptions<M> {
   defaultScrollType?: ScrollType
   pathTransform?: PathTransform
 }
-
-// Matches "/" with optional query and hash
-const rootDefaultRouteRegex = new RegExp(/^\/(\?.*)?(#.*)?$/)
 
 export const createRouter = <M = IDefaultRouteType>(
   options: ICreateRouterOptions<M>,
@@ -314,19 +312,9 @@ export const createRouter = <M = IDefaultRouteType>(
     const { matchNotFoundRoute } = options ?? {}
     const { rootDefaultRoute, notFoundRoute } = routesMetadata.value
 
-    let rootRoute: IRouteWithPathRegex<M> | undefined
+    const rootRoute = matchRoute(rootRoutes.value, resolvedPath, rootDefaultRoute)
     let deepestMatchedRoute: IResolvedRoute<M> | undefined
 
-    if (rootDefaultRouteRegex.test(resolvedPath)) {
-      rootRoute = rootDefaultRoute
-    } else {
-      rootRoute = rootRoutes.value.find(
-        (route) =>
-          route !== rootDefaultRoute &&
-          route !== notFoundRoute &&
-          route.mergedPathRegex.test(resolvedPath),
-      )
-    }
     if (rootRoute) {
       const resolvedRootRoute = resolvedRoute(rootRoute, resolvedPath)
       deepestMatchedRoute = resolvedRootRoute

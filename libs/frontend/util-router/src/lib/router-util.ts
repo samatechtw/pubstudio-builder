@@ -1,7 +1,10 @@
 import { ILocationParams, ILocationParts } from './i-location-parts'
-import { IRoute } from './i-route'
+import { IRoute, IRouteWithPathRegex } from './i-route'
 
 type ISimpleRoute = Omit<IRoute<unknown>, 'meta'>
+
+// Matches "/" with optional query and hash
+export const rootDefaultRouteRegex = new RegExp(/^\/(\?.*)?(#.*)?$/)
 
 export const validateRoute = (route: ISimpleRoute) => {
   const { name, path } = route
@@ -35,7 +38,7 @@ export const mergePath = (parentPath: string, childPath: string): string => {
  */
 export const computePathRegex = (path: string): RegExp => {
   const p = path.endsWith('*') ? path.slice(0, path.length - 1) : path
-  // If `path` starts with a variable, the first parameter should be non-empty.
+  // If the path starts with a variable (e.g. '/:id') then the first parameter should be non-empty.
   let firstParameter = p.startsWith('/:')
   const sourcePattern = p.replace(/:\w+/g, () => {
     if (firstParameter) {
@@ -44,8 +47,43 @@ export const computePathRegex = (path: string): RegExp => {
     }
     return '[-_\\w]*' // Allow empty for subsequent parameters
   })
-  const pattern = `^${sourcePattern}(?:/(?=$|[?#]))?(?:[?#].*)?$`
+  const pattern = `^((${sourcePattern}/?$)|(${sourcePattern}[/?#]))`
   return new RegExp(pattern)
+}
+
+export const matchRoute = <M>(
+  rootRoutes: IRouteWithPathRegex<M>[],
+  resolvedPath: string,
+  rootDefaultRoute: IRouteWithPathRegex<M> | undefined,
+): IRouteWithPathRegex<M> | undefined => {
+  if (rootDefaultRouteRegex.test(resolvedPath)) {
+    return rootDefaultRoute
+  }
+
+  let bestRoute: IRouteWithPathRegex<M> | undefined | undefined
+  let bestMatchLength = 0
+
+  for (const route of rootRoutes) {
+    // Exclude root and not found routes
+    if (route === rootDefaultRoute || route.isNotFoundRoute) {
+      continue
+    }
+    const match = resolvedPath.match(route.mergedPathRegex)
+    if (!match) {
+      continue
+    }
+    // If resolvedPath matches perfectly, return early.
+    if (match[0] === resolvedPath) {
+      bestRoute = route
+      break
+    }
+    // Keep the longest matched route
+    if (match[0].length > bestMatchLength) {
+      bestMatchLength = match[0].length
+      bestRoute = route
+    }
+  }
+  return bestRoute
 }
 
 // Strip path of query and hash

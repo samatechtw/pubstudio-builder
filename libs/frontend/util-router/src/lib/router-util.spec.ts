@@ -21,8 +21,10 @@ describe('Router util - ', () => {
       expect(regex.test('/?test=123')).toBe(false)
       expect(regex.test('/#test')).toBe(false)
       expect(regex.test('/?test=123#test')).toBe(false)
-      expect(regex.test('/test/anotherpart')).toBe(false)
-      expect(regex.test('/test/anotherpart?123')).toBe(false)
+
+      // Matches as root path
+      expect(regex.test('/test/anotherpart')).toBe(true)
+      expect(regex.test('/test/anotherpart?123')).toBe(true)
 
       expect(regex.test('/test')).toBe(true)
       expect(regex.test('/test?test=123')).toBe(true)
