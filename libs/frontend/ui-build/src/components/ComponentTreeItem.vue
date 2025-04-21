@@ -80,6 +80,7 @@ import {
 import { builderContext } from '@pubstudio/frontend/util-builder'
 import { Eye, Hide } from '@pubstudio/frontend/ui-widgets'
 import ComponentTreeItemRename from './ComponentTreeItemRename.vue'
+import { closeMixinMenuOnComponentChange } from '@pubstudio/frontend/feature-build-event'
 
 const props = defineProps<{
   component: IComponent
@@ -145,9 +146,11 @@ const toggleHidden = () => {
 }
 
 const selectComponent = () => {
-  setSelectedComponent(site.value, component.value, {
+  const componentChanged = setSelectedComponent(site.value, component.value, {
     expandTree: false,
+    closeMixinMenu: false,
   })
+  closeMixinMenuOnComponentChange(site.value, component.value.id, componentChanged)
 }
 
 const toggleExpanded = (e: MouseEvent) => {

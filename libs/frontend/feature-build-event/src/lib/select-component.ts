@@ -1,16 +1,22 @@
 import {
+  ISetSelectedComponentOptions,
   scrollToComponentTreeItem,
   setSelectedComponent,
 } from '@pubstudio/frontend/data-access-command'
 import { IComponent, ISite } from '@pubstudio/shared/type-site'
 
-export const selectComponent = (site: ISite, component: IComponent) => {
-  setSelectedComponent(site, component)
+export const selectComponent = (
+  site: ISite,
+  component: IComponent,
+  options?: ISetSelectedComponentOptions,
+): boolean => {
+  const componentChanged = setSelectedComponent(site, component, options)
 
   // Scroll to the corresponding tree item if component tree is visible
   if (site.editor?.showComponentTree) {
     scrollToComponentTreeItem(component)
   }
+  return componentChanged
 }
 
 export const selectPreviousComponent = (site: ISite, component: IComponent) => {
