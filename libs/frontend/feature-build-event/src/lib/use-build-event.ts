@@ -2,6 +2,9 @@ import {
   clearComponentTabState,
   editingCommandCount,
   isEditingStyles,
+  ISetSelectedComponentOptions,
+  makeCloseMixinMenu,
+  pushCommandObject,
   setBuildSubmenu,
   setEditorDropdown,
   setSelectedComponent,
@@ -9,11 +12,11 @@ import {
 } from '@pubstudio/frontend/data-access-command'
 import {
   buildContentWindowInnerId,
+  closeMixinMenu,
   useBuild,
   useCopyPaste,
   useDuplicateComponent,
   useHistory,
-  useMixinMenuUi,
   usePaddingMarginEdit,
 } from '@pubstudio/frontend/feature-build'
 import { setBuildOverlays } from '@pubstudio/frontend/feature-build-overlay'
@@ -35,7 +38,11 @@ import {
   selectPreviousComponent,
 } from './select-component'
 import { triggerHotkey } from './trigger-hotkey'
-import { hotkeysDisabled, prosemirrorActive } from './util-build-event'
+import {
+  closeMixinMenuOnComponentChange,
+  hotkeysDisabled,
+  prosemirrorActive,
+} from './util-build-event'
 import { calcNextHeight, calcNextWidth } from './util-resize'
 
 const clickEventType = document.ontouchstart !== null ? 'click' : 'touchend'
@@ -111,7 +118,6 @@ export const useBuildEvent = () => {
   const { undo, redo } = useHistory()
   const { pressDuplicate } = useDuplicateComponent()
   const { dragging: paddingMarginDragData, drag, stopDrag } = usePaddingMarginEdit()
-  const { closeMixinMenu } = useMixinMenuUi()
 
   let buildWindow: HTMLElement | null = null
 
@@ -127,14 +133,25 @@ export const useBuildEvent = () => {
         target?.closest('.component-content-container, .svg-container')?.parentElement?.id
       if (componentId) {
         const component = site.value.context.components[componentId]
+        const selectOptions: ISetSelectedComponentOptions = { closeMixinMenu: false }
+        let componentChanged = false
         if (component) {
-          selectComponent(site.value, component)
+          componentChanged = selectComponent(site.value, component, selectOptions)
         }
         // If the root component doesn't extend to the whole editor width/height,
         // select it when the build window is clicked
         else if (target?.id === buildContentWindowInnerId) {
-          setSelectedComponent(site.value, activePage.value?.root)
+          componentChanged = setSelectedComponent(
+            site.value,
+            activePage.value?.root,
+            selectOptions,
+          )
         }
+        closeMixinMenuOnComponentChange(
+          site.value,
+          component?.id ?? activePage.value?.root.id,
+          componentChanged,
+        )
       }
     }
   }
@@ -196,7 +213,7 @@ export const useBuildEvent = () => {
         clickRenderer(target)
       }
       if (isProseMirrorLink(target)) {
-        // Prevent links in prosemirror editor from being opened upon click.
+        // Prevent links in prosemirror editor from being opened on click
         event.preventDefault()
       }
     } else if (isStyleToolbar(target)) {
@@ -231,7 +248,7 @@ export const useBuildEvent = () => {
     } else if (isEditingStyles()) {
       // Let the style menu handle escape
     } else if (editor.value?.editingMixinData) {
-      closeMixinMenu()
+      closeMixinMenu(site.value)
     } else if (
       editor.value?.mode &&
       [EditorMode.Theme, EditorMode.Styles].includes(editor.value.mode)

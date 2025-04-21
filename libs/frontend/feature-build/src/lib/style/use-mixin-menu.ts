@@ -30,6 +30,7 @@ import {
 import { useI18n } from 'petite-vue-i18n'
 import { computed, ComputedRef, Ref, ref } from 'vue'
 import { editMixinEntryCommand, editStyleNameCommand } from '../build-command-helpers'
+import { closeMixinMenu } from '../command-wrap/mixin-menu-ui'
 import { addMixin, convertComponentStyle } from '../command-wrap/mixins'
 import {
   pushOrReplaceStyleCommand,
@@ -37,7 +38,6 @@ import {
   removeMixinNameCommand,
 } from './set-style-helpers'
 import { IUseEditStyles, useEditStyles } from './use-edit-styles'
-import { useMixinMenuUi } from './use-mixin-menu-ui'
 
 export interface IUseStyleMenuFeature extends IUseEditStyles {
   isEditingMixin: ComputedRef<boolean>
@@ -94,7 +94,6 @@ export const newMixin = (site: ISite, source?: IComponent) => {
 export const useMixinMenu = (): IUseStyleMenuFeature => {
   const { t } = useI18n()
   const { site, editor, currentPseudoClass } = useSiteSource()
-  const { closeMixinMenu } = useMixinMenuUi()
 
   const styleEntries = computed(() => {
     // Compute breakpoint styles with source
@@ -199,7 +198,7 @@ export const useMixinMenu = (): IUseStyleMenuFeature => {
     if (!styleId || !validateStyle()) {
       return
     }
-    closeMixinMenu()
+    closeMixinMenu(site.value)
   }
 
   const setStyle = (

@@ -1,3 +1,9 @@
+import {
+  makeCloseMixinMenu,
+  pushCommandObject,
+} from '@pubstudio/frontend/data-access-command'
+import { ISite } from '@pubstudio/shared/type-site'
+
 // Hack to let modals handle ESC without triggering editor events or stopping propagation
 let cancelNextEsc = false
 
@@ -19,4 +25,17 @@ export const hotkeysDisabled = (e: KeyboardEvent) => {
     return !e.target.hasAttribute('readonly')
   }
   return prosemirrorActive(e)
+}
+
+export const closeMixinMenuOnComponentChange = (
+  site: ISite,
+  componentId: string | undefined,
+  changed: boolean,
+) => {
+  if (changed) {
+    const closeMixinMenuCommand = makeCloseMixinMenu(site.editor, componentId)
+    if (closeMixinMenuCommand) {
+      pushCommandObject(site, closeMixinMenuCommand)
+    }
+  }
 }

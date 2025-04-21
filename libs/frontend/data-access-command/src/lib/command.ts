@@ -8,6 +8,7 @@ import {
 import { ISite } from '@pubstudio/shared/type-site'
 import { applyCommand } from './apply-command'
 import { getLastCommandHelper } from './command-helpers'
+import { makeCloseMixinMenu } from './make-command-data'
 import { optimizeCommandGroup } from './optimize-command-group'
 import { undoCommand } from './undo-command'
 
@@ -34,19 +35,12 @@ const pushCommandHelper = (
   }
 
   // Push a command to close mixin menu for user when necessary
-  if (editingMixinData && shouldCloseMixinMenuForUser(cmd)) {
-    const closeMixinMenuCommand: ICommand<IUpdateUiData<UiAction.CloseMixinMenu>> = {
-      type: CommandType.UpdateUi,
-      data: {
-        action: UiAction.CloseMixinMenu,
-        params: {
-          mixinId: editingMixinData?.mixinId as string,
-          originComponentId: editingMixinData?.originComponentId,
-        },
-      },
+  if (editingMixinData && shouldCloseMixinMenu(cmd)) {
+    const closeMixinMenuCommand = makeCloseMixinMenu(site.editor)
+    if (closeMixinMenuCommand) {
+      site.history.back.push(closeMixinMenuCommand)
+      applyCommand(site, closeMixinMenuCommand)
     }
-    site.history.back.push(closeMixinMenuCommand)
-    applyCommand(site, closeMixinMenuCommand)
   }
 
   if (cmd) {
@@ -58,15 +52,18 @@ const pushCommandHelper = (
   }
 }
 
+// Returns true if a command is in the given commandTypes.
+// Checks if it matches directly, of if it is in a group
 const commandsInGroup = (command: ICommand, commandTypes: CommandType[]): boolean => {
-  if (command.type === CommandType.Group) {
-    const groupCommands = command.data as ICommandGroupData
-    return groupCommands.commands.some((cmd) => commandTypes.includes(cmd.type))
-  }
+  if (commandTypes.includes(command.type))
+    if (command.type === CommandType.Group) {
+      const groupCommands = command.data as ICommandGroupData
+      return groupCommands.commands.some((cmd) => commandTypes.includes(cmd.type))
+    }
   return false
 }
 
-const shouldCloseMixinMenuForUser = (newCmd: ICommand | undefined): boolean => {
+const shouldCloseMixinMenu = (newCmd: ICommand | undefined): boolean => {
   const mixinCommands = [CommandType.SetMixinEntry, CommandType.EditStyleMixin]
   if (
     !newCmd ||

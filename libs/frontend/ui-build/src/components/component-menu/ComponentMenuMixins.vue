@@ -20,7 +20,7 @@
         :sourceCustomComponentId="mixin.sourceCustomComponentId"
         class="mixin"
         @set="setMixin($event.oldMixinId, $event.newMixinId)"
-        @edit="openMixinMenu($event, true)"
+        @edit="openMixinMenu(site, $event, true)"
         @remove="removeMixin($event)"
         @flatten="flattenMixin(mixin.id)"
       />
@@ -33,7 +33,7 @@ import { computed, ref, toRefs } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { resolveComponent, resolveStyle } from '@pubstudio/frontend/util-resolve'
 import { builtinStyles } from '@pubstudio/frontend/util-builtin'
-import { useBuild, useMixinMenuUi } from '@pubstudio/frontend/feature-build'
+import { openMixinMenu, useBuild } from '@pubstudio/frontend/feature-build'
 import { IComponent } from '@pubstudio/shared/type-site'
 import EditMenuTitle from '../EditMenuTitle.vue'
 import MixinSelect from './MixinSelect.vue'
@@ -53,7 +53,6 @@ const {
   removeComponentMixin,
   flattenComponentMixin,
 } = useBuild()
-const { openMixinMenu } = useMixinMenuUi()
 
 const showNewMixin = ref(false)
 const newMixinRef = ref()

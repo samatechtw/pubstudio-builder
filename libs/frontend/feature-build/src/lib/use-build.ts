@@ -67,7 +67,6 @@ import {
   ISetComponentInputData,
   ISetHomePageData,
   IUpdateMixinOrderData,
-  IUpdateUiData,
   IUpdateUiParams,
   UiAction,
 } from '@pubstudio/shared/type-command-data'
@@ -206,10 +205,6 @@ export interface IUseBuild {
   deleteSelected: () => void
   selectComponentParent: () => void
   setBreakpoint: (newBreakpoints: IAddBreakpoint[]) => void
-  updateUi: <Action extends UiAction>(
-    action: Action,
-    params: IUpdateUiParams[Action],
-  ) => void
   addCustomComponent: (component: IComponent) => void
 }
 
@@ -1045,17 +1040,6 @@ export const useBuild = (): IUseBuild => {
     pushCommand(site.value, CommandType.SetBreakpoint, data)
   }
 
-  const updateUi = <Action extends UiAction>(
-    action: Action,
-    params: IUpdateUiParams[Action],
-  ) => {
-    const data: IUpdateUiData<Action> = {
-      action,
-      params,
-    }
-    pushCommand(site.value, CommandType.UpdateUi, data)
-  }
-
   const addCustomComponent = (component: IComponent) => {
     const data: IAddCustomComponentData = {
       componentId: component.id,
@@ -1118,7 +1102,6 @@ export const useBuild = (): IUseBuild => {
     changePage,
     setHomePage,
     setBreakpoint,
-    updateUi,
     addCustomComponent,
   }
 }

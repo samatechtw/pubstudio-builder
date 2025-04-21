@@ -21,7 +21,7 @@
         >
           <DragVertical class="drag" />
         </div>
-        <div class="style-name" @click="openMixinMenu(style.id, false)">
+        <div class="style-name" @click="openMixinMenu(site, style.id, false)">
           {{ style.name }}
         </div>
         <Minus class="item-delete" @click="deleteStyle(style)" />
@@ -37,7 +37,7 @@
 import { computed } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { DragVertical, Minus } from '@pubstudio/frontend/ui-widgets'
-import { useBuild, useMixinMenu, useMixinMenuUi } from '@pubstudio/frontend/feature-build'
+import { openMixinMenu, useBuild, useMixinMenu } from '@pubstudio/frontend/feature-build'
 import EditMenuTitle from '../EditMenuTitle.vue'
 import { useListDrag } from '@pubstudio/frontend/util-doc'
 
@@ -45,8 +45,6 @@ const { t } = useI18n()
 
 const { newMixin } = useMixinMenu()
 const { deleteStyle, updateMixinOrder, site } = useBuild()
-
-const { openMixinMenu } = useMixinMenuUi()
 
 const {
   newPos,

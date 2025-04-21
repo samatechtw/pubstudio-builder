@@ -29,13 +29,17 @@ export interface ISetSelectedComponentOptions {
    * @default true
    */
   scrollToComponent?: boolean
+  /**
+   * @default true
+   */
+  closeMixinMenu?: boolean
 }
 
 export const setSelectedComponent = (
   site: ISite,
   component: IComponent | undefined,
   options?: ISetSelectedComponentOptions,
-) => {
+): boolean => {
   const { editor } = site
   if (editor) {
     // Remember old state to see if we should save to local storage
@@ -44,8 +48,11 @@ export const setSelectedComponent = (
 
     editor.selectedComponent = component
     const isSelectMode = editor.mode === EditorMode.SelectedComponent
-    const { expandTree = true, scrollToComponent: shouldScrollToComponent = true } =
-      options ?? {}
+    const {
+      expandTree = true,
+      scrollToComponent: shouldScrollToComponent = true,
+      closeMixinMenu = true,
+    } = options ?? {}
     if (component) {
       if (!isSelectMode) {
         editor.mode = EditorMode.SelectedComponent
@@ -62,8 +69,12 @@ export const setSelectedComponent = (
     }
     // Save editor state to local storage if anything changed
     if (editor.mode !== prevMode || component !== prevComponent) {
-      editStylesCancelEdit(site)
+      if (closeMixinMenu) {
+        editStylesCancelEdit(site)
+      }
       clearComponentTabState(editor)
     }
+    return component !== prevComponent
   }
+  return false
 }
