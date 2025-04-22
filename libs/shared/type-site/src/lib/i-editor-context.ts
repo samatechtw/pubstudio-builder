@@ -141,6 +141,9 @@ export interface IEditorPreferences {
   // Force transform to default/initial
   overrideTransform?: boolean
   selectedComponentOutlineColor?: string
+  componentMenuHover?: boolean
+  componentHover?: boolean
+  componentHoverColor?: string
 }
 
 export interface IEditorContext {

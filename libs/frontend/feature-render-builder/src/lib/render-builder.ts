@@ -9,7 +9,7 @@ import {
   activeBreakpoint,
   descSortedBreakpoints,
 } from '@pubstudio/frontend/feature-site-source'
-import { builderContext, resetBuilderContext } from '@pubstudio/frontend/util-builder'
+import { resetBuilderContext } from '@pubstudio/frontend/util-builder'
 import { findStyles } from '@pubstudio/frontend/util-component'
 import {
   IBuildContent,
@@ -132,19 +132,6 @@ const computeBuilderStyleProps = (
       extraChildren = [h(SvgEdit, { componentId: component.id })]
       forceRelative()
     }
-  }
-
-  const hoveredInComponentTree =
-    builderContext.hoveredComponentIdInComponentTree.value === component.id
-
-  if (hoveredInComponentTree) {
-    builderClass.push('hover-in-tree')
-    const pos = getPosition()
-    if (pos && pos !== 'relative') {
-      builderClass.push(`hover-in-tree--${pos}`)
-    }
-
-    extraChildren = (extraChildren ?? []).concat(h('div', { class: 'hover-overlay' }))
   }
 
   if (editor?.prefs.debugBounding) {

@@ -1,13 +1,13 @@
 <template>
   <div
-    v-if="hoverOverlay"
+    v-if="dndHoverOverlay"
     ref="edgesRef"
     :draggable="false"
-    :style="hoverOverlay.style"
+    :style="dndHoverOverlay.style"
     class="hover-edges"
     :class="{
-      'small-width': hoverOverlay.smallWidth,
-      'small-height': hoverOverlay.smallHeight,
+      'small-width': dndHoverOverlay.smallWidth,
+      'small-height': dndHoverOverlay.smallHeight,
     }"
   >
     <div
@@ -58,7 +58,7 @@ import {
   getWidthPxPerPercent,
   isLengthValue,
 } from '@pubstudio/frontend/feature-build-event'
-import { hoverOverlay } from '../lib/feature-build-overlay'
+import { dndHoverOverlay } from '../lib/feature-build-overlay'
 
 const { site, editor, activePage } = useSiteSource()
 

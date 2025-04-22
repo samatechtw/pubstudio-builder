@@ -1,5 +1,6 @@
 import { getPref } from '@pubstudio/frontend/data-access-command'
 import { IComponentOverlay } from '@pubstudio/frontend/type-ui-widgets'
+import { builderContext } from '@pubstudio/frontend/util-builder'
 import { IEditorContext, IPage } from '@pubstudio/shared/type-site'
 import { sleep } from '@pubstudio/shared/util-core'
 import { ref } from 'vue'
@@ -11,15 +12,16 @@ export const selectionDimensions = ref<IComponentOverlay>()
 // Use `ref`+`watch` instead of `computed` because we have to wait for the screen to (re)render
 // before calculating the width and height of the component on page load & after selection.
 export const selectionOverlayStyle = ref<Record<string, string> | undefined>()
+export const hoverOverlayStyle = ref<Record<string, string> | undefined>()
 
 interface IHoverOverlay {
   style: Record<string, string>
   smallWidth: boolean
   smallHeight: boolean
 }
-export const hoverOverlay = ref<IHoverOverlay | undefined>()
+export const dndHoverOverlay = ref<IHoverOverlay | undefined>()
 
-const setHoverOverlay = async (
+const setDndHoverOverlay = (
   editor: IEditorContext | undefined,
   activePage: IPage | undefined,
 ) => {
@@ -29,7 +31,7 @@ const setHoverOverlay = async (
   }
   const dim = computeHoverOverlay(editor, component)
   if (dim) {
-    hoverOverlay.value = {
+    dndHoverOverlay.value = {
       style: {
         top: `${dim.top}px`,
         left: `${dim.left}px`,
@@ -40,12 +42,12 @@ const setHoverOverlay = async (
       smallHeight: dim.height < 70,
     }
   } else {
-    hoverOverlay.value = undefined
+    dndHoverOverlay.value = undefined
   }
 }
 
-const setSelectionOverlayStyle = async (editor: IEditorContext | undefined) => {
-  const dim = computeSelectionOverlay(editor, editor?.selectedComponent)
+const setSelectionOverlayStyle = (editor: IEditorContext | undefined) => {
+  const dim = computeSelectionOverlay(editor, editor?.selectedComponent?.id)
   selectionDimensions.value = dim
   if (dim) {
     const outlineColor = getPref(editor, 'selectedComponentOutlineColor')
@@ -68,5 +70,5 @@ export const setBuildOverlays = async (
   // This sleep is necessary for buildContentWindowInner and componentElement
   await sleep(1)
   setSelectionOverlayStyle(editor)
-  setHoverOverlay(editor, activePage)
+  setDndHoverOverlay(editor, activePage)
 }
