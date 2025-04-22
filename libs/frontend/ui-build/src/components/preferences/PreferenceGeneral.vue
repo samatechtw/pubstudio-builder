@@ -3,7 +3,7 @@
     <div class="modal-text" v-html="t('prefs.text')"></div>
     <PreferenceRow :label="t('prefs.bounding')" :text="t('prefs.bounding_text')">
       <PSToggle
-        :on="!!editor?.prefs.debugBounding"
+        :on="!!getPref(editor, 'debugBounding')"
         small
         class="bounding-toggle"
         @toggle="setPref(editor, 'debugBounding', $event)"
@@ -11,7 +11,7 @@
     </PreferenceRow>
     <PreferenceRow :label="t('prefs.opacity')" :text="t('prefs.opacity')">
       <PSToggle
-        :on="!!editor?.prefs.overrideOpacity"
+        :on="!!getPref(editor, 'overrideOpacity')"
         small
         class="opacity-toggle"
         @toggle="setPref(editor, 'overrideOpacity', $event)"
@@ -19,17 +19,17 @@
     </PreferenceRow>
     <PreferenceRow :label="t('prefs.transform')" :text="t('prefs.transform_text')">
       <PSToggle
-        :on="!!editor?.prefs.overrideTransform"
+        :on="!!getPref(editor, 'overrideTransform')"
         small
         class="transform-toggle"
         @toggle="setPref(editor, 'overrideTransform', $event)"
       />
     </PreferenceRow>
-    <PreferenceRow :label="t('prefs.transform')" :text="t('prefs.transform_text')">
-      <div class="color-wrap">
+    <PreferenceRow :label="t('prefs.selected')" :text="t('prefs.selected_text')">
+      <div class="color-wrap outline-color-wrap">
         <div
           ref="itemRef"
-          class="selected-outline-color"
+          class="color-display"
           :style="{ 'background-color': selectedOutlineColor }"
           @click="showOutlinePicker"
         />
@@ -39,9 +39,49 @@
             :color="selectedOutlineColor"
             :forceNonGradient="true"
             :selectedThemeColors="[]"
-            class="outline-color-picker"
-            :style="{ ...tooltipStyle, 'z-index': 7000 }"
+            class="color-picker"
+            :style="{ ...outlineTooltip.tooltipStyle, 'z-index': 7000 }"
             @selectColor="setSelectedOutlineColor($event?.hex)"
+          />
+        </div>
+      </div>
+    </PreferenceRow>
+    <PreferenceRow :label="t('prefs.menu_hover')" :text="t('prefs.menu_hover_text')">
+      <PSToggle
+        :on="!!getPref(editor, 'componentMenuHover')"
+        small
+        class="menu-hover-toggle"
+        @toggle="setPref(editor, 'componentMenuHover', $event)"
+      />
+    </PreferenceRow>
+    <PreferenceRow
+      :label="t('prefs.component_hover')"
+      :text="t('prefs.component_hover_text')"
+    >
+      <PSToggle
+        :on="!!getPref(editor, 'componentHover')"
+        small
+        class="component-hover-toggle"
+        @toggle="setPref(editor, 'componentHover', $event)"
+      />
+    </PreferenceRow>
+    <PreferenceRow :label="t('prefs.hover_color')" :text="t('prefs.hover_color_text')">
+      <div class="color-wrap hover-color-wrap">
+        <div
+          ref="itemRef"
+          class="color-display"
+          :style="{ 'background-color': selectedHoverColor }"
+          @click="showHoverPicker"
+        />
+        <div ref="tooltipRef">
+          <ColorPicker
+            v-if="showHoverColorPicker"
+            :color="selectedHoverColor"
+            :forceNonGradient="true"
+            :selectedThemeColors="[]"
+            class="color-picker"
+            :style="{ ...hoverTooltip.tooltipStyle, 'z-index': 7000 }"
+            @selectColor="setSelectedHoverColor($event?.hex)"
           />
         </div>
       </div>
@@ -70,14 +110,13 @@ import PreferenceRow from './PreferenceRow.vue'
 
 const { t } = useI18n()
 const { editor } = useSiteSource()
-const {
-  itemRef,
-  tooltipRef,
-  tooltipStyle,
-  updatePosition,
-  tooltipMouseEnter,
-  tooltipMouseLeave,
-} = useTooltip({
+const outlineTooltip = useTooltip({
+  placement: 'top-end',
+  offset: 310,
+  offsetCross: -178,
+  shift: false,
+})
+const hoverTooltip = useTooltip({
   placement: 'top-end',
   offset: 310,
   offsetCross: -178,
@@ -85,16 +124,22 @@ const {
 })
 
 const hideOutlinePicker = () => {
-  tooltipMouseLeave()
+  outlineTooltip.tooltipMouseLeave()
   showOutlineColorPicker.value = false
 }
-useClickaway('.color-wrap', hideOutlinePicker)
+const hideHoverPicker = () => {
+  hoverTooltip.tooltipMouseLeave()
+  showHoverColorPicker.value = false
+}
+useClickaway('.outline-color-wrap', hideOutlinePicker)
+useClickaway('.hover-color-wrap', hideHoverPicker)
 
 const emit = defineEmits<{
   (e: 'cancel'): void
 }>()
 
 const showOutlineColorPicker = ref(false)
+const showHoverColorPicker = ref(false)
 
 const selectedOutlineColor = computed(() => {
   return getPref(editor.value, 'selectedComponentOutlineColor')
@@ -102,13 +147,28 @@ const selectedOutlineColor = computed(() => {
 
 const showOutlinePicker = () => {
   showOutlineColorPicker.value = true
-  tooltipMouseEnter()
-  updatePosition()
+  outlineTooltip.tooltipMouseEnter()
+  outlineTooltip.updatePosition()
 }
 
 const setSelectedOutlineColor = (color: string | undefined) => {
   setPref(editor.value, 'selectedComponentOutlineColor', color)
   hideOutlinePicker()
+}
+
+const selectedHoverColor = computed(() => {
+  return getPref(editor.value, 'componentHoverColor')
+})
+
+const showHoverPicker = () => {
+  showHoverColorPicker.value = true
+  hoverTooltip.tooltipMouseEnter()
+  hoverTooltip.updatePosition()
+}
+
+const setSelectedHoverColor = (color: string | undefined) => {
+  setPref(editor.value, 'componentHoverColor', color)
+  hideHoverPicker()
 }
 </script>
 
@@ -126,14 +186,14 @@ const setSelectedOutlineColor = (color: string | undefined) => {
 }
 .modal-buttons {
   @mixin flex-row;
-  padding-bottom: 24px;
+  padding: 16px 0 24px;
 }
 .modal-buttons {
   display: flex;
   justify-content: center;
   margin-top: auto;
 }
-.outline-color-picker {
+.color-picker {
   position: relative;
   top: 0;
 }
@@ -142,9 +202,10 @@ const setSelectedOutlineColor = (color: string | undefined) => {
   text-align: center;
   position: relative;
 }
-.selected-outline-color {
-  width: 20px;
-  height: 20px;
+.color-display {
+  width: 22px;
+  height: 22px;
+  border-radius: 2px;
   cursor: pointer;
 }
 </style>

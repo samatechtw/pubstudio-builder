@@ -96,26 +96,36 @@ const treeStyles = computed(() => {
 }
 
 .component-tree-item {
+  position: relative;
   $border-width: 2px;
 
   &.dragging {
     opacity: 0.2;
   }
-  &.hover-self {
-    border: $border-width solid #f82389;
-  }
-  &.hover-top {
-    border: $border-width solid transparent;
-    border-top-color: black;
-  }
-  &.hover-bottom {
-    border: $border-width solid transparent;
-    border-bottom-color: black;
-  }
   &.expanded {
     & + .component-tree-item {
       margin-top: -4px;
     }
+  }
+  .hover-edge {
+    position: absolute;
+    height: 3px;
+    width: 100%;
+    left: 0;
+    background-color: black;
+    pointer-events: none;
+  }
+  .hover-self {
+    height: 100%;
+    top: 0;
+    border: $border-width solid #f82389;
+    background-color: unset;
+  }
+  .hover-top {
+    top: -1.5px;
+  }
+  .hover-bottom {
+    bottom: -1.5px;
   }
   .eye {
     @mixin size 12px;

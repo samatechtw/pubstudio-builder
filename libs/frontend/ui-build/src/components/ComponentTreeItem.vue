@@ -6,9 +6,6 @@
     :class="{
       dragging: dndState?.dragging,
       expanded: haveChildren && expanded,
-      ['hover-self']: dndState?.hoverSelf,
-      ['hover-top']: dndState?.hoverTop,
-      ['hover-bottom']: dndState?.hoverBottom,
     }"
     @mouseleave.stop="mouseLeave"
     @dragenter.stop="dragenter"
@@ -16,6 +13,9 @@
     @dragleave.stop="dragleave"
     @drop.stop="drop"
   >
+    <div v-if="dndState?.hoverTop" class="hover-top hover-edge" />
+    <div v-if="dndState?.hoverBottom" class="hover-bottom hover-edge" />
+    <div v-if="dndState?.hoverSelf" class="hover-self hover-edge" />
     <div
       class="component-title"
       :class="{

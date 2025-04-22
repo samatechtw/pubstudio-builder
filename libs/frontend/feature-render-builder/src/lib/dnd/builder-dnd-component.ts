@@ -62,7 +62,7 @@ export const BuilderDndComponent = defineComponent({
         RenderMode.Build,
         dndState.value,
       )
-      const { id, tag, content } = component.value
+      const { tag, content } = component.value
       const { editView } = site.value.editor ?? {}
       const isRoot = !component.value.parent
       const editViewFocus = editView?.hasFocus()

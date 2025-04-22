@@ -1,15 +1,15 @@
 import { buildContentWindowInnerId } from '@pubstudio/frontend/feature-build'
 import { IComponentOverlay } from '@pubstudio/frontend/type-ui-widgets'
-import { IComponent, IEditorContext } from '@pubstudio/shared/type-site'
+import { IEditorContext } from '@pubstudio/shared/type-site'
 import { normalizeDimensions } from './overlay-util'
 
 export const computeSelectionOverlay = (
   editor: IEditorContext | undefined,
-  selectedComponent: IComponent | undefined,
+  selectedComponentId: string | undefined,
 ): IComponentOverlay | undefined => {
-  if (selectedComponent) {
+  if (selectedComponentId) {
     const buildContentWindowInner = document.getElementById(buildContentWindowInnerId)
-    let componentElement = document.getElementById(selectedComponent.id)
+    let componentElement = document.getElementById(selectedComponentId)
     // Container size might be different from the actual component
     const containerChild = componentElement?.children?.[0]
     if (containerChild?.className?.includes('component-content-container')) {

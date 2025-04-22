@@ -15,10 +15,6 @@
 </template>
 
 <script lang="ts" setup>
-import { useI18n } from 'petite-vue-i18n'
-
-const { t } = useI18n()
-
 defineProps<{
   label: string
   text: string
@@ -33,10 +29,13 @@ defineProps<{
   align-items: center;
   justify-content: space-between;
   border-top: 1px solid $border1;
-  padding: 12px 0;
+  padding: 8px 0;
 }
 .row-label {
   @mixin title-bold 14px;
+}
+.row-text {
+  font-size: 14px;
 }
 .row-right {
   margin-left: 16px;

@@ -6,7 +6,9 @@ import {
   moveAbsoluteComponent,
   moveComponent,
 } from '@pubstudio/frontend/feature-build'
+import { setBuildOverlays } from '@pubstudio/frontend/feature-build-overlay'
 import { activeBreakpoint } from '@pubstudio/frontend/feature-site-source'
+import { getActivePage } from '@pubstudio/frontend/feature-site-store'
 import {
   BuilderDragDataType,
   IDraggedComponentAddData,
@@ -366,6 +368,9 @@ export const useDragDrop = (props: IUseDragDropProps): IUseDragDrop => {
     dropProps.value = defaultDropProps()
     hovering.value = false
     dropOption?.()
+    // It's difficult/inefficient to use reactivity in BuildDndOverlay.vue to update the
+    // selected component outline, so we do it here.
+    setBuildOverlays(site.editor, getActivePage(site))
   }
 
   const dragend = (e: DragEvent) => {

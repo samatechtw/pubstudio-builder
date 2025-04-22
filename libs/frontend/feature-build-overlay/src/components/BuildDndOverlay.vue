@@ -4,6 +4,7 @@
     :style="selectionOverlayStyle"
   />
   <div class="build-dnd-overlay build-dnd-overlay-hover" :style="dndHoverOverlayStyle" />
+  <div class="build-dnd-overlay build-component-hover" :style="hoverOverlayStyle" />
   <HoverEdges />
   <ImageEdit
     v-if="imageEditStyle"
@@ -30,6 +31,9 @@ import {
   setBuildOverlays,
 } from '../lib/feature-build-overlay'
 import { debounce } from '@pubstudio/shared/util-debounce'
+import { computeSelectionOverlay } from '../lib/compute-selection-overlay'
+import { builderContext } from '@pubstudio/frontend/util-builder'
+import { getPref } from '@pubstudio/frontend/data-access-command'
 
 const { site, editor, activePage } = useSiteSource()
 
@@ -55,6 +59,27 @@ const imageEditStyle = computed(() => {
         top: `${dim.top - 26}px`,
         left: `${dim.left + dim.width}px`,
       }
+    }
+  }
+  return undefined
+})
+
+const hoverOverlayStyle = computed(() => {
+  const show = getPref(editor.value, 'componentMenuHover')
+  if (!show) {
+    return
+  }
+  const hoverId = builderContext.hoveredComponentIdInComponentTree.value
+  const dim = computeSelectionOverlay(editor.value, hoverId)
+  selectionDimensions.value = dim
+  if (dim) {
+    const hoverColor = getPref(editor.value, 'componentHoverColor')
+    return {
+      top: `${dim.top - 1}px`,
+      left: `${dim.left - 1}px`,
+      width: `${dim.width}px`,
+      height: `${dim.height}px`,
+      'background-color': hoverColor,
     }
   }
   return undefined
