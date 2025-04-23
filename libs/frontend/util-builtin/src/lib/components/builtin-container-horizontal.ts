@@ -26,7 +26,7 @@ export const containerHorizontal: IComponent = {
     custom: {
       [DEFAULT_BREAKPOINT_ID]: {
         default: {
-          height: '120px',
+          'min-height': '120px',
         },
       },
     },

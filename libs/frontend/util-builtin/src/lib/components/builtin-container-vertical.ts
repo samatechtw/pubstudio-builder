@@ -25,7 +25,7 @@ export const containerVertical: IComponent = {
       [DEFAULT_BREAKPOINT_ID]: {
         default: {
           width: '50%',
-          height: '120px',
+          'min-height': '120px',
         },
       },
     },
