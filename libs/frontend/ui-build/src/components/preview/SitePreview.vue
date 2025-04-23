@@ -74,10 +74,7 @@ onMounted(() => {
 })
 </script>
 
-<style lang="postcss" scoped>
-html {
-  background-color: black;
-}
+<style lang="postcss">
 .preview-content {
   width: 100%;
   height: 100%;
