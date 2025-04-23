@@ -94,8 +94,8 @@ importers:
         specifier: ^0.7.4
         version: 0.7.4(postcss@8.5.3)
       '@samatech/vue-color-picker':
-        specifier: ^1.0.4
-        version: 1.0.4(typescript@5.8.2)
+        specifier: ^1.1.1
+        version: 1.1.1(typescript@5.8.2)
       '@types/convict':
         specifier: ^6.1.6
         version: 6.1.6
@@ -1619,8 +1619,8 @@ packages:
     peerDependencies:
       postcss: ^8.4.31
 
-  '@samatech/vue-color-picker@1.0.4':
-    resolution: {integrity: sha512-KBNWSf8XVP/x0pmioghYCxJH77J5IKKC2qGw7K16gIjY1fb6cz6Lt/iFUCncZpKjBqmI/Tid0h+K5lijtJ5sJA==}
+  '@samatech/vue-color-picker@1.1.1':
+    resolution: {integrity: sha512-TjBfqE3WRRlCpnQTHGWNFtxY5FgW58oJ4f3EnK//HQU/N4VHE6Um2o54fY+kGoL1tQVKaLGXy6/7jcxzmAtKqg==}
 
   '@samatech/vue-components@1.3.2':
     resolution: {integrity: sha512-quSZlJm1R+OchHkuS/9W4rAscJRIgM1JV2HFUEL9+wMy8G179boRo+Zd9tyPGt1ebsZHKjJ8FD6o6bcpnC6s+w==}
@@ -6398,7 +6398,7 @@ snapshots:
       postcss: 8.5.3
       postcss-value-parser: 4.2.0
 
-  '@samatech/vue-color-picker@1.0.4(typescript@5.8.2)':
+  '@samatech/vue-color-picker@1.1.1(typescript@5.8.2)':
     dependencies:
       vue: 3.5.13(typescript@5.8.2)
     transitivePeerDependencies:

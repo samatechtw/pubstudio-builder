@@ -28,20 +28,20 @@
     <PreferenceRow :label="t('prefs.selected')" :text="t('prefs.selected_text')">
       <div class="color-wrap outline-color-wrap">
         <div
-          ref="itemRef"
+          ref="outlineItemRef"
           class="color-display"
           :style="{ 'background-color': selectedOutlineColor }"
           @click="showOutlinePicker"
         />
-        <div ref="tooltipRef">
+        <div ref="outlineTooltipRef">
           <ColorPicker
             v-if="showOutlineColorPicker"
             :color="selectedOutlineColor"
             :forceNonGradient="true"
             :selectedThemeColors="[]"
             class="color-picker"
-            :style="{ ...outlineTooltip.tooltipStyle, 'z-index': 7000 }"
-            @selectColor="setSelectedOutlineColor($event?.hex)"
+            :style="{ ...outlineTooltip.tooltipStyle.value, 'z-index': 7000 }"
+            @selectColor="setSelectedOutlineColor($event)"
           />
         </div>
       </div>
@@ -68,20 +68,20 @@
     <PreferenceRow :label="t('prefs.hover_color')" :text="t('prefs.hover_color_text')">
       <div class="color-wrap hover-color-wrap">
         <div
-          ref="itemRef"
+          ref="hoverItemRef"
           class="color-display"
           :style="{ 'background-color': selectedHoverColor }"
           @click="showHoverPicker"
         />
-        <div ref="tooltipRef">
+        <div ref="hoverTooltipRef">
           <ColorPicker
             v-if="showHoverColorPicker"
             :color="selectedHoverColor"
             :forceNonGradient="true"
             :selectedThemeColors="[]"
             class="color-picker"
-            :style="{ ...hoverTooltip.tooltipStyle, 'z-index': 7000 }"
-            @selectColor="setSelectedHoverColor($event?.hex)"
+            :style="{ ...hoverTooltip.tooltipStyle.value, 'z-index': 7000 }"
+            @selectColor="setSelectedHoverColor($event)"
           />
         </div>
       </div>
@@ -102,7 +102,7 @@
 import { computed, ref } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { useClickaway, useTooltip } from '@samatech/vue-components'
-import { ColorPicker } from '@samatech/vue-color-picker'
+import { ColorPicker, getRgbaCss, IPickerColor } from '@samatech/vue-color-picker'
 import { PSToggle, PSButton } from '@pubstudio/frontend/ui-widgets'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { getPref, setPref } from '@pubstudio/frontend/data-access-command'
@@ -110,13 +110,21 @@ import PreferenceRow from './PreferenceRow.vue'
 
 const { t } = useI18n()
 const { editor } = useSiteSource()
-const outlineTooltip = useTooltip({
+const {
+  tooltipRef: outlineTooltipRef,
+  itemRef: outlineItemRef,
+  ...outlineTooltip
+} = useTooltip({
   placement: 'top-end',
   offset: 310,
   offsetCross: -178,
   shift: false,
 })
-const hoverTooltip = useTooltip({
+const {
+  tooltipRef: hoverTooltipRef,
+  itemRef: hoverItemRef,
+  ...hoverTooltip
+} = useTooltip({
   placement: 'top-end',
   offset: 310,
   offsetCross: -178,
@@ -151,8 +159,8 @@ const showOutlinePicker = () => {
   outlineTooltip.updatePosition()
 }
 
-const setSelectedOutlineColor = (color: string | undefined) => {
-  setPref(editor.value, 'selectedComponentOutlineColor', color)
+const setSelectedOutlineColor = (color: IPickerColor | undefined) => {
+  setPref(editor.value, 'selectedComponentOutlineColor', getRgbaCss(color?.rgba))
   hideOutlinePicker()
 }
 
@@ -166,8 +174,8 @@ const showHoverPicker = () => {
   hoverTooltip.updatePosition()
 }
 
-const setSelectedHoverColor = (color: string | undefined) => {
-  setPref(editor.value, 'componentHoverColor', color)
+const setSelectedHoverColor = (color: IPickerColor | undefined) => {
+  setPref(editor.value, 'componentHoverColor', getRgbaCss(color?.rgba))
   hideHoverPicker()
 }
 </script>
@@ -207,5 +215,6 @@ const setSelectedHoverColor = (color: string | undefined) => {
   height: 22px;
   border-radius: 2px;
   cursor: pointer;
+  border: 1px solid black;
 }
 </style>

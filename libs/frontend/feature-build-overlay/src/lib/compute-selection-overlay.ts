@@ -13,7 +13,7 @@ export const computeSelectionOverlay = (
     // Container size might be different from the actual component
     const containerChild = componentElement?.children?.[0]
     if (containerChild?.className?.includes('component-content-container')) {
-      componentElement = containerChild.children?.[0] as HTMLElement
+      componentElement = containerChild as HTMLElement
     }
 
     if (buildContentWindowInner && componentElement) {

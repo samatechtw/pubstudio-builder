@@ -68,7 +68,7 @@
     "@nx/workspace": "20.5.0",
     "@samatech/image-api-types": "^0.0.2",
     "@samatech/postcss-basics": "^0.7.4",
-    "@samatech/vue-color-picker": "^1.0.4",
+    "@samatech/vue-color-picker": "^1.1.1",
     "@types/convict": "^6.1.6",
     "@types/jest": "^29.5.14",
     "@types/jsonwebtoken": "^9.0.9",
