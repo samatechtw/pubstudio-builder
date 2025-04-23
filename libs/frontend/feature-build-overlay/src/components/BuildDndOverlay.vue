@@ -64,13 +64,11 @@ const imageEditStyle = computed(() => {
   return undefined
 })
 
-const hoverOverlayStyle = computed(() => {
-  const show = getPref(editor.value, 'componentMenuHover')
-  if (!show) {
-    return
+const getComponentHoverStyle = (componentId: string | undefined) => {
+  if (componentId === activePage.value?.root.id) {
+    return undefined
   }
-  const hoverId = builderContext.hoveredComponentIdInComponentTree.value
-  const dim = computeSelectionOverlay(editor.value, hoverId)
+  const dim = computeSelectionOverlay(editor.value, componentId)
   selectionDimensions.value = dim
   if (dim) {
     const hoverColor = getPref(editor.value, 'componentHoverColor')
@@ -83,6 +81,17 @@ const hoverOverlayStyle = computed(() => {
     }
   }
   return undefined
+}
+
+const hoverOverlayStyle = computed(() => {
+  const show = getPref(editor.value, 'componentMenuHover')
+  if (!show) {
+    return
+  }
+  const hoverId =
+    builderContext.hoveredComponentIdInComponentTree.value ||
+    editor.value?.hoveredComponent?.id
+  return getComponentHoverStyle(hoverId)
 })
 
 const debounceSetOverlays = debounce(
@@ -113,6 +122,10 @@ onMounted(async () => {
 
 <style lang="postcss" scoped>
 @import '@theme/css/mixins.postcss';
+
+.dragging-mode .build-dnd-overlay-selection {
+  display: none;
+}
 
 .build-dnd-overlay {
   position: absolute;

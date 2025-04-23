@@ -168,6 +168,10 @@ export const useDragDrop = (props: IUseDragDropProps): IUseDragDrop => {
     if (componentId && e.dataTransfer) {
       const el = getDraggedElement?.(e) ?? document.getElementById(componentId)
       const bound = el?.getBoundingClientRect()
+
+      // Hide overlays
+      document.body.classList.add('dragging-mode')
+
       // Workaround for Chrome calling `dragend` immediately after `dragstart`
       setTimeout(() => {
         const clickOffset: XYCoord = {
@@ -380,6 +384,7 @@ export const useDragDrop = (props: IUseDragDropProps): IUseDragDrop => {
     dragSource.value = undefined
     dragendOption?.()
     builderContext.buildDndState.value = undefined
+    document.body.classList.remove('dragging-mode')
   }
 
   return {
