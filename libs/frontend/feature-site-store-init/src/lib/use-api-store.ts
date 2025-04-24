@@ -151,6 +151,8 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
           hasUpdates = true
         }
       }
+      // Reset dirty flags so we don't miss changes while an update is on the wire
+      dirty.value = dirtyDefault()
       if (hasUpdates) {
         const result = await updateFn(siteId.value, payload, keepalive)
         if (result.content_updated_at) {
@@ -158,7 +160,6 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
         }
         updateKey.value = result.updated_at.toString()
       }
-      dirty.value = dirtyDefault()
     } catch (e) {
       saveError.value = toApiError(e)
       console.log('Save site API call fail:', e)
