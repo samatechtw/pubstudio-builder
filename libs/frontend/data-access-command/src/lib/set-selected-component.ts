@@ -69,6 +69,7 @@ export const setSelectedComponent = (
     }
     // Save editor state to local storage if anything changed
     if (editor.mode !== prevMode || component !== prevComponent) {
+      editor.componentTreeRenameData.renaming = false
       if (closeMixinMenu) {
         editStylesCancelEdit(site)
       }
