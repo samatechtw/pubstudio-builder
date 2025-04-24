@@ -33,6 +33,7 @@ export const useTemplateApi = (api: PSApi): IApiTemplate => {
       pages: JSON.parse(serialized.pages),
       pageOrder: serialized.pageOrder ? JSON.parse(serialized.pageOrder) : undefined,
       created_at: serialized.created_at,
+      updated_at: serialized.updated_at,
       public: serialized.public,
     }
   }
@@ -71,6 +72,7 @@ export const useTemplateApi = (api: PSApi): IApiTemplate => {
       pages: JSON.parse(serialized.pages),
       pageOrder: serialized.pageOrder ? JSON.parse(serialized.pageOrder) : undefined,
       created_at: serialized.created_at,
+      updated_at: serialized.updated_at,
       public: serialized.public,
     }
   }
@@ -99,6 +101,7 @@ export const useTemplateApi = (api: PSApi): IApiTemplate => {
       pages: JSON.parse(serialized.pages),
       pageOrder: serialized.pageOrder ? JSON.parse(serialized.pageOrder) : undefined,
       created_at: serialized.created_at,
+      updated_at: serialized.updated_at,
       public: serialized.public,
     }
   }

@@ -68,4 +68,9 @@ const goBack = () => {
 .print {
   height: 24px;
 }
+@media (max-width: 480px) {
+  .banner-content {
+    padding: 0 8px;
+  }
+}
 </style>

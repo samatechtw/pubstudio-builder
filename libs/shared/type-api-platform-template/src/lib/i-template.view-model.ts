@@ -13,4 +13,5 @@ export interface ITemplateViewModel {
   pages: string
   pageOrder: string
   created_at: Date
+  updated_at: Date
 }
