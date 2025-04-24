@@ -76,8 +76,6 @@ onMounted(() => {
 
 <style lang="postcss">
 .preview-content {
-  width: 100%;
-  height: 100%;
   /* Page Root */
   & > :deep(div) {
     min-height: v-bind(rootComponentMinHeight) !important;
