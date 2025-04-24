@@ -1,6 +1,6 @@
 <template>
   <div class="preview-banner" @click="goBack">
-    <div class="preview-content">
+    <div class="banner-content">
       <div class="go-back">
         {{ t('build.preview_banner') }}
       </div>
@@ -50,7 +50,7 @@ const goBack = () => {
   position: relative;
   z-index: 9999;
 }
-.preview-content {
+.banner-content {
   @mixin flex-center;
   max-width: 1020px;
   margin: 0 auto;

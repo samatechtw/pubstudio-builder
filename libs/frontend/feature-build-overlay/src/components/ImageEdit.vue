@@ -1,5 +1,5 @@
 <template>
-  <div class="image-edit" :style="{ top: `${offsetTop}px` }">
+  <div class="image-edit">
     <Assets color="black" class="edit-icon" @click="showSelectAssetModal = true" />
     <SelectAssetModal
       :show="showSelectAssetModal"
@@ -13,12 +13,11 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref, toRefs } from 'vue'
+import { toRefs } from 'vue'
 import { Assets } from '@pubstudio/frontend/ui-widgets'
 import { useBuild, useSelectAsset, useToolbar } from '@pubstudio/frontend/feature-build'
 import { SelectAssetModal } from '@pubstudio/frontend/feature-site-assets'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
-import { computeComponentOffset } from '@pubstudio/frontend/util-builder'
 import { ISiteAssetViewModel } from '@pubstudio/shared/type-api-platform-site-asset'
 import { urlFromAsset } from '@pubstudio/frontend/util-asset'
 import { resolveComponent } from '@pubstudio/frontend/util-resolve'
@@ -34,7 +33,6 @@ const { addOrUpdateSelectedInput, selectedComponentFlattenedStyles } = useBuild(
 const { setOrRemoveStyle } = useToolbar()
 const { site, siteStore } = useSiteSource()
 const { showSelectAssetModal, contentTypes } = useSelectAsset()
-const offsetTop = ref(-28)
 
 const props = defineProps<{
   componentId: string | undefined
@@ -72,14 +70,6 @@ const onUrlSelected = (url: string) => {
     showSelectAssetModal.value = false
   }
 }
-
-const computeOffset = () => {
-  offsetTop.value = computeComponentOffset(componentId.value) ?? offsetTop.value
-}
-
-onMounted(() => {
-  computeOffset()
-})
 </script>
 
 <style lang="postcss" scoped>

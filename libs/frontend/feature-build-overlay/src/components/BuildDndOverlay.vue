@@ -55,9 +55,10 @@ const imageEditStyle = computed(() => {
       )['background-image'] !== undefined
     const isImg = cmp.tag === Tag.Img
     if (hasBg || isImg) {
+      const top = dim.top - 30
       return {
-        top: `${dim.top - 26}px`,
-        left: `${dim.left + dim.width}px`,
+        top: `${top < 0 ? 4 : top}px`,
+        left: `${dim.left + dim.width - 40}px`,
       }
     }
   }
@@ -69,7 +70,6 @@ const getComponentHoverStyle = (componentId: string | undefined) => {
     return undefined
   }
   const dim = computeSelectionOverlay(editor.value, componentId)
-  selectionDimensions.value = dim
   if (dim) {
     const hoverColor = getPref(editor.value, 'componentHoverColor')
     return {
