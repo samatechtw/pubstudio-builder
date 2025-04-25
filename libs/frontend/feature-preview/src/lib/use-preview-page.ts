@@ -47,14 +47,17 @@ export const usePreviewPage = (siteId: string | undefined): IUsePreviewPage => {
       return
     }
     // Check local storage to check for updates in this browser session
-    const newContentUpdatedAt = checkSiteNeedsUpdate(site.value.content_updated_at)
-    if (newContentUpdatedAt) {
-      restoreLocal(newContentUpdatedAt)
+    const { storedTime, forceRefresh } = checkSiteNeedsUpdate(
+      siteId,
+      site.value.content_updated_at,
+    )
+    if (storedTime) {
+      restoreLocal(storedTime)
       apiRestoreCounter = 7
       return
     }
     apiRestoreCounter -= 1
-    if (apiRestoreCounter > 0) {
+    if (!forceRefresh && apiRestoreCounter > 0) {
       return
     }
     // If not updated locally for more than 5 seconds, check the API
