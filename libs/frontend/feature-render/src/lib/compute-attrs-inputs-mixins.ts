@@ -1,11 +1,6 @@
 import { computeInputs, RenderMode } from '@pubstudio/frontend/util-render'
 import { resolveComponent } from '@pubstudio/frontend/util-resolve'
-import {
-  CssPseudoClassType,
-  IComponent,
-  IEditorContext,
-  ISiteContext,
-} from '@pubstudio/shared/type-site'
+import { IComponent, IEditorContext, ISiteContext } from '@pubstudio/shared/type-site'
 import { IAttrsInputsMixins } from './i-attrs-inputs-mixins'
 import { pseudoClassToCssClass } from './pseudo-class-to-css-class'
 
