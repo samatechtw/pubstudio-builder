@@ -156,7 +156,7 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
       if (hasUpdates) {
         const result = await updateFn(siteId.value, payload, keepalive)
         if (result.content_updated_at) {
-          setLocalContentUpdatedAt(result.content_updated_at)
+          setLocalContentUpdatedAt(siteId.value, result.content_updated_at)
         }
         updateKey.value = result.updated_at.toString()
       }
@@ -198,7 +198,7 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
       }
     }
     store.site.setSite(storedSite)
-    setLocalContentUpdatedAt(Date.now())
+    setLocalContentUpdatedAt(siteId.value, Date.now())
     if (changed) {
       if (options?.immediate) {
         if (saveTimer) {
@@ -251,7 +251,7 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
         updated_at: updateKey.value,
         content_updated_at: siteData?.content_updated_at,
       }
-      setLocalContentUpdatedAt(siteData?.content_updated_at)
+      setLocalContentUpdatedAt(siteId.value, siteData?.content_updated_at)
       const site = restoreSiteHelper(data)
       return site
     } catch (e) {
