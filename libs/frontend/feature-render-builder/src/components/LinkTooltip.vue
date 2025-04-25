@@ -1,82 +1,71 @@
 <template>
-  <Teleport to="body">
-    <div
-      ref="tooltipRef"
-      class="link-tooltip"
-      :class="{ tall: editing && mode === LinkTooltipMode.ProseMirror }"
-      :style="{ ...tooltipStyle, 'z-index': 3000 }"
-      @mousedown.stop
-    >
-      <div v-if="editing" class="link-input-wrap">
-        <STInput
-          v-if="mode === LinkTooltipMode.ProseMirror"
-          v-model="editedText"
-          :label="t('text')"
-          class="link-input"
-          :draggable="true"
-          @dragstart.stop.prevent
-          @keyup.enter="updateLink"
-          @keyup.esc="($event.target as HTMLInputElement)?.blur()"
-        />
-        <STInput
-          ref="linkInput"
-          v-model="editedLink"
-          class="link-input"
-          :datalistId="componentId"
-          :datalist="linkDatalist"
-          :draggable="true"
-          @dragstart.stop.prevent
-          @keyup.enter="updateLink"
-          @keyup.esc="($event.target as HTMLInputElement)?.blur()"
-        />
-      </div>
-      <div v-else-if="internalLink" class="link-view" @click="gotoPage">
-        {{ link }}
-      </div>
-      <a v-else-if="link" :href="link" target="_blank" class="link-view" @click.stop>
-        {{ link }}
-      </a>
-      <div v-else class="empty">
-        {{ t('build.no_link') }}
-      </div>
-      <div v-if="editing" class="editing-wrap">
-        <Checkbox
-          class="new-tab-checkbox"
-          :item="{
-            label: t('build.open_in_new_tab'),
-            checked: openInNewTab,
-          }"
-          @checked="openInNewTab = $event"
-        />
-        <Check class="link-save" color="#009879" @click="updateLink" />
-      </div>
-      <div v-else class="icon-wrap">
-        <IconTooltip :tip="t('edit')">
-          <Edit class="edit-link" @click="edit" />
-        </IconTooltip>
-        <CopyText :text="link" class="copy-text" />
-        <Trash
-          v-if="mode === LinkTooltipMode.ProseMirror"
-          color="#b7436a"
-          class="delete"
-          @click="removeProsemirrorLink"
-        />
-      </div>
+  <div
+    ref="tooltipRef"
+    class="link-tooltip"
+    :class="{ tall: editing && mode === LinkTooltipMode.ProseMirror }"
+    :style="{ ...tooltipStyle, 'z-index': 3000 }"
+    @mousedown.stop
+  >
+    <div v-if="editing" class="link-input-wrap">
+      <STInput
+        v-if="mode === LinkTooltipMode.ProseMirror"
+        v-model="editedText"
+        :label="t('text')"
+        class="link-input"
+        :draggable="true"
+        @dragstart.stop.prevent
+        @keyup.enter="updateLink"
+        @keyup.esc="($event.target as HTMLInputElement)?.blur()"
+      />
+      <STInput
+        ref="linkInput"
+        v-model="editedLink"
+        class="link-input"
+        :datalistId="componentId"
+        :datalist="linkDatalist"
+        :draggable="true"
+        @dragstart.stop.prevent
+        @keyup.enter="updateLink"
+        @keyup.esc="($event.target as HTMLInputElement)?.blur()"
+      />
     </div>
-  </Teleport>
+    <div v-else-if="internalLink" class="link-view" @click="gotoPage">
+      {{ link }}
+    </div>
+    <a v-else-if="link" :href="link" target="_blank" class="link-view" @click.stop>
+      {{ link }}
+    </a>
+    <div v-else class="empty">
+      {{ t('build.no_link') }}
+    </div>
+    <div v-if="editing" class="editing-wrap">
+      <Checkbox
+        class="new-tab-checkbox"
+        :item="{
+          label: t('build.open_in_new_tab'),
+          checked: openInNewTab,
+        }"
+        @checked="openInNewTab = $event"
+      />
+      <Check class="link-save" color="#009879" @click="updateLink" />
+    </div>
+    <div v-else class="icon-wrap">
+      <IconTooltip :tip="t('edit')">
+        <Edit class="edit-link" @click="edit" />
+      </IconTooltip>
+      <CopyText :text="link" class="copy-text" />
+      <Trash
+        v-if="mode === LinkTooltipMode.ProseMirror"
+        color="#b7436a"
+        class="delete"
+        @click="removeProsemirrorLink"
+      />
+    </div>
+  </div>
 </template>
 
 <script lang="ts" setup>
-import {
-  computed,
-  nextTick,
-  ref,
-  toRefs,
-  onMounted,
-  onUnmounted,
-  toRaw,
-  watch,
-} from 'vue'
+import { computed, nextTick, ref, onMounted, onUnmounted, toRaw, watch } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { STInput, useTooltip } from '@samatech/vue-components'
 import { EditorView } from 'prosemirror-view'
@@ -105,49 +94,41 @@ const {
   removeComponentInput,
 } = useBuild()
 
-const props = withDefaults(
-  defineProps<{
-    link: string
-    componentId: string
-    defaultOpenInNewTab?: boolean
-    mode: LinkTooltipMode
-    editView?: EditorView
-    anchor?: Element
-  }>(),
-  {
-    editView: undefined,
-    defaultOpenInNewTab: false,
-    anchor: undefined,
-  },
-)
-const { link, componentId, defaultOpenInNewTab, mode, editView, anchor } = toRefs(props)
+const { link, componentId, defaultOpenInNewTab, mode, editView, anchor } = defineProps<{
+  link: string
+  componentId: string
+  defaultOpenInNewTab?: boolean
+  mode: LinkTooltipMode
+  editView?: EditorView
+  anchor?: Element
+}>()
 
 const linkInput = ref()
 const editing = ref(false)
 const editedLink = ref('')
 const editedText = ref('')
-const openInNewTab = ref(defaultOpenInNewTab.value)
+const openInNewTab = ref(defaultOpenInNewTab)
 
-const linkDatalist = computed(() => getLinkDatalistOptions(site.value, componentId.value))
+const linkDatalist = computed(() => getLinkDatalistOptions(site.value, componentId))
 
 const internalLink = computed(() => {
-  return link.value?.startsWith('/') && link.value in site.value.pages
+  return link?.startsWith('/') && link in site.value.pages
 })
 
-const component = computed(() => resolveComponent(site.value.context, componentId.value))
+const component = computed(() => resolveComponent(site.value.context, componentId))
 
 const componentTargetInput = computed(
   () => component.value?.inputs?.target?.is as string | undefined,
 )
 
 const gotoPage = () => {
-  changePage(link.value)
+  changePage(link)
 }
 
 const edit = async () => {
   editing.value = true
-  editedLink.value = link.value
-  if (mode.value === LinkTooltipMode.Component) {
+  editedLink.value = link
+  if (mode === LinkTooltipMode.Component) {
     // Overwrite openInNewTab with the latest component input because inputs can be changed
     // from the component menu when LinkTooltip is already mounted.
     openInNewTab.value = componentTargetInput.value === '_blank'
@@ -166,9 +147,9 @@ const edit = async () => {
 const updateLink = async () => {
   editing.value = false
 
-  if (mode.value === LinkTooltipMode.Component) {
+  if (mode === LinkTooltipMode.Component) {
     updateComponentInputs()
-  } else if (mode.value === LinkTooltipMode.ProseMirror) {
+  } else if (mode === LinkTooltipMode.ProseMirror) {
     updateProseMirrorLink()
   }
 
@@ -237,7 +218,7 @@ const getProsemirrorLink = (): IProsemirrorLink | undefined => {
   // toRaw is necessary because ProseMirror doesn't behave well when proxied
   // eslint-disable-next-line max-len
   // https://discuss.prosemirror.net/t/getting-rangeerror-applying-a-mismatched-transaction-even-with-trivial-code/4948/6
-  const { state } = toRaw(editView.value) ?? {}
+  const { state } = toRaw(editView) ?? {}
   if (state) {
     const { $anchor } = state.selection as TextSelection
     if ($anchor) {
@@ -262,7 +243,7 @@ const updateProseMirrorLink = () => {
       editedLink.value,
       target,
     )
-    editView.value?.dispatch(proseLink.state.tr.replaceWith(start, end, newLinkNode))
+    editView?.dispatch(proseLink.state.tr.replaceWith(start, end, newLinkNode))
   }
 }
 
@@ -271,7 +252,7 @@ const removeProsemirrorLink = () => {
   if (proseLink) {
     const [start, end] = proseLink.pos
     const tr = proseLink.state.tr.removeMark(start, end, schemaText.marks.link)
-    editView.value?.dispatch(tr.removeMark(start, end, schemaText.marks.u))
+    editView?.dispatch(tr.removeMark(start, end, schemaText.marks.u))
   }
 }
 
@@ -288,17 +269,22 @@ const {
   flip: true,
 })
 
-const getAnchor = () => anchor.value ?? document.getElementById(componentId.value)
+const getAnchor = () => {
+  return anchor ?? document.getElementById(componentId)
+}
 
 onMounted(() => {
   itemRef.value = getAnchor()
   tooltipMouseEnter()
 })
 
-watch(anchor, () => {
-  itemRef.value = getAnchor()
-  updatePosition()
-})
+watch(
+  () => anchor,
+  () => {
+    itemRef.value = getAnchor()
+    updatePosition()
+  },
+)
 
 onUnmounted(() => {
   tooltipMouseLeave()

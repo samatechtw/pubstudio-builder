@@ -38,7 +38,6 @@ onMounted(() => {
 .builder-edit {
   @mixin flex-center;
   position: absolute;
-  right: -28px;
   .edit-icon {
     @mixin size 26px;
     filter: drop-shadow(0px 1px 6px rgb(255 255 255 / 0.9));

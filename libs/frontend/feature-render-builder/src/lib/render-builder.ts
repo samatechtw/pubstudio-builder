@@ -5,40 +5,23 @@ import {
   IAttrsInputsMixins,
   parseI18n,
 } from '@pubstudio/frontend/feature-render'
-import {
-  activeBreakpoint,
-  descSortedBreakpoints,
-} from '@pubstudio/frontend/feature-site-source'
 import { resetBuilderContext } from '@pubstudio/frontend/util-builder'
-import { findStyles } from '@pubstudio/frontend/util-component'
 import {
   IBuildContent,
   IPropsBuildContent,
   RenderMode,
 } from '@pubstudio/frontend/util-render'
 import { resolveComponent } from '@pubstudio/frontend/util-resolve'
-import {
-  Css,
-  IComponent,
-  IPage,
-  IRawStyle,
-  ISite,
-  Tag,
-} from '@pubstudio/shared/type-site'
+import { IComponent, IPage, IRawStyle, ISite, Tag } from '@pubstudio/shared/type-site'
 import { h, VNode } from 'vue'
-import LinkTooltip from '../components/LinkTooltip.vue'
-import { ListAdd } from '../components/ListAdd'
 import { ProseMirrorEditor } from '../components/ProseMirrorEditor'
-import SvgEdit from '../components/SvgEdit.vue'
 import { IDndState } from './dnd/builder-dnd'
 import { BuilderDndComponent } from './dnd/builder-dnd-component'
-import { LinkTooltipMode } from './enum-link-tooltip-mode'
 
 // Style and props for a component rendered in the builder
 interface IBuilderStyleProps {
   builderStyle: IRawStyle | undefined
   builderProps: Record<string, unknown> | undefined
-  extraChildren: VNode[] | undefined
   builderClass: string[]
 }
 
@@ -52,36 +35,7 @@ const computeBuilderStyleProps = (
 
   const builderStyle: IRawStyle = {}
   const builderProps: Record<string, unknown> = {}
-  let extraChildren: VNode[] | undefined = undefined
   const builderClass: string[] = []
-  let position: string | null | undefined = undefined
-
-  const cmp = resolveComponent(site.context, component.customSourceId) ?? component
-
-  // Cache CSS position. Must be called before using `position`
-  const getPosition = (): string | null => {
-    if (position !== undefined) {
-      return position
-    }
-    position =
-      findStyles(
-        [Css.Position],
-        site,
-        cmp,
-        descSortedBreakpoints.value,
-        activeBreakpoint.value,
-      ).position ?? null
-    return position
-  }
-  // Force builder container to be relative position
-  const forceRelative = () => {
-    const pos = getPosition()
-    if (!pos) {
-      builderClass.push('force-relative')
-    }
-  }
-
-  const selected = editor?.selectedComponent?.id === component.id
 
   if (component.tag === Tag.Img && !data.attrs.src) {
     data.mixins.push('__image')
@@ -99,39 +53,6 @@ const computeBuilderStyleProps = (
   if (component.tag === Tag.Input || component.tag === Tag.Textarea) {
     builderProps['readonly'] = true
     builderStyle['cursor'] = 'default'
-  }
-  if (selected) {
-    if (component.tag === Tag.A) {
-      const display =
-        findStyles(
-          [Css.Display],
-          site,
-          cmp,
-          descSortedBreakpoints.value,
-          activeBreakpoint.value,
-        ).display ?? null
-      // Don't show the tooltip if the link isn't in the DOM
-      if (display !== 'none') {
-        extraChildren = [
-          h(LinkTooltip, {
-            link: (data.attrs.href ?? '') as string,
-            componentId: component.id,
-            mode: LinkTooltipMode.Component,
-          }),
-        ]
-        data.mixins.push('__link')
-        builderProps.href = 'javascript:'
-        forceRelative()
-      }
-      // TODO -- move this to DndOverlay
-    } else if (component.tag === Tag.Ul || component.tag === Tag.Ol) {
-      extraChildren = [h(ListAdd, { componentId: component.id })]
-      forceRelative()
-    } else if (component.tag === Tag.Svg) {
-      // Add an icon that shows SvgEditModal on click
-      extraChildren = [h(SvgEdit, { componentId: component.id })]
-      forceRelative()
-    }
   }
 
   if (editor?.prefs.debugBounding) {
@@ -161,7 +82,7 @@ const computeBuilderStyleProps = (
     builderStyle['pointer-events'] = 'none'
   }
 
-  return { builderStyle, builderProps, builderClass, extraChildren }
+  return { builderStyle, builderProps, builderClass }
 }
 
 export const renderPage = (site: ISite, page: IPage): VNode | undefined => {
@@ -248,10 +169,6 @@ export const computePropsContent = (
   let builderStyleProps: IBuilderStyleProps | undefined = undefined
   if (editor?.active) {
     builderStyleProps = computeBuilderStyleProps(site, component, data, dndState)
-    const { extraChildren } = builderStyleProps
-    if (extraChildren) {
-      content.push(...extraChildren)
-    }
   }
 
   // TODO -- improve efficiency by avoiding unnecessary input/attr computation
