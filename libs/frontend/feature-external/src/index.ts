@@ -9,6 +9,7 @@ import { useSiteApi } from '@pubstudio/frontend/data-access-site-api'
 import { store } from '@pubstudio/frontend/data-access-web-store'
 import { useBuild, useHistory } from '@pubstudio/frontend/feature-build'
 import { hotkeysDisabled, useBuildEvent } from '@pubstudio/frontend/feature-build-event'
+import { replaceNamespace, useCopyPaste } from '@pubstudio/frontend/feature-copy-paste'
 import { useRender } from '@pubstudio/frontend/feature-render'
 import { useDragDropData } from '@pubstudio/frontend/feature-render-builder'
 import { SiteSaveErrorModal } from '@pubstudio/frontend/feature-site-error'
@@ -65,7 +66,6 @@ import {
 import {
   deserializedHelper,
   deserializeSite,
-  replaceNamespace,
   unstoreSite,
 } from '@pubstudio/frontend/util-site-deserialize'
 import {
@@ -115,6 +115,7 @@ export {
   storeSite,
   stringifySite,
   toggleEditorMenu,
+  useCopyPaste,
   useDragDropData,
   useBuildEvent,
   hotkeysDisabled,

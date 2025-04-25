@@ -1,4 +1,5 @@
 import { applyAddComponent } from '@pubstudio/frontend/data-access-command'
+import { IUseSiteSource, useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { initializeSiteStore } from '@pubstudio/frontend/feature-site-store-init'
 import { DEFAULT_BREAKPOINT_ID } from '@pubstudio/frontend/util-defaults'
 import { resolveComponent } from '@pubstudio/frontend/util-resolve'
@@ -7,7 +8,6 @@ import {
   mockSerializedComponent,
 } from '@pubstudio/frontend/util-test-mock'
 import { IComponent, ISerializedComponent, ISite } from '@pubstudio/shared/type-site'
-import { IUseBuild, useBuild } from './use-build'
 import { IUseCopyPaste, useCopyPaste } from './use-copy-paste'
 
 jest.mock('petite-vue-i18n', () => ({ useI18n: () => ({ t: jest.fn() }) }))
@@ -17,16 +17,16 @@ jest.mock('@pubstudio/frontend/util-ui-alert', () => ({
   uiAlert: jest.fn(),
 }))
 
-describe('use-build composable', () => {
-  let build: IUseBuild
+describe('use-copy-paste composable', () => {
+  let source: IUseSiteSource
   let site: ISite
   let copyPaste: IUseCopyPaste
   let childComponent: ISerializedComponent
 
   beforeEach(async () => {
-    build = useBuild()
+    source = useSiteSource()
     await initializeSiteStore({ siteId: undefined })
-    site = build.site.value
+    site = source.site.value
     copyPaste = useCopyPaste()
 
     const component = mockSerializedComponent(site, {
@@ -69,8 +69,8 @@ describe('use-build composable', () => {
     })
     applyAddComponent(site, mockAddComponentData(targetComponent))
     // Set target component as selected
-    if (build.editor.value) {
-      build.editor.value.selectedComponent = targetComponent
+    if (source.editor.value) {
+      source.editor.value.selectedComponent = targetComponent
     }
 
     copyPaste.pasteStyle(childComponent)
