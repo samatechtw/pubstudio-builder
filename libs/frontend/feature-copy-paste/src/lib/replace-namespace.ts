@@ -3,9 +3,8 @@ import {
   IBehavior,
   IComponent,
   IComponentStyleOverrides,
-  ICopiedComponent,
+  ISerializedComponent,
   ISite,
-  ISiteContext,
   IStyle,
 } from '@pubstudio/shared/type-site'
 
@@ -13,7 +12,7 @@ const makeReplaceId = (oldNamespace: string, namespace: string) => {
   return (id: string) => id.replace(oldNamespace, namespace)
 }
 const makeIdRegex = (namespace: string) => {
-  return new RegExp(`${namespace}(-[a-z]{1,2}-[a-zA-Z0-9]+)`, 'g')
+  return () => new RegExp(`${namespace}(-[a-z]{1,2}-[a-zA-Z0-9]+)`, 'g')
 }
 const hasId = (idRegex: RegExp, text: unknown | undefined) => {
   if (!text || typeof text !== 'string') {
@@ -47,10 +46,10 @@ const replaceComponentNamespace = (
   // Inputs
   if (component.inputs) {
     for (const input of Object.values(component.inputs)) {
-      if (hasId(idRegex, input.default)) {
+      if (hasId(idRegex(), input.default)) {
         input.default = replaceId(input.default)
       }
-      if (hasId(idRegex, input.is)) {
+      if (hasId(idRegex(), input.is)) {
         input.is = replaceId(input.is as string)
       }
     }
@@ -58,6 +57,21 @@ const replaceComponentNamespace = (
   // Event behavior inputs
   if (component.events) {
     for (const event of Object.values(component.events)) {
+      for (const behavior of event.behaviors) {
+        behavior.behaviorId = replaceId(behavior.behaviorId)
+        if (behavior.args) {
+          for (const [argName, arg] of Object.entries(behavior.args)) {
+            if (typeof arg === 'string' && arg.startsWith(oldNamespace)) {
+              behavior.args[argName] = replaceId(arg)
+            }
+          }
+        }
+      }
+    }
+  }
+  // Editor event behavior inputs
+  if (component.editorEvents) {
+    for (const event of Object.values(component.editorEvents)) {
       for (const behavior of event.behaviors) {
         behavior.behaviorId = replaceId(behavior.behaviorId)
         if (behavior.args) {
@@ -82,7 +96,7 @@ const replaceBehaviorsNamespace = (
   const idRegex = makeIdRegex(oldNamespace)
 
   const updateAll = (str: string): string => {
-    return str.replaceAll(idRegex, `${newNamespace}$1`)
+    return str.replaceAll(idRegex(), `${newNamespace}$1`)
   }
   for (const [behaviorId, behavior] of Object.entries(behaviors)) {
     const newId = replaceId(behaviorId)
@@ -95,7 +109,7 @@ const replaceBehaviorsNamespace = (
     }
     if (behavior.args) {
       for (const [name, arg] of Object.entries(behavior.args)) {
-        if (hasId(idRegex, arg.default)) {
+        if (hasId(idRegex(), arg.default)) {
           behavior.args[name].default = replaceId(arg.default as string)
         }
       }
@@ -159,16 +173,13 @@ export const replaceNamespace = (site: ISite, namespace: string): ISite => {
 // Replaces a component's namespace, including children
 // This is somewhat inefficient, since  breakpoints, behaviors, styles have already been replaced
 export const replacePastedComponentNamespace = (
-  context: ISiteContext,
-  copiedComponent: ICopiedComponent,
+  component: ISerializedComponent,
   oldNamespace: string,
-): boolean => {
-  const { component } = copiedComponent
-  const namespace = context.namespace
-
+  newNamespace: string,
+): ISerializedComponent => {
   // Replace component IDs
   iterateComponent(component, (cmp) =>
-    replaceComponentNamespace(cmp, oldNamespace, namespace),
+    replaceComponentNamespace(cmp, oldNamespace, newNamespace),
   )
-  return true
+  return component
 }

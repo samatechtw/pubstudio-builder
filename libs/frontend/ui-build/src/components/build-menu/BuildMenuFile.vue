@@ -70,12 +70,10 @@ import {
   SaveTemplateModal,
   Templates,
 } from '@pubstudio/frontend/ui-widgets'
-import { defaultExportedFileName, validateSite } from '@pubstudio/frontend/util-doc-site'
+import { defaultExportedFileName } from '@pubstudio/frontend/util-doc-site'
 import { loadFile } from '@pubstudio/frontend/util-doc'
-import {
-  deserializeSite,
-  replaceNamespace,
-} from '@pubstudio/frontend/util-site-deserialize'
+import { deserializeSite } from '@pubstudio/frontend/util-site-deserialize'
+import { replaceNamespace } from '@pubstudio/frontend/feature-copy-paste'
 import {
   setShowExportModal,
   showExport,

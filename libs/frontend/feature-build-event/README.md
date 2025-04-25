@@ -1,4 +1,4 @@
-# frontend-feature-build-event-event
+# frontend-feature-build-event
 
 This library was generated with [Nx](https://nx.dev).
 

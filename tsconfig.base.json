@@ -43,6 +43,9 @@
       "@pubstudio/frontend/feature-custom-data": [
         "libs/frontend/feature-custom-data/src/index.ts"
       ],
+      "@pubstudio/frontend/feature-copy-paste": [
+        "libs/frontend/feature-copy-paste/src/index.ts"
+      ],
       "@pubstudio/frontend/feature-mailing-list-form": [
         "libs/frontend/feature-mailing-list-form/src/index.ts"
       ],

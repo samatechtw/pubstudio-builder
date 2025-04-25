@@ -1,0 +1,25 @@
+{
+  "name": "frontend-feature-copy-paste",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/frontend/feature-copy-paste/src",
+  "projectType": "library",
+  "targets": {
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/frontend/feature-copy-paste/**/*.ts"],
+        "eslintConfig": "libs/frontend/feature-copy-paste/.eslintrc.cjs"
+      }
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/libs/frontend/feature-copy-paste"],
+      "options": {
+        "jestConfig": "libs/frontend/feature-copy-paste/jest.config.ts",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": ["scope:frontend", "type:feature"]
+}
