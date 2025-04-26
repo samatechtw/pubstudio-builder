@@ -6,7 +6,6 @@ import {
   IBreakpointStylesWithSource,
   IEditorContext,
   IRawStylesWithSource,
-  StyleSourceType,
 } from '@pubstudio/shared/type-site'
 
 export const computeFlattenedStyles = (
@@ -53,10 +52,7 @@ export const computeFlattenedStyles = (
       // Only update the result when the source type is component custom style
       // since custom style has higher priority, or when the existing entry is
       // not from component custom style.
-      if (
-        source.sourceType === StyleSourceType.Custom ||
-        result[key]?.sourceType !== StyleSourceType.Custom
-      ) {
+      if (source.sourceType === 'custom' || result[key]?.sourceType !== 'custom') {
         const styleWithSource = { ...source }
         if (includePseudoClass) {
           styleWithSource.sourcePseudoClass = currentPseudoClass

@@ -34,7 +34,7 @@ import {
   Css,
   EditorDropdown,
   EditorMode,
-  StyleSourceType,
+  StyleSource,
   ThemeTab,
 } from '@pubstudio/shared/type-site'
 import { useBuild, useToolbar } from '@pubstudio/frontend/feature-build'
@@ -63,7 +63,7 @@ const fontFamily = computed(() => {
 })
 
 const inherited = computed(() => {
-  return fontFamily.value?.sourceType !== StyleSourceType.Custom
+  return fontFamily.value?.sourceType !== StyleSource.Custom
 })
 
 const showFontMenu = async () => {

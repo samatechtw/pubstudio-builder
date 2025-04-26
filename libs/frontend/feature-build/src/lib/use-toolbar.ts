@@ -24,7 +24,7 @@ import {
   Css,
   IRawStyleWithSource,
   IStyleEntry,
-  StyleSourceType,
+  StyleSource,
 } from '@pubstudio/shared/type-site'
 import { Command } from 'prosemirror-state'
 import { EditorView } from 'prosemirror-view'
@@ -143,7 +143,7 @@ export const useToolbar = (): IUseToolbar => {
           selectionStyles[property as keyof typeof selectionStyles] ??
           resolved?.value ??
           '',
-        sourceType: StyleSourceType.Custom,
+        sourceType: StyleSource.Custom,
         sourceId: resolved?.sourceId ?? '',
         sourceBreakpointId: resolved?.sourceBreakpointId ?? '',
       }
@@ -234,7 +234,7 @@ export const useToolbar = (): IUseToolbar => {
     // Style inherited from mixin should not be set as oldStyle,
     // otherwise undo will create a duplicate custom style that didn't exist before
     const oldValue =
-      currentStyle?.sourceType === StyleSourceType.Custom ? currentStyle.value : undefined
+      currentStyle?.sourceType === StyleSource.Custom ? currentStyle.value : undefined
     if (oldValue === value) {
       return undefined
     }
@@ -347,7 +347,7 @@ export const useToolbar = (): IUseToolbar => {
     // Style inherited from mixin should not be set as oldStyle,
     // otherwise undo will create a duplicate custom style that didn't exist before
     const oldValue =
-      oldStyle?.sourceType === StyleSourceType.Custom ? oldStyle.value : undefined
+      oldStyle?.sourceType === StyleSource.Custom ? oldStyle.value : undefined
 
     if (!oldValue && !newValue) {
       return undefined

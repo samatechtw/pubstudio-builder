@@ -1,7 +1,6 @@
 import { DEFAULT_BREAKPOINT_ID, LANG_STORAGE_ID } from '@pubstudio/frontend/util-defaults'
 import { INavigateOptions } from '@pubstudio/frontend/util-router'
 import {
-  CustomDataAction,
   IAddRowApiRequest,
   ICustomDataApiRequest,
   ICustomTableRow,
@@ -183,7 +182,7 @@ const addRow = async (table: string, row: Record<string, string>) => {
     row,
   }
   const payload: ICustomDataApiRequest = {
-    action: CustomDataAction.AddRow,
+    action: 'AddRow',
     data: addRow,
   }
   await tableRequest(payload)
@@ -201,7 +200,7 @@ const updateRow = async (
     row_id: id,
     new_row: row,
   }
-  const payload = { action: CustomDataAction.UpdateRow, data }
+  const payload: ICustomDataApiRequest = { action: 'UpdateRow', data }
   return tableRequest<IUpdateRowResponse>(payload)
 }
 
@@ -214,7 +213,7 @@ const getRow = async (
     filters,
   }
   const payload: ICustomDataApiRequest = {
-    action: CustomDataAction.GetRow,
+    action: 'GetRow',
     data: getRow,
   }
   return tableRequest<ICustomTableRow>(payload)

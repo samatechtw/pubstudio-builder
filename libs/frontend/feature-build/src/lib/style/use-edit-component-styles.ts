@@ -7,7 +7,7 @@ import {
   IInheritedStyleEntry,
   IRawStyleWithSource,
   IStyleEntry,
-  StyleSourceType,
+  StyleSource,
 } from '@pubstudio/shared/type-site'
 import { useI18n } from 'petite-vue-i18n'
 import { computed } from 'vue'
@@ -84,7 +84,7 @@ export const useEditComponentStyles = (): IUseEditStyles => {
   }
 
   const getInheritedFrom = (entry: IRawStyleWithSource): string | undefined => {
-    if (entry.sourceType === StyleSourceType.Custom) {
+    if (entry.sourceType === StyleSource.Custom) {
       if (entry.sourceBreakpointId !== activeBreakpoint.value.id) {
         return t('style.inherited_breakpoint', {
           breakpoint: site.value.context.breakpoints[entry.sourceBreakpointId]?.name,
@@ -99,16 +99,16 @@ export const useEditComponentStyles = (): IUseEditStyles => {
       } else {
         return undefined
       }
-    } else if (entry.sourceType === StyleSourceType.Mixin) {
+    } else if (entry.sourceType === StyleSource.Mixin) {
       return t('style.inherited_mixin', {
         mixin: site.value.context.styles[entry.sourceId]?.name,
       })
-    } else if (entry.sourceType === StyleSourceType.Is) {
+    } else if (entry.sourceType === StyleSource.Is) {
       const sourceName = site.value.context.components[entry.sourceId]?.name
       return t('style.inherited_source', {
         source: `${sourceName}#${entry.sourceId}`,
       })
-    } else if (entry.sourceType === StyleSourceType.CustomComponent) {
+    } else if (entry.sourceType === StyleSource.CustomComponent) {
       const sourceName = site.value.context.components[entry.sourceId]?.name
       return t('style.inherited_source', {
         source: `${sourceName}#${entry.sourceId}`,

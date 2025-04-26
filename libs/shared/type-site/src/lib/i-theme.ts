@@ -17,6 +17,7 @@ export enum ThemeFontSource {
   Google = 'google',
   Custom = 'custom',
 }
+export type ThemeFontSourceType = `${ThemeFontSource}`
 
 export enum WebSafeFont {
   Arial = 'Arial',

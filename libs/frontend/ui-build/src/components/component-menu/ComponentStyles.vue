@@ -42,7 +42,7 @@ import {
   Css,
   EditorDropdown,
   IInheritedStyleEntry,
-  StyleSourceType,
+  StyleSource,
 } from '@pubstudio/shared/type-site'
 import { IconTooltipDelay, ScaleIn } from '@pubstudio/frontend/ui-widgets'
 import {
@@ -98,7 +98,7 @@ const addStyle = () => {
 const setValueWrap = (oldEntry: IInheritedStyleEntry, newValue: string) => {
   // If the property was inherited, create a new entry so undo works as expected
   // Otherwise, the style would be reverted to `oldEntry` on undo
-  if (oldEntry.sourceType !== StyleSourceType.Custom) {
+  if (oldEntry.sourceType !== StyleSource.Custom) {
     createStyle({ prop: oldEntry.property, value: newValue })
   } else {
     setValue(oldEntry, newValue)
@@ -106,7 +106,7 @@ const setValueWrap = (oldEntry: IInheritedStyleEntry, newValue: string) => {
 }
 
 const setPropertyWrap = (oldEntry: IInheritedStyleEntry, newProp: Css) => {
-  if (oldEntry.sourceType !== StyleSourceType.Custom) {
+  if (oldEntry.sourceType !== StyleSource.Custom) {
     createStyle({ prop: newProp, value: oldEntry.value })
     // Close the old style, since we're editing a new property and there were no changes
     // to the old one

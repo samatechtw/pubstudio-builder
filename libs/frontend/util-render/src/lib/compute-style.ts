@@ -38,7 +38,7 @@ export const computeMixinBreakpointStyles = (
 
           Object.entries(mixinRawStyle).forEach(([css, value]) => {
             rawStyle[css as Css] = {
-              sourceType: overrideSourceType ?? StyleSourceType.Mixin,
+              sourceType: overrideSourceType ?? 'mixin',
               sourceId: overrideSourceId ?? mixinId,
               sourceBreakpointId: breakpointId,
               value,
@@ -68,7 +68,7 @@ export const computePseudoStyleWithSource = (
     Object.entries(customRawStyle).forEach(([css, value]) => {
       rawStyle[css as Css] = {
         // TODO: add style source type for custom component
-        sourceType: overrideSourceType ?? StyleSourceType.Custom,
+        sourceType: overrideSourceType ?? 'custom',
         sourceId: componentId,
         sourceBreakpointId: breakpointId,
         value,

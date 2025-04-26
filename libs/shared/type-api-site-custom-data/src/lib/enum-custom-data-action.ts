@@ -12,3 +12,5 @@ export enum CustomDataAction {
   ModifyColumn = 'ModifyColumn',
   DeleteTable = 'DeleteTable',
 }
+
+export type CustomDataActionType = `${CustomDataAction}`

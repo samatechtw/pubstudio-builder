@@ -6,7 +6,7 @@ export const useRouter = <M = unknown>(): IRouter<M> => {
   const router = inject<IRouter<M>>(RouterSymbol)
 
   if (!router) {
-    throw new Error('No router. Register with `app.use(router)` before `useRouter()`')
+    throw new Error('No router, register first')
   }
 
   return router

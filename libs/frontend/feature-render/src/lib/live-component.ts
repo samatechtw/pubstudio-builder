@@ -1,4 +1,8 @@
-import { IContent, RenderMode, renderVueComponent } from '@pubstudio/frontend/util-render'
+import {
+  IContent,
+  RenderModeType,
+  renderVueComponent,
+} from '@pubstudio/frontend/util-render'
 import { RouterLink } from '@pubstudio/frontend/util-router'
 import { getSiteRouter } from '@pubstudio/frontend/util-runtime'
 import { IComponent, ISite } from '@pubstudio/shared/type-site'
@@ -9,7 +13,7 @@ import { computePropsContent } from './render'
 export interface ILiveComponentProps {
   site: ISite
   component: IComponent
-  renderMode: RenderMode
+  renderMode: RenderModeType
 }
 
 export const LiveComponent = () => {
@@ -24,7 +28,7 @@ export const LiveComponent = () => {
         required: true,
       },
       renderMode: {
-        type: String as PropType<RenderMode>,
+        type: String as PropType<RenderModeType>,
         required: true,
       },
     },

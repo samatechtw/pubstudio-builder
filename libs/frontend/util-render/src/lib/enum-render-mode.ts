@@ -8,3 +8,5 @@ export enum RenderMode {
   // Live page
   Release = 'release',
 }
+
+export type RenderModeType = `${RenderMode}`

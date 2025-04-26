@@ -1,4 +1,1 @@
-export enum RouterNavigationType {
-  Push = 'push',
-  Replace = 'replace',
-}
+export type RouterNavigationType = 'push' | 'replace'

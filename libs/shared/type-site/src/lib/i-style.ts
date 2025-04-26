@@ -12,7 +12,7 @@ export interface IStyleEntry {
 }
 
 export interface IInheritedStyleEntry extends IStyleEntry {
-  sourceType: StyleSourceType
+  sourceType: StyleSource
   sourceId: string
   sourceBreakpointId: string
   inheritedFrom: string | undefined
@@ -63,7 +63,7 @@ export type IBreakpointOverrideStylesWithSource = Record<
   IOverrideStylesWithSource
 >
 
-export enum StyleSourceType {
+export enum StyleSource {
   Mixin = 'mixin',
   // Component source (is)
   Is = 'is',
@@ -71,3 +71,5 @@ export enum StyleSourceType {
   Custom = 'custom',
   CustomComponent = 'customComponent',
 }
+
+export type StyleSourceType = `${StyleSource}`
