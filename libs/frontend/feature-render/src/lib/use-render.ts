@@ -5,10 +5,10 @@ import {
   rawStyleToResolvedStyle,
   renderCustomFontLink,
   renderGoogleFontLinks,
-  RenderMode,
+  RenderModeType,
   themeToCssVars,
 } from '@pubstudio/frontend/util-render'
-import { IPage, ISite, ThemeFontSource } from '@pubstudio/shared/type-site'
+import { IPage, ISite } from '@pubstudio/shared/type-site'
 import { Component, computed, defineComponent, h, Ref, VNode } from 'vue'
 import {
   getGlobalStyle,
@@ -28,7 +28,7 @@ export interface IUseRender {
 export interface IUseRenderOptions {
   site: Ref<ISite>
   activePage: Ref<IPage | undefined>
-  renderMode: RenderMode
+  renderMode: RenderModeType
   notFoundComponent: Component
 }
 
@@ -97,9 +97,9 @@ export const useRender = (options: IUseRenderOptions): IUseRender => {
     const googleFonts: string[] = []
     const customFonts: VNode[] = []
     for (const font of Object.values(site.value?.context.theme.fonts ?? {})) {
-      if (font.source === ThemeFontSource.Google) {
+      if (font.source === 'google') {
         googleFonts.push(font.name)
-      } else if (font.source === ThemeFontSource.Custom) {
+      } else if (font.source === 'custom') {
         const link = renderCustomFontLink(font)
         if (link) {
           customFonts.push(link)

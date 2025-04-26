@@ -174,11 +174,11 @@ export const createRouter = <M = IDefaultRouteType>(
   }
 
   const push = (options: INavigateOptions) => {
-    navigate(options, RouterNavigationType.Push)
+    navigate(options, 'push')
   }
 
   const replace = (options: INavigateOptions) => {
-    navigate(options, RouterNavigationType.Replace)
+    navigate(options, 'replace')
   }
 
   const go = (delta: number) => {
@@ -206,9 +206,9 @@ export const createRouter = <M = IDefaultRouteType>(
     const { routesMap, notFoundRoute } = routesMetadata.value
 
     if (!name && path === undefined) {
-      throw new Error('Either name or path must be provided in router navigation')
+      throw new Error('Name or path required in router navigation')
     } else if (name && path) {
-      throw new Error('name and path cannot be used simultaneously in router navigation')
+      throw new Error('only name or path in router navigation')
     }
 
     let route: IRouteWithPathRegex<M> | undefined
@@ -247,7 +247,7 @@ export const createRouter = <M = IDefaultRouteType>(
   const navigate = (options: INavigateOptions, navigationType: RouterNavigationType) => {
     const { path, route } = resolve(options)
 
-    if (navigationType === RouterNavigationType.Push) {
+    if (navigationType === 'push') {
       history.pushState(undefined, '', path)
     } else {
       history.replaceState(undefined, '', path)
@@ -255,7 +255,7 @@ export const createRouter = <M = IDefaultRouteType>(
     if (!route) {
       matchedRoutes.value = []
     } else {
-      recomputeMatchedRoutes(navigationType === RouterNavigationType.Push)
+      recomputeMatchedRoutes(navigationType === 'push')
     }
   }
   // Scroll behavior

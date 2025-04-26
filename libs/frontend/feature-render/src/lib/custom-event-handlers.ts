@@ -1,7 +1,6 @@
 import { resolveComponent } from '@pubstudio/frontend/util-resolve'
 import { registerScroll, runtimeContext } from '@pubstudio/frontend/util-runtime'
 import {
-  ComponentEventType,
   EventHandler,
   IComponent,
   ICustomEvents,
@@ -41,7 +40,7 @@ const registerClickOutsideEvent = (
   component: IComponent,
   customEventHandlers: ICustomEvents,
 ) => {
-  const eventWithArgs = customEventHandlers[ComponentEventType.ClickOutside]
+  const eventWithArgs = customEventHandlers['clickOutside']
 
   if (eventWithArgs?.[0]) {
     runtimeContext.eventHandlers.click[component.id] = createClickawayListener(
@@ -61,7 +60,7 @@ const registerScrollIntoViewEvent = (
   customEventHandlers: ICustomEvents,
   root: HTMLElement | null,
 ) => {
-  const eventWithArgs = customEventHandlers[ComponentEventType.ScrollIntoView]
+  const eventWithArgs = customEventHandlers['scrollIntoView']
 
   removeScrollIntoViewEvent(component)
 
@@ -137,7 +136,7 @@ const registerPeriodicEvent = (
   component: IComponent,
   customEventHandlers: ICustomEvents,
 ) => {
-  const eventWithArgs = customEventHandlers[ComponentEventType.Periodic]
+  const eventWithArgs = customEventHandlers['periodic']
 
   removePeriodicEvent(component)
 
@@ -150,8 +149,8 @@ const registerPeriodicEvent = (
 }
 
 const registerKeyEvents = (component: IComponent, customEventHandlers: ICustomEvents) => {
-  const keydown = customEventHandlers[ComponentEventType.Keydown]
-  const keyup = customEventHandlers[ComponentEventType.Keyup]
+  const keydown = customEventHandlers['keydown']
+  const keyup = customEventHandlers['keyup']
 
   if (keydown) {
     runtimeContext.eventHandlers.keydown[component.id] = (event: Event | undefined) =>
@@ -167,7 +166,7 @@ const registerScrollEvent = (
   component: IComponent,
   customEventHandlers: ICustomEvents,
 ) => {
-  const scroll = customEventHandlers[ComponentEventType.Scroll]
+  const scroll = customEventHandlers['scroll']
 
   if (scroll) {
     registerScroll(component.id, scroll[0])
@@ -191,7 +190,7 @@ const removePeriodicEvent = (component: IComponent) => {
 }
 
 const handleOnAppearEvent = (customEventHandlers: ICustomEvents) => {
-  const eventWithArgs = customEventHandlers[ComponentEventType.OnAppear]
+  const eventWithArgs = customEventHandlers['appear']
   if (eventWithArgs) {
     eventWithArgs[0]()
   }

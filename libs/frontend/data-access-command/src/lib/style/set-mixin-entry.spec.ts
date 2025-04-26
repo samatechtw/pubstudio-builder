@@ -1,3 +1,4 @@
+import { CssPseudoClassValues } from '@pubstudio/frontend/util-builder'
 import { DEFAULT_BREAKPOINT_ID } from '@pubstudio/frontend/util-defaults'
 import { resolveComponent, resolveStyle } from '@pubstudio/frontend/util-resolve'
 import { deserializeSite } from '@pubstudio/frontend/util-site-deserialize'
@@ -12,7 +13,6 @@ import {
   Css,
   CssPseudoClass,
   CssPseudoClassType,
-  CssPseudoClassValues,
   IPseudoStyle,
   ISite,
   IStyleEntry,

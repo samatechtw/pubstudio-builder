@@ -11,7 +11,6 @@ import {
   IComponent,
   IRawStylesWithSource,
   ISiteContext,
-  StyleSourceType,
 } from '@pubstudio/shared/type-site'
 
 export const computeComponentBreakpointStyles = (
@@ -32,13 +31,10 @@ export const computeComponentBreakpointStyles = (
     customCmpMixinBpStyles = computeMixinBreakpointStyles(
       context,
       customCmp.style.mixins,
-      StyleSourceType.CustomComponent,
+      'customComponent',
       customCmp.id,
     )
-    customCmpCustomBpStyles = computeCustomBreakpointStyles(
-      customCmp,
-      StyleSourceType.CustomComponent,
-    )
+    customCmpCustomBpStyles = computeCustomBreakpointStyles(customCmp, 'customComponent')
   }
 
   // Priority: custom style > mixin > custom component style > custom component mixin
@@ -78,7 +74,7 @@ export const computeComponentOverrideStyle = (
 
       Object.entries(customRawStyle).forEach(([css, value]) => {
         rawStyle[css as Css] = {
-          sourceType: StyleSourceType.Custom,
+          sourceType: 'custom',
           sourceId: component.id,
           sourceBreakpointId: breakpointId,
           value,

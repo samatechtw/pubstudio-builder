@@ -25,7 +25,7 @@ import {
   ISite,
   IStyle,
   IStyleEntry,
-  StyleSourceType,
+  StyleSource,
 } from '@pubstudio/shared/type-site'
 import { useI18n } from 'petite-vue-i18n'
 import { computed, ComputedRef, Ref, ref } from 'vue'
@@ -115,7 +115,7 @@ export const useMixinMenu = (): IUseStyleMenuFeature => {
 
           Object.entries(editingRawStyle).forEach(([css, value]) => {
             rawStyle[css as Css] = {
-              sourceType: StyleSourceType.Mixin,
+              sourceType: StyleSource.Mixin,
               sourceId: editingStyle.value?.id ?? '',
               sourceBreakpointId: breakpointId,
               value,

@@ -1,11 +1,11 @@
-import { computeInputs, RenderMode } from '@pubstudio/frontend/util-render'
+import { computeInputs, RenderModeType } from '@pubstudio/frontend/util-render'
 import { resolveComponent } from '@pubstudio/frontend/util-resolve'
 import { IComponent, IEditorContext, ISiteContext } from '@pubstudio/shared/type-site'
 import { IAttrsInputsMixins } from './i-attrs-inputs-mixins'
 import { pseudoClassToCssClass } from './pseudo-class-to-css-class'
 
 export interface IComputeAttrsInputsMixinsOptions {
-  renderMode: RenderMode
+  renderMode: RenderModeType
   /**
    * @default true
    */
@@ -58,7 +58,7 @@ export const computeAttrsInputsMixins = (
     }
   }
 
-  if (component.tag === 'a' && attrs.href && renderMode === RenderMode.Release) {
+  if (component.tag === 'a' && attrs.href && renderMode === 'release') {
     attrs.href = attrs.href?.toString()
   }
 

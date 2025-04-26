@@ -29,7 +29,6 @@ import {
   useNotFoundPage,
   useRender,
 } from '@pubstudio/frontend/feature-render'
-import { RenderMode } from '@pubstudio/frontend/util-render'
 import { unstoreSite, loadSiteLanguage } from '@pubstudio/frontend/util-site-deserialize'
 import { rootSiteApi } from '@pubstudio/shared/util-web-site-api'
 import { ISite } from '@pubstudio/shared/type-site'
@@ -73,7 +72,7 @@ const activePage = computed(() => {
 const { CustomStyle, Mixins, ComponentStyle, FontLinks, PageContent } = useRender({
   site: site as Ref<ISite>,
   activePage,
-  renderMode: RenderMode.Release,
+  renderMode: 'release',
   notFoundComponent: NotFound,
 })
 

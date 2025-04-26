@@ -1,6 +1,7 @@
 import { NativeEvents, resolveComponent } from '@pubstudio/frontend/util-resolve'
 import { triggerEventBehaviors } from '@pubstudio/frontend/util-runtime'
 import {
+  ComponentEventTypeType,
   IComponent,
   IEventCollection,
   ISite,
@@ -35,7 +36,8 @@ export const computeEvents = (site: ISite, component: IComponent): IEventCollect
     if (isNative) {
       events.native[nativeEventName] = eventHandler
     } else {
-      events.custom[event.name] = [eventHandler, event.eventParams]
+      const name = event.name as ComponentEventTypeType
+      events.custom[name] = [eventHandler, event.eventParams]
     }
   }
   return events

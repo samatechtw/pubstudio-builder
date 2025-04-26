@@ -1,6 +1,6 @@
-import { CustomDataAction } from './enum-custom-data-action'
+import { CustomDataActionType } from './enum-custom-data-action'
 
 export interface ICustomDataApiRequest {
-  action: CustomDataAction
+  action: CustomDataActionType
   data: unknown
 }

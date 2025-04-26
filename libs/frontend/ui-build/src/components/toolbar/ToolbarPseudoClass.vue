@@ -22,11 +22,8 @@ import {
   setEditorDropdown,
   setCssPseudoClass,
 } from '@pubstudio/frontend/data-access-command'
-import {
-  CssPseudoClass,
-  CssPseudoClassValues,
-  EditorDropdown,
-} from '@pubstudio/shared/type-site'
+import { CssPseudoClass, EditorDropdown } from '@pubstudio/shared/type-site'
+import { CssPseudoClassValues } from '@pubstudio/frontend/util-builder'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 
 const { t } = useI18n()

@@ -11,5 +11,3 @@ export enum CssPseudoClass {
 }
 
 export type CssPseudoClassType = `${CssPseudoClass}`
-
-export const CssPseudoClassValues: CssPseudoClass[] = Object.values(CssPseudoClass)

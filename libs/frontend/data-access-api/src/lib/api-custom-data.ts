@@ -1,6 +1,6 @@
 import { IApiCustomData, PSApiShim } from '@pubstudio/shared/type-api-interfaces'
 import {
-  CustomDataAction,
+  CustomDataActionType,
   IAddColumnApiRequest,
   IAddRowApiRequest,
   IAddRowApiResponse,
@@ -22,7 +22,7 @@ import {
 export const useCustomDataApi = (siteId: string): IApiCustomData => {
   const customDataRequest = async <T = unknown>(
     api: PSApiShim | undefined,
-    action: CustomDataAction,
+    action: CustomDataActionType,
     payload: unknown,
   ): Promise<T> => {
     if (!api) {
@@ -44,70 +44,70 @@ export const useCustomDataApi = (siteId: string): IApiCustomData => {
     api: PSApiShim | undefined,
     query: IListTablesApiQuery,
   ): Promise<IListTablesResponse> => {
-    return customDataRequest(api, CustomDataAction.ListTables, query)
+    return customDataRequest(api, 'ListTables', query)
   }
 
   const listRows = async (
     api: PSApiShim | undefined,
     query: IListRowsApiQuery,
   ): Promise<IListRowsResponse> => {
-    return customDataRequest(api, CustomDataAction.ListRows, query)
+    return customDataRequest(api, 'ListRows', query)
   }
 
   const createTable = async (
     api: PSApiShim | undefined,
     payload: ICreateTableApiRequest,
   ): Promise<ICreateTableResponse> => {
-    return customDataRequest(api, CustomDataAction.CreateTable, payload)
+    return customDataRequest(api, 'CreateTable', payload)
   }
 
   const addRow = async (
     api: PSApiShim | undefined,
     payload: IAddRowApiRequest,
   ): Promise<IAddRowApiResponse> => {
-    return customDataRequest(api, CustomDataAction.AddRow, payload)
+    return customDataRequest(api, 'AddRow', payload)
   }
 
   const updateRow = async (
     api: PSApiShim | undefined,
     payload: IUpdateRowApiRequest,
   ): Promise<IUpdateRowResponse> => {
-    return customDataRequest(api, CustomDataAction.UpdateRow, payload)
+    return customDataRequest(api, 'UpdateRow', payload)
   }
 
   const removeRow = async (
     api: PSApiShim | undefined,
     payload: IRemoveRowApiRequest,
   ): Promise<void> => {
-    await customDataRequest(api, CustomDataAction.RemoveRow, payload)
+    await customDataRequest(api, 'RemoveRow', payload)
   }
 
   const addColumn = async (
     api: PSApiShim | undefined,
     payload: IAddColumnApiRequest,
   ): Promise<void> => {
-    await customDataRequest(api, CustomDataAction.AddColumn, payload)
+    await customDataRequest(api, 'AddColumn', payload)
   }
 
   const modifyColumn = async (
     api: PSApiShim | undefined,
     payload: IModifyColumnApiRequest,
   ): Promise<void> => {
-    await customDataRequest(api, CustomDataAction.ModifyColumn, payload)
+    await customDataRequest(api, 'ModifyColumn', payload)
   }
 
   const updateTable = async (
     api: PSApiShim | undefined,
     payload: IUpdateTableApiRequest,
   ): Promise<void> => {
-    await customDataRequest(api, CustomDataAction.UpdateTable, payload)
+    await customDataRequest(api, 'UpdateTable', payload)
   }
 
   const deleteTable = async (
     api: PSApiShim | undefined,
     payload: IDeleteTableApiRequest,
   ): Promise<void> => {
-    await customDataRequest(api, CustomDataAction.DeleteTable, payload)
+    await customDataRequest(api, 'DeleteTable', payload)
   }
 
   return {

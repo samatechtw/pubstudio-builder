@@ -12,3 +12,5 @@ export enum ComponentEventType {
   Keyup = 'keyup',
   Keydown = 'keydown',
 }
+
+export type ComponentEventTypeType = `${ComponentEventType}`
