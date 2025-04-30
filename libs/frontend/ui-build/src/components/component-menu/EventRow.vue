@@ -16,7 +16,7 @@ import { useI18n } from 'petite-vue-i18n'
 import { IComponentEvent } from '@pubstudio/shared/type-site'
 import { Settings } from '@pubstudio/frontend/ui-widgets'
 import { resolveBehavior } from '@pubstudio/frontend/util-resolve'
-import { useBuild } from '@pubstudio/frontend/feature-build'
+import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 
 const { t } = useI18n()
 
@@ -29,7 +29,7 @@ const emit = defineEmits<{
   (e: 'edit'): void
 }>()
 
-const { site } = useBuild()
+const { site } = useSiteSource()
 
 const resolvedBehaviorNames = computed(() => {
   const names: string[] = []

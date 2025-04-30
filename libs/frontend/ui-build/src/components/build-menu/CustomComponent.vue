@@ -18,14 +18,12 @@
 
 <script lang="ts" setup>
 import { computed, toRefs } from 'vue'
-import {
-  addCustomComponentAtSelection,
-  useBuild,
-} from '@pubstudio/frontend/feature-build'
+import { addCustomComponentAtSelection } from '@pubstudio/frontend/feature-build'
 import { useDragDrop } from '@pubstudio/frontend/feature-render-builder'
 import { IComponent } from '@pubstudio/shared/type-site'
 import { BuilderDragDataType } from '@pubstudio/frontend/type-builder'
 import { builderContext } from '@pubstudio/frontend/util-builder'
+import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 
 const props = defineProps<{
   customComponent: IComponent
@@ -33,7 +31,7 @@ const props = defineProps<{
 
 const { customComponent } = toRefs(props)
 
-const { site } = useBuild()
+const { site } = useSiteSource()
 
 const text = computed(() => {
   const { id, name } = customComponent.value

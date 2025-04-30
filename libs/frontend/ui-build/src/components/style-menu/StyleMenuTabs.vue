@@ -23,15 +23,15 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
+import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { EditorMode, StyleTab } from '@pubstudio/shared/type-site'
-import { useBuild } from '@pubstudio/frontend/feature-build'
 import { setStyleTab, toggleEditorMenu } from '@pubstudio/frontend/data-access-command'
 import IcX from '@frontend-assets/icon/x.svg'
 import StyleMenuList from './StyleMenuList.vue'
 import GlobalStyles from './GlobalStyles.vue'
 
 const { t } = useI18n()
-const { editor } = useBuild()
+const { editor } = useSiteSource()
 
 const activeTab = computed(() => {
   return editor.value?.styleTab ?? StyleTab.Reusable

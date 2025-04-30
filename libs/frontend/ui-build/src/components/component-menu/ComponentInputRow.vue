@@ -56,16 +56,16 @@ import {
   TagType,
 } from '@pubstudio/shared/type-site'
 import {
-  useBuild,
   validateComponentArg,
   convertComponentArg,
   getLinkDatalistOptions,
 } from '@pubstudio/frontend/feature-build'
 import { setComponentEditInputValue } from '@pubstudio/frontend/data-access-command'
+import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 
 const { t } = useI18n()
 
-const { site, editor } = useBuild()
+const { site, editor } = useSiteSource()
 
 const props = withDefaults(
   defineProps<{

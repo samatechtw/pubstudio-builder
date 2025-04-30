@@ -54,11 +54,11 @@ import { useI18n } from 'petite-vue-i18n'
 import { undoN, redoN, clearAll } from '@pubstudio/frontend/data-access-command'
 import { CommandType } from '@pubstudio/shared/type-command'
 import { ConfirmModal, PSButton } from '@pubstudio/frontend/ui-widgets'
-import { useBuild } from '@pubstudio/frontend/feature-build'
+import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import HistoryRow from './HistoryRow.vue'
 
 const { t } = useI18n()
-const { site } = useBuild()
+const { site } = useSiteSource()
 const showClearModal = ref(false)
 
 const forwardHistory = computed(() => {

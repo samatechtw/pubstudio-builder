@@ -24,13 +24,13 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
-import { useBuild } from '@pubstudio/frontend/feature-build'
 import { setEditBehavior } from '@pubstudio/frontend/data-access-command'
 import { Edit, Plus } from '@pubstudio/frontend/ui-widgets'
+import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import BehaviorModal from '../component-menu/BehaviorModal.vue'
 
 const { t } = useI18n()
-const { editor, site } = useBuild()
+const { editor, site } = useSiteSource()
 
 const showEditBehavior = (id: string) => {
   setEditBehavior(editor.value, site.value.context.behaviors?.[id])

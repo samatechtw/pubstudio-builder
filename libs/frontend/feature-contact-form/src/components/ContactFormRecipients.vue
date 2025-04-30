@@ -33,7 +33,7 @@ import { useI18n } from 'petite-vue-i18n'
 import { setContactFormWalkthrough } from '@pubstudio/frontend/data-access-command'
 import { ContactFormWalkthroughState } from '@pubstudio/shared/type-site'
 import { ErrorMessage, PSButton } from '@pubstudio/frontend/ui-widgets'
-import { useBuild } from '@pubstudio/frontend/feature-build'
+import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { useContactForm } from '../lib/use-contact-form'
 import {
   checkRecipientsError,
@@ -42,7 +42,7 @@ import {
 
 const { createContactTable, recipients, recipientKey, tableName, hasName } =
   useContactForm()
-const { editor } = useBuild()
+const { editor } = useSiteSource()
 
 const { t } = useI18n()
 

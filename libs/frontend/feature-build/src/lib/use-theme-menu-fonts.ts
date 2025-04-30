@@ -1,8 +1,8 @@
+import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { IThemeFont, ThemeFontSource } from '@pubstudio/shared/type-site'
 import { useI18n } from 'petite-vue-i18n'
 import { computed, ComputedRef, reactive, Ref, ref, UnwrapNestedRefs } from 'vue'
 import { addThemeFont, editThemeFont } from './command-wrap/theme-font'
-import { useBuild } from './use-build'
 
 export interface IUseThemeMenuFontFeature {
   editing: Ref<boolean>
@@ -38,7 +38,7 @@ export const resetThemeMenuFonts = () => {
 
 export const useThemeMenuFonts = (): IUseThemeMenuFontFeature => {
   const { t } = useI18n()
-  const { site } = useBuild()
+  const { site } = useSiteSource()
 
   const fonts = computed(() => {
     return Object.values(site.value.context.theme.fonts)

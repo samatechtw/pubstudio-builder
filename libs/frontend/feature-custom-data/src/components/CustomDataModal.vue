@@ -105,7 +105,6 @@ import {
   PSButton,
   PSMenu,
 } from '@pubstudio/frontend/ui-widgets'
-import { useBuild } from '@pubstudio/frontend/feature-build'
 import { setSelectedTable } from '@pubstudio/frontend/data-access-command'
 import {
   ICustomTableColumn,
@@ -125,7 +124,7 @@ import EditActionsModal from './EditActionsModal.vue'
 
 const { t } = useI18n()
 const route = useRoute()
-const { editor } = useBuild()
+const { editor } = useSiteSource()
 const { apiSite } = useSiteSource()
 
 const loadingTables = ref(false)

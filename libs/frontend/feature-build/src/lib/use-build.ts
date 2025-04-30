@@ -67,8 +67,6 @@ import {
   ISetComponentInputData,
   ISetHomePageData,
   IUpdateMixinOrderData,
-  IUpdateUiParams,
-  UiAction,
 } from '@pubstudio/shared/type-command-data'
 import {
   Css,

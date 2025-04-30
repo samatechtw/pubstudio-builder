@@ -21,16 +21,6 @@ export interface ILoadVueComponent {
   retries: number
 }
 
-export interface IBuildDndState {
-  hoverSelf: boolean
-  hoverTop: boolean
-  hoverRight: boolean
-  hoverBottom: boolean
-  hoverLeft: boolean
-  hoverCmpId: string
-  hoverCmpParentIsRow: boolean
-}
-
 export interface IComponentTreeRenameData {
   treeItemId: string | undefined
   renaming: boolean

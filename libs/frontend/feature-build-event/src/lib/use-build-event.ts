@@ -20,6 +20,7 @@ import { setBuildOverlays } from '@pubstudio/frontend/feature-build-overlay'
 import { useCopyPaste } from '@pubstudio/frontend/feature-copy-paste'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { builderContext } from '@pubstudio/frontend/util-builder'
+import { prosemirrorEditing } from '@pubstudio/frontend/util-edit-text'
 import { resolveComponent } from '@pubstudio/frontend/util-resolve'
 import {
   BuildSubmenu,
@@ -288,7 +289,16 @@ export const useBuildEvent = () => {
     }
   }
 
+  const checkShiftKey = (event: KeyboardEvent) => {
+    if (!event.shiftKey) {
+      builderContext.shiftPressed.value = false
+    } else if (!prosemirrorActive(event)) {
+      builderContext.shiftPressed.value = true
+    }
+  }
+
   const handleKeyup = (event: KeyboardEvent) => {
+    checkShiftKey(event)
     // Special case for escape when prosemirror active
     if (
       event.key === Keys.Escape &&
@@ -310,6 +320,7 @@ export const useBuildEvent = () => {
   }
 
   const handleKeydown = (event: KeyboardEvent) => {
+    checkShiftKey(event)
     if (manualDisableHotkeys || hotkeysDisabled(event)) {
       return
     }
@@ -451,6 +462,7 @@ export const useBuildEvent = () => {
 
   const handleFocus = (_e: FocusEvent) => {
     setBuildOverlays(editor.value, activePage.value)
+    builderContext.shiftPressed.value = false
   }
 
   onMounted(() => {

@@ -95,10 +95,10 @@ import { STMultiselect } from '@samatech/vue-components'
 import {
   IResolvedComponentEvent,
   IResolvedComponentEventBehavior,
-  useBuild,
   useEditComponentEditorEvent,
   useEditComponentEvent,
 } from '@pubstudio/frontend/feature-build'
+import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { ErrorMessage, PSButton, Plus } from '@pubstudio/frontend/ui-widgets'
 import { setEditBehavior } from '@pubstudio/frontend/data-access-command'
 import { noBehavior } from '@pubstudio/frontend/util-builtin'
@@ -116,7 +116,7 @@ import BehaviorModal from './BehaviorModal.vue'
 import ComponentEventParam from './ComponentEventParam.vue'
 
 const { t } = useI18n()
-const { site, editor } = useBuild()
+const { site, editor } = useSiteSource()
 
 const props = defineProps<{
   component: IComponent

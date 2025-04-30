@@ -1,6 +1,6 @@
+import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { Css } from '@pubstudio/shared/type-site'
 import { Ref, ref, watch } from 'vue'
-import { useBuild } from './use-build'
 import { useToolbar } from './use-toolbar'
 import {
   IUseToolbarResumeTextFocus,
@@ -20,7 +20,7 @@ export interface IFontSize {
 }
 
 export const useToolbarFontSize = (): IUseToolbarFontSize => {
-  const { editor } = useBuild()
+  const { editor } = useSiteSource()
   const { getResolvedOrSelectedStyle, setStyle, refocusSelection, selectionStyles } =
     useToolbar()
   const fontSizeTextFocus = useToolbarResumeTextFocus({ editor })

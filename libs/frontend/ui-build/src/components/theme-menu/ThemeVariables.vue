@@ -44,24 +44,24 @@
 </template>
 
 <script lang="ts" setup>
+import { computed } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { InfoBubble, Plus } from '@pubstudio/frontend/ui-widgets'
 import {
   IThemeVariableEditState,
   IThemeVariables,
-  useBuild,
   useThemeMenuVariables,
 } from '@pubstudio/frontend/feature-build'
 import { IThemeVariable } from '@pubstudio/shared/type-site'
 import { resolveThemeVariables } from '@pubstudio/frontend/util-resolve'
-import ThemeVariableList from './ThemeVariableList.vue'
 import { isColor } from '@pubstudio/frontend/util-doc'
 import { builtinThemeVariables } from '@pubstudio/frontend/util-ids'
-import { computed } from 'vue'
+import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
+import ThemeVariableList from './ThemeVariableList.vue'
 
 const { t } = useI18n()
 
-const { site } = useBuild()
+const { site } = useSiteSource()
 const { newThemeVariable } = useThemeMenuVariables()
 
 const themeVariables = computed<IThemeVariables>(() => {

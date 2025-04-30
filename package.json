@@ -39,7 +39,7 @@
   "author": "SamaTech",
   "dependencies": {
     "@floating-ui/vue": "^1.1.6",
-    "@samatech/vue-components": "1.3.2",
+    "@samatech/vue-components": "1.3.5",
     "@samatech/vue-store": "^0.7.0",
     "@sampullman/fetch-api": "^0.12.1",
     "date-fns": "^4.1.0",

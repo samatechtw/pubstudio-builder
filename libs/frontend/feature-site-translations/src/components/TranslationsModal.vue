@@ -121,7 +121,7 @@ import {
   PSMenu,
   DotsIcon,
 } from '@pubstudio/frontend/ui-widgets'
-import { useBuild } from '@pubstudio/frontend/feature-build'
+import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { useSiteTranslations } from '../lib/use-site-translations'
 import { IMultiselectObj } from '@pubstudio/frontend/type-ui-widgets'
 import { ref } from 'vue'
@@ -130,7 +130,7 @@ import ImportTranslations from './ImportTranslations.vue'
 import ConvertTranslations from './ConvertTranslations.vue'
 
 const { t } = useI18n()
-const { editor } = useBuild()
+const { editor } = useSiteSource()
 const {
   editTranslation,
   editorRef,

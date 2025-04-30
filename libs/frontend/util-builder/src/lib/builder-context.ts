@@ -6,6 +6,7 @@ export interface IBuilderContext {
   hoveredComponentIdInComponentTree: Ref<string | undefined>
   buildDndState: Ref<IBuildDndState | undefined>
   rightMenuFocused: Ref<boolean>
+  shiftPressed: Ref<boolean>
 }
 
 interface ISize {
@@ -30,6 +31,7 @@ export const builderContext: IBuilderContext = {
   hoveredComponentIdInComponentTree: ref<string>(),
   buildDndState: ref<IBuildDndState>(),
   rightMenuFocused: ref(false),
+  shiftPressed: ref(false),
 }
 
 export const resetBuilderContext = () => {

@@ -50,11 +50,11 @@ import { STInput } from '@samatech/vue-components'
 import { setContactFormWalkthrough } from '@pubstudio/frontend/data-access-command'
 import { ContactFormWalkthroughState } from '@pubstudio/shared/type-site'
 import { Checkbox, ErrorMessage, PSButton } from '@pubstudio/frontend/ui-widgets'
-import { useBuild } from '@pubstudio/frontend/feature-build'
+import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { useContactForm } from '../lib/use-contact-form'
 
 const { contactTables, hasName, tableName } = useContactForm()
-const { editor } = useBuild()
+const { editor } = useSiteSource()
 
 const { t } = useI18n()
 

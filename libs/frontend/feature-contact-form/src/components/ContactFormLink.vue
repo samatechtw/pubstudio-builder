@@ -35,12 +35,12 @@ import { STMultiselect } from '@samatech/vue-components'
 import { setContactFormWalkthrough } from '@pubstudio/frontend/data-access-command'
 import { PSButton } from '@pubstudio/frontend/ui-widgets'
 import { ContactFormWalkthroughState } from '@pubstudio/shared/type-site'
-import { useBuild } from '@pubstudio/frontend/feature-build'
+import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { useContactForm } from '../lib/use-contact-form'
 
 const { t } = useI18n()
 const { contactTables, linkContactTable } = useContactForm()
-const { editor } = useBuild()
+const { editor } = useSiteSource()
 
 const tableName = ref()
 

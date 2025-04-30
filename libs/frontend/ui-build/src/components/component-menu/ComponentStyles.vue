@@ -22,9 +22,11 @@
         :editing="isEditing(entry.property)"
         :omitEditProperties="nonInheritedProperties"
         :error="!resolveThemeVariables(site.context, entry.value)"
+        :allowMoveToMixin="true"
         @setProperty="setPropertyWrap(entry, $event)"
         @setValue="setValueWrap(entry, $event)"
         @edit="editStyle(entry.property)"
+        @moveToMixin="moveToMixin(entry, $event)"
         @save="saveStyle(entry.property)"
         @remove="removeStyle(entry)"
       />
@@ -49,6 +51,7 @@ import {
   useBuild,
   useMixinMenu,
   useEditComponentStyles,
+  moveComponentStyleToMixin,
 } from '@pubstudio/frontend/feature-build'
 import {
   setEditorDropdown,
@@ -102,6 +105,19 @@ const setValueWrap = (oldEntry: IInheritedStyleEntry, newValue: string) => {
     createStyle({ prop: oldEntry.property, value: newValue })
   } else {
     setValue(oldEntry, newValue)
+  }
+}
+
+const moveToMixin = (entry: IInheritedStyleEntry, mixinId: string) => {
+  const component = editor.value?.selectedComponent
+  if (!entry.inheritedFrom && component && mixinId) {
+    moveComponentStyleToMixin(
+      site.value,
+      component,
+      mixinId,
+      entry.pseudoClass,
+      entry.property,
+    )
   }
 }
 

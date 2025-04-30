@@ -22,10 +22,10 @@
 import { computed } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { STMultiselect } from '@samatech/vue-components'
-import { useBuild } from '@pubstudio/frontend/feature-build'
+import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 
 const { t } = useI18n()
-const { site } = useBuild()
+const { site } = useSiteSource()
 
 const emit = defineEmits<{
   (e: 'select', font: string | undefined): void

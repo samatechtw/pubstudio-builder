@@ -108,18 +108,15 @@ import { useI18n } from 'petite-vue-i18n'
 import { ToolbarItem } from '@pubstudio/frontend/ui-widgets'
 import { Eye, Hide, Scroll } from '@pubstudio/frontend/ui-widgets'
 import { ComponentMenuCollapsible, Css } from '@pubstudio/shared/type-site'
-import {
-  useBuild,
-  usePaddingMarginEdit,
-  useToolbar,
-} from '@pubstudio/frontend/feature-build'
+import { usePaddingMarginEdit, useToolbar } from '@pubstudio/frontend/feature-build'
 import { setComponentMenuCollapses } from '@pubstudio/frontend/data-access-command'
 import SizeInput from './SizeInput.vue'
 import PaddingMarginEdit from './PaddingMarginEdit.vue'
 import EditMenuTitle from '../EditMenuTitle.vue'
+import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 
 const { t } = useI18n()
-const { editor } = useBuild()
+const { editor } = useSiteSource()
 const { getStyleValue, setOrRemoveStyle, setStyleOrReplace } = useToolbar()
 const { editValueData } = usePaddingMarginEdit()
 

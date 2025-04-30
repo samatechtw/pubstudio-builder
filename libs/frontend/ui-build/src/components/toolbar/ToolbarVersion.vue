@@ -62,7 +62,6 @@
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { STMultiselect, useClickaway } from '@samatech/vue-components'
-import { useBuild } from '@pubstudio/frontend/feature-build'
 import { setEditorDropdown } from '@pubstudio/frontend/data-access-command'
 import { siteSaveAlert } from '@pubstudio/frontend/feature-site-store-init'
 import {
@@ -72,17 +71,16 @@ import {
   Spinner,
   ToolbarItem,
 } from '@pubstudio/frontend/ui-widgets'
-import { addToast, copyWithToast } from '@pubstudio/frontend/util-ui-alert'
+import { copyWithToast } from '@pubstudio/frontend/util-ui-alert'
 import { EditorDropdown } from '@pubstudio/shared/type-site'
 import { useSiteVersion, VersionOption } from '@pubstudio/frontend/feature-site-version'
 import { IMultiselectObj } from '@pubstudio/frontend/type-ui-widgets'
-import { copy } from '@pubstudio/frontend/util-doc'
 import { WEB_URL } from '@pubstudio/frontend/util-config'
 import { IMergedSiteData, useGetSite } from '@pubstudio/frontend/feature-sites'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 
 const { t } = useI18n()
-const { site, editor } = useBuild()
+const { site, editor } = useSiteSource()
 const {
   hasDraft,
   loading,

@@ -35,12 +35,12 @@ import { STMultiselect } from '@samatech/vue-components'
 import { setMailingListWalkthrough } from '@pubstudio/frontend/data-access-command'
 import { PSButton } from '@pubstudio/frontend/ui-widgets'
 import { MailingListWalkthroughState } from '@pubstudio/shared/type-site'
-import { useBuild } from '@pubstudio/frontend/feature-build'
+import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { useMailingListForm } from '../lib/use-mailing-list-form'
 
 const { t } = useI18n()
 const { mailingListTables, linkMailingListTable } = useMailingListForm()
-const { editor } = useBuild()
+const { editor } = useSiteSource()
 
 const tableName = ref()
 

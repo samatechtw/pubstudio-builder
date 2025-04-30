@@ -37,15 +37,16 @@ import {
   StyleSource,
   ThemeTab,
 } from '@pubstudio/shared/type-site'
-import { useBuild, useToolbar } from '@pubstudio/frontend/feature-build'
+import { useToolbar } from '@pubstudio/frontend/feature-build'
 import {
   setEditorDropdown,
   setThemeTab,
   toggleEditorMenu,
 } from '@pubstudio/frontend/data-access-command'
+import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 
 const { t } = useI18n()
-const { site, editor } = useBuild()
+const { site, editor } = useSiteSource()
 const { getResolvedOrSelectedStyle, setStyle } = useToolbar()
 
 const addFontText = t('toolbar.add_font')

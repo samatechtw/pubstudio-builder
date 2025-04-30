@@ -25,10 +25,10 @@
 import { useI18n } from 'petite-vue-i18n'
 import { setMailingListWalkthrough } from '@pubstudio/frontend/data-access-command'
 import { MailingListWalkthroughState } from '@pubstudio/shared/type-site'
-import { useBuild } from '@pubstudio/frontend/feature-build'
+import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 
 const { t } = useI18n()
-const { editor } = useBuild()
+const { editor } = useSiteSource()
 
 const linkTable = () => {
   setMailingListWalkthrough(editor.value, MailingListWalkthroughState.LinkTable)
