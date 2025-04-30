@@ -100,7 +100,7 @@
 <script lang="ts" setup>
 import { computed, ref } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
-import { useBuild } from '@pubstudio/frontend/feature-build'
+import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import {
   setBuildSubmenu,
   showTranslations,
@@ -134,7 +134,7 @@ import BuildMenuBehavior from './BuildMenuBehavior.vue'
 import BuildMenuHistory from './BuildMenuHistory.vue'
 
 const { t } = useI18n()
-const { site, editor } = useBuild()
+const { site, editor } = useSiteSource()
 
 const emit = defineEmits<{
   (e: 'toggleStyleMenu', show?: boolean): void

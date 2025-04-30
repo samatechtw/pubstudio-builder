@@ -23,13 +23,14 @@
 import { toRefs } from 'vue'
 import { uidSingleton } from '@pubstudio/frontend/util-doc'
 import { Css } from '@pubstudio/shared/type-site'
-import { useToolbar, useBuild, useCssSize } from '@pubstudio/frontend/feature-build'
+import { useToolbar, useCssSize } from '@pubstudio/frontend/feature-build'
 import { rightMenuTabIndex } from '@pubstudio/frontend/util-builder'
 import { ICssSize } from '@pubstudio/frontend/util-component'
 import { SizeUnit } from '@pubstudio/frontend/ui-widgets'
+import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 
 const uid = uidSingleton.next()
-const { editor } = useBuild()
+const { editor } = useSiteSource()
 const { getStyleValue } = useToolbar()
 
 const props = defineProps<{

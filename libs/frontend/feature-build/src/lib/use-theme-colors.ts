@@ -1,9 +1,9 @@
+import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { isColor } from '@pubstudio/frontend/util-doc'
 import { builtinThemeVariables } from '@pubstudio/frontend/util-ids'
 import { resolveThemeVariables } from '@pubstudio/frontend/util-resolve'
 import { IThemeVariable } from '@pubstudio/shared/type-site'
 import { computed, ComputedRef } from 'vue'
-import { useBuild } from './use-build'
 
 export const MAX_SELECTED_THEME_COLORS = 16
 
@@ -12,7 +12,7 @@ export interface IUseThemeColors {
 }
 
 export const useThemeColors = (): IUseThemeColors => {
-  const { site, editor } = useBuild()
+  const { site, editor } = useSiteSource()
 
   const themeColors = computed<IThemeVariable[]>(() => {
     return Object.entries(site.value.context.theme.variables)

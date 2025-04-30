@@ -18,7 +18,7 @@
 
 <script lang="ts" setup>
 import { computed, onMounted } from 'vue'
-import { useBuild } from '@pubstudio/frontend/feature-build'
+import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { Modal, Spinner } from '@pubstudio/frontend/ui-widgets'
 import { setMailingListWalkthrough } from '@pubstudio/frontend/data-access-command'
 import { MailingListWalkthroughState } from '@pubstudio/shared/type-site'
@@ -27,7 +27,7 @@ import MailingListLink from './MailingListLink.vue'
 import MailingListCreate from './MailingListCreate.vue'
 import { useMailingListForm } from '../lib/use-mailing-list-form'
 
-const { editor } = useBuild()
+const { editor } = useSiteSource()
 const { loadingTables, loadMailingListTables } = useMailingListForm()
 
 const state = computed(() => editor.value?.mailingListWalkthrough?.state)

@@ -17,11 +17,11 @@
 
 <script lang="ts" setup>
 import { useI18n } from 'petite-vue-i18n'
-import { useBuild } from '@pubstudio/frontend/feature-build'
 import { Modal, PSButton } from '@pubstudio/frontend/ui-widgets'
+import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 
 const { t } = useI18n()
-const { site } = useBuild()
+const { site } = useSiteSource()
 
 const emit = defineEmits<{
   (e: 'cancel'): void

@@ -50,12 +50,12 @@ import { STInput } from '@samatech/vue-components'
 import { setMailingListWalkthrough } from '@pubstudio/frontend/data-access-command'
 import { MailingListWalkthroughState } from '@pubstudio/shared/type-site'
 import { Checkbox, ErrorMessage, PSButton } from '@pubstudio/frontend/ui-widgets'
-import { useBuild } from '@pubstudio/frontend/feature-build'
+import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { useMailingListForm } from '../lib/use-mailing-list-form'
 
 const { mailingListTables, createMailingListTable, hasName, tableName } =
   useMailingListForm()
-const { editor } = useBuild()
+const { editor } = useSiteSource()
 
 const { t } = useI18n()
 

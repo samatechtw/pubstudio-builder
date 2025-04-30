@@ -27,7 +27,6 @@ import {
   descSortedBreakpoints,
 } from '@pubstudio/frontend/feature-site-source'
 import {
-  useBuild,
   buildContentWindowId,
   buildContentWindowInnerId,
 } from '@pubstudio/frontend/feature-build'
@@ -38,7 +37,7 @@ import { builderContext } from '@pubstudio/frontend/util-builder'
 import { BuildDndOverlay } from '@pubstudio/frontend/feature-build-overlay'
 
 const { site, activePage } = useSiteSource()
-const { editor } = useBuild()
+const { editor } = useSiteSource()
 
 const {
   CustomStyle,

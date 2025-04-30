@@ -46,6 +46,7 @@
         {{ propertyText }}
       </div>
       <div
+        v-if="!moveToMixinOptions"
         class="value-preview"
         :class="{ error, ['value-inherited']: style.inheritedFrom }"
       >
@@ -56,8 +57,35 @@
         class="edit-icon background-asset-icon"
         @click="showSelectAssetModal = true"
       />
-      <Edit class="edit-icon" @click="edit" />
-      <Minus v-if="!style.inheritedFrom" class="item-delete" @click.stop="removeStyle" />
+      <STMultiselect
+        v-if="moveToMixinOptions"
+        :value="undefined"
+        valueKey="id"
+        labelKey="name"
+        :placeholder="t('style.select')"
+        :options="moveToMixinOptions"
+        :clearable="false"
+        :openInitial="true"
+        class="move-to-mixin-select"
+        @close="closeMoveToMixin"
+        @select="selectMoveToMixin($event as IStyle)"
+      />
+      <IconTooltipDelay
+        v-else-if="
+          allowMoveToMixin && builderContext.shiftPressed.value && !style.inheritedFrom
+        "
+        ref="moveToMixinRef"
+        :tip="t('style.move_to_mixin')"
+        class="move-to-mixin"
+      >
+        <Grow class="move-icon" @click="moveToMixin" />
+      </IconTooltipDelay>
+      <Edit v-else class="edit-icon" @click="edit" />
+      <Minus
+        v-if="!moveToMixinOptions && !style.inheritedFrom"
+        class="item-delete"
+        @click.stop="removeStyle"
+      />
       <InfoBubble
         v-if="style.inheritedFrom"
         class="inherited-from"
@@ -77,83 +105,48 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, nextTick, onMounted, ref, toRefs } from 'vue'
+import { computed, nextTick, onMounted, ref } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
-import { STInput } from '@samatech/vue-components'
-import { StyleProperty, StyleValue } from '@pubstudio/frontend/ui-widgets'
+import { STInput, STMultiselect } from '@samatech/vue-components'
+import {
+  Grow,
+  IconTooltipDelay,
+  StyleProperty,
+  StyleValue,
+} from '@pubstudio/frontend/ui-widgets'
 import { Assets, Check, Edit, InfoBubble, Minus } from '@pubstudio/frontend/ui-widgets'
 import {
   Css,
   CssPseudoClass,
   IInheritedStyleEntry,
+  IStyle,
   Keys,
 } from '@pubstudio/shared/type-site'
-import {
-  useBuild,
-  useSelectAsset,
-  validateCssValue,
-} from '@pubstudio/frontend/feature-build'
+import { useSelectAsset, validateCssValue } from '@pubstudio/frontend/feature-build'
 import { SelectAssetModal } from '@pubstudio/frontend/feature-site-assets'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { ISiteAssetViewModel } from '@pubstudio/shared/type-api-platform-site-asset'
 import { urlFromAsset } from '@pubstudio/frontend/util-asset'
 import { replaceBackground } from '@pubstudio/frontend/util-component'
-
-// Items listed here will be used to populate the dropdown in editor, disabling users
-// from entering custom values.
-// Only non-numeric, dynamic values should be listed here.
-const OVERFLOW = ['auto', 'hidden', 'scroll', 'visible']
-const cssValues = new Map<Css, string[]>([
-  [
-    Css.AlignContent,
-    ['center', 'flex-end', 'flex-start', 'space-around', 'space-between', 'stretch'],
-  ],
-  [Css.AlignItems, ['baseline', 'center', 'flex-end', 'flex-start', 'stretch']],
-  [Css.AlignSelf, ['baseline', 'center', 'flex-end', 'flex-start', 'stretch']],
-  [Css.BackgroundOrigin, ['border-box', 'content-box', 'padding-box']],
-  [Css.Cursor, ['auto', 'default', 'none', 'pointer', 'text']],
-  [Css.Display, ['block', 'flex', 'inline', 'inline-block', 'none']],
-  [Css.FlexDirection, ['column', 'column-reverse', 'row', 'row-reverse']],
-  [Css.FlexWrap, ['nowrap', 'wrap', 'wrap-reverse']],
-  [Css.FontStyle, ['italic', 'normal']],
-  [Css.FontWeight, ['100', '300', '400', '500', '600', '700']],
-  [
-    Css.JustifyContent,
-    ['center', 'flex-end', 'flex-start', 'space-around', 'space-between', 'stretch'],
-  ],
-  [Css.ObjectFit, ['contain', 'cover', 'fill', 'none', 'scale-down']],
-  [Css.Overflow, OVERFLOW],
-  [Css.OverflowX, OVERFLOW],
-  [Css.OverflowY, OVERFLOW],
-  [Css.PointerEvents, ['auto', 'none']],
-  [Css.Position, ['absolute', 'fixed', 'relative', 'static', 'sticky']],
-  [Css.ScrollBehavior, ['auto', 'smooth']],
-  [Css.TextAlign, ['start', 'end', 'justify', 'center']],
-  [Css.TextOverflow, ['clip', 'ellipsis']],
-  [Css.TextTransform, ['capitalize', 'uppercase', 'lowercase', 'none', 'full-width']],
-  [Css.UserSelect, ['all', 'auto', 'none', 'text']],
-  [Css.Visibility, ['hidden', 'visible']],
-  [Css.WebkitBackgroundClip, ['border-box', 'padding-box', 'content-box', 'text']],
-  [Css.WhiteSpace, ['normal', 'nowrap', 'pre', 'pre-line', 'pre-wrap']],
-  [Css.WordBreak, ['break-word', 'break-all', 'keep-all', 'auto-phrase', 'normal']],
-  [Css.WordWrap, ['break-word', 'normal']],
-])
+import { builderContext } from '@pubstudio/frontend/util-builder'
+import { CSS_VALUES } from './style-values'
 
 const { t } = useI18n()
-const { site } = useBuild()
+const { site, editor } = useSiteSource()
 const { showSelectAssetModal, contentTypes } = useSelectAsset()
 
-const props = defineProps<{
+const { editing, style } = defineProps<{
   editing?: boolean
   omitEditProperties: string[]
   style: IInheritedStyleEntry
   error?: boolean
   focusProp?: boolean
+  allowMoveToMixin?: boolean
 }>()
-const { editing, style } = toRefs(props)
 
 const emit = defineEmits<{
   (e: 'edit', propName: string): void
+  (e: 'moveToMixin', mixinId: string): void
   (e: 'setProperty', prop: Css): void
   (e: 'setValue', val: string): void
   (e: 'save'): void
@@ -162,36 +155,36 @@ const emit = defineEmits<{
 
 const valueInputRef = ref<InstanceType<typeof STInput> | undefined>()
 const valueSelectRef = ref()
+const moveToMixinRef = ref()
+const moveToMixinOptions = ref()
 
 const valueOptions = computed(() => {
-  const prop = style.value?.property
-  return prop ? cssValues.get(prop) : undefined
+  const prop = style?.property
+  return prop ? CSS_VALUES.get(prop) : undefined
 })
 
 // Wrap the property/value inputs when they overflow
 const editWrap = computed(() => {
   const s = style.value
-  if (editing.value) {
-    if ([Css.Background, Css.BackgroundImage].includes(s.property)) {
-      return s.value.length > 10
+  if (editing) {
+    if ([Css.Background, Css.BackgroundImage].includes(s as Css)) {
+      return s.length > 10
     }
-    return s.property.length > 16 || s.value.length > 12
+    return s.length > 16 || s.length > 12
   }
   return false
 })
 
 const propertyText = computed(() => {
-  if (style.value?.pseudoClass === CssPseudoClass.Default) {
-    return style.value.property
+  if (style?.pseudoClass === CssPseudoClass.Default) {
+    return style.property
   } else {
-    return `${style.value.pseudoClass} ${style.value.property}`
+    return `${style.pseudoClass} ${style.property}`
   }
 })
 
 const showAssetButton = computed(
-  () =>
-    style.value.property === Css.Background ||
-    style.value.property === Css.BackgroundImage,
+  () => style.property === Css.Background || style.property === Css.BackgroundImage,
 )
 
 const { siteStore } = useSiteSource()
@@ -210,7 +203,7 @@ const focusValue = async () => {
     } catch (_e) {
       //
     }
-    if (!style.value.value) {
+    if (!style.value) {
       setTimeout(() => valueSelectRef.value?.toggleDropdown(), 1)
     }
   } else {
@@ -222,10 +215,38 @@ const focusValue = async () => {
 }
 
 const edit = async () => {
-  emit('edit', style.value.property)
-  if (style.value.property) {
+  emit('edit', style.property)
+  if (style.property) {
     focusValue()
   }
+}
+
+const moveToMixin = () => {
+  moveToMixinRef.value?.cancelHoverTimer()
+
+  const component = editor.value?.selectedComponent
+  const mixinId = component?.style?.mixins?.[0]
+  if (!style.inheritedFrom && component && mixinId) {
+    const mixins = component.style?.mixins
+    if (mixins && mixins.length > 1) {
+      // Show dropdown with mixin options
+      moveToMixinOptions.value = component.style?.mixins
+        ?.map((mId) => site.value.context.styles[mId])
+        .filter((m) => !!m)
+    } else {
+      // Move to only available mixin
+      emit('moveToMixin', mixinId)
+    }
+  }
+}
+
+const selectMoveToMixin = (mixin: IStyle) => {
+  moveToMixinOptions.value = undefined
+  emit('moveToMixin', mixin.id)
+}
+
+const closeMoveToMixin = () => {
+  moveToMixinOptions.value = undefined
 }
 
 const updateProperty = (property: Css) => {
@@ -234,7 +255,7 @@ const updateProperty = (property: Css) => {
 }
 
 const isValueValid = computed(() =>
-  validateCssValue(site.value.context, style.value.property, style.value.value),
+  validateCssValue(site.value.context, style.property, style.value),
 )
 
 const valueErrorMessage = computed(() => {
@@ -256,9 +277,9 @@ const checkEscape = (e: KeyboardEvent) => {
 }
 
 const saveStyle = () => {
-  if (style.value.property && isValueValid.value) {
+  if (style.property && isValueValid.value) {
     emit('save')
-  } else if (!style.value.property && !style.value.value) {
+  } else if (!style.property && !style.value) {
     // Clear empty style on save
     emit('remove')
   }
@@ -274,11 +295,11 @@ const onBackgroundAssetSelected = (asset: ISiteAssetViewModel) => {
 }
 
 const onBackgroundUrlSelected = (url: string) => {
-  if (style.value.property === Css.Background) {
-    const newValue = replaceBackground(style.value.value, url)
+  if (style.property === Css.Background) {
+    const newValue = replaceBackground(style.value, url)
     updateValue(newValue)
     saveStyle()
-  } else if (style.value.property === Css.BackgroundImage) {
+  } else if (style.property === Css.BackgroundImage) {
     updateValue(`url("${url}")`)
     saveStyle()
   }
@@ -288,7 +309,7 @@ const onBackgroundUrlSelected = (url: string) => {
 onMounted(() => {
   // Component is re-mounted on property change. Ideally we would avoid this,
   // but it's difficult because there is no consistent key in that case
-  if (style.value.property) {
+  if (style.property) {
     focusValue()
   }
 })
@@ -304,6 +325,7 @@ onMounted(() => {
 .style-row,
 .style {
   display: flex;
+  position: relative;
   font-size: 14px;
   padding: 8px 0;
 }
@@ -332,7 +354,8 @@ onMounted(() => {
 .error {
   color: $color-error;
 }
-.edit-icon {
+.edit-icon,
+.move-icon {
   flex-shrink: 0;
 }
 .item {
@@ -361,6 +384,15 @@ onMounted(() => {
 .small {
   max-width: 88px;
   width: 88px;
+}
+.move-to-mixin {
+  display: flex;
+  align-items: center;
+}
+.move-to-mixin-select {
+  position: absolute;
+  right: 8px;
+  top: 0;
 }
 .edit-wrap {
   flex-wrap: wrap;

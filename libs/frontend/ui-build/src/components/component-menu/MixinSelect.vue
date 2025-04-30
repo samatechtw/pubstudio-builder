@@ -43,7 +43,7 @@ import {
   Minus,
   ScaleOut,
 } from '@pubstudio/frontend/ui-widgets'
-import { useBuild } from '@pubstudio/frontend/feature-build'
+import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 
 const { t } = useI18n()
 
@@ -65,7 +65,7 @@ const emit = defineEmits<{
   (e: 'flatten'): void
 }>()
 
-const { site } = useBuild()
+const { site } = useSiteSource()
 
 const flattenRef = ref()
 const multiselectRef = ref()

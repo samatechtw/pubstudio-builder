@@ -77,7 +77,6 @@ import { useClickaway } from '@samatech/vue-components'
 import { ErrorMessage, PSButton, Theme } from '@pubstudio/frontend/ui-widgets'
 import {
   IThemeVariableEditState,
-  useBuild,
   useThemeColors,
   useThemeMenuVariables,
 } from '@pubstudio/frontend/feature-build'
@@ -91,10 +90,11 @@ import {
 import { resolveThemeVariables } from '@pubstudio/frontend/util-resolve'
 import ThemeVariableFont from './ThemeVariableFont.vue'
 import { BuildMenuIcon } from '../..'
+import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 
 const { t } = useI18n()
 
-const { site } = useBuild()
+const { site } = useSiteSource()
 const {
   editingThemeVariable,
   themeVariableError,

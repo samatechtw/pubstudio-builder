@@ -28,10 +28,11 @@ import { ColorPicker, IPickerColor, IThemedGradient } from '@samatech/vue-color-
 import { IThemeVariable } from '@pubstudio/shared/type-site'
 import { resolveThemeVariables } from '@pubstudio/frontend/util-resolve'
 import { ToolbarItem } from '@pubstudio/frontend/ui-widgets'
-import { useBuild, useToolbarResumeTextFocus } from '@pubstudio/frontend/feature-build'
+import { useToolbarResumeTextFocus } from '@pubstudio/frontend/feature-build'
 import { IToolbarPickerColor, IToolbarThemedGradient } from './i-toolbar-color-picker'
+import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 
-const { site, editor } = useBuild()
+const { site, editor } = useSiteSource()
 
 const resolveThemeVar = (themeVar: string): string | undefined => {
   return resolveThemeVariables(site.value.context, themeVar)

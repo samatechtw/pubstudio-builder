@@ -69,7 +69,8 @@ import { computed, toRefs } from 'vue'
 import { Caret } from '@pubstudio/frontend/ui-widgets'
 import { IComponent } from '@pubstudio/shared/type-site'
 import { useDragDrop } from '@pubstudio/frontend/feature-render-builder'
-import { useBuild } from '@pubstudio/frontend/feature-build'
+import { closeMixinMenuOnComponentChange } from '@pubstudio/frontend/feature-build-event'
+import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import {
   collapseComponentTreeItem,
   expandComponentTreeItem,
@@ -80,7 +81,6 @@ import {
 import { builderContext } from '@pubstudio/frontend/util-builder'
 import { Eye, Hide } from '@pubstudio/frontend/ui-widgets'
 import ComponentTreeItemRename from './ComponentTreeItemRename.vue'
-import { closeMixinMenuOnComponentChange } from '@pubstudio/frontend/feature-build-event'
 
 const props = defineProps<{
   component: IComponent
@@ -90,7 +90,7 @@ const props = defineProps<{
 
 const { component, level, componentIndex } = toRefs(props)
 
-const { site, editor } = useBuild()
+const { site, editor } = useSiteSource()
 
 const canDrag = computed(
   () =>

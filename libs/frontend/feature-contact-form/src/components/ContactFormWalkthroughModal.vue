@@ -21,7 +21,7 @@
 
 <script lang="ts" setup>
 import { computed, onMounted } from 'vue'
-import { useBuild } from '@pubstudio/frontend/feature-build'
+import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { Modal, Spinner } from '@pubstudio/frontend/ui-widgets'
 import { setContactFormWalkthrough } from '@pubstudio/frontend/data-access-command'
 import { ContactFormWalkthroughState } from '@pubstudio/shared/type-site'
@@ -31,7 +31,7 @@ import ContactFormCreate from './ContactFormCreate.vue'
 import ContactFormRecipients from './ContactFormRecipients.vue'
 import { useContactForm } from '../lib/use-contact-form'
 
-const { editor } = useBuild()
+const { editor } = useSiteSource()
 const { loadingTables, loadContactFormTables } = useContactForm()
 
 const state = computed(() => editor.value?.contactFormWalkthrough?.state)

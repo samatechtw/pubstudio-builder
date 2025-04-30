@@ -47,11 +47,11 @@ import { ref, computed, ComponentPublicInstance, watch } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { STInput, useDropdown } from '@samatech/vue-components'
 import { ToolbarItem } from '@pubstudio/frontend/ui-widgets'
-import { useBuild } from '@pubstudio/frontend/feature-build'
 import { setBuilderWidth, setBuilderScale } from '@pubstudio/frontend/data-access-command'
+import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 
 const { t } = useI18n()
-const { editor } = useBuild()
+const { editor } = useSiteSource()
 
 const getEditorBuilderWidth = () => (editor.value?.builderWidth ?? 0).toString()
 const getEditorBuilderScale = () => (editor.value?.builderScale ?? 1).toString()

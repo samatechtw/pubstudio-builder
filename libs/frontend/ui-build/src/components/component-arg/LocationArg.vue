@@ -14,11 +14,11 @@ import { computed, toRefs } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { STMultiselect } from '@samatech/vue-components'
 import { IBehaviorArg, IComponentInput } from '@pubstudio/shared/type-site'
-import { useBuild } from '@pubstudio/frontend/feature-build'
+import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { IUpdateComponentArgPayload } from './i-update-component-arg-payload'
 
 const { t } = useI18n()
-const { site } = useBuild()
+const { site } = useSiteSource()
 
 const props = defineProps<{
   arg: IComponentInput | IBehaviorArg

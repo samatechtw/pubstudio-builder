@@ -1,4 +1,5 @@
 import { pushCommand } from '@pubstudio/frontend/data-access-command'
+import { activeBreakpoint } from '@pubstudio/frontend/feature-site-source'
 import { styleId } from '@pubstudio/frontend/util-ids'
 import { resolveComponent } from '@pubstudio/frontend/util-resolve'
 import { CommandType, ICommand } from '@pubstudio/shared/type-command'
@@ -7,13 +8,17 @@ import {
   IAddStyleMixinData,
   ICommandGroupData,
   ISetComponentCustomStyleData,
+  ISetMixinEntryData,
 } from '@pubstudio/shared/type-command-data'
 import {
   Css,
   CssPseudoClass,
+  CssPseudoClassType,
   IBreakpointStyles,
+  IComponent,
   ISite,
 } from '@pubstudio/shared/type-site'
+import { removeComponentCustomStyleCommand } from '../build-command-helpers'
 
 export const addMixin = (site: ISite, name: string, breakpoints: IBreakpointStyles) => {
   const data: IAddStyleMixinData = {
@@ -21,6 +26,51 @@ export const addMixin = (site: ISite, name: string, breakpoints: IBreakpointStyl
     breakpoints: breakpoints,
   }
   pushCommand(site, CommandType.AddStyleMixin, data)
+}
+
+export const moveComponentStyleToMixin = (
+  site: ISite,
+  component: IComponent,
+  mixinId: string,
+  pseudo: CssPseudoClassType,
+  css: Css,
+) => {
+  const breakpointId = activeBreakpoint.value.id
+  // Remove the style from the component
+  const removeStyle = removeComponentCustomStyleCommand(site, {
+    pseudoClass: pseudo,
+    property: css,
+  })
+  // Add the style to the mixin
+  const mixin = site.context.styles[mixinId]
+  const newVal = component.style.custom[breakpointId]?.[pseudo]?.[css]
+  if (removeStyle && mixin && newVal) {
+    const oldVal = mixin.breakpoints[breakpointId]?.[pseudo]?.[css]
+    const setMixinData: ISetMixinEntryData = {
+      mixinId,
+      breakpointId,
+      oldStyle: oldVal
+        ? {
+            pseudoClass: pseudo,
+            property: css,
+            value: oldVal,
+          }
+        : undefined,
+      newStyle: {
+        pseudoClass: pseudo,
+        property: css,
+        value: newVal,
+      },
+    }
+    const commands: ICommand[] = [
+      removeStyle,
+      { type: CommandType.SetMixinEntry, data: setMixinData },
+    ]
+    const data: ICommandGroupData = {
+      commands,
+    }
+    pushCommand(site, CommandType.Group, data)
+  }
 }
 
 export const convertComponentStyle = (

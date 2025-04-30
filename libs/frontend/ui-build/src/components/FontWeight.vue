@@ -19,11 +19,12 @@ import { computed, onMounted, toRefs } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { STMultiselect } from '@samatech/vue-components'
 import { Css, EditorDropdown, ThemeFontSource } from '@pubstudio/shared/type-site'
-import { useBuild, useToolbar } from '@pubstudio/frontend/feature-build'
+import { useToolbar } from '@pubstudio/frontend/feature-build'
 import { setEditorDropdown } from '@pubstudio/frontend/data-access-command'
+import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 
 const { t } = useI18n()
-const { site, editor } = useBuild()
+const { site, editor } = useSiteSource()
 const { getResolvedOrSelectedStyle, setStyle } = useToolbar()
 
 const props = withDefaults(
