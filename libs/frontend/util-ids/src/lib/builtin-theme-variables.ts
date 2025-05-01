@@ -1,3 +1,4 @@
+// New theme variables must be added to existing sites via migration
 export const builtinThemeVariables = {
   'color-title': '#000000',
   'size-title': '40px',
