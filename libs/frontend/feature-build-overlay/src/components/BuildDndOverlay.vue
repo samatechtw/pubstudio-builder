@@ -1,5 +1,6 @@
 <template>
   <div
+    v-if="!builderContext.prosemirrorFocused.value"
     class="build-dnd-overlay build-dnd-overlay-selection"
     :style="selectionOverlayStyle"
   />
@@ -45,6 +46,8 @@ import {
   ListAdd,
   SvgEdit,
 } from '@pubstudio/frontend/feature-render-builder'
+import { computeInputs } from '@pubstudio/frontend/util-render'
+import { resolveComponent } from '@pubstudio/frontend/util-resolve'
 import { computeHoverOverlayStyle } from '../lib/hover-overlay-style'
 import ImageEdit from './ImageEdit.vue'
 import HoverEdges from './HoverEdges.vue'
@@ -54,8 +57,6 @@ import {
   setBuildOverlays,
 } from '../lib/feature-build-overlay'
 import { computeSelectionOverlay } from '../lib/compute-selection-overlay'
-import { computeInputs } from '@pubstudio/frontend/util-render'
-import { resolveComponent } from '@pubstudio/frontend/util-resolve'
 
 const { site, editor, activePage } = useSiteSource()
 
@@ -196,6 +197,7 @@ watch(
     () => editor.value?.selectedComponent,
     () => editor.value?.builderScale,
     () => editor.value?.builderWidth,
+    () => builderContext.prosemirrorFocused.value,
   ],
   debounceSetOverlays,
 )

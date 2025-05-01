@@ -7,6 +7,7 @@ export interface IBuilderContext {
   buildDndState: Ref<IBuildDndState | undefined>
   rightMenuFocused: Ref<boolean>
   shiftPressed: Ref<boolean>
+  prosemirrorFocused: Ref<boolean>
 }
 
 interface ISize {
@@ -32,6 +33,7 @@ export const builderContext: IBuilderContext = {
   buildDndState: ref<IBuildDndState>(),
   rightMenuFocused: ref(false),
   shiftPressed: ref(false),
+  prosemirrorFocused: ref(false),
 }
 
 export const resetBuilderContext = () => {
@@ -40,5 +42,6 @@ export const resetBuilderContext = () => {
   builderContext.hoveredComponentIdInComponentTree.value = undefined
   builderContext.buildDndState.value = undefined
   builderContext.rightMenuFocused.value = false
+  builderContext.prosemirrorFocused.value = false
   resetRuntimeContext()
 }
