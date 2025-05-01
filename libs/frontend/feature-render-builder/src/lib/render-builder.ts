@@ -22,7 +22,6 @@ import { BuilderDndComponent } from './dnd/builder-dnd-component'
 interface IBuilderStyleProps {
   builderStyle: IRawStyle | undefined
   builderProps: Record<string, unknown> | undefined
-  builderClass: string[]
 }
 
 const computeBuilderStyleProps = (
@@ -35,7 +34,6 @@ const computeBuilderStyleProps = (
 
   const builderStyle: IRawStyle = {}
   const builderProps: Record<string, unknown> = {}
-  const builderClass: string[] = []
 
   if (component.tag === Tag.Img && !data.attrs.src) {
     data.mixins.push('__image')
@@ -82,7 +80,7 @@ const computeBuilderStyleProps = (
     builderStyle['pointer-events'] = 'none'
   }
 
-  return { builderStyle, builderProps, builderClass }
+  return { builderStyle, builderProps }
 }
 
 export const renderPage = (site: ISite, page: IPage): VNode | undefined => {
@@ -112,6 +110,7 @@ export const computePropsContent = (
   const content: IBuildContent = []
   const hasChildren = (component.children?.length ?? 0) > 0
   const customCmpHasChildren = (customCmp?.children?.length ?? 0) > 0
+  const builderClass: string[] = []
 
   if (hasChildren) {
     content.push(
@@ -150,6 +149,7 @@ export const computePropsContent = (
       const cmpWithDefaultContent: IComponent = { ...component, content: cmpContent }
       content.push(h(ProseMirrorEditor, { component: cmpWithDefaultContent, editor }))
       if (component.tag === Tag.A) {
+        builderClass.push('__link')
         content.push(
           h('div', { class: '__link-placeholder' }, 'Add text or drop components'),
         )
@@ -192,7 +192,7 @@ export const computePropsContent = (
     ...builderStyleProps?.builderProps,
     // TODO -- should all native events really be disabled in the builder?
     // ...events.native,
-    class: data.mixins.concat(component.id, builderStyleProps?.builderClass ?? []),
+    class: data.mixins.concat(component.id, builderClass),
     style: builderStyleProps?.builderStyle,
     id: component.id,
   }

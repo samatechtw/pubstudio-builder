@@ -20,6 +20,7 @@
   />
   <LinkTooltip
     v-if="linkTooltipStyle && selectedId"
+    :key="selectedId"
     :componentId="selectedId"
     :mode="LinkTooltipMode.Component"
     :link="linkTooltipStyle.link"
