@@ -20,7 +20,6 @@ import { setBuildOverlays } from '@pubstudio/frontend/feature-build-overlay'
 import { useCopyPaste } from '@pubstudio/frontend/feature-copy-paste'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { builderContext } from '@pubstudio/frontend/util-builder'
-import { prosemirrorEditing } from '@pubstudio/frontend/util-edit-text'
 import { resolveComponent } from '@pubstudio/frontend/util-resolve'
 import {
   BuildSubmenu,

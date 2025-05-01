@@ -11,6 +11,7 @@ import {
   descSortedBreakpoints,
 } from '@pubstudio/frontend/feature-site-source'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
+import { builderContext } from '@pubstudio/frontend/util-builder'
 import { findStyles } from '@pubstudio/frontend/util-component'
 import {
   firstMarkInSelection,
@@ -223,7 +224,11 @@ export const ProseMirrorEditor = defineComponent({
     onMounted(() => {
       mountProseMirrorEditor(editor.value, container.value)
       const el = container.value
+      el?.addEventListener('focusin', () => {
+        builderContext.prosemirrorFocused.value = true
+      })
       el?.addEventListener('focusout', (e) => {
+        builderContext.prosemirrorFocused.value = false
         const tag = (e.relatedTarget as HTMLElement)?.tagName?.toLowerCase()
         // Only set selection when an input is focused (e.g. text size), otherwise
         // the browser will scroll back to the editor component when the transaction is dispatched

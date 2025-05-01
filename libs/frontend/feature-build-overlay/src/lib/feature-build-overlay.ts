@@ -1,6 +1,5 @@
 import { getPref } from '@pubstudio/frontend/data-access-command'
 import { IComponentOverlay } from '@pubstudio/frontend/type-ui-widgets'
-import { builderContext } from '@pubstudio/frontend/util-builder'
 import { IEditorContext, IPage } from '@pubstudio/shared/type-site'
 import { sleep } from '@pubstudio/shared/util-core'
 import { ref } from 'vue'
