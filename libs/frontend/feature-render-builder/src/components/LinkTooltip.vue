@@ -348,7 +348,7 @@ onUnmounted(() => {
     padding: 6px 8px 5px;
   }
   :deep(.st-input-label) {
-    top: 7px;
+    margin-top: -4px;
   }
 }
 
