@@ -36,7 +36,7 @@ import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { builderContext } from '@pubstudio/frontend/util-builder'
 import { BuildDndOverlay } from '@pubstudio/frontend/feature-build-overlay'
 
-const { site, activePage } = useSiteSource()
+const { site, siteStore, activePage, setRestoredSite } = useSiteSource()
 const { editor } = useSiteSource()
 
 const {
@@ -101,13 +101,26 @@ const resizeObserver = new ResizeObserver(
   }, 150),
 )
 
+// Refresh site from API when page is made visible, to avoid write conflicts
+const checkOutdated = async () => {
+  if (!document.hidden) {
+    const restored = await siteStore.restore(site.value.content_updated_at)
+    setRestoredSite(restored)
+    if (restored) {
+      console.log('Reload from API', site.value.content_updated_at)
+    }
+  }
+}
+
 onMounted(() => {
   if (contentWindowRef.value) {
     resizeObserver.observe(contentWindowRef.value)
   }
+  document.addEventListener('visibilitychange', checkOutdated)
 })
 
 onUnmounted(() => {
+  document.removeEventListener('visibilitychange', checkOutdated)
   resizeObserver.disconnect()
 })
 </script>
