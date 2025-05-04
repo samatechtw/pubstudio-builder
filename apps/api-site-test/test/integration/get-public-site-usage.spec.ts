@@ -41,7 +41,7 @@ describe('Get Site Usage', () => {
         .expect(200)
 
       const body1: IGetPublicSiteUsageApiResponse = res1.body
-      expect(body1.total_request_count).toEqual(1)
+      expect(body1.total_site_view_count).toEqual(0)
       expect(body1.last_updated).toMatch(new RegExp(commonRegex.date))
 
       // Successful site request
@@ -54,7 +54,7 @@ describe('Get Site Usage', () => {
         .expect(200)
 
       const body2: IGetPublicSiteUsageApiResponse = res2.body
-      expect(body2.total_request_count).toEqual(2)
+      expect(body2.total_site_view_count).toEqual(1)
     })
 
     it('tracks site usage after successful site creation', async () => {
@@ -73,7 +73,7 @@ describe('Get Site Usage', () => {
         .expect(200)
 
       const body2: IGetPublicSiteUsageApiResponse = res2.body
-      expect(body2.total_request_count).toEqual(1)
+      expect(body2.total_site_view_count).toEqual(0)
     })
 
     it('tracks site usage after successful site update', async () => {
@@ -84,7 +84,7 @@ describe('Get Site Usage', () => {
         .expect(200)
 
       const body1: IGetPublicSiteUsageApiResponse = res1.body
-      expect(body1.total_request_count).toEqual(1)
+      expect(body1.total_site_view_count).toEqual(0)
 
       // Update a site
       await api
@@ -93,14 +93,14 @@ describe('Get Site Usage', () => {
         .send(mockUpdateSitePayload())
         .expect(200)
 
-      // Verify site usage after successful update
+      // Verify site view count not incremented after successful update
       const res3 = await api
         .get(testEndpoint(siteId))
         .set('Authorization', adminAuth)
         .expect(200)
 
       const body2: IGetPublicSiteUsageApiResponse = res3.body
-      expect(body2.total_request_count).toEqual(2)
+      expect(body2.total_site_view_count).toEqual(0)
     })
   })
 
@@ -112,7 +112,7 @@ describe('Get Site Usage', () => {
       .expect(200)
 
     const body2: IGetPublicSiteUsageApiResponse = res2.body
-    expect(body2.total_request_count).toEqual(1)
+    expect(body2.total_site_view_count).toEqual(0)
   })
 
   it('when user is not authorized', async () => {
@@ -124,13 +124,13 @@ describe('Get Site Usage', () => {
       .expect(200)
 
     const body2: IGetPublicSiteUsageApiResponse = res2.body
-    expect(body2.total_request_count).toEqual(1)
+    expect(body2.total_site_view_count).toEqual(0)
   })
 
   it('when requester is anonymous', async () => {
     const res2 = await api.get(testEndpoint(publishedSiteId)).expect(200)
 
     const body2: IGetPublicSiteUsageApiResponse = res2.body
-    expect(body2.total_request_count).toEqual(1)
+    expect(body2.total_site_view_count).toEqual(0)
   })
 })

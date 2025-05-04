@@ -6,6 +6,7 @@ pub struct SiteUsageEntity {
     pub id: u32,
     pub site_id: String,
     pub request_count: i64,
+    pub site_view_count: i64,
     pub request_error_count: i64,
     pub total_bandwidth: i64,
     pub start_time: DateTime<Utc>,
@@ -17,6 +18,7 @@ pub struct SiteUsageTotals {
     pub id: u32,
     pub site_id: String,
     pub total_request_count: i64,
+    pub total_site_view_count: i64,
     pub current_monthly_bandwidth: u64,
 }
 
@@ -26,6 +28,8 @@ pub struct SiteUsageEntityWithTotals {
     pub site_id: String,
     pub request_count: i64,
     pub total_request_count: i64,
+    pub site_view_count: i64,
+    pub total_site_view_count: i64,
     pub request_error_count: i64,
     pub total_bandwidth: i64,
     pub current_monthly_bandwidth: u64,

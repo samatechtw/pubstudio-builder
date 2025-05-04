@@ -46,7 +46,7 @@ pub async fn get_current_site(
 
     context
         .cache
-        .increase_request_count(&site_id, site_size, metadata.site_type)
+        .increase_view_count(&site_id, site_size, metadata.site_type)
         .await;
 
     Ok(Json(site))

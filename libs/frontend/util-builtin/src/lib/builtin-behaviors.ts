@@ -88,7 +88,7 @@ export const viewCounterBehavior: IBehavior = {
   name: 'View Counter',
   code: `const getUsage = async () => {
   const usage = await helpers.getPublicUsage(site)
-  helpers.setContent(component, usage.total_request_count.toString())
+  helpers.setContent(component, usage.total_site_view_count.toString())
 }
 getUsage()
   `,

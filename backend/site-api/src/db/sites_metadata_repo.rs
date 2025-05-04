@@ -286,7 +286,13 @@ impl SitesMetadataRepoTrait for SitesMetadataRepo {
     }
 
     async fn reset(&self) -> Result<(), Error> {
-        let tables = vec!["_sqlx_migrations", "backups", "domains", "sites"];
+        let tables = vec![
+            "_sqlx_migrations",
+            "backups",
+            "domains",
+            "sites",
+            "site_usage",
+        ];
 
         for table in tables.iter() {
             sqlx::query(&format!(r#"DROP TABLE {}"#, table))

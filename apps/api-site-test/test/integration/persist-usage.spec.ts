@@ -56,6 +56,8 @@ describe('Persist Site Usage', () => {
     const initialSiteSize = body1.site_size
     expect(body1.request_count).toEqual(1)
     expect(body1.total_request_count).toEqual(1)
+    expect(body1.site_view_count).toEqual(0)
+    expect(body1.total_site_view_count).toEqual(0)
     expect(body1.total_bandwidth).toEqual(initialSiteSize)
     expect(body1.current_monthly_bandwidth).toEqual(initialSiteSize)
 
@@ -67,6 +69,8 @@ describe('Persist Site Usage', () => {
     const body2 = await getUsage()
     expect(body2.request_count).toEqual(3)
     expect(body2.total_request_count).toEqual(3)
+    expect(body2.site_view_count).toEqual(2)
+    expect(body2.total_site_view_count).toEqual(2)
     expect(body2.total_bandwidth).toEqual(initialSiteSize * 3)
     expect(body2.current_monthly_bandwidth).toEqual(initialSiteSize * 3)
 
@@ -77,6 +81,8 @@ describe('Persist Site Usage', () => {
     const body3 = await getUsage()
     expect(body3.request_count).toEqual(0)
     expect(body3.total_request_count).toEqual(3)
+    expect(body3.site_view_count).toEqual(0)
+    expect(body3.total_site_view_count).toEqual(2)
     expect(body3.total_bandwidth).toEqual(0)
     expect(body3.current_monthly_bandwidth).toEqual(initialSiteSize * 3)
 
@@ -91,6 +97,8 @@ describe('Persist Site Usage', () => {
     const body4 = await getUsage()
     expect(body4.request_count).toEqual(1)
     expect(body4.total_request_count).toEqual(4)
+    expect(body4.site_view_count).toEqual(0)
+    expect(body4.total_site_view_count).toEqual(2)
     expect(body4.total_bandwidth).toEqual(initialSiteSize)
     expect(body4.current_monthly_bandwidth).toEqual(initialSiteSize * 4)
 
@@ -105,6 +113,8 @@ describe('Persist Site Usage', () => {
     const body5 = await getUsage()
     expect(body5.request_count).toEqual(0)
     expect(body5.total_request_count).toEqual(6)
+    expect(body5.site_view_count).toEqual(0)
+    expect(body5.total_site_view_count).toEqual(4)
     expect(body5.total_bandwidth).toEqual(0)
     expect(body5.current_monthly_bandwidth).toEqual(initialSiteSize * 6)
   })

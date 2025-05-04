@@ -28,6 +28,7 @@ fn map_to_usage_entity(row: SqliteRow) -> Result<SiteUsageEntity, Error> {
         id: row.try_get("id")?,
         site_id: row.try_get("site_id")?,
         request_count: row.try_get("request_count")?,
+        site_view_count: row.try_get("site_view_count")?,
         request_error_count: row.try_get("request_error_count")?,
         total_bandwidth: row.try_get("total_bandwidth")?,
         start_time: row.try_get("start_time")?,
@@ -40,6 +41,7 @@ fn map_to_usage_totals(row: SqliteRow) -> Result<SiteUsageTotals, Error> {
         id: row.try_get("id")?,
         site_id: row.try_get("site_id")?,
         total_request_count: row.try_get("total_request_count")?,
+        total_site_view_count: row.try_get("total_site_view_count")?,
         current_monthly_bandwidth: row.try_get("current_monthly_bandwidth")?,
     })
 }
@@ -55,10 +57,11 @@ impl UsageRepoTrait for UsageRepo {
             return Ok(());
         }
         let mut query_builder: QueryBuilder<Sqlite> =
-        QueryBuilder::new("INSERT INTO site_usage(site_id, request_count, request_error_count, total_bandwidth, start_time, end_time) ");
+        QueryBuilder::new("INSERT INTO site_usage(site_id, request_count, site_view_count, request_error_count, total_bandwidth, start_time, end_time) ");
         query_builder.push_values(cache.iter(), |mut b, (site_id, site_data)| {
             b.push_bind(site_id.to_string())
                 .push_bind(site_data.request_count.to_string())
+                .push_bind(site_data.site_view_count.to_string())
                 .push_bind(site_data.request_error_count.to_string())
                 .push_bind(site_data.total_bandwidth.to_string())
                 .push_bind(site_data.last_updated.timestamp)
@@ -112,6 +115,7 @@ impl UsageRepoTrait for UsageRepo {
               id,
               site_id,
               SUM(request_count) AS total_request_count,
+              SUM(site_view_count) AS total_site_view_count,
               SUM(CASE WHEN start_time >= ? THEN total_bandwidth ELSE 0 END) AS current_monthly_bandwidth
             FROM
                 site_usage
