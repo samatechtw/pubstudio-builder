@@ -19,6 +19,8 @@ pub async fn populate_usage_cache(context: &ApiContext) -> Result<(), DbError> {
             site_id: site_id.clone(),
             request_count: 0,
             total_request_count: usage.total_request_count,
+            site_view_count: 0,
+            total_site_view_count: usage.total_site_view_count,
             request_error_count: 0,
             total_bandwidth: 0,
             current_monthly_bandwidth: usage.current_monthly_bandwidth,

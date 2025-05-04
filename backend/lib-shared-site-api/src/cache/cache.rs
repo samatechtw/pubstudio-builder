@@ -61,6 +61,8 @@ impl AppCache {
                     site_size,
                     request_count: 0,
                     total_request_count: 0,
+                    site_view_count: 0,
+                    total_site_view_count: 0,
                     request_error_count: 0,
                     total_bandwidth: 0,
                     current_monthly_bandwidth: 0,
@@ -83,27 +85,44 @@ impl AppCache {
         self.cache.run_pending_tasks().await;
     }
 
-    pub async fn create_or_update_usage(&self, site_id: &str, site_size: u64, site_type: SiteType) {
-        let mut data = self.get_with_usage(site_id, site_size, site_type).await;
-
-        data.site_size = site_size;
+    fn increase_request_count_helper(
+        &self,
+        mut data: SiteUsageData,
+        site_size: u64,
+    ) -> SiteUsageData {
         data.request_count += 1;
         data.total_request_count += 1;
         data.current_monthly_bandwidth += site_size;
         data.total_bandwidth += site_size;
         data.last_updated = JsDate::now();
+        data
+    }
+
+    pub async fn create_or_update_usage(&self, site_id: &str, site_size: u64, site_type: SiteType) {
+        let mut data = self.get_with_usage(site_id, site_size, site_type).await;
+
+        data.site_size = site_size;
+        data = self.increase_request_count_helper(data, site_size);
 
         self.cache.insert(site_id.to_string(), data).await;
     }
 
+    // Increment site request count, for bandwidth tracking but not view count
     pub async fn increase_request_count(&self, site_id: &str, site_size: u64, site_type: SiteType) {
         let mut data = self.get_with_usage(site_id, site_size, site_type).await;
 
-        data.request_count += 1;
-        data.total_request_count += 1;
-        data.current_monthly_bandwidth += data.site_size;
-        data.total_bandwidth += data.site_size;
-        data.last_updated = JsDate::now();
+        data = self.increase_request_count_helper(data, site_size);
+
+        self.cache.insert(site_id.to_string(), data).await;
+    }
+
+    // Increment both site view and request count
+    pub async fn increase_view_count(&self, site_id: &str, site_size: u64, site_type: SiteType) {
+        let mut data = self.get_with_usage(site_id, site_size, site_type).await;
+
+        data.site_view_count += 1;
+        data.total_site_view_count += 1;
+        data = self.increase_request_count_helper(data, site_size);
 
         self.cache.insert(site_id.to_string(), data).await;
     }
@@ -141,6 +160,7 @@ impl AppCache {
     pub async fn reset_bandwidth(&self, clear_monthly: bool) {
         for (site_id, mut usage_data) in self.cache.iter() {
             usage_data.request_count = 0;
+            usage_data.site_view_count = 0;
             usage_data.request_error_count = 0;
             usage_data.total_bandwidth = 0;
             if clear_monthly {
@@ -162,6 +182,8 @@ impl AppCache {
             site_size,
             request_count: usage.request_count as u64,
             total_request_count: usage.total_request_count as u64,
+            site_view_count: usage.site_view_count as u64,
+            total_site_view_count: usage.total_site_view_count as u64,
             request_error_count: usage.request_error_count as u64,
             total_bandwidth: usage.total_bandwidth as u64,
             current_monthly_bandwidth: usage.current_monthly_bandwidth as u64,

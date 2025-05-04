@@ -45,6 +45,8 @@ describe('Get Site Usage', () => {
       const body1: IGetSiteUsageApiResponse = res1.body
       expect(body1.request_count).toEqual(1)
       expect(body1.total_request_count).toEqual(1)
+      expect(body1.site_view_count).toEqual(0)
+      expect(body1.total_site_view_count).toEqual(0)
       expect(body1.request_error_count).toEqual(0)
       expect(body1.total_bandwidth).toEqual(body1.site_size)
       expect(body1.current_monthly_bandwidth).toEqual(body1.site_size)
@@ -67,6 +69,8 @@ describe('Get Site Usage', () => {
       const body2: IGetSiteUsageApiResponse = res2.body
       expect(body2.request_count).toEqual(2)
       expect(body2.total_request_count).toEqual(2)
+      expect(body2.site_view_count).toEqual(1)
+      expect(body2.total_site_view_count).toEqual(1)
       expect(body2.request_error_count).toEqual(0)
       expect(body2.custom_data_usage).toEqual(0)
       expect(body2.custom_data_allowance).toEqual(20 * MB)
@@ -84,6 +88,8 @@ describe('Get Site Usage', () => {
       const body1: IGetSiteUsageApiResponse = res1.body
       expect(body1.request_count).toEqual(1)
       expect(body1.total_request_count).toEqual(1)
+      expect(body1.site_view_count).toEqual(0)
+      expect(body1.total_site_view_count).toEqual(0)
       expect(body1.request_error_count).toEqual(0)
       expect(body1.site_size).toEqual(body1.total_bandwidth)
 
@@ -104,6 +110,8 @@ describe('Get Site Usage', () => {
 
       expect(body2.request_count).toEqual(1)
       expect(body2.total_request_count).toEqual(1)
+      expect(body2.site_view_count).toEqual(0)
+      expect(body2.total_site_view_count).toEqual(0)
       expect(body2.request_error_count).toEqual(1)
       expect(body2.site_size).toEqual(body2.total_bandwidth)
     })
@@ -127,6 +135,8 @@ describe('Get Site Usage', () => {
       expect(body2.site_size).toEqual(body2.total_bandwidth)
       expect(body2.request_count).toEqual(1)
       expect(body2.total_request_count).toEqual(1)
+      expect(body2.site_view_count).toEqual(0)
+      expect(body2.total_site_view_count).toEqual(0)
       expect(body2.request_error_count).toEqual(0)
     })
 
@@ -141,6 +151,8 @@ describe('Get Site Usage', () => {
       const initialSiteSize = body1.site_size
       expect(body1.request_count).toEqual(1)
       expect(body1.total_request_count).toEqual(1)
+      expect(body1.site_view_count).toEqual(0)
+      expect(body1.total_site_view_count).toEqual(0)
       expect(body1.request_error_count).toEqual(0)
       expect(body1.custom_data_usage).toEqual(0)
       expect(body1.custom_data_allowance).toEqual(0)
@@ -166,6 +178,8 @@ describe('Get Site Usage', () => {
       expect(body2.site_size).toEqual(newSiteSize)
       expect(body2.request_count).toEqual(2)
       expect(body2.total_request_count).toEqual(2)
+      expect(body2.site_view_count).toEqual(0)
+      expect(body2.total_site_view_count).toEqual(0)
       expect(body2.request_error_count).toEqual(0)
       expect(body2.custom_data_usage).toEqual(0)
       expect(body2.custom_data_allowance).toEqual(0)

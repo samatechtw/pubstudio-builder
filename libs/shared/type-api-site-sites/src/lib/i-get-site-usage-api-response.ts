@@ -5,6 +5,8 @@ export interface IGetSiteUsageApiResponse {
   max_pages_length: number
   total_request_count: number
   request_count: number
+  site_view_count: number
+  total_site_view_count: number
   request_error_count: number
   total_bandwidth: number
   current_monthly_bandwidth: number
@@ -15,6 +17,6 @@ export interface IGetSiteUsageApiResponse {
 }
 
 export interface IGetPublicSiteUsageApiResponse {
-  total_request_count: number
+  total_site_view_count: number
   last_updated: Date
 }
