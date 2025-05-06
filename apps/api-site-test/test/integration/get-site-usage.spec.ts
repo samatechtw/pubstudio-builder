@@ -47,6 +47,8 @@ describe('Get Site Usage', () => {
       expect(body1.total_request_count).toEqual(1)
       expect(body1.site_view_count).toEqual(0)
       expect(body1.total_site_view_count).toEqual(0)
+      expect(body1.page_views).toEqual({})
+      expect(body1.total_page_views).toEqual({})
       expect(body1.request_error_count).toEqual(0)
       expect(body1.total_bandwidth).toEqual(body1.site_size)
       expect(body1.current_monthly_bandwidth).toEqual(body1.site_size)
@@ -57,8 +59,13 @@ describe('Get Site Usage', () => {
       expect(body1.custom_data_allowance).toEqual(20 * MB)
       expect(body1.last_updated).toMatch(new RegExp(commonRegex.date))
 
-      // Successful site request
+      // Successful site request and page view record
       await api.get('/api/sites/current').set('Host', 'test3.localhost').expect(200)
+      await api
+        .post(`/api/sites/${publishedSiteId}/usage/actions/page_view`)
+        .set('Host', 'test3.localhost')
+        .send({ route: '/home' })
+        .expect(200)
 
       // Verify updated site usage after successful request
       const res2 = await api
@@ -71,6 +78,8 @@ describe('Get Site Usage', () => {
       expect(body2.total_request_count).toEqual(2)
       expect(body2.site_view_count).toEqual(1)
       expect(body2.total_site_view_count).toEqual(1)
+      expect(body2.page_views).toEqual({ '/home': 1 })
+      expect(body2.total_page_views).toEqual({ '/home': 1 })
       expect(body2.request_error_count).toEqual(0)
       expect(body2.custom_data_usage).toEqual(0)
       expect(body2.custom_data_allowance).toEqual(20 * MB)
@@ -111,6 +120,8 @@ describe('Get Site Usage', () => {
       expect(body2.request_count).toEqual(1)
       expect(body2.total_request_count).toEqual(1)
       expect(body2.site_view_count).toEqual(0)
+      expect(body2.page_views).toEqual({})
+      expect(body2.total_page_views).toEqual({})
       expect(body2.total_site_view_count).toEqual(0)
       expect(body2.request_error_count).toEqual(1)
       expect(body2.site_size).toEqual(body2.total_bandwidth)
@@ -180,6 +191,8 @@ describe('Get Site Usage', () => {
       expect(body2.total_request_count).toEqual(2)
       expect(body2.site_view_count).toEqual(0)
       expect(body2.total_site_view_count).toEqual(0)
+      expect(body2.page_views).toEqual({})
+      expect(body2.total_page_views).toEqual({})
       expect(body2.request_error_count).toEqual(0)
       expect(body2.custom_data_usage).toEqual(0)
       expect(body2.custom_data_allowance).toEqual(0)

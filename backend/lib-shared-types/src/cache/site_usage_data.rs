@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use serde::Serialize;
 
 use crate::shared::js_date::JsDate;
@@ -18,6 +20,10 @@ pub struct SiteUsageData {
     pub total_bandwidth: u64,
     // Bandwidth used since the beginning of the month
     pub current_monthly_bandwidth: u64,
+    // Page view counts
+    pub page_views: HashMap<String, u64>,
+    // Total page view counts
+    pub total_page_views: HashMap<String, u64>,
     pub bandwidth_allowance: u64,
     pub last_updated: JsDate,
 }

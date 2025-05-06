@@ -150,6 +150,10 @@ fn api_router(context: &ApiContext) -> Router<ApiContext> {
             get(site::get_site_usage::get_public_site_usage),
         )
         .route(
+            "/sites/{site_id}/usage/actions/page_view",
+            post(site::record_page_view::record_page_view),
+        )
+        .route(
             "/actions/persist-usage",
             get(usage::persist_usage::persist_usage),
         )

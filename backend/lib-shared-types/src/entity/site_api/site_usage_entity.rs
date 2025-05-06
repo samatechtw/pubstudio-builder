@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
@@ -9,6 +11,7 @@ pub struct SiteUsageEntity {
     pub site_view_count: i64,
     pub request_error_count: i64,
     pub total_bandwidth: i64,
+    pub page_views: HashMap<String, u64>,
     pub start_time: DateTime<Utc>,
     pub end_time: DateTime<Utc>,
 }
@@ -20,6 +23,7 @@ pub struct SiteUsageTotals {
     pub total_request_count: i64,
     pub total_site_view_count: i64,
     pub current_monthly_bandwidth: u64,
+    pub total_page_views: HashMap<String, u64>,
 }
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -33,6 +37,8 @@ pub struct SiteUsageEntityWithTotals {
     pub request_error_count: i64,
     pub total_bandwidth: i64,
     pub current_monthly_bandwidth: u64,
+    pub page_views: HashMap<String, u64>,
+    pub total_page_views: HashMap<String, u64>,
     pub start_time: DateTime<Utc>,
     pub end_time: DateTime<Utc>,
 }

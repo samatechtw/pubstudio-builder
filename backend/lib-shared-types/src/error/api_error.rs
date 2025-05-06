@@ -24,6 +24,7 @@ pub enum ApiErrorCode {
     UpdateStale,
     SiteHasAssets,
     InvalidCollectionId,
+    InvalidRoute,
     TemplateNameExists,
     TemplateCollectionNameExists,
     Unauthorized,
