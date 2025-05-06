@@ -6,6 +6,7 @@ pub mod get_current_site_dto;
 pub mod get_site_domains_dto;
 pub mod get_site_version_dto;
 pub mod publish_site_dto;
+pub mod record_page_view_dto;
 pub mod reset_all_dto;
 pub mod site_info_viewmodel;
 pub mod site_metadata_viewmodel;

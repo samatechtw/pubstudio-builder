@@ -102,6 +102,62 @@ describe('Get Site Usage', () => {
       const body2: IGetPublicSiteUsageApiResponse = res3.body
       expect(body2.total_site_view_count).toEqual(0)
     })
+
+    it.only('tracks page views after recording', async () => {
+      // Initial site usage request
+      const res1 = await api
+        .get(testEndpoint(publishedSiteId))
+        .set('Authorization', adminAuth)
+        .expect(200)
+
+      const body1: IGetPublicSiteUsageApiResponse = res1.body
+      expect(body1.total_page_views).toEqual({})
+
+      // Record page views
+      await api
+        .post(`/api/sites/${publishedSiteId}/usage/actions/page_view`)
+        .set('Host', 'test3.localhost')
+        .send({ route: '/home' })
+        .expect(200)
+      await api
+        .post(`/api/sites/${publishedSiteId}/usage/actions/page_view`)
+        .set('Host', 'test3.localhost')
+        .send({ route: '/home' })
+        .expect(200)
+
+      // Verify page view count updated
+      const res2 = await api
+        .get(testEndpoint(publishedSiteId))
+        .set('Authorization', adminAuth)
+        .expect(200)
+
+      const body2: IGetPublicSiteUsageApiResponse = res2.body
+      expect(body2.total_page_views).toEqual({ '/home': 2 })
+    })
+  })
+
+  it('when page does not exist', async () => {
+    await api
+      .post(`/api/sites/${publishedSiteId}/usage/actions/page_view`)
+      .set('Host', 'test3.localhost')
+      .send({ route: '/home2' })
+      .expect(400, {
+        status: 400,
+        code: 'InvalidRoute',
+        message: 'Failed to validate request',
+      })
+  })
+
+  it('when host does not match site id', async () => {
+    await api
+      .post(`/api/sites/${siteId}/usage/actions/page_view`)
+      .set('Host', 'test3.localhost')
+      .send({ route: '/home' })
+      .expect(400, {
+        status: 400,
+        code: 'InvalidFormData',
+        message: 'Failed to validate request',
+      })
   })
 
   it('when user is other owner', async () => {

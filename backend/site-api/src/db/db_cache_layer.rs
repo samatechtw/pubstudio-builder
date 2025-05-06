@@ -1,3 +1,5 @@
+use std::collections::{HashMap, HashSet};
+
 use lib_shared_site_api::cache::cache_helpers::{
     get_site_defaults, get_site_description, get_site_title,
 };
@@ -74,6 +76,31 @@ pub async fn get_site_from_cache_or_repo(
     let site_value = get_raw_site_from_cache_or_repo(context, site_id).await?;
 
     Ok(serde_json::from_value(site_value).map_err(|e| ApiError::internal_error().message(e))?)
+}
+
+pub async fn get_pages_from_cache_or_repo(
+    context: &ApiContext,
+    site_id: &str,
+) -> Result<HashSet<String>, ApiError> {
+    let pages = context
+        .cache
+        .get_page_routes_with(site_id, async move {
+            let site = context
+                .site_repo
+                .get_site_latest_version(site_id, true)
+                .await
+                .map_err(|e| ApiError::not_found().message(e))?;
+
+            let unwrapped_pages: String =
+                serde_json::from_str(&site.pages).map_err(|e| ApiError::not_found().message(e))?;
+            let pages: HashMap<String, Value> = serde_json::from_str(&unwrapped_pages)
+                .map_err(|e| ApiError::not_found().message(e))?;
+            let page_routes: HashSet<String> = pages.into_keys().collect();
+            Ok(page_routes)
+        })
+        .await?;
+
+    Ok(pages)
 }
 
 pub async fn get_site_or_preview(

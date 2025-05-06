@@ -9,6 +9,7 @@ pub mod get_site_usage;
 pub mod get_site_version;
 pub mod list_site_versions;
 pub mod list_sites;
+pub mod record_page_view;
 pub mod update_site;
 pub mod update_site_metadata;
 pub mod util;

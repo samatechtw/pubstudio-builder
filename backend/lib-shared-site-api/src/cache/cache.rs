@@ -1,4 +1,8 @@
-use std::{borrow::Borrow, future::Future};
+use std::{
+    borrow::Borrow,
+    collections::{HashMap, HashSet},
+    future::Future,
+};
 
 use lib_shared_types::{
     cache::site_usage_data::SiteUsageData,
@@ -22,6 +26,7 @@ pub type SiteUsageCache = Cache<String, SiteUsageData>; // key: site_id, value: 
 pub type SiteDomainCache = Cache<String, String>; // key: domain, value: site_id
 pub type SiteMetadataCache = Cache<String, SiteMetadata>; // key: site_id, value: SiteMetadata
 pub type SiteDataCache = Cache<String, Value>; // key: site_id, value: site JSON
+pub type PageNamesCache = Cache<String, HashSet<String>>; // key: site_id, value: page names
 
 #[derive(Clone)]
 pub struct AppCache {
@@ -29,6 +34,7 @@ pub struct AppCache {
     pub domain_cache: SiteDomainCache,
     pub metadata_cache: SiteMetadataCache,
     pub site_data_cache: SiteDataCache,
+    pub page_routes_cache: PageNamesCache,
     exec_env: ExecEnv,
 }
 
@@ -39,11 +45,13 @@ impl AppCache {
         let domain_cache = Cache::new(10_000);
         let metadata_cache = Cache::new(2_000);
         let site_data_cache = Cache::new(2_000);
+        let page_routes_cache = Cache::new(2_000);
         AppCache {
             cache,
             domain_cache,
             metadata_cache,
             site_data_cache,
+            page_routes_cache,
             exec_env,
         }
     }
@@ -66,6 +74,8 @@ impl AppCache {
                     request_error_count: 0,
                     total_bandwidth: 0,
                     current_monthly_bandwidth: 0,
+                    page_views: HashMap::new(),
+                    total_page_views: HashMap::new(),
                     last_updated: JsDate::now(),
                     bandwidth_allowance: site_type.get_bandwidth_allowance(self.exec_env),
                 }
@@ -157,11 +167,39 @@ impl AppCache {
         Ok(())
     }
 
+    pub async fn increase_page_view_count(
+        &self,
+        site_id: &str,
+        route: String,
+    ) -> Result<u64, ApiError> {
+        let mut data = self.get_usage(site_id).await?;
+
+        // Increment page count
+        data.page_views
+            .entry(route.clone())
+            .and_modify(|c| *c += 1)
+            .or_insert(1);
+
+        // Increment total page count
+        let count: u64 = {
+            let cnt_ref = data
+                .total_page_views
+                .entry(route)
+                .and_modify(|c| *c += 1)
+                .or_insert(1);
+            *cnt_ref
+        };
+
+        self.cache.insert(site_id.to_string(), data).await;
+        Ok(count)
+    }
+
     pub async fn reset_bandwidth(&self, clear_monthly: bool) {
         for (site_id, mut usage_data) in self.cache.iter() {
             usage_data.request_count = 0;
             usage_data.site_view_count = 0;
             usage_data.request_error_count = 0;
+            usage_data.page_views.clear();
             usage_data.total_bandwidth = 0;
             if clear_monthly {
                 usage_data.current_monthly_bandwidth = 0;
@@ -187,6 +225,8 @@ impl AppCache {
             request_error_count: usage.request_error_count as u64,
             total_bandwidth: usage.total_bandwidth as u64,
             current_monthly_bandwidth: usage.current_monthly_bandwidth as u64,
+            page_views: usage.page_views.clone(),
+            total_page_views: usage.total_page_views.clone(),
             last_updated: JsDate::now(),
             bandwidth_allowance: site_type.get_bandwidth_allowance(self.exec_env),
         };
@@ -251,6 +291,17 @@ impl AppCache {
         init: impl Future<Output = Result<Value, ApiError>>,
     ) -> Result<Value, ApiError> {
         self.site_data_cache
+            .try_get_with(site_id.to_string(), init)
+            .await
+            .map_err(|e| Borrow::<ApiError>::borrow(&e).clone())
+    }
+
+    pub async fn get_page_routes_with(
+        &self,
+        site_id: &str,
+        init: impl Future<Output = Result<HashSet<String>, ApiError>>,
+    ) -> Result<HashSet<String>, ApiError> {
+        self.page_routes_cache
             .try_get_with(site_id.to_string(), init)
             .await
             .map_err(|e| Borrow::<ApiError>::borrow(&e).clone())

@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use crate::{app::usage::notify::notify_allowance_exceeded, util::mail_helpers::make_mail_params};
 use chrono::Utc;
 use lib_shared_site_api::db::db_error::DbError;
@@ -24,6 +26,8 @@ pub async fn populate_usage_cache(context: &ApiContext) -> Result<(), DbError> {
             request_error_count: 0,
             total_bandwidth: 0,
             current_monthly_bandwidth: usage.current_monthly_bandwidth,
+            page_views: HashMap::new(),
+            total_page_views: usage.total_page_views.clone(),
             start_time: Utc::now(), // Discarded
             end_time: Utc::now(),   // Discarded
         };

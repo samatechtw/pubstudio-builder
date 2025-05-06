@@ -58,12 +58,19 @@ describe('Persist Site Usage', () => {
     expect(body1.total_request_count).toEqual(1)
     expect(body1.site_view_count).toEqual(0)
     expect(body1.total_site_view_count).toEqual(0)
+    expect(body1.page_views).toEqual({})
+    expect(body1.total_page_views).toEqual({})
     expect(body1.total_bandwidth).toEqual(initialSiteSize)
     expect(body1.current_monthly_bandwidth).toEqual(initialSiteSize)
 
     // Make site requests
     await api.get('/api/sites/current').set('Host', 'test3.localhost').expect(200)
     await api.get('/api/sites/current').set('Host', 'test3.localhost').expect(200)
+    await api
+      .post(`/api/sites/${siteId}/usage/actions/page_view`)
+      .set('Host', 'test3.localhost')
+      .send({ route: '/home' })
+      .expect(200)
 
     // Verify
     const body2 = await getUsage()
@@ -71,6 +78,8 @@ describe('Persist Site Usage', () => {
     expect(body2.total_request_count).toEqual(3)
     expect(body2.site_view_count).toEqual(2)
     expect(body2.total_site_view_count).toEqual(2)
+    expect(body2.page_views).toEqual({ '/home': 1 })
+    expect(body2.total_page_views).toEqual({ '/home': 1 })
     expect(body2.total_bandwidth).toEqual(initialSiteSize * 3)
     expect(body2.current_monthly_bandwidth).toEqual(initialSiteSize * 3)
 
@@ -83,6 +92,8 @@ describe('Persist Site Usage', () => {
     expect(body3.total_request_count).toEqual(3)
     expect(body3.site_view_count).toEqual(0)
     expect(body3.total_site_view_count).toEqual(2)
+    expect(body3.page_views).toEqual({})
+    expect(body3.total_page_views).toEqual({ '/home': 1 })
     expect(body3.total_bandwidth).toEqual(0)
     expect(body3.current_monthly_bandwidth).toEqual(initialSiteSize * 3)
 
@@ -99,12 +110,19 @@ describe('Persist Site Usage', () => {
     expect(body4.total_request_count).toEqual(4)
     expect(body4.site_view_count).toEqual(0)
     expect(body4.total_site_view_count).toEqual(2)
+    expect(body4.page_views).toEqual({})
+    expect(body4.total_page_views).toEqual({ '/home': 1 })
     expect(body4.total_bandwidth).toEqual(initialSiteSize)
     expect(body4.current_monthly_bandwidth).toEqual(initialSiteSize * 4)
 
     // Make site requests
     await api.get('/api/sites/current').set('Host', 'test3.localhost').expect(200)
     await api.get('/api/sites/current').set('Host', 'test3.localhost').expect(200)
+    await api
+      .post(`/api/sites/${siteId}/usage/actions/page_view`)
+      .set('Host', 'test3.localhost')
+      .send({ route: '/home' })
+      .expect(200)
 
     // Persist again
     await api.get('/api/actions/persist-usage').expect(200)
@@ -115,6 +133,8 @@ describe('Persist Site Usage', () => {
     expect(body5.total_request_count).toEqual(6)
     expect(body5.site_view_count).toEqual(0)
     expect(body5.total_site_view_count).toEqual(4)
+    expect(body5.page_views).toEqual({})
+    expect(body5.total_page_views).toEqual({ '/home': 2 })
     expect(body5.total_bandwidth).toEqual(0)
     expect(body5.current_monthly_bandwidth).toEqual(initialSiteSize * 6)
   })

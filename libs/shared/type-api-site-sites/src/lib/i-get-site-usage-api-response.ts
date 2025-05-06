@@ -7,6 +7,8 @@ export interface IGetSiteUsageApiResponse {
   request_count: number
   site_view_count: number
   total_site_view_count: number
+  page_views: Record<string, number>
+  total_page_views: Record<string, number>
   request_error_count: number
   total_bandwidth: number
   current_monthly_bandwidth: number
@@ -18,5 +20,6 @@ export interface IGetSiteUsageApiResponse {
 
 export interface IGetPublicSiteUsageApiResponse {
   total_site_view_count: number
+  total_page_views: Record<string, number>
   last_updated: Date
 }

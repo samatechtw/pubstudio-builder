@@ -119,6 +119,16 @@ router.afterEach((newRoute, oldRoute) => {
     oldPage = site.value?.pages[oldRoute?.path ?? '']
   }
   replaceHead(site.value, page, oldPage)
+  const id = rootSiteApi.siteId.value
+  const url = `${rootSiteApi.baseUrl}api/sites/${id}/usage/actions/page_view`
+  if (newRoute) {
+    rootSiteApi.request({
+      url,
+      method: 'POST',
+      ignoreBaseUrl: true,
+      data: { route: newRoute.path },
+    })
+  }
 })
 
 onMounted(async () => {
