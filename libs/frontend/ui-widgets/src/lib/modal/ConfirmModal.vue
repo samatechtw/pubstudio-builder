@@ -10,15 +10,15 @@
     <div class="modal-buttons">
       <PSButton
         class="confirm-button"
-        :text="t('confirm')"
+        :text="confirmText ?? t('confirm')"
         :animate="loading"
         @click="emit('confirm')"
       />
       <PSButton
         class="cancel-button"
-        :text="computedCancelText"
+        :text="cancelText ?? t('cancel')"
         :secondary="true"
-        @click="emit('cancel')"
+        @click="emit('cancel', true)"
       />
     </div>
   </Modal>
@@ -28,33 +28,29 @@
 import { useI18n } from 'petite-vue-i18n'
 import Modal from './Modal.vue'
 import PSButton from '../form/PSButton.vue'
-import { computed, toRefs } from 'vue'
 
 const { t } = useI18n()
 
 const emit = defineEmits<{
   (e: 'confirm'): void
-  (e: 'cancel'): void
+  (e: 'cancel', fromButton?: boolean): void
 }>()
 
-const props = withDefaults(
+withDefaults(
   defineProps<{
     title?: string
     text?: string
     loading?: boolean
+    confirmText?: string
     cancelText?: string
   }>(),
   {
     title: undefined,
     text: undefined,
+    confirm: undefined,
     cancelText: undefined,
   },
 )
-
-const { cancelText } = toRefs(props)
-
-// Use `computed` for default because `t` is not available in `defineProps`.
-const computedCancelText = computed(() => cancelText.value ?? t('cancel'))
 </script>
 
 <style lang="postcss" scoped>
