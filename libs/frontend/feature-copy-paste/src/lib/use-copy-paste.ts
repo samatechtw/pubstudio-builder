@@ -26,21 +26,19 @@ import { replacePastedComponentNamespace } from './replace-namespace'
 
 // Export functions for testing
 export interface IUseCopyPaste {
-  showReplaceRootModal: Ref<boolean>
+  showReplaceRootModalData: Ref<ClipboardData | undefined>
   pressCopy(evt: KeyboardEvent): void
   pressPaste(evt: KeyboardEvent): Promise<void>
   pasteStyle(copiedComponent: ISerializedComponent): void
   pasteComponent(copiedComponent: ISerializedComponent): void
-  replaceRootWithCopiedComponent(): Promise<void>
+  confirmPaste(replaceRoot: boolean): Promise<void>
 }
 
-type ClipboardData =
-  | {
-      text: string | undefined
-      copiedComponent: ICopiedComponent | undefined
-      isLocal: boolean
-    }
-  | undefined
+type ClipboardData = {
+  text: string | undefined
+  copiedComponent: ICopiedComponent | undefined
+  isLocal: boolean
+}
 
 function componentI18n(component: IComponent): string[] {
   const { content } = component
@@ -77,7 +75,7 @@ function getBreakpointStyleThemeVars(
   }
 }
 
-const showReplaceRootModal = ref(false)
+const showReplaceRootModalData = ref<ClipboardData | undefined>()
 
 export const useCopyPaste = (): IUseCopyPaste => {
   const {
@@ -170,7 +168,7 @@ export const useCopyPaste = (): IUseCopyPaste => {
     addHUD({ text: 'Style Pasted' })
   }
 
-  const getClipboardData = async (): Promise<ClipboardData> => {
+  const getClipboardData = async (): Promise<ClipboardData | undefined> => {
     const { selectedComponent } = site.value.editor ?? {}
     if (!selectedComponent) return undefined
     try {
@@ -227,65 +225,88 @@ export const useCopyPaste = (): IUseCopyPaste => {
   const pressPaste = async (evt: KeyboardEvent) => {
     evt.stopImmediatePropagation()
     const pasteData = await getClipboardData()
-    if (!pasteData) {
-      return
-    }
     const selectedComponent = site.value.editor?.selectedComponent
-    const { isLocal, copiedComponent, text } = pasteData
-    if (selectedComponent) {
-      const component = copiedComponent?.component
-      if (evt.shiftKey) {
-        // Make sure we don't paste style to the same component
-        if (component && selectedComponent.id !== component.id) {
-          pasteStyle(component)
-        }
-      } else if (copiedComponent) {
-        const isRoot =
-          !!selectedComponent &&
-          !selectedComponent.parent &&
-          selectedComponent.id !== copiedComponent.component.id
-        if (isRoot && isLocal) {
-          // Show a warning before replacing the root component
-          // Components from an external site currently cannot replace root components
-          showReplaceRootModal.value = true
-          return
-        }
-        const component = copiedComponent.component
-        if (isLocal) {
-          if (!component.parentId) {
-            // Root component should not be pasted through paste hotkey.
-            addHUD({
-              text: 'Root component can only be used to replace another root component',
-              duration: 2000,
-            })
-          } else {
-            pasteComponent(component)
-          }
-        } else if (copiedComponent) {
-          pasteExternalComponent(copiedComponent, selectedComponent)
-          addHUD({ text: 'Component Pasted' })
-        }
-      } else if (text) {
-        editSelectedComponent({ content: text })
+    if (!pasteData || !selectedComponent) {
+      return
+    } else if (evt.shiftKey) {
+      const component = pasteData?.copiedComponent?.component
+      // Make sure we don't paste style to the same component
+      if (component && selectedComponent.id !== component.id) {
+        pasteStyle(component)
       }
+    } else {
+      pasteClipboardComponent(pasteData, selectedComponent, true)
     }
   }
 
-  const replaceRootWithCopiedComponent = async () => {
-    const pasteData = await getClipboardData()
+  const pasteClipboardComponent = (
+    data: ClipboardData,
+    selectedComponent: IComponent,
+    warnRoot: boolean,
+  ) => {
+    const { isLocal, copiedComponent, text } = data
+    if (copiedComponent) {
+      const component = copiedComponent.component
+      const isRoot =
+        !!selectedComponent &&
+        !selectedComponent.parent &&
+        selectedComponent.id !== copiedComponent.component.id
+      if (warnRoot && isRoot && isLocal && component.children) {
+        // Show a warning before replacing the root component
+        // Components from an external site currently cannot replace root components
+        showReplaceRootModalData.value = data
+        return
+      }
+      if (isLocal) {
+        if (!component.parentId) {
+          // Root component should not be pasted through paste hotkey.
+          addHUD({
+            text: 'Root component can only be used to replace another root component',
+            duration: 2000,
+          })
+        } else {
+          pasteComponent(component)
+        }
+      } else if (copiedComponent) {
+        pasteExternalComponent(copiedComponent, selectedComponent)
+        addHUD({ text: 'Component Pasted' })
+      }
+    } else if (text) {
+      editSelectedComponent({ content: text })
+    }
+  }
+
+  const replaceRootWithCopiedComponent = async (pasteData: ClipboardData) => {
     if (editor.value?.active && pasteData?.copiedComponent && pasteData?.isLocal) {
       const component = pasteData.copiedComponent.component
-      replacePageRoot(component.id, editor.value?.active)
+      replacePageRoot(component.id, editor.value.active)
       addHUD({ text: 'Replaced' })
     }
   }
 
+  // Replace root, or paste as root child, depending on user selection
+  const confirmPaste = async (replaceRoot: boolean) => {
+    const pasteData = showReplaceRootModalData.value
+    showReplaceRootModalData.value = undefined
+    if (!editor.value?.active || !pasteData) {
+      return
+    }
+    if (replaceRoot) {
+      replaceRootWithCopiedComponent(pasteData)
+    } else {
+      const root = site.value.pages[editor.value.active]?.root
+      if (root) {
+        pasteClipboardComponent(pasteData, root, false)
+      }
+    }
+  }
+
   return {
-    showReplaceRootModal,
+    showReplaceRootModalData,
     pressCopy,
     pressPaste,
     pasteStyle,
     pasteComponent,
-    replaceRootWithCopiedComponent,
+    confirmPaste,
   }
 }
