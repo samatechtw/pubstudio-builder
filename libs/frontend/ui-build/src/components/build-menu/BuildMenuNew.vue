@@ -12,6 +12,11 @@
         :builtinComponentId="containerVertical.id"
       />
       <NewComponent
+        class="new-grid"
+        :text="t('build.grid')"
+        :builtinComponentId="grid.id"
+      />
+      <NewComponent
         class="new-image"
         :text="t('build.image')"
         :builtinComponentId="image.id"
@@ -168,6 +173,7 @@ import {
   viewCounter,
   vueComponent,
   label,
+  grid,
 } from '@pubstudio/frontend/util-builtin'
 import {
   ContactFormWalkthroughModal,

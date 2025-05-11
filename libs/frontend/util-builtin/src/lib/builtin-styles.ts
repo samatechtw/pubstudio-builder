@@ -7,6 +7,7 @@ import {
   dividerVerticalStyle,
 } from './components/builtin-divider'
 import { footerStyle } from './components/builtin-footer'
+import { gridStyle } from './components/builtin-grid'
 import {
   h1Style,
   h2Style,
@@ -42,6 +43,7 @@ import { textareaStyle } from './components/builtin-textarea'
 export const builtinStyles: Record<string, IStyle> = {
   [horizontalStyle.id]: horizontalStyle,
   [verticalStyle.id]: verticalStyle,
+  [gridStyle.id]: gridStyle,
   [textStyle.id]: textStyle,
   [h1Style.id]: h1Style,
   [h2Style.id]: h2Style,

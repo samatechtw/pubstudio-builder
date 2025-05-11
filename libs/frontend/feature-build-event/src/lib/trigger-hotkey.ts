@@ -23,6 +23,7 @@ import {
   dividerHorizontalId,
   dividerVerticalId,
   footerId,
+  gridId,
   h1Id,
   h2Id,
   h3Id,
@@ -152,6 +153,9 @@ export const triggerHotkey = (site: ISite, key: Keys) => {
         break
       case ComponentHotkeys.NewContainerV:
         addBuiltinComponent(site, { id: containerVerticalId })
+        break
+      case ComponentHotkeys.NewGrid:
+        addBuiltinComponent(site, { id: gridId })
         break
       case ComponentHotkeys.NewSvg:
         addBuiltinComponent(site, { id: svgId })

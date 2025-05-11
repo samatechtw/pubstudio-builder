@@ -64,6 +64,7 @@ export enum ComponentHotkeys {
   // Basic components
   NewContainerH = 'nCH',
   NewContainerV = 'nCV',
+  NewGrid = 'nG',
   NewSvg = 'nSvg',
   NewImage = 'nI',
   NewText = 'nT',

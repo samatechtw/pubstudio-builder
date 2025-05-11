@@ -41,6 +41,7 @@ export const containerVerticalId = componentId(
   globalContext.namespace,
   'containerVertical',
 )
+export const gridId = componentId(globalContext.namespace, 'grid')
 export const footerStyleId = nextStyleId(globalContext)
 export const footerId = componentId(globalContext.namespace, 'footer')
 export const navMenuStyleId = nextStyleId(globalContext)
@@ -121,6 +122,8 @@ export const caretRightStyleId = nextStyleId(globalContext)
 export const caretBubbleStyleId = nextStyleId(globalContext)
 export const langOptionStyleId = nextStyleId(globalContext)
 export const langOptionsStyleId = nextStyleId(globalContext)
+
+export const gridStyleId = nextStyleId(globalContext)
 
 // Placeholder for children of builtin components that aren't used independently
 export const tempChildId = componentId(globalContext.namespace, 'tempchild')
