@@ -47,6 +47,7 @@ export const DefaultHotkeys: IHotkeys = {
     [Keys.Tab]: ComponentHotkeys.NewSwitch,
     [Keys.h]: ComponentHotkeys.NewContainerH,
     [Keys.v]: ComponentHotkeys.NewContainerV,
+    [Keys.g]: ComponentHotkeys.NewGrid,
     [Keys.s]: ComponentHotkeys.NewSvg,
     [Keys.p]: ComponentHotkeys.NewImage,
     [Keys.t]: ComponentHotkeys.NewText,

@@ -5,6 +5,7 @@ import { containerHorizontal } from './builtin-container-horizontal'
 import { containerVertical } from './builtin-container-vertical'
 import { dividerHorizontal, dividerVertical } from './builtin-divider'
 import { footer } from './builtin-footer'
+import { grid } from './builtin-grid'
 import { h1, h2, h3, h4, h5, h6 } from './builtin-h'
 import { header, headerLogo, headerLogoLink, headerNavMenu } from './builtin-header'
 import { backgroundImage, captionedImage, image } from './builtin-image'
@@ -23,6 +24,7 @@ import { vueComponent } from './builtin-vue-component'
 export const builtinComponents: Record<string, ISerializedComponent> = {
   [containerHorizontal.id]: containerHorizontal,
   [containerVertical.id]: containerVertical,
+  [grid.id]: grid,
   [text.id]: text,
   [h1.id]: h1,
   [h2.id]: h2,
