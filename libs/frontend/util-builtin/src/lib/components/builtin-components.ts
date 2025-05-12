@@ -9,6 +9,7 @@ import { grid } from './builtin-grid'
 import { h1, h2, h3, h4, h5, h6 } from './builtin-h'
 import { header, headerLogo, headerLogoLink, headerNavMenu } from './builtin-header'
 import { backgroundImage, captionedImage, image } from './builtin-image'
+import { imageGallery } from './builtin-image-gallery'
 import { input } from './builtin-input'
 import { label } from './builtin-label'
 import { link } from './builtin-link'
@@ -33,6 +34,7 @@ export const builtinComponents: Record<string, ISerializedComponent> = {
   [h5.id]: h5,
   [h6.id]: h6,
   [image.id]: image,
+  [imageGallery.id]: imageGallery,
   [captionedImage.id]: captionedImage,
   [backgroundImage.id]: backgroundImage,
   [svg.id]: svg,

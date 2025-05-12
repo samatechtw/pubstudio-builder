@@ -26,7 +26,7 @@ export const imageStyle: IStyle = {
   },
 }
 
-const makeImage = (src: string, style?: IRawStyle): IComponent => {
+export const makeImage = (src: string, style?: IRawStyle): IComponent => {
   return {
     id: imageId,
     name: 'Image',
@@ -43,7 +43,7 @@ const makeImage = (src: string, style?: IRawStyle): IComponent => {
   }
 }
 
-export const image = makeImage('')
+export const image = makeImage('https://web.pubstudioassets.com/placeholder.png')
 
 export const captionedImageStyle: IStyle = {
   id: captionedImageStyleId,
@@ -78,7 +78,7 @@ export const captionedImage: IComponent = {
     },
   },
   children: [
-    makeImage('https://pubstudioassets.com/photo.png', {
+    makeImage('https://web.pubstudioassets.com/placeholder.png', {
       width: '100%',
       height: '400px',
     }),
