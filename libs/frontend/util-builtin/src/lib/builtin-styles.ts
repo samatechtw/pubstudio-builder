@@ -22,6 +22,7 @@ import {
   captionedImageStyle,
   imageStyle,
 } from './components/builtin-image'
+import { gridImageStyle, imageGalleryStyle } from './components/builtin-image-gallery'
 import { inputStyle } from './components/builtin-input'
 import { labelStyle } from './components/builtin-label'
 import {
@@ -44,6 +45,8 @@ export const builtinStyles: Record<string, IStyle> = {
   [horizontalStyle.id]: horizontalStyle,
   [verticalStyle.id]: verticalStyle,
   [gridStyle.id]: gridStyle,
+  [gridImageStyle.id]: gridImageStyle,
+  [imageGalleryStyle.id]: imageGalleryStyle,
   [textStyle.id]: textStyle,
   [h1Style.id]: h1Style,
   [h2Style.id]: h2Style,

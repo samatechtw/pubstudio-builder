@@ -81,6 +81,7 @@ export enum ComponentHotkeys {
   NewTextarea = 'nTa',
   NewDividerH = 'nDH',
   NewDividerV = 'nDV',
+  NewImageGallery = 'nIG',
   NewVue = 'nV',
 }
 

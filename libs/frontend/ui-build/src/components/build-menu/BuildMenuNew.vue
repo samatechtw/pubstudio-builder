@@ -112,6 +112,11 @@
         :builtinComponentId="dividerVertical.id"
       />
       <NewComponent
+        class="new-image-gallery"
+        :text="t('build.image_gallery')"
+        :builtinComponentId="imageGallery.id"
+      />
+      <NewComponent
         v-if="isSiteApi"
         class="new-contact-form"
         :text="t('build.contact_form')"
@@ -174,6 +179,7 @@ import {
   vueComponent,
   label,
   grid,
+  imageGallery,
 } from '@pubstudio/frontend/util-builtin'
 import {
   ContactFormWalkthroughModal,

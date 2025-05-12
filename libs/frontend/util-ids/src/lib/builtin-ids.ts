@@ -122,8 +122,11 @@ export const caretRightStyleId = nextStyleId(globalContext)
 export const caretBubbleStyleId = nextStyleId(globalContext)
 export const langOptionStyleId = nextStyleId(globalContext)
 export const langOptionsStyleId = nextStyleId(globalContext)
+export const imageGalleryId = componentId(globalContext.namespace, 'gallery')
+export const imageGalleryStyleId = styleId(globalContext.namespace, 'gallery')
+export const gridImageStyleId = styleId(globalContext.namespace, 'gridimage')
 
-export const gridStyleId = nextStyleId(globalContext)
+export const gridStyleId = styleId(globalContext.namespace, 'grid')
 
 // Placeholder for children of builtin components that aren't used independently
 export const tempChildId = componentId(globalContext.namespace, 'tempchild')
