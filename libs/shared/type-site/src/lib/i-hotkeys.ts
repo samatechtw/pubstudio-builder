@@ -67,6 +67,7 @@ export enum ComponentHotkeys {
   NewGrid = 'nG',
   NewSvg = 'nSvg',
   NewImage = 'nI',
+  NewVideo = 'nVid',
   NewText = 'nT',
   NewLink = 'nL',
   NewH1 = 'nH1',

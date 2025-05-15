@@ -4,7 +4,7 @@
     <SelectAssetModal
       :show="showSelectAssetModal"
       :initialSiteId="getSiteId()"
-      :contentTypes="contentTypes"
+      :contentTypes="ContentTypes"
       @cancel="showSelectAssetModal = false"
       @select="onAssetSelected"
       @externalUrl="onUrlSelected"
@@ -13,12 +13,19 @@
 </template>
 
 <script lang="ts" setup>
-import { toRefs } from 'vue'
+import { ref, toRefs } from 'vue'
 import { Assets } from '@pubstudio/frontend/ui-widgets'
-import { useBuild, useSelectAsset, useToolbar } from '@pubstudio/frontend/feature-build'
+import {
+  addOrUpdateSelectedInput,
+  useBuild,
+  useToolbar,
+} from '@pubstudio/frontend/feature-build'
 import { SelectAssetModal } from '@pubstudio/frontend/feature-site-assets'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
-import { ISiteAssetViewModel } from '@pubstudio/shared/type-api-platform-site-asset'
+import {
+  AssetContentType,
+  ISiteAssetViewModel,
+} from '@pubstudio/shared/type-api-platform-site-asset'
 import { urlFromAsset } from '@pubstudio/frontend/util-asset'
 import { resolveComponent } from '@pubstudio/frontend/util-resolve'
 import {
@@ -29,10 +36,18 @@ import {
 } from '@pubstudio/shared/type-site'
 import { clone } from '@pubstudio/frontend/util-component'
 
-const { addOrUpdateSelectedInput, selectedComponentFlattenedStyles } = useBuild()
+const ContentTypes = [
+  AssetContentType.Jpeg,
+  AssetContentType.Png,
+  AssetContentType.Webp,
+  AssetContentType.Svg,
+  AssetContentType.Gif,
+]
+
+const { selectedComponentFlattenedStyles } = useBuild()
 const { setOrRemoveStyle } = useToolbar()
 const { site, siteStore } = useSiteSource()
-const { showSelectAssetModal, contentTypes } = useSelectAsset()
+const showSelectAssetModal = ref(false)
 
 const props = defineProps<{
   componentId: string | undefined
@@ -60,7 +75,7 @@ const onUrlSelected = (url: string) => {
         is: url,
       }
       input.is = url
-      addOrUpdateSelectedInput(input.name, input)
+      addOrUpdateSelectedInput(site.value, input.name, input)
     } else {
       const style = selectedComponentFlattenedStyles.value['background-image']
       if (style) {

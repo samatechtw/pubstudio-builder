@@ -1,7 +1,12 @@
 import { setComponentEditInput } from '@pubstudio/frontend/data-access-command'
+import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { ComponentTabState, IComponentInput } from '@pubstudio/shared/type-site'
 import { computed, ComputedRef } from 'vue'
-import { useBuild } from '../use-build'
+import {
+  addOrUpdateSelectedInput,
+  removeComponentInput,
+  setSelectedIsInput,
+} from '../command-wrap/component-input'
 
 export interface IInputUpdate {
   property: string
@@ -18,8 +23,7 @@ export interface IUseEditComponentInputFeature {
 }
 
 export const useEditComponentInput = (): IUseEditComponentInputFeature => {
-  const { editor, addOrUpdateSelectedInput, removeComponentInput, setSelectedIsInput } =
-    useBuild()
+  const { site, editor } = useSiteSource()
 
   const isEditingInput = computed(() => {
     return editor.value?.componentTab?.state === ComponentTabState.EditInput
@@ -38,17 +42,17 @@ export const useEditComponentInput = (): IUseEditComponentInputFeature => {
   }
 
   const upsertInput = (input: IComponentInput) => {
-    addOrUpdateSelectedInput(input.name, input)
+    addOrUpdateSelectedInput(site.value, input.name, input)
     setEditedInput(undefined)
   }
 
   const removeInput = (name: string) => {
-    removeComponentInput(name)
+    removeComponentInput(site.value, name)
     setEditedInput(undefined)
   }
 
   const setInputIs = (data: IInputUpdate) => {
-    setSelectedIsInput(data.property, data.newValue)
+    setSelectedIsInput(site.value, data.property, data.newValue)
   }
 
   return {

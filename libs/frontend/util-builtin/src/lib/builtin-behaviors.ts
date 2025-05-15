@@ -176,40 +176,43 @@ const { error: argError, ...resolvedArgs } = helpers.requireArgs(args, [
   'apiEmailField',
   'apiMessageField',
 ])
-const errorCmp = getComponent(site, resolvedArgs.errorId)
-if (argError) {
-  console.warn(argError)
-  helpers.setContent(errorCmp, 'Unknown form error')
-} else {
-  let name
-  const email = helpers.getValue(resolvedArgs.emailId)
-  const message = helpers.getValue(resolvedArgs.messageId)
-  if (args?.nameId) {
-    name = helpers.getValue(args.nameId)
-  }
-  const button = helpers.findComponent(component, (cmp) => cmp.tag === 'button')
-  try {
-    helpers.setLoading(button, true)
-    const row = {
-      [resolvedArgs.apiEmailField]: email ?? '',
-      [resolvedArgs.apiMessageField]: message ?? '',
+const submit = async () => {
+  const errorCmp = getComponent(site, resolvedArgs.errorId)
+  if (argError) {
+    console.warn(argError)
+    helpers.setContent(errorCmp, 'Unknown form error')
+  } else {
+    let name
+    const email = helpers.getValue(resolvedArgs.emailId)
+    const message = helpers.getValue(resolvedArgs.messageId)
+    if (args?.nameId) {
+      name = helpers.getValue(args.nameId)
     }
-    if (args?.apiNameField && name) {
-      row[args?.apiNameField] = name
-    }
-    helpers.addRow(resolvedArgs.tableName, row).then(() => {
+    const button = helpers.findComponent(component, (cmp) => cmp.tag === 'button')
+    try {
+      helpers.setLoading(button, true)
+      const row = {
+        [resolvedArgs.apiEmailField]: email ?? '',
+        [resolvedArgs.apiMessageField]: message ?? '',
+      }
+      if (args?.apiNameField && name) {
+        row[args?.apiNameField] = name
+      }
+      await helpers.addRow(resolvedArgs.tableName, row)
       helpers.setCustomStyle(errorCmp, 'opacity', '1')
       helpers.setCustomStyle(errorCmp, 'color', '\${color-success}')
       helpers.setContent(errorCmp, 'Contact request sent!')
       helpers.setLoading(button, false)
-    })
-  } catch (e) {
-    helpers.setError(errorCmp, e, {
-      CustomDataUniqueFail: 'Contact request already submitted',
-    })
-    helpers.setLoading(button, false)
+      helpers.setState(button, 'hide', true)
+    } catch (e) {
+      helpers.setError(errorCmp, e, {
+        CustomDataUniqueFail: 'Contact request already submitted',
+      })
+      helpers.setLoading(button, false)
+    }
   }
 }
+submit()
 `,
 }
 

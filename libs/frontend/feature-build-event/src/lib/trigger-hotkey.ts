@@ -39,6 +39,7 @@ import {
   svgId,
   textareaId,
   textId,
+  videoWrapId,
 } from '@pubstudio/frontend/util-ids'
 import {
   AssetHotkeys,
@@ -162,6 +163,9 @@ export const triggerHotkey = (site: ISite, key: Keys) => {
         break
       case ComponentHotkeys.NewImage:
         addBuiltinComponent(site, { id: imageId })
+        break
+      case ComponentHotkeys.NewVideo:
+        addBuiltinComponent(site, { id: videoWrapId })
         break
       case ComponentHotkeys.NewText:
         addBuiltinComponent(site, { id: textId })

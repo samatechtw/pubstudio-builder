@@ -40,6 +40,7 @@ import { navMenuItemStyle, navMenuStyle } from './components/builtin-nav-menu'
 import { svgStyle } from './components/builtin-svg'
 import { textStyle } from './components/builtin-text'
 import { textareaStyle } from './components/builtin-textarea'
+import { videoStyle, videoWrapStyle } from './components/builtin-video'
 
 export const builtinStyles: Record<string, IStyle> = {
   [horizontalStyle.id]: horizontalStyle,
@@ -57,6 +58,8 @@ export const builtinStyles: Record<string, IStyle> = {
   [imageStyle.id]: imageStyle,
   [captionedImageStyle.id]: captionedImageStyle,
   [backgroundImageStyle.id]: backgroundImageStyle,
+  [videoStyle.id]: videoStyle,
+  [videoWrapStyle.id]: videoWrapStyle,
   [navMenuStyle.id]: navMenuStyle,
   [navMenuItemStyle.id]: navMenuItemStyle,
   [svgStyle.id]: svgStyle,

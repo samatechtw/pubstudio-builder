@@ -8,6 +8,7 @@
   <div class="build-dnd-overlay build-component-hover" :style="hoverOverlayStyle" />
   <HoverEdges />
   <ImageEdit v-if="imageEditStyle" :componentId="selectedId" :style="imageEditStyle" />
+  <VideoEdit v-if="videoEditStyle" :componentId="selectedId" :style="videoEditStyle" />
   <SvgEdit
     v-if="svgEditStyle && selectedId"
     :componentId="selectedId"
@@ -48,8 +49,11 @@ import {
 } from '@pubstudio/frontend/feature-render-builder'
 import { computeInputs } from '@pubstudio/frontend/util-render'
 import { resolveComponent } from '@pubstudio/frontend/util-resolve'
+import { IComponentOverlay } from '@pubstudio/frontend/type-ui-widgets'
+import { getAdjacentVideo } from '@pubstudio/frontend/util-component'
 import { computeHoverOverlayStyle } from '../lib/hover-overlay-style'
 import ImageEdit from './ImageEdit.vue'
+import VideoEdit from './VideoEdit.vue'
 import HoverEdges from './HoverEdges.vue'
 import {
   selectionDimensions,
@@ -68,6 +72,14 @@ const selectedId = computed(() => {
   return editor.value?.selectedComponent?.id
 })
 
+const editStylePos = (dim: IComponentOverlay): { top: string; left: string } => {
+  const top = dim.top - 30
+  return {
+    top: `${top < 0 ? 4 : top}px`,
+    left: `${dim.left + dim.width - 40}px`,
+  }
+}
+
 const imageEditStyle = computed(() => {
   const cmp = editor.value?.selectedComponent
   const dim = selectionDimensions.value
@@ -82,11 +94,26 @@ const imageEditStyle = computed(() => {
       )['background-image'] !== undefined
     const isImg = cmp.tag === Tag.Img
     if (hasBg || isImg) {
-      const top = dim.top - 30
-      return {
-        top: `${top < 0 ? 4 : top}px`,
-        left: `${dim.left + dim.width - 40}px`,
+      return editStylePos(dim)
+    }
+  }
+  return undefined
+})
+
+const videoEditStyle = computed(() => {
+  const cmp = editor.value?.selectedComponent
+  const dim = selectionDimensions.value
+  if (cmp && dim) {
+    const videoCmp = getAdjacentVideo(cmp)
+    if (videoCmp) {
+      if (cmp.tag === Tag.Source) {
+        // Source element has no dimensions, so use the video element
+        const videoDim = computeSelectionOverlay(editor.value, videoCmp.id)
+        if (videoDim) {
+          return editStylePos(videoDim)
+        }
       }
+      return editStylePos(dim)
     }
   }
   return undefined
@@ -97,11 +124,7 @@ const svgEditStyle = computed(() => {
   const dim = selectionDimensions.value
   if (cmp && dim) {
     if (cmp.tag === Tag.Svg) {
-      const top = dim.top - 30
-      return {
-        top: `${top < 0 ? 2 : top}px`,
-        left: `${dim.left + dim.width - 40}px`,
-      }
+      return editStylePos(dim)
     }
   }
   return undefined
@@ -135,7 +158,6 @@ const linkTooltipStyle = computed(() => {
         activeBreakpoint.value,
       ).display ?? null
     if (display !== 'none') {
-      const top = dim.top - 30
       const r = resolveComponent(site.value.context, cmp.customSourceId)
       const attrs = computeInputs(site.value.context, cmp, r, {
         resolveTheme: false,
@@ -145,10 +167,7 @@ const linkTooltipStyle = computed(() => {
       return {
         link,
         // Not currently used, since the link tooltip calculates its own position
-        style: {
-          top: `${top < 0 ? 2 : top}px`,
-          left: `${dim.left + dim.width - 40}px`,
-        },
+        style: editStylePos(dim),
       }
     }
   }

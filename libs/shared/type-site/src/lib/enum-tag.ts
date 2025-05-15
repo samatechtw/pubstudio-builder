@@ -14,6 +14,7 @@ export enum Tag {
   Header = 'header',
   Img = 'img',
   Span = 'span',
+  Source = 'source',
   Svg = 'svg',
   Input = 'input',
   Textarea = 'textarea',
@@ -21,6 +22,7 @@ export enum Tag {
   Ul = 'ul',
   Ol = 'ol',
   Li = 'li',
+  Video = 'video',
   Vue = 'vue',
   Canvas = 'canvas',
 }

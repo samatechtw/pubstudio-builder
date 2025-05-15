@@ -50,6 +50,7 @@ export const DefaultHotkeys: IHotkeys = {
     [Keys.g]: ComponentHotkeys.NewGrid,
     [Keys.s]: ComponentHotkeys.NewSvg,
     [Keys.p]: ComponentHotkeys.NewImage,
+    [Keys.o]: ComponentHotkeys.NewVideo,
     [Keys.t]: ComponentHotkeys.NewText,
     [Keys.l]: ComponentHotkeys.NewLink,
     [Keys.Digit1]: ComponentHotkeys.NewH1,
