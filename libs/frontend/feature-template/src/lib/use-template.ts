@@ -99,21 +99,28 @@ export const useTemplate = (): ITemplateFeature => {
     }
   }
 
+  // Parse the input if it's a string, otherwise return it unmodified.
+  // The API returned un-parsed strings at one point, so this is necessary for old templates
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const parseIfStr = (blob: any): any => {
+    return typeof blob === 'string' ? JSON.parse(blob) : blob
+  }
+
   const templateToSerializedSite = (
     template: ITemplateViewModel | undefined,
   ): ISerializedSite | undefined => {
     if (template) {
-      const pages = JSON.parse(template.pages)
+      const pages = parseIfStr(template.pages)
       const homePage = Object.values(pages)[0] as IPage
       return {
         name: template.name,
         version: template.version,
-        context: JSON.parse(template.context),
-        defaults: JSON.parse(template.defaults),
+        context: parseIfStr(template.context),
+        defaults: parseIfStr(template.defaults),
         editor: serializeEditor(createEditorContext(homePage)),
         history: { back: [], forward: [] },
         pages,
-        pageOrder: JSON.parse(template.pageOrder ?? null) || Object.keys(pages),
+        pageOrder: parseIfStr(template.pageOrder ?? null) || Object.keys(pages),
       }
     }
   }
