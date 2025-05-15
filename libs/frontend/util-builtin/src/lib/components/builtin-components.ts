@@ -19,6 +19,7 @@ import { navMenu, navMenuItem } from './builtin-nav-menu'
 import { svg } from './builtin-svg'
 import { text } from './builtin-text'
 import { textarea } from './builtin-textarea'
+import { video } from './builtin-video'
 import { viewCounter } from './builtin-view-counter'
 import { vueComponent } from './builtin-vue-component'
 
@@ -35,6 +36,7 @@ export const builtinComponents: Record<string, ISerializedComponent> = {
   [h6.id]: h6,
   [image.id]: image,
   [imageGallery.id]: imageGallery,
+  [video.id]: video,
   [captionedImage.id]: captionedImage,
   [backgroundImage.id]: backgroundImage,
   [svg.id]: svg,

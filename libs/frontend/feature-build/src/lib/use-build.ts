@@ -21,7 +21,6 @@ import {
   addComponentEventData,
   makeEditComponentData,
   makeRemoveComponentData,
-  makeSetInputData,
   makeSetTranslationsData,
   selectAddParent,
 } from '@pubstudio/frontend/util-command-data'
@@ -64,7 +63,6 @@ import {
   ISetBreakpointData,
   ISetComponentCustomStyleData,
   ISetComponentEventData,
-  ISetComponentInputData,
   ISetHomePageData,
   IUpdateMixinOrderData,
 } from '@pubstudio/shared/type-command-data'
@@ -76,7 +74,6 @@ import {
   IBreakpointStyles,
   IComponent,
   IComponentEvent,
-  IComponentInput,
   ICopiedComponent,
   IEditorContext,
   IEditorEvent,
@@ -174,14 +171,6 @@ export interface IUseBuild {
     oldEventName: string,
     newEvent: IEditorEvent,
   ) => void
-  addOrUpdateComponentInput: (
-    component: IComponent | undefined,
-    property: string,
-    payload: Partial<IComponentInput>,
-  ) => void
-  addOrUpdateSelectedInput: (property: string, payload: Partial<IComponentInput>) => void
-  removeComponentInput: (name: string) => void
-  setSelectedIsInput: (prop: string, newValue: unknown) => void
   setBehavior: (behavior: INewBehavior) => void
   removeBehavior: (id: string) => void
   setBehaviorArg: (
@@ -782,39 +771,6 @@ export const useBuild = (): IUseBuild => {
     pushCommand(site.value, CommandType.SetComponentEditorEvent, data)
   }
 
-  const addOrUpdateComponentInput = (
-    component: IComponent | undefined,
-    property: string,
-    payload: Partial<IComponentInput>,
-  ) => {
-    const data = makeSetInputData(component, property, payload)
-    if (data) {
-      pushCommand(site.value, CommandType.SetComponentInput, data)
-    }
-  }
-
-  const addOrUpdateSelectedInput = (
-    property: string,
-    payload: Partial<IComponentInput>,
-  ) => {
-    const selected = site.value.editor?.selectedComponent
-    addOrUpdateComponentInput(selected, property, payload)
-  }
-
-  const removeComponentInput = (name: string) => {
-    const selected = site.value.editor?.selectedComponent
-    const oldInput = selected?.inputs?.[name]
-    if (!selected) {
-      return
-    }
-    const data: ISetComponentInputData = {
-      componentId: selected.id,
-      oldInput,
-      newInput: undefined,
-    }
-    pushCommand(site.value, CommandType.SetComponentInput, data)
-  }
-
   const setBehavior = (behavior: INewBehavior) => {
     const oldBehavior = behavior.id
       ? site.value.context.behaviors[behavior.id]
@@ -851,16 +807,6 @@ export const useBuild = (): IUseBuild => {
       newArg,
     }
     pushCommand(site.value, CommandType.SetBehaviorArg, data)
-  }
-
-  const setSelectedIsInput = (prop: string, newValue: unknown) => {
-    const selected = site.value.editor?.selectedComponent
-    const data = makeSetInputData(selected, prop, {
-      is: newValue,
-    })
-    if (data) {
-      pushCommand(site.value, CommandType.SetComponentInput, data)
-    }
   }
 
   const flattenComponentMixin = (componentId: string, mixinId: string) => {
@@ -1079,10 +1025,6 @@ export const useBuild = (): IUseBuild => {
     addSelectedComponentEditorEvent,
     updateSelectedComponentEditorEvent,
     removeSelectedComponentEditorEvent,
-    addOrUpdateComponentInput,
-    addOrUpdateSelectedInput,
-    removeComponentInput,
-    setSelectedIsInput,
     deleteSelected,
     selectComponentParent,
     setBehavior,

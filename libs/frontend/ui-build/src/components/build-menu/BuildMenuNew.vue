@@ -22,6 +22,11 @@
         :builtinComponentId="image.id"
       />
       <NewComponent
+        class="new-video"
+        :text="t('build.video')"
+        :builtinComponentId="video.id"
+      />
+      <NewComponent
         class="new-captioned-image"
         :text="t('build.captioned_image')"
         :builtinComponentId="captionedImage.id"
@@ -180,6 +185,7 @@ import {
   label,
   grid,
   imageGallery,
+  video,
 } from '@pubstudio/frontend/util-builtin'
 import {
   ContactFormWalkthroughModal,

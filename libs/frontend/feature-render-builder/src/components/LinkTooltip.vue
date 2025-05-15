@@ -79,20 +79,20 @@ import {
   Edit,
   Trash,
 } from '@pubstudio/frontend/ui-widgets'
-import { useBuild, getLinkDatalistOptions } from '@pubstudio/frontend/feature-build'
+import {
+  useBuild,
+  setSelectedIsInput,
+  removeComponentInput,
+  addOrUpdateSelectedInput,
+  getLinkDatalistOptions,
+} from '@pubstudio/frontend/feature-build'
 import { resolveComponent } from '@pubstudio/frontend/util-resolve'
 import { ComponentArgPrimitive } from '@pubstudio/shared/type-site'
 import { createLinkNode, schemaText } from '@pubstudio/frontend/util-edit-text'
 import { LinkTooltipMode } from '../lib/enum-link-tooltip-mode'
 
 const { t } = useI18n()
-const {
-  site,
-  changePage,
-  setSelectedIsInput,
-  addOrUpdateSelectedInput,
-  removeComponentInput,
-} = useBuild()
+const { site, changePage } = useBuild()
 
 const { link, componentId, defaultOpenInNewTab, mode, editView, anchor } = defineProps<{
   link: string
@@ -159,17 +159,17 @@ const updateLink = async () => {
 }
 
 const updateComponentInputs = () => {
-  setSelectedIsInput('href', editedLink.value)
+  setSelectedIsInput(site.value, 'href', editedLink.value)
 
   if (openInNewTab.value) {
-    addOrUpdateSelectedInput('target', {
+    addOrUpdateSelectedInput(site.value, 'target', {
       type: ComponentArgPrimitive.String,
       name: 'target',
       attr: true,
       is: '_blank',
     })
   } else if (componentTargetInput.value === '_blank') {
-    removeComponentInput('target')
+    removeComponentInput(site.value, 'target')
   }
 }
 

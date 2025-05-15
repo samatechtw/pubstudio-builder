@@ -4,7 +4,11 @@ import {
 } from '@pubstudio/frontend/data-access-command'
 import { getActivePage } from '@pubstudio/frontend/feature-site-store'
 import { BuilderDragDataType } from '@pubstudio/frontend/type-builder'
-import { builtinBehaviors, getBuiltinComponent } from '@pubstudio/frontend/util-builtin'
+import {
+  builtinBehaviors,
+  builtinComponents,
+  getBuiltinComponent,
+} from '@pubstudio/frontend/util-builtin'
 import {
   makeAddBuiltinComponentData,
   makeAddCustomComponentData,

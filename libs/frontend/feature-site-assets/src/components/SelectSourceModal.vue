@@ -1,7 +1,7 @@
 <template>
-  <Modal :show="show" cls="select-asset-modal" @cancel="cancel">
+  <Modal :show="show" cls="select-source-modal" @cancel="cancel">
     <div class="modal-title">
-      {{ t('build.select_asset') }}
+      {{ t('build.video_source') }}
       <PSButton
         class="upload-button"
         size="medium"
@@ -10,7 +10,7 @@
       />
     </div>
     <div class="modal-text">
-      {{ t('build.asset_text') }}
+      {{ t('build.source_text') }}
     </div>
     <div class="asset-filter-row">
       <STInput
@@ -61,8 +61,8 @@
       <div v-if="loading" class="assets-spinner-wrap">
         <Spinner class="assets-spinner" :size="16" color="#2a17d6" />
       </div>
-      <div v-else-if="!siteAssets?.length" class="no-asset">
-        {{ t('build.no_matching_results') }}
+      <div v-else-if="!siteAssets?.length" class="no-source">
+        {{ t('build.no_videos') }}
       </div>
       <div
         v-for="asset in siteAssets"
@@ -88,6 +88,7 @@
       :sites="sites"
       :initialSiteId="filter.site_id || initialSiteId"
       :loadSites="true"
+      :text="t('assets.new_video')"
       @complete="createComplete"
       @cancel="showCreateModal = false"
     />
@@ -100,16 +101,20 @@ import { useI18n } from 'petite-vue-i18n'
 import { STInput } from '@samatech/vue-components'
 import { STMultiselect } from '@samatech/vue-components'
 import { Modal, PSButton, Spinner } from '@pubstudio/frontend/ui-widgets'
+import { ISiteViewModel } from '@pubstudio/shared/type-api-platform-site'
 import { useSites } from '@pubstudio/frontend/feature-sites'
 import {
   AssetContentType,
   ISiteAssetViewModel,
   ICreatePlatformSiteAssetResponse,
 } from '@pubstudio/shared/type-api-platform-site-asset'
+import { ILocalSiteRelationViewModel } from '@pubstudio/shared/type-api-platform-user'
 import { urlFromAsset } from '@pubstudio/frontend/util-asset'
 import CreateAssetModal from './CreateAssetModal.vue'
 import { ASSET_PLACEHOLDERS } from '../lib/use-site-assets'
-import { ILocalOrApiSite, useAssetsFilter } from '../lib/use-assets-filter'
+import { useAssetsFilter } from '../lib/use-assets-filter'
+
+type ILocalOrApiSite = ILocalSiteRelationViewModel | ISiteViewModel
 
 const { t } = useI18n()
 
@@ -117,14 +122,16 @@ const props = withDefaults(
   defineProps<{
     show: boolean
     initialSiteId?: string
+    initialUrl?: string
     contentTypes?: AssetContentType[]
   }>(),
   {
     initialSiteId: undefined,
+    initialUrl: undefined,
     contentTypes: undefined,
   },
 )
-const { show, initialSiteId } = toRefs(props)
+const { show, initialUrl, initialSiteId } = toRefs(props)
 
 const emit = defineEmits<{
   (e: 'cancel'): void
@@ -144,7 +151,12 @@ const {
   filter,
   showCreateModal,
   externalUrl,
-} = useAssetsFilter({ initialSiteId, sites })
+} = useAssetsFilter({
+  initialSiteId,
+  sites,
+  initialUrl,
+  defaultContentType: AssetContentType.Mp4,
+})
 
 const setExternalUrl = () => {
   emit('externalUrl', externalUrl.value)
@@ -175,7 +187,7 @@ watch(show, async (modalShown) => {
 <style lang="postcss">
 @import '@theme/css/mixins.postcss';
 
-.select-asset-modal {
+.select-source-modal {
   .modal-inner {
     width: 640px;
     max-width: 95%;

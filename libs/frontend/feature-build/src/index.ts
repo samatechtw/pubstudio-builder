@@ -1,4 +1,5 @@
 export * from './lib/command-wrap/component-state'
+export * from './lib/command-wrap/component-input'
 export * from './lib/command-wrap/global-style'
 export * from './lib/command-wrap/group'
 export * from './lib/command-wrap/mixins'

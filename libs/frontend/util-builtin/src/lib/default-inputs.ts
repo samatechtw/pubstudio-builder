@@ -24,6 +24,51 @@ export const defaultImageInputs = (src?: string): IComponentInputs => {
   }
 }
 
+export const defaultVideoInputs = (): IComponentInputs => {
+  return {
+    controls: {
+      type: ComponentArgPrimitive.Boolean,
+      name: 'controls',
+      attr: true,
+      default: true,
+      is: true,
+    },
+    preload: {
+      type: ComponentArgPrimitive.String,
+      name: 'preload',
+      attr: true,
+      default: '',
+      is: 'metadata',
+    },
+    poster: {
+      type: ComponentArgPrimitive.String,
+      name: 'poster',
+      attr: true,
+      default: '',
+      is: '',
+    },
+  }
+}
+
+export const defaultSourceInputs = (src?: string): IComponentInputs => {
+  return {
+    src: {
+      type: ComponentArgPrimitive.String,
+      name: 'src',
+      attr: true,
+      default: '',
+      is: src ?? '',
+    },
+    type: {
+      type: ComponentArgPrimitive.String,
+      name: 'type',
+      attr: true,
+      default: '',
+      is: '',
+    },
+  }
+}
+
 export const defaultInputInputs = (placeholder?: string): IComponentInputs => {
   return {
     placeholder: {

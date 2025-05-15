@@ -4,7 +4,7 @@
       {{ assetToUpdate ? t('assets.replace') : t('assets.new') }}
     </div>
     <div class="modal-text">
-      {{ t('assets.new_text') }}
+      {{ text ?? t('assets.new_text') }}
     </div>
     <div class="asset-name-wrap">
       <STMultiselect
@@ -78,7 +78,6 @@ import { DEFAULT_TEMPLATE_ID } from '@pubstudio/shared/type-api-platform-templat
 import { IUploadFileResult } from '../lib/upload-asset'
 import { ASSET_PLACEHOLDERS, useSiteAssets } from '../lib/use-site-assets'
 import { isAssetDroppable } from '@pubstudio/frontend/util-asset'
-import { sleep } from '@pubstudio/shared/util-core'
 
 interface ISelectableSite {
   id: string
@@ -100,6 +99,7 @@ const props = withDefaults(
     initialName?: string
     initialFile?: File
     sites?: ISiteViewModel[] | undefined
+    text?: string
   }>(),
   {
     sites: undefined,
@@ -108,6 +108,7 @@ const props = withDefaults(
     initialFile: undefined,
     loadSites: false,
     assetToUpdate: undefined,
+    text: undefined,
   },
 )
 const {

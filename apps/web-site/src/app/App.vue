@@ -1,23 +1,21 @@
 <template>
-  <div class="app">
-    <div v-if="loading" class="sw c">
-      <span class="dot" />
-      <span class="dot" />
-      <span class="dot" />
-    </div>
-    <div v-else-if="error" class="emw c">
-      <div class="em c">
-        <span v-html="error" />
-      </div>
-    </div>
-    <template v-else>
-      <CustomStyle />
-      <Mixins />
-      <ComponentStyle />
-      <FontLinks />
-      <PageContent />
-    </template>
+  <div v-if="loading" class="sw c">
+    <span class="dot" />
+    <span class="dot" />
+    <span class="dot" />
   </div>
+  <div v-else-if="error" class="emw c">
+    <div class="em c">
+      <span v-html="error" />
+    </div>
+  </div>
+  <template v-else>
+    <CustomStyle />
+    <Mixins />
+    <ComponentStyle />
+    <FontLinks />
+    <PageContent />
+  </template>
 </template>
 
 <script setup lang="ts">
