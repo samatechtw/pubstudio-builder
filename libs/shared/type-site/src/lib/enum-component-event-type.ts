@@ -1,5 +1,7 @@
 export enum ComponentEventType {
   Click = 'click',
+  Load = 'load',
+  Error = 'error',
   ClickOutside = 'clickOutside',
   MouseOver = 'mouseover',
   MouseLeave = 'mouseleave',

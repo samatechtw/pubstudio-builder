@@ -84,12 +84,6 @@ export const makeButton = (options?: IMakeButtonOptions): IComponent => {
         behaviors: [{ behaviorId: noBehaviorId }],
       },
     },
-    editorEvents: {
-      [EditorEventName.OnSelfAdded]: {
-        name: EditorEventName.OnSelfAdded,
-        behaviors: [{ behaviorId: setupLoaderBehaviorId }],
-      },
-    },
     children: [
       {
         id: tempChildId,

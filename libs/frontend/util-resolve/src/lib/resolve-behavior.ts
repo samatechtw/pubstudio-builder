@@ -11,12 +11,12 @@ export const registerEditorBehavior = (behavior: IBehavior) => {
 // Events triggered by Vue
 export const NativeEvents: Record<string, string> = {
   click: 'onClick',
+  load: 'onLoad',
+  error: 'onError',
   mouseover: 'onMouseover',
   mouseleave: 'onMouseleave',
   submit: 'onSubmit',
   input: 'onInput',
-  keydown: 'onKeydownPrevent',
-  keyup: 'onKeyupPrevent',
 }
 
 export const resolveBehaviorFunction = (

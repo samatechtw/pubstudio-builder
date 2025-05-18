@@ -3,9 +3,16 @@ import {
   loadingDotStyleId,
   loadingId,
   loadingStyleId,
+  setupLoaderBehaviorId,
   tempChildId,
 } from '@pubstudio/frontend/util-ids'
-import { IComponent, IRawStyle, IStyle, Tag } from '@pubstudio/shared/type-site'
+import {
+  EditorEventName,
+  IComponent,
+  IRawStyle,
+  IStyle,
+  Tag,
+} from '@pubstudio/shared/type-site'
 
 export const loadingDotStyle: IStyle = {
   id: loadingDotStyleId,
@@ -54,21 +61,33 @@ const makeDot = (style: IRawStyle): IComponent => {
   }
 }
 
-export const makeLoading = (): IComponent => {
+export const makeLoading = (dotSize?: number): IComponent => {
+  const size = dotSize ?? 14
+  const style = { width: `${size}px`, height: `${size}px` }
+  const margin = Math.round(size / 3.4)
   return {
     id: loadingId,
     name: 'Loading',
     tag: Tag.Div,
     style: {
-      custom: {},
+      custom: {
+        [DEFAULT_BREAKPOINT_ID]: {
+          default: {},
+        },
+      },
       mixins: [loadingStyleId],
     },
-    inputs: {},
+    editorEvents: {
+      [EditorEventName.OnSelfAdded]: {
+        name: EditorEventName.OnSelfAdded,
+        behaviors: [{ behaviorId: setupLoaderBehaviorId }],
+      },
+    },
     state: { hide: true },
     children: [
-      makeDot({}),
-      makeDot({ 'animation-delay': '0.2s', margin: '0px 0px 0px 4px' }),
-      makeDot({ 'animation-delay': '0.4s', margin: '0px 0px 0px 4px' }),
+      makeDot({ ...style }),
+      makeDot({ 'animation-delay': '0.2s', margin: `0px 0px 0px ${margin}px`, ...style }),
+      makeDot({ 'animation-delay': '0.4s', margin: `0px 0px 0px ${margin}px`, ...style }),
     ],
   }
 }

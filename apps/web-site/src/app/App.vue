@@ -183,7 +183,6 @@ a {
 }
 
 #app {
-  height: 100%;
   display: flex;
   flex-direction: column;
   flex-shrink: 0;

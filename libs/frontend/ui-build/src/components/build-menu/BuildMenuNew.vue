@@ -122,6 +122,13 @@
         :builtinComponentId="imageGallery.id"
       />
       <NewComponent
+        class="new-lightbox-gallery"
+        :text="t('build.lightbox_gallery')"
+        builtinComponentId=""
+        :skipAdd="true"
+        @add="addLightboxGallery(site)"
+      />
+      <NewComponent
         v-if="isSiteApi"
         class="new-contact-form"
         :text="t('build.contact_form')"
@@ -202,7 +209,7 @@ import {
 import NewComponent from './NewComponent.vue'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { store } from '@pubstudio/frontend/data-access-web-store'
-import { addLanguageSelect } from '@pubstudio/frontend/feature-build'
+import { addLanguageSelect, addLightboxGallery } from '@pubstudio/frontend/feature-build'
 
 const { t } = useI18n()
 const { showContactFormWalkthrough } = useContactForm()

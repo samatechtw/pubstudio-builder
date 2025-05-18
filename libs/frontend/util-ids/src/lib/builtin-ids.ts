@@ -4,6 +4,7 @@ import { behaviorId, componentId, nextStyleId, styleId } from './make-ids'
 
 // Public behaviors
 export const noBehaviorId = behaviorId(globalContext.namespace, 'none')
+export const stopClickBehaviorId = behaviorId(globalContext.namespace, 'stopClick')
 export const toggleHiddenId = behaviorId(globalContext.namespace, 'toggleHidden')
 export const setHiddenId = behaviorId(globalContext.namespace, 'setHidden')
 export const navMenuAddBehaviorId = behaviorId(globalContext.namespace, 'navAddChildren')
@@ -27,6 +28,17 @@ export const setupLanguageBehaviorId = behaviorId(
   globalContext.namespace,
   'setupLanguage',
 )
+export const showLightboxBehaviorId = behaviorId(globalContext.namespace, 'showLightbox')
+export const hideLightboxBehaviorId = behaviorId(globalContext.namespace, 'hideLightbox')
+export const lightboxImageLoadBehaviorId = behaviorId(
+  globalContext.namespace,
+  'lightboxImageLoad',
+)
+export const downloadImageBehaviorId = behaviorId(
+  globalContext.namespace,
+  'downloadImage',
+)
+export const updateNavIndexId = behaviorId(globalContext.namespace, 'updateNavIndex')
 
 // Builtin components and styles
 export const buttonStyleId = nextStyleId(globalContext)
@@ -129,7 +141,18 @@ export const langOptionStyleId = nextStyleId(globalContext)
 export const langOptionsStyleId = nextStyleId(globalContext)
 export const imageGalleryId = componentId(globalContext.namespace, 'gallery')
 export const imageGalleryStyleId = styleId(globalContext.namespace, 'gallery')
+export const gridImageId = componentId(globalContext.namespace, 'gridimage')
 export const gridImageStyleId = styleId(globalContext.namespace, 'gridimage')
+export const lightboxGalleryId = componentId(globalContext.namespace, 'lightboxgallery')
+export const lightboxGalleryStyleId = styleId(globalContext.namespace, 'lightboxgallery')
+export const lightboxWrapStyleId = styleId(globalContext.namespace, 'lightboxwrap')
+export const lightboxContentStyleId = styleId(globalContext.namespace, 'lightboxcontent')
+export const lightboxIconWrapStyleId = styleId(
+  globalContext.namespace,
+  'lightboxiconwrap',
+)
+export const lightboxId = componentId(globalContext.namespace, 'lightbox')
+export const imageNavStyleId = styleId(globalContext.namespace, 'imagenav')
 
 export const gridStyleId = styleId(globalContext.namespace, 'grid')
 
