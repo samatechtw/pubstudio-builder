@@ -8,7 +8,7 @@
       :gradient="getRawStyle(Css.Background)"
       :showPicker="showBackgroundPicker"
       :selectedThemeColors="selectedThemeColors"
-      class="toolbar-menu"
+      class="toolbar-background"
       @selectColor="setBackgroundColor($event)"
       @applyGradient="setGradientBackground($event)"
       @click.stop="togglePicker(!showBackgroundPicker)"
@@ -189,7 +189,7 @@ const setGradientBackground = (pickerGradient: IToolbarThemedGradient) => {
 }
 
 const { activate, deactivate } = useControlledClickaway(
-  '.color-picker-wrap',
+  '.color-picker-wrap,.toolbar-picker',
   () => togglePicker(false),
   true,
 )

@@ -22,7 +22,7 @@
         :editing="isEditing(entry.property)"
         :omitEditProperties="nonInheritedProperties"
         :error="!resolveThemeVariables(site.context, entry.value)"
-        :allowMoveToMixin="true"
+        :allowMoveToMixin="allowMoveToMixin"
         @setProperty="setPropertyWrap(entry, $event)"
         @setValue="setValueWrap(entry, $event)"
         @edit="editStyle(entry.property)"
@@ -107,6 +107,10 @@ const setValueWrap = (oldEntry: IInheritedStyleEntry, newValue: string) => {
     setValue(oldEntry, newValue)
   }
 }
+
+const allowMoveToMixin = computed(() => {
+  return !!editor.value?.selectedComponent?.style.mixins?.length
+})
 
 const moveToMixin = (entry: IInheritedStyleEntry, mixinId: string) => {
   const component = editor.value?.selectedComponent

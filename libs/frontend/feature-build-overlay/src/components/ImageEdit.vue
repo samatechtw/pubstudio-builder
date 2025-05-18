@@ -3,6 +3,7 @@
     <Assets color="black" class="edit-icon" @click="showSelectAssetModal = true" />
     <SelectAssetModal
       :show="showSelectAssetModal"
+      :initialUrl="initialUrl"
       :initialSiteId="getSiteId()"
       :contentTypes="ContentTypes"
       @cancel="showSelectAssetModal = false"
@@ -13,7 +14,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, toRefs } from 'vue'
+import { computed, ref, toRefs } from 'vue'
 import { Assets } from '@pubstudio/frontend/ui-widgets'
 import {
   addOrUpdateSelectedInput,
@@ -62,6 +63,11 @@ const onAssetSelected = (asset: ISiteAssetViewModel) => {
   const assetUrl = urlFromAsset(asset)
   onUrlSelected(assetUrl)
 }
+
+const initialUrl = computed(() => {
+  const component = resolveComponent(site.value.context, componentId.value)
+  return component?.inputs?.src?.is as string | undefined
+})
 
 const onUrlSelected = (url: string) => {
   const component = resolveComponent(site.value.context, componentId.value)
