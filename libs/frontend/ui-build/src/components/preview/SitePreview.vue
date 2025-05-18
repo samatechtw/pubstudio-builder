@@ -32,15 +32,10 @@ const router = setSiteRouter(NotFound, {
 const { site } = useSiteSource()
 const { notFoundPage } = useNotFoundPage(site)
 
-const { renderMode } = withDefaults(
-  defineProps<{
-    renderMode?: RenderMode
-    loading?: boolean
-  }>(),
-  {
-    renderMode: RenderMode.Preview,
-  },
-)
+const { renderMode = RenderMode.Preview } = defineProps<{
+  renderMode?: RenderMode
+  loading?: boolean
+}>()
 
 const activePage = computed(() => {
   if (!site.value) {

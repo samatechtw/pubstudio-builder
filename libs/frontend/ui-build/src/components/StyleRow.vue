@@ -27,7 +27,7 @@
           :placeholder="t('value')"
           :isError="!!valueErrorMessage"
           @update:modelValue="updateValue"
-          @keydown.enter="saveStyle"
+          @keyup.enter="saveStyle"
           @keyup.esc="saveStyle"
         />
       </div>

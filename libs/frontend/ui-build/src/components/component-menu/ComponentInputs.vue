@@ -38,6 +38,7 @@
       :show="showSelectAssetModal"
       :initialSiteId="siteIdProp"
       :contentTypes="contentTypes"
+      :initialUrl="component.inputs?.src?.is as string"
       @cancel="showSelectAssetModal = false"
       @select="onImageAssetSelected"
       @externalUrl="onImageUrlSelected"

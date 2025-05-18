@@ -19,7 +19,7 @@ export interface IUseAssetsFilterOptions {
   defaultContentType?: AssetContentType
   sites: Ref<ISiteViewModel[] | undefined>
   initialSiteId: Ref<string | undefined>
-  initialUrl?: Ref<string | undefined>
+  initialUrl: Ref<string | undefined>
 }
 
 export const useAssetsFilter = (options: IUseAssetsFilterOptions) => {
@@ -47,7 +47,7 @@ export const useAssetsFilter = (options: IUseAssetsFilterOptions) => {
   const siteAssets = ref<ISiteAssetViewModel[]>()
   const filter = ref<IListPlatformSiteAssetsRequest>(defaultFilter())
   const showCreateModal = ref(false)
-  const externalUrl = ref(initialUrl?.value ?? '')
+  const externalUrl = ref(initialUrl.value ?? '')
 
   const resolvedSites = computed<ILocalOrApiSite[]>(() => [
     store.user.identity.value,
@@ -87,12 +87,9 @@ export const useAssetsFilter = (options: IUseAssetsFilterOptions) => {
 
   // SelectSourceModal and SelectAssetModal are not reset if another video/image component
   // is clicked, so this is needed to keep state in sync
-  watch(
-    () => initialUrl?.value,
-    (newUrl) => {
-      externalUrl.value = newUrl ?? ''
-    },
-  )
+  watch(initialUrl, (newUrl) => {
+    externalUrl.value = newUrl ?? ''
+  })
 
   return {
     loading,

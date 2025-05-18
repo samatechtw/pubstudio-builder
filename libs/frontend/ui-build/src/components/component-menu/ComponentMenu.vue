@@ -1,5 +1,5 @@
 <template>
-  <div class="component-menu">
+  <div id="component-menu">
     <StyleMenuEdit v-if="isEditingMixin" class="style-edit" />
     <ComponentInputEdit
       v-else-if="isEditingInput"
@@ -120,7 +120,7 @@ const toCustomComponent = () => {
 <style lang="postcss" scoped>
 @import '@theme/css/mixins.postcss';
 
-.component-menu {
+#component-menu {
   background-color: $menu-bg1;
 }
 

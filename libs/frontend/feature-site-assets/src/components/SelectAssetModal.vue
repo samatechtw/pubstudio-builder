@@ -116,15 +116,17 @@ const { t } = useI18n()
 const props = withDefaults(
   defineProps<{
     show: boolean
+    initialUrl?: string
     initialSiteId?: string
     contentTypes?: AssetContentType[]
   }>(),
   {
+    initialUrl: undefined,
     initialSiteId: undefined,
     contentTypes: undefined,
   },
 )
-const { show, initialSiteId } = toRefs(props)
+const { show, initialUrl, initialSiteId } = toRefs(props)
 
 const emit = defineEmits<{
   (e: 'cancel'): void
@@ -144,7 +146,7 @@ const {
   filter,
   showCreateModal,
   externalUrl,
-} = useAssetsFilter({ initialSiteId, sites })
+} = useAssetsFilter({ initialSiteId, initialUrl, sites })
 
 const setExternalUrl = () => {
   emit('externalUrl', externalUrl.value)
