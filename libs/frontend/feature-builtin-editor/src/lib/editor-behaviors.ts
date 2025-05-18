@@ -214,7 +214,7 @@ export const setupLoaderBehavior: IBehavior = {
     _args?: IBehaviorCustomArgs,
   ) => {
     const { site } = behaviorContext
-    const button = behaviorContext.component
+    const loader = behaviorContext.component
     let hasScaleStyle = false
     for (const [name, data] of Object.entries(site.context.globalStyles)) {
       if (name === 'BuiltinScale' || data.style.includes('@keyframes scale {')) {
@@ -242,9 +242,8 @@ export const setupLoaderBehavior: IBehavior = {
       appendLastCommand(site, command)
     }
     // Hide loader in the UI
-    const loaderId = button?.children?.[1]?.id
-    if (loaderId) {
-      toggleComponentTreeHidden(site, loaderId, true)
+    if (loader?.id) {
+      toggleComponentTreeHidden(site, loader?.id, true)
     }
   },
 }

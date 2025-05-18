@@ -12,6 +12,7 @@ import { backgroundImage, captionedImage, image } from './builtin-image'
 import { imageGallery } from './builtin-image-gallery'
 import { input } from './builtin-input'
 import { label } from './builtin-label'
+import { lightboxGallery } from './builtin-lightbox-gallery'
 import { link } from './builtin-link'
 import { ol, ul } from './builtin-list'
 import { mailingList } from './builtin-mailing-list'
@@ -36,6 +37,7 @@ export const builtinComponents: Record<string, ISerializedComponent> = {
   [h6.id]: h6,
   [image.id]: image,
   [imageGallery.id]: imageGallery,
+  [lightboxGallery.id]: lightboxGallery,
   [video.id]: video,
   [captionedImage.id]: captionedImage,
   [backgroundImage.id]: backgroundImage,

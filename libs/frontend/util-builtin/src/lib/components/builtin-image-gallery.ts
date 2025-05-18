@@ -1,6 +1,7 @@
 import { DEFAULT_BREAKPOINT_ID } from '@pubstudio/frontend/util-defaults'
 import {
   gridId,
+  gridImageId,
   gridImageStyleId,
   imageGalleryId,
   imageGalleryStyleId,
@@ -40,7 +41,7 @@ export const imageGalleryStyle: IStyle = {
 }
 
 const gridImage = (style?: IRawStyle): IComponent => ({
-  id: imageGalleryId,
+  id: gridImageId,
   name: 'ImageWrap',
   tag: Tag.Div,
   children: [makeImage('https://web.pubstudioassets.com/placeholder.png')],

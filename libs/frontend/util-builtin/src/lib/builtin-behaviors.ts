@@ -1,18 +1,31 @@
 import {
   clearErrorBehaviorId,
   contactFormBehaviorId,
+  downloadImageBehaviorId,
+  hideLightboxBehaviorId,
   homeLinkBehaviorId,
+  lightboxImageLoadBehaviorId,
   mailingListBehaviorId,
   noBehaviorId,
   selectLanguageBehaviorId,
   setHiddenId,
   setupLanguageBehaviorId,
+  showLightboxBehaviorId,
+  stopClickBehaviorId,
   toggleHiddenId,
+  updateNavIndexId,
   viewCounterBehaviorId,
 } from '@pubstudio/frontend/util-ids'
 import { ComponentArgPrimitive, IBehavior } from '@pubstudio/shared/type-site'
 
 export const noBehavior: IBehavior = { id: noBehaviorId, name: 'None', code: '' }
+
+const stopClick: IBehavior = {
+  id: stopClickBehaviorId,
+  name: 'Stop Click',
+  code: `event?.preventDefault()
+event?.stopPropagation()`,
+}
 
 export const selectLanguage: IBehavior = {
   id: selectLanguageBehaviorId,
@@ -49,13 +62,10 @@ export const toggleHidden: IBehavior = {
     id: {
       name: 'id',
       type: ComponentArgPrimitive.String,
-      help: 'The ID of the component which will be toggled.',
+      help: 'The ID of the component which will be toggled',
     },
   },
-  code: `let cmp = undefined
-if (args?.id) {
-  cmp = getComponent(site, args.id)
-}
+  code: `const cmp = getComponent(site, args.id)
 setState(cmp, 'hide', !getState(cmp, 'hide'))
 `,
 }
@@ -67,7 +77,7 @@ export const setHidden: IBehavior = {
     id: {
       name: 'id',
       type: ComponentArgPrimitive.String,
-      help: 'The ID of the component which will be hidden.',
+      help: 'The ID of the component which will be hidden',
     },
     hide: {
       name: 'hide',
@@ -75,10 +85,7 @@ export const setHidden: IBehavior = {
       help: 'Set true to hide, false to show',
     },
   },
-  code: `let cmp = undefined
-if (args?.id) {
-  cmp = getComponent(site, args.id)
-}
+  code: `const cmp = getComponent(site, args.id)
 setState(cmp, 'hide', !!args?.hide)
 `,
 }
@@ -129,7 +136,7 @@ export const contactFormBehavior: IBehavior = {
     tableName: {
       name: 'tableName',
       type: ComponentArgPrimitive.String,
-      help: 'The name of the API table linked to the contact form.',
+      help: 'The name of the API table linked to the contact form',
     },
     emailId: {
       name: 'emailId',
@@ -223,7 +230,7 @@ export const mailingListBehavior: IBehavior = {
     tableName: {
       name: 'tableName',
       type: ComponentArgPrimitive.String,
-      help: 'The name of the API table linked to the mailing list.',
+      help: 'The name of the API table linked to the mailing list',
     },
     emailId: {
       name: 'emailId',
@@ -293,8 +300,194 @@ if (argError) {
 `,
 }
 
+const showLightboxBehavior: IBehavior = {
+  id: showLightboxBehaviorId,
+  name: 'Show Lightbox',
+  args: {
+    imageIndex: {
+      name: 'imageIndex',
+      type: ComponentArgPrimitive.Boolean,
+      help: 'Index of image to show',
+    },
+    lightboxId: {
+      name: 'lightboxId',
+      type: ComponentArgPrimitive.String,
+      help: 'Lightbox component ID',
+    },
+    loaderId: {
+      name: 'loaderId',
+      type: ComponentArgPrimitive.String,
+      help: 'Image loader component ID',
+    },
+  },
+  code: `event?.preventDefault()
+event?.stopPropagation()
+const imageIndex = args.imageIndex
+
+const lightbox = helpers.getComponent(site, args.lightboxId)
+setState(lightbox, 'hide', false)
+const setLightboxIndex = (index) => {
+  const data = window[args.lightboxId]
+  if(!data || imageIndex === undefined) {
+    return
+  }
+  const idx = (index + data.images.length) % data.images.length
+  const lightbox = helpers.getComponent(site, args.lightboxId)
+  const loader = helpers.getComponent(site, args.loaderId)
+  const src = data.images[idx]
+  const imgWrap = lightbox?.children?.[0]?.children?.[1]
+  const img = imgWrap?.children?.[1]
+
+  const imgEl = document.getElementById(img?.id)
+  if(imgEl) {
+    // imgEl.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
+    const width = imgEl.getBoundingClientRect().width
+    const minWidth = width ? (width + 'px') : '300px'
+    helpers.setCustomStyle(img, 'min-width', minWidth)
+  }
+    /*
+  const onImageLoad = () => {
+    setState(loader, 'hide', true)
+    imgEl?.removeEventListener('load', onImageLoad);
+    imgEl?.removeEventListener('error', onImageLoad);
+  }
+  imgEl?.addEventListener('load', onImageLoad);
+  imgEl?.addEventListener('error', onImageLoad);
+  */
+  setState(loader, 'hide', false)
+
+  helpers.setInput(img, 'src', src)
+  window[args.lightboxId].index = idx
+}
+const images = component.parent?.children ?? []
+window[args.lightboxId] = {
+  index: imageIndex,
+  images: images.map(m => m?.children?.[0]?.inputs?.src?.is),
+  setIndex: setLightboxIndex
+}
+setLightboxIndex(imageIndex)
+`,
+}
+
+const hideLightboxBehavior: IBehavior = {
+  id: hideLightboxBehaviorId,
+  name: 'Hide Lightbox',
+  args: {
+    lightboxId: {
+      name: 'lightboxId',
+      type: ComponentArgPrimitive.String,
+      help: 'Lightbox component ID',
+    },
+    onKey: {
+      name: 'onKey',
+      type: ComponentArgPrimitive.String,
+      help: 'Key to trigger hide',
+    },
+  },
+  code: `const key = args.onKey
+if(key && key !== event?.key) {
+  return
+}
+event?.preventDefault()
+event?.stopPropagation()
+const lightbox = helpers.getComponent(site, args.lightboxId)
+setState(lightbox, 'hide', true)
+window[args.lightboxId] = undefined
+`,
+}
+
+const lightboxImageLoadBehavior: IBehavior = {
+  id: lightboxImageLoadBehaviorId,
+  name: 'Lightbox Image Load',
+  args: {
+    loaderId: {
+      name: 'loaderId',
+      type: ComponentArgPrimitive.String,
+      help: 'Image loader component ID',
+    },
+  },
+  code: `const loader = getComponent(site, args.loaderId)
+setState(loader, 'hide', true)
+const imgEl = document.getElementById(component.id)
+if(imgEl) {
+  const width = imgEl.getBoundingClientRect().width
+  const minWidth = width ? (width + 'px') : '300px'
+  helpers.setCustomStyle(component, 'min-width', minWidth)
+}
+`,
+}
+
+const updateNavIndex: IBehavior = {
+  id: updateNavIndexId,
+  name: 'Set Nav Index',
+  args: {
+    navDataId: {
+      name: 'navDataId',
+      type: ComponentArgPrimitive.String,
+      help: 'ID of nav data stored in window',
+    },
+    onKey: {
+      name: 'onKey',
+      type: ComponentArgPrimitive.String,
+      help: 'Key to trigger update',
+    },
+    increment: {
+      name: 'increment',
+      type: ComponentArgPrimitive.Number,
+      help: 'Amount to increment nav index',
+    },
+  },
+  code: `const data = window[args.navDataId]
+const increment = args.increment ?? 0
+const key = args.onKey
+if(!data || (key && key !== event?.key)) {
+  return
+}
+event?.preventDefault()
+event?.stopPropagation()
+data.setIndex(data.index + increment)
+`,
+}
+
+const downloadImageBehavior: IBehavior = {
+  id: downloadImageBehaviorId,
+  name: 'Download Image',
+  args: {
+    imageId: {
+      name: 'imageId',
+      type: ComponentArgPrimitive.String,
+      help: 'Lightbox image component ID',
+    },
+  },
+  code: `event?.preventDefault()
+event?.stopPropagation()
+const image = document.getElementById(args.imageId)
+const download = (imgEl) => {
+  const canvas = document.createElement('canvas');
+  canvas.width  = imgEl.naturalWidth;
+  canvas.height = imgEl.naturalHeight;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(imgEl, 0, 0);
+
+  canvas.toBlob(blob => {
+    const blobUrl = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.style.display = 'none';
+    a.href = blobUrl;
+    a.download = imgEl.src.split('/').pop().split('?')[0];
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(blobUrl);
+  }, 'image/png');
+}
+download(image)
+`,
+}
+
 export const builtinBehaviors: Record<string, IBehavior> = {
   [noBehavior.id]: noBehavior,
+  [stopClick.id]: stopClick,
   [selectLanguage.id]: selectLanguage,
   [setupLanguage.id]: setupLanguage,
   [toggleHidden.id]: toggleHidden,
@@ -304,4 +497,9 @@ export const builtinBehaviors: Record<string, IBehavior> = {
   [clearFormErrorBehavior.id]: clearFormErrorBehavior,
   [contactFormBehavior.id]: contactFormBehavior,
   [mailingListBehavior.id]: mailingListBehavior,
+  [showLightboxBehavior.id]: showLightboxBehavior,
+  [hideLightboxBehavior.id]: hideLightboxBehavior,
+  [lightboxImageLoadBehavior.id]: lightboxImageLoadBehavior,
+  [downloadImageBehavior.id]: downloadImageBehavior,
+  [updateNavIndex.id]: updateNavIndex,
 }

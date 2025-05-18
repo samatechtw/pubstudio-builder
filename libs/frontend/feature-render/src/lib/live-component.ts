@@ -38,8 +38,6 @@ export const LiveComponent = () => {
       const router = getSiteRouter()
 
       onMounted(() => {
-        // TODO -- remove this or trigger specific custom events in editor
-        // const { custom } = computeEvents(site.value, component.value)
         registerCustomEvents(site.value, component.value, true)
       })
       onUnmounted(() => {
@@ -83,7 +81,6 @@ export const LiveComponent = () => {
         } else if (tag === 'vue') {
           return renderVueComponent(site.value.context, component.value, renderProps)
         }
-
         return h(tag as string, renderProps, children)
       }
     },

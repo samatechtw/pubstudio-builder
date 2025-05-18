@@ -26,14 +26,7 @@ export const computeEvents = (site: ISite, component: IComponent): IEventCollect
       triggerEventBehaviors(event.behaviors, site, component, e)
     }
 
-    const isNative =
-      !!nativeEventName &&
-      !(
-        ['keyup', 'keydown'].includes(event.name) &&
-        ['input', 'textarea'].includes(component.tag)
-      )
-
-    if (isNative) {
+    if (nativeEventName) {
       events.native[nativeEventName] = eventHandler
     } else {
       const name = event.name as ComponentEventTypeType

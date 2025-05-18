@@ -1,32 +1,14 @@
 import { pushCommand } from '@pubstudio/frontend/data-access-command'
 import { activeBreakpoint } from '@pubstudio/frontend/feature-site-source'
 import { parseCssSize } from '@pubstudio/frontend/util-component'
-import { CommandType, ICommand } from '@pubstudio/shared/type-command'
+import { CommandType } from '@pubstudio/shared/type-command'
 import {
   ICommandGroupData,
   IComponentPosition,
   IMoveComponentData,
 } from '@pubstudio/shared/type-command-data'
 import { Css, CssPseudoClass, IComponent, ISite } from '@pubstudio/shared/type-site'
-
-const makeSetComponentCustomStyle = (
-  component: IComponent,
-  breakpointId: string,
-  prop: Css,
-  oldValue: string | undefined,
-  value: string,
-): ICommand => {
-  const pseudoClass = CssPseudoClass.Default
-  return {
-    type: CommandType.SetComponentCustomStyle,
-    data: {
-      componentId: component.id,
-      breakpointId,
-      oldStyle: oldValue ? { pseudoClass, property: prop, value: oldValue } : undefined,
-      newStyle: { pseudoClass, property: prop, value },
-    },
-  }
-}
+import { makeSetComponentCustomStyle } from './component-style'
 
 const addPxToCss = (
   scale: number,

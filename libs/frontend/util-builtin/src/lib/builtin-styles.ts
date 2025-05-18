@@ -33,6 +33,13 @@ import {
   langOptionStyle,
   langTextStyle,
 } from './components/builtin-languages'
+import {
+  imageNavStyle,
+  lightboxContentStyle,
+  lightboxGalleryStyle,
+  lightboxIconWrapStyle,
+  lightboxWrapStyle,
+} from './components/builtin-lightbox-gallery'
 import { linkStyle } from './components/builtin-link'
 import { listItemStyle, listStyle } from './components/builtin-list'
 import { loadingDotStyle, loadingStyle } from './components/builtin-loading'
@@ -48,6 +55,11 @@ export const builtinStyles: Record<string, IStyle> = {
   [gridStyle.id]: gridStyle,
   [gridImageStyle.id]: gridImageStyle,
   [imageGalleryStyle.id]: imageGalleryStyle,
+  [lightboxGalleryStyle.id]: lightboxGalleryStyle,
+  [lightboxWrapStyle.id]: lightboxWrapStyle,
+  [lightboxContentStyle.id]: lightboxContentStyle,
+  [lightboxIconWrapStyle.id]: lightboxIconWrapStyle,
+  [imageNavStyle.id]: imageNavStyle,
   [textStyle.id]: textStyle,
   [h1Style.id]: h1Style,
   [h2Style.id]: h2Style,
