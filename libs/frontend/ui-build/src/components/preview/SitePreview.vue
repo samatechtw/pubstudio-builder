@@ -13,11 +13,15 @@
 
 <script lang="ts" setup>
 import { computed, onMounted } from 'vue'
-import { RenderMode } from '@pubstudio/frontend/util-render'
+import { iteratePage, RenderMode } from '@pubstudio/frontend/util-render'
 import { routeToPreviewPath, useRenderPreview } from '@pubstudio/frontend/feature-preview'
 import { NotFound, Spinner } from '@pubstudio/frontend/ui-widgets'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
-import { setupRoutes, useNotFoundPage } from '@pubstudio/frontend/feature-render'
+import {
+  setupRoutes,
+  useNotFoundPage,
+  replaceHead,
+} from '@pubstudio/frontend/feature-render'
 import { setSiteRouter } from '@pubstudio/frontend/util-runtime'
 
 const router = setSiteRouter(NotFound, {
@@ -36,6 +40,21 @@ const { renderMode = RenderMode.Preview } = defineProps<{
   renderMode?: RenderMode
   loading?: boolean
 }>()
+
+router.afterEach((newRoute, oldRoute) => {
+  const page = site.value?.pages[newRoute?.path?.replace('/preview', '') ?? '']
+  let oldPage = undefined
+  // TODO -- this is a hack to solve an issue where the NotFound route is matched before
+  // the site is loaded. Ideally the site initialization should be modified to avoid this
+  if (oldRoute && oldRoute.name !== 'NotFound') {
+    oldPage = site.value?.pages[oldRoute?.path ?? '']
+  }
+  if (page && newRoute?.name !== 'NotFound') {
+    const title = page.head.title ?? site.value.defaults.head.title
+    page.head.title = title ? `${title} - PubStudio Preview` : 'PubStudio Preview'
+    replaceHead(site.value, page, oldPage)
+  }
+})
 
 const activePage = computed(() => {
   if (!site.value) {
