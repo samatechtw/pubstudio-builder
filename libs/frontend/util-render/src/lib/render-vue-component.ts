@@ -27,10 +27,11 @@ const getOrWaitComponent = (
   componentName: string,
   componentRef: Ref<VNode | undefined>,
 ) => {
+  runtimeContext.loadVueComponent.loadedComponents[componentName] = componentRef
   if (window[componentName as keyof Window]) {
     componentRef.value = window[componentName as keyof Window]
+    return
   }
-  runtimeContext.loadVueComponent.loadedComponents[componentName] = componentRef
   if (!runtimeContext.loadVueComponent.loadComponentTimer) {
     runtimeContext.loadVueComponent.loadComponentTimer = setInterval(
       checkComponentsLoaded,
