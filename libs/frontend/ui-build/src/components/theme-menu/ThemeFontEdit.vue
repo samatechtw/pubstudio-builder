@@ -4,6 +4,13 @@
     <div class="menu-row source-row">
       <div class="label">
         {{ t('source') }}
+        <a
+          v-if="editingFont.source === ThemeFontSource.Google"
+          href="https://fonts.google.com"
+          target="_blank"
+        >
+          <Link class="google-link" />
+        </a>
       </div>
       <FontSourceSelect
         class="item"
@@ -67,7 +74,7 @@
 import { computed } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { ThemeFontSource } from '@pubstudio/shared/type-site'
-import { ErrorMessage, InfoBubble, PSButton } from '@pubstudio/frontend/ui-widgets'
+import { ErrorMessage, Link, InfoBubble, PSButton } from '@pubstudio/frontend/ui-widgets'
 import { useThemeMenuFonts, resetThemeMenuFonts } from '@pubstudio/frontend/feature-build'
 import FontSourceSelect from './FontSourceSelect.vue'
 import WebSafeFontSelect from './WebSafeFontSelect.vue'
@@ -104,6 +111,10 @@ const selectGoogleFont = async (fontName: string) => {
   @mixin title-bold 13px;
   display: flex;
   align-items: center;
+}
+.google-link {
+  @mixin size 22px;
+  margin-left: 6px;
 }
 .info {
   margin-left: 6px;

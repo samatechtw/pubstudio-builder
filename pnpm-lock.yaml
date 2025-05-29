@@ -12,8 +12,8 @@ importers:
         specifier: ^1.1.6
         version: 1.1.6(vue@3.5.14(typescript@5.8.2))
       '@samatech/vue-components':
-        specifier: 1.3.5
-        version: 1.3.5(typescript@5.8.2)
+        specifier: 1.4.0
+        version: 1.4.0(typescript@5.8.2)
       '@samatech/vue-store':
         specifier: ^0.7.0
         version: 0.7.0(vue@3.5.14(typescript@5.8.2))
@@ -1639,8 +1639,8 @@ packages:
   '@samatech/vue-color-picker@1.2.0':
     resolution: {integrity: sha512-Wvw3AJ361mpT7vFylonAxssN3JCNXPT1XL5DdE8Ixf3e/Kdo1lGa+0Bh7bqZu0eBGNssEXhzPDUJeh/AM0nTXQ==}
 
-  '@samatech/vue-components@1.3.5':
-    resolution: {integrity: sha512-EiznMBAZNLtOPuycUKi+dp9/KKOM8dp509tJkP7kyvUkM35QMxjyOafHXUfFx5I4vpBRrf8EszP8Hg5aYL2Gsg==}
+  '@samatech/vue-components@1.4.0':
+    resolution: {integrity: sha512-wIcXvx87T0G8LROqEKrF38P5E/AI7HWt3tazIio605gP1NhU8h0SVcdZwlxBSmgw8OonCNfPgxeNInK/DZXqLg==}
     bundledDependencies:
       - '@samatech/st-input'
       - '@samatech/st-multiselect'
@@ -6471,7 +6471,7 @@ snapshots:
     transitivePeerDependencies:
       - typescript
 
-  '@samatech/vue-components@1.3.5(typescript@5.8.2)':
+  '@samatech/vue-components@1.4.0(typescript@5.8.2)':
     dependencies:
       vue: 3.5.13(typescript@5.8.2)
     transitivePeerDependencies:
@@ -6521,7 +6521,7 @@ snapshots:
 
   '@types/babel__template@7.4.4':
     dependencies:
-      '@babel/parser': 7.26.5
+      '@babel/parser': 7.27.2
       '@babel/types': 7.26.5
 
   '@types/babel__traverse@7.20.6':
@@ -6779,7 +6779,7 @@ snapshots:
 
   '@vue/compiler-core@3.5.13':
     dependencies:
-      '@babel/parser': 7.26.5
+      '@babel/parser': 7.27.2
       '@vue/shared': 3.5.13
       entities: 4.5.0
       estree-walker: 2.0.2
@@ -6805,7 +6805,7 @@ snapshots:
 
   '@vue/compiler-sfc@3.5.13':
     dependencies:
-      '@babel/parser': 7.26.5
+      '@babel/parser': 7.27.2
       '@vue/compiler-core': 3.5.13
       '@vue/compiler-dom': 3.5.13
       '@vue/compiler-ssr': 3.5.13
@@ -8332,7 +8332,7 @@ snapshots:
   istanbul-lib-instrument@5.2.1:
     dependencies:
       '@babel/core': 7.26.0
-      '@babel/parser': 7.26.5
+      '@babel/parser': 7.27.2
       '@istanbuljs/schema': 0.1.3
       istanbul-lib-coverage: 3.2.2
       semver: 6.3.1
