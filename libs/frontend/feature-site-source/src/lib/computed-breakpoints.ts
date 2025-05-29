@@ -5,9 +5,9 @@ import { computed } from 'vue'
 import { site } from './site-source'
 
 // Sorts breakpoints from small to large
-export const sortedBreakpoints = computed(() =>
-  Object.values(site.value.context.breakpoints).sort(breakpointSortFn),
-)
+export const sortedBreakpoints = computed(() => {
+  return Object.values(site.value.context.breakpoints).sort(breakpointSortFn)
+})
 
 export const descSortedBreakpoints = computed(() =>
   // Create a shallow copy to prevent `reverse` from influencing the original array

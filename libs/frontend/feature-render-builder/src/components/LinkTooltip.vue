@@ -50,7 +50,7 @@
       <Check class="link-save" color="#009879" @click="updateLink" />
     </div>
     <div v-else class="icon-wrap">
-      <IconTooltip :tip="t('edit')">
+      <IconTooltip :tip="t('edit')" class="edit-wrap">
         <Edit class="edit-link" @click="edit" />
       </IconTooltip>
       <CopyText :text="link" class="copy-text" />
@@ -380,6 +380,10 @@ onUnmounted(() => {
   @mixin size 21px;
   margin-left: 6px;
   cursor: pointer;
+}
+.edit-wrap {
+  display: flex;
+  align-items: center;
 }
 .copy-wrap {
   display: flex;

@@ -81,7 +81,7 @@ impl SiteType {
         if exec_env == ExecEnv::Dev || exec_env == ExecEnv::Ci {
             match self {
                 // Reduced bandwidth for testing
-                SiteType::Free => 5000,
+                SiteType::Free => 7500,
                 SiteType::Paid1 => 100 * GB,
                 SiteType::Paid2 => 1 * TB,
                 SiteType::Paid3 => 3 * TB,

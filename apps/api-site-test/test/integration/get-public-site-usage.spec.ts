@@ -103,7 +103,7 @@ describe('Get Site Usage', () => {
       expect(body2.total_site_view_count).toEqual(0)
     })
 
-    it.only('tracks page views after recording', async () => {
+    it('tracks page views after recording', async () => {
       // Initial site usage request
       const res1 = await api
         .get(testEndpoint(publishedSiteId))

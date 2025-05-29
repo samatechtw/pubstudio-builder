@@ -12,6 +12,7 @@ import {
   registerComponentEditorEvents,
   removeEditorEvents,
 } from '../editor-event-handlers'
+import { toggleComponentTreeHidden } from '../editor-helpers'
 import { setSelectedComponent } from '../set-selected-component'
 
 const addChildrenHelper = (
@@ -172,12 +173,22 @@ export const applyAddComponent = (
 ) => {
   const component = addComponentHelper(site, data, isRedo)
 
+  if (data.hidden) {
+    for (const [id, hide] of Object.entries(data.hidden)) {
+      toggleComponentTreeHidden(site, id, hide)
+    }
+  }
+
   // Select created component
   // Split helper function to enable creating components without a page
   setSelectedComponent(site, component)
 }
 
-export const deleteComponentWithId = (site: ISite, componentId?: string): number => {
+export const deleteComponentWithId = (
+  site: ISite,
+  componentId: string | undefined,
+  hidden: Record<string, boolean>,
+): number => {
   const { editor, context } = site
   const component = resolveComponent(context, componentId)
   // Track total number of deleted components to help reset `context.nextId`
@@ -199,7 +210,7 @@ export const deleteComponentWithId = (site: ISite, componentId?: string): number
     }
     if (component.children) {
       for (const child of component.children) {
-        deleteCount += deleteComponentWithId(site, child.id)
+        deleteCount += deleteComponentWithId(site, child.id, hidden)
       }
     }
     // Clear editor events
@@ -211,6 +222,9 @@ export const deleteComponentWithId = (site: ISite, componentId?: string): number
       delete componentTreeExpandedItems[component.id]
     }
     if (componentsHidden) {
+      if (componentsHidden[component.id] !== undefined) {
+        hidden[component.id] = componentsHidden[component.id]
+      }
       delete componentsHidden[component.id]
     }
   }
@@ -220,7 +234,11 @@ export const deleteComponentWithId = (site: ISite, componentId?: string): number
 export const undoAddComponent = (site: ISite, data: IAddComponentData) => {
   const context = site.context
   const { id, selectedComponentId } = data
-  const deleteCount = deleteComponentWithId(site, id)
+  const hidden = {}
+  const deleteCount = deleteComponentWithId(site, id, hidden)
+  if (Object.keys(hidden).length) {
+    data.hidden = hidden
+  }
   context.nextId -= deleteCount
 
   if (selectedComponentId) {

@@ -22,6 +22,7 @@ import {
   ISerializedComponent,
   ISite,
 } from '@pubstudio/shared/type-site'
+import { toggleComponentTreeHidden } from '../editor-helpers'
 import { applyAddComponent, undoAddComponent } from './add-component'
 
 jest.mock('@pubstudio/frontend/util-runtime', () => {
@@ -74,6 +75,27 @@ describe('Add Component', () => {
     expect(newComponentCount).toEqual(componentCount)
     // Stringify and parse site to clear undefined keys
     expectSiteWithoutComponentTree(site, mockSerializedSite)
+  })
+
+  it('should undo/redo add-component after hiding in editor', () => {
+    const newCmp = mockSerializedComponent(site)
+
+    const data = addComponentDataWithSelected(newCmp, site.editor)
+    applyAddComponent(site, data)
+    toggleComponentTreeHidden(site, newCmp.id, true)
+    expect(site.editor?.componentsHidden).toEqual({ [newCmp.id]: true })
+
+    undoAddComponent(site, data)
+
+    const newComponentCount = Object.keys(site.context.components).length
+
+    expect(newComponentCount).toEqual(componentCount)
+    // Stringify and parse site to clear undefined keys
+    expectSiteWithoutComponentTree(site, mockSerializedSite)
+    expect(site.editor?.componentsHidden).toEqual({})
+
+    applyAddComponent(site, data, true)
+    expect(site.editor?.componentsHidden).toEqual({ [newCmp.id]: true })
   })
 
   describe('with `is`/children', () => {

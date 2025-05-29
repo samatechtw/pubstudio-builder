@@ -22,6 +22,7 @@ import {
   ISerializedSite,
   ISite,
 } from '@pubstudio/shared/type-site'
+import { toggleComponentTreeHidden } from '../editor-helpers'
 import { setSelectedComponent } from '../set-selected-component'
 import { applyAddComponent } from './add-component'
 import { applyRemoveComponent, undoRemoveComponent } from './remove-component'
@@ -58,6 +59,26 @@ describe('Remove Component', () => {
     newComponentCount = Object.keys(site.context.components).length
     expect(newComponentCount).toEqual(componentCount)
     expectSiteWithoutComponentTree(site, mockSerializedSite)
+  })
+
+  it('should remove component and restore editor hidden state on undo', () => {
+    const deleteCmp = resolveComponent(site.context, 'test-c-1') as IComponent
+    toggleComponentTreeHidden(site, deleteCmp.id, true)
+    expect(site.editor?.componentsHidden).toEqual({ 'test-c-1': true })
+    const originalSite = serializeSite(site)
+
+    const data = makeRemoveComponentData(site, deleteCmp)
+    applyRemoveComponent(site, data)
+    expect(site.editor?.componentsHidden).toEqual({})
+
+    let newComponentCount = Object.keys(site.context.components).length
+    expect(newComponentCount).toEqual(componentCount - 1)
+
+    undoRemoveComponent(site, data)
+    newComponentCount = Object.keys(site.context.components).length
+    expect(newComponentCount).toEqual(componentCount)
+    expectSiteWithoutComponentTree(site, originalSite)
+    expect(site.editor?.componentsHidden).toEqual({ 'test-c-1': true })
   })
 
   it('should clear component editor events in the editor context', () => {

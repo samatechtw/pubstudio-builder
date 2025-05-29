@@ -38,6 +38,8 @@ export interface IAddComponentData {
   children?: ISerializedComponent[]
   // Used to set selected component back after undo
   selectedComponentId?: string
+  // Records whether the component and children are hidden in the editor at the time of undo
+  hidden?: Record<string, boolean>
 }
 
 export interface AddComponent extends ICommand<IAddComponentData> {
