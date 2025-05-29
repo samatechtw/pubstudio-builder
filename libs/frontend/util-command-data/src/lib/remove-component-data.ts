@@ -25,5 +25,6 @@ export const makeRemoveComponentData = (
     events: component.events,
     editorEvents: site.editor?.editorEvents[component.id],
     parentIndex: parentIndex ?? 0,
+    hidden: site.editor?.componentsHidden?.[component.id],
   }
 }

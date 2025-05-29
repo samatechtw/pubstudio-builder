@@ -72,6 +72,7 @@ export const undoRemoveComponentHelper = (
     events,
     parentIndex,
     editorEvents,
+    hidden,
   } = data
   const parent = resolveComponent(context, parentId)
   const component: IComponent = {
@@ -101,9 +102,12 @@ export const undoRemoveComponentHelper = (
   data.children?.forEach((c) => undoRemoveComponentHelper(site, c, selectAfterUndo))
 
   // Add back component tree expand state
-  const { componentTreeExpandedItems } = site.editor ?? {}
+  const { componentTreeExpandedItems, componentsHidden } = site.editor ?? {}
   if (componentTreeExpandedItems) {
     componentTreeExpandedItems[component.id] = true
+  }
+  if (componentsHidden && hidden !== undefined) {
+    componentsHidden[component.id] = hidden
   }
 
   // Register editor events

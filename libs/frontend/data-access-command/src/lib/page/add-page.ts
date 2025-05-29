@@ -48,7 +48,7 @@ export const undoAddPage = (site: ISite, data: IAddPageData) => {
   delete site.pages[metadata.route]
   site.pageOrder = site.pageOrder.filter((route) => route !== metadata.route)
 
-  const deleteCount = deleteComponentWithId(site, rootId)
+  const deleteCount = deleteComponentWithId(site, rootId, {})
   context.nextId -= deleteCount
 
   // Set active page and selected component

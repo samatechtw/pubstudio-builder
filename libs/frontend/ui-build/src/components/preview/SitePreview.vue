@@ -13,7 +13,7 @@
 
 <script lang="ts" setup>
 import { computed, onMounted } from 'vue'
-import { iteratePage, RenderMode } from '@pubstudio/frontend/util-render'
+import { RenderMode } from '@pubstudio/frontend/util-render'
 import { routeToPreviewPath, useRenderPreview } from '@pubstudio/frontend/feature-preview'
 import { NotFound, Spinner } from '@pubstudio/frontend/ui-widgets'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
@@ -41,6 +41,8 @@ const { renderMode = RenderMode.Preview } = defineProps<{
   loading?: boolean
 }>()
 
+let linkRewriteTimeout: ReturnType<typeof setTimeout> | undefined
+
 router.afterEach((newRoute, oldRoute) => {
   const page = site.value?.pages[newRoute?.path?.replace('/preview', '') ?? '']
   let oldPage = undefined
@@ -53,6 +55,21 @@ router.afterEach((newRoute, oldRoute) => {
     const title = page.head.title ?? site.value.defaults.head.title
     page.head.title = title ? `${title} - PubStudio Preview` : 'PubStudio Preview'
     replaceHead(site.value, page, oldPage)
+    // Rewrite links in prosemirror text. Wait a bit to ensure we do it after initial render
+    if (linkRewriteTimeout) {
+      clearTimeout(linkRewriteTimeout)
+    }
+    linkRewriteTimeout = setTimeout(() => {
+      const linkNodes = document.querySelectorAll('.pm-p a')
+      linkNodes.forEach((node) => {
+        const original = node.getAttribute('href')
+        if (original) {
+          const previewLink = routeToPreviewPath(original, RenderMode.Preview)
+          node.setAttribute('href', previewLink.url)
+        }
+        linkRewriteTimeout = undefined
+      }, 200)
+    })
   }
 })
 
