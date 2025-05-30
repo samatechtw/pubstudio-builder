@@ -11,9 +11,11 @@ export const computeSelectionOverlay = (
     const buildContentWindowInner = document.getElementById(buildContentWindowInnerId)
     let componentElement = document.getElementById(selectedComponentId)
     // Container size might be different from the actual component
-    const containerChild = componentElement?.children?.[0]
-    if (containerChild?.className?.includes('component-content-container')) {
-      componentElement = containerChild as HTMLElement
+    const containerChildren = componentElement?.children
+    if (containerChildren?.[0]?.className?.includes('component-content-container')) {
+      componentElement = containerChildren?.[0] as HTMLElement
+    } else if (containerChildren?.[1]?.className === '__link-placeholder') {
+      componentElement = containerChildren?.[1] as HTMLElement
     }
 
     if (buildContentWindowInner && componentElement) {
