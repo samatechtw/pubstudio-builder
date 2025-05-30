@@ -15,7 +15,7 @@ export const getAdjacentVideo = (cmp: IComponent | undefined): IComponent | unde
   if (cmp.tag === Tag.Source && cmp.parent?.tag === Tag.Video) {
     return cmp.parent
   }
-  if (cmp.children?.[0].tag === Tag.Video && cmp.name.includes('ideo')) {
+  if (cmp.children?.[0]?.tag === Tag.Video && cmp.name.includes('ideo')) {
     return cmp.children?.[0]
   }
   return undefined
