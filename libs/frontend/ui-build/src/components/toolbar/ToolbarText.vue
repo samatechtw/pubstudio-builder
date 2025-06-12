@@ -99,7 +99,7 @@ defineProps<{
 }>()
 
 const { activate, deactivate } = useControlledClickaway(
-  '.color-picker-wrap',
+  '.color-picker-wrap,.toolbar-picker',
   () => togglePicker(false),
   true,
 )
