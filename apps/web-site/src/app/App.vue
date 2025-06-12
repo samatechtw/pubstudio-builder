@@ -187,6 +187,7 @@ a {
   flex-direction: column;
   flex-shrink: 0;
   flex-grow: 1;
+  height: 100%;
 }
 ._rc {
   flex-grow: 1;
