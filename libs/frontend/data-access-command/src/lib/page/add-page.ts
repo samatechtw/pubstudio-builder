@@ -1,3 +1,4 @@
+import { iteratePage } from '@pubstudio/frontend/util-render'
 import { IAddPageData } from '@pubstudio/shared/type-command-data'
 import { EditorEventName, IComponent, ISite } from '@pubstudio/shared/type-site'
 import { addComponentHelper, deleteComponentWithId } from '../component/add-component'
@@ -44,12 +45,19 @@ export const undoAddPage = (site: ISite, data: IAddPageData) => {
   const prevSelectedComponent = context.components[selectedComponentId ?? '']
 
   // Remove page and root component
-  const rootId = site.pages[metadata.route].root.id
+  const page = site.pages[metadata.route]
+  const rootId = page.root.id
   delete site.pages[metadata.route]
   site.pageOrder = site.pageOrder.filter((route) => route !== metadata.route)
 
   const deleteCount = deleteComponentWithId(site, rootId, {})
   context.nextId -= deleteCount
+
+  // Clear editor state
+  iteratePage(page, (component) => {
+    delete site.editor?.componentTreeExpandedItems[component.id]
+    delete site.editor?.componentsHidden[component.id]
+  })
 
   // Set active page and selected component
   setActivePage(site.editor, activePageRoute)

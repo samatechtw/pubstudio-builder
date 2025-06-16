@@ -153,9 +153,13 @@ export const addComponentHelper = (
   component.style.overrides = detachOverrides(component, sourceComponent)
 
   // Add component tree expand state
-  const { componentTreeExpandedItems } = site.editor ?? {}
+  const { componentTreeExpandedItems, componentsHidden } = site.editor ?? {}
   if (componentTreeExpandedItems) {
     componentTreeExpandedItems[id] = true
+  }
+  // If the source was hidden, hide the new component
+  if (componentsHidden && sourceId) {
+    componentsHidden[id] = componentsHidden[sourceId]
   }
   // Register editor events
   const editorEvents = component.editorEvents
