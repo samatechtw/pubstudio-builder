@@ -79,6 +79,10 @@ export const resetPageMenu = () => {
   pageError.value = getDefaultError()
 }
 
+const routeWithInitialSlash = (route: string): string => {
+  return route.startsWith('/') ? route : `/${route}`
+}
+
 export const usePageMenu = (): IUsePageMenuFeature => {
   const { t } = useI18n()
   const { site, editPage, addPage, removePage: removePageBuild } = useBuild()
@@ -94,11 +98,9 @@ export const usePageMenu = (): IUsePageMenuFeature => {
     if (!editingPage.route) {
       pageError.value.route = t('build.page_route_required')
     }
+    const newRoute = routeWithInitialSlash(editingPage.route)
     // Cannot overwrite an existing page
-    if (
-      editingPage.route in site.value.pages &&
-      editingPage.route !== editingPageSource.route
-    ) {
+    if (newRoute in site.value.pages && newRoute !== editingPageSource.route) {
       pageError.value.route = t('build.page_route_unique')
     }
 
@@ -134,8 +136,7 @@ export const usePageMenu = (): IUsePageMenuFeature => {
         return
       }
       const newPage = getMetadataCopy(editingPage)
-      const route = newPage.route
-      newPage.route = route.startsWith('/') ? route : `/${route}`
+      newPage.route = routeWithInitialSlash(newPage.route)
 
       if (isNew.value) {
         addPage(newPage, editingPage.copyFrom)
