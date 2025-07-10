@@ -1,7 +1,6 @@
 import {
   IComponent,
   IEditorContext,
-  IEditorEvents,
   IPage,
   ISerializedComponent,
   ISerializedEditorContext,
@@ -15,7 +14,6 @@ import {
 interface IDeserializePagesResult {
   pages: Record<string, IPage>
   components: Record<string, IComponent>
-  editorEvents: IEditorEvents
 }
 
 export const deserializeEditor = (
@@ -96,7 +94,6 @@ export const deserializePages = (
 ): IDeserializePagesResult => {
   const pages: Record<string, IPage> = {}
   const components: Record<string, IComponent> = {}
-  const editorEvents: IEditorEvents = {}
   // First, generate the component cache with empty parent/children
   for (const [name, page] of Object.entries(serializedPages)) {
     // Set up the page with root
@@ -128,7 +125,7 @@ export const deserializePages = (
       queue.push(...(cur.children ?? []))
     }
   }
-  return { pages, components, editorEvents }
+  return { pages, components }
 }
 
 export const deserializedHelper = (serialized: ISerializedSite): ISite => {
