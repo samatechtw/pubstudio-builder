@@ -6,6 +6,7 @@ import {
 import { Fragment, Slice } from 'prosemirror-model'
 import { Selection } from 'prosemirror-state'
 import { EditorView } from 'prosemirror-view'
+import { codeDomEventHandlers } from './code-editor-helpers'
 import { codeEditorPlugins } from './code-editor-plugins'
 
 export function createCodeEditorView(
@@ -25,6 +26,7 @@ export function createCodeEditorView(
 
   const view = new EditorView(container, {
     state,
+    handleDOMEvents: codeDomEventHandlers,
     dispatchTransaction(transaction) {
       let newState = view.state.apply(transaction)
       const { textContent } = newState.doc
