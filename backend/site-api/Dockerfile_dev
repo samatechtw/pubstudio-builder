@@ -36,6 +36,7 @@ COPY ./tools/test/backup_test_dev_ci.db ./db/sites/backups/
 
 ARG EXEC_ENV
 ENV EXEC_ENV=$EXEC_ENV
+ARG RUST_TARGET=x86_64-unknown-linux-gnu
 ARG PLATFORM_WEB_URL
 ENV PLATFORM_WEB_URL=$PLATFORM_WEB_URL
 ARG SITE_API_HOST
@@ -59,8 +60,8 @@ ENV MAX_BACKUPS=$MAX_BACKUPS
 ARG SENDGRID_API_KEY
 ENV SENDGRID_API_KEY=$SENDGRID_API_KEY
 
-COPY ./backend/target/aarch64-unknown-linux-gnu/debug/libsite_api.* ../target/aarch64-unknown-linux-gnu/debug/
-COPY ./backend/target/aarch64-unknown-linux-gnu/debug/site-api* ../target/aarch64-unknown-linux-gnu/debug/
+COPY ./backend/target/${RUST_TARGET}/debug/libsite_api.* ../target/dev/debug/
+COPY ./backend/target/${RUST_TARGET}/debug/site-api* ../target/dev/debug/
 
 ENTRYPOINT ["/tini", "--"]
 CMD ["../run-docker.sh", "site-api"]

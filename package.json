@@ -19,6 +19,7 @@
     "dev:build-aarch": "cd backend && CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=aarch64-unknown-linux-gnu-gcc cargo build --target aarch64-unknown-linux-gnu",
     "dev:run-aarch": "cd backend && CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=aarch64-unknown-linux-gnu-gcc cargo run --target aarch64-unknown-linux-gnu",
     "dev:build": "cd backend && cargo build",
+    "dev:build:docker": "./tools/scripts/dev-build-docker.sh",
     "dev:run": "cd backend && cargo run",
     "dev:watch": "cd backend && cargo watch --why -x run",
     "dev:watch-aarch": "cd backend && CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=aarch64-unknown-linux-gnu-gcc cargo watch --why -- bash -c \"(cargo build --target aarch64-unknown-linux-gnu)\"",
