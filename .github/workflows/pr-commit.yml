@@ -19,7 +19,7 @@ jobs:
       should_skip: ${{ steps.skip_check.outputs.should_skip }}
     steps:
       - id: skip_check
-        uses: fkirc/skip-duplicate-actions@master
+        uses: fkirc/skip-duplicate-actions@v5
         with:
           concurrent_skipping: 'never'
           skip_after_successful_duplicate: 'true'
@@ -34,7 +34,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout code into workspace directory
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - uses: ./.github/actions/env-setup
@@ -60,14 +60,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout code into workspace directory
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - uses: ./.github/actions/env-setup
       - name: Build apps
         run: npx nx run-many -t build --projects="web*" --parallel=3
       - name: Upload web-site bundle
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: web-site-bundle
           path: |
@@ -81,7 +81,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout code into workspace directory
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - run: |
@@ -95,7 +95,7 @@ jobs:
       - name: Build app in release mode
         run: cd backend && cargo build --release
       - name: Upload binaries
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: backend-binaries
           path: |
@@ -121,22 +121,22 @@ jobs:
         id: slug
         run: echo "::set-output name=sha8::$(echo ${{github.event.after}} | cut -c1-8)"
       - name: Checkout code into workspace directory
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Download binary
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: backend-binaries
           path: ./backend/target/release/${{env.APP_NAME}}
       - name: Download web-site bundle
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: web-site-bundle
           path: ./dist/apps/web-site/index.html
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
       - name: Build docker image
         id: docker_build
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v7
         with:
           context: ${{env.WORKSPACE_ROOT}}
           file: ${{env.WORKSPACE_ROOT}}/backend/${{env.APP_NAME}}/Dockerfile
@@ -146,7 +146,7 @@ jobs:
           tags: ${{env.APP_NAME}}.prod
           outputs: type=docker,dest=/tmp/${{env.APP_NAME}}-${{steps.slug.outputs.sha8}}-${{github.run_number}}.tar
       - name: Upload docker image
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ${{env.APP_NAME}}-${{steps.slug.outputs.sha8}}-${{github.run_number}}
           path: /tmp/${{env.APP_NAME}}-${{steps.slug.outputs.sha8}}-${{github.run_number}}.tar
@@ -164,12 +164,12 @@ jobs:
         id: slug
         run: echo "::set-output name=sha8::$(echo ${{github.event.after}} | cut -c1-8)"
       - name: Checkout code into workspace directory
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: Download docker images
         id: download
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: ${{env.APP_NAME}}-${{steps.slug.outputs.sha8}}-${{github.run_number}}
           path: /tmp
@@ -194,7 +194,7 @@ jobs:
     if: always()
     runs-on: ubuntu-22.04
     steps:
-      - uses: geekyeggo/delete-artifact@v5
+      - uses: geekyeggo/delete-artifact@v6
         with:
           name: |
             site-api-*
