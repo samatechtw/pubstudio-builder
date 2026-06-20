@@ -29,12 +29,12 @@
   },
   "search.useIgnoreFiles": false,
   "cSpell.words": ["postcss", "pubstudio"],
-  "rust-analyzer.linkedProjects": [
-    "./backend/Cargo.toml",
-    "./backend/lib-shared-types/Cargo.toml",
-    "./backend/lib-shared-types/Cargo.toml",
-    "./backend/lib-shared-site-api/Cargo.toml"
-  ],
+  "rust-analyzer.linkedProjects": ["./backend/Cargo.toml"],
+  "rust-analyzer.numThreads": 6,
+  "rust-analyzer.cachePriming.numThreads": 6,
+  "rust-analyzer.check.extraArgs": ["-j", "6"],
+  "rust-analyzer.cargo.extraEnv": { "CARGO_BUILD_JOBS": "6" },
+  "rust-analyzer.lru.capacity": 128,
   "[sql]": {
     "editor.tabSize": 4
   },

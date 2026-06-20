@@ -1,6 +1,5 @@
 use lib_shared_types::shared::core::ExecEnv;
 use serde::Serialize;
-use std::collections::HashMap;
 use thiserror::Error;
 
 #[derive(Debug, Clone)]
@@ -47,41 +46,8 @@ impl Email {
     }
 }
 
-#[derive(Clone, Serialize)]
-pub struct Content {
-    r#type: String,
-
-    value: String,
-}
-
-impl Content {
-    pub fn new(t: &str, value: String) -> Self {
-        Self {
-            r#type: t.into(),
-            value,
-        }
-    }
-}
-
-#[derive(Serialize)]
-pub struct Personalization {
-    to: Vec<Email>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    cc: Option<Vec<Email>>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    bcc: Option<Vec<Email>>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    subject: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    substitutions: Option<HashMap<String, String>>,
-}
-
 #[derive(Debug, Error)]
-pub enum SendgridError {
+pub enum MailError {
     #[error("Failed to send: {0}")]
     Failed(String),
     #[error("Template parse: {0}")]

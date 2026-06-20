@@ -4,71 +4,77 @@ use reqwest::header;
 use serde_json::json;
 use tracing::error;
 
-use super::{Content, MailParams, SendgridError};
+use super::{MailError, MailParams};
 
 pub async fn send_mails(
     params: MailParams,
     subject: &str,
     text: Option<String>,
     html: Option<String>,
-) -> Result<(), SendgridError> {
-    let mut content: Vec<Content> = vec![];
-    if let Some(t) = text {
-        content.push(Content::new("text/plain", t))
-    }
-    if let Some(h) = html {
-        content.push(Content::new("text/html", h))
-    }
-
-    let personalizations: Vec<serde_json::Value> = params
-        .recipients
-        .iter()
-        .map(|r| json!({"to": [r]}))
-        .collect();
-
+) -> Result<(), MailError> {
     let subject_with_env = if params.env == ExecEnv::Prod {
-        subject
+        subject.to_string()
     } else {
-        &format!("({}) {}", params.env, subject)
+        format!("({}) {}", params.env, subject)
     };
-
-    let body = json!(
-        {
-            "from": params.sender,
-            "personalizations": personalizations,
-            "subject": subject_with_env,
-            "content": content
-        }
-    );
 
     if params.env == ExecEnv::Dev || params.env == ExecEnv::Ci {
         return Ok(());
     }
 
+    // MailerSend's `to` array does not isolate recipients from each other, so send one
+    // request per recipient and ggregate any failures.
     let client = reqwest::Client::new();
-    let res = client
-        .post("https://api.sendgrid.com/v3/mail/send")
-        .json(&body)
-        .bearer_auth(params.api_key)
-        .header(
-            header::CONTENT_TYPE,
-            header::HeaderValue::from_static("application/json"),
-        )
-        .send()
-        .await
-        .map_err(|e| SendgridError::Failed(e.to_string()))?;
+    let mut errors: Vec<String> = vec![];
 
-    let status = res.status().as_u16();
-    match status {
-        200..=299 => Ok(()),
-        _ => {
-            let body = res
-                .text()
-                .await
-                .map_err(|e| SendgridError::Failed(e.to_string()))?;
-            error!(body = body, "Failed to send mail");
-            Err(SendgridError::Failed(format!("{}: {}", status, body)))
+    for recipient in params.recipients.iter() {
+        let mut body = json!({
+            "from": params.sender,
+            "to": [recipient],
+            "subject": subject_with_env,
+        });
+        if let Some(t) = &text {
+            body["text"] = json!(t);
         }
+        if let Some(h) = &html {
+            body["html"] = json!(h);
+        }
+
+        let res = client
+            .post("https://api.mailersend.com/v1/email")
+            .json(&body)
+            .bearer_auth(&params.api_key)
+            .header(
+                header::CONTENT_TYPE,
+                header::HeaderValue::from_static("application/json"),
+            )
+            .header(
+                "X-Requested-With",
+                header::HeaderValue::from_static("XMLHttpRequest"),
+            )
+            .send()
+            .await;
+
+        match res {
+            Ok(res) => {
+                let status = res.status().as_u16();
+                if !(200..=299).contains(&status) {
+                    let body = res.text().await.unwrap_or_else(|e| e.to_string());
+                    error!(body = body, "Failed to send mail");
+                    errors.push(format!("{}: {}", status, body));
+                }
+            }
+            Err(e) => {
+                error!(error = e.to_string(), "Failed to send mail");
+                errors.push(e.to_string());
+            }
+        }
+    }
+
+    if errors.is_empty() {
+        Ok(())
+    } else {
+        Err(MailError::Failed(errors.join("; ")))
     }
 }
 
@@ -77,6 +83,6 @@ pub async fn send_mail(
     subject: &str,
     text: Option<String>,
     html: Option<String>,
-) -> Result<(), SendgridError> {
+) -> Result<(), MailError> {
     send_mails(params, subject, text, html).await
 }
