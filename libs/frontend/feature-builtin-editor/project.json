@@ -12,11 +12,11 @@
       }
     },
     "test": {
-      "executor": "@nx/jest:jest",
+      "executor": "nx:run-commands",
       "outputs": ["{workspaceRoot}/coverage/libs/frontend/feature-builtin-editor"],
       "options": {
-        "jestConfig": "libs/frontend/feature-builtin-editor/jest.config.ts",
-        "passWithNoTests": true
+        "command": "vitest run --passWithNoTests",
+        "cwd": "libs/frontend/feature-builtin-editor"
       }
     }
   },

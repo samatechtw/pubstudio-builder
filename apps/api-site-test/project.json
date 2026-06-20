@@ -11,12 +11,11 @@
       }
     },
     "req-test": {
-      "executor": "@nx/jest:jest",
+      "executor": "nx:run-commands",
       "outputs": ["{workspaceRoot}/coverage/apps/api-site-test"],
       "options": {
-        "jestConfig": "apps/api-site-test/jest.config.ts",
-        "passWithNoTests": true,
-        "runInBand": true
+        "command": "vitest run --passWithNoTests",
+        "cwd": "apps/api-site-test"
       }
     }
   },

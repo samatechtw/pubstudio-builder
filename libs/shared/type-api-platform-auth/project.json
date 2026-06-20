@@ -12,11 +12,11 @@
       }
     },
     "test": {
-      "executor": "@nx/jest:jest",
+      "executor": "nx:run-commands",
       "outputs": ["{workspaceRoot}/coverage/libs/shared/type-api-platform-auth"],
       "options": {
-        "jestConfig": "libs/shared/type-api-platform-auth/jest.config.ts",
-        "passWithNoTests": true
+        "command": "vitest run --passWithNoTests",
+        "cwd": "libs/shared/type-api-platform-auth"
       }
     }
   },

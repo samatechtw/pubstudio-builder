@@ -1,4 +1,3 @@
-import { expect } from '@jest/globals'
 import { uidSingleton } from './uid'
 
 describe('form uid generator', () => {

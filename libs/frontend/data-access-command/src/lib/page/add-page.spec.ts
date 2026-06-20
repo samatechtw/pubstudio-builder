@@ -34,7 +34,7 @@ describe('Add Page', () => {
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('should add a new page', () => {

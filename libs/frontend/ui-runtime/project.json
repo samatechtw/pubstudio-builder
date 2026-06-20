@@ -13,11 +13,11 @@
       }
     },
     "test": {
-      "executor": "@nx/jest:jest",
+      "executor": "nx:run-commands",
       "outputs": ["{workspaceRoot}/coverage/libs/frontend/ui-runtime"],
       "options": {
-        "jestConfig": "libs/frontend/ui-runtime/jest.config.ts",
-        "passWithNoTests": true
+        "command": "vitest run --passWithNoTests",
+        "cwd": "libs/frontend/ui-runtime"
       }
     }
   },

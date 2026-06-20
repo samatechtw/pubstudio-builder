@@ -3,7 +3,7 @@ export const saveFile = (
   data: string | Uint8Array,
   fileType: string,
 ) => {
-  const blob = new Blob([data], { type: fileType })
+  const blob = new Blob([data as BlobPart], { type: fileType })
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const navAny = window.navigator as any
   if (navAny.msSaveOrOpenBlob) {

@@ -8,12 +8,13 @@ import {
   IComponentEditorEvents,
   ISite,
 } from '@pubstudio/shared/type-site'
+import { type Mock, vi } from 'vitest'
 import { addComponentDataWithSelected } from './add-component-data-with-selected'
 
 export interface IMockedComponentBehavior {
   componentData: IAddComponentData
   oldBehavior: IBehavior
-  mock: jest.Mock
+  mock: Mock
 }
 
 // Create a test component with mocked editor event behavior
@@ -24,7 +25,7 @@ export const setupMockBehavior = (
   const events = editorEvents ?? []
   // Mock builtin "noBehavior"
   const oldBehavior = resolveBehavior(site.context, noBehaviorId) as IBehavior
-  const noBehaviorMock = jest.fn()
+  const noBehaviorMock = vi.fn()
   site.context.behaviors[noBehaviorId] = {
     id: noBehaviorId,
     name: noBehaviorId,

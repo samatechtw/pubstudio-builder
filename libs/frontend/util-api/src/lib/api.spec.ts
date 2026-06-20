@@ -1,4 +1,4 @@
-const fetch = jest.fn(() => {
+const fetch = vi.fn(() => {
   return Promise.resolve({
     body: 'mock-body',
     json: Promise.resolve('mock-json'),
