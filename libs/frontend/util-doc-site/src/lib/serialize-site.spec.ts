@@ -4,7 +4,7 @@ import { mockSerializedSite } from '@pubstudio/frontend/util-test-mock'
 import { ISite } from '@pubstudio/shared/type-site'
 import { validateSite } from './validate-site'
 
-jest.mock('@pubstudio/frontend/util-config', () => ({
+vi.mock('@pubstudio/frontend/util-config', () => ({
   SITE_FORMAT_VERSION: '2',
   builderConfig: { siteFormatVersion: '2' },
 }))

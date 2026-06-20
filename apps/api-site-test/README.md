@@ -10,6 +10,6 @@ Managed by Nx.
 # Run API request tests
 npx nx req-test api-site-test
 
-# Run a single test
-npx nx req-test api-site-test --test-file apps/api-site-test/test/smoke/health-check.spec.ts
+# Run a single test (positional arg is a Vitest path filter)
+npx nx req-test api-site-test -- smoke/health-check
 ```

@@ -11,11 +11,11 @@
       }
     },
     "test": {
-      "executor": "@nx/jest:jest",
+      "executor": "nx:run-commands",
       "outputs": ["{workspaceRoot}/coverage/libs/frontend/util-resolve"],
       "options": {
-        "jestConfig": "libs/frontend/util-resolve/jest.config.ts",
-        "passWithNoTests": true
+        "command": "vitest run --passWithNoTests",
+        "cwd": "libs/frontend/util-resolve"
       }
     }
   },

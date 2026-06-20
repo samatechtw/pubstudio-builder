@@ -13,11 +13,11 @@
       }
     },
     "test": {
-      "executor": "@nx/jest:jest",
+      "executor": "nx:run-commands",
       "outputs": ["{workspaceRoot}/coverage/libs/frontend/feature-copy-paste"],
       "options": {
-        "jestConfig": "libs/frontend/feature-copy-paste/jest.config.ts",
-        "passWithNoTests": true
+        "command": "vitest run --passWithNoTests",
+        "cwd": "libs/frontend/feature-copy-paste"
       }
     }
   },

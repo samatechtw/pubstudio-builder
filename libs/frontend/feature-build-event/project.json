@@ -13,11 +13,11 @@
       }
     },
     "test": {
-      "executor": "@nx/jest:jest",
+      "executor": "nx:run-commands",
       "outputs": ["{workspaceRoot}/coverage/libs/frontend/feature-build-event"],
       "options": {
-        "jestConfig": "libs/frontend/feature-build-event/jest.config.ts",
-        "passWithNoTests": true
+        "command": "vitest run --passWithNoTests",
+        "cwd": "libs/frontend/feature-build-event"
       }
     }
   },

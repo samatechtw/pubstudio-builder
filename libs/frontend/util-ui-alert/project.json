@@ -12,11 +12,11 @@
       }
     },
     "test": {
-      "executor": "@nx/jest:jest",
+      "executor": "nx:run-commands",
       "outputs": ["{workspaceRoot}/coverage/libs/frontend/util-ui-alert"],
       "options": {
-        "jestConfig": "libs/frontend/util-ui-alert/jest.config.ts",
-        "passWithNoTests": true
+        "command": "vitest run --passWithNoTests",
+        "cwd": "libs/frontend/util-ui-alert"
       }
     }
   },

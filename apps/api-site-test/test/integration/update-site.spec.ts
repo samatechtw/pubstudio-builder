@@ -219,9 +219,9 @@ describe('Update Site', () => {
 
   it.each(['a', 'a'.repeat(30), 'test_site', 'test-site', 'test.site', '#abc'])(
     'when site name is invalid',
-    () => {
+    async () => {
       payload.name = 'a'.repeat(51)
-      return api
+      await api
         .patch(`${testEndpoint}/${siteId}`)
         .set('Authorization', adminAuth)
         .send(payload)

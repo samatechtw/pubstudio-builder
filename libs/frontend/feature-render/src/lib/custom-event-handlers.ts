@@ -6,8 +6,7 @@ import {
   ICustomEvents,
   ISite,
 } from '@pubstudio/shared/type-site'
-// import { createClickawayListener } from '@samatech/vue-components'
-import { ClickawayCallback } from '@samatech/vue-components'
+type ClickawayCallback = (event?: Event) => void
 import { computeEvents } from './render-helpers'
 
 const toInt = (thing: string | undefined, fallback: number): number => {

@@ -10,11 +10,11 @@ import {
 import { IComponent, ISerializedComponent, ISite } from '@pubstudio/shared/type-site'
 import { IUseCopyPaste, useCopyPaste } from './use-copy-paste'
 
-jest.mock('petite-vue-i18n', () => ({ useI18n: () => ({ t: jest.fn() }) }))
-jest.mock('@pubstudio/frontend/util-ui-alert', () => ({
-  addToast: jest.fn(),
-  addHUD: jest.fn(),
-  uiAlert: jest.fn(),
+vi.mock('petite-vue-i18n', () => ({ useI18n: () => ({ t: vi.fn() }) }))
+vi.mock('@pubstudio/frontend/util-ui-alert', () => ({
+  addToast: vi.fn(),
+  addHUD: vi.fn(),
+  uiAlert: vi.fn(),
 }))
 
 describe('use-copy-paste composable', () => {
