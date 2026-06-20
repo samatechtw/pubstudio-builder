@@ -55,7 +55,7 @@ pub struct Config {
     #[clap(long, env = "MAX_BACKUPS", default_value_t = 10)]
     pub max_backups: u32,
 
-    /// API key for sending email via SendGrid
-    #[clap(long, env = "SENDGRID_API_KEY")]
-    pub sendgrid_api_key: String,
+    /// API key for sending email via MailerSend
+    #[clap(long, env = "MAILSENDER_API_KEY")]
+    pub mailsender_api_key: String,
 }

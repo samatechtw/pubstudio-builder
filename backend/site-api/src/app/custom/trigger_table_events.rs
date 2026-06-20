@@ -1,6 +1,6 @@
 use lib_shared_site_api::{
     error::api_error::ApiError,
-    mail::{send_mails, Email, MailParams, SendgridError},
+    mail::{send_mails, Email, MailError, MailParams},
 };
 use lib_shared_types::dto::custom_data::{
     custom_event_dto::{EmailRowOptions, EventInfo, EventTrigger},
@@ -14,7 +14,7 @@ async fn send_add_row_mail(
     table_name: &str,
     options: EmailRowOptions,
     row: &CustomDataRow,
-) -> Result<(), SendgridError> {
+) -> Result<(), MailError> {
     let mut text = format!("A row was added to table \"{}\"\n", table_name);
     for (key, val) in row.iter() {
         text.push_str(&format!("\n{}: {}\n", key, val));
@@ -23,7 +23,7 @@ async fn send_add_row_mail(
     let params = MailParams {
         sender: Email::new("donotreply@pubstud.io"),
         recipients,
-        api_key: config.sendgrid_api_key.clone(),
+        api_key: config.mailsender_api_key.clone(),
         env: config.exec_env,
     };
     send_mails(
@@ -73,7 +73,7 @@ async fn send_update_row_mail(
     options: EmailRowOptions,
     old_row: &CustomDataRow,
     new_row: &CustomDataRow,
-) -> Result<(), SendgridError> {
+) -> Result<(), MailError> {
     let mut text = format!("A row was updated in table \"{}\"\n\nOld row:", table_name);
     for (key, val) in old_row.iter() {
         text.push_str(&format!("\n{}: {}\n", key, val));
@@ -86,7 +86,7 @@ async fn send_update_row_mail(
     let params = MailParams {
         sender: Email::new("donotreply@pubstud.io"),
         recipients,
-        api_key: config.sendgrid_api_key.clone(),
+        api_key: config.mailsender_api_key.clone(),
         env: config.exec_env,
     };
     send_mails(
