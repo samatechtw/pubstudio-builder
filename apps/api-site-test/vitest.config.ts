@@ -11,11 +11,8 @@ export default defineConfig({
     root: __dirname,
     include: ['test/**/*.spec.ts'],
     setupFiles: ['./vitest.setup.ts'],
-    // Integration suite: every spec resets a single shared backend in beforeEach,
-    // so files must not run concurrently — run them serially in a single fork.
-    pool: 'forks',
-    poolOptions: {
-      forks: { singleFork: true },
-    },
+    // Every spec resets one shared backend in beforeEach via non-atomic DROP+migrate,
+    // so overlapping resets corrupt the DB. The files.must run fully serially.
+    fileParallelism: false,
   },
 })
