@@ -89,7 +89,7 @@
     "jsonwebtoken": "^9.0.3",
     "lightningcss": "^1.32.0",
     "nx": "20.5.0",
-    "nx-vue3-vite": "0.30.0",
+    "nx-vue3-vite": "0.32.0",
     "postcss": "^8.5.15",
     "prettier": "^3.8.4",
     "rollup-plugin-visualizer": "^6.0.11",
