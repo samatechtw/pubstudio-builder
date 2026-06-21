@@ -23,8 +23,7 @@ vi.mock('@pubstudio/frontend/data-access-web-store', () => ({
 }))
 
 vi.mock('@pubstudio/frontend/feature-site-store', async (importOriginal) => {
-  const actual =
-    await importOriginal<typeof import('@pubstudio/frontend/feature-site-store')>()
+  const actual = await importOriginal<{ useSiteSource: () => Record<string, unknown> }>()
   return {
     useLocalStore: () => store,
     useSiteStore: () => store,

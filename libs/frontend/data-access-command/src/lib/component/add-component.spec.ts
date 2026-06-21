@@ -1,4 +1,5 @@
 import { builtinBehaviors } from '@pubstudio/frontend/util-builtin'
+import { DEFAULT_BREAKPOINT_ID } from '@pubstudio/frontend/util-defaults'
 import { noBehaviorId } from '@pubstudio/frontend/util-ids'
 import { resolveComponent } from '@pubstudio/frontend/util-resolve'
 import { deserializeSite } from '@pubstudio/frontend/util-site-deserialize'
@@ -24,22 +25,19 @@ import {
 import { toggleComponentTreeHidden } from '../editor-helpers'
 import { applyAddComponent, undoAddComponent } from './add-component'
 
-vi.mock('@pubstudio/frontend/util-runtime', async (importOriginal) => {
-  // Imported inside the factory: vi.mock is hoisted above the file's imports,
-  // so out-of-scope (imported) bindings can't be referenced directly.
-  const { DEFAULT_BREAKPOINT_ID } = await import('@pubstudio/frontend/util-defaults')
-  // We can't use ref or computed here because Vue instance is not initialized here
-  const activeBreakpoint: IBreakpoint = {
-    id: DEFAULT_BREAKPOINT_ID,
-    name: 'Desktop (default)',
-  }
-  return {
-    ...(await importOriginal<typeof import('@pubstudio/frontend/util-runtime')>()),
-    activeBreakpoint: {
-      value: activeBreakpoint,
-    },
-  }
-})
+// vi.mock is hoisted above the file's imports, so the breakpoint holder is created
+// via vi.hoisted and its id is filled in from the static util-defaults import below.
+// We can't use ref or computed here because Vue is not initialized.
+const { activeBreakpoint } = vi.hoisted(() => ({
+  activeBreakpoint: { value: { id: '', name: 'Desktop (default)' } as IBreakpoint },
+}))
+
+vi.mock('@pubstudio/frontend/util-runtime', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@pubstudio/frontend/util-runtime')>()),
+  activeBreakpoint,
+}))
+
+activeBreakpoint.value.id = DEFAULT_BREAKPOINT_ID
 
 describe('Add Component', () => {
   let siteString: string
