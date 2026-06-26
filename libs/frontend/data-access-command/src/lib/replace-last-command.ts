@@ -13,7 +13,7 @@ export const replaceLastCommand = (site: ISite, command: ICommand, save?: boolea
     applyCommand(site, command)
     history.back[history.back.length - 1] = command
     if (save ?? true) {
-      site.editor?.store?.save(site)
+      site.editor?.store?.save?.(site)
     }
   }
 }
@@ -39,7 +39,7 @@ export const appendLastCommand = (site: ISite, command: ICommand, save?: boolean
     applyCommand(site, command)
     history.back[history.back.length - 1] = newCmd
     if (save ?? true) {
-      site.editor?.store?.save(site)
+      site.editor?.store?.save?.(site)
     }
   }
 }
