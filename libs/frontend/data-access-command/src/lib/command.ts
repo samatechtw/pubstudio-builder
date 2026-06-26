@@ -90,7 +90,7 @@ export const pushCommandObject = (
   options?: IPushCommandOptions,
 ) => {
   pushCommandHelper(site, command, options)
-  site.editor?.store?.save(site)
+  site.editor?.store?.save?.(site)
 }
 
 export const getLastCommand = (site: ISite): ICommand | undefined => {
@@ -109,14 +109,14 @@ const undoLastCommandHelper = (site: ISite) => {
 
 export const undoLastCommand = (site: ISite) => {
   undoLastCommandHelper(site)
-  site.editor?.store?.save(site)
+  site.editor?.store?.save?.(site)
 }
 
 export const undoN = (site: ISite, n: number) => {
   for (let i = 0; i < n; i += 1) {
     undoLastCommand(site)
   }
-  site.editor?.store?.save(site)
+  site.editor?.store?.save?.(site)
 }
 
 // Redo the most recent un-done command
@@ -135,14 +135,14 @@ export const redoN = (site: ISite, n: number) => {
       pushCommandHelper(site, command, { isRedo: true })
     }
   }
-  site.editor?.store?.save(site)
+  site.editor?.store?.save?.(site)
 }
 
 // Clear all undo/redo history
 export const clearAll = (site: ISite) => {
   site.history.back = []
   site.history.forward = []
-  site.editor?.store?.save(site)
+  site.editor?.store?.save?.(site)
 }
 
 // Clear a percentage of undo history
@@ -153,6 +153,6 @@ export const clearPartial = (site: ISite, percent: number) => {
   if (clearCount < back.length) {
     site.history.back = back.slice(clearCount, back.length)
     console.log(`Cleared ${clearCount} items from history`)
-    site.editor?.store?.save(site)
+    site.editor?.store?.save?.(site)
   }
 }
