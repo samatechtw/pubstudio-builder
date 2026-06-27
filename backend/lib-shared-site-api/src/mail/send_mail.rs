@@ -2,9 +2,11 @@ use lib_shared_types::shared::core::ExecEnv;
 use reqwest::header;
 
 use serde_json::json;
-use tracing::error;
+use tracing::{error, info};
 
 use super::{MailError, MailParams};
+
+const SLACK_BODY_PREVIEW_LEN: usize = 2000;
 
 pub async fn send_mails(
     params: MailParams,
@@ -12,13 +14,37 @@ pub async fn send_mails(
     text: Option<String>,
     html: Option<String>,
 ) -> Result<(), MailError> {
+    if params.env == ExecEnv::Dev || params.env == ExecEnv::Ci {
+        return Ok(());
+    }
+
     let subject_with_env = if params.env == ExecEnv::Prod {
         subject.to_string()
     } else {
         format!("({}) {}", params.env, subject)
     };
 
-    if params.env == ExecEnv::Dev || params.env == ExecEnv::Ci {
+    // In stg, bypass the mail provider and send to stg-info Slack channel.
+    if params.env == ExecEnv::Stg {
+        let recipients = params
+            .recipients
+            .iter()
+            .map(|r| r.email.as_str())
+            .collect::<Vec<_>>()
+            .join(", ");
+        let full_body = text.or(html).unwrap_or_default();
+        let body = if full_body.chars().count() > SLACK_BODY_PREVIEW_LEN {
+            let preview: String = full_body.chars().take(SLACK_BODY_PREVIEW_LEN).collect();
+            format!("{preview}… (truncated)")
+        } else {
+            full_body
+        };
+        info!(
+            recipients = recipients,
+            body = body,
+            "Staging mail bypass: {}",
+            subject_with_env
+        );
         return Ok(());
     }
 
