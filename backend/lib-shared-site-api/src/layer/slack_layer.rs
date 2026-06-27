@@ -149,13 +149,18 @@ impl SlackLayer {
             Level::ERROR => ":x:",
         };
 
+        let location = match (event.metadata().file(), event.metadata().line()) {
+            (Some(file), Some(line)) => format!(" {}:{}", file, line),
+            (Some(file), None) => format!(" {}", file),
+            _ => String::new(),
+        };
+
         let mut blocks = vec![
-            SlackMessage::section_text(&format!("{} *{}*", event_level_emoji, event_level)),
-            SlackMessage::section_text(&format!("> *{}*", message)),
             SlackMessage::section_text(&format!(
-                "*Source*\n{}",
-                &event.metadata().name().replace("event", "")
+                "{} *{}*{}",
+                event_level_emoji, event_level, location
             )),
+            SlackMessage::section_text(&format!("> *{}*", message)),
         ];
         if metadata.len() > 0 && metadata != "{}" {
             blocks.push(SlackMessage::section_text("*Metadata:*"));
