@@ -77,6 +77,11 @@ function getBreakpointStyleThemeVars(
 
 const showReplaceRootModalData = ref<ClipboardData | undefined>()
 
+// Serialized copy of the last component copied in this session, so paste can use it
+// without racing the async navigator.clipboard.write.
+// The system clipboard is still used for external site/cross-tab pastes.
+const localCopyData = ref<string>()
+
 export const useCopyPaste = (): IUseCopyPaste => {
   const {
     site,
@@ -147,13 +152,15 @@ export const useCopyPaste = (): IUseCopyPaste => {
         styles,
         theme,
       }
+      const serializedCopyData = JSON.stringify(copyData)
+      localCopyData.value = serializedCopyData
       addHUD({ text: 'Copied' })
 
       // Firefox doesn't support clipboard.write ^_^
       if (typeof ClipboardItem && navigator.clipboard.write) {
         navigator.clipboard.write([
           new ClipboardItem({
-            'web text/pubstudio': new Blob([JSON.stringify(copyData)], {
+            'web text/pubstudio': new Blob([serializedCopyData], {
               type: 'web text/pubstudio',
             }),
             'text/plain': new Blob([serialized.content ?? ''], { type: 'text/plain' }),
@@ -168,13 +175,37 @@ export const useCopyPaste = (): IUseCopyPaste => {
     addHUD({ text: 'Style Pasted' })
   }
 
+  // Resolve a copied component into paste data, deduplicating and re-namespacing
+  // it when it originated from a different site.
+  const toClipboardData = (
+    copiedComponent: ICopiedComponent,
+    text?: string,
+  ): ClipboardData | undefined => {
+    const isLocal = copiedComponent.siteId === apiSiteId.value
+    if (isLocal) {
+      return { text, copiedComponent, isLocal }
+    }
+    const oldNamespace = parseNamespace(copiedComponent.component.id)
+    if (!oldNamespace) {
+      return undefined
+    }
+    const externalComponent = deduplicateExternalComponent(site.value, copiedComponent)
+    replacePastedComponentNamespace(
+      externalComponent.component,
+      oldNamespace,
+      site.value.context.namespace,
+    )
+    return { text, copiedComponent: externalComponent, isLocal }
+  }
+
   const getClipboardData = async (): Promise<ClipboardData | undefined> => {
     const { selectedComponent } = site.value.editor ?? {}
     if (!selectedComponent) return undefined
+    if (localCopyData.value) {
+      return toClipboardData(JSON.parse(localCopyData.value) as ICopiedComponent)
+    }
     try {
       let text: string | undefined
-      let copiedComponent: ICopiedComponent | undefined
-      let isLocal = true
       // Iterate over all clipboard items.
       const clipboardItems = await navigator.clipboard.read()
       for (const clipboardItem of clipboardItems) {
@@ -187,22 +218,9 @@ export const useCopyPaste = (): IUseCopyPaste => {
         }
         if (clipboardItem.types.includes('web text/pubstudio')) {
           const blob = await clipboardItem.getType('web text/pubstudio')
-          copiedComponent = JSON.parse(await blob.text()) as ICopiedComponent
-          isLocal = copiedComponent.siteId === apiSiteId.value
-          if (!isLocal) {
-            const oldNamespace = parseNamespace(copiedComponent.component.id)
-            if (!oldNamespace) {
-              return undefined
-            }
-            copiedComponent = deduplicateExternalComponent(site.value, copiedComponent)
-            replacePastedComponentNamespace(
-              copiedComponent.component,
-              oldNamespace,
-              site.value.context.namespace,
-            )
-          }
+          return toClipboardData(JSON.parse(await blob.text()) as ICopiedComponent, text)
         }
-        return { text, copiedComponent, isLocal }
+        return { text, copiedComponent: undefined, isLocal: true }
       }
     } catch (err) {
       console.error('Failed to paste from clipboard', err)
