@@ -1,5 +1,6 @@
 import {
   createQueryStyle,
+  escapeCssForStyleTag,
   iterateMixin,
   queryStyleToString,
   rawStyleToResolvedStyle,
@@ -52,7 +53,7 @@ export const useRender = (options: IUseRenderOptions): IUseRender => {
 
       styleContent += queryStyleToString(site.value.context, queryStyle)
     }
-    return h('style', styleContent)
+    return h('style', { innerHTML: escapeCssForStyleTag(styleContent) })
   })
 
   const Mixins = defineComponent({
@@ -76,8 +77,8 @@ export const useRender = (options: IUseRenderOptions): IUseRender => {
       styleContent = queryStyleToString(context, pageStyle.component)
     }
     return {
-      component: h('style', styleContent),
-      custom: h('style', customContent),
+      component: h('style', { innerHTML: escapeCssForStyleTag(styleContent) }),
+      custom: h('style', { innerHTML: escapeCssForStyleTag(customContent) }),
     }
   })
 

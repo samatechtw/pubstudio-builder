@@ -71,6 +71,35 @@ describe('generateSite', () => {
     expect(home?.body).toContain('id="test-c-1"')
   })
 
+  it('emits raw CSS in <style> and neutralizes closing tags', async () => {
+    const input = makeInput((site) => {
+      site.context.globalStyles = {
+        'global-bg': {
+          style:
+            '.hero{background-image:url(https://img.example.com/p.jpg?w=100&fit=crop);}' +
+            '@media (width < 600px){.hero{display:none;}}',
+        },
+        'global-escape': {
+          style: '.x{content:"</style><script>alert(1)</script>";}',
+        },
+      }
+    })
+    const result = await generateSite(input)
+    const home = result.pages.find((p) => p.route === '/')
+
+    // `<style>` is an HTML raw text element, so an escaped `&` would reach the browser as a
+    // literal `&amp;` and corrupt every url() query string
+    expect(home?.body).toContain('url(https://img.example.com/p.jpg?w=100&fit=crop)')
+    expect(home?.body).not.toContain('&amp;fit=crop')
+    // Author CSS may legitimately contain `<`, e.g. range media queries
+    expect(home?.body).toContain('@media (width < 600px)')
+    // ...but must never be able to close the style element
+    // (a bare `<script>` is inert inside raw text -- only `</style` can terminate the element)
+    expect(home?.body).not.toContain('</style><script>')
+    expect(home?.body).toContain('\\00003c/style>')
+    expect(home?.body).toContain('\\00003c/script>')
+  })
+
   it('refuses noJs when the site has interactive features', async () => {
     const input = makeInput((site) => {
       site.pages['/home'].root.events = {
