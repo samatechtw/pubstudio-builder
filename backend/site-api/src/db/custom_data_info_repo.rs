@@ -233,32 +233,21 @@ impl CustomDataInfoRepoTrait for CustomDataInfoRepo {
         Ok(columns)
     }
 
+    // Bytes on disk used by the site's custom data tables. `dbstat` reports per-btree
+    // page usage, so only the customer's own tables are measured.
     async fn get_custom_tables_size(&self, id: &str) -> Result<i64, DbError> {
         let mut conn = self.get_db_conn(id).await?;
 
         let row = sqlx::query(
             r#"
             SELECT
-                SUM(total_bytes) AS size
-            FROM (
-                SELECT
-                    name,
-                    (page_count * page_size) AS total_bytes
-                FROM
-                    pragma_page_size
-                JOIN
-                    pragma_page_count ON 1 = 1
-                JOIN
-                    sqlite_master ON type = 'table'
-                WHERE
-                    name NOT LIKE 'sqlite_%'
-                AND
-                    name != 'site_versions'
-                AND
-                    name != 'custom_data_info'
-                AND
-                    name != '_sqlx_migrations'
-            );
+                COALESCE(SUM(dbstat.pgsize), 0) AS size
+            FROM
+                dbstat
+            JOIN
+                sqlite_master ON sqlite_master.name = dbstat.name
+            WHERE
+                sqlite_master.tbl_name IN (SELECT name FROM custom_data_info);
             "#,
         )
         .fetch_one(&mut *conn)

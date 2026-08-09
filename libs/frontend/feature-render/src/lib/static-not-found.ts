@@ -1,9 +1,6 @@
 import { defineComponent, h } from 'vue'
 
-// Plain-TS not-found component for static rendering and hydration. Sites
-// normally provide a /not-found page; this only renders on client-side
-// navigation to an unknown route. Kept SFC-free so the SSG CLI (esno) and the
-// hydration runtime (no CSS extraction) can use it.
+// not-found component fallback for static rendering and hydration.
 export const StaticNotFound = defineComponent({
   name: 'StaticNotFound',
   render() {
@@ -16,7 +13,7 @@ export const StaticNotFound = defineComponent({
           'justify-content': 'center',
           padding: '40px 16px',
           'font-family': 'Helvetica, sans-serif',
-          'font-size': '20px',
+          'font-size': '24px',
         },
       },
       'Page not found',

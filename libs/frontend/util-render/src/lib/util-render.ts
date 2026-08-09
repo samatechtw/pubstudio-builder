@@ -13,9 +13,7 @@ import {
 import { breakpointSortFn } from './sort-breakpoint-fn'
 import { IQueryStyle, IRawStyleRecord } from './util-render-types'
 
-// CSS.supports validation is skipped in static (SSG/hydration) rendering.
-// `CSS` is undefined in Node, and the prerendered <style> text must match the
-// hydrating client's output exactly, so both sides disable validation.
+// CSS.supports validation is skipped in static rendering.
 let validateCssSupport = true
 
 export const setCssValidation = (enabled: boolean) => {

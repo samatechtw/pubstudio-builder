@@ -10,16 +10,13 @@ import { overrideHelper } from '@pubstudio/frontend/util-resolve'
 import { INameNavigateOptions, IRouter } from '@pubstudio/frontend/util-router'
 import { setSiteRouter } from '@pubstudio/frontend/util-runtime'
 import { loadSiteLanguage, unstoreSite } from '@pubstudio/frontend/util-site-deserialize'
-import { IStaticSitePayload } from '@pubstudio/shared/type-api-site-sites'
-import { ISite } from '@pubstudio/shared/type-site'
+import { ISite, IStaticSitePayload } from '@pubstudio/shared/type-site'
 import { rootSiteApi } from '@pubstudio/shared/util-web-site-api'
 import { computed, createSSRApp, ref, Ref } from 'vue'
 import './window-vue'
 
-// Hydration runtime for statically generated (SSG) pages. The page body is
-// already prerendered; this script reads the inlined site payload, rebuilds
-// the same render tree in `static` mode, and hydrates it with createSSRApp —
-// no site JSON fetch, no client-side re-render from scratch.
+// Hydration runtime for SSG pages. The page body is already prerendered, this script reads
+// the inlined site payload, rebuilds the same render tree in `static` mode, and hydrates.
 
 declare global {
   interface Window {
@@ -30,8 +27,6 @@ declare global {
 
 const setupSiteApi = (payload: IStaticSitePayload) => {
   rootSiteApi.siteId.value = payload.id
-  // The generator may emit a `___SITE_API_URL___` placeholder which
-  // platform-api substitutes at serve time (same mechanism as App.vue).
   // When absent or unreplaced, the Site API is same-origin.
   const apiUrl = window.__PUBSTUDIO_SITE_API__
   if (apiUrl && !apiUrl.startsWith('___')) {
@@ -48,9 +43,9 @@ const setupSiteApi = (payload: IStaticSitePayload) => {
   }
 }
 
-// Route resolution sets matchedRoutes in a promise callback; wait for it so
+// Route resolution sets matchedRoutes in a promise callback, wait for it so
 // the correct page hydrates (a NotFound flash would mismatch the markup)
-const waitForRoute = async (router: IRouter<unknown>) => {
+const waitForRoute = async <M>(router: IRouter<M>) => {
   for (let i = 0; i < 100; i += 1) {
     if (router.route.value) {
       return
@@ -65,33 +60,30 @@ const main = async () => {
     console.error('Missing site payload, hydration skipped')
     return
   }
-  // Match the SSG prerender: no CSS.supports filtering of style declarations
+  // Match the SSG prerender (no CSS.supports style filtering)
   setCssValidation(false)
 
   const router = setSiteRouter(StaticNotFound)
   router.initialize()
   setupSiteApi(payload)
 
-  const userSite = unstoreSite({
-    name: payload.name,
-    version: payload.version,
-    defaults: payload.defaults,
-    context: payload.context,
-    pages: payload.pages,
-    pageOrder: payload.pageOrder,
-  })
+  // IStaticSitePayload is the IStoredSite encoding, so it deserializes directly
+  const userSite = unstoreSite(payload)
   if (!userSite) {
     console.error('Invalid site payload, hydration skipped')
     return
   }
 
-  const site = ref<ISite>(userSite)
+  // Deep reactivity is needed for post-mount site mutations (language, component state).
+  // `ref` unwraps the nested refs in ISite.editor.store, which widens the inferred type
+  // away from ISite. This site never has an editor, so cast it back.
+  const site = ref(userSite) as Ref<ISite>
   const { notFoundPage } = useNotFoundPage(site)
   const activePage = computed(() => {
     const page = site.value.pages[router.route.value?.path ?? '']
     return page ?? notFoundPage.value
   })
-  const { App, render } = createStaticSiteApp(site as Ref<ISite>, activePage)
+  const { App, render } = createStaticSiteApp(site, activePage)
 
   router.afterEach((newRoute, oldRoute) => {
     const page = site.value.pages[newRoute?.path ?? '']
@@ -99,9 +91,7 @@ const main = async () => {
     if (oldRoute && oldRoute.name !== 'NotFound') {
       oldPage = site.value.pages[oldRoute?.path ?? '']
     }
-    // The initial head is prerendered; only update it on client-side
-    // navigation (running replaceHead over a prerendered head would
-    // duplicate its <link>/<script> tags)
+    // The initial head is prerendered, only update it on client nav.
     if (oldPage && oldPage !== page) {
       replaceHead(site.value, page, oldPage)
     }
@@ -124,8 +114,7 @@ const main = async () => {
 
   createSSRApp(App).mount('#app')
 
-  // Apply the user's stored/browser language after hydration (post-mount
-  // updates cannot cause hydration mismatches)
+  // Apply the user's stored/browser language after hydration to avoid mismatch.
   loadSiteLanguage(site.value)
 }
 

@@ -1,5 +1,4 @@
-# SSG service: prerenders published sites to static HTML.
-# Build the bundle first: npx nx build ssg  (outputs to dist/apps/ssg)
+# Prerenders published sites to static HTML. Build the bundle first: npx nx build ssg
 FROM node:22-slim
 WORKDIR /usr/src/ssg
 

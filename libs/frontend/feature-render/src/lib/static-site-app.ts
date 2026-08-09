@@ -9,11 +9,8 @@ export interface IStaticSiteApp {
   render: IUseRender
 }
 
-// Root component shared by the SSG prerender (via @vue/server-renderer) and
-// the hydration runtime (via createSSRApp). Both sides render this exact
-// component in `static` mode, so the prerendered markup and the hydrating
-// client's markup match by construction.
-// The child order must not change: it defines the prerendered DOM structure.
+// Root component shared by the SSG prerender and hydration runtime. Both sides
+// render this in `static` mode to ensure matching markup.
 export const createStaticSiteApp = (
   site: Ref<ISite>,
   activePage: Ref<IPage | undefined>,

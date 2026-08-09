@@ -3,12 +3,10 @@ import path from 'node:path'
 import { generateSite } from './lib/generate-site'
 import { ISsgSiteInput } from './lib/ssg-types'
 
-// CLI for local generation / full static exports:
+// CLI for static site exports:
 //   npx esno --tsconfig apps/ssg/tsconfig.json apps/ssg/src/cli.ts \
 //     --site site.json --out dist/ssg-out [--base-url https://example.com] \
 //     [--runtime /_ps/site.js] [--no-js] [--force]
-// The site JSON file holds an ISsgSiteInput (fields may be plain objects or
-// JSON-encoded strings, e.g. copied from a site DB or API response).
 
 interface ICliArgs {
   site: string

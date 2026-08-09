@@ -71,8 +71,8 @@ export const requestHandler = async (
   }
 }
 
-// Note: not SSG_PORT — the Kubernetes service named `ssg` injects
-// SSG_PORT=tcp://... service-link vars into pods in the namespace
+// Not SSG_PORT, the Kubernetes `ssg` service injects SSG_PORT=tcp://...
+// service-link vars into pods in the namespace
 const port = Number(process.env.PORT || 3200)
 const host = process.env.HOST || '0.0.0.0'
 

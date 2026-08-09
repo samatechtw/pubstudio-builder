@@ -34,9 +34,9 @@ export const LiveComponent = () => {
     },
     setup(props: ILiveComponentProps) {
       const { site, component, renderMode } = toRefs(props)
-      // Static mode renders under @vue/server-renderer (no DOM) and must emit
-      // markup identical to the hydrating client, so event registration is
-      // deferred to onMounted and the router (plain <a href>) is not used.
+      // Static mode renders under @vue/server-renderer (no DOM) and must emit markup
+      // identical to the hydrating client, so event registration is deferred to
+      // onMounted and the router (plain <a href>) is not used.
       const isStatic = renderMode.value === 'static'
       if (!isStatic) {
         registerCustomEvents(site.value, component.value, false)
@@ -75,7 +75,7 @@ export const LiveComponent = () => {
         }
         if (tag === 'a') {
           if (!router) {
-            // Static prerender/hydration: plain anchor, full-page navigation
+            // Plain anchor, full-page navigation for prerender/hydration
             return h('a', renderProps, children)
           }
           const path = router.pathTransform((props.href as string) ?? '')

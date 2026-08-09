@@ -7,10 +7,9 @@ use lib_shared_types::dto::site_api::ssg_dto::{GetStaticPageQuery, StaticPageVie
 
 use crate::{api_context::ApiContext, app::ssg::static_serve::serve_static_page};
 
-// Returns the statically generated page served for a request path (unknown routes fall
-// back to the site's /not-found page, signaled by `route`), or 404 when the site has no
-// fresh static pages. Usage accounting (bandwidth check, view count) is applied here since
-// the page is served to a visitor by the caller.
+// Returns the SSG page served for a request path (unknown routes fall back to the site's
+// /not-found page, signaled by `route`), or 404 when the site has no fresh static pages.
+// Usage tracking is applied here since the page is served to a visitor by the caller.
 pub async fn get_static_page(
     Path(site_id): Path<String>,
     Query(query): Query<GetStaticPageQuery>,

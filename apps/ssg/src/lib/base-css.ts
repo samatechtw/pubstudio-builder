@@ -1,6 +1,6 @@
-// Base page CSS emitted into each generated page's <head>.
-// Keep in sync with the <style> block in apps/web-site/src/app/App.vue
-// (loading spinner / error styles omitted — static pages never show them).
+// Base page CSS emitted into each generated page's <head>, keep synced with the
+// <style> block in apps/web-site/src/app/App.vue (loading spinner / error styles omitted).
+// TODO -- automatically generate this when App.vue changes
 export const BASE_PAGE_CSS = [
   'html,body{padding:0;margin:0;width:100%;height:100%;}',
   'html *,body *{box-sizing:border-box;}',

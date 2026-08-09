@@ -16,10 +16,8 @@ pub fn normalize_route(path: &str) -> String {
     }
 }
 
-// Look up a generated static page for the current published site content.
-// Returns None when the site is disabled/unpublished, no page was generated
-// for the route, or the stored page is stale (site content changed since
-// generation) — callers fall back to the SPA shell.
+// Look up an SSG page for the current published site. Returns None when the site is
+// disabled/unpublished, no page was generated for the route, or the stored page is stale.
 pub async fn get_fresh_static_page(
     context: &ApiContext,
     site_id: &str,
