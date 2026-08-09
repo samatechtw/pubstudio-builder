@@ -18,7 +18,6 @@ use site_api::db::site_repo::{DynSiteRepo, SiteRepo};
 use site_api::db::sites_metadata_repo::{DynSitesMetadataRepo, SitesMetadataRepo};
 use site_api::db::usage_repo::{DynUsageRepo, UsageRepo};
 use sqlx::migrate::MigrateDatabase;
-use sqlx::sqlite::SqlitePool;
 use std::collections::HashMap;
 use std::sync::Arc;
 use tower::ServiceBuilder;
@@ -60,13 +59,17 @@ async fn main() {
     // Setup tracing
     let _guard = setup_logging(CRATE_NAME);
 
+    let site_db_pools = Arc::new(RwLock::new(HashMap::default()));
+    let db_pool_manager = DbPoolManager::new(site_db_pools, config.sqlite_journal_mode);
+    println!("SQLite journal mode: {:?}", config.sqlite_journal_mode);
+
     // Set up metadata database
     let metadata_db_url = &format!("sqlite:{}/db/metadata/sites_metadata.db", manifest_dir);
     if !sqlx::Any::database_exists(metadata_db_url).await.unwrap() {
         sqlx::Any::create_database(metadata_db_url).await.unwrap();
         println!("created sqlite metadata database: {}", metadata_db_url);
     }
-    let metadata_db_pool = SqlitePool::connect(metadata_db_url).await.unwrap();
+    let metadata_db_pool = db_pool_manager.connect(metadata_db_url).await.unwrap();
 
     // Set up ApiContext
     let metadata_repo = Arc::new(SitesMetadataRepo {
@@ -78,9 +81,6 @@ async fn main() {
     let usage_repo = Arc::new(UsageRepo {
         metadata_db_pool: metadata_db_pool.clone(),
     }) as DynUsageRepo;
-
-    let site_db_pools = Arc::new(RwLock::new(HashMap::default()));
-    let db_pool_manager = DbPoolManager::new(site_db_pools);
 
     let site_repo = Arc::new(SiteRepo {
         db_pool_manager: db_pool_manager.clone(),

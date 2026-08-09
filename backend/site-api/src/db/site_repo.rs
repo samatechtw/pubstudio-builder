@@ -17,11 +17,7 @@ use lib_shared_types::{
         site_metadata_entity::SiteMetadataEntity, static_page_entity::StaticPageEntity,
     },
 };
-use sqlx::{
-    migrate::MigrateDatabase,
-    sqlite::{SqlitePoolOptions, SqliteRow},
-    Error, QueryBuilder, Row, SqlitePool,
-};
+use sqlx::{migrate::MigrateDatabase, sqlite::SqliteRow, Error, QueryBuilder, Row, SqlitePool};
 use std::{
     fs::{self, File},
     io::Write,
@@ -264,7 +260,7 @@ impl SiteRepoTrait for SiteRepo {
         }
 
         // Connect to the database
-        let pool = SqlitePoolOptions::new().connect(&site_db_url).await?;
+        let pool = self.db_pool_manager.connect(&site_db_url).await?;
 
         // Insert the connection pool into the map.
         self.db_pool_manager
@@ -474,7 +470,7 @@ impl SiteRepoTrait for SiteRepo {
 
         // Create new DB pool
         let site_db_url = self.site_db_url(id);
-        let pool = SqlitePoolOptions::new().connect(&site_db_url).await?;
+        let pool = self.db_pool_manager.connect(&site_db_url).await?;
         self.db_pool_manager
             .insert_db_pool(id, pool.clone())
             .await?;

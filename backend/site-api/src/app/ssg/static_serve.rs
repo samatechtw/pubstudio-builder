@@ -1,5 +1,6 @@
-use lib_shared_site_api::error::api_error::ApiError;
+use lib_shared_site_api::{db::db_error::DbError, error::api_error::ApiError};
 use lib_shared_types::entity::site_api::static_page_entity::StaticPageEntity;
+use tracing::error;
 
 use crate::{
     api_context::ApiContext,
@@ -32,8 +33,19 @@ pub async fn get_fresh_static_page(
         return Ok(None);
     }
     let route = normalize_route(path);
-    let Ok(page) = context.site_repo.get_static_page(site_id, &route).await else {
-        return Ok(None);
+    let page = match context.site_repo.get_static_page(site_id, &route).await {
+        Ok(page) => page,
+        // No row route is a normal miss, anything else is a real DB failure to be reported
+        Err(DbError::SqlxError(sqlx::Error::RowNotFound)) | Err(DbError::EntityNotFound()) => {
+            return Ok(None);
+        }
+        Err(e) => {
+            error!(
+                "static page lookup failed for site {} route {}: {}",
+                site_id, route, e
+            );
+            return Ok(None);
+        }
     };
     if page.content_updated_at != site.content_updated_at {
         return Ok(None);
