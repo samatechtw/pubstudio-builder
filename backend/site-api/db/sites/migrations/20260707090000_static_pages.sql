@@ -1,7 +1,5 @@
--- Statically generated (SSG) pages for the published site version.
--- Rows are replaced wholesale on publish; `content_updated_at` mirrors the
--- published site_versions row at generation time and is used as a freshness
--- check by the serve path.
+-- SSG pages for the published site version. Rows are replaced wholesale on publish,
+-- `content_updated_at` matches published site_versions row at generation time.
 CREATE TABLE IF NOT EXISTS static_pages (
     route TEXT PRIMARY KEY NOT NULL,
     body TEXT NOT NULL,

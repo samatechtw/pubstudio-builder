@@ -4,12 +4,12 @@ import {
   ISerializedSiteContext,
   ISiteDefaults,
 } from '@pubstudio/shared/type-site'
+import { filterRecord } from '@pubstudio/shared/util-core'
 import { ISsgSiteInput } from './ssg-types'
 
-// Site DB columns hold JSON-encoded strings, and passing them through the API
-// adds another encoding layer, so a field may arrive as an object, a JSON
-// string, or a JSON string wrapping another JSON string. Unwrap until a
-// non-string value appears.
+// Site DB columns hold JSON-encoded strings, and passing them through the API adds
+// another encoding layer, so fields can arrive as objects, JSON strings, or a JSON
+// string wrapping another JSON string. Unwrap until a non-string value appears.
 export const parseJsonField = <T>(value: unknown): T | undefined => {
   let result: unknown = value
   let depth = 0
@@ -33,12 +33,7 @@ export const normalizeSiteInput = (input: ISsgSiteInput): INormalizedSiteInput =
   if (!defaults || !context || !pages) {
     throw new Error('Site input is missing defaults, context, or pages')
   }
-  const publicPages: Record<string, ISerializedPage> = {}
-  for (const [key, page] of Object.entries(pages)) {
-    if (page.public) {
-      publicPages[key] = page
-    }
-  }
+  const publicPages = filterRecord(pages, (page) => !!page.public)
   const serialized: ISerializedSite = {
     name: input.name,
     version: input.version,
@@ -48,7 +43,8 @@ export const normalizeSiteInput = (input: ISsgSiteInput): INormalizedSiteInput =
     pageOrder:
       pageOrder?.filter((route) => route in publicPages) ?? Object.keys(publicPages),
     history: { back: [], forward: [] },
-    updated_at: input.updated_at ?? undefined,
+    // Epoch millis from site API `SsgSiteDto`, or ISO string from a CLI fixture.
+    updated_at: input.updated_at ? new Date(input.updated_at).toISOString() : undefined,
   }
   return { serialized, publicPages }
 }

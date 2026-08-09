@@ -147,7 +147,7 @@ describe('Persist Site Usage', () => {
       .expect(200)
     const body1: IGetSiteUsageApiResponse = res1.body
     expect(body1.custom_data_usage).toEqual(0)
-    expect(body1.custom_data_allowance).toEqual(40000)
+    expect(body1.custom_data_allowance).toEqual(4096)
 
     await createTable(siteId)
 
@@ -161,7 +161,9 @@ describe('Persist Site Usage', () => {
       .expect(200)
 
     const body2: IGetSiteUsageApiResponse = res2.body
-    expect(body2.custom_data_usage).toEqual(65536) // 2 tables
+    // Bytes actually used by the 2 custom tables, one empty root page each.
+    // Internal tables (site content, SSG static pages) are not counted.
+    expect(body2.custom_data_usage).toEqual(8192)
   })
 
   it('returns error when custom data size exceeds allowance', async () => {

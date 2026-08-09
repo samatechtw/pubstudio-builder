@@ -39,23 +39,20 @@ fn serve_site_js(context: &ApiContext) -> Response {
     let js = if context.config.exec_env == ExecEnv::Dev {
         get_site_js_dev()
     } else {
-        get_site_js().map(|js| js.to_string())
+        get_site_js().to_string()
     };
-    match js {
-        Some(js) => (
-            StatusCode::OK,
-            [
-                (header::CONTENT_TYPE, "application/javascript".to_string()),
-                (
-                    header::CACHE_CONTROL,
-                    "public, max-age=31536000, immutable".to_string(),
-                ),
-            ],
-            js,
-        )
-            .into_response(),
-        None => (StatusCode::NOT_FOUND, "Not found").into_response(),
-    }
+    (
+        StatusCode::OK,
+        [
+            (header::CONTENT_TYPE, "application/javascript".to_string()),
+            (
+                header::CACHE_CONTROL,
+                "public, max-age=31536000, immutable".to_string(),
+            ),
+        ],
+        js,
+    )
+        .into_response()
 }
 
 // Serve a statically generated page when a fresh one exists for the current

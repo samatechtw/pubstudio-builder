@@ -24,16 +24,12 @@ const tagAttrs = (attrs: HeadTagAttrs): string => {
       if (value === undefined || value === null || value === false || name === 'key') {
         return ''
       }
-      if (value === true) {
-        return ` ${name}`
-      }
-      return ` ${name}="${escapeAttr(String(value))}"`
+      return value === true ? ` ${name}` : ` ${name}="${escapeAttr(String(value))}"`
     })
     .join('')
 }
 
-// Default favicon (matches apps/web-site/index.html) to avoid /favicon.ico
-// requests when the site has no icon configured
+// Default favicon to avoid /favicon.ico requests when the site has no icon configured
 const DEFAULT_FAVICON: IHeadLink = {
   rel: 'icon',
   type: 'image/png',
@@ -68,9 +64,8 @@ export const buildHtmlPage = (options: IHtmlPageOptions): string => {
   if (payloadJson && runtimeSrc) {
     // Escape `<` so `</script>` inside the JSON cannot close the tag early
     const safePayload = payloadJson.replace(/</g, '\\u003c')
-    // The ___SITE_API_URL___ placeholder is substituted by platform-api when
-    // it serves the page (same mechanism as the SPA shell); site-api serves
-    // it raw and the hydration runtime falls back to the same-origin API
+    // ___SITE_API_URL___ is substituted by platform-api when it serves the page.
+    // site-api serves it raw and the hydration runtime falls back to the same-origin API
     bodyLines.push(
       `<script>window.__PUBSTUDIO_SITE_API__ = '___SITE_API_URL___';` +
         `window.__PUBSTUDIO_SITE__ = ${safePayload}</script>`,

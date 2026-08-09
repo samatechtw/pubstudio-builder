@@ -19,10 +19,8 @@ fn base_url_from_domain(domain: &str) -> String {
     }
 }
 
-// Prerender the published site with the SSG service and store the result in
-// the per-site static_pages table. Clears stored pages when the site is
-// unpublished or generation fails (an SPA-shell fallback is always correct;
-// stale static pages are not).
+// Prerender the published site with the SSG service and store the result in the static_pages
+// table. Clears stored pages when the site is unpublished or generation fails.
 pub async fn regenerate_static_pages(context: &ApiContext, site_id: &str) -> Result<(), ApiError> {
     let Some(ssg_url) = context.config.ssg_url.clone() else {
         return Ok(());
@@ -102,10 +100,8 @@ pub async fn regenerate_static_pages(context: &ApiContext, site_id: &str) -> Res
     }
 }
 
-// Fire-and-forget regeneration, used by publish/update handlers. When
-// `expected_content_updated_at` is set, the regeneration is skipped if the
-// published content changed in the meantime (a newer task will handle it) —
-// this debounces bursts of builder saves.
+// Fire-and-forget regeneration, used by publish/update handlers. Skipped when
+// `expected_content_updated_at` is set to debounce builder saves.
 pub fn spawn_regenerate_static_pages(
     context: &ApiContext,
     site_id: &str,

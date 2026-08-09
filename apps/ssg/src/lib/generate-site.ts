@@ -1,11 +1,13 @@
-import { getHead } from '@pubstudio/frontend/feature-render'
+import { createStaticSiteApp, getHead } from '@pubstudio/frontend/feature-render'
 import { setCssValidation } from '@pubstudio/frontend/util-render'
 import { deserializedHelper } from '@pubstudio/frontend/util-site-deserialize'
+import { IPage, ISite, IStaticSitePayload } from '@pubstudio/shared/type-site'
+import { renderToString } from '@vue/server-renderer'
+import { createSSRApp, shallowRef } from 'vue'
 import { detectNoJsBlockers } from './detect-capabilities'
 import { emitRobots, emitSitemap } from './emit-sitemap'
 import { buildHtmlPage } from './html-page'
 import { normalizeSiteInput } from './normalize-input'
-import { renderPageBody } from './render-page'
 import {
   DEFAULT_RUNTIME_SRC,
   ISsgOptions,
@@ -14,6 +16,13 @@ import {
   IStaticPage,
   SSG_GENERATOR,
 } from './ssg-types'
+
+export const renderPageBody = async (site: ISite, page: IPage): Promise<string> => {
+  const siteRef = shallowRef(site)
+  const pageRef = shallowRef<IPage | undefined>(page)
+  const { App } = createStaticSiteApp(siteRef, pageRef)
+  return renderToString(createSSRApp(App))
+}
 
 export const generateSite = async (
   input: ISsgSiteInput,
@@ -44,26 +53,25 @@ export const generateSite = async (
     }
   }
 
-  // Hydration payload: single-encoded JSON string fields, the exact shape the
-  // hydration runtime feeds through unstoreSite (public pages only)
-  const payloadJson = noJs
-    ? undefined
-    : JSON.stringify({
-        id: input.id,
-        name: serialized.name,
-        version: serialized.version,
-        defaults: JSON.stringify(serialized.defaults),
-        context: JSON.stringify(serialized.context),
-        pages: JSON.stringify(serialized.pages),
-        pageOrder: JSON.stringify(serialized.pageOrder),
-      })
+  // The hydration payload is single-encoded JSON, which must match what the
+  // hydration runtime passes to unstoreSite.
+  const payload: IStaticSitePayload = {
+    id: input.id,
+    name: serialized.name,
+    version: serialized.version,
+    defaults: JSON.stringify(serialized.defaults),
+    context: JSON.stringify(serialized.context),
+    pages: JSON.stringify(serialized.pages),
+    pageOrder: JSON.stringify(serialized.pageOrder),
+  }
+  const payloadJson = noJs ? undefined : JSON.stringify(payload)
   const runtimeSrc = options.runtimeSrc ?? DEFAULT_RUNTIME_SRC
 
   const lang = site.context.activeI18n ?? 'en'
   const pages: IStaticPage[] = []
   let homeGenerated = false
 
-  for (const [route, _serializedPage] of Object.entries(publicPages)) {
+  for (const route of Object.keys(publicPages)) {
     const page = site.pages[route]
     if (!page) {
       warnings.push(`Page not found after deserialization: ${route}`)

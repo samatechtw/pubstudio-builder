@@ -2,10 +2,6 @@ use serde::{Deserialize, Serialize};
 
 use crate::entity::site_api::site_entity::SiteEntity;
 
-// Request/response types for the SSG service (apps/ssg), which prerenders a
-// published site to static HTML at publish time. Field names match the
-// service's TypeScript types (see apps/ssg/src/lib/ssg-types.ts).
-
 #[derive(Debug, Serialize)]
 pub struct SsgSiteInput {
     pub id: String,

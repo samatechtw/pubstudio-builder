@@ -98,9 +98,10 @@ impl SiteType {
     pub fn get_custom_data_allowance(&self, exec_env: ExecEnv) -> i64 {
         let allowance = if exec_env == ExecEnv::Dev || exec_env == ExecEnv::Ci {
             match self {
-                // Reduced allowance for testing
+                // Reduced allowance for testing. An empty custom table costs one 4096-byte root
+                // page so a site stays under the limit with one table and exceeds it with two.
                 SiteType::Free => 0,
-                SiteType::Paid1 => 40000,
+                SiteType::Paid1 => 4096,
                 SiteType::Paid2 => 20 * MB,
                 SiteType::Paid3 => 100 * MB,
             }

@@ -7,9 +7,7 @@ export enum RenderMode {
   PreviewEmbed = 'previewEmbed',
   // Live page
   Release = 'release',
-  // Static prerender (SSG) and hydration of prerendered pages.
-  // Emits hydration-stable markup: plain <a href> instead of RouterLink, no
-  // event registration during setup, and no CSS.supports validation.
+  // SSG and hydration of prerendered pages. Emits hydration-stable markup.
   Static = 'static',
 }
 

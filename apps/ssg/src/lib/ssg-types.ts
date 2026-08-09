@@ -1,7 +1,5 @@
-// Site input for static generation. Field encoding matches the site DB
-// columns / API responses: `defaults`/`context`/`pages`/`pageOrder` are
-// JSON-encoded strings (possibly nested-encoded — see `parseJsonField`).
-// Plain objects are also accepted for convenience (e.g. CLI fixture files).
+// Field encoding matches site DB columns / API responses, plain objects are also
+// accepted for convenience (e.g. CLI fixture files).
 export interface ISsgSiteInput {
   id?: string
   name: string
@@ -18,7 +16,7 @@ export interface ISsgSiteInput {
 export interface ISsgOptions {
   // Canonical site origin (e.g. https://example.com) for sitemap/robots URLs
   baseUrl?: string
-  // Omit the hydration payload + runtime script (zero-JS output)
+  // Omit hydration payload and runtime script
   noJs?: boolean
   // Generate noJs output even when the capability detector reports blockers
   force?: boolean
@@ -34,7 +32,7 @@ export interface IStaticPage {
 
 export interface ISsgResult {
   pages: IStaticPage[]
-  // Interactive features that require the hydration runtime (noJs blockers)
+  // Interactive features that require the hydration runtime
   blockers: string[]
   warnings: string[]
   noJs: boolean

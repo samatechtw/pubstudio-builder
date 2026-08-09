@@ -1,8 +1,8 @@
 import { iteratePage } from '@pubstudio/frontend/util-render'
-import { IComponent, ISite } from '@pubstudio/shared/type-site'
+import { IComponent, ISite, Tag } from '@pubstudio/shared/type-site'
 
 // Reports site features that stop working without the hydration runtime.
-// Used to refuse (or warn about) `noJs` output.
+// Used to refuse or warn about `noJs` output.
 export const detectNoJsBlockers = (site: ISite): string[] => {
   const blockers: string[] = []
   const seen = new Set<string>()
@@ -22,10 +22,10 @@ export const detectNoJsBlockers = (site: ISite): string[] => {
     ) {
       addBlocker(`events/behaviors on component ${component.id}`)
     }
-    if (component.tag === 'vue') {
+    if (component.tag === Tag.Vue) {
       addBlocker(`custom Vue component ${component.id}`)
     }
-    if (component.tag === 'form') {
+    if (component.tag === Tag.Form) {
       addBlocker(`form ${component.id}`)
     }
   }

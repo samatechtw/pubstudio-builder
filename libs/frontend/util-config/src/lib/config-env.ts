@@ -1,9 +1,8 @@
 import { ExecEnv } from '@pubstudio/shared/util-core'
 
 export const SITE_API_URL = import.meta.env?.VITE_SITE_API_URL || ''
-// Hostname that cluster-internal Site API addresses are rewritten to in dev/CI, see
-// `resolveSiteServerAddress`. Override when the browser isn't running on the machine hosting
-// the dev cluster. Distinct from web-site's `VITE_SITE_API_HOST`, which is a full URL.
+// Hostname that cluster-internal Site API addresses are rewritten to in dev/CI.
+// Override when the browser isn't running on the machine hosting the dev cluster.
 export const DEV_SITE_API_HOST = import.meta.env?.VITE_DEV_SITE_API_HOST || '127.0.0.1'
 // Explicit `<cluster address>=<browser address>` overrides, for a reverse proxy that changes
 // the scheme or port as well as the host. Takes precedence over DEV_SITE_API_HOST.
