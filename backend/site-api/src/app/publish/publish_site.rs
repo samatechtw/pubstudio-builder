@@ -15,7 +15,10 @@ use lib_shared_types::{
 };
 use validator::Validate;
 
-use crate::{api_context::ApiContext, middleware::auth::verify_site_owner};
+use crate::{
+    api_context::ApiContext, app::ssg::generate_static::spawn_regenerate_static_pages,
+    middleware::auth::verify_site_owner,
+};
 
 pub async fn publish_site(
     Path(id): Path<String>,
@@ -47,6 +50,9 @@ pub async fn publish_site(
 
         // Reset cache
         context.cache.remove_site(&id).await;
+
+        // Regenerate (or clear, when unpublishing) static pages
+        spawn_regenerate_static_pages(&context, &id, None);
         return Ok(StatusCode::NO_CONTENT.into_response());
     }
 
@@ -58,6 +64,9 @@ pub async fn publish_site(
 
     // Reset cache
     context.cache.remove_site(&id).await;
+
+    // Regenerate static pages for the newly published content
+    spawn_regenerate_static_pages(&context, &id, None);
 
     Ok(StatusCode::NO_CONTENT.into_response())
 }

@@ -6,6 +6,8 @@
 !libs/
 !backend/
 !dist/apps/web-site/
+!dist/apps/web-site-hydrate/
+!dist/apps/ssg/
 !dist/apps/archive/
 !**/tsconfig*.json
 !subset.config.js

@@ -11,6 +11,14 @@
         "minify": "terser"
       }
     },
+    "build-hydrate": {
+      "executor": "nx:run-commands",
+      "outputs": ["{workspaceRoot}/dist/apps/web-site-hydrate"],
+      "options": {
+        "command": "vite build --config vite.config.hydrate.ts",
+        "cwd": "apps/web-site"
+      }
+    },
     "serve": {
       "executor": "nx-vue3-vite:dev-server",
       "options": {

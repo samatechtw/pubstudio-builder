@@ -16,7 +16,7 @@ const activePageName = (activePage: IPage | undefined) => {
   }
 }
 
-interface IRenderSiteHead {
+export interface IRenderSiteHead {
   title: string
   meta: IHeadMeta[]
   link: IHeadLink[]
@@ -30,13 +30,13 @@ const metaKey = (meta: IHeadMeta) => {
   return `${keySel('http-equiv', equiv)}${keySel('property', property)}${keySel('name', name)}`
 }
 
-function getHead(site: ISite | undefined, activePage: IPage): IRenderSiteHead
-function getHead(
+export function getHead(site: ISite | undefined, activePage: IPage): IRenderSiteHead
+export function getHead(
   site: ISite | undefined,
   activePage: IPage | undefined,
 ): IRenderSiteHead | undefined
 
-function getHead(
+export function getHead(
   site: ISite | undefined,
   activePage: IPage | undefined,
 ): IRenderSiteHead | undefined {

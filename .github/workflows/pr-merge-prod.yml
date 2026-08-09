@@ -87,13 +87,21 @@ jobs:
           fetch-depth: 0
       - uses: ./.github/actions/env-setup
       - name: Build apps
-        run: npx nx run-many -t build --projects="web*" --parallel=3
+        run: npx nx run-many -t build --projects="web*" --parallel=3 && npx nx build-hydrate web-site && npx nx build ssg
       - name: Upload web-site bundle
         uses: actions/upload-artifact@v7
         with:
           name: web-site-bundle
           path: |
             ./dist/apps/web-site/index.html
+          if-no-files-found: error
+          retention-days: 1
+      - name: Upload hydration runtime
+        uses: actions/upload-artifact@v7
+        with:
+          name: web-site-hydrate-bundle
+          path: |
+            ./dist/apps/web-site-hydrate/site.js
           if-no-files-found: error
           retention-days: 1
 
@@ -185,6 +193,11 @@ jobs:
         with:
           name: web-site-bundle
           path: ./dist/apps/web-site/index.html
+      - name: Download hydration runtime
+        uses: actions/download-artifact@v8
+        with:
+          name: web-site-hydrate-bundle
+          path: ./dist/apps/web-site-hydrate/site.js
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
       - name: Login to GitHub Container Registry

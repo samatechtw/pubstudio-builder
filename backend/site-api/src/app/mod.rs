@@ -6,4 +6,5 @@ pub mod health;
 pub mod publish;
 pub mod serve;
 pub mod site;
+pub mod ssg;
 pub mod usage;

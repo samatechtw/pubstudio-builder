@@ -21,18 +21,37 @@
     "strict": true,
     "strictPropertyInitialization": false,
     "paths": {
-      "@pubstudio/frontend/util-builder": ["libs/frontend/util-builder/src/index.ts"],
-      "@pubstudio/frontend/util-builtin": ["libs/frontend/util-builtin/src/index.ts"],
-      "@pubstudio/frontend/feature-render": ["libs/frontend/feature-render/src/index.ts"],
       "@frontend-assets/*": ["libs/frontend/ui-assets/src/*"],
-      "@pubstudio/frontend/data-access-site-api": [
-        "libs/frontend/data-access-site-api/src/index.ts"
+      "@pubstudio/frontend/data-access-api": [
+        "libs/frontend/data-access-api/src/index.ts"
+      ],
+      "@pubstudio/frontend/data-access-command": [
+        "libs/frontend/data-access-command/src/index.ts"
       ],
       "@pubstudio/frontend/data-access-injection": [
         "libs/frontend/data-access-injection/src/index.ts"
       ],
+      "@pubstudio/frontend/data-access-site-api": [
+        "libs/frontend/data-access-site-api/src/index.ts"
+      ],
       "@pubstudio/frontend/data-access-state": [
         "libs/frontend/data-access-state/src/index.ts"
+      ],
+      "@pubstudio/frontend/data-access-web-store": [
+        "libs/frontend/data-access-web-store/src/index.ts"
+      ],
+      "@pubstudio/frontend/feature-breakpoint": [
+        "libs/frontend/feature-breakpoint/src/index.ts"
+      ],
+      "@pubstudio/frontend/feature-build": ["libs/frontend/feature-build/src/index.ts"],
+      "@pubstudio/frontend/feature-build-event": [
+        "libs/frontend/feature-build-event/src/index.ts"
+      ],
+      "@pubstudio/frontend/feature-build-overlay": [
+        "libs/frontend/feature-build-overlay/src/index.ts"
+      ],
+      "@pubstudio/frontend/feature-builtin-editor": [
+        "libs/frontend/feature-builtin-editor/src/index.ts"
       ],
       "@pubstudio/frontend/feature-checkout": [
         "libs/frontend/feature-checkout/src/index.ts"
@@ -40,41 +59,102 @@
       "@pubstudio/frontend/feature-contact-form": [
         "libs/frontend/feature-contact-form/src/index.ts"
       ],
-      "@pubstudio/frontend/feature-custom-data": [
-        "libs/frontend/feature-custom-data/src/index.ts"
-      ],
       "@pubstudio/frontend/feature-copy-paste": [
         "libs/frontend/feature-copy-paste/src/index.ts"
       ],
+      "@pubstudio/frontend/feature-custom-data": [
+        "libs/frontend/feature-custom-data/src/index.ts"
+      ],
+      "@pubstudio/frontend/feature-login": ["libs/frontend/feature-login/src/index.ts"],
       "@pubstudio/frontend/feature-mailing-list-form": [
         "libs/frontend/feature-mailing-list-form/src/index.ts"
       ],
+      "@pubstudio/frontend/feature-preview": [
+        "libs/frontend/feature-preview/src/index.ts"
+      ],
+      "@pubstudio/frontend/feature-render": ["libs/frontend/feature-render/src/index.ts"],
+      "@pubstudio/frontend/feature-render-builder": [
+        "libs/frontend/feature-render-builder/src/index.ts"
+      ],
+      "@pubstudio/frontend/feature-render-helpers": [
+        "libs/frontend/feature-render-helpers/src/index.ts"
+      ],
+      "@pubstudio/frontend/feature-site-assets": [
+        "libs/frontend/feature-site-assets/src/index.ts"
+      ],
+      "@pubstudio/frontend/feature-site-error": [
+        "libs/frontend/feature-site-error/src/index.ts"
+      ],
+      "@pubstudio/frontend/feature-site-settings": [
+        "libs/frontend/feature-site-settings/src/index.ts"
+      ],
+      "@pubstudio/frontend/feature-site-source": [
+        "libs/frontend/feature-site-source/src/index.ts"
+      ],
+      "@pubstudio/frontend/feature-site-store": [
+        "libs/frontend/feature-site-store/src/index.ts"
+      ],
+      "@pubstudio/frontend/feature-site-store-init": [
+        "libs/frontend/feature-site-store-init/src/index.ts"
+      ],
+      "@pubstudio/frontend/feature-site-translations": [
+        "libs/frontend/feature-site-translations/src/index.ts"
+      ],
+      "@pubstudio/frontend/feature-site-version": [
+        "libs/frontend/feature-site-version/src/index.ts"
+      ],
+      "@pubstudio/frontend/feature-sites": ["libs/frontend/feature-sites/src/index.ts"],
       "@pubstudio/frontend/feature-template": [
         "libs/frontend/feature-template/src/index.ts"
       ],
-      "@pubstudio/frontend/feature-walkthrough": [
-        "libs/frontend/feature-walkthrough/src/index.ts"
-      ],
       "@pubstudio/frontend/feature-vue-component": [
         "libs/frontend/feature-vue-component/src/index.ts"
+      ],
+      "@pubstudio/frontend/feature-walkthrough": [
+        "libs/frontend/feature-walkthrough/src/index.ts"
       ],
       "@pubstudio/frontend/type-builder": ["libs/frontend/type-builder/src/index.ts"],
       "@pubstudio/frontend/type-ui-widgets": [
         "libs/frontend/type-ui-widgets/src/index.ts"
       ],
+      "@pubstudio/frontend/ui-build": ["libs/frontend/ui-build/src/index.ts"],
+      "@pubstudio/frontend/ui-runtime": ["libs/frontend/ui-runtime/src/index.ts"],
+      "@pubstudio/frontend/ui-theme": ["libs/frontend/ui-theme/src"],
       "@pubstudio/frontend/ui-widgets": ["libs/frontend/ui-widgets/src/index.ts"],
       "@pubstudio/frontend/util-api": ["libs/frontend/util-api/src/index.ts"],
       "@pubstudio/frontend/util-asset": ["libs/frontend/util-asset/src/index.ts"],
+      "@pubstudio/frontend/util-builder": ["libs/frontend/util-builder/src/index.ts"],
+      "@pubstudio/frontend/util-builtin": ["libs/frontend/util-builtin/src/index.ts"],
+      "@pubstudio/frontend/util-command-data": [
+        "libs/frontend/util-command-data/src/index.ts"
+      ],
+      "@pubstudio/frontend/util-component": ["libs/frontend/util-component/src/index.ts"],
       "@pubstudio/frontend/util-config": ["libs/frontend/util-config/src/index.ts"],
       "@pubstudio/frontend/util-custom-data": [
         "libs/frontend/util-custom-data/src/index.ts"
       ],
+      "@pubstudio/frontend/util-defaults": ["libs/frontend/util-defaults/src/index.ts"],
       "@pubstudio/frontend/util-doc": ["libs/frontend/util-doc/src/index.ts"],
       "@pubstudio/frontend/util-doc-site": ["libs/frontend/util-doc-site/src/index.ts"],
-      "@pubstudio/frontend/util-i18n": ["libs/frontend/util-i18n/src/index.ts"],
+      "@pubstudio/frontend/util-edit-text": ["libs/frontend/util-edit-text/src/index.ts"],
       "@pubstudio/frontend/util-fields": ["libs/frontend/util-fields/src/index.ts"],
+      "@pubstudio/frontend/util-i18n": ["libs/frontend/util-i18n/src/index.ts"],
       "@pubstudio/frontend/util-identicon": ["libs/frontend/util-identicon/src/index.ts"],
+      "@pubstudio/frontend/util-ids": ["libs/frontend/util-ids/src/index.ts"],
+      "@pubstudio/frontend/util-render": ["libs/frontend/util-render/src/index.ts"],
+      "@pubstudio/frontend/util-resolve": ["libs/frontend/util-resolve/src/index.ts"],
       "@pubstudio/frontend/util-router": ["libs/frontend/util-router/src/index.ts"],
+      "@pubstudio/frontend/util-runtime": ["libs/frontend/util-runtime/src/index.ts"],
+      "@pubstudio/frontend/util-site": ["libs/frontend/util-site/src/index.ts"],
+      "@pubstudio/frontend/util-site-deserialize": [
+        "libs/frontend/util-site-deserialize/src/index.ts"
+      ],
+      "@pubstudio/frontend/util-site-store": [
+        "libs/frontend/util-site-store/src/index.ts"
+      ],
+      "@pubstudio/frontend/util-site-translations": [
+        "libs/frontend/util-site-translations/src/index.ts"
+      ],
       "@pubstudio/frontend/util-test": ["libs/frontend/util-test/src/index.ts"],
       "@pubstudio/frontend/util-test-mock": ["libs/frontend/util-test-mock/src/index.ts"],
       "@pubstudio/frontend/util-translations": [
@@ -133,90 +213,10 @@
       "@pubstudio/shared/util-web-site-api": [
         "libs/shared/util-web-site-api/src/index.ts"
       ],
-      "@pubstudio/frontend/data-access-api": [
-        "libs/frontend/data-access-api/src/index.ts"
-      ],
-      "@pubstudio/frontend/data-access-web-store": [
-        "libs/frontend/data-access-web-store/src/index.ts"
-      ],
-      "@pubstudio/frontend/feature-builtin-editor": [
-        "libs/frontend/feature-builtin-editor/src/index.ts"
-      ],
-      "@pubstudio/frontend/feature-breakpoint": [
-        "libs/frontend/feature-breakpoint/src/index.ts"
-      ],
-      "@pubstudio/frontend/feature-build": ["libs/frontend/feature-build/src/index.ts"],
-      "@pubstudio/frontend/feature-render-builder": [
-        "libs/frontend/feature-render-builder/src/index.ts"
-      ],
-      "@pubstudio/frontend/feature-build-event": [
-        "libs/frontend/feature-build-event/src/index.ts"
-      ],
-      "@pubstudio/frontend/feature-build-overlay": [
-        "libs/frontend/feature-build-overlay/src/index.ts"
-      ],
-      "@pubstudio/frontend/feature-login": ["libs/frontend/feature-login/src/index.ts"],
-      "@pubstudio/frontend/feature-preview": [
-        "libs/frontend/feature-preview/src/index.ts"
-      ],
-      "@pubstudio/frontend/feature-site-assets": [
-        "libs/frontend/feature-site-assets/src/index.ts"
-      ],
-      "@pubstudio/frontend/feature-site-error": [
-        "libs/frontend/feature-site-error/src/index.ts"
-      ],
-      "@pubstudio/frontend/feature-site-settings": [
-        "libs/frontend/feature-site-settings/src/index.ts"
-      ],
-      "@pubstudio/frontend/feature-site-translations": [
-        "libs/frontend/feature-site-translations/src/index.ts"
-      ],
       "@pubstudio/web/feature-site-resources": [
         "libs/web/feature-site-resources/src/index.ts"
       ],
-      "@pubstudio/frontend/feature-site-source": [
-        "libs/frontend/feature-site-source/src/index.ts"
-      ],
-      "@pubstudio/frontend/feature-site-store": [
-        "libs/frontend/feature-site-store/src/index.ts"
-      ],
-      "@pubstudio/frontend/feature-site-store-init": [
-        "libs/frontend/feature-site-store-init/src/index.ts"
-      ],
-      "@pubstudio/frontend/feature-site-version": [
-        "libs/frontend/feature-site-version/src/index.ts"
-      ],
-      "@pubstudio/frontend/feature-sites": ["libs/frontend/feature-sites/src/index.ts"],
-      "@pubstudio/web/type-builtins": ["libs/web/type-builtins/src/index.ts"],
-      "@pubstudio/frontend/ui-build": ["libs/frontend/ui-build/src/index.ts"],
-      "@pubstudio/frontend/ui-theme": ["libs/frontend/ui-theme/src"],
-      "@pubstudio/frontend/ui-runtime": ["libs/frontend/ui-runtime/src/index.ts"],
-      "@pubstudio/frontend/data-access-command": [
-        "libs/frontend/data-access-command/src/index.ts"
-      ],
-      "@pubstudio/frontend/util-command-data": [
-        "libs/frontend/util-command-data/src/index.ts"
-      ],
-      "@pubstudio/frontend/util-component": ["libs/frontend/util-component/src/index.ts"],
-      "@pubstudio/frontend/util-defaults": ["libs/frontend/util-defaults/src/index.ts"],
-      "@pubstudio/frontend/util-edit-text": ["libs/frontend/util-edit-text/src/index.ts"],
-      "@pubstudio/frontend/util-ids": ["libs/frontend/util-ids/src/index.ts"],
-      "@pubstudio/frontend/util-render": ["libs/frontend/util-render/src/index.ts"],
-      "@pubstudio/frontend/feature-render-helpers": [
-        "libs/frontend/feature-render-helpers/src/index.ts"
-      ],
-      "@pubstudio/frontend/util-resolve": ["libs/frontend/util-resolve/src/index.ts"],
-      "@pubstudio/frontend/util-runtime": ["libs/frontend/util-runtime/src/index.ts"],
-      "@pubstudio/frontend/util-site": ["libs/frontend/util-site/src/index.ts"],
-      "@pubstudio/frontend/util-site-deserialize": [
-        "libs/frontend/util-site-deserialize/src/index.ts"
-      ],
-      "@pubstudio/frontend/util-site-store": [
-        "libs/frontend/util-site-store/src/index.ts"
-      ],
-      "@pubstudio/frontend/util-site-translations": [
-        "libs/frontend/util-site-translations/src/index.ts"
-      ]
+      "@pubstudio/web/type-builtins": ["libs/web/type-builtins/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

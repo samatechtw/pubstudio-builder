@@ -7,6 +7,7 @@ pub mod get_site_head;
 pub mod get_site_metadata;
 pub mod get_site_usage;
 pub mod get_site_version;
+pub mod get_static_page;
 pub mod list_site_versions;
 pub mod list_sites;
 pub mod record_page_view;

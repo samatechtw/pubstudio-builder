@@ -20,7 +20,10 @@ use lib_shared_types::{
 };
 use validator::Validate;
 
-use crate::{api_context::ApiContext, middleware::auth::verify_site_owner};
+use crate::{
+    api_context::ApiContext, app::ssg::generate_static::spawn_regenerate_static_pages,
+    middleware::auth::verify_site_owner,
+};
 
 pub async fn update_site(
     Path(id): Path<String>,
@@ -102,6 +105,12 @@ pub async fn update_site(
         .cache
         .create_or_update_usage(&id, site.calculate_site_size(), site_type)
         .await;
+
+    // A site with no separate draft version is published live on save, so
+    // its static pages must be regenerated (debounced via content_updated_at)
+    if site.published && content_updated_at.is_some() {
+        spawn_regenerate_static_pages(&context, &id, Some(site.content_updated_at));
+    }
 
     Ok((StatusCode::OK, Json(to_api_response(site))))
 }

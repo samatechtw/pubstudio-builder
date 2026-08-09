@@ -20,6 +20,8 @@ RUN apt-get update -yq \
 COPY --chmod=755 ./backend/target/${PLATFORM_FOLDER}release/site-api ./
 COPY --chmod=755 ./dist/apps/web-site/index.html ./
 COPY --chmod=755 ./dist/apps/archive/index_v1.html ./
+# Hydration runtime for statically generated (SSG) pages
+COPY --chmod=755 ./dist/apps/web-site-hydrate/site.js ./
 COPY --chmod=755 ./backend/pre-update.sh ../
 COPY ./backend/site-api/db/metadata/migrations/* ./db/metadata/migrations/
 COPY ./backend/site-api/db/sites/migrations/* ./db/sites/migrations/
