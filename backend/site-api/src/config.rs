@@ -3,6 +3,7 @@
 /// Passed via command line, or environment variables.
 use clap::Parser;
 use lib_shared_types::shared::core::ExecEnv;
+use sqlx::sqlite::SqliteJournalMode;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
@@ -22,6 +23,12 @@ pub struct Config {
     /// The sqlite connection URL
     #[clap(long, env = "DATABASE_URL")]
     pub database_url: String,
+
+    /// Journal mode for metadata and site sqlite databases. WAL requires coherent
+    /// shared memory across connections, which VM-shared filesystems don't provide.
+    /// Deployments storing site data on such mounts should use "truncate" or "delete"
+    #[clap(long, env = "SQLITE_JOURNAL_MODE", default_value = "wal")]
+    pub sqlite_journal_mode: SqliteJournalMode,
 
     /// The API host
     #[clap(long, env = "SITE_API_HOST")]
