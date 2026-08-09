@@ -27,7 +27,7 @@ jobs:
           concurrent_skipping: 'never'
           skip_after_successful_duplicate: 'true'
           # Changes to paths must be synced with pr-merge*.yml
-          paths: '[".github/workflows/pr-commit.yml", "apps/**", "backend/**", "libs/**", "*"]'
+          paths: '[".github/workflows/pr-merge-*.yml", "apps/**", "backend/**", "libs/**", "*"]'
           paths_ignore: '["**/README.md", "skaffold*.yaml"]'
 
   repo-metadata:
