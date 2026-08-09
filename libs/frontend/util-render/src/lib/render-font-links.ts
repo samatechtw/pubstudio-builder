@@ -1,5 +1,6 @@
 import { IThemeFont } from '@pubstudio/shared/type-site'
 import { h, VNode } from 'vue'
+import { escapeCssForStyleTag } from './escape-css'
 
 export const renderGoogleFontLinks = (fontNames: string[]) => {
   if (!fontNames.length) {
@@ -21,7 +22,11 @@ export const renderGoogleFontLinks = (fontNames: string[]) => {
 
 export const renderCustomFontLink = (font: IThemeFont): VNode | undefined => {
   if (font.url) {
-    return h('style', `@font-face {font-family: ${font.name};src: url('${font.url}');}`)
+    return h('style', {
+      innerHTML: escapeCssForStyleTag(
+        `@font-face {font-family: ${font.name};src: url('${font.url}');}`,
+      ),
+    })
   }
   return undefined
 }
