@@ -82,6 +82,10 @@ export const resetRuntimeContext = () => {
     retries: 0,
   }
   runtimeContext.scrollEventAdded = false
+  // `document` is undefined during static prerendering (SSG) in Node
+  if (typeof document === 'undefined') {
+    return
+  }
   document.removeEventListener('scroll', scrollHandler)
   document.removeEventListener('keyup', keyupHandler)
   document.removeEventListener('keydown', keydownHandler)

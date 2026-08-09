@@ -12,6 +12,7 @@ pub mod site_info_viewmodel;
 pub mod site_metadata_viewmodel;
 pub mod site_usage_viewmodel;
 pub mod site_viewmodel;
+pub mod ssg_dto;
 pub mod update_metadata_dto;
 pub mod update_site_dto;
 pub mod validate_domain_query;

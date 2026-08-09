@@ -58,7 +58,11 @@ export const computeAttrsInputsMixins = (
     }
   }
 
-  if (component.tag === 'a' && attrs.href && renderMode === 'release') {
+  if (
+    component.tag === 'a' &&
+    attrs.href &&
+    (renderMode === 'release' || renderMode === 'static')
+  ) {
     attrs.href = attrs.href?.toString()
   }
 

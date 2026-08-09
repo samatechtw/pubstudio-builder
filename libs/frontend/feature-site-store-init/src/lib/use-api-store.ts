@@ -10,7 +10,7 @@ import {
   store,
 } from '@pubstudio/frontend/data-access-web-store'
 import { parseApiErrorKey, PSApi, toApiError } from '@pubstudio/frontend/util-api'
-import { builderConfig } from '@pubstudio/frontend/util-config'
+import { builderConfig, resolveSiteServerAddress } from '@pubstudio/frontend/util-config'
 import { serializeEditor, storeSite } from '@pubstudio/frontend/util-site-store'
 import {
   IUpdateSiteApiRequest,
@@ -109,11 +109,7 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
         siteVersion = site.version
       }
       // Convert cluster URLs for dev/CI
-      serverAddress =
-        {
-          'http://site-api1:3100': 'http://127.0.0.1:3100',
-          'http://site-api1:3110': 'http://127.0.0.1:3110',
-        }[serverAddress] ?? serverAddress
+      serverAddress = resolveSiteServerAddress(serverAddress)
 
       const api = new PSApi({
         baseUrl: `${serverAddress}/api/`,

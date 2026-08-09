@@ -45,6 +45,7 @@ pub fn site_to_value(site: &SiteEntity, site_id: &str) -> Result<Value, serde_js
         defaults: site.defaults.clone(),
         pages: filtered_pages,
         published: site.published,
+        content_updated_at: site.content_updated_at,
     };
     let cached_site = site_response_to_cached(response);
     Ok(serde_json::to_value(cached_site)?)

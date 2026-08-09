@@ -3,6 +3,8 @@ dist/*
 !dist/apps
 dist/apps/builder-demo
 dist/apps/web-site
+dist/apps/web-site-hydrate
+dist/apps/ssg
 !dist/apps/archive
 tmp/
 out-tsc/

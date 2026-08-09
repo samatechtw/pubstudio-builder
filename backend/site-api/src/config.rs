@@ -35,6 +35,11 @@ pub struct Config {
     #[clap(long, env = "AUTH_BYPASS_API_KEY")]
     pub auth_bypass_api_key: Option<String>,
 
+    /// URL of the SSG service used to prerender published sites to static
+    /// pages. Static generation is skipped when unset.
+    #[clap(long, env = "SSG_URL")]
+    pub ssg_url: Option<String>,
+
     /// Public key used to verify Admin
     #[clap(long, env = "SITE_ADMIN_PUBLIC_KEY")]
     pub admin_public_key: String,

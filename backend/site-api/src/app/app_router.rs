@@ -65,6 +65,10 @@ fn api_router(context: &ApiContext) -> Router<ApiContext> {
             get(site::get_site_head::get_site_head),
         )
         .route(
+            "/sites/{site_id}/static_pages",
+            get(site::get_static_page::get_static_page),
+        )
+        .route(
             "/sites",
             get(site::list_sites::list_sites)
                 .post(site::create_site::create_site)

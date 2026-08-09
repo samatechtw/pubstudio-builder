@@ -14,7 +14,7 @@ use lib_shared_types::{
     },
     entity::site_api::{
         site_entity::SiteEntity, site_info_entity::SiteInfoEntity,
-        site_metadata_entity::SiteMetadataEntity,
+        site_metadata_entity::SiteMetadataEntity, static_page_entity::StaticPageEntity,
     },
 };
 use sqlx::{
@@ -74,6 +74,13 @@ pub trait SiteRepoTrait {
     async fn export_backup(&self, id: &str) -> Result<Vec<u8>, DbError>;
     async fn create_from_backup(&self, id: &str, backup_data: Vec<u8>) -> Result<(), DbError>;
     async fn replace_from_backup(&self, id: &str, backup_data: Vec<u8>) -> Result<(), DbError>;
+    async fn replace_static_pages(
+        &self,
+        id: &str,
+        pages: Vec<StaticPageEntity>,
+    ) -> Result<(), DbError>;
+    async fn get_static_page(&self, id: &str, route: &str) -> Result<StaticPageEntity, DbError>;
+    async fn clear_static_pages(&self, id: &str) -> Result<(), DbError>;
 }
 
 pub struct SiteRepo {
@@ -483,6 +490,59 @@ impl SiteRepoTrait for SiteRepo {
         // Replace the site database
         self.create_from_backup(id, backup_data).await
     }
+
+    async fn replace_static_pages(
+        &self,
+        id: &str,
+        pages: Vec<StaticPageEntity>,
+    ) -> Result<(), DbError> {
+        let pool = self
+            .db_pool_manager
+            .get_db_pool(id, &self.manifest_dir)
+            .await?;
+        let mut tx = pool.begin().await?;
+
+        sqlx::query("DELETE FROM static_pages")
+            .execute(&mut *tx)
+            .await?;
+        for page in pages {
+            sqlx::query(
+                r#"
+                INSERT INTO static_pages(route, body, content_type, content_updated_at)
+                VALUES (?1, ?2, ?3, ?4)
+                "#,
+            )
+            .bind(page.route)
+            .bind(page.body)
+            .bind(page.content_type)
+            .bind(page.content_updated_at)
+            .execute(&mut *tx)
+            .await?;
+        }
+        tx.commit().await?;
+        Ok(())
+    }
+
+    async fn get_static_page(&self, id: &str, route: &str) -> Result<StaticPageEntity, DbError> {
+        let mut conn = self.get_db_conn(id).await?;
+
+        Ok(sqlx::query(
+            r#"SELECT route, body, content_type, content_updated_at FROM static_pages WHERE route = ?"#,
+        )
+        .bind(route)
+        .try_map(map_to_static_page_entity)
+        .fetch_one(&mut *conn)
+        .await?)
+    }
+
+    async fn clear_static_pages(&self, id: &str) -> Result<(), DbError> {
+        let mut conn = self.get_db_conn(id).await?;
+
+        sqlx::query("DELETE FROM static_pages")
+            .execute(&mut *conn)
+            .await?;
+        Ok(())
+    }
 }
 
 fn map_to_site_entity(row: SqliteRow) -> Result<SiteEntity, Error> {
@@ -501,6 +561,15 @@ fn map_to_site_entity(row: SqliteRow) -> Result<SiteEntity, Error> {
         content_updated_at: row.try_get("content_updated_at")?,
         published: row.try_get("published")?,
         preview_id: row.try_get_unchecked("preview_id")?,
+    })
+}
+
+fn map_to_static_page_entity(row: SqliteRow) -> Result<StaticPageEntity, Error> {
+    Ok(StaticPageEntity {
+        route: row.try_get("route")?,
+        body: row.try_get("body")?,
+        content_type: row.try_get("content_type")?,
+        content_updated_at: row.try_get("content_updated_at")?,
     })
 }
 

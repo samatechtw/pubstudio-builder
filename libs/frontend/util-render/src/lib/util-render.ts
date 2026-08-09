@@ -13,6 +13,19 @@ import {
 import { breakpointSortFn } from './sort-breakpoint-fn'
 import { IQueryStyle, IRawStyleRecord } from './util-render-types'
 
+// CSS.supports validation is skipped in static (SSG/hydration) rendering.
+// `CSS` is undefined in Node, and the prerendered <style> text must match the
+// hydrating client's output exactly, so both sides disable validation.
+let validateCssSupport = true
+
+export const setCssValidation = (enabled: boolean) => {
+  validateCssSupport = enabled
+}
+
+const cssSupports = (prop: string, value: string): boolean => {
+  return !validateCssSupport || CSS.supports(prop, value)
+}
+
 export const rawStyleRecordToString = (
   record: IRawStyleRecord,
   context: ISiteContext,
@@ -21,7 +34,7 @@ export const rawStyleRecordToString = (
     const fields = Object.entries(rawStyle)
       .map(([prop, value]) => {
         const computedValue = resolveThemeVariables(context, value) ?? value
-        const supportedValue = CSS.supports(prop, computedValue) ? computedValue : ''
+        const supportedValue = cssSupports(prop, computedValue) ? computedValue : ''
         return `${prop}:${supportedValue};`
       })
       .join('')

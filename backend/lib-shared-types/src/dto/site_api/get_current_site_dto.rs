@@ -17,6 +17,9 @@ pub struct GetCurrentSiteResponse {
     pub defaults: String,
     pub pages: String,
     pub published: bool,
+    // Freshness key for generated static pages (see static_pages)
+    #[serde(default)]
+    pub content_updated_at: i64,
 }
 
 pub fn to_api_response(site: &SiteEntity, site_id: &str) -> GetCurrentSiteResponse {
@@ -28,6 +31,7 @@ pub fn to_api_response(site: &SiteEntity, site_id: &str) -> GetCurrentSiteRespon
         defaults: site.defaults.clone(),
         pages: site.pages.clone(),
         published: site.published,
+        content_updated_at: site.content_updated_at,
     }
 }
 
