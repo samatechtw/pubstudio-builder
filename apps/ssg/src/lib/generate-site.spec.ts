@@ -1,7 +1,8 @@
 import { mockSerializedSite } from '@pubstudio/frontend/util-test-mock'
-import { ISerializedSite } from '@pubstudio/shared/type-site'
-import { generateSite } from './generate-site'
-import { parseJsonField } from './normalize-input'
+import { deserializedHelper } from '@pubstudio/frontend/util-site-deserialize'
+import { ComponentArgPrimitive, ISerializedSite, Tag } from '@pubstudio/shared/type-site'
+import { generateSite, renderPageBody } from './generate-site'
+import { normalizeSiteInput, parseJsonField } from './normalize-input'
 import { ISsgSiteInput } from './ssg-types'
 
 const makeInput = (modify?: (site: ISerializedSite) => void): ISsgSiteInput => {
@@ -98,6 +99,92 @@ describe('generateSite', () => {
     expect(home?.body).not.toContain('</style><script>')
     expect(home?.body).toContain('\\00003c/style>')
     expect(home?.body).toContain('\\00003c/script>')
+  })
+
+  it('emits canonical and social tags when the site domain is known', async () => {
+    const result = await generateSite(makeInput(), {
+      baseUrl: 'https://mock.example.com/',
+    })
+    const home = result.pages.find((p) => p.route === '/')
+    const about = result.pages.find((p) => p.route === '/home')
+
+    // Home is served at both routes, and `/` is the canonical one
+    expect(home?.body).toContain(
+      '<link rel="canonical" href="https://mock.example.com/" />',
+    )
+    expect(home?.body).toContain(
+      '<meta property="og:url" content="https://mock.example.com/" />',
+    )
+    expect(home?.body).toContain(
+      '<meta property="twitter:url" content="https://mock.example.com/" />',
+    )
+    expect(about?.body).toEqual(home?.body)
+    expect(home?.body).toContain('<meta property="og:type" content="website" />')
+    expect(home?.body).toContain(
+      '<meta property="twitter:card" content="summary_large_image" />',
+    )
+  })
+
+  it('omits canonical/url tags when no base url is known, and defers to the site', async () => {
+    const noBase = await generateSite(makeInput())
+    const noBaseHome = noBase.pages.find((p) => p.route === '/')
+    expect(noBaseHome?.body).not.toContain('rel="canonical"')
+    expect(noBaseHome?.body).not.toContain('og:url')
+    // Page-independent social tags are still emitted
+    expect(noBaseHome?.body).toContain('<meta property="og:type" content="website" />')
+
+    const override = await generateSite(
+      makeInput((site) => {
+        site.defaults.head = { meta: [{ property: 'og:type', content: 'article' }] }
+      }),
+    )
+    const overrideHome = override.pages.find((p) => p.route === '/')
+    expect(overrideHome?.body).toContain('<meta property="og:type" content="article" />')
+    expect(overrideHome?.body).not.toContain('content="website"')
+  })
+
+  it('prerenders custom Vue components as an empty placeholder to hydrate into', async () => {
+    const input = makeInput((site) => {
+      const child = site.pages['/home'].root.children?.[0]
+      if (child) {
+        child.tag = Tag.Vue
+        child.inputs = {
+          componentName: {
+            type: ComponentArgPrimitive.String,
+            name: 'componentName',
+            is: 'MyWidget',
+          },
+        }
+      }
+    })
+    const result = await generateSite(input)
+    const home = result.pages.find((p) => p.route === '/')
+
+    // Without the SSR guard in getOrWaitComponent, Vue emits a comment node that
+    // mismatches the `div` the client hydrates
+    expect(result.warnings).toEqual([])
+    expect(home?.body).toContain('id="test-c-0"><div></div></div>')
+    // Custom components need the runtime, so they block noJs output
+    expect(result.blockers.join(' ')).toContain('custom Vue component')
+  })
+
+  it('reports render errors instead of silently emitting a partial page', async () => {
+    const { serialized } = normalizeSiteInput(makeInput())
+    const site = deserializedHelper(serialized)
+    const page = site.pages['/home']
+    // A throwing getter stands in for any setup/render-time failure under SSR
+    Object.defineProperty(page.root.children?.[0] ?? {}, 'tag', {
+      get: () => {
+        throw new Error('boom')
+      },
+    })
+
+    const errors: string[] = []
+    const body = await renderPageBody(site, page, (message) => errors.push(message))
+
+    expect(errors.join(' ')).toContain('boom')
+    // Vue swallows the error and emits a placeholder, so the page looks complete otherwise
+    expect(body).toContain('<!---->')
   })
 
   it('refuses noJs when the site has interactive features', async () => {

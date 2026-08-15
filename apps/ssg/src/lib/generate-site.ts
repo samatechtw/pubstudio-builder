@@ -17,11 +17,23 @@ import {
   SSG_GENERATOR,
 } from './ssg-types'
 
-export const renderPageBody = async (site: ISite, page: IPage): Promise<string> => {
+export const renderPageBody = async (
+  site: ISite,
+  page: IPage,
+  // Vue catches errors thrown in setup/render and renders the subtree as a comment node, so
+  // without this a partially rendered page is indistinguishable from a complete one
+  onError?: (message: string) => void,
+): Promise<string> => {
   const siteRef = shallowRef(site)
   const pageRef = shallowRef<IPage | undefined>(page)
   const { App } = createStaticSiteApp(siteRef, pageRef)
-  return renderToString(createSSRApp(App))
+  const app = createSSRApp(App)
+  if (onError) {
+    app.config.errorHandler = (err) => {
+      onError(err instanceof Error ? err.message : String(err))
+    }
+  }
+  return renderToString(app)
 }
 
 export const generateSite = async (
@@ -68,6 +80,8 @@ export const generateSite = async (
   const runtimeSrc = options.runtimeSrc ?? DEFAULT_RUNTIME_SRC
 
   const lang = site.context.activeI18n ?? 'en'
+  const origin = options.baseUrl?.replace(/\/$/, '')
+  const canonical = (route: string) => (origin ? `${origin}${route}` : undefined)
   const pages: IStaticPage[] = []
   let homeGenerated = false
 
@@ -77,11 +91,22 @@ export const generateSite = async (
       warnings.push(`Page not found after deserialization: ${route}`)
       continue
     }
-    const bodyHtml = await renderPageBody(site, page)
+    const bodyHtml = await renderPageBody(site, page, (message) =>
+      warnings.push(`Render error on ${page.route}: ${message}`),
+    )
     const head = getHead(site, page)
-    const html = buildHtmlPage({ lang, head, bodyHtml, payloadJson, runtimeSrc })
+    const isHome = page.route === site.defaults.homePage
+    // The home page is served at both its route and `/`; `/` is the canonical one
+    const html = buildHtmlPage({
+      lang,
+      head,
+      bodyHtml,
+      canonicalUrl: canonical(isHome ? '/' : page.route),
+      payloadJson,
+      runtimeSrc,
+    })
     pages.push({ route: page.route, body: html, contentType: 'text/html' })
-    if (page.route === site.defaults.homePage) {
+    if (isHome) {
       pages.push({ route: '/', body: html, contentType: 'text/html' })
       homeGenerated = true
     }

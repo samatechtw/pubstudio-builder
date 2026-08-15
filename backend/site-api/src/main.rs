@@ -62,6 +62,10 @@ async fn main() {
     let site_db_pools = Arc::new(RwLock::new(HashMap::default()));
     let db_pool_manager = DbPoolManager::new(site_db_pools, config.sqlite_journal_mode);
     println!("SQLite journal mode: {:?}", config.sqlite_journal_mode);
+    match &config.ssg_url {
+        Some(url) => println!("SSG generator: {}", url),
+        None => println!("SSG disabled (SSG_URL unset), sites render client-side"),
+    }
 
     // Set up metadata database
     let metadata_db_url = &format!("sqlite:{}/db/metadata/sites_metadata.db", manifest_dir);

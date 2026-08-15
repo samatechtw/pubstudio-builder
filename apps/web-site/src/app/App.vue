@@ -94,6 +94,11 @@ const getUserSite = async () => {
         url += `?p=${p}`
       }
       rootSiteApi.baseUrl = `${host}/`
+    } else {
+      const apiIndex = url.indexOf('/api/')
+      if (apiIndex > 0) {
+        rootSiteApi.baseUrl = url.slice(0, apiIndex + 1)
+      }
     }
     const userSite = await getSite(url)
     return userSite

@@ -136,9 +136,9 @@ export const deserializedHelper = (serialized: ISerializedSite): ISite => {
     nextId: context.nextId,
     components,
     behaviors: context.behaviors,
-    styles: context.styles,
+    styles: context.styles ?? {},
     // Added 240521
-    styleOrder: context.styleOrder ?? Object.keys(context.styles),
+    styleOrder: context.styleOrder ?? Object.keys(context.styles ?? {}),
     theme: context.theme,
     customComponentIds: new Set(context.customComponentIds ?? []),
     customChildIds: new Set(context.customChildIds ?? []),

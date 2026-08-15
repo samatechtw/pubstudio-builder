@@ -30,6 +30,10 @@ const readBody = (req: http.IncomingMessage): Promise<string> => {
   })
 }
 
+const siteLabel = (site: ISsgSiteInput | undefined): string => {
+  return site ? `name=${site.name} id=${site.id ?? 'unknown'}` : 'unknown'
+}
+
 const sendJson = (res: http.ServerResponse, status: number, data: unknown) => {
   const body = JSON.stringify(data)
   res.writeHead(status, {
@@ -44,6 +48,7 @@ export const requestHandler = async (
   res: http.ServerResponse,
 ) => {
   const url = req.url?.split('?')[0]
+  let site: ISsgSiteInput | undefined
   try {
     if (req.method === 'GET' && (url === '/api/healthz' || url === '/healthz')) {
       sendJson(res, 200, { status: 'ok', generator: SSG_GENERATOR })
@@ -54,10 +59,14 @@ export const requestHandler = async (
         sendJson(res, 400, { error: 'Missing site input' })
         return
       }
+      site = request.site
       const start = Date.now()
-      const result = await generateSite(request.site, request.options)
+      const result = await generateSite(site, request.options)
+      for (const warning of result.warnings) {
+        console.warn(`Warning for site ${siteLabel(site)}: ${warning}`)
+      }
       console.log(
-        `Generated site name=${request.site.name} pages=${result.pages.length}` +
+        `Generated site ${siteLabel(site)} pages=${result.pages.length}` +
           ` noJs=${result.noJs} in ${Date.now() - start}ms`,
       )
       sendJson(res, 200, result)
@@ -65,9 +74,8 @@ export const requestHandler = async (
       sendJson(res, 404, { error: 'Not found' })
     }
   } catch (e) {
-    const message = e instanceof Error ? e.message : String(e)
-    console.error(`Generation failed: ${message}`)
-    sendJson(res, 400, { error: message })
+    console.error(`Generation failed for site ${siteLabel(site)}:`, e)
+    sendJson(res, 400, { error: e instanceof Error ? e.message : String(e) })
   }
 }
 
