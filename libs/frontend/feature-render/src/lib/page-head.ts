@@ -53,9 +53,12 @@ export function getHead(
     ...(site?.defaults.head.script ?? []),
     ...(activePage.head.script ?? []),
   ]
-  // Merge meta
+  // Merge meta. site?.name matches what platform-api substitutes into the SPA shell.
   const description =
-    activePage.head.description ?? site?.defaults.head.description ?? 'PubStudio Site'
+    activePage.head.description ??
+    site?.defaults.head.description ??
+    site?.name ??
+    'PubStudio Site'
   const meta = [
     {
       name: 'description',

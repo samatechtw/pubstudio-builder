@@ -27,6 +27,12 @@ const getOrWaitComponent = (
   componentName: string,
   componentRef: Ref<VNode | undefined>,
 ) => {
+  // No `window` when prerendering in Node. Leave the placeholder for the hydrating client
+  // to fill in, and keep the render from throwing (Vue would swallow it and emit a comment
+  // node, which then mismatches the client's div).
+  if (typeof window === 'undefined') {
+    return
+  }
   runtimeContext.loadVueComponent.loadedComponents[componentName] = componentRef
   if (window[componentName as keyof Window]) {
     componentRef.value = window[componentName as keyof Window]

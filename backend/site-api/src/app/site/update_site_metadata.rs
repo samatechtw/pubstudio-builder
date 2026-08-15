@@ -16,7 +16,10 @@ use lib_shared_types::{
     shared::user::{RequestUser, UserType},
 };
 
-use crate::{api_context::ApiContext, middleware::auth::verify_site_owner};
+use crate::{
+    api_context::ApiContext, app::ssg::generate_static::spawn_regenerate_static_pages,
+    middleware::auth::verify_site_owner,
+};
 
 pub async fn update_site_metadata(
     Path(id): Path<String>,
@@ -36,6 +39,8 @@ pub async fn update_site_metadata(
     if let Some(domains) = &dto.domains {
         validate_custom_domains(&domain_strings(domains))?;
     }
+    let domains_updated = dto.domains.is_some();
+    let disabled_updated = dto.disabled.is_some();
 
     let mut tx = context
         .metadata_repo
@@ -92,6 +97,10 @@ pub async fn update_site_metadata(
     tx.commit().await.map_err(|e| {
         ApiError::internal_error().message(format!("Failed to save domains: {}", e))
     })?;
+
+    if disabled_updated || domains_updated {
+        spawn_regenerate_static_pages(&context, &id, None);
+    }
 
     Ok(())
 }

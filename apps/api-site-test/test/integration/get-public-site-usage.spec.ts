@@ -160,6 +160,37 @@ describe('Get Site Usage', () => {
       })
   })
 
+  // Statically generated pages served through a platform subdomain address the site
+  // server directly, so Host is the server address and Origin is the site domain
+  it('records a page view when only the origin resolves', async () => {
+    await api
+      .post(`/api/sites/${publishedSiteId}/usage/actions/page_view`)
+      .set('Host', 's1.localhost')
+      .set('Origin', 'http://test3.localhost')
+      .send({ route: '/home' })
+      .expect(200)
+
+    const res = await api
+      .get(testEndpoint(publishedSiteId))
+      .set('Authorization', adminAuth)
+      .expect(200)
+    const body: IGetPublicSiteUsageApiResponse = res.body
+    expect(body.total_page_views).toEqual({ '/home': 1 })
+  })
+
+  it('when neither host nor origin resolve', async () => {
+    await api
+      .post(`/api/sites/${publishedSiteId}/usage/actions/page_view`)
+      .set('Host', 's1.localhost')
+      .set('Origin', 'http://not-a-site.localhost')
+      .send({ route: '/home' })
+      .expect(400, {
+        status: 400,
+        code: 'None',
+        message: 'Error fetching site ID by hostname',
+      })
+  })
+
   it('when user is other owner', async () => {
     const ownerAuth = ownerAuthHeader('0c069253-e45d-487c-b7c0-cbe467c33a10')
     const res2 = await api

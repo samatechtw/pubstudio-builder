@@ -1,13 +1,11 @@
 use axum::{
     extract::{Path, State},
+    http::HeaderMap,
     Json,
 };
 use axum_extra::extract::Host;
 use axum_macros::debug_handler;
-use lib_shared_site_api::{
-    error::api_error::ApiError,
-    util::{domains::domain_without_port, json_extractor::PsJson},
-};
+use lib_shared_site_api::{error::api_error::ApiError, util::json_extractor::PsJson};
 use lib_shared_types::{
     dto::site_api::record_page_view_dto::{RecordPageViewDto, RecordPageViewResponse},
     error::api_error::ApiErrorCode,
@@ -15,7 +13,7 @@ use lib_shared_types::{
 
 use crate::{
     api_context::ApiContext,
-    db::db_cache_layer::{get_pages_from_cache_or_repo, get_site_id_by_domain_from_cache_or_repo},
+    db::db_cache_layer::{get_pages_from_cache_or_repo, get_site_id_by_host_or_origin},
 };
 
 #[debug_handler]
@@ -23,12 +21,10 @@ pub async fn record_page_view(
     Path(id): Path<String>,
     State(context): State<ApiContext>,
     Host(hostname): Host,
+    headers: HeaderMap,
     PsJson(dto): PsJson<RecordPageViewDto>,
 ) -> Result<Json<RecordPageViewResponse>, ApiError> {
-    let domain = domain_without_port(hostname);
-
-    // domain -> site_id from cache
-    let site_id = get_site_id_by_domain_from_cache_or_repo(&context, domain).await?;
+    let site_id = get_site_id_by_host_or_origin(&context, hostname, &headers).await?;
     if id != site_id {
         return Err(ApiError::bad_request().code(ApiErrorCode::InvalidFormData));
     }

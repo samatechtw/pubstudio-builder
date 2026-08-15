@@ -1,8 +1,10 @@
 use std::collections::{HashMap, HashSet};
 
+use axum::http::HeaderMap;
 use lib_shared_site_api::cache::cache_helpers::{
     get_site_defaults, get_site_description, get_site_title,
 };
+use lib_shared_site_api::util::domains::{domain_without_port, origin_domain};
 use lib_shared_site_api::{cache::cache::SiteMetadata, error::api_error::ApiError};
 use lib_shared_types::cache::site_data::{CachedSiteData, CachedSiteHead};
 use lib_shared_types::dto::site_api::get_current_site_dto::GetCurrentSiteResponse;
@@ -161,4 +163,22 @@ pub async fn get_site_id_by_domain_from_cache_or_repo(
             .await
             .map_err(|_| ApiError::bad_request().message("Error fetching site ID by hostname"))?,
     })
+}
+
+// Resolve the site a browser request belongs to. Pages served through a platform subdomain
+// address the site server directly, so Host is server address rather than site domain.
+// the browser sends the site's own domain as Origin, which is no easier to forge than Host.
+pub async fn get_site_id_by_host_or_origin(
+    context: &ApiContext,
+    hostname: String,
+    headers: &HeaderMap,
+) -> Result<String, ApiError> {
+    let domain = domain_without_port(hostname);
+    match get_site_id_by_domain_from_cache_or_repo(context, domain).await {
+        Ok(site_id) => Ok(site_id),
+        Err(e) => {
+            let origin = origin_domain(headers).ok_or(e)?;
+            get_site_id_by_domain_from_cache_or_repo(context, origin).await
+        }
+    }
 }

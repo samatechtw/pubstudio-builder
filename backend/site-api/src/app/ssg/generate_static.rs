@@ -32,21 +32,25 @@ pub async fn regenerate_static_pages(context: &ApiContext, site_id: &str) -> Res
         .await
         .map_err(|e| ApiError::not_found().message(e))?;
 
-    if !site.published {
-        context
-            .site_repo
-            .clear_static_pages(site_id)
-            .await
-            .map_err(|e| ApiError::internal_error().message(e))?;
-        info!("Cleared static pages for unpublished site {}", site_id);
-        return Ok(());
-    }
-
     let metadata = context
         .metadata_repo
         .get_site_metadata(site_id)
         .await
         .map_err(|e| ApiError::not_found().message(e))?;
+
+    if !site.published || metadata.disabled {
+        context
+            .site_repo
+            .clear_static_pages(site_id)
+            .await
+            .map_err(|e| ApiError::internal_error().message(e))?;
+        info!(
+            "Cleared static pages for site {} (published={}, disabled={})",
+            site_id, site.published, metadata.disabled
+        );
+        return Ok(());
+    }
+
     let base_url = metadata
         .domains
         .first()
