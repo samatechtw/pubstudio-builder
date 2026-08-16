@@ -20,18 +20,20 @@ export interface IPushCommandOptions {
 }
 
 // Helper for pushing a command to separate siteStore.save
+// Returns false if the command was ignored because editing is disabled.
+// An empty command group is a no-op, and still returns true.
 const pushCommandHelper = (
   site: ISite,
   command: ICommand,
   options?: IPushCommandOptions,
-) => {
+): boolean => {
   const isRedo = options?.isRedo
   const cmd = optimizeCommandGroup(command)
   const { editingMixinData } = site.editor ?? {}
 
   // Live site cannot be updated when a draft exists
   if (!store.version.editingEnabled.value) {
-    return
+    return false
   }
 
   // Push a command to close mixin menu for user when necessary
@@ -50,6 +52,7 @@ const pushCommandHelper = (
       site.history.forward = []
     }
   }
+  return true
 }
 
 // Returns true if a command is in the given commandTypes.
@@ -79,18 +82,25 @@ const shouldCloseMixinMenu = (newCmd: ICommand | undefined): boolean => {
   }
 }
 
-// Applies a command and pushes it to the history stack
-export const pushCommand = <Data>(site: ISite, type: CommandType, data: Data) => {
-  pushCommandObject(site, { type, data })
+// Applies a command and pushes it to the history stack.
+// Returns false if the command was ignored because editing is disabled.
+export const pushCommand = <Data>(
+  site: ISite,
+  type: CommandType,
+  data: Data,
+): boolean => {
+  return pushCommandObject(site, { type, data })
 }
 
+// Returns false if the command was ignored because editing is disabled
 export const pushCommandObject = (
   site: ISite,
   command: ICommand,
   options?: IPushCommandOptions,
-) => {
-  pushCommandHelper(site, command, options)
+): boolean => {
+  const pushed = pushCommandHelper(site, command, options)
   site.editor?.store?.save?.(site)
+  return pushed
 }
 
 export const getLastCommand = (site: ISite): ICommand | undefined => {
