@@ -103,6 +103,28 @@ export const pushCommandObject = (
   return pushed
 }
 
+// Records commands that were already applied to `site` as a single undo step.
+// Callers that resolve each command against the state left by the previous one must
+// apply as they go, so this pushes history without applying again. The group is kept
+// even for a single command, so one batch stays one labelled history entry.
+// Returns false if the commands were ignored because editing is disabled.
+export const pushAppliedGroup = (
+  site: ISite,
+  commands: ICommand[],
+  label?: string,
+): boolean => {
+  if (!store.version.editingEnabled.value) {
+    return false
+  }
+  if (commands.length) {
+    const data: ICommandGroupData = { commands, label }
+    site.history.back.push({ type: CommandType.Group, data })
+    site.history.forward = []
+  }
+  site.editor?.store?.save?.(site)
+  return true
+}
+
 export const getLastCommand = (site: ISite): ICommand | undefined => {
   return getLastCommandHelper(site)
 }

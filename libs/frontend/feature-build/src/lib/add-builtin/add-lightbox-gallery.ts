@@ -5,7 +5,10 @@ import {
 } from '@pubstudio/frontend/data-access-command'
 import { descSortedBreakpoints } from '@pubstudio/frontend/feature-site-source'
 import { lightboxGallery } from '@pubstudio/frontend/util-builtin'
-import { makeAddComponentData } from '@pubstudio/frontend/util-command-data'
+import {
+  makeAddComponentData,
+  makeSetComponentCustomStyle,
+} from '@pubstudio/frontend/util-command-data'
 import {
   downloadImageBehaviorId,
   hideLightboxBehaviorId,
@@ -22,7 +25,6 @@ import {
   ISite,
   Keys,
 } from '@pubstudio/shared/type-site'
-import { makeSetComponentCustomStyle } from '../command-wrap/component-style'
 import {
   addComponentToParent,
   getMissingComponentFields,
@@ -74,7 +76,6 @@ export const addLightboxGallery = (site: ISite) => {
         imageGrid,
         breakpointId,
         Css.GridTemplateColumns,
-        undefined,
         'repeat(2, 1fr)',
       )
       appendLastCommand(site, gridResponsiveStyle, false)

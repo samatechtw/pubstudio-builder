@@ -1,5 +1,12 @@
 import { getLastCommand } from '@pubstudio/frontend/data-access-command'
 import { activeBreakpoint } from '@pubstudio/frontend/feature-site-source'
+import {
+  componentOverrideStyleValue,
+  componentStyleValue,
+  IStyleTarget,
+  makeSetComponentCustomStyleData,
+  makeSetComponentOverrideStyleData,
+} from '@pubstudio/frontend/util-command-data'
 import { resolvedComponentStyle } from '@pubstudio/frontend/util-component'
 import { CommandType, ICommand } from '@pubstudio/shared/type-command'
 import {
@@ -10,7 +17,7 @@ import {
 } from '@pubstudio/shared/type-command-data'
 import { Css, IComponent, ISite, IStyleEntry } from '@pubstudio/shared/type-site'
 
-export type IRemoveStyleEntry = Omit<IStyleEntry, 'value'>
+export type IRemoveStyleEntry = IStyleTarget
 
 export interface ISetCustomStyleOptions {
   replace?: boolean
@@ -66,22 +73,14 @@ export const removeComponentCustomStyleCommand = (
   style: IRemoveStyleEntry,
 ): ICommand | undefined => {
   const selected = site.editor?.selectedComponent
-  const oldValue =
-    selected?.style.custom[activeBreakpoint.value.id]?.[style.pseudoClass]?.[
-      style.property
-    ]
-  if (!selected || oldValue === undefined) {
+  const breakpointId = activeBreakpoint.value.id
+  if (!selected || componentStyleValue(selected, breakpointId, style) === undefined) {
     return undefined
   }
-  const data: ISetComponentCustomStyleData = {
-    componentId: selected.id,
-    breakpointId: activeBreakpoint.value.id,
-    oldStyle: {
-      ...style,
-      value: oldValue,
-    },
+  return {
+    type: CommandType.SetComponentCustomStyle,
+    data: makeSetComponentCustomStyleData(selected, breakpointId, style, undefined),
   }
-  return { type: CommandType.SetComponentCustomStyle, data }
 }
 
 // Commands for setting a component's position to absolute
@@ -118,25 +117,13 @@ export const setPositionAbsoluteCommands = (
   if (!parent || parentPosition === 'relative' || parentPosition === 'absolute') {
     return [setAbsolute]
   } else {
-    const oldValue =
-      parent.style.custom[activeBreakpoint.value.id][pseudoClass]?.[Css.Position]
-    const parentData: ISetComponentCustomStyleData = {
-      componentId: parent.id,
-      breakpointId: activeBreakpoint.value.id,
-      select: false,
-      oldStyle: oldValue
-        ? {
-            pseudoClass,
-            property: Css.Position,
-            value: oldValue,
-          }
-        : undefined,
-      newStyle: {
-        pseudoClass,
-        property: Css.Position,
-        value: 'relative',
-      },
-    }
+    const parentData = makeSetComponentCustomStyleData(
+      parent,
+      activeBreakpoint.value.id,
+      { pseudoClass, property: Css.Position },
+      'relative',
+      false,
+    )
     return [
       {
         type: CommandType.SetComponentCustomStyle,
@@ -172,23 +159,23 @@ export const removeComponentOverrideStyleEntryCommand = (
   style: IRemoveStyleEntry,
 ): ICommand | undefined => {
   const selected = site.editor?.selectedComponent
-  const oldValue =
-    selected?.style.overrides?.[selector][activeBreakpoint.value.id][style.pseudoClass]?.[
-      style.property
-    ]
-  if (!oldValue) {
+  const breakpointId = activeBreakpoint.value.id
+  if (
+    !selected ||
+    componentOverrideStyleValue(selected, selector, breakpointId, style) === undefined
+  ) {
     return
   }
-  const data: ISetComponentOverrideStyleData = {
-    componentId: selected.id,
-    breakpointId: activeBreakpoint.value.id,
-    selector: selector,
-    oldStyle: {
-      ...style,
-      value: oldValue,
-    },
+  return {
+    type: CommandType.SetComponentOverrideStyle,
+    data: makeSetComponentOverrideStyleData(
+      selected,
+      selector,
+      breakpointId,
+      style,
+      undefined,
+    ),
   }
-  return { type: CommandType.SetComponentOverrideStyle, data }
 }
 
 export const editMixinEntryCommand = (
