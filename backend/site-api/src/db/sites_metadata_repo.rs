@@ -60,14 +60,16 @@ pub struct SitesMetadataRepo {
 }
 
 fn row_to_site_metadata(row: SqliteRow) -> Result<SiteMetadataEntity, Error> {
-    let domains: String = row.try_get("domains")?;
+    let domains: Option<String> = row.try_get("domains")?;
     Ok(SiteMetadataEntity {
         id: row.try_get("id")?,
         location: row.try_get("location")?,
         owner_id: row.try_get("owner_id")?,
         owner_email: row.try_get("owner_email")?,
         domains: domains
+            .unwrap_or_default()
             .split(",")
+            .filter(|r| !r.is_empty())
             .map(|r| {
                 let d: Vec<&str> = r.split("|").collect();
                 let verified = d.get(1).unwrap_or(&"0") == &"1";
@@ -143,7 +145,7 @@ impl SitesMetadataRepoTrait for SitesMetadataRepo {
             GROUP_CONCAT(d.domain || '|' || d.verified) as domains
         FROM sites s
         LEFT OUTER JOIN domains d ON d.site_id = s.id
-        GROUP BY d.site_id
+        GROUP BY s.id
     "#,
         )
         .try_map(row_to_site_metadata)

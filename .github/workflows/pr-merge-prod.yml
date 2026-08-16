@@ -6,6 +6,10 @@ on:
     branches: [prod]
   issue_comment:
     types: [created]
+  workflow_dispatch:
+    inputs:
+      source:
+        description: 'Input a trigger source'
 
 env:
   WORKSPACE_ROOT: .
@@ -19,7 +23,7 @@ concurrency:
 jobs:
   fast_forward_job:
     name: Fast Forward
-    if: github.event.issue.pull_request && contains(github.event.comment.body, '/ff')
+    if: github.event_name == 'workflow_dispatch' || (github.event.issue.pull_request && contains(github.event.comment.body, '/ff'))
     runs-on: ubuntu-22.04
     steps:
       # To use this repository's private action, you must check out the repository
@@ -30,6 +34,7 @@ jobs:
           persist-credentials: false
       # Basic use case example
       - name: Fast Forward PR
+        if: ${{ github.event_name != 'workflow_dispatch' }}
         id: ff-action
         uses: samatechtw/fast-forward-js-action@master
         with:
@@ -47,6 +52,7 @@ jobs:
       should_skip: ${{ steps.skip_check.outputs.should_skip }}
     steps:
       - id: skip_check
+        if: ${{ github.event_name != 'workflow_dispatch' }}
         uses: fkirc/skip-duplicate-actions@v5
         with:
           concurrent_skipping: 'never'
