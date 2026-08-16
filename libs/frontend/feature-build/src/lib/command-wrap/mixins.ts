@@ -1,5 +1,9 @@
 import { pushCommand } from '@pubstudio/frontend/data-access-command'
 import { activeBreakpoint } from '@pubstudio/frontend/feature-site-source'
+import {
+  componentStyleValue,
+  makeSetMixinEntryData,
+} from '@pubstudio/frontend/util-command-data'
 import { styleId } from '@pubstudio/frontend/util-ids'
 import { resolveComponent } from '@pubstudio/frontend/util-resolve'
 import { CommandType, ICommand } from '@pubstudio/shared/type-command'
@@ -8,7 +12,6 @@ import {
   IAddStyleMixinData,
   ICommandGroupData,
   ISetComponentCustomStyleData,
-  ISetMixinEntryData,
 } from '@pubstudio/shared/type-command-data'
 import {
   Css,
@@ -43,25 +46,17 @@ export const moveComponentStyleToMixin = (
   })
   // Add the style to the mixin
   const mixin = site.context.styles[mixinId]
-  const newVal = component.style.custom[breakpointId]?.[pseudo]?.[css]
+  const newVal = componentStyleValue(component, breakpointId, {
+    pseudoClass: pseudo,
+    property: css,
+  })
   if (removeStyle && mixin && newVal) {
-    const oldVal = mixin.breakpoints[breakpointId]?.[pseudo]?.[css]
-    const setMixinData: ISetMixinEntryData = {
-      mixinId,
+    const setMixinData = makeSetMixinEntryData(
+      mixin,
       breakpointId,
-      oldStyle: oldVal
-        ? {
-            pseudoClass: pseudo,
-            property: css,
-            value: oldVal,
-          }
-        : undefined,
-      newStyle: {
-        pseudoClass: pseudo,
-        property: css,
-        value: newVal,
-      },
-    }
+      { pseudoClass: pseudo, property: css },
+      newVal,
+    )
     const commands: ICommand[] = [
       removeStyle,
       { type: CommandType.SetMixinEntry, data: setMixinData },

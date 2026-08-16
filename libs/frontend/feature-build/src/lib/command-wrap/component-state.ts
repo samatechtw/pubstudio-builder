@@ -1,7 +1,23 @@
 import { pushCommand } from '@pubstudio/frontend/data-access-command'
+import { makeSetStateData } from '@pubstudio/frontend/util-command-data'
 import { CommandType } from '@pubstudio/shared/type-command'
-import { ISetComponentStateData } from '@pubstudio/shared/type-command-data'
 import { IComponent, IComponentState, ISite } from '@pubstudio/shared/type-site'
+
+const pushSetState = (
+  site: ISite,
+  component: IComponent | undefined,
+  oldKey: string | undefined,
+  newKey: string | undefined,
+  newVal: IComponentState | undefined,
+) => {
+  if (!component) {
+    return
+  }
+  const data = makeSetStateData(component, oldKey, newKey, newVal)
+  if (data) {
+    pushCommand(site, CommandType.SetComponentState, data)
+  }
+}
 
 export const addComponentState = (
   site: ISite,
@@ -9,12 +25,11 @@ export const addComponentState = (
   stateKey: string,
   stateVal: IComponentState,
 ) => {
-  const data: ISetComponentStateData = {
+  pushCommand(site, CommandType.SetComponentState, {
     componentId,
     newKey: stateKey,
     newVal: stateVal,
-  }
-  pushCommand(site, CommandType.SetComponentState, data)
+  })
 }
 
 export const removeComponentState = (
@@ -22,16 +37,7 @@ export const removeComponentState = (
   component: IComponent | undefined,
   stateKey: string,
 ) => {
-  const oldVal = component?.state?.[stateKey]
-  if (!component || oldVal === undefined) {
-    return
-  }
-  const data: ISetComponentStateData = {
-    componentId: component.id,
-    oldKey: stateKey,
-    oldVal,
-  }
-  pushCommand(site, CommandType.SetComponentState, data)
+  pushSetState(site, component, stateKey, undefined, undefined)
 }
 
 export const setComponentState = (
@@ -41,15 +47,8 @@ export const setComponentState = (
   newKey: string | undefined,
   newVal: IComponentState,
 ) => {
-  const oldVal = component?.state?.[oldKey]
-  if (!component || oldVal === undefined || oldVal === newVal) {
+  if (component?.state?.[oldKey] === newVal) {
     return
   }
-  const data: ISetComponentStateData = {
-    componentId: component.id,
-    oldKey,
-    newKey,
-    newVal,
-  }
-  pushCommand(site, CommandType.SetComponentState, data)
+  pushSetState(site, component, oldKey, newKey, newVal)
 }

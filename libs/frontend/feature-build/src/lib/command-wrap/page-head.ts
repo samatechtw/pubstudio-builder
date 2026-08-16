@@ -1,52 +1,16 @@
-import { pushCommand, pushCommandObject } from '@pubstudio/frontend/data-access-command'
+import { pushCommandObject } from '@pubstudio/frontend/data-access-command'
+import { makeSetPageHead } from '@pubstudio/frontend/util-command-data'
 import { CommandType, ICommand } from '@pubstudio/shared/type-command'
-import { ICommandGroupData, ISetPageHeadData } from '@pubstudio/shared/type-command-data'
+import { ICommandGroupData } from '@pubstudio/shared/type-command-data'
 import { IHeadMeta, IHeadObject, IPageHeadTag, ISite } from '@pubstudio/shared/type-site'
-
-const getOldHead = (
-  site: ISite,
-  route: string,
-  tag: IPageHeadTag,
-  index: number,
-): IHeadObject | string | undefined => {
-  const head = site.pages[route]?.head
-  if (!head) {
-    return undefined
-  } else if (tag === 'title') {
-    return head.title
-  } else {
-    return (head[tag] as unknown[])?.[index] as IHeadObject
-  }
-}
-
-const makeSetPageHeadCommand = (
-  site: ISite,
-  route: string,
-  tag: IPageHeadTag,
-  index: number | undefined,
-  value: IHeadObject | string | undefined,
-): ICommand<ISetPageHeadData> => {
-  const oldValue = index === undefined ? undefined : getOldHead(site, route, tag, index)
-  return {
-    type: CommandType.SetPageHead,
-    data: {
-      route,
-      tag,
-      index: index ?? 0,
-      newValue: value,
-      oldValue,
-    },
-  }
-}
 
 export const addPageHead = (
   site: ISite,
   route: string,
   tag: IPageHeadTag,
-  value: IHeadObject | string,
+  value: IHeadObject,
 ) => {
-  const cmd = makeSetPageHeadCommand(site, route, tag, undefined, value)
-  pushCommandObject(site, cmd)
+  pushCommandObject(site, makeSetPageHead(site, route, tag, undefined, value))
 }
 
 export const setPageHead = (
@@ -54,10 +18,9 @@ export const setPageHead = (
   route: string,
   tag: IPageHeadTag,
   index: number,
-  value: IHeadObject | string,
+  value: IHeadObject,
 ) => {
-  const cmd = makeSetPageHeadCommand(site, route, tag, index, value)
-  pushCommandObject(site, cmd)
+  pushCommandObject(site, makeSetPageHead(site, route, tag, index, value))
 }
 
 export const removePageHead = (
@@ -66,8 +29,7 @@ export const removePageHead = (
   tag: IPageHeadTag,
   index: number,
 ) => {
-  const cmd = makeSetPageHeadCommand(site, route, tag, index, undefined)
-  pushCommandObject(site, cmd)
+  pushCommandObject(site, makeSetPageHead(site, route, tag, index, undefined))
 }
 
 type PageMetaPredicate = (m: IHeadMeta) => boolean
@@ -85,7 +47,6 @@ const getHeadIndex = (
 }
 
 export const setPageDescription = (site: ISite, route: string, value: string) => {
-  const cmds: ICommand[] = []
   const index = getHeadIndex(site, route, 'meta', (m) => m.name === 'description')
   const ogIndex = getHeadIndex(
     site,
@@ -101,9 +62,11 @@ export const setPageDescription = (site: ISite, route: string, value: string) =>
     property: 'og:description',
     content: value,
   }
-  cmds.push(makeSetPageHeadCommand(site, route, 'meta', index, desc))
-  cmds.push(makeSetPageHeadCommand(site, route, 'meta', ogIndex, ogDesc))
-  const data: ICommandGroupData = { commands: cmds }
+  const commands: ICommand[] = [
+    makeSetPageHead(site, route, 'meta', index, desc),
+    makeSetPageHead(site, route, 'meta', ogIndex, ogDesc),
+  ]
+  const data: ICommandGroupData = { commands }
   pushCommandObject(site, { type: CommandType.Group, data })
 }
 
@@ -114,18 +77,11 @@ export const setPageFavicon = (
 ) => {
   const page = site.pages[route]
   if (page) {
-    const index = page.head.link?.findIndex((link) => link.rel === 'icon') ?? 0
-    const oldValue = index === -1 ? undefined : page.head.link?.[index]
-    const data: ISetPageHeadData = {
-      route: page.route,
-      tag: 'link',
-      index: index === -1 ? 0 : index,
-      oldValue,
-      newValue: {
-        href: newFavicon,
-        rel: 'icon',
-      },
-    }
-    pushCommand(site, CommandType.SetPageHead, data)
+    const index = page.head.link?.findIndex((link) => link.rel === 'icon') ?? -1
+    const favicon = { href: newFavicon, rel: 'icon' }
+    pushCommandObject(
+      site,
+      makeSetPageHead(site, route, 'link', index === -1 ? undefined : index, favicon),
+    )
   }
 }

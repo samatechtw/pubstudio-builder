@@ -1,5 +1,6 @@
 import { pushCommand } from '@pubstudio/frontend/data-access-command'
 import { activeBreakpoint } from '@pubstudio/frontend/feature-site-source'
+import { makeSetComponentCustomStyle } from '@pubstudio/frontend/util-command-data'
 import { parseCssSize } from '@pubstudio/frontend/util-component'
 import { CommandType } from '@pubstudio/shared/type-command'
 import {
@@ -8,7 +9,6 @@ import {
   IMoveComponentData,
 } from '@pubstudio/shared/type-command-data'
 import { Css, CssPseudoClass, IComponent, ISite } from '@pubstudio/shared/type-site'
-import { makeSetComponentCustomStyle } from './component-style'
 
 const addPxToCss = (
   scale: number,
@@ -41,8 +41,8 @@ export const moveAbsoluteComponent = (
 
   const data: ICommandGroupData = {
     commands: [
-      makeSetComponentCustomStyle(component, breakpointId, Css.Left, oldLeft, newLeft),
-      makeSetComponentCustomStyle(component, breakpointId, Css.Top, oldTop, newTop),
+      makeSetComponentCustomStyle(component, breakpointId, Css.Left, newLeft),
+      makeSetComponentCustomStyle(component, breakpointId, Css.Top, newTop),
     ],
   }
   pushCommand(site, CommandType.Group, data)

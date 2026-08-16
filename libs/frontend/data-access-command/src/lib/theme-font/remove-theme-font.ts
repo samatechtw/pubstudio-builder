@@ -11,10 +11,11 @@ export const applyRemoveThemeFont = (site: ISite, data: IRemoveThemeFontData) =>
 }
 
 export const undoRemoveThemeFont = (site: ISite, data: IRemoveThemeFontData) => {
-  const { source, name, fallback } = data
+  const { source, name, url, fallback } = data
   site.context.theme.fonts[name] = {
     source,
     name,
+    url,
     fallback,
   }
 }

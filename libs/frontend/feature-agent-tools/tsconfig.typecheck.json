@@ -1,0 +1,11 @@
+{
+  "extends": "../../../tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "strict": true,
+    "target": "ESNext",
+    "lib": ["es2022", "dom", "dom.iterable"],
+    "types": ["vitest/globals", "vite/client"]
+  },
+  "include": ["src/**/*.ts"]
+}

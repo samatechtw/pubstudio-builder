@@ -21,6 +21,7 @@ export const makeRemoveComponentData = (
     children: component.children?.map((c) => makeRemoveComponentData(site, c)),
     customComponentId: component.customSourceId,
     style: component.style,
+    state: component.state,
     inputs: component.inputs,
     events: component.events,
     editorEvents: site.editor?.editorEvents[component.id],

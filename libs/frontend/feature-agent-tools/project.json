@@ -1,0 +1,24 @@
+{
+  "name": "feature-agent-tools",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/frontend/feature-agent-tools/src",
+  "projectType": "library",
+  "targets": {
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "options": {
+        "lintFilePatterns": ["libs/frontend/feature-agent-tools/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "outputs": ["{workspaceRoot}/coverage/libs/frontend/feature-agent-tools"],
+      "options": {
+        "commands": ["tsc -p tsconfig.typecheck.json", "vitest run --passWithNoTests"],
+        "cwd": "libs/frontend/feature-agent-tools",
+        "parallel": false
+      }
+    }
+  },
+  "tags": ["scope:frontend", "type:feature"]
+}
