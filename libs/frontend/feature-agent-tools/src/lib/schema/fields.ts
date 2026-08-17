@@ -29,7 +29,7 @@ export const pseudoClassField = (): Schema<CssPseudoClass | undefined> =>
   oneOf(PSEUDO_CLASSES).dflt(CssPseudoClass.Default).desc('CSS pseudo-class.')
 
 export const cssPropertyField = (): Schema<Css> =>
-  oneOf(CSS_PROPERTIES).desc('CSS property, in kebab-case.')
+  oneOf(CSS_PROPERTIES, 'cssProperty').desc('CSS property, in kebab-case.')
 
 export const styleValueField = (): Schema<string | undefined> =>
   str()
@@ -48,4 +48,4 @@ export const mixinIdField = (): Schema<string> =>
 export const behaviorIdField = (): Schema<string> =>
   str().desc('Behavior id, e.g. "my-site-b-3". See read({behaviors:true}).')
 
-export const tagField = (): Schema<Tag> => oneOf(TAGS).desc('HTML tag.')
+export const tagField = (): Schema<Tag> => oneOf(TAGS, 'tag').desc('HTML tag.')

@@ -1,4 +1,15 @@
-import { arr, bool, json, num, obj, oneOf, parseSchema, record, str } from './schema'
+import {
+  arr,
+  bool,
+  json,
+  num,
+  obj,
+  oneOf,
+  parseSchema,
+  record,
+  referencedDefs,
+  str,
+} from './schema'
 
 describe('Schema', () => {
   const schema = obj({
@@ -64,5 +75,34 @@ describe('Schema', () => {
         on: { type: 'boolean' },
       },
     })
+  })
+
+  it('emits a named enum as a $ref and resolves it through referencedDefs', () => {
+    const named = obj({
+      unit: oneOf(['px', 'em', 'rem'] as const, 'lengthUnit').desc('Unit'),
+      plain: oneOf(['a', 'b'] as const).optional(),
+    })
+    expect(named.toJson()).toEqual({
+      type: 'object',
+      additionalProperties: false,
+      required: ['unit'],
+      properties: {
+        unit: { $ref: '#/$defs/lengthUnit', description: 'Unit' },
+        plain: { type: 'string', enum: ['a', 'b'] },
+      },
+    })
+    expect(referencedDefs([named.toJson()])).toEqual({
+      lengthUnit: { type: 'string', enum: ['px', 'em', 'rem'] },
+    })
+    expect(referencedDefs([{ type: 'string' }])).toBeUndefined()
+  })
+
+  it('validates a named enum the same as an inline one', () => {
+    const named = obj({ unit: oneOf(['px', 'em'] as const, 'lengthUnit2') })
+    expect(parseSchema(named, { unit: 'px' })).toEqual({
+      ok: true,
+      value: { unit: 'px' },
+    })
+    expect(parseSchema(named, { unit: 'pt' }).ok).toEqual(false)
   })
 })

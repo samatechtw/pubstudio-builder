@@ -2,7 +2,7 @@
 //
 // It exists instead of a validation dependency because the only consumers are agent op
 // definitions, which need three things: TypeScript inference for `resolve`, JSON Schema
-// for `describe()`, and issue paths precise enough for an agent to self-correct.
+// for `describeTools()`, and issue paths precise enough for an agent to self-correct.
 
 export type JsonSchema = Record<string, unknown>
 
@@ -82,7 +82,40 @@ export const bool = (): Schema<boolean> => primitive<boolean>('boolean', 'boolea
 // Accepts any JSON value; used where the site model itself is unconstrained
 export const json = (): Schema<unknown> => new Schema<unknown>({}, (value) => value)
 
-const MAX_LISTED_OPTIONS = 12
+export const MAX_LISTED_OPTIONS = 12
+
+const SCHEMA_DEFS: Record<string, JsonSchema> = {}
+
+const DEFS_PREFIX = '#/$defs/'
+
+const collectRefs = (schema: unknown, into: Set<string>): void => {
+  if (Array.isArray(schema)) {
+    schema.forEach((entry) => collectRefs(entry, into))
+  } else if (schema && typeof schema === 'object') {
+    for (const [key, value] of Object.entries(schema)) {
+      if (key === '$ref' && typeof value === 'string' && value.startsWith(DEFS_PREFIX)) {
+        into.add(value.slice(DEFS_PREFIX.length))
+      } else {
+        collectRefs(value, into)
+      }
+    }
+  }
+}
+
+export const referencedDefs = (
+  schemas: unknown[],
+): Record<string, JsonSchema> | undefined => {
+  const names = new Set<string>()
+  schemas.forEach((schema) => collectRefs(schema, names))
+  if (!names.size) {
+    return undefined
+  }
+  const defs: Record<string, JsonSchema> = {}
+  for (const name of [...names].sort()) {
+    defs[name] = SCHEMA_DEFS[name]
+  }
+  return defs
+}
 
 // Long enums (every CSS property, every tag) would flood the agent's context, so list
 // near misses instead and point at the schema for the rest.
@@ -97,16 +130,26 @@ const enumMessage = (values: readonly string[], value: unknown): string => {
   const hint = near.length
     ? `did you mean: ${near.slice(0, MAX_LISTED_OPTIONS).join(', ')}?`
     : `e.g. ${values.slice(0, 5).join(', ')}`
-  return `not one of the ${values.length} allowed values — ${hint} See describe() for the full list.`
+  return `not one of the ${values.length} allowed values — ${hint} See describeTools() for the full list.`
 }
 
-export const oneOf = <const T extends readonly string[]>(values: T): Schema<T[number]> =>
-  new Schema<T[number]>({ type: 'string', enum: values }, (value, path, issues) => {
+export const oneOf = <const T extends readonly string[]>(
+  values: T,
+  // Required for any list longer than MAX_LISTED_OPTIONS
+  defName?: string,
+): Schema<T[number]> => {
+  const check: Check<T[number]> = (value, path, issues) => {
     if (typeof value !== 'string' || !values.includes(value)) {
       issues.push({ path, message: enumMessage(values, value) })
     }
     return value as T[number]
-  })
+  }
+  if (!defName) {
+    return new Schema<T[number]>({ type: 'string', enum: values }, check)
+  }
+  SCHEMA_DEFS[defName] = { type: 'string', enum: values }
+  return new Schema<T[number]>({ $ref: `${DEFS_PREFIX}${defName}` }, check)
+}
 
 export const arr = <S extends AnySchema>(item: S): Schema<Infer<S>[]> =>
   new Schema<Infer<S>[]>(

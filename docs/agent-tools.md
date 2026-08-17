@@ -5,7 +5,7 @@ for AI agents to drive from outside the app (e.g. `chrome-devtools-mcp`'s `evalu
 against a builder tab). Every mutation goes through the existing command stack, so agent
 edits undo like a human's.
 
-The code is the source of truth. `PubStudio.describe()` is the tool and op reference, this
+The code is the source of truth. `PubStudio.describeTools()` is the tool and op reference, this
 page covers non-obvious design constraints and maintenance rules.
 
 ## Enabling
@@ -54,7 +54,7 @@ src/lib/
 ├── op/              # OpDef, registry, drift guard, resolve helpers, test fixture
 ├── ops/             # the 41 op definitions, grouped by command family
 ├── read/            # compact agent-facing views (tree text, component views, find)
-├── tools/           # identify / describe / apply / history / status / session
+├── tools/           # identify / describeTools / apply / history / status / session
 ├── install.ts       # installs window.PubStudio, returns uninstall()
 └── AgentToolsBridge.vue
 ```
@@ -81,19 +81,35 @@ If you change `IOpDef`, re-verify the guard still triggers (below).
 ### No validation dependency
 
 `schema/schema.ts` is a ~190-line DSL. The workspace has no validation dependency and this
-lib has to stay small enough to lazy-load. It emits JSON Schema for `describe()`, validates
+lib has to stay small enough to lazy-load. It emits JSON Schema for `describeTools()`, validates
 with issue paths (`ops[3].input.property`), and infers TypeScript types.
 
-Two behaviours to preserve when editing it:
+Three behaviours to preserve when editing it:
 
 - **Unknown object keys are errors.** That is what turns an agent's `propery` typo into a
   fixable message instead of a silent no-op.
 - **Long enums are summarised in errors.** `oneOf` over 105 CSS properties must not dump all
-  105 names into a validation message; it reports near-misses and points at `describe()`.
+  105 names into a validation message; it reports near-misses and points at `describeTools()`.
+- **Long enums are emitted once.** `oneOf(values, 'name')` puts the list in a shared `$defs`
+  map and leaves `{"$ref": "#/$defs/name"}` at the use site; `describeTools()` then emits only the
+  defs the returned schemas reference. Inline, the CSS property list appeared in five ops and
+  inside `addComponent`'s style array items — it was half of a six-op `describeTools()` response.
+  A round-trip test fails on any inline enum longer than `MAX_LISTED_OPTIONS`.
 
 `.optional()` widens to `T | undefined` and the object type mapper turns those into optional
 keys, so there is no separate input/output type. `.dflt(v)` only annotates the JSON Schema
 and marks the field optional — the op applies the fallback itself in `resolve`.
+
+### `describeTools()` is on the agent's token budget
+
+It is the op reference, so an agent calls `describeTools({ops})` repeatedly mid-build. Two rules
+keep that affordable, and both are easy to undo by accident:
+
+- **`describeTools({ops})` omits the table of contents** (tools, 41 op summaries, the
+  excluded-command map — 5.7 KB). The agent already has it from `identify()`. `describeTools()`,
+  `describeTools({all:true})` and an explicit `toc:true` still include it.
+- **`$defs` as above.** Six style-adjacent ops cost 19.8 KB before both changes and 9.7 KB
+  after.
 
 ## The two compile-time guarantees
 
@@ -187,10 +203,10 @@ the object is obvious, keep it where there is ambiguity (`setComponentStyle` vs
   allocated during apply. `AddComponent` writes `data.id` in place; mixins and behaviors are
   read back off `latestStyleId`/`latestBehaviorId`; `AddPage` creates its root inside the
   command, so the root id is read from `site.pages[route]`.
-- **`apply()` is the only async tool.** `identify`, `describe`, `read`, `history` and
+- **`apply()` is the only async tool.** `identify`, `describeTools`, `read`, `history` and
   `status` return a `Result` directly. Over `evaluate_script` a forgotten `await` serialises
   to `{}`, which reads exactly like a silent failure, so the `apply` tool doc leads with it.
-- **An op entry is `{op, input}`,** not the op's fields inline. `describe()` documents each
+- **An op entry is `{op, input}`,** not the op's fields inline. `describeTools()` documents each
   op's input schema but the envelope belongs to `apply`, so `apply`'s tool doc carries an
   `example` — the same affordance ops get.
 
@@ -266,7 +282,7 @@ Included in `identify()`'s orientation payload, but important enough to repeat:
 
 ## Known gaps
 
-- **No generated op reference.** `describe()` is the live source of truth; a
+- **No generated op reference.** `describeTools()` is the live source of truth; a
   `docs/agent-tools-reference.md` generated from `OP_REGISTRY` with a CI drift check was
   designed but not built.
 - **No skill package** for the agent side of the workflow.

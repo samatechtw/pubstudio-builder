@@ -257,7 +257,7 @@ export const read = (site: ISite, input: IReadInput): Record<string, unknown> =>
   if (!Object.keys(result).length) {
     throw new AgentError(
       'INVALID_INPUT',
-      'read() needs a selector. See describe() for the list, or start with read({site:true}).',
+      'read() needs a selector. See describeTools() for the list, or start with read({site:true}).',
     )
   }
   return result
