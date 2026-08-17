@@ -127,7 +127,15 @@ against the op's own schema, resolves it, applies the commands, asserts somethin
 then undoes and asserts the site is byte-identical. A new op ships one `example()` and
 inherits all of it.
 
-Three things about that suite are easy to get wrong when editing it:
+**Every op runs the loop twice — once on a plain fixture, once on `reactive(site)`.** The
+builder's site is reactive, so an op reads Proxies, and `structuredClone` throws
+`DataCloneError` on a Proxy. Six ops shipped broken in the live builder while the suite was
+green, purely because the fixture was built from object literals. Clone with `clone()` from
+`util-component` (a JSON round trip); never `structuredClone`. Do not drop
+`makeReactiveTestSite` — it is the only thing standing between that class of bug and
+production, and it costs one extra `it` per op.
+
+Four things about that suite are easy to get wrong when editing it:
 
 - **Compare content, not `stringifySite`.** `stringifySite` includes `history` and `editor`,
   and any push-then-undo sequence necessarily leaves the entry on `history.forward`.
@@ -136,6 +144,10 @@ Three things about that suite are easy to get wrong when editing it:
   order is not meaningful in the site model and failing on it produces only noise.
 - **The "did something" assertion uses a wider snapshot** that includes `editor.active`, so
   editor-only ops such as `changePage` are still covered.
+- **The suite is an undo oracle, not an apply oracle.** An op whose forward half quietly
+  produces the wrong thing still round-trips perfectly. `addComponent({sourceId})` with an
+  unresolvable id was green here while producing an empty tag in the builder — resolvers
+  have to reject what they cannot resolve, because nothing downstream will.
 
 The mock site is too small to exercise 41 ops — one page, one mixin, one non-root component,
 no behaviors, fonts or override styles. `op/test-site.ts` seeds those with plain commands
@@ -175,6 +187,27 @@ the object is obvious, keep it where there is ambiguity (`setComponentStyle` vs
   allocated during apply. `AddComponent` writes `data.id` in place; mixins and behaviors are
   read back off `latestStyleId`/`latestBehaviorId`; `AddPage` creates its root inside the
   command, so the root id is read from `site.pages[route]`.
+- **`apply()` is the only async tool.** `identify`, `describe`, `read`, `history` and
+  `status` return a `Result` directly. Over `evaluate_script` a forgotten `await` serialises
+  to `{}`, which reads exactly like a silent failure, so the `apply` tool doc leads with it.
+- **An op entry is `{op, input}`,** not the op's fields inline. `describe()` documents each
+  op's input schema but the envelope belongs to `apply`, so `apply`'s tool doc carries an
+  `example` — the same affordance ops get.
+
+### Builtins are not copyable
+
+`read({builtins:true})` lists ids for reference. Builtin **behaviors** work directly in
+`setComponentEvent`; builtin **components** do not work in `addComponent({sourceId})`.
+`addComponentHelper` resolves `sourceId` through `resolveComponent`, which only searches
+`context.components`, so a builtin id silently degrades the copy to a bare tag — no
+children, styles, inputs or mixins — and `apply()` reports success. `use-build.ts` avoids
+this by inlining the whole builtin definition into `IAddComponentData` and pushing the
+mixins and theme variables it depends on as sibling commands first; the op deliberately
+omits `children`, so there is no equivalent agent path.
+
+Until there is one, `addComponent` rejects an unresolvable `sourceId` (naming builtins
+specifically) and a `customComponentId` that was never registered. Turning a silent wrong
+result into an error is the whole point — do not relax it to a warning.
 
 ## Site type differences
 
@@ -182,15 +215,40 @@ the object is obvious, keep it where there is ambiguity (`setComponentStyle` vs
 behaviours differ, and `status()`/`identify()` report `storage: 'api' | 'local'` so an agent
 can tell.
 
-|                       | Site API sites (paid)                                                                 | Scratch / identity (`useLocalStore`)                                                    |
+There are **three** site types and only two stores, and the split is not where the names
+suggest. `useApiStore` backs both Site API sites and identity sites; only scratch uses
+`useLocalStore`. Identity sites go through `useLocalSiteApi` to the _platform_ API
+(`PATCH /api/local_sites/{id}`), so their saves cross the network and can fail — which is
+why `storageKind()` keys off `apiSiteId === 'scratch'` and not off `isSiteApi` (false for
+identity, because identity is not a Site API site).
+
+|                       | Site API + identity (`useApiStore`)                                                   | Scratch (`useLocalStore`)                                                               |
 | --------------------- | ------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
 | `save(site, options)` | Writes localStorage, then debounces an API `PUT`, or awaits it on `{immediate: true}` | Writes localStorage only. **Ignores `options`** — no debounce, no immediate distinction |
 | `saveState`           | Real lifecycle: `Saving` → `Saved` / `Error`                                          | Constant `Saved`, never transitions                                                     |
-| `editingEnabled`      | Checked again inside `save`; false while a version/draft preview is active            | Not checked (local sites have no versions)                                              |
+| `editingEnabled`      | Checked again inside `save`; false while a version/draft preview is active            | Not checked (scratch sites have no versions)                                            |
 
-So `apply({save: 'immediate'})` is always safe to pass, and `status().saveState` is not a
-progress signal on scratch/identity sites — `saveStateMeaningful` says which case you are
-in.
+So `apply({save: 'immediate'})` is always safe to pass, and `saveStateMeaningful` says
+whether `saveState` is a progress signal at all.
+
+### `saveState` is not a save outcome
+
+`saveState` is derived from the dirty flags, and `updateApi` clears those _before_ the
+request goes out so edits made while it is in flight are not lost. A rejected `PATCH`
+therefore leaves `saveState: 'saved'`. It reported exactly that through twenty minutes of
+`400 UpdateStale` during the first real build on this API.
+
+The outcome lives in two separate refs on `ISiteStore`, reported by both `status()` and
+`apply()`:
+
+- **`lastSaveError`** — set from the failed attempt, and cleared only by a save that
+  succeeds, not by the next attempt starting. `apply()` also pushes it into `warnings`,
+  including when the failure came from an _earlier_ debounced save, since that is the case
+  a batching agent would otherwise never see.
+- **`lastSavedAt`** — epoch ms of the last write that landed.
+
+Keep both meaningful on every store. A signal an agent is told to distrust on some site
+types is worse than no signal.
 
 ## Conventions an agent has to be told
 
@@ -212,6 +270,14 @@ Included in `identify()`'s orientation payload, but important enough to repeat:
   `docs/agent-tools-reference.md` generated from `OP_REGISTRY` with a CI drift check was
   designed but not built.
 - **No skill package** for the agent side of the workflow.
+- **Composite builtins cannot be inserted at all.** `MailingList`, `ContactForm`,
+  `ImageGallery`, `NavMenu`, `LightboxGallery` and friends are most of what makes a builtin
+  worth having, and `addComponent` now rejects them rather than producing an empty tag. The
+  real fix is routing builtin sources through the path `use-build.ts` uses.
+- **Building a tree costs one `apply()` per depth level.** Ids are allocated during apply,
+  so a child's `parentId` is unknown when the batch is authored, and atomicity stops at each
+  level. A client-supplied handle (`{op:'addComponent', input:{parentId:'$hero'}, as:'hero'}`)
+  resolved during apply would fix it; resolution already runs sequentially per op.
 - **No e2e spec.** The flow has been driven by hand over chrome-devtools-mcp; a Playwright
   spec would keep the bridge, gating flag, save path and reactivity covered.
 - **`role` is lost on remove + undo.** Neither `IAddComponentData` nor `IRemoveComponentData`

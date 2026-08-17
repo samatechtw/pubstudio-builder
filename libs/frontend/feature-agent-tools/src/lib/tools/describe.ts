@@ -8,6 +8,8 @@ export interface IToolDoc {
   name: string
   title: string
   description: string
+  /** Concrete call, for the tools whose argument shape is not obvious from prose. */
+  example?: unknown
 }
 
 export interface IOpSummary {
@@ -43,9 +45,9 @@ export const TOOL_DOCS: IToolDoc[] = [
     name: 'identify',
     title: 'Identify the agent',
     description:
-      'Required first call. identify({client, model, skill}) returns an orientation ' +
-      'payload: site name, pages, breakpoint ids, theme variables, id conventions and ' +
-      'this table of contents.',
+      'Required first call, and again after every page reload. ' +
+      'identify({client, model, skill}) returns an orientation payload: site name, pages, ' +
+      'breakpoint ids, theme variables, id conventions and this table of contents.',
   },
   {
     name: 'describe',
@@ -67,10 +69,24 @@ export const TOOL_DOCS: IToolDoc[] = [
     name: 'apply',
     title: 'Apply a batch of edits',
     description:
+      'ASYNC — apply() returns a Promise, so await it; every other tool here returns ' +
+      'synchronously. Each entry of `ops` is an envelope {op, input}, NOT the op fields ' +
+      'inline: {op:"addThemeVariable", input:{key, value}}. See `example`. ' +
       'apply({ops, label, save}) validates every op, then applies them in order and ' +
       'records the batch as ONE undo step. Returns created ids and warnings. On a ' +
       'resolver failure it reports ok:false with result.partial — ops before failedIndex ' +
-      'are applied and are part of that single undo step.',
+      'are applied and are part of that single undo step. Check result.saveError: a ' +
+      'failed save does NOT make ok false.',
+    example: {
+      ops: [
+        { op: 'addThemeVariable', input: { key: 'color-accent', value: '#ff6600' } },
+        {
+          op: 'setComponentStyle',
+          input: { componentId: '<id>', property: 'color', value: '${color-accent}' },
+        },
+      ],
+      label: 'accent colour',
+    },
   },
   {
     name: 'history',
@@ -84,7 +100,9 @@ export const TOOL_DOCS: IToolDoc[] = [
     title: 'Cheap status poll',
     description:
       'status() returns readiness, editability, save state, storage kind, active page ' +
-      'and history depth without serializing any site content.',
+      'and history depth without serializing any site content. `lastSaveError` and ' +
+      '`lastSavedAt` are the save signals to trust — `saveState` is a lifecycle enum ' +
+      'that reads `saved` even when the last write was rejected.',
   },
 ]
 

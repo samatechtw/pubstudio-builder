@@ -2,6 +2,8 @@ import {
   makeEditComponentData,
   makeRemoveComponentData,
 } from '@pubstudio/frontend/util-command-data'
+import { builtinComponents } from '@pubstudio/frontend/util-builtin'
+import { clone } from '@pubstudio/frontend/util-component'
 import { serializeComponent } from '@pubstudio/frontend/util-site-store'
 import { CommandType } from '@pubstudio/shared/type-command'
 import {
@@ -34,10 +36,11 @@ export const addComponentOp = defineOp<IAddComponentData>()({
   command: CommandType.AddComponent,
   title: 'Add component',
   description:
-    'Create a component under an existing parent. Give `sourceId` to copy an existing ' +
-    'component (including a builtin — see read({builtins:true})), or `customComponentId` ' +
-    'to insert an instance of a custom component. The new id is returned in ' +
-    'createdComponentIds; children are created with further addComponent ops.',
+    'Create a component under an existing parent. Give `sourceId` to deep-copy a ' +
+    'component that already exists in this site, or `customComponentId` to insert an ' +
+    'instance of a custom component. The new id is returned in createdComponentIds; ' +
+    'children are created with further addComponent ops. Builtin ids from ' +
+    'read({builtins:true}) are NOT valid sources — build those out explicitly.',
   input: obj({
     parentId: componentIdField().desc('Id of the component to add the new child under.'),
     tag: tagField(),
@@ -50,10 +53,16 @@ export const addComponentOp = defineOp<IAddComponentData>()({
       .desc('Index in the parent’s children. Appends when omitted.'),
     sourceId: str()
       .optional()
-      .desc('Component id to copy tag, style, inputs, events and children from.'),
+      .desc(
+        'Id of a component in this site to copy tag, style, inputs, events and children ' +
+          'from. Builtin ids are rejected.',
+      ),
     customComponentId: str()
       .optional()
-      .desc('Custom component id to instantiate. See read({site:true}) counts.'),
+      .desc(
+        'Id of a component registered with addCustomComponent, to instantiate. ' +
+          'read({tree:{}}) marks instances as "[custom: <id>]".',
+      ),
     style: styleEntriesField().desc(
       'Styles applied to the new component. Equivalent to setComponentStyle ops afterwards.',
     ),
@@ -69,6 +78,28 @@ export const addComponentOp = defineOp<IAddComponentData>()({
   },
   resolve: (ctx, input) => {
     mustResolveComponent(ctx.site, input.parentId)
+    // addComponentHelper resolves both against site components only; a miss degrades to a
+    // bare tag and still reports success. Builtins are never found.
+    if (input.sourceId && !ctx.site.context.components[input.sourceId]) {
+      constraint(
+        builtinComponents[input.sourceId]
+          ? `sourceId "${input.sourceId}" is a builtin, which addComponent cannot copy. ` +
+              'Add the component and its children explicitly, or copy an instance that ' +
+              'is already in the site.'
+          : `No component "${input.sourceId}" to copy from. See read({tree:{}}).`,
+      )
+    }
+    if (input.customComponentId) {
+      if (!ctx.site.context.components[input.customComponentId]) {
+        constraint(`No component "${input.customComponentId}" to instantiate.`)
+      }
+      if (!ctx.site.context.customComponentIds.has(input.customComponentId)) {
+        constraint(
+          `${input.customComponentId} is not a custom component. Register it with ` +
+            'addCustomComponent first, or copy it with sourceId instead.',
+        )
+      }
+    }
     const custom = toBreakpointStyles(input.style, ctx.breakpointId)
     const data: IAddComponentData = {
       tag: input.tag,
@@ -262,8 +293,8 @@ export const mergeComponentStyleOp = defineOp<IMergeComponentStyleData>()({
     const from = mustResolveComponent(ctx.site, input.fromComponentId)
     const data: IMergeComponentStyleData = {
       componentId: target.id,
-      oldStyle: structuredClone(serializeComponent(target).style),
-      newStyle: structuredClone(serializeComponent(from).style),
+      oldStyle: clone(serializeComponent(target).style),
+      newStyle: clone(serializeComponent(from).style),
     }
     return { type: CommandType.MergeComponentStyle, data }
   },

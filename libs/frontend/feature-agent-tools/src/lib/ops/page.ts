@@ -1,4 +1,5 @@
 import { makeSetPageHeadData, pageHeadValue } from '@pubstudio/frontend/util-command-data'
+import { clone } from '@pubstudio/frontend/util-component'
 import { serializePage } from '@pubstudio/frontend/util-site-store'
 import { CommandType } from '@pubstudio/shared/type-command'
 import {
@@ -93,7 +94,7 @@ export const editPageOp = defineOp<IEditPageData>()({
       route: page.route,
       name: page.name,
       public: page.public,
-      head: structuredClone(page.head),
+      head: clone(page.head),
     }
     const data: IEditPageData = {
       oldMetadata,

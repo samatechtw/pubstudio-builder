@@ -2,8 +2,11 @@ import { SiteSaveState } from '@pubstudio/shared/type-site'
 import {
   currentIdentity,
   editingEnabled,
+  formatSaveError,
   isReady,
+  lastSavedAt,
   requireSite,
+  saveError,
   saveState,
   siteSource,
   storageKind,
@@ -16,8 +19,11 @@ export interface IStatus {
   storage: 'api' | 'local'
   saveState: SiteSaveState
   saving: boolean
-  /** saveState never changes on local storage, so polling it there is pointless. */
+  /** saveState never changes on a scratch site, so polling it there is pointless. */
   saveStateMeaningful: boolean
+  /** Cleared only by a save that succeeds, not by the next attempt starting. */
+  lastSaveError?: string
+  lastSavedAt?: number
   siteId?: string
   activePageRoute?: string
   selectedComponentId?: string
@@ -37,6 +43,8 @@ export const status = (): IStatus => {
     saveState: saveState(),
     saving: siteSource().isSaving.value,
     saveStateMeaningful: storage === 'api',
+    lastSaveError: formatSaveError(saveError()),
+    lastSavedAt: lastSavedAt(),
     siteId: siteSource().apiSiteId.value,
     activePageRoute: site?.editor?.active ?? site?.defaults.homePage,
     selectedComponentId: site?.editor?.selectedComponent?.id,

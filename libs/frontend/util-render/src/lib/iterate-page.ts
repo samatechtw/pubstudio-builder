@@ -1,4 +1,4 @@
-import { IComponent, IPage, ISite } from '@pubstudio/shared/type-site'
+import { IComponent, IPage, ISite, ISiteContext } from '@pubstudio/shared/type-site'
 
 export type ComponentIterFn = (component: IComponent) => void
 
@@ -30,5 +30,14 @@ export const iterateComponent = (
     if (cmp?.children) {
       stack.push(...cmp.children)
     }
+  }
+}
+
+// Custom sources are on the page they were registered from but instances can be anywhere,
+// so page style generation has to visit all of themthem separately. Narrowing to the
+// page's own `customSourceId`s misses sources that instantiate other custom components.
+export const iterateCustomComponents = (context: ISiteContext, fn: ComponentIterFn) => {
+  for (const id of context.customComponentIds) {
+    iterateComponent(context.components[id], fn)
   }
 }

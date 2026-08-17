@@ -56,6 +56,7 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
   const platformApi = inject(ApiInjectionKey) as PSApi
   const siteId = ref(props.siteId)
   const saveError = ref()
+  const lastSavedAt = ref<number>()
   let saveTimer: ReturnType<typeof setTimeout> | undefined
   let getFn: GetSiteVersionFn
   let updateFn: (
@@ -155,6 +156,7 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
           setLocalContentUpdatedAt(siteId.value, result.content_updated_at)
         }
         updateKey.value = result.updated_at.toString()
+        lastSavedAt.value = Date.now()
       }
     } catch (e) {
       saveError.value = toApiError(e)
@@ -269,6 +271,7 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
     siteId,
     saveState,
     saveError,
+    lastSavedAt,
     initialize,
     save,
     saveEditor,

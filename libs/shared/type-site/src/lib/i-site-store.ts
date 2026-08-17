@@ -42,6 +42,8 @@ export interface ISiteStore {
   saveState: Ref<SiteSaveState> | ComputedRef<SiteSaveState>
   siteId: Ref<string>
   saveError: Ref<IApiError | undefined>
+  /** Epoch ms of the last write that landed; `saveState` does not report success. */
+  lastSavedAt: Ref<number | undefined>
   initialize(): Promise<ISiteStoreInitializeResult | undefined>
   save(site: ISite, options?: ISiteSaveOptions): Promise<void>
   saveEditor(editor: IEditorContext): Promise<void>
