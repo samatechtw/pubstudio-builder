@@ -110,9 +110,9 @@ describe('Set Component Override Style', () => {
       applySetComponentOverrideStyle(site, data)
       undoSetComponentOverrideStyle(site, data)
 
-      // Assert style does not exist in component
-      const newPseudo = getDefaultPseudo(component.id, CssPseudoClass.Default)
-      expect(newPseudo?.[newStyle.property]).toBeUndefined()
+      // Assert the newly-created override scaffold is removed too
+      const resultComponent = resolveComponent(site.context, component.id)
+      expect(resultComponent?.style.overrides).toBeUndefined()
     })
   })
 

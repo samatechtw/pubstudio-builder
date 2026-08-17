@@ -136,7 +136,9 @@ export const setOverrideStyleOp = defineOp<ISetComponentOverrideStyleData>()({
   },
   example: (site) => ({
     componentId: exampleComponentId(site),
-    selector: '.agent-override',
+    // Exercise creation of a selector so the round-trip suite verifies undo removes
+    // every new override container.
+    selector: '.agent-new-override',
     property: Css.Color,
     value: '#00ff00',
   }),
