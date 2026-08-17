@@ -14,7 +14,16 @@ import { IOpCtx } from '../op/define-op'
 import { findOp } from '../op/op-registry'
 import { AgentError, IAgentError, Result, toAgentError } from '../result'
 import { parseSchema } from '../schema/schema'
-import { defaultBreakpointId, requireEditable, requireSite, siteSource } from './session'
+import {
+  defaultBreakpointId,
+  formatSaveError,
+  lastSavedAt,
+  requireEditable,
+  requireSite,
+  saveError,
+  saveState,
+  siteSource,
+} from './session'
 
 export const MAX_OPS = 200
 
@@ -40,6 +49,9 @@ export interface IApplyOutput {
   createdBehaviorIds: string[]
   createdPageRoutes: string[]
   saveState?: SiteSaveState
+  /** Last save attempt failed with this; `saveState` still reads `saved` when it does. */
+  saveError?: string
+  lastSavedAt?: number
   /** True when a resolver failed partway; ops before failedIndex ARE applied. */
   partial?: boolean
   applied?: number
@@ -193,7 +205,17 @@ export const applyOps = async (input: IApplyInput): Promise<Result<IApplyOutput>
     await siteSource().siteStore.save(site, { immediate: true })
   }
   if (save !== 'none') {
-    out.saveState = siteSource().siteStore.saveState as unknown as SiteSaveState
+    out.saveState = saveState()
+    out.lastSavedAt = lastSavedAt()
+    // Includes a failure from an earlier debounced save, so a batching agent sees it on
+    // the next call rather than at the end of the build.
+    out.saveError = formatSaveError(saveError())
+    if (out.saveError) {
+      warnings.push(
+        `Site NOT saved: ${out.saveError}. Edits exist only in this browser tab — ` +
+          'resolve the conflict in the builder before continuing.',
+      )
+    }
   }
   await flushRender()
 

@@ -1,9 +1,14 @@
-import { applyCommand, undoCommand } from '@pubstudio/frontend/data-access-command'
-import { CommandType, ICommand } from '@pubstudio/shared/type-command'
+import {
+  applyCommand,
+  pushAppliedGroup,
+  undoLastCommand,
+} from '@pubstudio/frontend/data-access-command'
+import { ICommand } from '@pubstudio/shared/type-command'
 import { ISite } from '@pubstudio/shared/type-site'
 import { AnyOpDef } from './define-op'
 import { agentOps } from './op-registry'
 import {
+  makeReactiveTestSite,
   makeTestSite,
   siteContentSnapshot,
   siteStateSnapshot,
@@ -16,6 +21,24 @@ const toArray = (commands: ICommand | ICommand[]): ICommand[] =>
 const resolveExample = (op: AnyOpDef, site: ISite): ICommand[] => {
   const parsed = op.input.parse(op.example(site), '', [])
   return toArray(op.resolve(testOpCtx(site), parsed))
+}
+
+const roundTrip = (op: AnyOpDef, makeSite: () => ISite) => {
+  const site = makeSite()
+  const before = siteContentSnapshot(site)
+  const beforeState = siteStateSnapshot(site)
+
+  const commands = resolveExample(op, site)
+  expect(commands.length).toBeGreaterThan(0)
+  commands.forEach((command) => applyCommand(site, command))
+
+  expect(siteStateSnapshot(site)).not.toEqual(beforeState)
+
+  // Via the history stack, as apply()/history() do, a locally held group would hand the
+  // undo half plain objects instead of whatever `history.back.pop()` returns.
+  pushAppliedGroup(site, commands, op.name)
+  undoLastCommand(site)
+  expect(siteContentSnapshot(site)).toEqual(before)
 }
 
 // An op is the forward half of a command; the resolver derives the undo half from live
@@ -39,19 +62,11 @@ describe.each(agentOps().map((op) => [op.name, op] as const))('op %s', (_name, o
   })
 
   it('apply then undo restores the site exactly', () => {
-    const site = makeTestSite()
-    const before = siteContentSnapshot(site)
-    const beforeState = siteStateSnapshot(site)
+    roundTrip(op, makeTestSite)
+  })
 
-    const commands = resolveExample(op, site)
-    expect(commands.length).toBeGreaterThan(0)
-    commands.forEach((command) => applyCommand(site, command))
-
-    expect(siteStateSnapshot(site)).not.toEqual(beforeState)
-
-    const group: ICommand = { type: CommandType.Group, data: { commands } }
-    undoCommand(site, group)
-    expect(siteContentSnapshot(site)).toEqual(before)
+  it('apply then undo restores a reactive site exactly', () => {
+    roundTrip(op, makeReactiveTestSite)
   })
 })
 

@@ -1,4 +1,4 @@
-import { mergeArr } from '@pubstudio/frontend/util-component'
+import { clone, mergeArr } from '@pubstudio/frontend/util-component'
 import { resolveComponent } from '@pubstudio/frontend/util-resolve'
 import { CommandType, ICommand } from '@pubstudio/shared/type-command'
 import { IMergeComponentStyleData } from '@pubstudio/shared/type-command-data'
@@ -34,9 +34,10 @@ export const undoMergeComponentStyle = (site: ISite, data: IMergeComponentStyleD
   const { componentId, oldStyle } = data
   const component = resolveComponent(site.context, componentId)
   if (component) {
-    // Restore rather than un-merge; a merge can introduce breakpoints that weren't there
+    // Restore rather than un-merge; a merge can introduce breakpoints that weren't there.
+    // `data` came off the reactive history, so `oldStyle` is a Proxy — structuredClone throws.
     component.style.mixins = oldStyle.mixins ? [...oldStyle.mixins] : undefined
-    component.style.custom = structuredClone(oldStyle.custom)
+    component.style.custom = clone(oldStyle.custom)
     // Select edited component for undo
     setSelectedComponent(site, component)
   }

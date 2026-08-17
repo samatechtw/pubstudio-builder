@@ -2,6 +2,7 @@ import {
   makeSetMixinEntryData,
   mixinStyleValue,
 } from '@pubstudio/frontend/util-command-data'
+import { clone } from '@pubstudio/frontend/util-component'
 import { CommandType } from '@pubstudio/shared/type-command'
 import {
   IAddStyleMixinData,
@@ -82,7 +83,7 @@ export const removeMixinOp = defineOp<IRemoveStyleMixinData>()({
   omitted: {},
   resolve: (ctx, input) => {
     const mixin = mustResolveMixin(ctx.site, input.mixinId)
-    return { type: CommandType.RemoveStyleMixin, data: structuredClone(mixin) }
+    return { type: CommandType.RemoveStyleMixin, data: clone(mixin) }
   },
   example: (site) => ({
     mixinId: site.context.styleOrder[site.context.styleOrder.length - 1],

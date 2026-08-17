@@ -2,6 +2,7 @@ import { store } from '@pubstudio/frontend/data-access-web-store'
 import { IUseSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { activeBreakpoint } from '@pubstudio/frontend/feature-site-source'
 import { DEFAULT_BREAKPOINT_ID } from '@pubstudio/frontend/util-defaults'
+import { IApiError } from '@pubstudio/shared/type-api'
 import { ISite, SiteSaveState } from '@pubstudio/shared/type-site'
 import { AgentError } from '../result'
 
@@ -71,12 +72,31 @@ export const requireEditable = () => {
   }
 }
 
-// Local sites write straight to localStorage, so saveState never leaves `Saved`
-export const storageKind = (): 'api' | 'local' =>
-  siteSource().isSiteApi.value ? 'api' : 'local'
+// Only scratch is localStorage-only. Identity sites are not Site API sites (`isSiteApi` is
+// false) but still PATCH the platform API, so their saves can fail like any other.
+export const storageKind = (): 'api' | 'local' => {
+  const siteId = siteSource().apiSiteId.value
+  return !siteId || siteId === 'scratch' ? 'local' : 'api'
+}
 
 export const saveState = (): SiteSaveState =>
   siteSource().siteStore.saveState as unknown as SiteSaveState
+
+// `reactive()` unwraps the store's refs, so these read as plain values at runtime
+export const saveError = (): IApiError | undefined =>
+  siteSource().siteStore.saveError as unknown as IApiError | undefined
+
+export const lastSavedAt = (): number | undefined =>
+  siteSource().siteStore.lastSavedAt as unknown as number | undefined
+
+export const formatSaveError = (error: IApiError | undefined): string | undefined => {
+  if (!error) {
+    return undefined
+  }
+  const head = [error.status, error.code].filter(Boolean).join(' ')
+  const parts = [head, error.message].filter(Boolean)
+  return parts.length ? parts.join(': ') : 'Unknown save error'
+}
 
 // Breakpoint an op falls back to when it does not name one
 export const defaultBreakpointId = (): string => {

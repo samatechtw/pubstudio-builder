@@ -40,11 +40,11 @@
       "@pubstudio/frontend/data-access-web-store": [
         "libs/frontend/data-access-web-store/src/index.ts"
       ],
-      "@pubstudio/frontend/feature-breakpoint": [
-        "libs/frontend/feature-breakpoint/src/index.ts"
-      ],
       "@pubstudio/frontend/feature-agent-tools": [
         "libs/frontend/feature-agent-tools/src/index.ts"
+      ],
+      "@pubstudio/frontend/feature-breakpoint": [
+        "libs/frontend/feature-breakpoint/src/index.ts"
       ],
       "@pubstudio/frontend/feature-build": ["libs/frontend/feature-build/src/index.ts"],
       "@pubstudio/frontend/feature-build-event": [

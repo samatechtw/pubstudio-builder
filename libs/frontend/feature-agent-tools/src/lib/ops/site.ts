@@ -138,7 +138,7 @@ export const setBreakpointsOp = defineOp<ISetBreakpointData>()({
       }
     }
     const data: ISetBreakpointData = {
-      oldBreakpoints: structuredClone(ctx.site.context.breakpoints),
+      oldBreakpoints: clone(ctx.site.context.breakpoints),
       newBreakpoints: input.breakpoints as IAddBreakpoint[],
     }
     return { type: CommandType.SetBreakpoint, data }

@@ -5,6 +5,7 @@ import {
   IQueryStyle,
   IRawStyleRecord,
   IResolvedPageStyle,
+  iterateCustomComponents,
   iterateMixin,
   iteratePage,
   mergeBreakpointStylesWithSource,
@@ -81,8 +82,13 @@ export const getLivePageStyle = (
 ): IResolvedPageStyle => {
   const queryStyle = createQueryStyle(context)
   const customStyle = createQueryStyle(context)
+  const seen = new Set<string>()
 
   const appendStyle = (component: IComponent) => {
+    if (seen.has(component.id)) {
+      return
+    }
+    seen.add(component.id)
     const isCustom =
       context.customComponentIds.has(component.id) ||
       context.customChildIds.has(component.id)
@@ -129,6 +135,7 @@ export const getLivePageStyle = (
     }
   }
   iteratePage(page, appendStyle)
+  iterateCustomComponents(context, appendStyle)
 
   // Resolve merged styles
   for (const pseudoStyle of Object.values(customStyle)) {

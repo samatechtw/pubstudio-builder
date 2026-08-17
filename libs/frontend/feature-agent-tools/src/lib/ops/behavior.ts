@@ -1,3 +1,4 @@
+import { clone } from '@pubstudio/frontend/util-component'
 import { CommandType } from '@pubstudio/shared/type-command'
 import {
   ISetBehaviorArgData,
@@ -37,7 +38,7 @@ export const setBehaviorOp = defineOp<ISetBehaviorData>()({
   omitted: {},
   resolve: (ctx, input) => {
     const oldBehavior = input.behaviorId
-      ? structuredClone(mustResolveBehavior(ctx.site, input.behaviorId))
+      ? clone(mustResolveBehavior(ctx.site, input.behaviorId))
       : undefined
     if (input.remove) {
       if (!oldBehavior) {

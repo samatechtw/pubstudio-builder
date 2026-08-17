@@ -4,6 +4,7 @@ import {
   makeSetComponentCustomStyleData,
   makeSetComponentOverrideStyleData,
 } from '@pubstudio/frontend/util-command-data'
+import { clone } from '@pubstudio/frontend/util-component'
 import { CommandType } from '@pubstudio/shared/type-command'
 import {
   IAddComponentMixinData,
@@ -168,7 +169,7 @@ export const removeOverrideStyleOp = defineOp<IRemoveComponentOverrideStyleData>
       data: {
         componentId: component.id,
         selector: input.selector,
-        styles: structuredClone(styles),
+        styles: clone(styles),
       },
     }
   },

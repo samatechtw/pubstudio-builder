@@ -241,7 +241,11 @@ export const read = (site: ISite, input: IReadInput): Record<string, unknown> =>
         name: b.name,
         args: b.args ? Object.keys(b.args) : undefined,
       })),
-      usage: 'Pass a component sourceId to addComponent({sourceId}).',
+      usage:
+        'Builtin behaviorIds are usable directly in setComponentEvent({behaviors}). ' +
+        'Builtin components are NOT: addComponent({sourceId}) only copies components ' +
+        'that exist in this site, so these ids are listed for reference only — build ' +
+        'the structure explicitly, then reuse it with sourceId or addCustomComponent.',
     }
   }
   if (input.html) {

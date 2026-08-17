@@ -29,6 +29,7 @@ export const useLocalStore = (storeName?: StoreKey): ISiteStore => {
   }
 
   const saveState = ref(SiteSaveState.Saved)
+  const lastSavedAt = ref<number>()
 
   const save = async (site: ISite) => {
     const stored = storeSite(site)
@@ -43,6 +44,7 @@ export const useLocalStore = (storeName?: StoreKey): ISiteStore => {
       }
     }
     store[_storeName].setSite(stored)
+    lastSavedAt.value = Date.now()
   }
   const saveEditor = async (editor: IEditorContext) => {
     const serialized = serializeEditor(editor)
@@ -64,6 +66,7 @@ export const useLocalStore = (storeName?: StoreKey): ISiteStore => {
     siteId,
     saveState,
     saveError: ref(),
+    lastSavedAt,
     initialize,
     save,
     saveEditor,

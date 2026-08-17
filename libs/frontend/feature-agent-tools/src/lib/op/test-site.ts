@@ -12,6 +12,7 @@ import {
   Tag,
   ThemeFontSource,
 } from '@pubstudio/shared/type-site'
+import { reactive } from 'vue'
 import { IOpCtx } from './define-op'
 
 // The mock site has one page, one mixin, one non-root component, and no behaviors, fonts
@@ -102,6 +103,10 @@ export const makeTestSite = (): ISite => {
   site.history.forward = []
   return site
 }
+
+// The builder's site is reactive, so ops read Proxies. structuredClone throws on those and
+// a plain-object fixture never notices; clone() is the only safe way to copy live state.
+export const makeReactiveTestSite = (): ISite => reactive(makeTestSite()) as ISite
 
 export const testOpCtx = (site: ISite, warn: (m: string) => void = () => 0): IOpCtx => ({
   site,

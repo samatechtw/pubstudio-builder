@@ -5,6 +5,7 @@ import {
 import { getActiveBreakpointIds } from '@pubstudio/frontend/feature-site-source'
 import {
   IRawStyleRecord,
+  iterateCustomComponents,
   iteratePage,
   sortMixinIds,
 } from '@pubstudio/frontend/util-render'
@@ -45,8 +46,13 @@ export const getBuildPageStyle = (site: ISite, page: IPage): IResolvedBuildPageS
   const pageStyle: IRawStyleRecord = {}
   const customStyle: IRawStyleRecord = {}
   const accumulatedBreakpointIds = getActiveBreakpointIds()
+  const seen = new Set<string>()
 
   const appendStyle = (component: IComponent) => {
+    if (seen.has(component.id)) {
+      return
+    }
+    seen.add(component.id)
     const isCustom =
       site.context.customComponentIds.has(component.id) ||
       site.context.customChildIds.has(component.id)
@@ -112,6 +118,7 @@ export const getBuildPageStyle = (site: ISite, page: IPage): IResolvedBuildPageS
     }
   }
   iteratePage(page, appendStyle)
+  iterateCustomComponents(site.context, appendStyle)
 
   const sortedPageStyle = sortRawStyleRecord(pageStyle)
   const sortedCustomStyle = sortRawStyleRecord(customStyle)
