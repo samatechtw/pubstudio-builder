@@ -4,9 +4,37 @@ import { ISetComponentOverrideStyleData } from '@pubstudio/shared/type-command-d
 import { IComponent, ISite, IStyleEntry } from '@pubstudio/shared/type-site'
 import { setSelectedComponent } from '../set-selected-component'
 
-export interface SetComponentOverrideStyle
-  extends ICommand<ISetComponentOverrideStyleData> {
+export interface SetComponentOverrideStyle extends ICommand<ISetComponentOverrideStyleData> {
   type: CommandType.SetComponentOverrideStyle
+}
+
+const deleteOverrideStyle = (
+  component: IComponent,
+  selector: string,
+  breakpointId: string,
+  style: IStyleEntry,
+) => {
+  const overrides = component.style.overrides
+  const selectorStyles = overrides?.[selector]
+  const breakpointStyles = selectorStyles?.[breakpointId]
+  const pseudoClassStyles = breakpointStyles?.[style.pseudoClass]
+  if (!overrides || !selectorStyles || !breakpointStyles || !pseudoClassStyles) {
+    return
+  }
+
+  delete pseudoClassStyles[style.property]
+  if (Object.keys(pseudoClassStyles).length === 0) {
+    delete breakpointStyles[style.pseudoClass]
+  }
+  if (Object.keys(breakpointStyles).length === 0) {
+    delete selectorStyles[breakpointId]
+  }
+  if (Object.keys(selectorStyles).length === 0) {
+    delete overrides[selector]
+  }
+  if (Object.keys(overrides).length === 0) {
+    delete component.style.overrides
+  }
 }
 
 const setOverrideStyle = (
@@ -22,9 +50,7 @@ const setOverrideStyle = (
   if (component) {
     // Delete old style
     if (oldStyle) {
-      delete component.style.overrides?.[selector]?.[breakpointId]?.[
-        oldStyle.pseudoClass
-      ]?.[oldStyle.property]
+      deleteOverrideStyle(component, selector, breakpointId, oldStyle)
     }
     // Add new style
     if (newStyle) {

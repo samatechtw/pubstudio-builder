@@ -27,7 +27,7 @@ const label = computed(() => identity.value?.client ?? 'Agent tools')
 const title = computed(() =>
   identity.value
     ? `window.PubStudio is available to ${identity.value.client}`
-    : 'window.PubStudio is available; waiting for identify()',
+    : 'window.PubStudio is available; after every page reload, call PubStudio.identify({ client: "your client" }) before using other tools',
 )
 
 const disconnect = () => {
