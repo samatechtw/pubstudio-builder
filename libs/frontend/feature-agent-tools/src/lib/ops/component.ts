@@ -43,7 +43,12 @@ export const addComponentOp = defineOp<IAddComponentData>()({
     'read({builtins:true}) are NOT valid sources — build those out explicitly.',
   input: obj({
     parentId: componentIdField().desc('Id of the component to add the new child under.'),
-    tag: tagField(),
+    tag: tagField()
+      .optional()
+      .desc(
+        'HTML tag. Required unless `sourceId` or `customComponentId` is provided; ' +
+          'sourced components use the source tag.',
+      ),
     name: str().optional().desc('Component name shown in the builder tree.'),
     content: str()
       .optional()
@@ -80,7 +85,10 @@ export const addComponentOp = defineOp<IAddComponentData>()({
     mustResolveComponent(ctx.site, input.parentId)
     // addComponentHelper resolves both against site components only; a miss degrades to a
     // bare tag and still reports success. Builtins are never found.
-    if (input.sourceId && !ctx.site.context.components[input.sourceId]) {
+    const sourceComponent = input.sourceId
+      ? ctx.site.context.components[input.sourceId]
+      : undefined
+    if (input.sourceId && !sourceComponent) {
       constraint(
         builtinComponents[input.sourceId]
           ? `sourceId "${input.sourceId}" is a builtin, which addComponent cannot copy. ` +
@@ -89,8 +97,11 @@ export const addComponentOp = defineOp<IAddComponentData>()({
           : `No component "${input.sourceId}" to copy from. See read({tree:{}}).`,
       )
     }
+    const customComponent = input.customComponentId
+      ? ctx.site.context.components[input.customComponentId]
+      : undefined
     if (input.customComponentId) {
-      if (!ctx.site.context.components[input.customComponentId]) {
+      if (!customComponent) {
         constraint(`No component "${input.customComponentId}" to instantiate.`)
       }
       if (!ctx.site.context.customComponentIds.has(input.customComponentId)) {
@@ -100,9 +111,13 @@ export const addComponentOp = defineOp<IAddComponentData>()({
         )
       }
     }
+    const tag = sourceComponent?.tag ?? customComponent?.tag ?? input.tag
+    if (!tag) {
+      constraint('`tag` is required without `sourceId` or `customComponentId`.')
+    }
     const custom = toBreakpointStyles(input.style, ctx.breakpointId)
     const data: IAddComponentData = {
-      tag: input.tag,
+      tag,
       name: input.name,
       content: input.content,
       parentId: input.parentId,
