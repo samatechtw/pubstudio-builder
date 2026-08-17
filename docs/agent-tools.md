@@ -102,14 +102,20 @@ and marks the field optional — the op applies the fallback itself in `resolve`
 
 ### `describeTools()` is on the agent's token budget
 
-It is the op reference, so an agent calls `describeTools({ops})` repeatedly mid-build. Two rules
-keep that affordable, and both are easy to undo by accident:
+It is the op and read-selector reference, so an agent calls focused `describeTools()` queries
+repeatedly mid-build. Two rules keep that affordable, and both are easy to undo by accident:
 
 - **`describeTools({ops})` omits the table of contents** (tools, 41 op summaries, the
   excluded-command map — 5.7 KB). The agent already has it from `identify()`. `describeTools()`,
   `describeTools({all:true})` and an explicit `toc:true` still include it.
 - **`$defs` as above.** Six style-adjacent ops cost 19.8 KB before both changes and 9.7 KB
   after.
+
+Read selectors use the same focused schema path without bloating the table of contents:
+`describeTools({read:true})` returns the complete `read()` input schema, and
+`describeTools({all:true})` includes it alongside every op schema. The schema in
+`read/input.ts` also supplies the TypeScript input type and runtime validation, so the three
+contracts cannot drift apart.
 
 ## The two compile-time guarantees
 

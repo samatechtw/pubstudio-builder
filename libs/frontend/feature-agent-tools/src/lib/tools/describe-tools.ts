@@ -1,6 +1,7 @@
 import { CommandType } from '@pubstudio/shared/type-command'
 import { isOp, OpEntry } from '../op/define-op'
 import { agentOps, findOp, OP_REGISTRY } from '../op/op-registry'
+import { READ_INPUT_SCHEMA } from '../read/input'
 import { AgentError } from '../result'
 import { JsonSchema, referencedDefs } from '../schema/schema'
 
@@ -38,6 +39,7 @@ export interface IDescribeResult extends Partial<IDescribeToc> {
   version: number
   $defs?: Record<string, JsonSchema>
   opDetails?: IOpDoc[]
+  readInput?: JsonSchema
 }
 
 export const AGENT_TOOLS_VERSION = 1
@@ -55,18 +57,19 @@ export const TOOL_DOCS: IToolDoc[] = [
     name: 'describeTools',
     title: 'Describe tools and ops',
     description:
-      'describeTools() returns this table of contents (ToC). describeTools({ops:["setComponentStyle"]}) ' +
-      'returns full JSON Schemas for just those ops, add toc:true for ToC. describeTools({all:true}) ' +
-      'returns everything. Long enums (CSS properties, tags, ARIA roles) are emitted once in `$defs` and ' +
-      'referenced as {"$ref":"#/$defs/name"}. Treat it as the only op reference — never guess an op signature.',
+      'describeTools() returns this table of contents (ToC). Request focused JSON Schemas with ' +
+      'describeTools({ops:["setComponentStyle"]}) or describeTools({read:true}); add toc:true for ToC. ' +
+      'describeTools({all:true}) returns everything. Long enums (CSS properties, tags, ARIA roles) are emitted once in `$defs` and ' +
+      'referenced as {"$ref":"#/$defs/name"}. Treat it as the only tool contract — never guess a signature.',
   },
   {
     name: 'read',
     title: 'Read the site',
     description:
-      'read(selector) returns one view of the site. Selectors: site, tree, components, ' +
+      'read(selectors) returns scoped views of the site. Selectors: site, tree, components, ' +
       'styles, find, mixins, theme, behaviors, i18n, head, builtins, html, history. ' +
-      'Reads are scoped on purpose — never pull the whole site into context.',
+      'Call describeTools({read:true}) for their JSON Schema. Reads are scoped on purpose — ' +
+      'never pull the whole site into context.',
   },
   {
     name: 'apply',
@@ -150,26 +153,38 @@ export const describeToc = (): IDescribeToc => {
 
 export interface IDescribeInput {
   ops?: string[]
+  /** Include the JSON Schema for read() selectors. */
+  read?: boolean
   all?: boolean
-  /** Include the table of contents. Defaults to true if `ops` list isn't passed. */
+  /** Include the table of contents. Defaults to false for a focused schema request. */
   toc?: boolean
 }
 
 export const describeTools = (input?: IDescribeInput): IDescribeResult => {
-  const named = !input?.all && !!input?.ops?.length
+  const named = !input?.all && (!!input?.ops?.length || !!input?.read)
   const opDetails = input?.all
     ? agentOps().map((op) => opDoc(op.name))
     : named
-      ? (input.ops as string[]).map(opDoc)
+      ? input.ops?.map(opDoc)
       : undefined
+  const readInput = input?.all || input?.read ? READ_INPUT_SCHEMA.toJson() : undefined
   const includeToc = input?.toc ?? !named
   // Exclude ToC unless asked for
   const head: IDescribeResult = includeToc
     ? describeToc()
     : { version: AGENT_TOOLS_VERSION }
-  if (!opDetails) {
+  if (!opDetails && !readInput) {
     return head
   }
-  const defs = referencedDefs(opDetails.map((op) => op.input))
-  return { ...head, ...(defs ? { $defs: defs } : {}), opDetails }
+  const schemas = [
+    ...(opDetails?.map((op) => op.input) ?? []),
+    ...(readInput ? [readInput] : []),
+  ]
+  const defs = referencedDefs(schemas)
+  return {
+    ...head,
+    ...(defs ? { $defs: defs } : {}),
+    ...(opDetails ? { opDetails } : {}),
+    ...(readInput ? { readInput } : {}),
+  }
 }

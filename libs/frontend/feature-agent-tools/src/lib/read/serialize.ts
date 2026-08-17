@@ -1,5 +1,6 @@
 import { serializeComponent } from '@pubstudio/frontend/util-site-store'
 import { IComponent, ISerializedComponent, IStyle } from '@pubstudio/shared/type-site'
+import { ComponentInclude } from './input'
 
 export const MAX_CONTENT_CHARS = 200
 export const MAX_TREE_NODES = 400
@@ -68,25 +69,6 @@ export const componentTree = (
       : {}),
   }
 }
-
-export type ComponentInclude =
-  | 'style'
-  | 'overrides'
-  | 'inputs'
-  | 'events'
-  | 'editorEvents'
-  | 'state'
-  | 'children'
-
-export const COMPONENT_INCLUDES: ComponentInclude[] = [
-  'style',
-  'overrides',
-  'inputs',
-  'events',
-  'editorEvents',
-  'state',
-  'children',
-]
 
 // Cycle-safe component view; `IComponent.parent` makes the live object unserializable
 export const componentView = (
