@@ -15,10 +15,17 @@ import {
   mustResolvePage,
 } from '../op/op-helpers'
 import { AgentError } from '../result'
+import { parseSchema } from '../schema/schema'
 import { orientation } from '../tools/orientation'
 import {
   COMPONENT_INCLUDES,
   ComponentInclude,
+  DEFAULT_TREE_DEPTH,
+  IReadInput,
+  MAX_COMPONENTS,
+  READ_INPUT_SCHEMA,
+} from './input'
+import {
   componentSummary,
   componentTree,
   componentView,
@@ -26,25 +33,7 @@ import {
   mixinSummary,
 } from './serialize'
 
-export interface IReadInput {
-  site?: boolean
-  tree?: { page?: string; componentId?: string; depth?: number }
-  components?: string[]
-  include?: ComponentInclude[]
-  styles?: { componentId: string; breakpointId?: string; resolved?: boolean }
-  find?: { tag?: string; name?: string; text?: string; hasMixin?: string; page?: string }
-  mixins?: boolean | string[]
-  theme?: boolean
-  behaviors?: boolean | string[]
-  i18n?: boolean | string[]
-  head?: { page?: string }
-  builtins?: boolean
-  html?: { componentId: string }
-  history?: { n?: number }
-}
-
-const DEFAULT_TREE_DEPTH = 4
-const MAX_COMPONENTS = 25
+export type { IReadInput } from './input'
 
 const iterate = (component: IComponent, fn: (c: IComponent) => void) => {
   fn(component)
@@ -159,7 +148,16 @@ const readHtml = (componentId: string) => {
   return { componentId, html: element.outerHTML }
 }
 
-export const read = (site: ISite, input: IReadInput): Record<string, unknown> => {
+export const read = (site: ISite, rawInput: IReadInput): Record<string, unknown> => {
+  const parsed = parseSchema(READ_INPUT_SCHEMA, rawInput ?? {})
+  if (!parsed.ok) {
+    throw new AgentError(
+      'INVALID_INPUT',
+      'One or more read selectors failed validation.',
+      parsed.issues,
+    )
+  }
+  const input = parsed.value
   const result: Record<string, unknown> = {}
   if (input.site) {
     result.site = orientation(false)

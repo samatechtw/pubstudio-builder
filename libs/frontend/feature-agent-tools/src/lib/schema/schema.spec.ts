@@ -1,4 +1,5 @@
 import {
+  anyOf,
   arr,
   bool,
   json,
@@ -104,5 +105,18 @@ describe('Schema', () => {
       value: { unit: 'px' },
     })
     expect(parseSchema(named, { unit: 'pt' }).ok).toEqual(false)
+  })
+
+  it('emits and validates alternative shapes', () => {
+    const alternative = anyOf(bool(), arr(str()))
+    expect(alternative.toJson()).toEqual({
+      anyOf: [{ type: 'boolean' }, { type: 'array', items: { type: 'string' } }],
+    })
+    expect(parseSchema(alternative, true).ok).toEqual(true)
+    expect(parseSchema(alternative, ['one', 'two']).ok).toEqual(true)
+    expect(parseSchema(alternative, 2)).toEqual({
+      ok: false,
+      issues: [{ path: '', message: 'did not match any allowed shape' }],
+    })
   })
 })

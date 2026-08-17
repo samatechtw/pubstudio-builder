@@ -151,6 +151,24 @@ export const oneOf = <const T extends readonly string[]>(
   return new Schema<T[number]>({ $ref: `${DEFS_PREFIX}${defName}` }, check)
 }
 
+export const anyOf = <const S extends readonly AnySchema[]>(
+  ...schemas: S
+): Schema<Infer<S[number]>> =>
+  new Schema<Infer<S[number]>>(
+    { anyOf: schemas.map((schema) => schema.toJson()) },
+    (value, path, issues) => {
+      for (const schema of schemas) {
+        const branchIssues: IIssue[] = []
+        const parsed = schema.parse(value, path, branchIssues)
+        if (!branchIssues.length) {
+          return parsed as Infer<S[number]>
+        }
+      }
+      issues.push({ path, message: 'did not match any allowed shape' })
+      return value as Infer<S[number]>
+    },
+  )
+
 export const arr = <S extends AnySchema>(item: S): Schema<Infer<S>[]> =>
   new Schema<Infer<S>[]>(
     { type: 'array', items: item.toJson() },
