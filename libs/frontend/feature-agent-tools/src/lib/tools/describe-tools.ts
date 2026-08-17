@@ -1,8 +1,8 @@
 import { CommandType } from '@pubstudio/shared/type-command'
 import { isOp, OpEntry } from '../op/define-op'
 import { agentOps, findOp, OP_REGISTRY } from '../op/op-registry'
-import { JsonSchema } from '../schema/schema'
 import { AgentError } from '../result'
+import { JsonSchema, referencedDefs } from '../schema/schema'
 
 export interface IToolDoc {
   name: string
@@ -34,7 +34,9 @@ export interface IDescribeToc {
   excludedCommands: Record<string, string>
 }
 
-export interface IDescribeResult extends IDescribeToc {
+export interface IDescribeResult extends Partial<IDescribeToc> {
+  version: number
+  $defs?: Record<string, JsonSchema>
   opDetails?: IOpDoc[]
 }
 
@@ -50,12 +52,13 @@ export const TOOL_DOCS: IToolDoc[] = [
       'breakpoint ids, theme variables, id conventions and this table of contents.',
   },
   {
-    name: 'describe',
+    name: 'describeTools',
     title: 'Describe tools and ops',
     description:
-      'describe() returns this table of contents. describe({ops:["setComponentStyle"]}) ' +
-      'returns full JSON Schemas for those ops. describe({all:true}) returns everything. ' +
-      'Treat it as the only op reference — never guess an op signature.',
+      'describeTools() returns this table of contents (ToC). describeTools({ops:["setComponentStyle"]}) ' +
+      'returns full JSON Schemas for just those ops, add toc:true for ToC. describeTools({all:true}) ' +
+      'returns everything. Long enums (CSS properties, tags, ARIA roles) are emitted once in `$defs` and ' +
+      'referenced as {"$ref":"#/$defs/name"}. Treat it as the only op reference — never guess an op signature.',
   },
   {
     name: 'read',
@@ -116,7 +119,7 @@ const opDoc = (name: string): IOpDoc => {
   if (!op) {
     throw new AgentError(
       'NOT_FOUND',
-      `No op named "${name}". Call describe() for the full list.`,
+      `No op named "${name}". Call describeTools() for the full list.`,
     )
   }
   return {
@@ -148,15 +151,25 @@ export const describeToc = (): IDescribeToc => {
 export interface IDescribeInput {
   ops?: string[]
   all?: boolean
+  /** Include the table of contents. Defaults to true if `ops` list isn't passed. */
+  toc?: boolean
 }
 
-export const describe = (input?: IDescribeInput): IDescribeResult => {
-  const toc = describeToc()
-  if (input?.all) {
-    return { ...toc, opDetails: agentOps().map((op) => opDoc(op.name)) }
+export const describeTools = (input?: IDescribeInput): IDescribeResult => {
+  const named = !input?.all && !!input?.ops?.length
+  const opDetails = input?.all
+    ? agentOps().map((op) => opDoc(op.name))
+    : named
+      ? (input.ops as string[]).map(opDoc)
+      : undefined
+  const includeToc = input?.toc ?? !named
+  // Exclude ToC unless asked for
+  const head: IDescribeResult = includeToc
+    ? describeToc()
+    : { version: AGENT_TOOLS_VERSION }
+  if (!opDetails) {
+    return head
   }
-  if (input?.ops?.length) {
-    return { ...toc, opDetails: input.ops.map(opDoc) }
-  }
-  return toc
+  const defs = referencedDefs(opDetails.map((op) => op.input))
+  return { ...head, ...(defs ? { $defs: defs } : {}), opDetails }
 }

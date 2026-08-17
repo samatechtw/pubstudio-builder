@@ -5,6 +5,7 @@ import {
 } from '@pubstudio/frontend/data-access-command'
 import { ICommand } from '@pubstudio/shared/type-command'
 import { ISite } from '@pubstudio/shared/type-site'
+import { MAX_LISTED_OPTIONS } from '../schema/schema'
 import { AnyOpDef } from './define-op'
 import { agentOps } from './op-registry'
 import {
@@ -81,6 +82,30 @@ describe('op registry', () => {
       .map((op) => op.name)
       .filter((name) => !/^[a-z][a-zA-Z]*$/.test(name))
     expect(bad).toEqual([])
+  })
+
+  it('long enums are emitted as $defs, not inline', () => {
+    const inline: string[] = []
+    const walk = (node: unknown, path: string): void => {
+      if (Array.isArray(node)) {
+        node.forEach((entry, i) => walk(entry, `${path}[${i}]`))
+      } else if (node && typeof node === 'object') {
+        for (const [key, value] of Object.entries(node)) {
+          if (
+            key === 'enum' &&
+            Array.isArray(value) &&
+            value.length > MAX_LISTED_OPTIONS
+          ) {
+            inline.push(`${path} (${value.length} values)`)
+          }
+          walk(value, path ? `${path}.${key}` : key)
+        }
+      }
+    }
+    for (const op of agentOps()) {
+      walk(op.input.toJson(), op.name)
+    }
+    expect(inline).toEqual([])
   })
 
   it('every omitted field carries a reason', () => {

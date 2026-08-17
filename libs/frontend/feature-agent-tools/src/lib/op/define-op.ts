@@ -19,7 +19,7 @@ export interface IOpDef<
   name: string
   command: CommandType
   title: string
-  /** Used be describe() generated docs. */
+  /** Used be describeTools() generated docs. */
   description: string
   input: Schema<TInput>
   /** Command data fields derived from live site state — the undo half. */

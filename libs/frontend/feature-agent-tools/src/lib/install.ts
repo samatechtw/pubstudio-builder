@@ -3,7 +3,7 @@ import { IReadInput, read } from './read/read'
 import { err, ok, Result, toAgentError } from './result'
 import { opNames } from './op/op-registry'
 import { applyOps, IApplyInput, IApplyOutput } from './tools/apply'
-import { describe, IDescribeInput, IDescribeResult } from './tools/describe'
+import { describeTools, IDescribeInput, IDescribeResult } from './tools/describe-tools'
 import { history, IHistoryInput, IHistoryOutput } from './tools/history'
 import { IOrientation, orientation } from './tools/orientation'
 import {
@@ -52,13 +52,13 @@ const guardAsync = <TIn, TOut>(
 export interface IPubStudioAgentApi {
   version: number
   identify(identity: IIdentity): Result<IOrientation>
-  describe(input?: IDescribeInput): Result<IDescribeResult>
+  describeTools(input?: IDescribeInput): Result<IDescribeResult>
   read(input: IReadInput): Result<Record<string, unknown>>
   apply(input: IApplyInput): Promise<Result<IApplyOutput>>
   history(input: IHistoryInput): Result<IHistoryOutput>
   status(input?: unknown): Result<IStatus>
   op: Record<string, (input?: unknown) => Promise<Result<IApplyOutput>>>
-  /** Same as describe({all:true}); built on access so install stays cheap. */
+  /** Same as describeTools({all:true}); built on access so install stays cheap. */
   readonly _meta: IDescribeResult
 }
 
@@ -91,14 +91,14 @@ export const installAgentTools = (siteSource: IUseSiteSource): (() => void) => {
       identify(input)
       return orientation()
     }, false),
-    describe: guard((input?: IDescribeInput) => describe(input), false),
+    describeTools: guard((input?: IDescribeInput) => describeTools(input), false),
     read: guard((input: IReadInput) => read(requireSite(), input)),
     apply: guardAsync(applyOps),
     history: guard(history),
     status: guard((_input?: unknown) => status(), false),
     op: {},
     get _meta() {
-      return describe({ all: true })
+      return describeTools({ all: true })
     },
   }
   api.op = opShortcuts()

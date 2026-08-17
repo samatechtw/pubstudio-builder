@@ -132,8 +132,8 @@ export const editComponentOp = defineOp<IEditComponentData>()({
   input: obj({
     componentId: componentIdField(),
     name: str().optional().desc('Component name shown in the builder tree.'),
-    tag: oneOf(TAGS).optional().desc('HTML tag.'),
-    role: oneOf(ARIA_ROLES).optional().desc('ARIA role.'),
+    tag: oneOf(TAGS, 'tag').optional().desc('HTML tag.'),
+    role: oneOf(ARIA_ROLES, 'ariaRole').optional().desc('ARIA role.'),
     content: str().optional().desc('Inner HTML content.'),
   }),
   derived: ['id', 'new', 'old'],

@@ -1,7 +1,7 @@
 import { sortedBreakpoints } from '@pubstudio/frontend/feature-site-source'
 import { CssPseudoClass } from '@pubstudio/shared/type-site'
 import { PSEUDO_CLASSES } from '../schema/fields'
-import { describeToc, IDescribeToc } from './describe'
+import { describeToc, IDescribeToc } from './describe-tools'
 import {
   defaultBreakpointId,
   editingEnabled,

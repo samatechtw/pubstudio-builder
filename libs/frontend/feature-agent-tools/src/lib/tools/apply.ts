@@ -122,7 +122,7 @@ const validate = (ops: IApplyOpInput[]): IValidatedOp[] => {
     if (!op) {
       issues.push({
         path: `ops[${i}].op`,
-        message: `unknown op "${entry.op}"; call describe() for the list`,
+        message: `unknown op "${entry.op}"; call describeTools() for the list`,
       })
       return
     }
