@@ -79,7 +79,9 @@ export const TOOL_DOCS: IToolDoc[] = [
       'synchronously. Each entry of `ops` is an envelope {op, input}, NOT the op fields ' +
       'inline: {op:"addThemeVariable", input:{key, value}}. See `example`. ' +
       'apply({ops, label, save}) validates every op, then applies them in order and ' +
-      'records the batch as ONE undo step. Returns created ids and warnings. On a ' +
+      'records the batch as ONE undo step. Returns created ids and warnings; ' +
+      'createdComponentIds holds one root per creation op, and createdComponentTrees ' +
+      'the full id tree of each addComponent (op order, children in DOM order). On a ' +
       'resolver failure it reports ok:false with result.partial — ops before failedIndex ' +
       'are applied and are part of that single undo step. Check result.saveError: a ' +
       'failed save does NOT make ok false.',

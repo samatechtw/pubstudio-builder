@@ -6,7 +6,10 @@ import {
 import { nextComponentId } from '@pubstudio/frontend/util-ids'
 import { resolveComponent } from '@pubstudio/frontend/util-resolve'
 import { triggerEventBehaviors } from '@pubstudio/frontend/util-runtime'
-import { IAddComponentData } from '@pubstudio/shared/type-command-data'
+import {
+  IAddComponentChildData,
+  IAddComponentData,
+} from '@pubstudio/shared/type-command-data'
 import { IComponent, ISite } from '@pubstudio/shared/type-site'
 import {
   registerComponentEditorEvents,
@@ -44,6 +47,30 @@ const addChildrenHelper = (
   }
 }
 
+// Create one node of an explicit child tree. Child data carries no placement, id, or
+// undo bookkeeping; the parent id comes from the recursion. Everything is cloned so
+// redo and repeated inserts of the same data never share objects with the site.
+const addChildComponentHelper = (
+  site: ISite,
+  parentId: string,
+  child: IAddComponentChildData,
+): IComponent =>
+  addComponentHelper(site, {
+    name: child.name,
+    tag: child.tag,
+    role: child.role,
+    content: child.content,
+    parentId,
+    sourceId: child.sourceId,
+    customComponentId: child.customComponentId,
+    style: clone(child.style),
+    state: clone(child.state),
+    inputs: clone(child.inputs),
+    events: clone(child.events),
+    editorEvents: clone(child.editorEvents),
+    children: child.children,
+  })
+
 export const addComponentHelper = (
   site: ISite,
   data: IAddComponentData,
@@ -53,6 +80,7 @@ export const addComponentHelper = (
   const {
     name,
     tag,
+    role,
     content,
     state,
     parentId,
@@ -71,6 +99,7 @@ export const addComponentHelper = (
     name: name ?? id,
     parent,
     tag,
+    role,
     content,
     state,
     children: undefined,
@@ -85,12 +114,14 @@ export const addComponentHelper = (
 
   if (sourceComponent) {
     component = detachComponent(component, sourceComponent)
+    component.role = role ?? sourceComponent.role
   } else if (customCmp) {
     component = {
       id,
       name: component.name,
       parent: component.parent,
       tag: component.tag,
+      role: component.role,
       content: undefined,
       children: component.children,
       // Only overridden inputs will be added to a custom instance.
@@ -120,22 +151,10 @@ export const addComponentHelper = (
   }
 
   context.components[id] = component
-  // Children overridden in builtin component definition take precedence
+  // Explicit children (builtin definitions, agent trees) take precedence
   if (data.children) {
     for (const child of data.children) {
-      addComponentHelper(site, {
-        name: child.name,
-        tag: child.tag,
-        content: child.content,
-        parentId: id,
-        sourceId: child.id,
-        state: child.state,
-        children: child.children,
-        inputs: clone(child.inputs),
-        events: clone(child.events),
-        editorEvents: clone(child.editorEvents),
-        style: clone(child.style),
-      })
+      addChildComponentHelper(site, id, child)
     }
   } else if (sourceComponent?.children) {
     addChildrenHelper(site, id, sourceComponent.children, 'sourceId')
@@ -174,7 +193,7 @@ export const applyAddComponent = (
   site: ISite,
   data: IAddComponentData,
   isRedo?: boolean,
-) => {
+): IComponent => {
   const component = addComponentHelper(site, data, isRedo)
 
   if (data.hidden) {
@@ -186,6 +205,7 @@ export const applyAddComponent = (
   // Select created component
   // Split helper function to enable creating components without a page
   setSelectedComponent(site, component)
+  return component
 }
 
 export const deleteComponentWithId = (

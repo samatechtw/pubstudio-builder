@@ -13,7 +13,9 @@ import {
   mockSerializedComponent,
   mockSerializedSite,
 } from '@pubstudio/frontend/util-test-mock'
+import { IAddComponentData } from '@pubstudio/shared/type-command-data'
 import {
+  AriaRole,
   EditorEventName,
   IBreakpoint,
   IComponent,
@@ -21,6 +23,7 @@ import {
   IEditorEvent,
   ISerializedComponent,
   ISite,
+  Tag,
 } from '@pubstudio/shared/type-site'
 import { toggleComponentTreeHidden } from '../editor-helpers'
 import { applyAddComponent, undoAddComponent } from './add-component'
@@ -170,6 +173,45 @@ describe('Add Component', () => {
       // Stringify and parse site to clear undefined keys
       expect(JSON.parse(stringifySite(site))).toEqual(JSON.parse(siteCheckpoint))
     })
+  })
+
+  it('should add explicit recursive children and undo the tree in one step', () => {
+    const nextIdBefore = site.context.nextId
+    const checkpoint = stringifySite(site)
+    const data: IAddComponentData = {
+      tag: Tag.Header,
+      name: 'Tree',
+      role: AriaRole.Banner,
+      parentId: 'test-c-0',
+      selectedComponentId: site.editor?.selectedComponent?.id,
+      children: [
+        { tag: Tag.H1, name: 'Title', content: 'Hello' },
+        {
+          tag: Tag.Div,
+          name: 'Body',
+          children: [{ tag: Tag.Span, name: 'Deep', content: 'Nested' }],
+        },
+      ],
+    }
+    applyAddComponent(site, data)
+
+    const added = resolveComponent(site.context, data.id)
+    expect(added?.role).toEqual(AriaRole.Banner)
+    expect(added?.children?.map((c) => c.name)).toEqual(['Title', 'Body'])
+    expect(added?.children?.[1]?.children?.[0]?.content).toEqual('Nested')
+    expect(Object.keys(site.context.components)).toHaveLength(componentCount + 4)
+
+    undoAddComponent(site, data)
+    expect(Object.keys(site.context.components)).toHaveLength(componentCount)
+    expect(site.context.nextId).toEqual(nextIdBefore)
+    // Selection churn updates editor tree bookkeeping; content must match exactly
+    const withoutTreeState = (serialized: string) => {
+      const parsed = JSON.parse(serialized)
+      delete parsed.editor.componentTreeExpandedItems
+      delete parsed.editor.componentTreeRenameData
+      return parsed
+    }
+    expect(withoutTreeState(stringifySite(site))).toEqual(withoutTreeState(checkpoint))
   })
 
   it('should register editor events in the editor context', () => {

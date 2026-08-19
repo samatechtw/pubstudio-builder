@@ -8,7 +8,7 @@ import {
   ICommandGroupData,
   ISetBehaviorData,
 } from '@pubstudio/shared/type-command-data'
-import { ISite, SiteSaveState } from '@pubstudio/shared/type-site'
+import { IComponent, ISite, SiteSaveState } from '@pubstudio/shared/type-site'
 import { nextTick } from 'vue'
 import { IOpCtx } from '../op/define-op'
 import { findOp } from '../op/op-registry'
@@ -41,10 +41,21 @@ export interface IApplyInput {
   save?: SaveMode
 }
 
+export interface ICreatedComponentTree {
+  id: string
+  children?: ICreatedComponentTree[]
+}
+
 export interface IApplyOutput {
   commandCount: number
   undoSteps: number
   createdComponentIds: string[]
+  /**
+   * One tree per addComponent op, in op order, children are in DOM order. Includes
+   * descendants created by sourceId/customComponentId. Trees from applied ops
+   * are reported even if a later op fails.
+   */
+  createdComponentTrees: ICreatedComponentTree[]
   createdMixinIds: string[]
   createdBehaviorIds: string[]
   createdPageRoutes: string[]
@@ -62,9 +73,19 @@ const emptyOutput = (): IApplyOutput => ({
   commandCount: 0,
   undoSteps: 0,
   createdComponentIds: [],
+  createdComponentTrees: [],
   createdMixinIds: [],
   createdBehaviorIds: [],
   createdPageRoutes: [],
+})
+
+// Reads the created component rather than the command input, because sourceId and
+// customComponentId create descendants the input never named
+const createdTree = (component: IComponent): ICreatedComponentTree => ({
+  id: component.id,
+  ...(component.children?.length
+    ? { children: component.children.map(createdTree) }
+    : {}),
 })
 
 // Ids are allocated during apply, so they are collected per command right after it runs
@@ -77,7 +98,13 @@ const collectCreated = (site: ISite, command: ICommand, out: IApplyOutput) => {
       break
     case CommandType.AddComponent: {
       const id = (command.data as IAddComponentData).id
-      if (id) out.createdComponentIds.push(id)
+      if (id) {
+        out.createdComponentIds.push(id)
+        const component = site.context.components[id]
+        if (component) {
+          out.createdComponentTrees.push(createdTree(component))
+        }
+      }
       break
     }
     case CommandType.AddStyleMixin:

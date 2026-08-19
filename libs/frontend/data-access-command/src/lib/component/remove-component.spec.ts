@@ -61,6 +61,19 @@ describe('Remove Component', () => {
     expectSiteWithoutComponentTree(site, mockSerializedSite)
   })
 
+  it('should preserve the ARIA role through remove and undo', () => {
+    const deleteCmp = resolveComponent(site.context, 'test-c-1') as IComponent
+    deleteCmp.role = 'banner'
+
+    const data = makeRemoveComponentData(site, deleteCmp)
+    expect(data.role).toEqual('banner')
+    applyRemoveComponent(site, data)
+    undoRemoveComponent(site, data)
+
+    const restored = resolveComponent(site.context, 'test-c-1')
+    expect(restored?.role).toEqual('banner')
+  })
+
   it('should remove component and restore editor hidden state on undo', () => {
     const deleteCmp = resolveComponent(site.context, 'test-c-1') as IComponent
     toggleComponentTreeHidden(site, deleteCmp.id, true)

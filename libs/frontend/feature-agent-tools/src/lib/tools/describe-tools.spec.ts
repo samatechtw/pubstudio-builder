@@ -98,4 +98,27 @@ describe('describeTools', () => {
     const result = describeTools({ ops: ['addPage'] })
     expect(result.$defs).toBeUndefined()
   })
+
+  it('emits addComponent as a finite recursive schema with one componentCreate def', () => {
+    const result = describeTools({ ops: ['addComponent'] })
+    // Serializable at all proves the schema is finite
+    const text = JSON.stringify(result)
+    const def = result.$defs?.componentCreate as {
+      properties: { children: { items: unknown } }
+    }
+    expect(def).toBeDefined()
+    expect(def.properties.children.items).toEqual({ $ref: '#/$defs/componentCreate' })
+    // The child shape is defined once, not expanded per depth
+    expect(text.split('"componentCreate"').length).toEqual(2)
+    // Defs referenced from inside the definition are included
+    for (const name of ['tag', 'cssProperty', 'ariaRole']) {
+      expect(result.$defs?.[name]).toBeDefined()
+    }
+    const input = result.opDetails?.[0].input as {
+      properties: Record<string, unknown>
+      required: string[]
+    }
+    expect(input.required).toEqual(['parentId'])
+    expect(Object.keys(input.properties)).toContain('children')
+  })
 })

@@ -1,12 +1,14 @@
+import { builtinBehaviors, builtinComponents } from '@pubstudio/frontend/util-builtin'
 import {
   makeEditComponentData,
   makeRemoveComponentData,
 } from '@pubstudio/frontend/util-command-data'
-import { builtinComponents } from '@pubstudio/frontend/util-builtin'
 import { clone } from '@pubstudio/frontend/util-component'
+import { resolveBehavior, resolveStyle } from '@pubstudio/frontend/util-resolve'
 import { serializeComponent } from '@pubstudio/frontend/util-site-store'
 import { CommandType } from '@pubstudio/shared/type-command'
 import {
+  IAddComponentChildData,
   IAddComponentData,
   IAddCustomComponentData,
   IEditComponentData,
@@ -16,8 +18,17 @@ import {
   IRemoveComponentData,
   IReplacePageRootData,
 } from '@pubstudio/shared/type-command-data'
-import { AriaRole, Css, Tag } from '@pubstudio/shared/type-site'
-import { defineOp } from '../op/define-op'
+import {
+  AriaRole,
+  ComponentArgPrimitive,
+  Css,
+  IComponentEvents,
+  IComponentInputs,
+  IComponentState,
+  IComponentStyle,
+  Tag,
+} from '@pubstudio/shared/type-site'
+import { defineOp, IOpCtx } from '../op/define-op'
 import {
   constraint,
   exampleComponentId,
@@ -25,106 +36,340 @@ import {
   mustResolveComponent,
   mustResolvePage,
 } from '../op/op-helpers'
-import { componentIdField, routeField, TAGS, tagField } from '../schema/fields'
-import { num, obj, oneOf, str } from '../schema/schema'
-import { styleEntriesField, toBreakpointStyles } from './style-entries'
+import {
+  componentIdField,
+  mixinIdField,
+  routeField,
+  tagField,
+  TAGS,
+} from '../schema/fields'
+import {
+  arr,
+  Infer,
+  json,
+  lazySchema,
+  num,
+  obj,
+  oneOf,
+  record,
+  Schema,
+  str,
+} from '../schema/schema'
+import {
+  eventBehaviorSchema,
+  eventNameField,
+  inputAttrField,
+  inputTypeField,
+} from './component-io'
+import { IStyleEntryInput, styleEntriesField, toBreakpointStyles } from './style-entries'
 
 const ARIA_ROLES = Object.values(AriaRole)
+
+// A recursive tree can smuggle an unbounded synchronous command past MAX_OPS,
+// so the whole input is bounded up front.
+export const MAX_TREE_NODES = 500
+export const MAX_TREE_DEPTH = 25
+
+const inputEntrySchema = () =>
+  obj({
+    name: str().desc('Input name, e.g. "href".'),
+    value: json().desc('Input value.'),
+    type: inputTypeField(),
+    attr: inputAttrField(),
+  })
+
+const eventEntrySchema = () =>
+  obj({
+    name: eventNameField(),
+    behaviors: arr(eventBehaviorSchema()).desc('Behaviors to run, in order.'),
+  })
+
+type IComponentInputEntry = Infer<ReturnType<typeof inputEntrySchema>>
+type IComponentEventEntry = Infer<ReturnType<typeof eventEntrySchema>>
+
+export interface IComponentCreateInput {
+  tag?: Tag
+  name?: string
+  role?: AriaRole
+  content?: string
+  sourceId?: string
+  customComponentId?: string
+  style?: IStyleEntryInput[]
+  mixinIds?: string[]
+  inputs?: IComponentInputEntry[]
+  state?: Record<string, unknown>
+  events?: IComponentEventEntry[]
+  children?: IComponentCreateInput[]
+}
+
+// One node of the create tree. Spread into the root input, referenced recursively via
+// $defs/componentCreate for `children`.
+const componentCreateFields = (childSchema: Schema<IComponentCreateInput>) => ({
+  tag: tagField()
+    .optional()
+    .desc(
+      'HTML tag. Required unless `sourceId` or `customComponentId` is provided; ' +
+        'sourced components use the source tag.',
+    ),
+  name: str().optional().desc('Component name shown in the builder tree.'),
+  role: oneOf(ARIA_ROLES, 'ariaRole').optional().desc('ARIA role.'),
+  content: str()
+    .optional()
+    .desc(
+      'Inner HTML content. Only meaningful for text-bearing tags, and not combinable ' +
+        'with `children` — content is hidden when a component has children.',
+    ),
+  sourceId: str()
+    .optional()
+    .desc(
+      'Id of a component in this site to copy tag, style, inputs, events and children ' +
+        'from. Builtin ids are rejected. Not combinable with `children`.',
+    ),
+  customComponentId: str()
+    .optional()
+    .desc(
+      'Id of a component registered with addCustomComponent, to instantiate. ' +
+        'read({tree:{}}) marks instances as "[custom: <id>]". Not combinable with ' +
+        '`children`.',
+    ),
+  style: styleEntriesField().desc(
+    'Styles applied to the new component. Equivalent to setComponentStyle ops afterwards.',
+  ),
+  mixinIds: arr(mixinIdField())
+    .optional()
+    .desc(
+      'Style mixins to attach, in cascade order — later mixins win. ' +
+        'Equivalent to addComponentMixin ops afterwards.',
+    ),
+  inputs: arr(inputEntrySchema())
+    .optional()
+    .desc(
+      'Initial inputs, same vocabulary as setComponentInput. Inputs with attr:true ' +
+        'render as HTML attributes (href, src, alt, target…).',
+    ),
+  state: record(json())
+    .optional()
+    .desc('Initial state entries — the JSON values behaviors read and write at runtime.'),
+  events: arr(eventEntrySchema())
+    .optional()
+    .desc(
+      'Runtime events wired to behavior lists, same vocabulary as setComponentEvent.',
+    ),
+  children: arr(childSchema)
+    .optional()
+    .desc(
+      'Child components, created in array order with this same recursive shape. Ids are ' +
+        'allocated during apply and reported in createdComponentTrees.',
+    ),
+})
+
+const componentCreateSchema: Schema<IComponentCreateInput> = lazySchema(
+  'componentCreate',
+  (self) => obj(componentCreateFields(self)),
+)
+
+const toComponentStyle = (
+  node: IComponentCreateInput,
+  breakpointId: string,
+): IComponentStyle | undefined => {
+  const mixins = node.mixinIds?.length ? [...node.mixinIds] : undefined
+  if (!node.style && !mixins) {
+    return undefined
+  }
+  const style: IComponentStyle = { custom: toBreakpointStyles(node.style, breakpointId) }
+  if (mixins) {
+    style.mixins = mixins
+  }
+  return style
+}
+
+const toComponentInputs = (
+  entries: IComponentInputEntry[] | undefined,
+): IComponentInputs | undefined => {
+  if (!entries?.length) {
+    return undefined
+  }
+  const inputs: IComponentInputs = {}
+  for (const entry of entries) {
+    inputs[entry.name] = {
+      name: entry.name,
+      type: entry.type ?? ComponentArgPrimitive.String,
+      attr: entry.attr ?? true,
+      is: entry.value,
+    }
+  }
+  return inputs
+}
+
+const toComponentEvents = (
+  entries: IComponentEventEntry[] | undefined,
+): IComponentEvents | undefined => {
+  if (!entries?.length) {
+    return undefined
+  }
+  const events: IComponentEvents = {}
+  for (const entry of entries) {
+    events[entry.name] = { name: entry.name, behaviors: entry.behaviors }
+  }
+  return events
+}
+
+// Validates one node and everything it references, then recurses. Nothing can fail
+// after this returns, the whole tree becomes a single command, so a deep error here
+// is the difference between "no mutation" and a partial apply.
+const resolveCreateNode = (
+  ctx: IOpCtx,
+  node: IComponentCreateInput,
+  path: string,
+  counter: { nodes: number },
+  depth: number,
+): IAddComponentChildData => {
+  counter.nodes += 1
+  if (counter.nodes > MAX_TREE_NODES) {
+    constraint(
+      `The component tree has more than ${MAX_TREE_NODES} nodes. ` +
+        'Split the build into multiple addComponent ops.',
+    )
+  }
+  const at = (field: string): string => (path ? `${path}.${field}` : field)
+  if (depth > MAX_TREE_DEPTH) {
+    constraint(`${at('children')} exceeds the maximum tree depth of ${MAX_TREE_DEPTH}.`)
+  }
+  const children = node.children?.length ? node.children : undefined
+  // addComponentHelper resolves both against site components only; a miss degrades to a
+  // bare tag and still reports success. Builtins are never found.
+  const sourceComponent = node.sourceId
+    ? ctx.site.context.components[node.sourceId]
+    : undefined
+  if (node.sourceId && !sourceComponent) {
+    constraint(
+      builtinComponents[node.sourceId]
+        ? `${at('sourceId')} "${node.sourceId}" is a builtin, which addComponent cannot ` +
+            'copy. Add the component and its children explicitly, or copy an instance ' +
+            'that is already in the site.'
+        : `${at('sourceId')}: no component "${node.sourceId}" to copy from. ` +
+            'See read({tree:{}}).',
+    )
+  }
+  const customComponent = node.customComponentId
+    ? ctx.site.context.components[node.customComponentId]
+    : undefined
+  if (node.customComponentId) {
+    if (!customComponent) {
+      constraint(
+        `${at('customComponentId')}: no component "${node.customComponentId}" to instantiate.`,
+      )
+    }
+    if (!ctx.site.context.customComponentIds.has(node.customComponentId)) {
+      constraint(
+        `${at('customComponentId')}: ${node.customComponentId} is not a custom ` +
+          'component. Register it with addCustomComponent first, or copy it with ' +
+          'sourceId instead.',
+      )
+    }
+  }
+  const tag = sourceComponent?.tag ?? customComponent?.tag ?? node.tag
+  if (!tag) {
+    constraint(`${at('tag')} is required without \`sourceId\` or \`customComponentId\`.`)
+  }
+  if (children && node.content !== undefined) {
+    constraint(
+      `${at('content')} cannot be combined with \`children\` — PubStudio hides content ` +
+        'when a component has children.',
+    )
+  }
+  if (children && (node.sourceId || node.customComponentId)) {
+    constraint(
+      `${at('children')} cannot be combined with \`sourceId\` or \`customComponentId\` — ` +
+        'a source owns its copied subtree. Wrap the sourced node in another component ' +
+        'to give it siblings.',
+    )
+  }
+  node.mixinIds?.forEach((mixinId, i) => {
+    if (!resolveStyle(ctx.site.context, mixinId)) {
+      constraint(
+        `${at(`mixinIds[${i}]`)}: no style mixin "${mixinId}". See read({mixins:true}).`,
+      )
+    }
+  })
+  const inputNames = new Set<string>()
+  node.inputs?.forEach((entry, i) => {
+    if (inputNames.has(entry.name)) {
+      constraint(`${at(`inputs[${i}]`)}: duplicate input "${entry.name}".`)
+    }
+    inputNames.add(entry.name)
+  })
+  const eventNames = new Set<string>()
+  node.events?.forEach((event, i) => {
+    if (eventNames.has(event.name)) {
+      constraint(`${at(`events[${i}]`)}: duplicate event "${event.name}".`)
+    }
+    eventNames.add(event.name)
+    event.behaviors.forEach((behavior, j) => {
+      const known =
+        resolveBehavior(ctx.site.context, behavior.behaviorId) ??
+        builtinBehaviors[behavior.behaviorId]
+      if (!known) {
+        constraint(
+          `${at(`events[${i}].behaviors[${j}]`)}: no behavior ` +
+            `"${behavior.behaviorId}". See read({behaviors:true}).`,
+        )
+      }
+    })
+  })
+  return {
+    tag,
+    name: node.name,
+    role: node.role,
+    content: node.content,
+    sourceId: node.sourceId,
+    customComponentId: node.customComponentId,
+    style: toComponentStyle(node, ctx.breakpointId),
+    state: node.state as Record<string, IComponentState> | undefined,
+    inputs: toComponentInputs(node.inputs),
+    events: toComponentEvents(node.events),
+    children: children?.map((child, i) =>
+      resolveCreateNode(ctx, child, at(`children[${i}]`), counter, depth + 1),
+    ),
+  }
+}
 
 export const addComponentOp = defineOp<IAddComponentData>()({
   name: 'addComponent',
   command: CommandType.AddComponent,
   title: 'Add component',
   description:
-    'Create a component under an existing parent. Give `sourceId` to deep-copy a ' +
+    'Create a component — or a whole component tree — under an existing parent in ONE ' +
+    'op. Each node takes tag/name/content/role, style entries, `mixinIds`, `inputs`, ' +
+    '`state`, runtime `events` and recursive `children` of the same shape (max ' +
+    `${MAX_TREE_NODES} nodes, depth ${MAX_TREE_DEPTH}). Give \`sourceId\` to deep-copy a ` +
     'component that already exists in this site, or `customComponentId` to insert an ' +
-    'instance of a custom component. The new id is returned in createdComponentIds; ' +
-    'children are created with further addComponent ops. Builtin ids from ' +
+    'instance of a custom component; neither combines with explicit `children`. The ' +
+    'root id is returned in createdComponentIds, and every created id (including ' +
+    'implicit source/custom descendants) in createdComponentTrees. Builtin ids from ' +
     'read({builtins:true}) are NOT valid sources — build those out explicitly.',
   input: obj({
     parentId: componentIdField().desc('Id of the component to add the new child under.'),
-    tag: tagField()
-      .optional()
-      .desc(
-        'HTML tag. Required unless `sourceId` or `customComponentId` is provided; ' +
-          'sourced components use the source tag.',
-      ),
-    name: str().optional().desc('Component name shown in the builder tree.'),
-    content: str()
-      .optional()
-      .desc('Inner HTML content. Only meaningful for text-bearing tags.'),
     parentIndex: num()
       .optional()
       .desc('Index in the parent’s children. Appends when omitted.'),
-    sourceId: str()
-      .optional()
-      .desc(
-        'Id of a component in this site to copy tag, style, inputs, events and children ' +
-          'from. Builtin ids are rejected.',
-      ),
-    customComponentId: str()
-      .optional()
-      .desc(
-        'Id of a component registered with addCustomComponent, to instantiate. ' +
-          'read({tree:{}}) marks instances as "[custom: <id>]".',
-      ),
-    style: styleEntriesField().desc(
-      'Styles applied to the new component. Equivalent to setComponentStyle ops afterwards.',
-    ),
+    ...componentCreateFields(componentCreateSchema),
   }),
   derived: ['id', 'selectedComponentId'],
   omitted: {
-    children: 'Deep child trees come from `sourceId`; otherwise add children explicitly.',
-    state: 'Use setComponentState after creation.',
-    inputs: 'Use setComponentInput after creation.',
-    events: 'Use setComponentEvent after creation.',
-    editorEvents: 'Use setComponentEditorEvent after creation.',
+    editorEvents:
+      'Builder-only events, and they can run side effects mid-command. Use ' +
+      'setComponentEditorEvent after creation.',
     hidden: 'Builder tree visibility; captured automatically when undoing.',
   },
   resolve: (ctx, input) => {
     mustResolveComponent(ctx.site, input.parentId)
-    // addComponentHelper resolves both against site components only; a miss degrades to a
-    // bare tag and still reports success. Builtins are never found.
-    const sourceComponent = input.sourceId
-      ? ctx.site.context.components[input.sourceId]
-      : undefined
-    if (input.sourceId && !sourceComponent) {
-      constraint(
-        builtinComponents[input.sourceId]
-          ? `sourceId "${input.sourceId}" is a builtin, which addComponent cannot copy. ` +
-              'Add the component and its children explicitly, or copy an instance that ' +
-              'is already in the site.'
-          : `No component "${input.sourceId}" to copy from. See read({tree:{}}).`,
-      )
-    }
-    const customComponent = input.customComponentId
-      ? ctx.site.context.components[input.customComponentId]
-      : undefined
-    if (input.customComponentId) {
-      if (!customComponent) {
-        constraint(`No component "${input.customComponentId}" to instantiate.`)
-      }
-      if (!ctx.site.context.customComponentIds.has(input.customComponentId)) {
-        constraint(
-          `${input.customComponentId} is not a custom component. Register it with ` +
-            'addCustomComponent first, or copy it with sourceId instead.',
-        )
-      }
-    }
-    const tag = sourceComponent?.tag ?? customComponent?.tag ?? input.tag
-    if (!tag) {
-      constraint('`tag` is required without `sourceId` or `customComponentId`.')
-    }
-    const custom = toBreakpointStyles(input.style, ctx.breakpointId)
+    const counter = { nodes: 0 }
+    const node = resolveCreateNode(ctx, input, '', counter, 1)
     const data: IAddComponentData = {
-      tag,
-      name: input.name,
-      content: input.content,
+      ...node,
       parentId: input.parentId,
       parentIndex: input.parentIndex,
-      sourceId: input.sourceId,
-      customComponentId: input.customComponentId,
-      style: input.style ? { custom } : undefined,
       selectedComponentId: ctx.site.editor?.selectedComponent?.id,
     }
     return { type: CommandType.AddComponent, data }
@@ -134,6 +379,15 @@ export const addComponentOp = defineOp<IAddComponentData>()({
     tag: Tag.Div,
     name: 'Agent block',
     style: [{ property: Css.Width, value: '50%' }],
+    children: [
+      { tag: Tag.H2, name: 'Agent title', content: 'Added by agent' },
+      {
+        tag: Tag.Div,
+        name: 'Agent body',
+        style: [{ property: Css.Display, value: 'flex' }],
+        children: [{ tag: Tag.Span, name: 'Agent detail', content: 'Nested' }],
+      },
+    ],
   }),
 })
 
@@ -186,6 +440,7 @@ export const removeComponentOp = defineOp<IRemoveComponentData>()({
     'id',
     'name',
     'tag',
+    'role',
     'content',
     'parentId',
     'parentIndex',

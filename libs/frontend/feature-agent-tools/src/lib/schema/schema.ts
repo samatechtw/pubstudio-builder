@@ -107,6 +107,18 @@ export const referencedDefs = (
 ): Record<string, JsonSchema> | undefined => {
   const names = new Set<string>()
   schemas.forEach((schema) => collectRefs(schema, names))
+  // A definition can reference other definitions (or itself), so collect transitively.
+  const queue = [...names]
+  while (queue.length) {
+    const found = new Set<string>()
+    collectRefs(SCHEMA_DEFS[queue.pop() as string], found)
+    for (const name of found) {
+      if (!names.has(name)) {
+        names.add(name)
+        queue.push(name)
+      }
+    }
+  }
   if (!names.size) {
     return undefined
   }
@@ -149,6 +161,24 @@ export const oneOf = <const T extends readonly string[]>(
   }
   SCHEMA_DEFS[defName] = { type: 'string', enum: values }
   return new Schema<T[number]>({ $ref: `${DEFS_PREFIX}${defName}` }, check)
+}
+
+// A named schema emitted once in $defs and used as {"$ref": "#/$defs/<name>"}. `build`
+// receives the ref schema itself, so the definition can nest recursively. Validation
+// delegates through the ref, and depth is bounded by the input.
+export const lazySchema = <T>(
+  name: string,
+  build: (self: Schema<T>) => Schema<T>,
+): Schema<T> => {
+  // Holder object rather than a let so `check` can close over the not-yet-built schema
+  const holder: { inner?: Schema<T> } = {}
+  const self: Schema<T> = new Schema<T>(
+    { $ref: `${DEFS_PREFIX}${name}` },
+    (value, path, issues) => (holder.inner as Schema<T>).parse(value, path, issues),
+  )
+  holder.inner = build(self)
+  SCHEMA_DEFS[name] = holder.inner.toJson()
+  return self
 }
 
 export const anyOf = <const S extends readonly AnySchema[]>(

@@ -23,15 +23,30 @@ import { arr, bool, json, obj, oneOf, record, str } from '../schema/schema'
 const EVENT_TYPES = Object.values(ComponentEventType)
 const EDITOR_EVENT_NAMES = Object.values(EditorEventName)
 
+// Shared with addComponent's recursive create schema, so the two stay one vocabulary
+export const eventBehaviorSchema = () =>
+  obj({
+    behaviorId: behaviorIdField(),
+    args: record(json())
+      .optional()
+      .desc('Arguments passed to the behavior, keyed by argument name.'),
+  })
+
+export const eventNameField = () =>
+  str().desc(`Event name. Built-in types: ${EVENT_TYPES.join(', ')}.`)
+
+export const inputTypeField = () =>
+  oneOf(ARG_TYPES)
+    .dflt(ComponentArgPrimitive.String)
+    .desc('Value type. Only used when creating a new input.')
+
+export const inputAttrField = () =>
+  bool()
+    .dflt(true)
+    .desc('Render as an HTML attribute. Only used when creating a new input.')
+
 const behaviorsField = () =>
-  arr(
-    obj({
-      behaviorId: behaviorIdField(),
-      args: record(json())
-        .optional()
-        .desc('Arguments passed to the behavior, keyed by argument name.'),
-    }),
-  )
+  arr(eventBehaviorSchema())
     .optional()
     .desc('Behaviors to run, in order. Omit to remove the event entirely.')
 
@@ -47,12 +62,8 @@ export const setComponentInputOp = defineOp<ISetComponentInputData>()({
     componentId: componentIdField(),
     name: str().desc('Input name, e.g. "href".'),
     value: json().optional().desc('Input value. Omit to remove the input.'),
-    type: oneOf(ARG_TYPES)
-      .dflt(ComponentArgPrimitive.String)
-      .desc('Value type. Only used when creating a new input.'),
-    attr: bool()
-      .dflt(true)
-      .desc('Render as an HTML attribute. Only used when creating a new input.'),
+    type: inputTypeField(),
+    attr: inputAttrField(),
   }),
   derived: ['oldInput', 'newInput'],
   omitted: {},
@@ -100,7 +111,7 @@ export const setComponentEventOp = defineOp<ISetComponentEventData>()({
     'with setBehavior; list existing ones with read({behaviors:true}).',
   input: obj({
     componentId: componentIdField(),
-    name: str().desc(`Event name. Built-in types: ${EVENT_TYPES.join(', ')}.`),
+    name: eventNameField(),
     behaviors: behaviorsField(),
   }),
   derived: ['oldEvent', 'newEvent'],
