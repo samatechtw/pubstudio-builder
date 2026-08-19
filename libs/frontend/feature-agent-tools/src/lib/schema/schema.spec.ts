@@ -3,12 +3,14 @@ import {
   arr,
   bool,
   json,
+  lazySchema,
   num,
   obj,
   oneOf,
   parseSchema,
   record,
   referencedDefs,
+  Schema,
   str,
 } from './schema'
 
@@ -117,6 +119,63 @@ describe('Schema', () => {
     expect(parseSchema(alternative, 2)).toEqual({
       ok: false,
       issues: [{ path: '', message: 'did not match any allowed shape' }],
+    })
+  })
+
+  describe('lazySchema recursion', () => {
+    interface INode {
+      label: string
+      items?: INode[]
+    }
+    const node: Schema<INode> = lazySchema('specNode', (self) =>
+      obj({ label: str(), items: arr(self).optional() }),
+    )
+
+    it('emits a $ref at the use site and the finite definition once', () => {
+      expect(node.toJson()).toEqual({ $ref: '#/$defs/specNode' })
+      expect(referencedDefs([node.toJson()])).toEqual({
+        specNode: {
+          type: 'object',
+          additionalProperties: false,
+          required: ['label'],
+          properties: {
+            label: { type: 'string' },
+            items: { type: 'array', items: { $ref: '#/$defs/specNode' } },
+          },
+        },
+      })
+    })
+
+    it('validates recursively with full issue paths', () => {
+      expect(
+        parseSchema(node, {
+          label: 'a',
+          items: [{ label: 'b', items: [{ label: 'c' }] }],
+        }).ok,
+      ).toEqual(true)
+      expect(parseSchema(node, { label: 'a', items: [{ items: [] }] })).toEqual({
+        ok: false,
+        issues: [{ path: 'items[0].label', message: 'is required' }],
+      })
+      expect(
+        parseSchema(node, { label: 'a', items: [{ label: 'b', extra: 1 }] }).ok,
+      ).toEqual(false)
+    })
+
+    it('collects defs referenced from inside other defs, terminating on cycles', () => {
+      oneOf(['x', 'y'] as const, 'specUnit')
+      const wrapper = lazySchema('specWrapper', () =>
+        obj({
+          unit: oneOf(['x', 'y'] as const, 'specUnit').optional(),
+          child: node.optional(),
+        }),
+      )
+      const defs = referencedDefs([wrapper.toJson()])
+      expect(Object.keys(defs ?? {}).sort()).toEqual([
+        'specNode',
+        'specUnit',
+        'specWrapper',
+      ])
     })
   })
 })

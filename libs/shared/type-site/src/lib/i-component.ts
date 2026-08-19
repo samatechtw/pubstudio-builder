@@ -106,7 +106,6 @@ export interface IComponent {
   name: string
   // HTML tag
   tag: TagType
-  // ARIA role
   role?: AriaRoleType
   // HTML content.
   // This is also used to override custom component content.

@@ -16,6 +16,7 @@ export const makeRemoveComponentData = (
     id: component.id,
     name: component.name,
     tag: component.tag,
+    role: component.role,
     content: component.content,
     parentId: parent?.id ?? '',
     children: component.children?.map((c) => makeRemoveComponentData(site, c)),
