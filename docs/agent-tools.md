@@ -224,12 +224,35 @@ the object is obvious, keep it where there is ambiguity (`setComponentStyle` vs
 `context.components`, so a builtin id silently degrades the copy to a bare tag — no
 children, styles, inputs or mixins — and `apply()` reports success. `use-build.ts` avoids
 this by inlining the whole builtin definition into `IAddComponentData` and pushing the
-mixins and theme variables it depends on as sibling commands first; the op deliberately
-omits `children`, so there is no equivalent agent path.
+mixins and theme variables it depends on as sibling commands first. The agent
+equivalent is explicit: build the structure with recursive `children` (below), adding any
+mixins and theme variables the design needs first.
 
-Until there is one, `addComponent` rejects an unresolvable `sourceId` (naming builtins
-specifically) and a `customComponentId` that was never registered. Turning a silent wrong
-result into an error is the whole point — do not relax it to a warning.
+`addComponent` rejects an unresolvable `sourceId` (naming builtins specifically) and a
+`customComponentId` that was never registered. Turning a silent wrong result into an
+error is the whole point — do not relax it to a warning.
+
+### Recursive `children`
+
+`addComponent` accepts a whole tree in one op: every node takes the same creation fields
+(tag/name/content/role, style entries, `mixinIds`, `inputs`, `state`, runtime `events`)
+plus recursive `children`, emitted in JSON Schema as one `$defs/componentCreate`
+definition. Constraints that keep it sound:
+
+- **The whole tree resolves before anything applies.** Every mixin, behavior, source and
+  custom-component reference in the tree is validated up front, with the offending path
+  in the message (`children[2].mixinIds[0]: …`), because the tree is ONE command — a
+  failure after partial application is exactly what this op exists to prevent.
+- **`content` and non-empty `children` are mutually exclusive** (PubStudio hides content
+  when a component has children), and explicit `children` cannot accompany
+  `sourceId`/`customComponentId` — a source owns its copied subtree.
+- **`MAX_TREE_NODES` (500) and `MAX_TREE_DEPTH` (25)** bound the input, since a recursive
+  tree would otherwise smuggle an unbounded synchronous command past `MAX_OPS`.
+- **Created ids are reported as `createdComponentTrees`** — one id tree per creation op,
+  children in DOM order, read from the created components so implicit source/custom
+  descendants are included. `createdComponentIds` stays root-only for compatibility.
+- Builder-only `editorEvents` stay follow-up ops: they can execute side effects while the
+  add command is still running.
 
 ## Site type differences
 
@@ -292,20 +315,13 @@ Included in `identify()`'s orientation payload, but important enough to repeat:
   `docs/agent-tools-reference.md` generated from `OP_REGISTRY` with a CI drift check was
   designed but not built.
 - **No skill package** for the agent side of the workflow.
-- **Composite builtins cannot be inserted at all.** `MailingList`, `ContactForm`,
+- **Composite builtins cannot be inserted directly.** `MailingList`, `ContactForm`,
   `ImageGallery`, `NavMenu`, `LightboxGallery` and friends are most of what makes a builtin
-  worth having, and `addComponent` now rejects them rather than producing an empty tag. The
-  real fix is routing builtin sources through the path `use-build.ts` uses.
-- **Building a tree costs one `apply()` per depth level.** Ids are allocated during apply,
-  so a child's `parentId` is unknown when the batch is authored, and atomicity stops at each
-  level. A client-supplied handle (`{op:'addComponent', input:{parentId:'$hero'}, as:'hero'}`)
-  resolved during apply would fix it; resolution already runs sequentially per op.
+  worth having, and `addComponent` rejects their ids rather than producing an empty tag.
+  Recursive `children` lets an agent build equivalent structures in one op, but the builtin
+  definitions themselves are still only reachable through `use-build.ts`.
 - **No e2e spec.** The flow has been driven by hand over chrome-devtools-mcp; a Playwright
   spec would keep the bridge, gating flag, save path and reactivity covered.
-- **`role` is lost on remove + undo.** Neither `IAddComponentData` nor `IRemoveComponentData`
-  has a `role` field, so `addComponent` cannot set one either (`editComponent` can, after the
-  fact). Fixing it means touching both data types plus `addComponentHelper`,
-  `makeRemoveComponentData` and `undoRemoveComponentHelper`.
 - **`undoRemoveComponentMixin` re-adds with `push`**, losing the mixin's position in the
   component's list, so undoing a removal can change the cascade.
 - **`undoRemovePage` activates the restored page**, not the page that was active before the

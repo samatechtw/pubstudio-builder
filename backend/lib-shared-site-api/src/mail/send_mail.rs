@@ -49,7 +49,7 @@ pub async fn send_mails(
     }
 
     // MailerSend's `to` array does not isolate recipients from each other, so send one
-    // request per recipient and ggregate any failures.
+    // request per recipient and aggregate any failures.
     let client = reqwest::Client::new();
     let mut errors: Vec<String> = vec![];
 
