@@ -9,7 +9,6 @@ export const makeContext = (namespace: string): ISiteContext => {
     styles: {},
     styleOrder: [],
     customComponentIds: new Set(),
-    customChildIds: new Set(),
     behaviors: {},
     theme: {
       variables: {},

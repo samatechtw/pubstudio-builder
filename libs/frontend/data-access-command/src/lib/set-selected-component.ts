@@ -47,6 +47,8 @@ export const setSelectedComponent = (
     const prevMode = editor.mode
 
     editor.selectedComponent = component
+    // Expanded-child selection is re-established by the click that made it
+    editor.selectedInstanceChildId = undefined
     const isSelectMode = editor.mode === EditorMode.SelectedComponent
     const {
       expandTree = true,

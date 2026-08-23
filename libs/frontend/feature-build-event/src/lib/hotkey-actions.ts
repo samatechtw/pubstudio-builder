@@ -1,4 +1,5 @@
 import {
+  exitComponentEdit,
   setActivePage,
   setEditPage,
   setSelectedComponent,
@@ -22,6 +23,7 @@ export const addCustomComponentAtIndex = (site: ISite, index: number) => {
 export const setPageByIndex = (site: ISite, index: number) => {
   const page = getOrderedPages(site)[index]
   if (page) {
+    exitComponentEdit(site)
     setActivePage(site.editor, page.route)
     setSelectedComponent(site, site.pages[page.route]?.root)
     resetPageMenu()

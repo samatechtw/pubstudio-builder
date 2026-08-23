@@ -8,6 +8,7 @@ import {
   computeComponentOverrideStyle,
   computeFlattenedStyles,
 } from '@pubstudio/frontend/util-component'
+import { overrideSelectorIds } from '@pubstudio/frontend/util-render'
 import { ICommand, StyleType } from '@pubstudio/shared/type-command'
 import {
   Css,
@@ -86,8 +87,9 @@ export const useEditComponentChildStyles = (
       )
   })
 
+  // An instance's selectors are the definition children it expands
   const childrenIdSet = computed(
-    () => new Set(component.value.children?.map((child) => child.id)),
+    () => new Set(overrideSelectorIds(site.value.context, component.value)),
   )
 
   const overriddenChildrenIdSet = computed(

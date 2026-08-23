@@ -1,6 +1,13 @@
+import { customComponentUsage } from '@pubstudio/frontend/util-component'
 import { serializeComponent } from '@pubstudio/frontend/util-site-store'
-import { IComponent, ISerializedComponent, IStyle } from '@pubstudio/shared/type-site'
-import { ComponentInclude } from './input'
+import {
+  IComponent,
+  ISerializedComponent,
+  ISite,
+  IStyle,
+} from '@pubstudio/shared/type-site'
+import { mustResolveComponent } from '../op/op-helpers'
+import { ComponentInclude, DEFAULT_TREE_DEPTH } from './input'
 
 export const MAX_CONTENT_CHARS = 200
 export const MAX_TREE_NODES = 400
@@ -132,6 +139,24 @@ export const componentSummary = (
   page,
   content: component.content ? truncate(component.content, 60) : undefined,
 })
+
+export const customComponentView = (
+  site: ISite,
+  definitionId: string,
+  withTree: boolean,
+) => {
+  const definition = mustResolveComponent(site, definitionId)
+  const { instances, routes } = customComponentUsage(site, definitionId)
+  return {
+    id: definition.id,
+    name: definition.name,
+    tag: definition.tag,
+    instanceCount: instances.length,
+    instanceIds: instances.map((instance) => instance.id),
+    routes,
+    tree: componentTree(definition, withTree ? DEFAULT_TREE_DEPTH : 1).tree,
+  }
+}
 
 export const mixinSummary = (mixin: IStyle) => ({
   id: mixin.id,

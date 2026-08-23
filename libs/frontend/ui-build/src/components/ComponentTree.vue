@@ -101,6 +101,10 @@ const treeStyles = computed(() => {
   &.dragging {
     opacity: 0.2;
   }
+  &.scaffolding > .component-title > .component-name {
+    color: $grey-500;
+    font-style: italic;
+  }
   &.expanded {
     & + .component-tree-item {
       margin-top: -4px;

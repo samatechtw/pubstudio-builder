@@ -6,6 +6,7 @@ import {
   IComponentInputs,
   IComponentState,
   IComponentStyle,
+  IInstanceOverrides,
   TagType,
 } from '@pubstudio/shared/type-site'
 
@@ -22,6 +23,8 @@ export interface IAddComponentBaseData {
   sourceId?: string
   // Custom component id
   customComponentId?: string
+  // Per-child overrides for a custom instance
+  instanceOverrides?: IInstanceOverrides
   style?: IComponentStyle
   state?: Record<string, IComponentState>
   inputs?: IComponentInputs

@@ -10,12 +10,15 @@ export const scrollToComponent = (site: ISite, component: IComponent) => {
   // where `document` is not available. `document !== undefined` is not viable here because
   // that'll lead to "ReferenceError: window is not defined" error in Node environment.
   if (editor && typeof document !== 'undefined') {
-    // Switch to the target page before scrolling
-    const componentPage = findComponentPage(site, component)
-    if (!componentPage) {
-      console.error(`Cannot find page for component with ID ${component.id}`)
-    } else if (editor.active !== componentPage.route) {
-      setActivePage(editor, componentPage.route)
+    // Switch to the target page before scrolling. Arena components are on no page, and
+    // setActivePage would close the component edit screen they belong to.
+    if (!editor.editingComponentId) {
+      const componentPage = findComponentPage(site, component)
+      if (!componentPage) {
+        console.error(`Cannot find page for component with ID ${component.id}`)
+      } else if (editor.active !== componentPage.route) {
+        setActivePage(editor, componentPage.route)
+      }
     }
 
     // Scroll to the target element. Use `nextTick` to wait for the new component (element)

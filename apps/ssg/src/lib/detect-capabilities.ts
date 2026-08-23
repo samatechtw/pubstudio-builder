@@ -1,4 +1,4 @@
-import { iteratePage } from '@pubstudio/frontend/util-render'
+import { renderChildren } from '@pubstudio/frontend/util-render'
 import { IComponent, ISite, Tag } from '@pubstudio/shared/type-site'
 
 // Reports site features that stop working without the hydration runtime.
@@ -29,9 +29,16 @@ export const detectNoJsBlockers = (site: ISite): string[] => {
       addBlocker(`form ${component.id}`)
     }
   }
+  // Walks what renders, so definitions are checked through the instances that expand them
+  const walk = (component: IComponent) => {
+    checkComponent(component)
+    for (const child of renderChildren(site.context, component) ?? []) {
+      walk(child)
+    }
+  }
   for (const page of Object.values(site.pages)) {
     if (page.public) {
-      iteratePage(page, checkComponent)
+      walk(page.root)
     }
   }
   return blockers

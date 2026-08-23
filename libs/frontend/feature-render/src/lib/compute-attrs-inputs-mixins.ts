@@ -1,4 +1,8 @@
-import { computeInputs, RenderModeType } from '@pubstudio/frontend/util-render'
+import {
+  computeInputs,
+  isCustomComponentPart,
+  RenderModeType,
+} from '@pubstudio/frontend/util-render'
 import { resolveComponent } from '@pubstudio/frontend/util-resolve'
 import { IComponent, IEditorContext, ISiteContext } from '@pubstudio/shared/type-site'
 import { IAttrsInputsMixins } from './i-attrs-inputs-mixins'
@@ -22,9 +26,7 @@ export const computeAttrsInputsMixins = (
 ): IAttrsInputsMixins => {
   const { renderMode, resolveTheme = true, editor } = options
 
-  const isCustom =
-    context.customComponentIds.has(component.id) ||
-    context.customChildIds.has(component.id)
+  const isCustom = isCustomComponentPart(context, component)
 
   const c: IComponent = component
   let r: IComponent | undefined = undefined

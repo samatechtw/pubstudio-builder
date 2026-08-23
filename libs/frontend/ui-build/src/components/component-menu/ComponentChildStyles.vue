@@ -116,9 +116,7 @@ const toggleCollapse = () => {
 }
 
 const currentSelectorMissing = computed(
-  () =>
-    !!selector.value &&
-    !component.value.children?.some((child) => child.id === selector.value),
+  () => !!selector.value && isMissingSelector(selector.value),
 )
 
 const labelEnter = (id: string) => {

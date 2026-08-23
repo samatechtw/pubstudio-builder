@@ -19,6 +19,10 @@ import { undoEditComponent } from './component/edit-component'
 import { undoRemoveComponent } from './component/remove-component'
 import { undoReplacePageRoot } from './component/replace-page-root'
 import { undoAddCustomComponent } from './custom-component/add-custom-component'
+import { undoConvertToCustomComponent } from './custom-component/convert-to-custom-component'
+import { undoDetachInstance } from './custom-component/detach-instance'
+import { undoRemoveCustomComponent } from './custom-component/remove-custom-component'
+import { undoSetInstanceOverride } from './custom-component/set-instance-override'
 import { undoSetDefaultsHead } from './defaults/set-defaults-head'
 import { undoCommandGroup } from './group/command-group'
 import { undoMigrateSite } from './migration/migrate-site'
@@ -93,6 +97,10 @@ export const undoCommand = (site: ISite, command: ICommand) => {
     [CommandType.SetGlobalStyle]: undoSetGlobalStyle,
     [CommandType.UpdateUi]: undoUpdateUi,
     [CommandType.AddCustomComponent]: undoAddCustomComponent,
+    [CommandType.ConvertToCustomComponent]: undoConvertToCustomComponent,
+    [CommandType.RemoveCustomComponent]: undoRemoveCustomComponent,
+    [CommandType.DetachInstance]: undoDetachInstance,
+    [CommandType.SetInstanceOverride]: undoSetInstanceOverride,
     [CommandType.SetComponentState]: undoSetComponentState,
     [CommandType.MigrateSite]: undoMigrateSite,
   }[command.type]

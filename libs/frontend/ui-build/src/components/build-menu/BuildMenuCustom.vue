@@ -37,7 +37,7 @@ import { getTopLevelCustomComponents } from '@pubstudio/frontend/util-builder'
 
 const { t } = useI18n()
 
-const { site, editor, addCustomComponent } = useBuild()
+const { site, editor, convertToCustomComponent } = useBuild()
 const customDragging = ref(false)
 let dragLeaveTimeout: ReturnType<typeof setTimeout> | undefined = undefined
 
@@ -72,7 +72,7 @@ const customMenuDrop = (_e: DragEvent) => {
   const cmpId = dragSource.value?.componentId
   const component = resolveComponent(site.value.context, cmpId)
   if (component && canBecomeCustom(site.value.context, cmpId)) {
-    addCustomComponent(component)
+    convertToCustomComponent(component)
     if (dragLeaveTimeout) {
       clearTimeout(dragLeaveTimeout)
     }

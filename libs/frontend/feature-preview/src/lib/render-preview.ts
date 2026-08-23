@@ -4,7 +4,12 @@ import {
   LiveComponent,
   parseI18n,
 } from '@pubstudio/frontend/feature-render'
-import { IContent, IPropsContent, RenderMode } from '@pubstudio/frontend/util-render'
+import {
+  IContent,
+  IPropsContent,
+  renderChildren,
+  RenderMode,
+} from '@pubstudio/frontend/util-render'
 import { resetRuntimeContext } from '@pubstudio/frontend/util-runtime'
 import { IComponent, IPage, ISite } from '@pubstudio/shared/type-site'
 import { h, VNode } from 'vue'
@@ -29,8 +34,9 @@ export const computePropsContent = (
 
   const active = site.context.activeI18n ?? 'en'
 
-  const content: IContent = component.children?.length
-    ? component.children.map((child) => renderComponent(site, child, renderMode))
+  const children = renderChildren(site.context, component)
+  const content: IContent = children?.length
+    ? children.map((child) => renderComponent(site, child, renderMode))
     : parseI18n(site.context.i18n, active, data.content)
 
   const props = {

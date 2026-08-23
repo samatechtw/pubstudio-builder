@@ -20,6 +20,7 @@ import { setBuildOverlays } from '@pubstudio/frontend/feature-build-overlay'
 import { useCopyPaste } from '@pubstudio/frontend/feature-copy-paste'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { builderContext } from '@pubstudio/frontend/util-builder'
+import { expandedChildId, expandedInstanceId } from '@pubstudio/frontend/util-render'
 import { resolveComponent } from '@pubstudio/frontend/util-resolve'
 import {
   BuildSubmenu,
@@ -130,11 +131,19 @@ export const useBuildEvent = () => {
         target?.dataset?.componentId ||
         target?.closest('.component-content-container, .svg-container')?.parentElement?.id
       if (componentId) {
-        const component = site.value.context.components[componentId]
+        // Clicking an expanded child selects the instance that owns it, and targets the
+        // definition child it stands for so the menu can edit that child's overrides
+        const instanceId = expandedInstanceId(site.value.context, componentId)
+        const component =
+          site.value.context.components[componentId] ??
+          site.value.context.components[instanceId ?? '']
         const selectOptions: ISetSelectedComponentOptions = { closeMixinMenu: false }
         let componentChanged = false
         if (component) {
           componentChanged = selectComponent(site.value, component, selectOptions)
+          if (instanceId && editor.value) {
+            editor.value.selectedInstanceChildId = expandedChildId(componentId)
+          }
         }
         // If the root component doesn't extend to the whole editor width/height,
         // select it when the build window is clicked

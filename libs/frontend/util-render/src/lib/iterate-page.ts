@@ -33,9 +33,8 @@ export const iterateComponent = (
   }
 }
 
-// Custom sources are on the page they were registered from but instances can be anywhere,
-// so page style generation has to visit all of themthem separately. Narrowing to the
-// page's own `customSourceId`s misses sources that instantiate other custom components.
+// Every page emits every definition's rules: an instance can be anywhere, and narrowing
+// to a page's own `customSourceId`s misses definitions that instantiate others.
 export const iterateCustomComponents = (context: ISiteContext, fn: ComponentIterFn) => {
   for (const id of context.customComponentIds) {
     iterateComponent(context.components[id], fn)

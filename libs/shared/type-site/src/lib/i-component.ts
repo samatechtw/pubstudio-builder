@@ -99,6 +99,14 @@ export interface IComponentStyle {
   // Custom style selectors scoped to this component
   overrides?: IComponentStyleOverrides
 }
+
+// Per-instance replacement for one definition node, keyed by definition descendant id
+export interface IInstanceOverride {
+  content?: string
+  inputs?: IComponentInputs
+}
+
+export type IInstanceOverrides = Record<string, IInstanceOverride>
 export interface IComponent {
   // ID unique to the namespace
   id: string
@@ -116,6 +124,8 @@ export interface IComponent {
   children?: IComponent[]
   // ID of custom component to inherit properties from
   customSourceId?: string
+  // Overrides applied to the expanded children of a custom instance
+  instanceOverrides?: IInstanceOverrides
   // Input values
   style: IComponentStyle
   state?: Record<string, IComponentState>

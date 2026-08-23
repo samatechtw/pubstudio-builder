@@ -29,6 +29,7 @@ import {
   componentSummary,
   componentTree,
   componentView,
+  customComponentView,
   IComponentMatch,
   mixinSummary,
 } from './serialize'
@@ -225,6 +226,18 @@ export const read = (site: ISite, rawInput: IReadInput): Record<string, unknown>
       route,
       page: mustResolvePage(site, route).head,
       siteDefaults: site.defaults.head,
+    }
+  }
+  if (input.customComponents) {
+    const ids = Array.isArray(input.customComponents)
+      ? input.customComponents
+      : Array.from(site.context.customComponentIds)
+    result.customComponents = {
+      definitions: ids.map((id) => customComponentView(site, id, !!input.include)),
+      usage:
+        'Definitions live outside every page. Insert one with ' +
+        'addComponent({customComponentId}), edit it in place to update all instances, ' +
+        'or detachInstance to break the link for one copy.',
     }
   }
   if (input.builtins) {

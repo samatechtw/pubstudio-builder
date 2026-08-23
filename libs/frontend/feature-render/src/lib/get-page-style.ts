@@ -5,6 +5,7 @@ import {
   IQueryStyle,
   IRawStyleRecord,
   IResolvedPageStyle,
+  isCustomComponentPart,
   iterateCustomComponents,
   iterateMixin,
   iteratePage,
@@ -89,9 +90,7 @@ export const getLivePageStyle = (
       return
     }
     seen.add(component.id)
-    const isCustom =
-      context.customComponentIds.has(component.id) ||
-      context.customChildIds.has(component.id)
+    const isCustom = isCustomComponentPart(context, component)
 
     for (const breakpointId in context.breakpoints) {
       const pseudoStyle = component.style.custom[breakpointId]

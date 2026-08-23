@@ -1,4 +1,5 @@
 import { usePlatformSiteApi } from '@pubstudio/frontend/data-access-api'
+import { enterComponentEdit } from '@pubstudio/frontend/data-access-command'
 import { ApiInjectionKey } from '@pubstudio/frontend/data-access-injection'
 import { site } from '@pubstudio/frontend/feature-site-source'
 import { PSApi } from '@pubstudio/frontend/util-api'
@@ -97,6 +98,16 @@ export const useSiteSource = (): IUseSiteSource => {
       if (apiSiteId.value && isSiteApi.value && migrated) {
         const { updateSite } = usePlatformSiteApi(platformApi)
         updateSite(apiSiteId.value, { version: site.value.version })
+      }
+    }
+    // Restore the component edit screen; a broken arena must not stop the site loading
+    const editingComponentId = site.value.editor?.editingComponentId
+    if (site.value.editor && editingComponentId) {
+      site.value.editor.editingComponentId = undefined
+      try {
+        enterComponentEdit(site.value, editingComponentId)
+      } catch (e) {
+        console.log('Failed to restore component edit screen', e)
       }
     }
   }

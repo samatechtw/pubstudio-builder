@@ -5,6 +5,7 @@ import {
 import { getActiveBreakpointIds } from '@pubstudio/frontend/feature-site-source'
 import {
   IRawStyleRecord,
+  isCustomComponentPart,
   iterateCustomComponents,
   iteratePage,
   sortMixinIds,
@@ -53,9 +54,7 @@ export const getBuildPageStyle = (site: ISite, page: IPage): IResolvedBuildPageS
       return
     }
     seen.add(component.id)
-    const isCustom =
-      site.context.customComponentIds.has(component.id) ||
-      site.context.customChildIds.has(component.id)
+    const isCustom = isCustomComponentPart(site.context, component)
     const curPseudo = site.editor?.cssPseudoClass ?? 'default'
 
     const styleRecord = isCustom ? customStyle : pageStyle

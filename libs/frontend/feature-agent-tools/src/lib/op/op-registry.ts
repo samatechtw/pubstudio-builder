@@ -2,12 +2,15 @@ import { CommandType } from '@pubstudio/shared/type-command'
 import { setBehaviorArgOp, setBehaviorOp } from '../ops/behavior'
 import {
   addComponentOp,
-  addCustomComponentOp,
+  convertToCustomComponentOp,
+  detachInstanceOp,
   editComponentOp,
   mergeComponentStyleOp,
   moveComponentOp,
   removeComponentOp,
+  removeCustomComponentOp,
   replacePageRootOp,
+  setInstanceOverrideOp,
 } from '../ops/component'
 import {
   setComponentEditorEventOp,
@@ -64,7 +67,10 @@ export const OP_REGISTRY: Record<CommandType, OpEntry> = {
   [CommandType.MoveComponent]: moveComponentOp,
   [CommandType.ReplacePageRoot]: replacePageRootOp,
   [CommandType.MergeComponentStyle]: mergeComponentStyleOp,
-  [CommandType.AddCustomComponent]: addCustomComponentOp,
+  [CommandType.ConvertToCustomComponent]: convertToCustomComponentOp,
+  [CommandType.RemoveCustomComponent]: removeCustomComponentOp,
+  [CommandType.DetachInstance]: detachInstanceOp,
+  [CommandType.SetInstanceOverride]: setInstanceOverrideOp,
 
   [CommandType.SetComponentCustomStyle]: setComponentStyleOp,
   [CommandType.SetComponentOverrideStyle]: setOverrideStyleOp,
@@ -112,12 +118,19 @@ export const OP_REGISTRY: Record<CommandType, OpEntry> = {
   [CommandType.Group]: excluded('Implicit: every apply() call is wrapped in one group.'),
   [CommandType.UpdateUi]: excluded('Builder UI state only; no effect on site output.'),
   [CommandType.MigrateSite]: excluded('System-driven site version migration.'),
+  [CommandType.AddCustomComponent]: excluded(
+    'Superseded by convertToCustomComponent, which also moves the definition out of ' +
+      'the page. Kept so stored histories replay.',
+  ),
 }
 
 export const agentOps = (): AnyOpDef[] => Object.values(OP_REGISTRY).filter(isOp)
 
 const opsByName: Record<string, AnyOpDef> = Object.fromEntries(
-  agentOps().map((op) => [op.name, op]),
+  agentOps().flatMap((op) => [
+    [op.name, op] as const,
+    ...(op.aliases ?? []).map((alias) => [alias, op] as const),
+  ]),
 )
 
 export const findOp = (name: string): AnyOpDef | undefined => opsByName[name]

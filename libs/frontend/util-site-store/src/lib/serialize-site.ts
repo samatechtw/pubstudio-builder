@@ -27,8 +27,16 @@ export const serializeComponent = (component: IComponent): ISerializedComponent 
     events: component.events,
     editorEvents: component.editorEvents,
     customSourceId: component.customSourceId,
+    instanceOverrides: component.instanceOverrides,
   }
 }
+
+export const serializeCustomComponent = (
+  component: IComponent,
+): ISerializedComponent => ({
+  ...serializeComponent(component),
+  parentId: undefined,
+})
 
 export const serializePage = (page: IPage): ISerializedPage => {
   return {
@@ -55,6 +63,8 @@ export const serializeEditor = (
         componentTab: editor.componentTab,
         mode: editor.mode,
         editPageRoute: editor.editPageRoute,
+        editingComponentId: editor.editingComponentId,
+        componentArenas: editor.componentArenas,
         showComponentTree: editor.showComponentTree,
         componentTreeExpandedItems: editor.componentTreeExpandedItems,
         componentTreeRenameData: editor.componentTreeRenameData,
@@ -76,13 +86,18 @@ export const serializeEditor = (
 }
 
 export const serializeSiteContext = (context: ISiteContext): ISerializedSiteContext => {
+  const customComponentIds = Array.from(context.customComponentIds).filter(
+    (id) => !!context.components[id],
+  )
   return {
     namespace: context.namespace,
     nextId: context.nextId,
     styles: context.styles,
     styleOrder: context.styleOrder,
-    customComponentIds: Array.from(context.customComponentIds),
-    customChildIds: Array.from(context.customChildIds),
+    customComponentIds,
+    customComponents: customComponentIds.map((id) =>
+      serializeCustomComponent(context.components[id]),
+    ),
     behaviors: context.behaviors,
     theme: context.theme,
     breakpoints: context.breakpoints,

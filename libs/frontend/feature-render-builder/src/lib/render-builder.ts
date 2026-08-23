@@ -1,4 +1,7 @@
-import { setSelectedComponent } from '@pubstudio/frontend/data-access-command'
+import {
+  isArenaScaffolding,
+  setSelectedComponent,
+} from '@pubstudio/frontend/data-access-command'
 import {
   computeAttrsInputsMixins,
   computeEvents,
@@ -9,6 +12,7 @@ import { resetBuilderContext } from '@pubstudio/frontend/util-builder'
 import {
   IBuildContent,
   IPropsBuildContent,
+  renderChildren,
   RenderMode,
 } from '@pubstudio/frontend/util-render'
 import { resolveComponent } from '@pubstudio/frontend/util-resolve'
@@ -79,6 +83,9 @@ const computeBuilderStyleProps = (
     builderStyle.opacity = '0'
     builderStyle['pointer-events'] = 'none'
   }
+  if (isArenaScaffolding(site, component)) {
+    builderStyle.outline = '1px dashed #a1a1aa'
+  }
 
   return { builderStyle, builderProps }
 }
@@ -108,21 +115,13 @@ export const computePropsContent = (
   const cmpContent = component.content ?? customCmp?.content
 
   const content: IBuildContent = []
-  const hasChildren = (component.children?.length ?? 0) > 0
-  const customCmpHasChildren = (customCmp?.children?.length ?? 0) > 0
+  const children = renderChildren(site.context, component)
+  const hasChildren = (children?.length ?? 0) > 0
   const builderClass: string[] = []
 
   if (hasChildren) {
     content.push(
-      ...(component.children?.map((child, index) =>
-        renderComponent(site, child, index),
-      ) ?? []),
-    )
-  } else if (customCmpHasChildren) {
-    content.push(
-      ...(customCmp?.children?.map((child, index) =>
-        renderComponent(site, child, index),
-      ) ?? []),
+      ...(children?.map((child, index) => renderComponent(site, child, index)) ?? []),
     )
   } else if (cmpContent) {
     if (component.tag === Tag.Svg) {
@@ -140,11 +139,7 @@ export const computePropsContent = (
         }),
       )
     }
-  } else if (
-    !['img', 'svg', 'input', 'textarea'].includes(component.tag) &&
-    !hasChildren &&
-    !customCmpHasChildren
-  ) {
+  } else if (!['img', 'svg', 'input', 'textarea'].includes(component.tag)) {
     if (isSelected) {
       const cmpWithDefaultContent: IComponent = { ...component, content: cmpContent }
       content.push(h(ProseMirrorEditor, { component: cmpWithDefaultContent, editor }))

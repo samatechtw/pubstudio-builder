@@ -18,32 +18,18 @@ import {
 import { toggleComponentTreeHidden } from '../editor-helpers'
 import { setSelectedComponent } from '../set-selected-component'
 
-const addChildrenHelper = (
-  site: ISite,
-  parentId: string,
-  children: IComponent[],
-  sourceField: 'sourceId' | 'customComponentId',
-) => {
+const addChildrenHelper = (site: ISite, parentId: string, children: IComponent[]) => {
   for (const child of children) {
-    if (sourceField === 'sourceId') {
-      addComponentHelper(site, {
-        name: child.name,
-        tag: child.tag,
-        content: child.content,
-        parentId,
-        [sourceField]: child.id,
-        state: clone(child.state),
-        inputs: clone(child.inputs),
-        style: clone(child.style),
-      })
-    } else {
-      addComponentHelper(site, {
-        name: child.name,
-        tag: child.tag,
-        parentId,
-        customComponentId: child.id,
-      })
-    }
+    addComponentHelper(site, {
+      name: child.name,
+      tag: child.tag,
+      content: child.content,
+      parentId,
+      sourceId: child.id,
+      state: clone(child.state),
+      inputs: clone(child.inputs),
+      style: clone(child.style),
+    })
   }
 }
 
@@ -116,22 +102,21 @@ export const addComponentHelper = (
     component = detachComponent(component, sourceComponent)
     component.role = role ?? sourceComponent.role
   } else if (customCmp) {
+    // An instance is a single node; the definition tree is expanded under it at render time
     component = {
       id,
       name: component.name,
       parent: component.parent,
       tag: component.tag,
       role: component.role,
-      content: undefined,
-      children: component.children,
-      // Only overridden inputs will be added to a custom instance.
-      inputs: undefined,
-      // Only overridden events will be added to a custom instance.
-      events: undefined,
-      // Initial state copied to instance
-      state: clone(customCmp.state),
-      editorEvents: clone(customCmp.editorEvents),
-      style: { custom: {} },
+      content,
+      children: undefined,
+      inputs,
+      events,
+      state: state ?? clone(customCmp.state),
+      editorEvents: data.editorEvents ?? clone(customCmp.editorEvents),
+      style: style ?? { custom: {} },
+      instanceOverrides: clone(data.instanceOverrides),
     }
   }
   // Allow both sourceId and customComponentId for copy/paste of custom instances
@@ -157,9 +142,7 @@ export const addComponentHelper = (
       addChildComponentHelper(site, id, child)
     }
   } else if (sourceComponent?.children) {
-    addChildrenHelper(site, id, sourceComponent.children, 'sourceId')
-  } else if (customCmp?.children) {
-    addChildrenHelper(site, id, customCmp.children, 'customComponentId')
+    addChildrenHelper(site, id, sourceComponent.children)
   }
 
   // Update `parent.children` after `addChildrenHelper` to avoid infinite loop
