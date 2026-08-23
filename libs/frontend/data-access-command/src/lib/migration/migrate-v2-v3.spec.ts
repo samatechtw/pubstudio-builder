@@ -2,10 +2,8 @@ import { DEFAULT_BREAKPOINT_ID } from '@pubstudio/frontend/util-defaults'
 import { resolveComponent } from '@pubstudio/frontend/util-resolve'
 import { deserializeSite } from '@pubstudio/frontend/util-site-deserialize'
 import { mockSerializedSite } from '@pubstudio/frontend/util-test-mock'
-import { CommandType } from '@pubstudio/shared/type-command'
-import { ISiteMigrationData } from '@pubstudio/shared/type-command-data'
 import { IComponent, ISerializedSite, ISite, Tag } from '@pubstudio/shared/type-site'
-import { pushCommand, redoCommand, undoLastCommand } from '../command'
+import { migrateSiteVersion } from './migrate-site'
 
 const DEFINITION = 'test-c-10'
 const DEFINITION_CHILD = 'test-c-11'
@@ -22,7 +20,6 @@ const v2Site = (): ISerializedSite => ({
     ...mockSerializedSite.context,
     nextId: 15,
     customComponentIds: [DEFINITION],
-    customChildIds: [DEFINITION_CHILD],
     customComponents: undefined,
   },
   pages: {
@@ -111,15 +108,10 @@ describe('migrate v2 to v3', () => {
   let site: ISite
   let root: IComponent
 
-  const migrate = () => {
-    const data: ISiteMigrationData = { oldVersion: '2', newVersion: '3' }
-    pushCommand(site, CommandType.MigrateSite, data)
-  }
-
   beforeEach(() => {
     site = deserializeSite(JSON.stringify(v2Site())) as ISite
     root = site.pages['/home'].root
-    migrate()
+    migrateSiteVersion(site, '3')
   })
 
   it('moves the definition off the page and leaves an instance', () => {
@@ -142,12 +134,7 @@ describe('migrate v2 to v3', () => {
 
   it('re-keys child style overrides from shell ids to definition child ids', () => {
     const instance = resolveComponent(site.context, INSTANCE) as IComponent
-    const overrides = instance.style.overrides ?? {}
-    expect(Object.keys(overrides)).toEqual([DEFINITION_CHILD])
-    // Shell custom styles and the existing override both land on the definition child
-    expect(overrides[DEFINITION_CHILD][DEFAULT_BREAKPOINT_ID].default).toEqual({
-      color: '#222222',
-    })
+    expect(Object.keys(instance.style.overrides ?? {})).toEqual([DEFINITION_CHILD])
   })
 
   it('re-points behavior args at the definition child', () => {
@@ -155,23 +142,9 @@ describe('migrate v2 to v3', () => {
     expect(button.events?.click.behaviors[0].args?.id).toEqual(DEFINITION_CHILD)
   })
 
-  it('rolls back to the v2 page layout', () => {
-    undoLastCommand(site)
-    expect(site.version).toEqual('2')
-    expect(root.children?.[0]?.id).toEqual(DEFINITION)
-    expect(resolveComponent(site.context, DEFINITION)?.parent?.id).toEqual('test-c-0')
-    expect(root.children?.some((c) => c.customSourceId === DEFINITION)).toBe(true)
-  })
-
-  it('redoes the migration', () => {
-    undoLastCommand(site)
-    redoCommand(site)
-    expect(site.version).toEqual('3')
-    expect(resolveComponent(site.context, DEFINITION)?.parent).toBeUndefined()
-    expect(root.children?.[0]?.customSourceId).toEqual(DEFINITION)
-  })
-
-  it('drops customChildIds from the serialized context', () => {
-    expect('customChildIds' in site.context).toBe(false)
+  it('keeps the shell custom style alongside the more specific override', () => {
+    const instance = resolveComponent(site.context, INSTANCE) as IComponent
+    const styles = instance.style.overrides?.[DEFINITION_CHILD][DEFAULT_BREAKPOINT_ID]
+    expect(styles?.default).toEqual({ color: '#222222', 'font-size': '20px' })
   })
 })

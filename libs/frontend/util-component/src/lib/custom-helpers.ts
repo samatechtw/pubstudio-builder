@@ -1,6 +1,6 @@
 import { isCustomComponentPart, iterateComponent } from '@pubstudio/frontend/util-render'
 import { resolveComponent } from '@pubstudio/frontend/util-resolve'
-import { IComponent, IPage, ISite, ISiteContext } from '@pubstudio/shared/type-site'
+import { IComponent, ISite, ISiteContext } from '@pubstudio/shared/type-site'
 
 export { isCustomComponentPart }
 
@@ -58,20 +58,3 @@ export const customComponentUsage = (
   }
   return { instances, routes }
 }
-
-// Blocks deleting a page or component that would take a definition with it
-export const definitionsInSubtree = (
-  context: ISiteContext,
-  component: IComponent | undefined,
-): string[] => {
-  const ids: string[] = []
-  iterateComponent(component, (cmp) => {
-    if (context.customComponentIds.has(cmp.id)) {
-      ids.push(cmp.id)
-    }
-  })
-  return ids
-}
-
-export const definitionsInPage = (context: ISiteContext, page: IPage | undefined) =>
-  definitionsInSubtree(context, page?.root)

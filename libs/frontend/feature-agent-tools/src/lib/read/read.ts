@@ -256,7 +256,8 @@ export const read = (site: ISite, rawInput: IReadInput): Record<string, unknown>
         'Builtin behaviorIds are usable directly in setComponentEvent({behaviors}). ' +
         'Builtin components are NOT: addComponent({sourceId}) only copies components ' +
         'that exist in this site, so these ids are listed for reference only — build ' +
-        'the structure explicitly, then reuse it with sourceId or addCustomComponent.',
+        'the structure explicitly, then reuse it with sourceId or ' +
+        'convertToCustomComponent.',
     }
   }
   if (input.html) {

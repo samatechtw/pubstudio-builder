@@ -1,10 +1,6 @@
-import { clone } from '@pubstudio/frontend/util-component'
+import { clone, mergeStyleOverrides } from '@pubstudio/frontend/util-component'
 import { iterateComponent, iterateSite } from '@pubstudio/frontend/util-render'
 import { resolveComponent } from '@pubstudio/frontend/util-resolve'
-import {
-  IDefinitionOrigin,
-  ISiteMigrationData,
-} from '@pubstudio/shared/type-command-data'
 import {
   IBehaviorCustomArgs,
   IComponent,
@@ -31,6 +27,12 @@ const foldShell = (
 ) => {
   const definitionId = shell.customSourceId as string
   shellToDefinition.set(shell.id, definitionId)
+
+  // v2 shells were mirrored once, so a definition child deleted later leaves an orphan
+  // with nothing to inherit from. v3 expansion is definition-driven, so it disappears.
+  if (!resolveComponent(site.context, definitionId)) {
+    lost.push(`orphan ${shell.id} (source ${definitionId} no longer exists)`)
+  }
 
   if (shell.content !== undefined || shell.inputs) {
     overrides[definitionId] = {
@@ -63,15 +65,17 @@ const foldInstance = (
   for (const child of instance.children ?? []) {
     foldShell(site, child, overrides, styleOverrides, shellToDefinition, lost)
   }
-  // Existing overrides are keyed by shell id; re-key to the child the shell stood for
-  const remapped: IComponentStyleOverrides = { ...styleOverrides }
+  // Existing overrides are keyed by shell id; re-key to the child the shell stood for.
+  // They were the more specific rule in v2, so they win over the shell's own styles.
+  const reKeyed: IComponentStyleOverrides = {}
   for (const [selector, styles] of Object.entries(instance.style.overrides ?? {})) {
-    remapped[shellToDefinition.get(selector) ?? selector] = styles
+    reKeyed[shellToDefinition.get(selector) ?? selector] = styles
   }
+  const remapped = mergeStyleOverrides(styleOverrides, reKeyed)
   if (Object.keys(overrides).length) {
     instance.instanceOverrides = overrides
   }
-  if (Object.keys(remapped).length) {
+  if (remapped && Object.keys(remapped).length) {
     instance.style.overrides = remapped
   }
   const { componentTreeExpandedItems, componentsHidden } = site.editor ?? {}
@@ -114,7 +118,33 @@ const remapBehaviorArgs = (
   }
 }
 
-export const migrateV2ToV3 = (site: ISite, data: ISiteMigrationData) => {
+// Each definition leaves the page it was converted from, and an instance takes its place
+// so the origin page renders identically
+const detachDefinitions = (site: ISite) => {
+  const { context } = site
+  for (const definitionId of Array.from(context.customComponentIds)) {
+    const definition = resolveComponent(context, definitionId)
+    const parent = definition?.parent
+    if (!definition || !parent) {
+      continue
+    }
+    const parentIndex = parent.children?.findIndex((c) => c.id === definitionId) ?? 0
+    parent.children = parent.children?.filter((c) => c.id !== definitionId)
+    if (!parent.children?.length) {
+      parent.children = undefined
+    }
+    definition.parent = undefined
+    addComponentHelper(site, {
+      name: definition.name,
+      tag: definition.tag,
+      parentId: parent.id,
+      parentIndex,
+      customComponentId: definitionId,
+    })
+  }
+}
+
+export const migrateV2ToV3 = (site: ISite) => {
   const { context } = site
   const shellToDefinition = new Map<string, string>()
   const lost: string[] = []
@@ -137,35 +167,7 @@ export const migrateV2ToV3 = (site: ISite, data: ISiteMigrationData) => {
     }
   }
   remapBehaviorArgs(site, shellToDefinition, remapped)
-
-  const origins: IDefinitionOrigin[] = []
-  for (const definitionId of Array.from(context.customComponentIds)) {
-    const definition = resolveComponent(context, definitionId)
-    const parent = definition?.parent
-    if (!definition || !parent) {
-      continue
-    }
-    const parentIndex = parent.children?.findIndex((c) => c.id === definitionId) ?? 0
-    parent.children = parent.children?.filter((c) => c.id !== definitionId)
-    if (!parent.children?.length) {
-      parent.children = undefined
-    }
-    definition.parent = undefined
-    const instance = addComponentHelper(site, {
-      name: definition.name,
-      tag: definition.tag,
-      parentId: parent.id,
-      parentIndex,
-      customComponentId: definitionId,
-    })
-    origins.push({
-      definitionId,
-      parentId: parent.id,
-      parentIndex,
-      instanceId: instance.id,
-    })
-  }
-  data.definitionOrigins = origins
+  detachDefinitions(site)
 
   if (
     site.editor?.selectedComponent &&
@@ -174,7 +176,7 @@ export const migrateV2ToV3 = (site: ISite, data: ISiteMigrationData) => {
     site.editor.selectedComponent = undefined
   }
   if (lost.length) {
-    console.warn(`Custom instance settings dropped by migration: ${lost.join(', ')}`)
+    console.warn(`Custom instance content dropped by migration: ${lost.join(', ')}`)
   }
   if (remapped.length) {
     console.warn(
@@ -183,37 +185,4 @@ export const migrateV2ToV3 = (site: ISite, data: ISiteMigrationData) => {
   }
   console.log(`Completed migration from version ${site.version} to 3`)
   site.version = '3'
-}
-
-// Shells are not rebuilt; `instanceOverrides` still carries every edit they held
-export const migrateV3ToV2 = (site: ISite, data: ISiteMigrationData) => {
-  const { context } = site
-  const origins = data.definitionOrigins ?? []
-  for (const origin of [...origins].reverse()) {
-    const instance = context.components[origin.instanceId]
-    if (instance?.parent) {
-      instance.parent.children = instance.parent.children?.filter(
-        (c) => c.id !== instance.id,
-      )
-      if (!instance.parent.children?.length) {
-        instance.parent.children = undefined
-      }
-    }
-    if (instance) {
-      delete context.components[origin.instanceId]
-      context.nextId -= 1
-    }
-    const definition = context.components[origin.definitionId]
-    const parent = context.components[origin.parentId]
-    if (definition && parent) {
-      definition.parent = parent
-      if (parent.children) {
-        parent.children.splice(origin.parentIndex, 0, definition)
-      } else {
-        parent.children = [definition]
-      }
-    }
-  }
-  data.definitionOrigins = undefined
-  site.version = '2'
 }

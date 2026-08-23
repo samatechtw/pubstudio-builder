@@ -22,7 +22,7 @@ pages instantiate. Editing a definition updates every instance.
   `.instanceId .defChildId`.
 
 `isCustomComponentPart` walks to the root, so membership needs no bookkeeping. It replaced
-the `customChildIds` set, which v3 removes.
+the v2 `customChildIds` set.
 
 ## Style precedence
 
@@ -40,9 +40,6 @@ renderer place before the page stylesheet. At equal specificity the later rule w
 | `DetachInstance`           | Replace an instance with an independent copy of what it currently renders    |
 | `EditComponent`            | Rename a definition, from the custom menu or the edit screen                 |
 | `SetInstanceOverride`      | Set or clear one instance's content override for a definition child          |
-
-`AddCustomComponent` ('addR') is the superseded v2 command. It only registers, and is
-kept so stored histories replay.
 
 ## Editing one instance's children
 
@@ -82,7 +79,7 @@ See `migrate-v2-v3.ts`
 3. Each definition is detached from its page and an instance is inserted at its old
    position, so the origin page renders identically.
 
-`migrateV3ToV2` restores definitions to their recorded positions and removes the
-instances that replaced them.
+The migration is one-way. It runs on load and the caller clears site history afterward,
+because stored commands were recorded against the v2 tree.
 
 Sites saved at v3 do not load in a v2 frontend, so web and SSG deploy together.

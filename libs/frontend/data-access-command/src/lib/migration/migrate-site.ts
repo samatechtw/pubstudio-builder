@@ -1,73 +1,28 @@
-import { CommandType } from '@pubstudio/shared/type-command'
-import {
-  ICommandGroupData,
-  ISiteMigrationData,
-} from '@pubstudio/shared/type-command-data'
 import { ISite } from '@pubstudio/shared/type-site'
-import { getLastCommand } from '../command'
-import { migrateV1ToV2, migrateV2ToV1 } from './migrate-v1-v2'
-import { migrateV2ToV3, migrateV3ToV2 } from './migrate-v2-v3'
+import { migrateV1ToV2 } from './migrate-v1-v2'
+import { migrateV2ToV3 } from './migrate-v2-v3'
 
-const migrateForward = (
-  site: ISite,
-  fromVersion: string,
-  data: ISiteMigrationData,
-): string | undefined => {
+// Migrations mutate the site directly instead of pushing commands: they run once when a
+// site loads, and the caller clears history afterward because stored commands predate
+// the new format. See docs/site-data-format.md
+const migrateForward = (site: ISite, fromVersion: string): string | undefined => {
   // Original version was 0.1, but we switched to integer versions
   if (fromVersion === '1' || fromVersion === '0.1') {
     migrateV1ToV2(site)
     return '2'
   }
   if (fromVersion === '2') {
-    migrateV2ToV3(site, data)
+    migrateV2ToV3(site)
     return '3'
   }
 }
 
-export const applyMigrateSite = (site: ISite, data: ISiteMigrationData) => {
-  const { oldVersion, newVersion } = data
-  // Hacky way to see if the migration commands have already been generated, which means this
-  // is a "redo" operation. If so, we shouldn't generate duplicates
-  const command = getLastCommand(site)
-  const groupData = command?.data as ICommandGroupData | undefined
-  if (command?.type === CommandType.MigrateSite && groupData?.commands?.length) {
-    console.warn('Skipping migrate command generation')
-    return
-  }
-  let currentVersion: string | undefined = oldVersion
+export const migrateSiteVersion = (site: ISite, newVersion: string) => {
+  let currentVersion: string | undefined = site.version
   while (currentVersion !== newVersion) {
-    currentVersion = migrateForward(site, currentVersion, data)
+    currentVersion = migrateForward(site, currentVersion)
     if (!currentVersion) {
       console.error('Failed to complete migration, site may be broken')
-      return
-    }
-  }
-}
-
-const rollBack = (
-  site: ISite,
-  fromVersion: string,
-  data: ISiteMigrationData,
-): string | undefined => {
-  if (fromVersion === '3') {
-    migrateV3ToV2(site, data)
-    return '2'
-  }
-  if (fromVersion === '2') {
-    migrateV2ToV1(site)
-    return '1'
-  }
-}
-
-export const undoMigrateSite = (site: ISite, data: ISiteMigrationData) => {
-  const { oldVersion, newVersion } = data
-  let currentVersion: string | undefined = newVersion
-  while (currentVersion !== oldVersion) {
-    currentVersion = rollBack(site, currentVersion, data)
-    if (!currentVersion) {
-      console.error(
-        `Failed to complete migration, version=${site.version}, expected=${oldVersion}`,
-      )
       return
     }
   }

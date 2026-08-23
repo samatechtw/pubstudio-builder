@@ -474,6 +474,7 @@ export const useBuild = (): IUseBuild => {
       content: component.content,
       sourceId: component.id,
       customComponentId: component.customSourceId,
+      instanceOverrides: component.instanceOverrides,
       name: component.name,
       ...selectAddParent(parent, activePage.value?.root.id),
     }

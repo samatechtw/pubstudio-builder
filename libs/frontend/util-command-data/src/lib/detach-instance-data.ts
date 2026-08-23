@@ -1,51 +1,16 @@
-import { clone } from '@pubstudio/frontend/util-component'
+import {
+  clone,
+  mergeBreakpointStyles,
+  mergeStyleOverrides,
+} from '@pubstudio/frontend/util-component'
 import { resolveComponent } from '@pubstudio/frontend/util-resolve'
 import {
   IAddComponentChildData,
   IAddComponentData,
   IDetachInstanceData,
 } from '@pubstudio/shared/type-command-data'
-import {
-  IBreakpointStyles,
-  IComponent,
-  IComponentStyleOverrides,
-  IInstanceOverrides,
-  IPseudoStyle,
-  ISite,
-} from '@pubstudio/shared/type-site'
+import { IComponent, IInstanceOverrides, ISite } from '@pubstudio/shared/type-site'
 import { makeRemoveComponentData } from './remove-component-data'
-
-const mergeBreakpointStyles = (
-  base: IBreakpointStyles | undefined,
-  over: IBreakpointStyles | undefined,
-): IBreakpointStyles => {
-  const result: IBreakpointStyles = clone(base) ?? {}
-  for (const [breakpointId, pseudoStyle] of Object.entries(over ?? {})) {
-    const merged: IPseudoStyle = result[breakpointId] ?? {}
-    for (const [pseudoClass, rawStyle] of Object.entries(pseudoStyle)) {
-      merged[pseudoClass as keyof IPseudoStyle] = {
-        ...merged[pseudoClass as keyof IPseudoStyle],
-        ...rawStyle,
-      }
-    }
-    result[breakpointId] = merged
-  }
-  return result
-}
-
-const mergeOverrides = (
-  base: IComponentStyleOverrides | undefined,
-  over: IComponentStyleOverrides | undefined,
-): IComponentStyleOverrides | undefined => {
-  if (!base && !over) {
-    return undefined
-  }
-  const result: IComponentStyleOverrides = clone(base) ?? {}
-  for (const [selector, styles] of Object.entries(over ?? {})) {
-    result[selector] = mergeBreakpointStyles(result[selector], styles)
-  }
-  return result
-}
 
 const materializeChild = (
   def: IComponent,
@@ -97,7 +62,7 @@ export const makeDetachInstanceData = (
     style: {
       custom: mergeBreakpointStyles(def.style.custom, instance.style.custom),
       mixins: mixins.length ? mixins : undefined,
-      overrides: mergeOverrides(def.style.overrides, instance.style.overrides),
+      overrides: mergeStyleOverrides(def.style.overrides, instance.style.overrides),
     },
     children: def.children?.map((child) =>
       materializeChild(child, instance.instanceOverrides),

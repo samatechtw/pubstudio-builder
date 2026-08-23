@@ -103,24 +103,12 @@ export const addComponentHelper = (
     component.role = role ?? sourceComponent.role
   } else if (customCmp) {
     // An instance is a single node; the definition tree is expanded under it at render time
-    component = {
-      id,
-      name: component.name,
-      parent: component.parent,
-      tag: component.tag,
-      role: component.role,
-      content,
-      children: undefined,
-      inputs,
-      events,
-      state: state ?? clone(customCmp.state),
-      editorEvents: data.editorEvents ?? clone(customCmp.editorEvents),
-      style: style ?? { custom: {} },
-      instanceOverrides: clone(data.instanceOverrides),
-    }
+    component.state = state ?? clone(customCmp.state)
+    component.editorEvents = data.editorEvents ?? clone(customCmp.editorEvents)
   }
   // Allow both sourceId and customComponentId for copy/paste of custom instances
   component.customSourceId = customComponentId
+  component.instanceOverrides = clone(data.instanceOverrides)
 
   let parentNewChildren = parent?.children ? [...parent.children] : undefined
 

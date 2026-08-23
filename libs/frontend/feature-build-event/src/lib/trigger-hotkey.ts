@@ -61,7 +61,7 @@ import {
   ThemeHotkeys,
 } from '@pubstudio/shared/type-site'
 import {
-  addCustomComponentAtIndex,
+  addInstanceAtIndex,
   newVueComponent,
   setPageByIndex,
   toggleStyleEdit,
@@ -233,31 +233,31 @@ export const triggerHotkey = (site: ISite, key: Keys) => {
         break
       // Custom components
       case CustomComponentHotkeys.Custom1:
-        addCustomComponentAtIndex(site, 0)
+        addInstanceAtIndex(site, 0)
         break
       case CustomComponentHotkeys.Custom2:
-        addCustomComponentAtIndex(site, 1)
+        addInstanceAtIndex(site, 1)
         break
       case CustomComponentHotkeys.Custom3:
-        addCustomComponentAtIndex(site, 2)
+        addInstanceAtIndex(site, 2)
         break
       case CustomComponentHotkeys.Custom4:
-        addCustomComponentAtIndex(site, 3)
+        addInstanceAtIndex(site, 3)
         break
       case CustomComponentHotkeys.Custom5:
-        addCustomComponentAtIndex(site, 4)
+        addInstanceAtIndex(site, 4)
         break
       case CustomComponentHotkeys.Custom6:
-        addCustomComponentAtIndex(site, 5)
+        addInstanceAtIndex(site, 5)
         break
       case CustomComponentHotkeys.Custom7:
-        addCustomComponentAtIndex(site, 6)
+        addInstanceAtIndex(site, 6)
         break
       case CustomComponentHotkeys.Custom8:
-        addCustomComponentAtIndex(site, 7)
+        addInstanceAtIndex(site, 7)
         break
       case CustomComponentHotkeys.Custom9:
-        addCustomComponentAtIndex(site, 8)
+        addInstanceAtIndex(site, 8)
         break
       // Page menu
       case PageHotkeys.PageNew:
