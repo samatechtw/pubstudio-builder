@@ -145,7 +145,7 @@ const componentCreateFields = (childSchema: Schema<IComponentCreateInput>) => ({
   customComponentId: str()
     .optional()
     .desc(
-      'Id of a component registered with addCustomComponent, to instantiate. ' +
+      'Id of a definition registered with convertToCustomComponent, to instantiate. ' +
         'read({tree:{}}) marks instances as "[custom: <id>]". Not combinable with ' +
         '`children`.',
     ),
@@ -280,8 +280,8 @@ const resolveCreateNode = (
     if (!ctx.site.context.customComponentIds.has(node.customComponentId)) {
       constraint(
         `${at('customComponentId')}: ${node.customComponentId} is not a custom ` +
-          'component. Register it with addCustomComponent first, or copy it with ' +
-          'sourceId instead.',
+          'component. Register it with convertToCustomComponent first, or copy it ' +
+          'with sourceId instead.',
       )
     }
   }
@@ -602,7 +602,6 @@ export const mergeComponentStyleOp = defineOp<IMergeComponentStyleData>()({
 
 export const convertToCustomComponentOp = defineOp<IConvertToCustomComponentData>()({
   name: 'convertToCustomComponent',
-  aliases: ['addCustomComponent'],
   command: CommandType.ConvertToCustomComponent,
   title: 'Make component reusable',
   description:

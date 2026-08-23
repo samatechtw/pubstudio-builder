@@ -1,17 +1,18 @@
-import { pushCommand } from '@pubstudio/frontend/data-access-command'
+import { clearAll, migrateSiteVersion } from '@pubstudio/frontend/data-access-command'
+import { store } from '@pubstudio/frontend/data-access-web-store'
 import { builderConfig } from '@pubstudio/frontend/util-config'
-import { CommandType } from '@pubstudio/shared/type-command'
-import { ISiteMigrationData } from '@pubstudio/shared/type-command-data'
 import { ISite } from '@pubstudio/shared/type-site'
 
+// Returns true when the migration can be persisted. A historical version is read-only,
+// so it migrates in memory to render correctly, but the stored site is left alone.
 export const migrateSite = (site: ISite): boolean => {
-  if (site.version !== builderConfig.siteFormatVersion) {
-    const data: ISiteMigrationData = {
-      oldVersion: site.version,
-      newVersion: builderConfig.siteFormatVersion,
-    }
-    pushCommand(site, CommandType.MigrateSite, data)
-    return true
+  const newVersion = builderConfig.siteFormatVersion
+  if (site.version === newVersion) {
+    return false
   }
-  return false
+  migrateSiteVersion(site, newVersion)
+  // Stored commands were recorded against the old format, so undoing across the
+  // migration would corrupt the site. `clearAll` also saves the migrated site.
+  clearAll(site)
+  return store.version.editingEnabled.value
 }

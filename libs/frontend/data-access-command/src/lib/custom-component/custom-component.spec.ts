@@ -96,7 +96,6 @@ describe('custom components', () => {
     expect(parsed.context.customComponents).toHaveLength(1)
     expect(parsed.context.customComponents[0].id).toEqual(sourceId)
     expect(parsed.context.customComponents[0].parentId).toBeUndefined()
-    expect(parsed.context.customChildIds).toBeUndefined()
 
     const restored = deserializeSite(serialized) as ISite
     const definition = resolveComponent(restored.context, sourceId) as IComponent

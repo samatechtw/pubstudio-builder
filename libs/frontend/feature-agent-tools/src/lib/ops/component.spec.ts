@@ -12,13 +12,28 @@ import {
   ComponentEventType,
   Css,
   CssPseudoClass,
+  IComponent,
   ISite,
   Tag,
 } from '@pubstudio/shared/type-site'
+import { resolveComponent } from '@pubstudio/frontend/util-resolve'
 import { exampleComponentId, examplePageRoute } from '../op/op-helpers'
 import { makeTestSite, siteContentSnapshot, testOpCtx } from '../op/test-site'
 import { parseSchema } from '../schema/schema'
 import { addComponentOp, MAX_TREE_DEPTH, MAX_TREE_NODES } from './component'
+
+const convertToCustom = (site: ISite, componentId: string) => {
+  const component = resolveComponent(site.context, componentId) as IComponent
+  const parent = component.parent as IComponent
+  applyCommand(site, {
+    type: CommandType.ConvertToCustomComponent,
+    data: {
+      componentId,
+      parentId: parent.id,
+      parentIndex: parent.children?.indexOf(component) ?? 0,
+    },
+  })
+}
 
 describe('addComponent source validation', () => {
   let site: ISite
@@ -62,11 +77,7 @@ describe('addComponent source validation', () => {
 
   it('accepts a registered customComponentId', () => {
     const componentId = exampleComponentId(site)
-    const register: ICommand = {
-      type: CommandType.AddCustomComponent,
-      data: { componentId },
-    }
-    applyCommand(site, register)
+    convertToCustom(site, componentId)
     expect(() => add({ customComponentId: componentId })).not.toThrow()
   })
 
@@ -86,10 +97,7 @@ describe('addComponent source validation', () => {
   it('derives tag from customComponentId when tag is omitted', () => {
     const componentId = exampleComponentId(site)
     site.context.components[componentId].tag = Tag.Button
-    applyCommand(site, {
-      type: CommandType.AddCustomComponent,
-      data: { componentId },
-    })
+    convertToCustom(site, componentId)
 
     expect(add({ customComponentId: componentId }).data.tag).toBe(Tag.Button)
   })
@@ -212,7 +220,7 @@ describe('addComponent recursive tree', () => {
       /children cannot be combined/,
     )
 
-    applyCommand(site, { type: CommandType.AddCustomComponent, data: { componentId } })
+    convertToCustom(site, componentId)
     expect(() =>
       add({ customComponentId: componentId, children: [{ tag: Tag.Span }] }),
     ).toThrow(/children cannot be combined/)

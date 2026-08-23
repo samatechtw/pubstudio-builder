@@ -7,7 +7,7 @@ import { BuilderDragDataType } from '@pubstudio/frontend/type-builder'
 import { builtinBehaviors, getBuiltinComponent } from '@pubstudio/frontend/util-builtin'
 import {
   makeAddBuiltinComponentData,
-  makeAddCustomComponentData,
+  makeAddInstanceData,
   makeAddImageData,
   makeAddLinkData,
 } from '@pubstudio/frontend/util-command-data'
@@ -88,10 +88,6 @@ export const addBuiltinComponentData = (site: ISite, data: IAddComponentData) =>
   pushCommandWithBuiltins(site, CommandType.AddComponent, data, missing)
 }
 
-export const addCustomComponentData = (site: ISite, data: IAddComponentData) => {
-  pushCommand(site, CommandType.AddComponent, data)
-}
-
 export const addComponentToParent = (
   site: ISite,
   options: IAddComponentOptions,
@@ -118,17 +114,12 @@ export const addComponentToParent = (
   return data
 }
 
-export const addCustomComponent = (site: ISite, options: IAddComponentOptions) => {
+export const addCustomInstance = (site: ISite, options: IAddComponentOptions) => {
   const data = addComponentToParent(site, options, (parent) =>
-    makeAddCustomComponentData(
-      site,
-      options.id,
-      parent,
-      site.editor?.selectedComponent?.id,
-    ),
+    makeAddInstanceData(site, options.id, parent, site.editor?.selectedComponent?.id),
   )
   if (data) {
-    addCustomComponentData(site, data)
+    pushCommand(site, CommandType.AddComponent, data)
   }
   return data?.id
 }

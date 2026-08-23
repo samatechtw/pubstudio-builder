@@ -1,7 +1,7 @@
 import { setBuildSubmenu } from '@pubstudio/frontend/data-access-command'
 import {
   addBuiltinComponent,
-  addCustomComponent,
+  addCustomInstance,
   addDroppedComponent,
   moveAbsoluteComponent,
   moveComponent,
@@ -326,7 +326,7 @@ export const useDragDrop = (props: IUseDragDropProps): IUseDragDrop => {
             })
             return
           } else if (addDataType === BuilderDragDataType.CustomComponent) {
-            addCustomComponent(site, {
+            addCustomInstance(site, {
               id: dragSource.value.addData.id,
               parentId: addParentId,
               parentIndex: dropProps.value.destinationIndex,

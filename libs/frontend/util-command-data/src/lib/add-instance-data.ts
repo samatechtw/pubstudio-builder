@@ -3,8 +3,8 @@ import { IAddComponentData } from '@pubstudio/shared/type-command-data'
 import { IComponent, ISite } from '@pubstudio/shared/type-site'
 import { selectAddParent } from './select-add-parent'
 
-// Generate new component data from a custom component
-export const makeAddCustomComponentData = (
+// Data for a new instance of a custom component
+export const makeAddInstanceData = (
   site: ISite,
   customComponentId: string,
   parent: IComponent,

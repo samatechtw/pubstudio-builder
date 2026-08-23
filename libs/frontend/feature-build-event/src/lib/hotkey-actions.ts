@@ -5,18 +5,15 @@ import {
   setSelectedComponent,
   setStyleTab,
 } from '@pubstudio/frontend/data-access-command'
-import {
-  addCustomComponentAtSelection,
-  resetPageMenu,
-} from '@pubstudio/frontend/feature-build'
+import { addInstanceAtSelection, resetPageMenu } from '@pubstudio/frontend/feature-build'
 import { useVueComponent } from '@pubstudio/frontend/feature-vue-component'
 import { getOrderedPages } from '@pubstudio/frontend/util-builder'
 import { ISite, StyleTab } from '@pubstudio/shared/type-site'
 
-export const addCustomComponentAtIndex = (site: ISite, index: number) => {
+export const addInstanceAtIndex = (site: ISite, index: number) => {
   const customId = Array.from(site.context.customComponentIds)[index]
   if (customId) {
-    addCustomComponentAtSelection(site, customId)
+    addInstanceAtSelection(site, customId)
   }
 }
 

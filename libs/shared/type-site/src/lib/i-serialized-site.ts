@@ -21,8 +21,6 @@ export interface ISerializedSiteContext extends Omit<
   customComponentIds: string[]
   // Definition trees, serialized like page roots. Added in site v3.
   customComponents?: ISerializedComponent[]
-  // Removed in site v3; membership is derived by walking to the definition root
-  customChildIds?: string[]
 }
 
 export interface ISerializedEditorContext extends Omit<

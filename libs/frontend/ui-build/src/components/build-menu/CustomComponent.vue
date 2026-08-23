@@ -28,10 +28,7 @@
 <script lang="ts" setup>
 import { computed, toRefs } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
-import {
-  addCustomComponentAtSelection,
-  useBuild,
-} from '@pubstudio/frontend/feature-build'
+import { addInstanceAtSelection, useBuild } from '@pubstudio/frontend/feature-build'
 import { useDragDrop } from '@pubstudio/frontend/feature-render-builder'
 import { IComponent } from '@pubstudio/shared/type-site'
 import { BuilderDragDataType } from '@pubstudio/frontend/type-builder'
@@ -51,8 +48,6 @@ const { t } = useI18n()
 const { site } = useSiteSource()
 const { removeCustomComponent } = useBuild()
 
-const text = computed(() => `${customComponent.value.name} (${customComponent.value.id})`)
-
 const usageCount = computed(
   () => customComponentUsage(site.value, customComponent.value.id).instances.length,
 )
@@ -60,7 +55,7 @@ const usageCount = computed(
 const usageText = computed(() => t('build.custom_usage', { count: usageCount.value }))
 
 const addInstance = () => {
-  addCustomComponentAtSelection(site.value, customComponent.value.id)
+  addInstanceAtSelection(site.value, customComponent.value.id)
 }
 
 const editComponent = () => {

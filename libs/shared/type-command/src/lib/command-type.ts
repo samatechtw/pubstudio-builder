@@ -47,11 +47,9 @@ export enum CommandType {
   ReplaceTranslations = 'rT',
   SetGlobalStyle = 'setGS',
   UpdateUi = 'uUi',
-  AddCustomComponent = 'addR',
   ConvertToCustomComponent = 'cvtR',
   RemoveCustomComponent = 'rmR',
   DetachInstance = 'detI',
   SetInstanceOverride = 'setIO',
   SetComponentState = 'sCS',
-  MigrateSite = 'mS',
 }

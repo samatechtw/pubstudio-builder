@@ -260,9 +260,9 @@ definition. Constraints that keep it sound:
 ids and the pages they sit on, so an agent can see the blast radius of a definition edit
 before making one. Pass ids instead of `true` for full trees.
 
-Three ops cover the lifecycle: `convertToCustomComponent` (aliased as the superseded
-`addCustomComponent`) moves a component out of its page into the registry and leaves an
-instance behind; `removeCustomComponent` refuses while instances exist and names them;
+Three ops cover the lifecycle: `convertToCustomComponent` moves a component out of its
+page into the registry and leaves an instance behind;
+`removeCustomComponent` refuses while instances exist and names them;
 `detachInstance` replaces an instance with an independent copy of what it renders.
 `addComponent({customComponentId})` still creates instances, and creates a single node —
 the definition tree is expanded under it at render time, so `read({tree:{}})` shows the
