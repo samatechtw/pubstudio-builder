@@ -11,11 +11,12 @@
 
 import {
   IAddComponentData,
-  IAddCustomComponentData,
   IAddStyleMixinData,
   IAddThemeFontData,
   IAddThemeVariableData,
   IChangePageData,
+  IConvertToCustomComponentData,
+  IDetachInstanceData,
   IEditComponentData,
   IEditPageData,
   IEditStyleMixinData,
@@ -26,6 +27,7 @@ import {
   IAddPageData,
   IRemoveComponentData,
   IRemoveComponentOverrideStyleData,
+  IRemoveCustomComponentData,
   IRemovePageData,
   IRemoveStyleMixinData,
   IRemoveThemeFontData,
@@ -45,6 +47,7 @@ import {
   ISetDefaultsHeadData,
   ISetGlobalStyleData,
   ISetHomePageData,
+  ISetInstanceOverrideData,
   ISetMixinEntryData,
   ISetPageHeadData,
   ISetTranslationsData,
@@ -55,12 +58,15 @@ import { Infer } from '../schema/schema'
 import { setBehaviorArgOp, setBehaviorOp } from '../ops/behavior'
 import {
   addComponentOp,
-  addCustomComponentOp,
+  convertToCustomComponentOp,
+  detachInstanceOp,
   editComponentOp,
   mergeComponentStyleOp,
   moveComponentOp,
   removeComponentOp,
+  removeCustomComponentOp,
   replacePageRootOp,
+  setInstanceOverrideOp,
 } from '../ops/component'
 import {
   setComponentEditorEventOp,
@@ -128,7 +134,19 @@ const _moveComponent: Accounted<IMoveComponentData, typeof moveComponentOp> = tr
 const _replacePageRoot: Accounted<IReplacePageRootData, typeof replacePageRootOp> = true
 const _mergeStyle: Accounted<IMergeComponentStyleData, typeof mergeComponentStyleOp> =
   true
-const _addCustom: Accounted<IAddCustomComponentData, typeof addCustomComponentOp> = true
+const _convertCustom: Accounted<
+  IConvertToCustomComponentData,
+  typeof convertToCustomComponentOp
+> = true
+const _removeCustom: Accounted<
+  IRemoveCustomComponentData,
+  typeof removeCustomComponentOp
+> = true
+const _detachInstance: Accounted<IDetachInstanceData, typeof detachInstanceOp> = true
+const _setInstanceOverride: Accounted<
+  ISetInstanceOverrideData,
+  typeof setInstanceOverrideOp
+> = true
 
 const _setStyle: Accounted<ISetComponentCustomStyleData, typeof setComponentStyleOp> =
   true

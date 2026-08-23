@@ -8,9 +8,16 @@ import {
 import { ISite } from '@pubstudio/shared/type-site'
 import { applyCommand } from './apply-command'
 import { getLastCommandHelper } from './command-helpers'
+import { snapshotArena } from './custom-component/component-arena'
 import { makeCloseMixinMenu } from './make-command-data'
 import { optimizeCommandGroup } from './optimize-command-group'
 import { undoCommand } from './undo-command'
+
+// Arena scaffolding is editor state, so it is captured alongside every command's save
+const saveSite = (site: ISite) => {
+  snapshotArena(site)
+  site.editor?.store?.save?.(site)
+}
 
 export interface IPushCommandOptions {
   // Command is the result of an undo/redo.
@@ -99,7 +106,7 @@ export const pushCommandObject = (
   options?: IPushCommandOptions,
 ): boolean => {
   const pushed = pushCommandHelper(site, command, options)
-  site.editor?.store?.save?.(site)
+  saveSite(site)
   return pushed
 }
 
@@ -121,7 +128,7 @@ export const pushAppliedGroup = (
     site.history.back.push({ type: CommandType.Group, data })
     site.history.forward = []
   }
-  site.editor?.store?.save?.(site)
+  saveSite(site)
   return true
 }
 
@@ -141,14 +148,14 @@ const undoLastCommandHelper = (site: ISite) => {
 
 export const undoLastCommand = (site: ISite) => {
   undoLastCommandHelper(site)
-  site.editor?.store?.save?.(site)
+  saveSite(site)
 }
 
 export const undoN = (site: ISite, n: number) => {
   for (let i = 0; i < n; i += 1) {
     undoLastCommand(site)
   }
-  site.editor?.store?.save?.(site)
+  saveSite(site)
 }
 
 // Redo the most recent un-done command
@@ -167,14 +174,14 @@ export const redoN = (site: ISite, n: number) => {
       pushCommandHelper(site, command, { isRedo: true })
     }
   }
-  site.editor?.store?.save?.(site)
+  saveSite(site)
 }
 
 // Clear all undo/redo history
 export const clearAll = (site: ISite) => {
   site.history.back = []
   site.history.forward = []
-  site.editor?.store?.save?.(site)
+  saveSite(site)
 }
 
 // Clear a percentage of undo history
@@ -185,6 +192,6 @@ export const clearPartial = (site: ISite, percent: number) => {
   if (clearCount < back.length) {
     site.history.back = back.slice(clearCount, back.length)
     console.log(`Cleared ${clearCount} items from history`)
-    site.editor?.store?.save?.(site)
+    saveSite(site)
   }
 }

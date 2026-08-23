@@ -19,6 +19,10 @@ import { applyEditComponent } from './component/edit-component'
 import { applyRemoveComponent } from './component/remove-component'
 import { applyReplacePageRoot } from './component/replace-page-root'
 import { applyAddCustomComponent } from './custom-component/add-custom-component'
+import { applyConvertToCustomComponent } from './custom-component/convert-to-custom-component'
+import { applyDetachInstance } from './custom-component/detach-instance'
+import { applyRemoveCustomComponent } from './custom-component/remove-custom-component'
+import { applySetInstanceOverride } from './custom-component/set-instance-override'
 import { applySetDefaultsHead } from './defaults/set-defaults-head'
 import { applyCommandGroup } from './group/command-group'
 import { applyMigrateSite } from './migration/migrate-site'
@@ -100,6 +104,10 @@ export const applyCommand = (
     [CommandType.SetGlobalStyle]: applySetGlobalStyle,
     [CommandType.UpdateUi]: applyUpdateUi,
     [CommandType.AddCustomComponent]: applyAddCustomComponent,
+    [CommandType.ConvertToCustomComponent]: applyConvertToCustomComponent,
+    [CommandType.RemoveCustomComponent]: applyRemoveCustomComponent,
+    [CommandType.DetachInstance]: applyDetachInstance,
+    [CommandType.SetInstanceOverride]: applySetInstanceOverride,
     [CommandType.SetComponentState]: applySetComponentState,
     [CommandType.MigrateSite]: applyMigrateSite,
   }

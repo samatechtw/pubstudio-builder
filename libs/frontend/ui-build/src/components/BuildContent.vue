@@ -1,5 +1,6 @@
 <template>
   <div class="build-content">
+    <ComponentEditBar />
     <div :id="buildContentWindowId" ref="contentWindowRef">
       <div
         :id="buildContentWindowInnerId"
@@ -35,6 +36,7 @@ import { useRenderBuilder } from '@pubstudio/frontend/feature-render-builder'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { builderContext } from '@pubstudio/frontend/util-builder'
 import { BuildDndOverlay } from '@pubstudio/frontend/feature-build-overlay'
+import ComponentEditBar from './ComponentEditBar.vue'
 
 const { site, siteStore, activePage, setRestoredSite } = useSiteSource()
 const { editor } = useSiteSource()

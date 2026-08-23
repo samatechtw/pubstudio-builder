@@ -6,6 +6,7 @@
     :class="{
       dragging: dndState?.dragging,
       expanded: haveChildren && expanded,
+      scaffolding: isScaffolding,
     }"
     @mouseleave.stop="mouseLeave"
     @dragenter.stop="dragenter"
@@ -74,6 +75,7 @@ import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import {
   collapseComponentTreeItem,
   expandComponentTreeItem,
+  isArenaScaffolding,
   toggleComponentHidden,
   getComponentTreeItemId,
   setSelectedComponent,
@@ -129,6 +131,8 @@ const {
 })
 
 const treeItemId = computed(() => getComponentTreeItemId(component.value))
+
+const isScaffolding = computed(() => isArenaScaffolding(site.value, component.value))
 
 const haveChildren = computed(() => !!component.value.children?.length)
 

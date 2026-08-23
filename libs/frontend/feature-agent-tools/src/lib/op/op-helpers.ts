@@ -1,3 +1,4 @@
+import { customComponentUsage } from '@pubstudio/frontend/util-component'
 import {
   resolveBehavior,
   resolveComponent,
@@ -82,3 +83,22 @@ export const exampleComponentId = (site: ISite): string => {
 
 export const examplePageRoute = (site: ISite): string =>
   site.defaults.homePage ?? site.pageOrder[0]
+
+export const exampleInstanceId = (site: ISite): string => {
+  for (const id of site.context.customComponentIds) {
+    const instance = customComponentUsage(site, id).instances[0]
+    if (instance) {
+      return instance.id
+    }
+  }
+  return exampleComponentId(site)
+}
+
+export const exampleUnusedCustomComponentId = (site: ISite): string => {
+  for (const id of site.context.customComponentIds) {
+    if (!customComponentUsage(site, id).instances.length) {
+      return id
+    }
+  }
+  return Array.from(site.context.customComponentIds)[0] ?? exampleComponentId(site)
+}

@@ -48,6 +48,10 @@ export enum CommandType {
   SetGlobalStyle = 'setGS',
   UpdateUi = 'uUi',
   AddCustomComponent = 'addR',
+  ConvertToCustomComponent = 'cvtR',
+  RemoveCustomComponent = 'rmR',
+  DetachInstance = 'detI',
+  SetInstanceOverride = 'setIO',
   SetComponentState = 'sCS',
   MigrateSite = 'mS',
 }

@@ -9,7 +9,7 @@ import {
 
 export const mockSerializedSite: ISerializedSite = {
   name: 'test',
-  version: '2',
+  version: '3',
   editor: {
     selectedComponentId: 'test-c-0',
     active: '/home',
@@ -57,7 +57,7 @@ export const mockSerializedSite: ISerializedSite = {
       },
     },
     customComponentIds: [],
-    customChildIds: [],
+    customComponents: [],
     styleOrder: ['global-s-0'],
     behaviors: {},
     theme: {

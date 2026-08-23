@@ -1,5 +1,6 @@
 import {
   createSite,
+  customComponentIndex,
   editStylesCancelEdit,
   getLastCommand,
   pushCommand,
@@ -19,6 +20,7 @@ import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import {
   addComponentEditorEventData,
   addComponentEventData,
+  makeDetachInstanceData,
   makeEditComponentData,
   makeRemoveComponentData,
   makeSetTranslationsData,
@@ -28,23 +30,24 @@ import {
   clone,
   computeComponentBreakpointStyles,
   computeFlattenedStyles,
+  customComponentUsage,
   flattenedComponentStyle,
 } from '@pubstudio/frontend/util-component'
 import { DEFAULT_BREAKPOINT_ID } from '@pubstudio/frontend/util-defaults'
 import { breakpointId } from '@pubstudio/frontend/util-ids'
 import { resolveComponent } from '@pubstudio/frontend/util-resolve'
-import { serializePage } from '@pubstudio/frontend/util-site-store'
+import { serializeComponent, serializePage } from '@pubstudio/frontend/util-site-store'
 import { uiAlert } from '@pubstudio/frontend/util-ui-alert'
 import { CommandType, ICommand } from '@pubstudio/shared/type-command'
 import {
   IAddBreakpoint,
   IAddComponentData,
   IAddComponentMixinData,
-  IAddCustomComponentData,
   IAddPageData,
   IAddThemeVariableData,
   IChangePageData,
   ICommandGroupData,
+  IConvertToCustomComponentData,
   IEditComponentData,
   IEditComponentFields,
   IEditPageData,
@@ -53,6 +56,7 @@ import {
   INewBehavior,
   IRemoveComponentMixinData,
   IRemoveComponentOverrideStyleData,
+  IRemoveCustomComponentData,
   IRemovePageData,
   IRemoveStyleMixinData,
   IRemoveThemeVariableData,
@@ -192,7 +196,9 @@ export interface IUseBuild {
   deleteSelected: () => void
   selectComponentParent: () => void
   setBreakpoint: (newBreakpoints: IAddBreakpoint[]) => void
-  addCustomComponent: (component: IComponent) => void
+  convertToCustomComponent: (component: IComponent) => void
+  removeCustomComponent: (definitionId: string) => boolean
+  detachInstance: (instance: IComponent) => void
 }
 
 // Briefly indicates active command
@@ -961,8 +967,15 @@ export const useBuild = (): IUseBuild => {
   const deleteSelected = () => {
     const selected = site.value.editor?.selectedComponent
     const parent = selected?.parent
-    // Cannot delete root component and custom instance children
-    if (!activePage.value || !selected || !parent || parent.customSourceId) {
+    // Rejects a page root, a definition, and an expanded instance child
+    if (
+      !activePage.value ||
+      !selected ||
+      !parent ||
+      parent.customSourceId ||
+      site.value.context.customComponentIds.has(selected.id) ||
+      !site.value.context.components[selected.id]
+    ) {
       return
     }
     const data = makeRemoveComponentData(site.value, selected)
@@ -984,11 +997,40 @@ export const useBuild = (): IUseBuild => {
     pushCommand(site.value, CommandType.SetBreakpoint, data)
   }
 
-  const addCustomComponent = (component: IComponent) => {
-    const data: IAddCustomComponentData = {
-      componentId: component.id,
+  const convertToCustomComponent = (component: IComponent) => {
+    const parent = component.parent
+    const parentIndex = parent?.children?.findIndex((c) => c.id === component.id)
+    if (!parent || parentIndex === undefined || parentIndex < 0) {
+      return
     }
-    pushCommand(site.value, CommandType.AddCustomComponent, data)
+    const data: IConvertToCustomComponentData = {
+      componentId: component.id,
+      parentId: parent.id,
+      parentIndex,
+    }
+    pushCommand(site.value, CommandType.ConvertToCustomComponent, data)
+  }
+
+  // Returns false when instances still reference the definition
+  const removeCustomComponent = (definitionId: string): boolean => {
+    const definition = resolveComponent(site.value.context, definitionId)
+    if (!definition || customComponentUsage(site.value, definitionId).instances.length) {
+      return false
+    }
+    const data: IRemoveCustomComponentData = {
+      componentId: definitionId,
+      component: serializeComponent(definition),
+      index: customComponentIndex(site.value, definitionId),
+    }
+    pushCommand(site.value, CommandType.RemoveCustomComponent, data)
+    return true
+  }
+
+  const detachInstance = (instance: IComponent) => {
+    const data = makeDetachInstanceData(site.value, instance)
+    if (data) {
+      pushCommand(site.value, CommandType.DetachInstance, data)
+    }
   }
 
   return {
@@ -1042,6 +1084,8 @@ export const useBuild = (): IUseBuild => {
     changePage,
     setHomePage,
     setBreakpoint,
-    addCustomComponent,
+    convertToCustomComponent,
+    removeCustomComponent,
+    detachInstance,
   }
 }

@@ -17,6 +17,8 @@ export interface IOpDef<
 > {
   /** Agent-facing name, e.g. 'setComponentStyle'. Unique across the registry. */
   name: string
+  /** Superseded names that still resolve to this op. */
+  aliases?: readonly string[]
   command: CommandType
   title: string
   /** Used be describeTools() generated docs. */

@@ -38,6 +38,9 @@ export const deserializeEditor = (
         mode: serializedEditor.mode,
         // Added 240607
         editPageRoute: serializedEditor.editPageRoute,
+        // Added 260819
+        editingComponentId: serializedEditor.editingComponentId,
+        componentArenas: serializedEditor.componentArenas,
         showComponentTree: serializedEditor.showComponentTree,
         componentTreeExpandedItems: serializedEditor.componentTreeExpandedItems,
         // Added 250321
@@ -86,6 +89,45 @@ const deserializeComponent = (ser: ISerializedComponent): IComponent => {
     events: ser.events,
     editorEvents: ser.editorEvents,
     customSourceId: ser.customSourceId,
+    instanceOverrides: ser.instanceOverrides,
+  }
+}
+
+const deserializeTree = (
+  root: ISerializedComponent,
+  components: Record<string, IComponent>,
+): IComponent => {
+  const queue: ISerializedComponent[] = [root]
+  for (;;) {
+    const cur = queue.shift()
+    if (!cur) break
+    components[cur.id] = deserializeComponent(cur)
+    queue.push(...(cur.children ?? []))
+  }
+  queue.push(root)
+  for (;;) {
+    const cur = queue.shift()
+    if (!cur) break
+    const c = components[cur.id]
+    c.parent = cur.parentId ? components[cur.parentId] : undefined
+    c.children = cur.children?.map((child) => components[child.id])
+    queue.push(...(cur.children ?? []))
+  }
+  return components[root.id]
+}
+
+// `skipExisting` keeps a definition that a damaged site also left inline in a page from
+// replacing the page's copy, which would detach it from its parent's children.
+export const deserializeCustomComponents = (
+  serialized: ISerializedComponent[] | undefined,
+  components: Record<string, IComponent>,
+  skipExisting = false,
+) => {
+  for (const root of serialized ?? []) {
+    if (skipExisting && components[root.id]) {
+      continue
+    }
+    deserializeTree({ ...root, parentId: undefined }, components)
   }
 }
 
@@ -131,6 +173,8 @@ export const deserializePages = (
 export const deserializedHelper = (serialized: ISerializedSite): ISite => {
   const { context, defaults, editor, history } = serialized
   const { pages, components } = deserializePages(serialized.pages)
+  // Added 260819
+  deserializeCustomComponents(context.customComponents, components, true)
   const siteContext: ISiteContext = {
     namespace: context.namespace,
     nextId: context.nextId,
@@ -140,8 +184,9 @@ export const deserializedHelper = (serialized: ISerializedSite): ISite => {
     // Added 240521
     styleOrder: context.styleOrder ?? Object.keys(context.styles ?? {}),
     theme: context.theme,
-    customComponentIds: new Set(context.customComponentIds ?? []),
-    customChildIds: new Set(context.customChildIds ?? []),
+    customComponentIds: new Set(
+      (context.customComponentIds ?? []).filter((id) => !!components[id]),
+    ),
     breakpoints: context.breakpoints,
     // Added 231105
     i18n: context.i18n ?? {},

@@ -1,5 +1,7 @@
 import { applyCommand } from '@pubstudio/frontend/data-access-command'
+import { makeRemoveComponentData } from '@pubstudio/frontend/util-command-data'
 import { DEFAULT_BREAKPOINT_ID } from '@pubstudio/frontend/util-defaults'
+import { latestComponentId } from '@pubstudio/frontend/util-ids'
 import { deserializeSite } from '@pubstudio/frontend/util-site-deserialize'
 import { mockSerializedSite } from '@pubstudio/frontend/util-test-mock'
 import { CommandType, ICommand } from '@pubstudio/shared/type-command'
@@ -95,9 +97,54 @@ const seedCommands: ICommand[] = [
   },
 ]
 
+// One definition with an instance (detach has a target) and one without (removal is not
+// blocked). Ids are allocated during apply, so this runs as code, not a command list.
+const seedCustomComponents = (site: ISite) => {
+  const root = site.pages['/home'].root
+  const convert = (name: string): string => {
+    applyCommand(site, {
+      type: CommandType.AddComponent,
+      data: { tag: Tag.Div, name, parentId: root.id },
+    })
+    const definitionId = latestComponentId(site.context)
+    applyCommand(site, {
+      type: CommandType.AddComponent,
+      data: {
+        tag: Tag.Span,
+        name: `${name}Text`,
+        content: 'definition text',
+        parentId: definitionId,
+      },
+    })
+    applyCommand(site, {
+      type: CommandType.ConvertToCustomComponent,
+      data: {
+        componentId: definitionId,
+        parentId: root.id,
+        parentIndex: root.children?.length ?? 0,
+      },
+    })
+    return definitionId
+  }
+
+  const usedId = convert('UsedCustom')
+  applyCommand(site, {
+    type: CommandType.AddComponent,
+    data: { tag: Tag.Div, parentId: root.id, customComponentId: usedId },
+  })
+
+  convert('UnusedCustom')
+  const instance = root.children?.[(root.children?.length ?? 1) - 1] as IComponent
+  applyCommand(site, {
+    type: CommandType.RemoveComponent,
+    data: makeRemoveComponentData(site, instance),
+  })
+}
+
 export const makeTestSite = (): ISite => {
   const site = deserializeSite(JSON.stringify(mockSerializedSite)) as ISite
   seedCommands.forEach((command) => applyCommand(site, command))
+  seedCustomComponents(site)
   // Seeding is fixture setup, not history the round trip should compare
   site.history.back = []
   site.history.forward = []
@@ -143,6 +190,7 @@ const componentContent = (component: IComponent): unknown => ({
   events: component.events,
   editorEvents: component.editorEvents,
   customSourceId: component.customSourceId,
+  instanceOverrides: component.instanceOverrides,
   children: component.children?.map(componentContent),
 })
 
@@ -163,10 +211,14 @@ export const siteContentSnapshot = (site: ISite): string => {
     ),
     context: {
       ...context,
-      // Components are compared through the page roots; this map holds parent cycles
+      // Components are compared through the page roots and definitions; this map holds
+      // parent cycles
       components: Object.keys(context.components).sort(),
-      customComponentIds: Array.from(context.customComponentIds).sort(),
-      customChildIds: Array.from(context.customChildIds).sort(),
+      // Registry order drives the custom menu, so compare it unsorted
+      customComponentIds: Array.from(context.customComponentIds),
+      customComponents: Array.from(context.customComponentIds).map((id) =>
+        componentContent(context.components[id]),
+      ),
     },
   })
 }

@@ -1,27 +1,42 @@
 import { builtinBehaviors, builtinComponents } from '@pubstudio/frontend/util-builtin'
+import { customComponentIndex } from '@pubstudio/frontend/data-access-command'
 import {
+  makeDetachInstanceData,
   makeEditComponentData,
   makeRemoveComponentData,
 } from '@pubstudio/frontend/util-command-data'
-import { clone } from '@pubstudio/frontend/util-component'
-import { resolveBehavior, resolveStyle } from '@pubstudio/frontend/util-resolve'
+import {
+  canBecomeCustom,
+  clone,
+  customComponentUsage,
+} from '@pubstudio/frontend/util-component'
+import { overrideSelectorIds } from '@pubstudio/frontend/util-render'
+import {
+  resolveBehavior,
+  resolveComponent,
+  resolveStyle,
+} from '@pubstudio/frontend/util-resolve'
 import { serializeComponent } from '@pubstudio/frontend/util-site-store'
 import { CommandType } from '@pubstudio/shared/type-command'
 import {
   IAddComponentChildData,
   IAddComponentData,
-  IAddCustomComponentData,
+  IConvertToCustomComponentData,
+  IDetachInstanceData,
   IEditComponentData,
   IEditComponentFields,
   IMergeComponentStyleData,
   IMoveComponentData,
   IRemoveComponentData,
+  IRemoveCustomComponentData,
   IReplacePageRootData,
+  ISetInstanceOverrideData,
 } from '@pubstudio/shared/type-command-data'
 import {
   AriaRole,
   ComponentArgPrimitive,
   Css,
+  IComponent,
   IComponentEvents,
   IComponentInputs,
   IComponentState,
@@ -32,7 +47,9 @@ import { defineOp, IOpCtx } from '../op/define-op'
 import {
   constraint,
   exampleComponentId,
+  exampleInstanceId,
   examplePageRoute,
+  exampleUnusedCustomComponentId,
   mustResolveComponent,
   mustResolvePage,
 } from '../op/op-helpers'
@@ -361,6 +378,9 @@ export const addComponentOp = defineOp<IAddComponentData>()({
       'Builder-only events, and they can run side effects mid-command. Use ' +
       'setComponentEditorEvent after creation.',
     hidden: 'Builder tree visibility; captured automatically when undoing.',
+    instanceOverrides:
+      'Per-child overrides on a custom instance. Set them after creation with ' +
+      'setComponentStyle/setOverrideStyle, or detach the instance for full control.',
   },
   resolve: (ctx, input) => {
     mustResolveComponent(ctx.site, input.parentId)
@@ -445,6 +465,7 @@ export const removeComponentOp = defineOp<IRemoveComponentData>()({
     'parentId',
     'parentIndex',
     'customComponentId',
+    'instanceOverrides',
     'style',
     'state',
     'inputs',
@@ -462,6 +483,11 @@ export const removeComponentOp = defineOp<IRemoveComponentData>()({
     if (!component.parent) {
       constraint(
         `${component.id} is a page root; use replacePageRoot or removePage instead.`,
+      )
+    }
+    if (ctx.site.context.customComponentIds.has(component.id)) {
+      constraint(
+        `${component.id} is a custom component definition; use removeCustomComponent.`,
       )
     }
     return {
@@ -574,22 +600,156 @@ export const mergeComponentStyleOp = defineOp<IMergeComponentStyleData>()({
   }),
 })
 
-export const addCustomComponentOp = defineOp<IAddCustomComponentData>()({
-  name: 'addCustomComponent',
-  command: CommandType.AddCustomComponent,
+export const convertToCustomComponentOp = defineOp<IConvertToCustomComponentData>()({
+  name: 'convertToCustomComponent',
+  aliases: ['addCustomComponent'],
+  command: CommandType.ConvertToCustomComponent,
   title: 'Make component reusable',
   description:
-    'Register an existing component as a custom (reusable) component. Instances are then ' +
-    'created with addComponent({customComponentId}).',
+    'Turn a component into a reusable custom component. The definition moves out of the ' +
+    'page into the definition registry and an instance takes its place, so the page ' +
+    'renders identically. Further instances come from addComponent({customComponentId}); ' +
+    'editing the definition updates every instance. A page root, an existing instance, ' +
+    'and anything already inside a definition cannot be converted.',
   input: obj({ componentId: componentIdField() }),
-  derived: [],
+  derived: ['parentId', 'parentIndex', 'instanceId'],
   omitted: {},
   resolve: (ctx, input) => {
     const component = mustResolveComponent(ctx.site, input.componentId)
+    if (!canBecomeCustom(ctx.site.context, component.id)) {
+      constraint(
+        `${component.id} cannot become a custom component: page roots, instances and ` +
+          'components inside a definition are not convertible.',
+      )
+    }
+    const parent = component.parent as IComponent
+    const parentIndex = parent.children?.findIndex((c) => c.id === component.id) ?? 0
     return {
-      type: CommandType.AddCustomComponent,
-      data: { componentId: component.id },
+      type: CommandType.ConvertToCustomComponent,
+      data: { componentId: component.id, parentId: parent.id, parentIndex },
     }
   },
   example: (site) => ({ componentId: exampleComponentId(site) }),
+})
+
+export const removeCustomComponentOp = defineOp<IRemoveCustomComponentData>()({
+  name: 'removeCustomComponent',
+  command: CommandType.RemoveCustomComponent,
+  title: 'Delete a custom component',
+  description:
+    'Delete a custom component definition and its tree. Refused while any instance ' +
+    'still references it — detach or remove the instances first. ' +
+    'read({customComponents:true}) reports where instances live.',
+  input: obj({
+    componentId: componentIdField().desc('Id of the custom component definition.'),
+  }),
+  derived: ['component', 'index'],
+  omitted: {},
+  resolve: (ctx, input) => {
+    const definition = mustResolveComponent(ctx.site, input.componentId)
+    if (!ctx.site.context.customComponentIds.has(definition.id)) {
+      constraint(
+        `${definition.id} is not a custom component. ` +
+          'List definitions with read({customComponents:true}).',
+      )
+    }
+    const usage = customComponentUsage(ctx.site, definition.id)
+    if (usage.instances.length) {
+      constraint(
+        `${definition.id} still has ${usage.instances.length} instance(s): ` +
+          `${usage.instances.map((i) => i.id).join(', ')}. Detach or remove them first.`,
+      )
+    }
+    return {
+      type: CommandType.RemoveCustomComponent,
+      data: {
+        componentId: definition.id,
+        component: clone(serializeComponent(definition)),
+        index: customComponentIndex(ctx.site, definition.id),
+      },
+    }
+  },
+  example: (site) => ({ componentId: exampleUnusedCustomComponentId(site) }),
+})
+
+export const detachInstanceOp = defineOp<IDetachInstanceData>()({
+  name: 'detachInstance',
+  command: CommandType.DetachInstance,
+  title: 'Detach a custom component instance',
+  description:
+    'Replace an instance with an independent copy of what it currently renders: the ' +
+    'definition structure with the instance’s own content, style, input and event ' +
+    'overrides merged in. The copy no longer follows the definition.',
+  input: obj({
+    componentId: componentIdField().desc('Id of the instance to detach.'),
+  }),
+  derived: ['instance', 'replacement'],
+  omitted: {},
+  resolve: (ctx, input) => {
+    const instance = mustResolveComponent(ctx.site, input.componentId)
+    const data = makeDetachInstanceData(ctx.site, instance)
+    if (!data) {
+      constraint(
+        `${instance.id} is not a custom component instance with a parent. ` +
+          'read({tree:{}}) marks instances as "[custom: <id>]".',
+      )
+    }
+    return { type: CommandType.DetachInstance, data }
+  },
+  example: (site) => ({ componentId: exampleInstanceId(site) }),
+})
+
+export const setInstanceOverrideOp = defineOp<ISetInstanceOverrideData>()({
+  name: 'setInstanceOverride',
+  command: CommandType.SetInstanceOverride,
+  title: 'Override one child of a custom instance',
+  description:
+    'Replace the content of one definition child, for this instance only. Other ' +
+    'instances keep the definition value. `childId` is a definition descendant id — ' +
+    'read({customComponents:[id]}) lists them. Omit `content` to clear the override. ' +
+    'Instance-wide style and input changes use setComponentStyle/setComponentInput on ' +
+    'the instance itself; per-child styles use setOverrideStyle with the same childId.',
+  input: obj({
+    componentId: componentIdField().desc('Id of the custom component instance.'),
+    childId: str().desc('Definition descendant the override applies to.'),
+    content: str().optional().desc('Content for this child. Omit to clear the override.'),
+  }),
+  derived: ['oldOverride', 'newOverride'],
+  omitted: {},
+  resolve: (ctx, input) => {
+    const instance = mustResolveComponent(ctx.site, input.componentId)
+    const definition = resolveComponent(ctx.site.context, instance.customSourceId)
+    if (!definition) {
+      constraint(`${instance.id} is not a custom component instance.`)
+    }
+    if (!overrideSelectorIds(ctx.site.context, instance).includes(input.childId)) {
+      constraint(
+        `${input.childId} is not a child of ${definition.id}. ` +
+          'List them with read({customComponents:["' +
+          definition.id +
+          '"]}).',
+      )
+    }
+    const oldOverride = instance.instanceOverrides?.[input.childId]
+    return {
+      type: CommandType.SetInstanceOverride,
+      data: {
+        componentId: instance.id,
+        childId: input.childId,
+        oldOverride: clone(oldOverride),
+        newOverride:
+          input.content === undefined
+            ? undefined
+            : { ...clone(oldOverride), content: input.content },
+      },
+    }
+  },
+  example: (site) => {
+    const instance = mustResolveComponent(site, exampleInstanceId(site))
+    return {
+      componentId: instance.id,
+      childId: overrideSelectorIds(site.context, instance)[0],
+      content: 'Overridden for this instance',
+    }
+  },
 })

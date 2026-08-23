@@ -62,7 +62,6 @@ export const createSite = (_namespace: string): ISite => {
     styles: {},
     styleOrder: [],
     customComponentIds: new Set<string>(),
-    customChildIds: new Set<string>(),
     behaviors: {},
     theme: {
       variables: {
@@ -113,7 +112,7 @@ export const createSite = (_namespace: string): ISite => {
   return {
     context,
     name: namespace,
-    version: '2',
+    version: '3',
     defaults: {
       head: {},
       homePage: homePageMetadata.route,

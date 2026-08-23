@@ -9,7 +9,7 @@ The following is a minimal Site representation in serialized JSON form, with com
   // Site name, mainly used for builder display
   "name": "test",
   // Format version, to indicate serialization/rendering features
-  "version": "2",
+  "version": "3",
   // TBD
   "defaults": {
     // Default document metadata
@@ -73,6 +73,16 @@ The following is a minimal Site representation in serialized JSON form, with com
     "nextId": 2,
     // Mixins
     "styles": {},
+    // Custom (reusable) component definition roots, in registry order
+    "customComponentIds": ["test-c-5"],
+    // Definition trees, serialized like page roots and never part of a page.
+    // See docs/custom-components.md
+    "customComponents": [
+      {
+        "id": "test-c-5",
+        // ...
+      },
+    ],
     // Component cache
     // TODO -- this should not be part of the serialized context
     "components": {

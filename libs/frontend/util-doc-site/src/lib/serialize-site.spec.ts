@@ -5,8 +5,8 @@ import { ISite } from '@pubstudio/shared/type-site'
 import { validateSite } from './validate-site'
 
 vi.mock('@pubstudio/frontend/util-config', () => ({
-  SITE_FORMAT_VERSION: '2',
-  builderConfig: { siteFormatVersion: '2' },
+  SITE_FORMAT_VERSION: '3',
+  builderConfig: { siteFormatVersion: '3' },
 }))
 
 describe('Serialize site', () => {

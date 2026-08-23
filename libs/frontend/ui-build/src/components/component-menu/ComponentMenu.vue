@@ -11,6 +11,7 @@
     <ComponentEventEdit v-else-if="isEditingEvent" :component="component" />
     <template v-else>
       <ComponentTabInfo :component="component" />
+      <ComponentInstanceChild :component="component" />
       <ToolbarText :show="showTextStyle" />
       <ToolbarContainer />
       <ComponentFlex />
@@ -42,6 +43,22 @@
           :secondary="true"
           @click="toCustomComponent"
         />
+        <PSButton
+          v-if="isInstance"
+          class="edit-custom-button"
+          size="small"
+          :text="t('build.edit_custom')"
+          :secondary="true"
+          @click="editCustomComponent"
+        />
+        <PSButton
+          v-if="isInstance"
+          class="detach-custom-button"
+          size="small"
+          :text="t('build.detach')"
+          :secondary="true"
+          @click="detach"
+        />
       </div>
     </template>
   </div>
@@ -56,6 +73,7 @@ import { BuildSubmenu, ComponentTabState, IComponent } from '@pubstudio/shared/t
 import { serializeComponent } from '@pubstudio/frontend/util-site-store'
 import { isDev } from '@pubstudio/frontend/util-config'
 import ComponentTabInfo from './ComponentTabInfo.vue'
+import ComponentInstanceChild from './ComponentInstanceChild.vue'
 import ComponentDimensions from './ComponentDimensions.vue'
 import ComponentTabStyle from './ComponentTabStyle.vue'
 import {
@@ -63,7 +81,10 @@ import {
   useEditComponentInput,
   useMixinMenu,
 } from '@pubstudio/frontend/feature-build'
-import { setBuildSubmenu } from '@pubstudio/frontend/data-access-command'
+import {
+  enterComponentEdit,
+  setBuildSubmenu,
+} from '@pubstudio/frontend/data-access-command'
 import { canBecomeCustom } from '@pubstudio/frontend/util-component'
 import ComponentInputEdit from './ComponentInputEdit.vue'
 import ComponentInputs from './ComponentInputs.vue'
@@ -77,7 +98,7 @@ import ToolbarText from '../toolbar/ToolbarText.vue'
 import ComponentState from './ComponentState.vue'
 
 const { t } = useI18n()
-const { site, editor, addCustomComponent } = useBuild()
+const { site, editor, convertToCustomComponent, detachInstance } = useBuild()
 const { isEditingMixin } = useMixinMenu()
 
 const props = defineProps<{
@@ -112,8 +133,24 @@ const showToCustomComponent = computed(() => {
 })
 
 const toCustomComponent = () => {
-  addCustomComponent(component.value)
+  convertToCustomComponent(component.value)
   setBuildSubmenu(editor.value, BuildSubmenu.Custom)
+}
+
+const isInstance = computed(
+  () =>
+    !!component.value.customSourceId &&
+    site.value.context.customComponentIds.has(component.value.customSourceId),
+)
+
+const editCustomComponent = () => {
+  if (component.value.customSourceId) {
+    enterComponentEdit(site.value, component.value.customSourceId)
+  }
+}
+
+const detach = () => {
+  detachInstance(component.value)
 }
 </script>
 
@@ -129,6 +166,8 @@ const toCustomComponent = () => {
   align-items: flex-end;
   padding-top: 24px;
   padding-left: 16px;
+  flex-wrap: wrap;
+  gap: 8px;
   .to-custom-button {
     margin-left: 8px;
   }

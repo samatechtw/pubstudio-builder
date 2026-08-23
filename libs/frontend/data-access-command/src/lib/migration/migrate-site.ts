@@ -6,12 +6,21 @@ import {
 import { ISite } from '@pubstudio/shared/type-site'
 import { getLastCommand } from '../command'
 import { migrateV1ToV2, migrateV2ToV1 } from './migrate-v1-v2'
+import { migrateV2ToV3, migrateV3ToV2 } from './migrate-v2-v3'
 
-const migrateForward = (site: ISite, fromVersion: string): string | undefined => {
+const migrateForward = (
+  site: ISite,
+  fromVersion: string,
+  data: ISiteMigrationData,
+): string | undefined => {
   // Original version was 0.1, but we switched to integer versions
   if (fromVersion === '1' || fromVersion === '0.1') {
     migrateV1ToV2(site)
     return '2'
+  }
+  if (fromVersion === '2') {
+    migrateV2ToV3(site, data)
+    return '3'
   }
 }
 
@@ -27,7 +36,7 @@ export const applyMigrateSite = (site: ISite, data: ISiteMigrationData) => {
   }
   let currentVersion: string | undefined = oldVersion
   while (currentVersion !== newVersion) {
-    currentVersion = migrateForward(site, currentVersion)
+    currentVersion = migrateForward(site, currentVersion, data)
     if (!currentVersion) {
       console.error('Failed to complete migration, site may be broken')
       return
@@ -35,7 +44,15 @@ export const applyMigrateSite = (site: ISite, data: ISiteMigrationData) => {
   }
 }
 
-const rollBack = (site: ISite, fromVersion: string): string | undefined => {
+const rollBack = (
+  site: ISite,
+  fromVersion: string,
+  data: ISiteMigrationData,
+): string | undefined => {
+  if (fromVersion === '3') {
+    migrateV3ToV2(site, data)
+    return '2'
+  }
   if (fromVersion === '2') {
     migrateV2ToV1(site)
     return '1'
@@ -46,7 +63,7 @@ export const undoMigrateSite = (site: ISite, data: ISiteMigrationData) => {
   const { oldVersion, newVersion } = data
   let currentVersion: string | undefined = newVersion
   while (currentVersion !== oldVersion) {
-    currentVersion = rollBack(site, currentVersion)
+    currentVersion = rollBack(site, currentVersion, data)
     if (!currentVersion) {
       console.error(
         `Failed to complete migration, version=${site.version}, expected=${oldVersion}`,

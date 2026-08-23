@@ -7,6 +7,7 @@ import {
 } from './enum-walkthrough-state'
 import { IBehavior, IComponent, IComponentEvent } from './i-component'
 import { IHotkeys } from './i-hotkeys'
+import type { ISerializedComponent } from './i-serialized-site'
 import { ISiteStore } from './i-site-store'
 
 export enum EditorMode {
@@ -162,6 +163,14 @@ export interface IEditorContext {
   mode: EditorMode
   // Active editing page route
   editPageRoute?: string
+  // Custom component definition open in the component edit screen
+  editingComponentId?: string
+  // Selection to restore when the component edit screen closes
+  componentEditReturnId?: string
+  // Definition child whose per-instance overrides the component menu edits
+  selectedInstanceChildId?: string
+  // Editor-only scaffolding around each definition, keyed by definition id
+  componentArenas?: Record<string, ISerializedComponent>
   // Active Build submenu
   buildSubmenu?: BuildSubmenu
   // Editor active dropdown menu

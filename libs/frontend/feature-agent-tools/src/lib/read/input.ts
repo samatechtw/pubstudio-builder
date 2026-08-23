@@ -83,6 +83,12 @@ export const READ_INPUT_SCHEMA = obj({
   })
     .optional()
     .desc('Read page head entries together with site-wide defaults.'),
+  customComponents: anyOf(bool(), arr(str()))
+    .optional()
+    .desc(
+      'Set true to list custom component definitions with their instance counts, or ' +
+        'pass definition ids for their full trees.',
+    ),
   builtins: bool().optional().desc('Set true to list builtin components and behaviors.'),
   html: obj({
     componentId: str().desc('Id of a component rendered on the active builder canvas.'),

@@ -254,6 +254,23 @@ definition. Constraints that keep it sound:
 - Builder-only `editorEvents` stay follow-up ops: they can execute side effects while the
   add command is still running.
 
+## Custom components
+
+`read({customComponents:true})` lists every definition with its instance count, instance
+ids and the pages they sit on, so an agent can see the blast radius of a definition edit
+before making one. Pass ids instead of `true` for full trees.
+
+Three ops cover the lifecycle: `convertToCustomComponent` (aliased as the superseded
+`addCustomComponent`) moves a component out of its page into the registry and leaves an
+instance behind; `removeCustomComponent` refuses while instances exist and names them;
+`detachInstance` replaces an instance with an independent copy of what it renders.
+`addComponent({customComponentId})` still creates instances, and creates a single node —
+the definition tree is expanded under it at render time, so `read({tree:{}})` shows the
+instance as one line marked `[custom: <id>]`. Per-child edits on an instance are
+`instanceOverrides`, which `addComponent` does not accept; set child content with
+`setInstanceOverride`, child styles with `setOverrideStyle`, or detach for full control. See
+docs/custom-components.md for the data model.
+
 ## Site type differences
 
 `apply()` needs no branching on site type — `ISiteStore.save` abstracts both — but three

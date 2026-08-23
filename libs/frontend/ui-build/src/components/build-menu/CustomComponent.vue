@@ -7,23 +7,39 @@
     :draggable="true"
     @mouseenter.stop="mouseEnter"
     @mouseleave.stop="mouseLeave"
-    @click="addCustomComponent"
     @dragstart="dragstart"
     @dragend="dragend"
     @drag="drag"
   >
-    {{ text }}
+    <div class="custom-label" @click="addInstance">
+      <div class="custom-name">{{ customComponent.name }}</div>
+      <div class="custom-usage">{{ usageText }}</div>
+    </div>
+    <Edit class="custom-action edit" @click.stop="editComponent" />
+    <Trash
+      class="custom-action delete"
+      :class="{ disabled: usageCount > 0 }"
+      :title="usageCount ? t('build.custom_in_use', { count: usageCount }) : t('delete')"
+      @click.stop="removeComponent"
+    />
   </div>
 </template>
 
 <script lang="ts" setup>
 import { computed, toRefs } from 'vue'
-import { addCustomComponentAtSelection } from '@pubstudio/frontend/feature-build'
+import { useI18n } from 'petite-vue-i18n'
+import {
+  addCustomComponentAtSelection,
+  useBuild,
+} from '@pubstudio/frontend/feature-build'
 import { useDragDrop } from '@pubstudio/frontend/feature-render-builder'
 import { IComponent } from '@pubstudio/shared/type-site'
 import { BuilderDragDataType } from '@pubstudio/frontend/type-builder'
 import { builderContext } from '@pubstudio/frontend/util-builder'
+import { customComponentUsage } from '@pubstudio/frontend/util-component'
+import { enterComponentEdit } from '@pubstudio/frontend/data-access-command'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
+import { Edit, Trash } from '@pubstudio/frontend/ui-widgets'
 
 const props = defineProps<{
   customComponent: IComponent
@@ -31,19 +47,28 @@ const props = defineProps<{
 
 const { customComponent } = toRefs(props)
 
+const { t } = useI18n()
 const { site } = useSiteSource()
+const { removeCustomComponent } = useBuild()
 
-const text = computed(() => {
-  const { id, name } = customComponent.value
-  let value = id
-  if (name && id !== name) {
-    value += ` (${name})`
-  }
-  return value
-})
+const text = computed(() => `${customComponent.value.name} (${customComponent.value.id})`)
 
-const addCustomComponent = () => {
+const usageCount = computed(
+  () => customComponentUsage(site.value, customComponent.value.id).instances.length,
+)
+
+const usageText = computed(() => t('build.custom_usage', { count: usageCount.value }))
+
+const addInstance = () => {
   addCustomComponentAtSelection(site.value, customComponent.value.id)
+}
+
+const editComponent = () => {
+  enterComponentEdit(site.value, customComponent.value.id)
+}
+
+const removeComponent = () => {
+  removeCustomComponent(customComponent.value.id)
 }
 
 const { dndState, elementRef, dragstart, drag, dragend } = useDragDrop({
@@ -70,28 +95,47 @@ const mouseLeave = () => {
 <style lang="postcss" scoped>
 @import '@theme/css/mixins.postcss';
 
-$arrow-size: 10px;
-
 .custom-component {
   @mixin title-medium 13px;
-  width: 100%;
-  display: block;
+  @mixin flex-row;
   align-items: center;
+  width: 100%;
   padding: 8px;
   color: $color-text;
   border-top: 1px solid $border1;
   border-bottom: 1px solid $border1;
-  cursor: pointer;
   transition: color 0.2s;
   word-break: break-all;
   &.dragging {
     opacity: 0.3;
   }
   &:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+  }
+}
+.custom-label {
+  flex-grow: 1;
+  min-width: 0;
+  cursor: pointer;
+  &:hover {
     color: $color-toolbar-button-active;
-    :deep(path) {
-      fill: $color-toolbar-button-active;
-    }
+  }
+}
+.custom-name {
+  @mixin truncate;
+}
+.custom-usage {
+  @mixin text 11px;
+  color: $grey-500;
+}
+.custom-action {
+  @mixin size 16px;
+  flex-shrink: 0;
+  margin-left: 6px;
+  cursor: pointer;
+  &.disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
   }
 }
 </style>

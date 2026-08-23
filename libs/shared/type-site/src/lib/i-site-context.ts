@@ -12,8 +12,8 @@ export interface ISiteContext {
   globalStyles: Record<string, IGlobalStyle>
   styles: Record<string, IStyle>
   styleOrder: string[]
+  // Definition roots, stored in `components` as parentless roots outside every page
   customComponentIds: Set<string>
-  customChildIds: Set<string>
   behaviors: Record<string, IBehavior>
   theme: ITheme
   breakpoints: Record<string, IBreakpoint>
