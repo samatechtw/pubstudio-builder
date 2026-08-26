@@ -66,7 +66,7 @@ const emit = defineEmits<{
   (e: 'unauthorized'): void
 }>()
 
-const { siteStore, site } = useSiteSource()
+const { siteStore, site, setRestoredSite } = useSiteSource()
 const show = ref(false)
 
 const isHistory = computed(() => {
@@ -75,6 +75,10 @@ const isHistory = computed(() => {
 
 const isStale = computed(() => {
   return siteError.value?.code === ApiErrorCode.UpdateStale
+})
+
+const isConflict = computed(() => {
+  return siteError.value?.code === ApiErrorCode.CollaborationConflict
 })
 
 const isValidateError = computed(() => {
@@ -104,6 +108,8 @@ const errorText = computed(() => {
     return t('build.save_history')
   } else if (isStale.value) {
     return t('build.stale')
+  } else if (isConflict.value) {
+    return t('build.collaboration_conflict')
   } else if (isValidateError.value) {
     return t('build.save_server_error')
   } else {
@@ -135,8 +141,14 @@ const refreshPage = () => {
   location.reload()
 }
 
-const cancel = () => {
+const cancel = async () => {
+  const conflict = isConflict.value
   siteStore.saveError = undefined
+  if (conflict) {
+    // Dismissing a conflict loads the accepted server version; the rejected local
+    // work stays in the tab's recovery slot
+    setRestoredSite(await siteStore.restore())
+  }
 }
 </script>
 

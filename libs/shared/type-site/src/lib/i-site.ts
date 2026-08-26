@@ -26,5 +26,7 @@ export interface ISite {
   pageOrder: string[]
   updated_at?: string
   content_updated_at?: number
+  revision?: number
+  operation_floor?: number
   preview_id?: string
 }

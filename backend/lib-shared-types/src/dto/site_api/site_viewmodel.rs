@@ -16,6 +16,8 @@ pub struct SiteViewModel {
     pub page_order: String,
     pub created_at: JsDate,
     pub content_updated_at: i64,
+    pub revision: i64,
+    pub operation_floor: i64,
     pub updated_at: JsDate,
     pub published: bool,
     pub preview_id: Option<String>,
@@ -36,6 +38,8 @@ pub fn to_api_response(site_entity: SiteEntity) -> SiteViewModel {
             timestamp: site_entity.created_at,
         },
         content_updated_at: site_entity.content_updated_at,
+        revision: site_entity.revision,
+        operation_floor: 0,
         updated_at: JsDate {
             timestamp: site_entity.updated_at,
         },

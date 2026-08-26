@@ -80,7 +80,7 @@ export const newMixin = (site: ISite, source?: IComponent) => {
       JSON.parse(JSON.stringify(source.style.custom)),
     )
   } else {
-    const id = styleId(site.context.namespace, site.context.nextId.toString())
+    const id = styleId(site.context.namespace, peekNextId(site.context))
     const name = `Style_${id}`
     const breakpoints: IBreakpointStyles = { default: {} }
     addMixin(site, name, breakpoints)

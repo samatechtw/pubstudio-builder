@@ -2,11 +2,13 @@
 
 members = [
     "site-api",
+    "lib-command-replay",
     "lib-shared-site-api",
     "lib-shared-types",
 ]
 
 [workspace.dependencies]
+lib-command-replay = { path = "./lib-command-replay" }
 lib-shared-site-api = { path = "./lib-shared-site-api" }
 lib-shared-types = { path = "./lib-shared-types" }
 aes = "0.8.4"

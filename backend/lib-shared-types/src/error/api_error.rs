@@ -22,6 +22,7 @@ pub enum ApiErrorCode {
     NoAvailableSiteServer,
     NoUpdates,
     UpdateStale,
+    CollaborationConflict,
     SiteHasAssets,
     InvalidCollectionId,
     InvalidRoute,
