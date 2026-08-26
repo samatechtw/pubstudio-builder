@@ -30,7 +30,7 @@ use super::site_db_pool_manager::{DbPoolManager, SqlitePoolConnection};
 
 pub type DynSiteRepo = Arc<dyn SiteRepoTrait + Send + Sync>;
 
-const SITE_COLUMNS: &str = r#"id, name, version, context, defaults, editor, history, pages, page_order, created_at, updated_at, content_updated_at, published, preview_id"#;
+const SITE_COLUMNS: &str = r#"id, name, version, context, defaults, editor, history, pages, page_order, created_at, updated_at, content_updated_at, revision, published, preview_id"#;
 const SITE_INFO_COLUMNS: &str = r#"id, name, updated_at, published"#;
 
 #[async_trait]
@@ -201,6 +201,14 @@ impl SiteRepoTrait for SiteRepo {
 
         let query = QueryBuilder::new("UPDATE site_versions SET");
         let update_count = 0;
+        // Snapshot writes bypass the operation log; bumping the revision makes
+        // collaborative clients reload instead of replaying onto replaced content
+        let document_changed = req.dto.name.is_some()
+            || req.dto.version.is_some()
+            || req.dto.context.is_some()
+            || req.dto.defaults.is_some()
+            || req.dto.pages.is_some()
+            || req.dto.page_order.is_some();
 
         let (query, update_count) = append_comma(query, "name", req.dto.name, update_count);
         let (query, update_count) = append_comma(query, "version", req.dto.version, update_count);
@@ -230,6 +238,9 @@ impl SiteRepoTrait for SiteRepo {
 
         if update_count == 0 {
             return Err(DbError::NoUpdate);
+        }
+        if document_changed {
+            query.push(", revision = revision + 1");
         }
 
         query.push(" WHERE id = (SELECT MAX(id) FROM site_versions)");
@@ -314,8 +325,8 @@ impl SiteRepoTrait for SiteRepo {
         let mut conn = self.get_db_conn(id).await?;
 
         sqlx::query(
-            r#"INSERT INTO site_versions (name, version, context, defaults, editor, history, pages, content_updated_at)
-            SELECT name, version, context, defaults, editor, history, pages, content_updated_at FROM site_versions WHERE id = ?
+            r#"INSERT INTO site_versions (name, version, context, defaults, editor, history, pages, page_order, content_updated_at, revision)
+            SELECT name, version, context, defaults, editor, history, pages, page_order, content_updated_at, revision FROM site_versions WHERE id = ?
             "#,
         )
         .bind(from_id)
@@ -328,6 +339,14 @@ impl SiteRepoTrait for SiteRepo {
     async fn delete_draft(&self, id: &str) -> Result<(), DbError> {
         let mut conn = self.get_db_conn(id).await?;
 
+        sqlx::query(
+            r#"
+               DELETE FROM site_operations
+               WHERE site_version_id = (SELECT MAX(id) FROM site_versions)
+            "#,
+        )
+        .execute(&mut *conn)
+        .await?;
         sqlx::query(
             r#"
                DELETE FROM site_versions
@@ -391,17 +410,30 @@ impl SiteRepoTrait for SiteRepo {
         let (query, update_count) =
             append_comma(query, "history", Some(draft.history), update_count);
         let (query, update_count) = append_comma(query, "pages", Some(draft.pages), update_count);
+        let (query, update_count) =
+            append_comma(query, "page_order", Some(draft.page_order), update_count);
         let (query, update_count) = append_comma(query, "published", Some(true), update_count);
-        let (mut query, update_count) = append_comma(
+        let (query, update_count) = append_comma(
             query,
             "content_updated_at",
             Some(draft.content_updated_at),
+            update_count,
+        );
+        let (mut query, update_count) = append_comma(
+            query,
+            "revision",
+            Some(published_site.revision.max(draft.revision) + 1),
             update_count,
         );
 
         if update_count == 0 {
             return Err(DbError::NoUpdate);
         }
+
+        sqlx::query("DELETE FROM site_operations WHERE site_version_id = ?")
+            .bind(published_site.id)
+            .execute(&mut *conn)
+            .await?;
 
         query.push(" WHERE id = ");
         query.push_bind(published_site.id);
@@ -555,6 +587,7 @@ fn map_to_site_entity(row: SqliteRow) -> Result<SiteEntity, Error> {
         created_at: row.try_get("created_at")?,
         updated_at: row.try_get("updated_at")?,
         content_updated_at: row.try_get("content_updated_at")?,
+        revision: row.try_get("revision")?,
         published: row.try_get("published")?,
         preview_id: row.try_get_unchecked("preview_id")?,
     })

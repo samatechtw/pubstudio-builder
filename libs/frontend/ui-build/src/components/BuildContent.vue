@@ -54,6 +54,7 @@ const {
 })
 
 const contentWindowRef = ref<HTMLDivElement>()
+let collaborationTimer: ReturnType<typeof setInterval> | undefined
 
 const innerStyle = computed<StyleValue>(() => {
   const { builderWidth = 0, builderScale = 1 } = editor.value ?? {}
@@ -119,10 +120,12 @@ onMounted(() => {
     resizeObserver.observe(contentWindowRef.value)
   }
   document.addEventListener('visibilitychange', checkOutdated)
+  collaborationTimer = setInterval(checkOutdated, 1000)
 })
 
 onUnmounted(() => {
   document.removeEventListener('visibilitychange', checkOutdated)
+  if (collaborationTimer) clearInterval(collaborationTimer)
   resizeObserver.disconnect()
 })
 </script>

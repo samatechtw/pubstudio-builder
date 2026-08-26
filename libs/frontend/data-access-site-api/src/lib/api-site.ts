@@ -12,6 +12,11 @@ import {
   IUpdateSiteApiResponse,
   IUpdateSiteMetadataApiRequest,
 } from '@pubstudio/shared/type-api-site-sites'
+import {
+  ICommandBatch,
+  IOperationsResponse,
+  ISubmitBatchResponse,
+} from '@pubstudio/shared/type-command'
 import { RequestParams } from '@sampullman/fetch-api'
 
 export interface IUseSiteApiParams {
@@ -39,6 +44,8 @@ export interface IApiSite {
     payload: IUpdateSiteApiRequest,
     keepalive?: boolean,
   ): Promise<IUpdateSiteApiResponse>
+  submitOperations(siteId: string, batch: ICommandBatch): Promise<ISubmitBatchResponse>
+  getOperations(siteId: string, afterRevision: number): Promise<IOperationsResponse>
   createDraft(siteId: string): Promise<IListSiteVersionsApiResponse>
   deleteDraft(siteId: string): Promise<void>
   publishSite(siteId: string, publish: boolean): Promise<void>
@@ -76,6 +83,8 @@ export const useSiteApi = (api: PSApi): IApiSite => {
         disabled: serialized.disabled,
         updated_at: serialized.updated_at,
         content_updated_at: serialized.content_updated_at,
+        revision: serialized.revision,
+        operation_floor: serialized.operation_floor,
         preview_id: serialized.preview_id,
       }
     }
@@ -169,13 +178,42 @@ export const useSiteApi = (api: PSApi): IApiSite => {
         published: serialized.published,
         updated_at: serialized.updated_at,
         content_updated_at: serialized.content_updated_at,
+        revision: serialized.revision,
+        operation_floor: serialized.operation_floor,
         preview_id: serialized.preview_id,
       }
     }
   }
 
+  const submitOperations = async (
+    siteId: string,
+    batch: ICommandBatch,
+  ): Promise<ISubmitBatchResponse> => {
+    const response = await api.authRequest<ISubmitBatchResponse>({
+      url: `sites/${siteId}/operations`,
+      method: 'POST',
+      data: batch,
+    })
+    if (response.status >= 400) throw response.data
+    return response.data
+  }
+
+  const getOperations = async (
+    siteId: string,
+    afterRevision: number,
+  ): Promise<IOperationsResponse> => {
+    const response = await api.authRequest<IOperationsResponse>({
+      url: `sites/${siteId}/operations`,
+      params: { after_revision: afterRevision },
+    })
+    if (response.status >= 400) throw response.data
+    return response.data
+  }
+
   return {
     updateSite,
+    submitOperations,
+    getOperations,
     getSiteUsage,
     getSiteMetadata,
     updateSiteMetadata,

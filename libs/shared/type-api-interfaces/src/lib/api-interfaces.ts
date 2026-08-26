@@ -53,6 +53,11 @@ import {
   IUpdateTableApiRequest,
 } from '@pubstudio/shared/type-api-site-custom-data'
 import { FetchRequestConfig } from '@sampullman/fetch-api'
+import {
+  ICommandBatch,
+  IOperationsResponse,
+  ISubmitBatchResponse,
+} from '@pubstudio/shared/type-command'
 import { EnumFileFormat, IImageJobConfig } from '@samatech/image-api-types'
 
 // Shim for PSApi, which is a utility class
@@ -99,6 +104,8 @@ export interface IApiCustomData {
 }
 
 export interface IApiLocalSite {
+  submitOperations(id: string, batch: ICommandBatch): Promise<ISubmitBatchResponse>
+  getOperations(id: string, afterRevision: number): Promise<IOperationsResponse>
   updateLocalSite: (
     id: string,
     data: IUpdateLocalSiteApiRequest,

@@ -251,6 +251,7 @@ export const useBuild = (): IUseBuild => {
       immediate: true,
       forceUpdate: true,
       ignoreUpdateKey: true,
+      snapshot: true,
     })
   }
 
@@ -374,10 +375,9 @@ export const useBuild = (): IUseBuild => {
     const context = site.value.context
     const commands: ICommand[] = []
     // Breakpoints from external component are merged with current site breakpoints
-    // Breakpoint commands are first, so we can guess new breakpoint IDs, which is
-    // necessary when mapping them to source site breakpoints. This solution may be fragile,
-    // if ID generation ever changes, but should otherwise be reliable.
-    let newBreakpointId = context.nextId
+    // Breakpoint commands are first, so we can predict new breakpoint IDs, which is
+    // necessary when mapping them to source site breakpoints.
+    let newBreakpointOffset = 0
     // Map source site breakpoints to target site
     const bpMap: Record<string, string> = {
       [DEFAULT_BREAKPOINT_ID]: DEFAULT_BREAKPOINT_ID,
@@ -398,8 +398,11 @@ export const useBuild = (): IUseBuild => {
         // If there's no match, we need to add the breakpoint
         if (!targetBp) {
           targetBreakpoints.push({ ...sourceBp, id: undefined })
-          const newId = breakpointId(context.namespace, newBreakpointId.toString())
-          newBreakpointId += 1
+          const newId = breakpointId(
+            context.namespace,
+            peekNextId(context, newBreakpointOffset),
+          )
+          newBreakpointOffset += 1
           bpMap[sourceBp.id] = newId
         } else {
           bpMap[sourceBp.id] = targetBp.id

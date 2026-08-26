@@ -139,6 +139,8 @@ export const storeSite = (site: ISite): IStoredSite => {
     history: JSON.stringify(serialized.history),
     updated_at: serialized.updated_at,
     content_updated_at: serialized.content_updated_at,
+    revision: serialized.revision,
+    operation_floor: serialized.operation_floor,
   }
 }
 

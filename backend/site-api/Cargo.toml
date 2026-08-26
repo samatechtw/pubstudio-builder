@@ -6,6 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+lib-command-replay = { workspace = true }
 lib-shared-site-api = { workspace = true }
 lib-shared-types = { workspace = true }
 async-trait = "0.1.85"

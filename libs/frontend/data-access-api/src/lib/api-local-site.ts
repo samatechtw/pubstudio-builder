@@ -8,6 +8,11 @@ import {
 } from '@pubstudio/shared/type-api-local-site'
 import { plainResponseInterceptors } from '@pubstudio/shared/util-web-site-api'
 import { RequestParams } from '@sampullman/fetch-api'
+import {
+  ICommandBatch,
+  IOperationsResponse,
+  ISubmitBatchResponse,
+} from '@pubstudio/shared/type-command'
 
 export const useLocalSiteApi = (_api: PSApi): IApiLocalSite => {
   // TODO -- this is a workaround to avoid parsing Site updated_at so we can use it
@@ -65,6 +70,8 @@ export const useLocalSiteApi = (_api: PSApi): IApiLocalSite => {
       disabled: serialized.disabled,
       updated_at: serialized.updated_at,
       content_updated_at: serialized.content_updated_at,
+      revision: serialized.revision,
+      operation_floor: serialized.operation_floor,
       preview_id: serialized.preview_id,
     }
   }
@@ -77,8 +84,35 @@ export const useLocalSiteApi = (_api: PSApi): IApiLocalSite => {
     return getLocalSite(siteId, query)
   }
 
+  const submitOperations = async (
+    id: string,
+    batch: ICommandBatch,
+  ): Promise<ISubmitBatchResponse> => {
+    const response = await api.authRequest<ISubmitBatchResponse>({
+      url: `local_sites/${id}/operations`,
+      method: 'POST',
+      data: batch,
+    })
+    if (response.status >= 400) throw response.data
+    return response.data
+  }
+
+  const getOperations = async (
+    id: string,
+    afterRevision: number,
+  ): Promise<IOperationsResponse> => {
+    const response = await api.authRequest<IOperationsResponse>({
+      url: `local_sites/${id}/operations`,
+      params: { after_revision: afterRevision },
+    })
+    if (response.status >= 400) throw response.data
+    return response.data
+  }
+
   return {
     updateLocalSite,
+    submitOperations,
+    getOperations,
     getLocalSite,
     getLocalSiteVersion,
   }

@@ -9,12 +9,14 @@ export interface IStoredSite {
   history?: string | null
   updated_at?: string | null
   content_updated_at?: number | null
+  revision?: number | null
+  operation_floor?: number | null
   preview_id?: string | null
 }
 
 export type IStoredSiteDirty = {
   [key in keyof Omit<
     IStoredSite,
-    'updated_at' | 'content_updated_at' | 'preview_id'
+    'updated_at' | 'content_updated_at' | 'revision' | 'operation_floor' | 'preview_id'
   >]: boolean
 }

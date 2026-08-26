@@ -1,0 +1,366 @@
+[
+  {
+    "name": "scalar set",
+    "initial": {
+      "name": "Site",
+      "version": "3",
+      "context": {
+        "theme": {
+          "primary": "red"
+        }
+      },
+      "defaults": {
+        "homePage": "/"
+      },
+      "pages": {
+        "/": {
+          "root": {
+            "id": "root",
+            "children": []
+          }
+        }
+      },
+      "page_order": ["/"]
+    },
+    "batch": {
+      "protocol_version": 1,
+      "batch_id": "fixture-scalar",
+      "client_id": "fixture-client",
+      "base_revision": 0,
+      "commands": [
+        {
+          "type": "set",
+          "section": "context",
+          "path": ["theme", "primary"],
+          "expected": {
+            "kind": "value",
+            "value": "red"
+          },
+          "value": "blue"
+        }
+      ]
+    },
+    "expected": {
+      "name": "Site",
+      "version": "3",
+      "context": {
+        "theme": {
+          "primary": "blue"
+        }
+      },
+      "defaults": {
+        "homePage": "/"
+      },
+      "pages": {
+        "/": {
+          "root": {
+            "id": "root",
+            "children": []
+          }
+        }
+      },
+      "page_order": ["/"]
+    }
+  },
+  {
+    "name": "stable component insertion and edit",
+    "initial": {
+      "name": "Site",
+      "version": "3",
+      "context": {},
+      "defaults": {
+        "homePage": "/"
+      },
+      "pages": {
+        "/": {
+          "root": {
+            "id": "root",
+            "children": [
+              {
+                "id": "a",
+                "content": "A"
+              },
+              {
+                "id": "b",
+                "content": "B"
+              }
+            ]
+          }
+        }
+      },
+      "page_order": ["/"]
+    },
+    "batch": {
+      "protocol_version": 1,
+      "batch_id": "fixture-insert",
+      "client_id": "fixture-client",
+      "base_revision": 0,
+      "commands": [
+        {
+          "type": "insert",
+          "section": "pages",
+          "path": ["/", "root", "children"],
+          "item_id": "c",
+          "item": {
+            "id": "c",
+            "content": "C"
+          },
+          "after_id": "a",
+          "before_id": "b"
+        },
+        {
+          "type": "set",
+          "section": "pages",
+          "path": [
+            "/",
+            "root",
+            "children",
+            {
+              "id": "b"
+            },
+            "content"
+          ],
+          "expected": {
+            "kind": "value",
+            "value": "B"
+          },
+          "value": "Updated"
+        }
+      ]
+    },
+    "expected": {
+      "name": "Site",
+      "version": "3",
+      "context": {},
+      "defaults": {
+        "homePage": "/"
+      },
+      "pages": {
+        "/": {
+          "root": {
+            "id": "root",
+            "children": [
+              {
+                "id": "a",
+                "content": "A"
+              },
+              {
+                "id": "c",
+                "content": "C"
+              },
+              {
+                "id": "b",
+                "content": "Updated"
+              }
+            ]
+          }
+        }
+      },
+      "page_order": ["/"]
+    }
+  },
+  {
+    "name": "idempotent scalar",
+    "initial": {
+      "name": "Site",
+      "version": "3",
+      "context": {},
+      "defaults": {},
+      "pages": {},
+      "page_order": []
+    },
+    "batch": {
+      "protocol_version": 1,
+      "batch_id": "fixture-idempotent",
+      "client_id": "fixture-client",
+      "base_revision": 8,
+      "commands": [
+        {
+          "type": "set",
+          "section": "name",
+          "path": [],
+          "expected": {
+            "kind": "value",
+            "value": "Old"
+          },
+          "value": "Site"
+        }
+      ]
+    },
+    "expected": {
+      "name": "Site",
+      "version": "3",
+      "context": {},
+      "defaults": {},
+      "pages": {},
+      "page_order": []
+    },
+    "changed": false
+  },
+  {
+    "name": "scalar conflict",
+    "initial": {
+      "name": "Remote",
+      "version": "3",
+      "context": {},
+      "defaults": {},
+      "pages": {},
+      "page_order": []
+    },
+    "batch": {
+      "protocol_version": 1,
+      "batch_id": "fixture-conflict",
+      "client_id": "fixture-client",
+      "base_revision": 0,
+      "commands": [
+        {
+          "type": "set",
+          "section": "name",
+          "path": [],
+          "expected": {
+            "kind": "value",
+            "value": "Site"
+          },
+          "value": "Local"
+        }
+      ]
+    },
+    "conflict": {
+      "command_index": 0,
+      "reason": "the scalar value changed"
+    }
+  },
+  {
+    "name": "counter merges by max without a precondition",
+    "initial": {
+      "name": "Site",
+      "version": "3",
+      "context": {
+        "nextId": 7,
+        "theme": {
+          "primary": "red"
+        }
+      },
+      "defaults": {
+        "homePage": "/"
+      },
+      "pages": {
+        "/": {
+          "root": {
+            "id": "root",
+            "children": []
+          }
+        }
+      },
+      "page_order": ["/"]
+    },
+    "batch": {
+      "protocol_version": 1,
+      "batch_id": "fixture-counter-max",
+      "client_id": "fixture-client",
+      "base_revision": 0,
+      "commands": [
+        {
+          "type": "set",
+          "section": "context",
+          "path": ["nextId"],
+          "expected": {
+            "kind": "value",
+            "value": 5
+          },
+          "value": 9,
+          "merge": "max"
+        }
+      ]
+    },
+    "expected": {
+      "name": "Site",
+      "version": "3",
+      "context": {
+        "nextId": 9,
+        "theme": {
+          "primary": "red"
+        }
+      },
+      "defaults": {
+        "homePage": "/"
+      },
+      "pages": {
+        "/": {
+          "root": {
+            "id": "root",
+            "children": []
+          }
+        }
+      },
+      "page_order": ["/"]
+    }
+  },
+  {
+    "name": "counter keeps the higher canonical value",
+    "initial": {
+      "name": "Site",
+      "version": "3",
+      "context": {
+        "nextId": 7,
+        "theme": {
+          "primary": "red"
+        }
+      },
+      "defaults": {
+        "homePage": "/"
+      },
+      "pages": {
+        "/": {
+          "root": {
+            "id": "root",
+            "children": []
+          }
+        }
+      },
+      "page_order": ["/"]
+    },
+    "batch": {
+      "protocol_version": 1,
+      "batch_id": "fixture-counter-keep",
+      "client_id": "fixture-client",
+      "base_revision": 0,
+      "commands": [
+        {
+          "type": "set",
+          "section": "context",
+          "path": ["nextId"],
+          "expected": {
+            "kind": "value",
+            "value": 5
+          },
+          "value": 6,
+          "merge": "max"
+        }
+      ]
+    },
+    "expected": {
+      "name": "Site",
+      "version": "3",
+      "context": {
+        "nextId": 7,
+        "theme": {
+          "primary": "red"
+        }
+      },
+      "defaults": {
+        "homePage": "/"
+      },
+      "pages": {
+        "/": {
+          "root": {
+            "id": "root",
+            "children": []
+          }
+        }
+      },
+      "page_order": ["/"]
+    },
+    "changed": false
+  }
+]

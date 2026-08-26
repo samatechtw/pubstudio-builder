@@ -13,6 +13,8 @@ export interface ISiteSaveOptions {
   immediate?: boolean
   ignoreUpdateKey?: boolean
   forceUpdate?: boolean
+  // Replace the whole server document (imports, templates, site resets)
+  snapshot?: boolean
 }
 
 // Types to mimic site API in `apps/web-site/src/app/api.ts`
