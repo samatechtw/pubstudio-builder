@@ -4,10 +4,12 @@ import { EditorEventName, IComponent, ISite } from '@pubstudio/shared/type-site'
 import { addComponentHelper, deleteComponentWithId } from '../component/add-component'
 import { createPage, createRootComponent } from '../create-util'
 import { triggerEditorEvent } from '../editor-event-handlers'
+import { exitComponentEdit } from '../custom-component/component-arena'
 import { setActivePage } from '../set-active-page'
 import { setSelectedComponent } from '../set-selected-component'
 
 export const applyAddPage = (site: ISite, data: IAddPageData, isRedo?: boolean) => {
+  exitComponentEdit(site)
   const context = site.context
   const { metadata, root } = data
   let pageRoot: IComponent
@@ -39,6 +41,7 @@ export const applyAddPage = (site: ISite, data: IAddPageData, isRedo?: boolean) 
 }
 
 export const undoAddPage = (site: ISite, data: IAddPageData) => {
+  exitComponentEdit(site)
   const context = site.context
   const { metadata, activePageRoute, selectedComponentId } = data
 

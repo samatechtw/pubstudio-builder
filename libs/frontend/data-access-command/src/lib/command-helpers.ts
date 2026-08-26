@@ -10,6 +10,7 @@ import {
 } from '@pubstudio/shared/type-command-data'
 import { IComponent, IComponentEvent, ISite } from '@pubstudio/shared/type-site'
 import { applyCommand } from './apply-command'
+import { withoutScaffolding } from './custom-component/arena-history'
 import { appendLastCommand } from './replace-last-command'
 
 // Groups a list of commands with the previous command
@@ -17,22 +18,28 @@ export const mergeLastCommand = (site: ISite, commands: ICommand[]) => {
   if (commands.length === 0) {
     return
   }
+  const recorded = commands
+    .map((command) => withoutScaffolding(site, command))
+    .filter((command): command is ICommand => !!command)
   for (const command of commands) {
     applyCommand(site, command)
+  }
+  if (!recorded.length) {
+    return
   }
   const last = getLastCommandHelper(site)
   if (last) {
     // If `last` is a group, append the new commands instead of creating another group
     const mergedCommands =
       last.type === CommandType.Group
-        ? [...(last.data as ICommandGroupData).commands, ...commands]
-        : [last, ...commands]
+        ? [...(last.data as ICommandGroupData).commands, ...recorded]
+        : [last, ...recorded]
     site.history.back[site.history.back.length - 1] = {
       type: CommandType.Group,
       data: { commands: mergedCommands },
     }
   } else {
-    site.history.back.push({ type: CommandType.Group, data: { commands } })
+    site.history.back.push({ type: CommandType.Group, data: { commands: recorded } })
   }
 }
 

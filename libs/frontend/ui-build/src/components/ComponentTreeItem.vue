@@ -46,7 +46,7 @@
         </template>
       </div>
       <Hide
-        v-if="editor?.componentsHidden[component.id]"
+        v-if="editor?.componentsHidden?.[component.id]"
         class="eye"
         :data-tree-item-id="treeItemId"
         @click="toggleHidden"
@@ -137,7 +137,7 @@ const isScaffolding = computed(() => isArenaScaffolding(site.value, component.va
 const haveChildren = computed(() => !!component.value.children?.length)
 
 const expanded = computed(
-  () => editor.value?.componentTreeExpandedItems[component.value.id],
+  () => editor.value?.componentTreeExpandedItems?.[component.value.id],
 )
 
 const currentSelected = computed(() => {

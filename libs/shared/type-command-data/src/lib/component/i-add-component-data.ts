@@ -49,6 +49,8 @@ export interface IAddComponentData extends IAddComponentBaseData {
   parentId: string
   // Index to insert new component in parent's children array
   parentIndex?: number
+  // `context.nextId` before allocation, restored by undo
+  nextIdBeforeAdd?: number
   // Used to set selected component back after undo
   selectedComponentId?: string
   // Records whether the component and children are hidden in the editor at the time of undo

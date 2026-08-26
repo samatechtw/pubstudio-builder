@@ -38,6 +38,7 @@ const done = () => {
 
 .component-edit-bar {
   @mixin flex-row;
+  flex-shrink: 0;
   align-items: center;
   gap: 12px;
   padding: 6px 12px;

@@ -1,5 +1,6 @@
 import { IEditPageData } from '@pubstudio/shared/type-command-data'
 import { EditorEventName, IPageMetadata, ISite } from '@pubstudio/shared/type-site'
+import { exitComponentEdit } from '../custom-component/component-arena'
 import { triggerEditorEvent } from '../editor-event-handlers'
 import { setActivePage } from '../set-active-page'
 
@@ -14,6 +15,7 @@ const editPageHelper = (
       // Update existing page
       Object.assign(oldPage, newMetadata)
     } else {
+      exitComponentEdit(site)
       // Replace old page with new page
       const root = oldPage.root
       site.pages[newMetadata.route] = {

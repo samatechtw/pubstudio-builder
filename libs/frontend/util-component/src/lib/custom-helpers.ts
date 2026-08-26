@@ -1,10 +1,15 @@
-import { isCustomComponentPart, iterateComponent } from '@pubstudio/frontend/util-render'
+import {
+  isArenaId,
+  isCustomComponentPart,
+  iterateComponent,
+} from '@pubstudio/frontend/util-render'
 import { resolveComponent } from '@pubstudio/frontend/util-resolve'
 import { IComponent, ISite, ISiteContext } from '@pubstudio/shared/type-site'
 
 export { isCustomComponentPart }
 
-// Only ordinary page content converts: not a page root, an instance, or definition content
+// Only ordinary page content converts: not a page root, an instance, definition content,
+// or component-edit-screen scaffolding, which is discarded when the screen closes
 export const canBecomeCustom = (
   context: ISiteContext,
   componentId: string | undefined,
@@ -15,7 +20,11 @@ export const canBecomeCustom = (
   }
   let cmp: IComponent | undefined = component
   while (cmp) {
-    if (cmp.customSourceId || context.customComponentIds.has(cmp.id)) {
+    if (
+      cmp.customSourceId ||
+      context.customComponentIds.has(cmp.id) ||
+      isArenaId(cmp.id)
+    ) {
       return false
     }
     cmp = cmp.parent
@@ -57,4 +66,39 @@ export const customComponentUsage = (
     }
   }
   return { instances, routes }
+}
+
+export const wouldCreateCustomComponentCycle = (
+  context: ISiteContext,
+  definitionId: string,
+  parentId: string | undefined,
+): boolean => {
+  const enclosing = new Set<string>()
+  let parent = resolveComponent(context, parentId)
+  while (parent) {
+    if (context.customComponentIds.has(parent.id)) {
+      enclosing.add(parent.id)
+    }
+    parent = parent.parent
+  }
+  if (!enclosing.size) {
+    return false
+  }
+  const reaches = (id: string, seen: Set<string>): boolean => {
+    if (enclosing.has(id)) {
+      return true
+    }
+    if (seen.has(id)) {
+      return false
+    }
+    seen.add(id)
+    let found = false
+    iterateComponent(context.components[id], (node) => {
+      if (!found && node.customSourceId) {
+        found = reaches(node.customSourceId, seen)
+      }
+    })
+    return found
+  }
+  return reaches(definitionId, new Set())
 }

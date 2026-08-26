@@ -1,3 +1,4 @@
+import { activeCanvasRoute } from '@pubstudio/frontend/data-access-command'
 import { SiteSaveState } from '@pubstudio/shared/type-site'
 import {
   currentIdentity,
@@ -26,6 +27,8 @@ export interface IStatus {
   lastSavedAt?: number
   siteId?: string
   activePageRoute?: string
+  /** Definition open in the component edit screen. */
+  editingComponentId?: string
   selectedComponentId?: string
   historyDepth: number
   redoDepth: number
@@ -46,7 +49,8 @@ export const status = (): IStatus => {
     lastSaveError: formatSaveError(saveError()),
     lastSavedAt: lastSavedAt(),
     siteId: siteSource().apiSiteId.value,
-    activePageRoute: site?.editor?.active ?? site?.defaults.homePage,
+    activePageRoute: site ? activeCanvasRoute(site) : undefined,
+    editingComponentId: site?.editor?.editingComponentId,
     selectedComponentId: site?.editor?.selectedComponent?.id,
     historyDepth: site?.history.back.length ?? 0,
     redoDepth: site?.history.forward.length ?? 0,

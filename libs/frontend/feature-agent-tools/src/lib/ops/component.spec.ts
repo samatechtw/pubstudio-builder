@@ -1,5 +1,7 @@
 import {
   applyCommand,
+  ARENA_ROOT_ID,
+  enterComponentEdit,
   pushAppliedGroup,
   undoLastCommand,
 } from '@pubstudio/frontend/data-access-command'
@@ -20,7 +22,12 @@ import { resolveComponent } from '@pubstudio/frontend/util-resolve'
 import { exampleComponentId, examplePageRoute } from '../op/op-helpers'
 import { makeTestSite, siteContentSnapshot, testOpCtx } from '../op/test-site'
 import { parseSchema } from '../schema/schema'
-import { addComponentOp, MAX_TREE_DEPTH, MAX_TREE_NODES } from './component'
+import {
+  addComponentOp,
+  MAX_TREE_DEPTH,
+  MAX_TREE_NODES,
+  moveComponentOp,
+} from './component'
 
 const convertToCustom = (site: ISite, componentId: string) => {
   const component = resolveComponent(site.context, componentId) as IComponent
@@ -105,6 +112,42 @@ describe('addComponent source validation', () => {
   it('does not advertise tag as unconditionally required', () => {
     const required = addComponentOp.input.toJson().required as string[]
     expect(required).toEqual(['parentId'])
+  })
+
+  it('names an instance after its definition, like the builder does', () => {
+    const componentId = exampleComponentId(site)
+    site.context.components[componentId].name = 'Newsletter'
+    convertToCustom(site, componentId)
+
+    expect(add({ customComponentId: componentId }).data.name).toBe('Newsletter')
+    expect(add({ customComponentId: componentId, name: 'Footer signup' }).data.name).toBe(
+      'Footer signup',
+    )
+  })
+
+  it('refuses a definition instantiated inside itself', () => {
+    const componentId = exampleComponentId(site)
+    applyCommand(site, {
+      type: CommandType.AddComponent,
+      data: { tag: Tag.Div, parentId: componentId },
+    })
+    convertToCustom(site, componentId)
+    const definition = site.context.components[componentId]
+    const childId = definition.children?.[0]?.id as string
+
+    expect(() => add({ parentId: componentId, customComponentId: componentId })).toThrow(
+      /cannot be instantiated inside itself/,
+    )
+    expect(() => add({ parentId: childId, customComponentId: componentId })).toThrow(
+      /cannot be instantiated inside itself/,
+    )
+    expect(() =>
+      add({
+        parentId: childId,
+        tag: Tag.Div,
+        children: [{ customComponentId: componentId }],
+      }),
+    ).toThrow(/cannot be instantiated inside itself/)
   })
 })
 
@@ -334,5 +377,51 @@ describe('addComponent recursive tree', () => {
       }),
     ).toThrow()
     expect(siteContentSnapshot(site)).toEqual(before)
+  })
+})
+
+describe('component edit boundary', () => {
+  it('rejects an agent move between a page and arena scaffolding', () => {
+    const site = makeTestSite()
+    const definitionId = Array.from(site.context.customComponentIds)[0]
+    const pageRoot = site.pages[examplePageRoute(site)].root
+    const component = pageRoot.children?.[0] as IComponent
+    enterComponentEdit(site, definitionId)
+    const parsed = parseSchema(moveComponentOp.input, {
+      componentId: component.id,
+      parentId: ARENA_ROOT_ID,
+      index: 0,
+    })
+    if (!parsed.ok) {
+      throw new Error(JSON.stringify(parsed.issues))
+    }
+    expect(() => moveComponentOp.resolve(testOpCtx(site), parsed.value)).toThrow(
+      /cannot be moved/,
+    )
+    expect(component.parent?.id).toEqual(pageRoot.id)
+  })
+
+  it('rejects moving a component under its own descendant', () => {
+    const site = makeTestSite()
+    const pageRoot = site.pages[examplePageRoute(site)].root
+    const parentData: IAddComponentData = { tag: Tag.Div, parentId: pageRoot.id }
+    applyCommand(site, { type: CommandType.AddComponent, data: parentData })
+    const parent = site.context.components[parentData.id as string]
+    const childData: IAddComponentData = { tag: Tag.Div, parentId: parent.id }
+    applyCommand(site, { type: CommandType.AddComponent, data: childData })
+    const child = site.context.components[childData.id as string]
+    const parsed = parseSchema(moveComponentOp.input, {
+      componentId: parent.id,
+      parentId: child.id,
+      index: 0,
+    })
+    if (!parsed.ok) {
+      throw new Error(JSON.stringify(parsed.issues))
+    }
+
+    expect(() => moveComponentOp.resolve(testOpCtx(site), parsed.value)).toThrow(
+      /cannot be moved inside itself/,
+    )
+    expect(parent.parent?.id).toEqual(pageRoot.id)
   })
 })

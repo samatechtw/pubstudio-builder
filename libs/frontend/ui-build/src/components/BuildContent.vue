@@ -143,8 +143,8 @@ onUnmounted(() => {
 #build-content-window {
   /* -2px because of the border so that scrollbar doesn't show up */
   width: calc(100% - 2px);
-  min-height: 100%;
-  max-height: 100%;
+  flex: 1 1 0;
+  min-height: 0;
   margin: auto;
   position: relative;
   .build-content-window-inner {

@@ -3,6 +3,7 @@ import { deserializePages } from '@pubstudio/frontend/util-site-deserialize'
 import { IRemovePageData } from '@pubstudio/shared/type-command-data'
 import { EditorEventName, ISite } from '@pubstudio/shared/type-site'
 import { triggerEditorEvent } from '../editor-event-handlers'
+import { exitComponentEdit } from '../custom-component/component-arena'
 import { setEditPage } from '../editor-helpers'
 import { setActivePage } from '../set-active-page'
 import { setSelectedComponent } from '../set-selected-component'
@@ -14,6 +15,7 @@ export const applyRemovePage = (site: ISite, data: IRemovePageData) => {
   if (pageRoutes.length < 2) {
     throw new Error('Cannot remove page when page count is less than 2')
   }
+  exitComponentEdit(site)
 
   // Clear editor state
   iteratePage(site.pages[pageRoute], (component) => {
@@ -37,6 +39,7 @@ export const applyRemovePage = (site: ISite, data: IRemovePageData) => {
 }
 
 export const undoRemovePage = (site: ISite, data: IRemovePageData) => {
+  exitComponentEdit(site)
   const { pageRoute, orderIndex, serializedPage, selectedComponentId } = data
 
   // Add back page and components

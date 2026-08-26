@@ -125,3 +125,15 @@ export const overrideSelectorIds = (
   walk(component, new Set())
   return ids
 }
+
+// Generated component ids always contain `-c-`; this form cannot collide with one.
+export const ARENA_ID_PREFIX = '__arena_'
+export const ARENA_ROOT_ID = `${ARENA_ID_PREFIX}root`
+export const ARENA_SLOT_ID = `${ARENA_ID_PREFIX}slot`
+
+const arenaIdPattern = /^__arena_(?:\d+|root|slot)$/
+
+export const arenaComponentId = (id: number): string => `${ARENA_ID_PREFIX}${id}`
+
+export const isArenaId = (componentId: string | undefined): boolean =>
+  !!componentId && arenaIdPattern.test(componentId)

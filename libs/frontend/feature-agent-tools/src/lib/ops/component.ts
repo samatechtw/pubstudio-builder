@@ -1,5 +1,8 @@
 import { builtinBehaviors, builtinComponents } from '@pubstudio/frontend/util-builtin'
-import { customComponentIndex } from '@pubstudio/frontend/data-access-command'
+import {
+  commandValidationError,
+  customComponentIndex,
+} from '@pubstudio/frontend/data-access-command'
 import {
   makeDetachInstanceData,
   makeEditComponentData,
@@ -286,6 +289,7 @@ const resolveCreateNode = (
     }
   }
   const tag = sourceComponent?.tag ?? customComponent?.tag ?? node.tag
+  const name = node.name ?? customComponent?.name
   if (!tag) {
     constraint(`${at('tag')} is required without \`sourceId\` or \`customComponentId\`.`)
   }
@@ -336,7 +340,7 @@ const resolveCreateNode = (
   })
   return {
     tag,
-    name: node.name,
+    name,
     role: node.role,
     content: node.content,
     sourceId: node.sourceId,
@@ -372,7 +376,7 @@ export const addComponentOp = defineOp<IAddComponentData>()({
       .desc('Index in the parent’s children. Appends when omitted.'),
     ...componentCreateFields(componentCreateSchema),
   }),
-  derived: ['id', 'selectedComponentId'],
+  derived: ['id', 'nextIdBeforeAdd', 'selectedComponentId'],
   omitted: {
     editorEvents:
       'Builder-only events, and they can run side effects mid-command. Use ' +
@@ -392,7 +396,12 @@ export const addComponentOp = defineOp<IAddComponentData>()({
       parentIndex: input.parentIndex,
       selectedComponentId: ctx.site.editor?.selectedComponent?.id,
     }
-    return { type: CommandType.AddComponent, data }
+    const command = { type: CommandType.AddComponent, data } as const
+    const error = commandValidationError(ctx.site, command)
+    if (error) {
+      constraint(error)
+    }
+    return command
   },
   example: (site) => ({
     parentId: site.pages[examplePageRoute(site)].root.id,
@@ -525,6 +534,13 @@ export const moveComponentOp = defineOp<IMoveComponentData>()({
       to: { parentId: toParent.id, index: input.index },
       selectedComponentId: ctx.site.editor?.selectedComponent?.id,
     }
+    const error = commandValidationError(ctx.site, {
+      type: CommandType.MoveComponent,
+      data,
+    })
+    if (error) {
+      constraint(error)
+    }
     return { type: CommandType.MoveComponent, data }
   },
   example: (site) => {
@@ -611,7 +627,7 @@ export const convertToCustomComponentOp = defineOp<IConvertToCustomComponentData
     'editing the definition updates every instance. A page root, an existing instance, ' +
     'and anything already inside a definition cannot be converted.',
   input: obj({ componentId: componentIdField() }),
-  derived: ['parentId', 'parentIndex', 'instanceId'],
+  derived: ['parentId', 'parentIndex', 'instanceId', 'arena'],
   omitted: {},
   resolve: (ctx, input) => {
     const component = mustResolveComponent(ctx.site, input.componentId)
@@ -642,7 +658,7 @@ export const removeCustomComponentOp = defineOp<IRemoveCustomComponentData>()({
   input: obj({
     componentId: componentIdField().desc('Id of the custom component definition.'),
   }),
-  derived: ['component', 'index'],
+  derived: ['component', 'index', 'arena'],
   omitted: {},
   resolve: (ctx, input) => {
     const definition = mustResolveComponent(ctx.site, input.componentId)

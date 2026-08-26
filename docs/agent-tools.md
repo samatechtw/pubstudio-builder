@@ -266,10 +266,26 @@ page into the registry and leaves an instance behind;
 `detachInstance` replaces an instance with an independent copy of what it renders.
 `addComponent({customComponentId})` still creates instances, and creates a single node —
 the definition tree is expanded under it at render time, so `read({tree:{}})` shows the
-instance as one line marked `[custom: <id>]`. Per-child edits on an instance are
-`instanceOverrides`, which `addComponent` does not accept; set child content with
-`setInstanceOverride`, child styles with `setOverrideStyle`, or detach for full control. See
+instance as one line marked `[custom: <id>]`. An instance takes the definition's name
+unless one is passed, matching the builder. Both the builder and agent ops refuse to
+instantiate a definition anywhere inside itself because the nested instance would render
+empty. Moves that would put a component under its own descendant or move an instance into
+its definition are refused for the same reason. Per-child edits on an instance are `instanceOverrides`,
+which `addComponent` does not accept; set child content with `setInstanceOverride`, child
+styles with `setOverrideStyle`, or detach for full control. See
 docs/custom-components.md for the data model.
+
+### The component edit screen
+
+While a definition is open in the edit screen the canvas shows its arena, not a page.
+`status()` and `read({site:true})` report `editingComponentId`, `activePageRoute` is the
+synthetic `__component__` route, and `read({tree:{}})` returns the arena tree — so what an
+agent reads matches what is on the canvas. Ops still address components by id, so page
+edits work from the edit screen; pass the page's own ids, or leave the screen first.
+Anything an agent adds under the arena root rather than the definition is scaffolding: it
+takes a `__arena_*` id, is not undoable, and is discarded when the screen closes. Moving
+a component between scaffolding and site content is refused; leave the screen or recreate
+the component under the intended parent instead.
 
 ## Site type differences
 

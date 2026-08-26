@@ -19,6 +19,7 @@ export const undoChangePage = (site: ISite, data: IChangePageData) => {
   const { from, selectedComponentId } = data
   const editor = site.editor
   if (editor) {
+    exitComponentEdit(site)
     editor.active = from
     const component = resolveComponent(site.context, selectedComponentId)
     setSelectedComponent(site, component)
