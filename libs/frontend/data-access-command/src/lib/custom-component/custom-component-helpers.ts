@@ -9,9 +9,3 @@ export const insertCustomComponentId = (site: ISite, id: string, index: number) 
 
 export const customComponentIndex = (site: ISite, id: string): number =>
   Array.from(site.context.customComponentIds).indexOf(id)
-
-export const closeEditingComponent = (site: ISite, definitionId: string) => {
-  if (site.editor?.editingComponentId === definitionId) {
-    site.editor.editingComponentId = undefined
-  }
-}

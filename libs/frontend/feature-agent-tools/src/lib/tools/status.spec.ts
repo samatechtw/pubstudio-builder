@@ -1,8 +1,14 @@
+import {
+  ARENA_ROOT_ID,
+  ARENA_ROUTE,
+  enterComponentEdit,
+} from '@pubstudio/frontend/data-access-command'
 import { IUseSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { IApiError } from '@pubstudio/shared/type-api'
 import { ISite, SiteSaveState } from '@pubstudio/shared/type-site'
 import { computed, reactive, ref } from 'vue'
 import { makeTestSite } from '../op/test-site'
+import { read } from '../read/read'
 import { endSession, formatSaveError, startSession } from './session'
 import { status } from './status'
 
@@ -79,6 +85,20 @@ describe('status save reporting', () => {
   it('omits the error when the last save succeeded', () => {
     install({ apiSiteId: 'identity', lastSavedAt: 1000 })
     expect(status().lastSaveError).toBeUndefined()
+  })
+
+  it('reports the component arena as the active canvas', () => {
+    install({ apiSiteId: 'identity' })
+    const definitionId = Array.from(site.context.customComponentIds)[0]
+    enterComponentEdit(site, definitionId)
+
+    expect(status()).toMatchObject({
+      activePageRoute: ARENA_ROUTE,
+      editingComponentId: definitionId,
+    })
+    expect((read(site, { tree: { depth: 0 } }).tree as { tree: string }).tree).toMatch(
+      new RegExp(`^${ARENA_ROOT_ID}`),
+    )
   })
 })
 

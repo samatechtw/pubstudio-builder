@@ -1,3 +1,4 @@
+import { activeCanvasPage } from '@pubstudio/frontend/data-access-command'
 import { builtinBehaviors, builtinComponents } from '@pubstudio/frontend/util-builtin'
 import {
   computeComponentBreakpointStyles,
@@ -41,11 +42,18 @@ const iterate = (component: IComponent, fn: (c: IComponent) => void) => {
   component.children?.forEach((child) => iterate(child, fn))
 }
 
+const treeRoot = (site: ISite, input: NonNullable<IReadInput['tree']>) => {
+  if (input.componentId) {
+    return mustResolveComponent(site, input.componentId)
+  }
+  if (input.page) {
+    return mustResolvePage(site, input.page).root
+  }
+  return activeCanvasPage(site)?.root ?? mustResolvePage(site, activeRoute(site)).root
+}
+
 const readTree = (site: ISite, input: NonNullable<IReadInput['tree']>) => {
-  const root = input.componentId
-    ? mustResolveComponent(site, input.componentId)
-    : mustResolvePage(site, input.page ?? activeRoute(site)).root
-  return componentTree(root, input.depth ?? DEFAULT_TREE_DEPTH)
+  return componentTree(treeRoot(site, input), input.depth ?? DEFAULT_TREE_DEPTH)
 }
 
 const activeRoute = (site: ISite): string => site.editor?.active ?? site.defaults.homePage

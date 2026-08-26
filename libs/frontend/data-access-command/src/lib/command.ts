@@ -7,17 +7,13 @@ import {
 } from '@pubstudio/shared/type-command-data'
 import { ISite } from '@pubstudio/shared/type-site'
 import { applyCommand } from './apply-command'
+import { commandValidationError } from './command-validation'
 import { getLastCommandHelper } from './command-helpers'
-import { snapshotArena } from './custom-component/component-arena'
+import { withoutScaffolding } from './custom-component/arena-history'
 import { makeCloseMixinMenu } from './make-command-data'
 import { optimizeCommandGroup } from './optimize-command-group'
+import { saveSite } from './save-site'
 import { undoCommand } from './undo-command'
-
-// Arena scaffolding is editor state, so it is captured alongside every command's save
-const saveSite = (site: ISite) => {
-  snapshotArena(site)
-  site.editor?.store?.save?.(site)
-}
 
 export interface IPushCommandOptions {
   // Command is the result of an undo/redo.
@@ -42,6 +38,9 @@ const pushCommandHelper = (
   if (!store.version.editingEnabled.value) {
     return false
   }
+  if (commandValidationError(site, command)) {
+    return false
+  }
 
   // Push a command to close mixin menu for user when necessary
   if (editingMixinData && shouldCloseMixinMenu(cmd)) {
@@ -53,11 +52,16 @@ const pushCommandHelper = (
   }
 
   if (cmd) {
-    site.history.back.push(cmd)
-    applyCommand(site, cmd, isRedo)
-    if (!isRedo) {
-      site.history.forward = []
+    // Scaffolding is applied but not recorded; it changes no site state, so it must not
+    // discard the redo stack either
+    const recorded = withoutScaffolding(site, cmd)
+    if (recorded) {
+      site.history.back.push(recorded)
+      if (!isRedo) {
+        site.history.forward = []
+      }
     }
+    applyCommand(site, cmd, isRedo)
   }
   return true
 }
@@ -125,8 +129,11 @@ export const pushAppliedGroup = (
   }
   if (commands.length) {
     const data: ICommandGroupData = { commands, label }
-    site.history.back.push({ type: CommandType.Group, data })
-    site.history.forward = []
+    const recorded = withoutScaffolding(site, { type: CommandType.Group, data })
+    if (recorded) {
+      site.history.back.push(recorded)
+      site.history.forward = []
+    }
   }
   saveSite(site)
   return true

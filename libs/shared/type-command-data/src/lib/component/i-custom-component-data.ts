@@ -11,6 +11,8 @@ export interface IConvertToCustomComponentData {
   parentIndex: number
   // Assigned during apply, like IAddComponentData.id
   instanceId?: string
+  // Preserves editor scaffolding across undo/redo
+  arena?: ISerializedComponent
 }
 
 export interface ConvertToCustomComponent extends ICommand<IConvertToCustomComponentData> {
@@ -23,6 +25,8 @@ export interface IRemoveCustomComponentData {
   component: ISerializedComponent
   // Position in the definition registry, for undo
   index: number
+  // Preserves editor scaffolding across undo/redo
+  arena?: ISerializedComponent
 }
 
 export interface RemoveCustomComponent extends ICommand<IRemoveCustomComponentData> {

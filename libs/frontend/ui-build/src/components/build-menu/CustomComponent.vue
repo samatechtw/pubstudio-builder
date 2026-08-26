@@ -3,7 +3,7 @@
     ref="elementRef"
     class="custom-component"
     :class="{ dragging: dndState?.dragging }"
-    :title="text"
+    :title="customComponent.name"
     :draggable="true"
     @mouseenter.stop="mouseEnter"
     @mouseleave.stop="mouseLeave"

@@ -16,6 +16,7 @@ import {
   removeEditorEvents,
 } from '../editor-event-handlers'
 import { toggleComponentTreeHidden } from '../editor-helpers'
+import { isArenaScaffolding, nextArenaId } from '../custom-component/component-arena'
 import { setSelectedComponent } from '../set-selected-component'
 
 const addChildrenHelper = (site: ISite, parentId: string, children: IComponent[]) => {
@@ -77,9 +78,11 @@ export const addComponentHelper = (
     sourceId,
     style,
   } = data
-  const id = nextComponentId(context)
-  data.id = id
   const parent = resolveComponent(context, parentId)
+  const scaffolding = !!parent && isArenaScaffolding(site, parent)
+  data.nextIdBeforeAdd = context.nextId
+  const id = scaffolding ? nextArenaId(context) : nextComponentId(context)
+  data.id = id
   let component: IComponent = {
     id,
     name: name ?? id,
@@ -228,13 +231,14 @@ export const deleteComponentWithId = (
 
 export const undoAddComponent = (site: ISite, data: IAddComponentData) => {
   const context = site.context
-  const { id, selectedComponentId } = data
+  const { id, nextIdBeforeAdd, selectedComponentId } = data
   const hidden = {}
   const deleteCount = deleteComponentWithId(site, id, hidden)
   if (Object.keys(hidden).length) {
     data.hidden = hidden
   }
-  context.nextId -= deleteCount
+  // Older history entries predate `nextIdBeforeAdd`.
+  context.nextId = nextIdBeforeAdd ?? context.nextId - deleteCount
 
   if (selectedComponentId) {
     const selectedComponent = context.components[selectedComponentId]

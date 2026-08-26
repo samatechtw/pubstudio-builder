@@ -53,13 +53,32 @@ the whole expansion for an instance. Events stay definition-level.
 
 A definition is not on any page, so it is edited in a synthetic arena page
 (`component-arena.ts`). `getActivePage` returns the arena while `editor.editingComponentId`
-is set, and the canvas, component tree, style menus and undo stack work unchanged.
+is set. Definition edits use the normal canvas, component tree, style menus and undo stack;
+scaffolding remains editor-only.
 
 Anything in the arena other than the definition is scaffolding, containers that
 constrain width, background colors, sibling content. It is stored per definition in
-`editor.componentArenas[definitionId]` with a `arena-c-slot` placeholder marking where
+`editor.componentArenas[definitionId]` with a `__arena_slot` placeholder marking where
 the definition mounts, and never enters `context.customComponents`, release rendering or
 SSG output. Scaffolding is dimmed in the tree and outlined on the canvas.
+
+Scaffolding is editor state, and two rules keep it out of the site:
+
+- **Its ids are `__arena_*`, never generated from `context.nextId`.** The exact arena-id
+  pattern cannot overlap a generated `<namespace>-c-<number>` id. Arenas stored with the
+  previous reserved ids or site ids are renumbered when the screen next opens.
+- **Its edits are applied but not recorded in `site.history`** (`arena-history.ts`). A
+  reload restores the history without materializing any arena, so an undo of a scaffolding
+  command would have no target. Mixed batches retain only their site commands, while a
+  single command that moves content across the arena boundary is refused. Scaffolding
+  edits are therefore not undoable, and the arena is discarded from
+  `context.components` when the screen closes.
+
+Converting scaffolding into a definition is refused (`canBecomeCustom`) — the definition
+would be deleted with the arena.
+
+Creating, pasting or moving an instance inside its own definition is also refused. The
+check follows nested definition references, so indirect cycles are rejected as well.
 
 Entering records the current selection in `editor.componentEditReturnId`; Done restores it
 so the instance you came from is selected again. A recorded selection that is itself in a

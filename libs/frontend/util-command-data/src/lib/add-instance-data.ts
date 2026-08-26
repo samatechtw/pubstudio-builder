@@ -1,3 +1,4 @@
+import { wouldCreateCustomComponentCycle } from '@pubstudio/frontend/util-component'
 import { resolveComponent } from '@pubstudio/frontend/util-resolve'
 import { IAddComponentData } from '@pubstudio/shared/type-command-data'
 import { IComponent, ISite } from '@pubstudio/shared/type-site'
@@ -11,13 +12,17 @@ export const makeAddInstanceData = (
   selectedComponentId: string | undefined,
 ): IAddComponentData | undefined => {
   const customCmp = resolveComponent(site.context, customComponentId)
-  if (!customCmp) {
+  const position = selectAddParent(parent, undefined)
+  if (
+    !customCmp ||
+    wouldCreateCustomComponentCycle(site.context, customCmp.id, position.parentId)
+  ) {
     return undefined
   }
   const data: IAddComponentData = {
     tag: customCmp.tag,
     name: customCmp.name,
-    ...selectAddParent(parent, undefined),
+    ...position,
     customComponentId: customCmp.id,
     selectedComponentId,
   }

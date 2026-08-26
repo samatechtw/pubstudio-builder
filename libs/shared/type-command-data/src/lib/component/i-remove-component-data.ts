@@ -4,7 +4,7 @@ import { IAddComponentData } from './i-add-component-data'
 // We need to be able to recreate the component for undo
 export interface IRemoveComponentData extends Omit<
   IAddComponentData,
-  'children' | 'hidden'
+  'children' | 'hidden' | 'nextIdBeforeAdd'
 > {
   id: string
   children?: IRemoveComponentData[]

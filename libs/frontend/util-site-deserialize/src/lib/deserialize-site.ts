@@ -42,7 +42,7 @@ export const deserializeEditor = (
         editingComponentId: serializedEditor.editingComponentId,
         componentArenas: serializedEditor.componentArenas,
         showComponentTree: serializedEditor.showComponentTree,
-        componentTreeExpandedItems: serializedEditor.componentTreeExpandedItems,
+        componentTreeExpandedItems: serializedEditor.componentTreeExpandedItems ?? {},
         // Added 250321
         componentTreeRenameData: serializedEditor.componentTreeRenameData ?? {
           itemId: undefined,

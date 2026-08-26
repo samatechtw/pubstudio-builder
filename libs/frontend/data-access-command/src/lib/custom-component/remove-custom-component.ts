@@ -9,9 +9,11 @@ import {
 } from '../editor-event-handlers'
 import { setSelectedComponent } from '../set-selected-component'
 import {
-  closeEditingComponent,
-  insertCustomComponentId,
-} from './custom-component-helpers'
+  exitComponentEdit,
+  removeStoredArena,
+  restoreStoredArena,
+} from './component-arena'
+import { insertCustomComponentId } from './custom-component-helpers'
 
 // Callers must refuse while instances exist
 export const applyRemoveCustomComponent = (
@@ -23,7 +25,10 @@ export const applyRemoveCustomComponent = (
   if (!component) {
     return
   }
-  closeEditingComponent(site, data.componentId)
+  if (site.editor?.editingComponentId === data.componentId) {
+    exitComponentEdit(site)
+  }
+  data.arena = removeStoredArena(site, data.componentId) ?? data.arena
   context.customComponentIds.delete(data.componentId)
   const { componentTreeExpandedItems, componentsHidden } = site.editor ?? {}
   iterateComponent(component, (cmp) => {
@@ -43,6 +48,7 @@ export const undoRemoveCustomComponent = (
 ) => {
   deserializeCustomComponents([data.component], site.context.components)
   insertCustomComponentId(site, data.componentId, data.index)
+  restoreStoredArena(site, data.componentId, data.arena)
   iterateComponent(site.context.components[data.componentId], (cmp) => {
     registerComponentEditorEvents(site, cmp)
   })

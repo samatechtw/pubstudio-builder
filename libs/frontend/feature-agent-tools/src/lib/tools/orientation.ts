@@ -1,3 +1,4 @@
+import { activeCanvasRoute } from '@pubstudio/frontend/data-access-command'
 import { sortedBreakpoints } from '@pubstudio/frontend/feature-site-source'
 import { CssPseudoClass } from '@pubstudio/shared/type-site'
 import { PSEUDO_CLASSES } from '../schema/fields'
@@ -19,6 +20,8 @@ export interface IOrientation {
   storage: 'api' | 'local'
   saveState: string
   activePageRoute: string
+  /** Definition open in the component edit screen. */
+  editingComponentId?: string
   selectedComponentId?: string
   homePageRoute: string
   pages: { route: string; name: string; public: boolean }[]
@@ -47,7 +50,8 @@ export const orientation = (includeMeta = true): IOrientation => {
     editable: editingEnabled(),
     storage: storageKind(),
     saveState: saveState(),
-    activePageRoute: site.editor?.active ?? site.defaults.homePage,
+    activePageRoute: activeCanvasRoute(site),
+    editingComponentId: site.editor?.editingComponentId,
     selectedComponentId: site.editor?.selectedComponent?.id,
     homePageRoute: site.defaults.homePage,
     pages: site.pageOrder.map((route) => ({

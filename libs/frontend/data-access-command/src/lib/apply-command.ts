@@ -18,6 +18,7 @@ import { applyAddComponent } from './component/add-component'
 import { applyEditComponent } from './component/edit-component'
 import { applyRemoveComponent } from './component/remove-component'
 import { applyReplacePageRoot } from './component/replace-page-root'
+import { assertValidCommand } from './command-validation'
 import { applyConvertToCustomComponent } from './custom-component/convert-to-custom-component'
 import { applyDetachInstance } from './custom-component/detach-instance'
 import { applyRemoveCustomComponent } from './custom-component/remove-custom-component'
@@ -57,6 +58,7 @@ export const applyCommand = (
   command: ICommand,
   isRedo = false,
 ): ICommand => {
+  assertValidCommand(site, command)
   const applyFunctions: Record<CommandType, ApplyFn> = {
     [CommandType.Redo]: noop,
     [CommandType.Undo]: noop,

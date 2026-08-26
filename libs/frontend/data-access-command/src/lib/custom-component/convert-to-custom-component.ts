@@ -3,7 +3,11 @@ import { IConvertToCustomComponentData } from '@pubstudio/shared/type-command-da
 import { ISite } from '@pubstudio/shared/type-site'
 import { addComponentHelper, deleteComponentWithId } from '../component/add-component'
 import { setSelectedComponent } from '../set-selected-component'
-import { closeEditingComponent } from './custom-component-helpers'
+import {
+  exitComponentEdit,
+  removeStoredArena,
+  restoreStoredArena,
+} from './component-arena'
 
 // Leaves an instance behind, so the page renders exactly as it did before
 export const applyConvertToCustomComponent = (
@@ -22,6 +26,7 @@ export const applyConvertToCustomComponent = (
   }
   component.parent = undefined
   context.customComponentIds.add(component.id)
+  restoreStoredArena(site, data.componentId, data.arena)
 
   const instance = addComponentHelper(site, {
     name: component.name,
@@ -39,9 +44,12 @@ export const undoConvertToCustomComponent = (
   data: IConvertToCustomComponentData,
 ) => {
   const { context } = site
+  if (site.editor?.editingComponentId === data.componentId) {
+    exitComponentEdit(site)
+  }
+  data.arena = removeStoredArena(site, data.componentId) ?? data.arena
   context.nextId -= deleteComponentWithId(site, data.instanceId, {})
   context.customComponentIds.delete(data.componentId)
-  closeEditingComponent(site, data.componentId)
 
   const component = context.components[data.componentId]
   const parent = resolveComponent(context, data.parentId)

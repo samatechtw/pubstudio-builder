@@ -23,6 +23,7 @@ import {
   ISiteSaveOptions,
   ISiteStore,
   ISiteStoreInitializeResult,
+  IStoredSite,
   IStoredSiteDirty,
   SiteSaveState,
 } from '@pubstudio/shared/type-site'
@@ -77,6 +78,8 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
   })
 
   const dirty = ref<IStoredSiteDirty>(dirtyDefault())
+  let apiSnapshot: IStoredSite | undefined
+  let pendingSnapshot: IStoredSite | undefined
   // Used to ensure site data from another tab/browser isn't overwritten
   const updateKey = ref<string | undefined>()
 
@@ -133,18 +136,23 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
   const updateApi = async (options: IUpdateApiOptions) => {
     const { keepalive } = options
     saveError.value = undefined
-    const site = store.site.getSite.value
+    const site = pendingSnapshot
+    if (!site) {
+      return
+    }
     try {
       const payload: IUpdateSiteApiRequest = {}
       if (updateKey.value && !options.ignoreUpdateKey) {
         payload.update_key = updateKey.value
       }
+      const sent: Partial<IStoredSite> = {}
       let hasUpdates = false
       for (const key in dirty.value) {
         const k = key as keyof IStoredSiteDirty
         const val = site[k]
         if (dirty.value[k] && val !== null) {
           payload[k] = val
+          sent[k] = val
           hasUpdates = true
         }
       }
@@ -152,6 +160,7 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
       dirty.value = dirtyDefault()
       if (hasUpdates) {
         const result = await updateFn(siteId.value, payload, keepalive)
+        apiSnapshot = { ...(apiSnapshot ?? site), ...sent }
         if (result.content_updated_at) {
           setLocalContentUpdatedAt(siteId.value, result.content_updated_at)
         }
@@ -187,14 +196,16 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
     }
     const storedSite = storeSite(site)
     let changed = false
-    for (const key in site) {
+    for (const key in dirty.value) {
       const k = key as keyof IStoredSiteDirty
       dirty.value[k] =
-        options?.forceUpdate || dirty.value[k] || storedSite[k] !== store.site[k]?.value
+        options?.forceUpdate || dirty.value[k] || storedSite[k] !== apiSnapshot?.[k]
       if (dirty.value[k]) {
         changed = true
       }
     }
+    pendingSnapshot = storedSite
+    // The preview page reads unsaved content from here
     store.site.setSite(storedSite)
     setLocalContentUpdatedAt(siteId.value, Date.now())
     if (changed) {
@@ -224,8 +235,11 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
     const serialized = serializeEditor(editor)
     if (serialized) {
       const editorStr = JSON.stringify(serialized)
-      dirty.value.editor = dirty.value.editor || editorStr !== store.site.editor?.value
+      dirty.value.editor = dirty.value.editor || editorStr !== apiSnapshot?.editor
       if (dirty.value.editor) {
+        if (pendingSnapshot) {
+          pendingSnapshot.editor = editorStr
+        }
         store.site.setEditor(editorStr)
         // The editor changes often, so we don't want to over-burden the API
         // But Site changes are more critical, so we shouldn't override the shorter timer
@@ -251,6 +265,8 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
       }
       setLocalContentUpdatedAt(siteId.value, siteData?.content_updated_at)
       const site = restoreSiteHelper(data)
+      apiSnapshot = storeSite(site.site)
+      pendingSnapshot = { ...apiSnapshot }
       return site
     } catch (e) {
       console.log('Restore failed:', e)

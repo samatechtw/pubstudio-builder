@@ -1,16 +1,30 @@
-import { makeDetachInstanceData } from '@pubstudio/frontend/util-command-data'
+import {
+  makeAddInstanceData,
+  makeDetachInstanceData,
+  makeRemoveComponentData,
+} from '@pubstudio/frontend/util-command-data'
+import { canBecomeCustom } from '@pubstudio/frontend/util-component'
 import { DEFAULT_BREAKPOINT_ID } from '@pubstudio/frontend/util-defaults'
 import { latestComponentId } from '@pubstudio/frontend/util-ids'
-import { renderChildren } from '@pubstudio/frontend/util-render'
+import { isArenaId, renderChildren } from '@pubstudio/frontend/util-render'
 import { resolveComponent } from '@pubstudio/frontend/util-resolve'
 import { deserializeSite } from '@pubstudio/frontend/util-site-deserialize'
 import { serializeComponent, stringifySite } from '@pubstudio/frontend/util-site-store'
 import { mockSerializedSite } from '@pubstudio/frontend/util-test-mock'
 import { CommandType } from '@pubstudio/shared/type-command'
+import { IAddComponentData, IAddPageData } from '@pubstudio/shared/type-command-data'
 import { Css, CssPseudoClass, IComponent, ISite, Tag } from '@pubstudio/shared/type-site'
-import { pushCommand, redoCommand, undoLastCommand } from '../command'
+import { applyCommand } from '../apply-command'
+import { pushAppliedGroup, pushCommand, redoCommand, undoLastCommand } from '../command'
+import { createSite } from '../create-site'
+import { replaceLastCommand } from '../replace-last-command'
 import { setSelectedComponent } from '../set-selected-component'
-import { enterComponentEdit, exitComponentEdit } from './component-arena'
+import {
+  ARENA_ROOT_ID,
+  ARENA_SLOT_ID,
+  enterComponentEdit,
+  exitComponentEdit,
+} from './component-arena'
 import { customComponentIndex } from './custom-component-helpers'
 
 const HOME = '/home'
@@ -225,6 +239,442 @@ describe('custom components', () => {
       exitComponentEdit(site)
 
       expect(site.editor?.selectedComponent).toBeUndefined()
+    })
+
+    it('clears the arena when conversion is undone from the edit screen', () => {
+      enterComponentEdit(site, sourceId)
+
+      undoLastCommand(site)
+
+      expect(site.editor?.editingComponentId).toBeUndefined()
+      expect(site.context.components[ARENA_ROOT_ID]).toBeUndefined()
+      expect(site.editor?.componentArenas?.[sourceId]).toBeUndefined()
+      expect(site.context.customComponentIds.has(sourceId)).toBe(false)
+      expect(site.context.components[sourceId].parent?.id).toEqual(root.id)
+      expect(
+        root.children?.filter((component) => component.id === sourceId),
+      ).toHaveLength(1)
+    })
+
+    it('clears the arena when the open definition is deleted', () => {
+      pushCommand(
+        site,
+        CommandType.RemoveComponent,
+        makeRemoveComponentData(site, site.context.components[instanceId]),
+      )
+      enterComponentEdit(site, sourceId)
+      const definition = site.context.components[sourceId]
+
+      pushCommand(site, CommandType.RemoveCustomComponent, {
+        componentId: sourceId,
+        component: serializeComponent(definition),
+        index: customComponentIndex(site, sourceId),
+      })
+
+      expect(site.editor?.editingComponentId).toBeUndefined()
+      expect(site.context.components[ARENA_ROOT_ID]).toBeUndefined()
+      expect(site.context.components[sourceId]).toBeUndefined()
+      expect(site.editor?.componentArenas?.[sourceId]).toBeUndefined()
+
+      undoLastCommand(site)
+      expect(site.context.components[sourceId].parent).toBeUndefined()
+      expect(site.editor?.componentArenas?.[sourceId]).toBeDefined()
+    })
+  })
+
+  describe('arena scaffolding', () => {
+    const arenaRoot = () => site.context.components[ARENA_ROOT_ID] as IComponent
+
+    beforeEach(() => {
+      enterComponentEdit(site, sourceId)
+    })
+
+    it('numbers scaffolding outside the site id sequence', () => {
+      const nextId = site.context.nextId
+      add(site, arenaRoot().id, { name: 'Backdrop' })
+
+      expect(isArenaId(arenaRoot().children?.[1]?.id)).toBe(true)
+      expect(site.context.nextId).toEqual(nextId)
+    })
+
+    it('does not confuse a site named arena with editor scaffolding', () => {
+      const arenaSite = createSite('arena')
+      const pageRoot = arenaSite.pages[HOME].root
+      pushCommand(arenaSite, CommandType.AddComponent, {
+        tag: Tag.Div,
+        parentId: pageRoot.id,
+      })
+      const component = pageRoot.children?.[0] as IComponent
+
+      expect(component.id).toMatch(/^arena-c-/)
+      expect(isArenaId(component.id)).toBe(false)
+      expect(canBecomeCustom(arenaSite.context, component.id)).toBe(true)
+    })
+
+    it('keeps scaffolding edits out of site history', () => {
+      const depth = site.history.back.length
+      add(site, arenaRoot().id, { name: 'Backdrop' })
+      pushCommand(site, CommandType.SetComponentCustomStyle, {
+        componentId: arenaRoot().children?.[1]?.id,
+        breakpointId: DEFAULT_BREAKPOINT_ID,
+        oldStyle: undefined,
+        newStyle: {
+          pseudoClass: CssPseudoClass.Default,
+          property: Css.Width,
+          value: '1px',
+        },
+      })
+
+      expect(site.history.back.length).toEqual(depth)
+    })
+
+    it('keeps a scaffolding detach out of site history', () => {
+      const depth = site.history.back.length
+      pushCommand(site, CommandType.AddComponent, {
+        tag: Tag.Div,
+        parentId: arenaRoot().id,
+        customComponentId: sourceId,
+      })
+      const instance = arenaRoot().children?.find(
+        (component) => component.customSourceId === sourceId,
+      ) as IComponent
+      pushCommand(
+        site,
+        CommandType.DetachInstance,
+        makeDetachInstanceData(site, instance),
+      )
+      const detachedId = arenaRoot().children?.find(
+        (component) => component.id !== sourceId,
+      )?.id
+
+      expect(site.history.back.length).toEqual(depth)
+      exitComponentEdit(site)
+      expect(site.context.components[instance.id]).toBeUndefined()
+      expect(site.context.components[detachedId as string]).toBeUndefined()
+    })
+
+    it('records only site commands from a mixed group', () => {
+      add(site, arenaRoot().id, { name: 'Backdrop' })
+      const scaffold = arenaRoot().children?.find(
+        (component) => component.id !== sourceId,
+      ) as IComponent
+      const depth = site.history.back.length
+      const oldName = root.name
+      pushCommand(site, CommandType.Group, {
+        commands: [
+          {
+            type: CommandType.EditComponent,
+            data: { id: root.id, old: { name: oldName }, new: { name: 'Renamed' } },
+          },
+          {
+            type: CommandType.RemoveComponent,
+            data: makeRemoveComponentData(site, scaffold),
+          },
+        ],
+      })
+
+      expect(site.history.back).toHaveLength(depth + 1)
+      expect(site.history.back.at(-1)).toMatchObject({
+        type: CommandType.Group,
+        data: { commands: [{ type: CommandType.EditComponent }] },
+      })
+      exitComponentEdit(site)
+      undoLastCommand(site)
+      expect(root.name).toEqual(oldName)
+      expect(site.context.components[scaffold.id]).toBeUndefined()
+    })
+
+    it('filters a mixed agent batch after its commands were applied', () => {
+      add(site, arenaRoot().id, { name: 'Backdrop' })
+      const scaffold = arenaRoot().children?.find(
+        (component) => component.id !== sourceId,
+      ) as IComponent
+      const depth = site.history.back.length
+      const commands = [
+        {
+          type: CommandType.EditComponent,
+          data: { id: root.id, old: { name: root.name }, new: { name: 'Agent rename' } },
+        },
+        {
+          type: CommandType.RemoveComponent,
+          data: makeRemoveComponentData(site, scaffold),
+        },
+      ]
+      commands.forEach((command) => applyCommand(site, command))
+      pushAppliedGroup(site, commands, 'mixed arena batch')
+
+      expect(site.history.back).toHaveLength(depth + 1)
+      expect(site.history.back.at(-1)).toMatchObject({
+        data: { commands: [{ type: CommandType.EditComponent }] },
+      })
+      exitComponentEdit(site)
+      undoLastCommand(site)
+      expect(site.context.components[scaffold.id]).toBeUndefined()
+    })
+
+    it('filters scaffolding from an agent batch that closes the arena', () => {
+      const depth = site.history.back.length
+      const scaffoldData: IAddComponentData = {
+        tag: Tag.Div,
+        parentId: ARENA_ROOT_ID,
+      }
+      const scaffoldCommand = {
+        type: CommandType.AddComponent,
+        data: scaffoldData,
+      }
+      applyCommand(site, scaffoldCommand)
+      const scaffoldId = scaffoldData.id as string
+      const changePageCommand = {
+        type: CommandType.ChangePage,
+        data: { from: HOME, to: HOME, selectedComponentId: sourceId },
+      }
+      applyCommand(site, changePageCommand)
+      const pageData: IAddComponentData = { tag: Tag.Div, parentId: root.id }
+      const pageCommand = {
+        type: CommandType.AddComponent,
+        data: pageData,
+      }
+      applyCommand(site, pageCommand)
+      const pageComponentId = pageData.id as string
+      const nextId = site.context.nextId
+
+      pushAppliedGroup(
+        site,
+        [scaffoldCommand, changePageCommand, pageCommand],
+        'leave arena batch',
+      )
+
+      expect(site.editor?.editingComponentId).toBeUndefined()
+      expect(site.context.components[scaffoldId]).toBeUndefined()
+      expect(site.history.back).toHaveLength(depth + 1)
+      expect(site.history.back.at(-1)).toMatchObject({
+        data: {
+          commands: [
+            { type: CommandType.ChangePage },
+            { type: CommandType.AddComponent },
+          ],
+        },
+      })
+
+      undoLastCommand(site)
+      redoCommand(site)
+
+      expect(site.context.nextId).toEqual(nextId)
+      expect(site.context.components[pageComponentId]).toBeDefined()
+      expect(Object.keys(site.context.components).some(isArenaId)).toBe(false)
+    })
+
+    it('rejects moving components across the arena boundary', () => {
+      const depth = site.history.back.length
+      const fromIndex = root.children?.findIndex(
+        (component) => component.id === instanceId,
+      )
+      const moved = pushCommand(site, CommandType.MoveComponent, {
+        from: { parentId: root.id, index: fromIndex },
+        to: { parentId: arenaRoot().id, index: 0 },
+      })
+
+      expect(moved).toBe(false)
+      expect(site.history.back).toHaveLength(depth)
+      expect(site.context.components[instanceId].parent?.id).toEqual(root.id)
+    })
+
+    it('rejects moving an instance inside its definition', () => {
+      const fromIndex = root.children?.findIndex(
+        (component) => component.id === instanceId,
+      ) as number
+      const depth = site.history.back.length
+
+      const moved = pushCommand(site, CommandType.MoveComponent, {
+        from: { parentId: root.id, index: fromIndex },
+        to: { parentId: sourceId, index: 0 },
+      })
+
+      expect(moved).toBe(false)
+      expect(site.history.back).toHaveLength(depth)
+      expect(site.context.components[instanceId].parent?.id).toEqual(root.id)
+    })
+
+    it('snapshots replacement edits before saving', () => {
+      add(site, arenaRoot().id, { name: 'Backdrop' })
+      const scaffold = arenaRoot().children?.find(
+        (component) => component.id !== sourceId,
+      ) as IComponent
+      replaceLastCommand(site, {
+        type: CommandType.EditComponent,
+        data: {
+          id: scaffold.id,
+          old: { name: scaffold.name },
+          new: { name: 'Renamed backdrop' },
+        },
+      })
+
+      expect(
+        site.editor?.componentArenas?.[sourceId].children?.find(
+          (component) => component.id === scaffold.id,
+        )?.name,
+      ).toEqual('Renamed backdrop')
+    })
+
+    it('refuses the builder path for an instance inside its definition', () => {
+      const definition = site.context.components[sourceId]
+
+      expect(
+        makeAddInstanceData(site, sourceId, definition, definition.id),
+      ).toBeUndefined()
+    })
+
+    it('allows the builder path when selection rules place the instance outside', () => {
+      const definition = site.context.components[sourceId]
+      definition.content = 'Card'
+
+      expect(
+        makeAddInstanceData(site, sourceId, definition, definition.id)?.parentId,
+      ).toEqual(ARENA_ROOT_ID)
+    })
+
+    it('records definition edits made in the arena', () => {
+      const depth = site.history.back.length
+      add(site, sourceId, { name: 'CardBadge' })
+
+      expect(site.history.back.length).toEqual(depth + 1)
+    })
+
+    it('discards scaffolding when the screen closes', () => {
+      add(site, arenaRoot().id, { name: 'Backdrop' })
+      const scaffoldId = arenaRoot().children?.[1]?.id as string
+      exitComponentEdit(site)
+
+      expect(site.context.components[scaffoldId]).toBeUndefined()
+      expect(site.context.components[ARENA_ROOT_ID]).toBeUndefined()
+      expect(site.context.components[sourceId]).toBeDefined()
+    })
+
+    it('tears down the arena before adding and switching to a page', () => {
+      add(site, arenaRoot().id, { name: 'Backdrop' })
+      const data: IAddPageData = {
+        metadata: {
+          name: 'New Page',
+          route: '/new-page',
+          public: true,
+          head: {},
+        },
+        activePageRoute: HOME,
+        selectedComponentId: sourceId,
+      }
+
+      pushCommand(site, CommandType.AddPage, data)
+
+      expect(site.editor?.editingComponentId).toBeUndefined()
+      expect(site.context.components[ARENA_ROOT_ID]).toBeUndefined()
+      expect(site.context.components[sourceId].parent).toBeUndefined()
+      expect(Object.keys(site.context.components).some(isArenaId)).toBe(false)
+      expect(site.editor?.active).toEqual('/new-page')
+    })
+
+    it('leaves nextId untouched across a reload of a scaffolded arena', () => {
+      add(site, arenaRoot().id, { name: 'Backdrop' })
+      exitComponentEdit(site)
+      const nextId = site.context.nextId
+
+      const reloaded = deserializeSite(stringifySite(site)) as ISite
+      const depth = reloaded.history.back.length
+      undoLastCommand(reloaded)
+      redoCommand(reloaded)
+
+      expect(reloaded.context.nextId).toEqual(nextId)
+      expect(reloaded.history.back.length).toEqual(depth)
+    })
+
+    it('restores nextId exactly when a created component is already gone', () => {
+      exitComponentEdit(site)
+      const nextId = site.context.nextId
+      const addedId = add(site, root.id, { name: 'Section' })
+      delete site.context.components[addedId]
+
+      undoLastCommand(site)
+
+      expect(site.context.nextId).toEqual(nextId)
+    })
+
+    it('renumbers an arena stored with site ids', () => {
+      exitComponentEdit(site)
+      const legacyId = `${site.context.namespace}-c-9999`
+      if (site.editor) {
+        site.editor.componentArenas = {
+          [sourceId]: {
+            id: ARENA_ROOT_ID,
+            name: 'Arena',
+            tag: Tag.Div,
+            style: { custom: {} },
+            children: [
+              { id: legacyId, name: 'Backdrop', tag: Tag.Div, style: { custom: {} } },
+              {
+                id: ARENA_SLOT_ID,
+                name: 'Component',
+                tag: Tag.Div,
+                style: { custom: {} },
+              },
+            ],
+          },
+        }
+      }
+      enterComponentEdit(site, sourceId)
+
+      expect(site.context.components[legacyId]).toBeUndefined()
+      expect(isArenaId(arenaRoot().children?.[0]?.id)).toBe(true)
+    })
+
+    it('does not rename definition selectors on legacy arena instances', () => {
+      exitComponentEdit(site)
+      const legacyInstanceId = `${site.context.namespace}-c-9998`
+      if (site.editor) {
+        site.editor.componentArenas = {
+          [sourceId]: {
+            id: 'arena-c-root',
+            name: 'Arena',
+            tag: Tag.Div,
+            style: { custom: {} },
+            children: [
+              {
+                id: childId,
+                name: 'Colliding backdrop',
+                tag: Tag.Div,
+                style: { custom: {} },
+              },
+              {
+                id: legacyInstanceId,
+                name: 'Card preview',
+                tag: Tag.Div,
+                customSourceId: sourceId,
+                style: {
+                  custom: {},
+                  overrides: {
+                    [childId]: {
+                      [DEFAULT_BREAKPOINT_ID]: {
+                        default: { color: '#ff0000' },
+                      },
+                    },
+                  },
+                },
+              },
+              {
+                id: 'arena-c-slot',
+                name: 'Component',
+                tag: Tag.Div,
+                style: { custom: {} },
+              },
+            ],
+          },
+        }
+      }
+      enterComponentEdit(site, sourceId)
+      const instance = arenaRoot().children?.find(
+        (component) => component.customSourceId === sourceId,
+      ) as IComponent
+
+      expect(Object.keys(instance.style.overrides ?? {})).toEqual([childId])
+      expect(site.context.components[childId].name).toEqual('CardText')
     })
   })
 
