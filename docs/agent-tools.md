@@ -138,9 +138,8 @@ This guards the field set, not semantics. A field whose meaning changes still ne
 round-trip suite to catch it.
 
 > **Nothing imports `op-drift.ts`** — it exists purely to be typechecked. Neither vite nor
-> eslint typechecks, and CI has no `tsc` step, so `nx test feature-agent-tools` runs
-> `tsc -p tsconfig.typecheck.json` before vitest. That is the only thing supporting
-> the drift guard, don't drop it from the `test` target.
+> eslint typechecks; the workspace `npm run typecheck` (`tsc -p tsconfig.typecheck.json`,
+> run in CI) is the only thing supporting the drift guard.
 
 ## Round-trip suite
 

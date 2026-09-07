@@ -14,9 +14,8 @@
       "executor": "nx:run-commands",
       "outputs": ["{workspaceRoot}/coverage/libs/frontend/feature-agent-tools"],
       "options": {
-        "commands": ["tsc -p tsconfig.typecheck.json", "vitest run --passWithNoTests"],
-        "cwd": "libs/frontend/feature-agent-tools",
-        "parallel": false
+        "command": "vitest run --passWithNoTests",
+        "cwd": "libs/frontend/feature-agent-tools"
       }
     }
   },

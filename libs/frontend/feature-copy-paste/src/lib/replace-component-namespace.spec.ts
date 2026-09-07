@@ -3,9 +3,10 @@ import {
   ComponentArgPrimitive,
   EditorEventName,
   ISerializedComponent,
+  ISite,
   Tag,
 } from '@pubstudio/shared/type-site'
-import { replacePastedComponentNamespace } from './replace-namespace'
+import { replaceNamespace, replacePastedComponentNamespace } from './replace-namespace'
 
 vi.mock('petite-vue-i18n', () => ({ useI18n: () => ({ t: vi.fn() }) }))
 vi.mock('@pubstudio/frontend/util-ui-alert', () => ({
@@ -144,5 +145,103 @@ describe('replace component namespace', () => {
         mixins: [styleId(newNamespace, '2')],
       },
     })
+  })
+
+  it('should replace ids with a collaboration client suffix', () => {
+    const newNamespace = 'newnamespace'
+    const suffix = '_a1b2c3d4e5'
+    const cmpId = componentId(oldNamespace, `1${suffix}`)
+    const childId = componentId(oldNamespace, `10${suffix}`)
+    const suffixed: ISerializedComponent = {
+      id: cmpId,
+      name: 'Suffixed',
+      tag: Tag.Div,
+      children: [
+        {
+          id: childId,
+          name: 'SuffixedChild',
+          tag: Tag.Div,
+          parentId: cmpId,
+          events: {
+            TestEvent: {
+              name: 'TestEvent',
+              eventParams: {},
+              behaviors: [
+                {
+                  args: { id: childId },
+                  behaviorId: behaviorId(oldNamespace, `11${suffix}`),
+                },
+              ],
+            },
+          },
+          style: { custom: {}, mixins: [styleId(oldNamespace, `13${suffix}`)] },
+        },
+      ],
+      inputs: {
+        TestInput: {
+          type: ComponentArgPrimitive.String,
+          name: 'TestInput',
+          default: childId,
+          is: childId,
+        },
+      },
+      style: { custom: {}, overrides: { [childId]: {} } },
+    }
+
+    replacePastedComponentNamespace(suffixed, oldNamespace, newNamespace)
+
+    const newChildId = componentId(newNamespace, `10${suffix}`)
+    const child = suffixed.children?.[0]
+    expect(suffixed.id).toEqual(componentId(newNamespace, `1${suffix}`))
+    expect(child?.id).toEqual(newChildId)
+    expect(child?.events?.TestEvent.behaviors[0]).toEqual({
+      args: { id: newChildId },
+      behaviorId: behaviorId(newNamespace, `11${suffix}`),
+    })
+    expect(child?.style.mixins).toEqual([styleId(newNamespace, `13${suffix}`)])
+    expect(suffixed.inputs?.TestInput.default).toEqual(newChildId)
+    expect(suffixed.inputs?.TestInput.is).toEqual(newChildId)
+    expect(suffixed.style.overrides).toEqual({ [newChildId]: {} })
+  })
+
+  it('should replace suffixed ids referenced in behavior code', () => {
+    const newNamespace = 'newnamespace'
+    const suffix = '_a1b2c3d4e5'
+    const suffixedCmpId = componentId(oldNamespace, `3${suffix}`)
+    const plainCmpId = componentId(oldNamespace, '4')
+    const bId = behaviorId(oldNamespace, `5${suffix}`)
+    const makeCode = (id1: string, id2: string) =>
+      `getComponent('${id1}'); getComponent('${id2}')`
+    const site = {
+      context: {
+        namespace: oldNamespace,
+        styleOrder: [],
+        styles: {},
+        components: {},
+        behaviors: {
+          [bId]: {
+            id: bId,
+            name: 'Test',
+            code: makeCode(suffixedCmpId, plainCmpId),
+            args: {
+              cmp: {
+                name: 'cmp',
+                type: ComponentArgPrimitive.String,
+                default: suffixedCmpId,
+              },
+            },
+          },
+        },
+      },
+    } as unknown as ISite
+
+    replaceNamespace(site, newNamespace)
+
+    const newBId = behaviorId(newNamespace, `5${suffix}`)
+    const newCmpId = componentId(newNamespace, `3${suffix}`)
+    const behavior = site.context.behaviors[newBId]
+    expect(behavior.id).toEqual(newBId)
+    expect(behavior.code).toEqual(makeCode(newCmpId, componentId(newNamespace, '4')))
+    expect(behavior.args?.cmp.default).toEqual(newCmpId)
   })
 })

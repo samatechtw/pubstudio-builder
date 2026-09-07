@@ -8,7 +8,7 @@ import {
   IContent,
   IPropsContent,
   renderChildren,
-  RenderMode,
+  RenderModeType,
 } from '@pubstudio/frontend/util-render'
 import { resetRuntimeContext } from '@pubstudio/frontend/util-runtime'
 import { IComponent, IPage, ISite } from '@pubstudio/shared/type-site'
@@ -17,7 +17,7 @@ import { h, VNode } from 'vue'
 export const renderPage = (
   site: ISite,
   page: IPage,
-  renderMode: RenderMode,
+  renderMode: RenderModeType,
 ): VNode | undefined => {
   resetRuntimeContext()
   const rootNode = renderComponent(site, page.root, renderMode)
@@ -27,7 +27,7 @@ export const renderPage = (
 export const computePropsContent = (
   site: ISite,
   component: IComponent,
-  renderMode: RenderMode,
+  renderMode: RenderModeType,
 ): IPropsContent => {
   const data = computeAttrsInputsMixins(site.context, component, { renderMode })
   const events = computeEvents(site, component)
@@ -55,7 +55,7 @@ export const computePropsContent = (
 export const renderComponent = (
   site: ISite,
   component: IComponent,
-  renderMode: RenderMode,
+  renderMode: RenderModeType,
 ): VNode | undefined => {
   if (component.state?.hide) {
     return undefined
