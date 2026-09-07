@@ -29,7 +29,6 @@ export interface IInitializeApiStore {
 }
 
 export enum SiteSaveState {
-  SavingEditor = 'savingEditor',
   Saving = 'saving',
   Saved = 'saved',
   Error = 'error',

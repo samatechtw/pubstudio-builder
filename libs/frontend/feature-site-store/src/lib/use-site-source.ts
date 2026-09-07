@@ -58,7 +58,7 @@ const editor = computed(() => {
 const isSaving = computed(() => {
   // TODO -- figure out how to avoid nested ComputedRef in `siteStore` Ref
   const saveState = siteStore.saveState as unknown as SiteSaveState
-  return saveState === SiteSaveState.Saving || saveState === SiteSaveState.SavingEditor
+  return saveState === SiteSaveState.Saving
 })
 
 const activePage = computed(() => {

@@ -12,7 +12,7 @@ const makeReplaceId = (oldNamespace: string, namespace: string) => {
   return (id: string) => id.replace(oldNamespace, namespace)
 }
 const makeIdRegex = (namespace: string) => {
-  return () => new RegExp(`${namespace}(-[a-z]{1,2}-[a-zA-Z0-9]+)`, 'g')
+  return () => new RegExp(`${namespace}(-[a-z]{1,2}-[a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)?)`, 'g')
 }
 const hasId = (idRegex: RegExp, text: unknown | undefined) => {
   if (!text || typeof text !== 'string') {

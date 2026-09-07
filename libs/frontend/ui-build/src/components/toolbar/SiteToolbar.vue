@@ -193,8 +193,7 @@ const forceSave = async () => {
   &.saved {
     background-color: $green-700;
   }
-  &.saving,
-  &.savingEditor {
+  &.saving {
     background-color: $grey-700;
   }
   &.error {

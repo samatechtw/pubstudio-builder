@@ -40,6 +40,9 @@ jobs:
       - uses: ./.github/actions/env-setup
       - name: Check code format
         run: npx nx format:check --base=origin/main
+      - name: Type check
+        if: success() || failure()
+        run: npm run typecheck
       - name: Lint source code
         if: success() || failure()
         run: npx nx affected:lint --base=origin/main --parallel=4

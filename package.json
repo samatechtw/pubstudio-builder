@@ -12,6 +12,7 @@
     "format:check": "nx format:check",
     "lint": "nx workspace-lint && nx lint",
     "lint:style": "./node_modules/stylelint/bin/stylelint.js \"**/src/**/*.{css,vue}\"",
+    "typecheck": "tsc -p tsconfig.typecheck.json",
     "build:web-site": "npx nx build web-site --skip-nx-cache && npx nx build-hydrate web-site --skip-nx-cache && cp ./dist/apps/web-site/index.html ./backend/",
     "build:feature-external": "cd libs/frontend/feature-external && npm run build",
     "build:util-external": "cd libs/frontend/util-external && npm run build",
