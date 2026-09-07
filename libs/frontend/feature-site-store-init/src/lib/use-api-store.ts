@@ -25,6 +25,8 @@ import {
   IUpdateSiteApiResponse,
 } from '@pubstudio/shared/type-api-site-sites'
 import {
+  CollaborationServerMessage,
+  IAcceptedOperation,
   collaborationProtocolVersion,
   ICommandBatch,
   IOperationsResponse,
@@ -77,6 +79,12 @@ const randomId = (): string => {
 // Suffixed onto every generated site ID, so it must not contain `-` (see `parseNamespace`)
 const makeClientId = (): string => randomId().replace(/-/g, '').slice(0, 10)
 
+const makeWebSocketUrl = (baseUrl: string, path: string): string => {
+  const url = new URL(path, baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`)
+  url.protocol = url.protocol === 'https:' ? 'wss:' : 'ws:'
+  return url.toString()
+}
+
 // Reject HMR for the API store. Revision/pending state are module-local.
 if (import.meta.hot) {
   import.meta.hot.accept(() => {
@@ -112,10 +120,21 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
   let updatePromise: Promise<void> | undefined
   let snapshotRefreshRequired = false
   // Remote operations were merged into `pendingSnapshot` but the reactive builder site
-  // has not received them yet. The polling restore() call delivers them.
+  // has not received them yet. A socket notification asks the builder to restore them.
   let remoteChangePending = false
   let loadedVersionId: string | undefined
   let clientId = ''
+  let collaborationUrl: string | undefined
+  let collaborationToken: (() => string | null | undefined) | undefined
+  let collaborationSocket: WebSocket | undefined
+  let reconnectTimer: ReturnType<typeof setTimeout> | undefined
+  let reconnectAttempt = 0
+  let retryAttempt = 0
+  let retryWrite: (() => Promise<void>) | undefined
+  let ownSnapshotRevision: number | undefined
+  let socketWanted = false
+  let socketMessages = Promise.resolve()
+  const collaborationListeners = new Set<() => void>()
 
   const session = () =>
     typeof sessionStorage === 'undefined' ? undefined : sessionStorage
@@ -203,6 +222,13 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
       updateFn = api.updateLocalSite
       submitFn = api.submitOperations
       operationsFn = api.getOperations
+      if (typeof window !== 'undefined' && platformApi.baseUrl) {
+        collaborationUrl = makeWebSocketUrl(
+          platformApi.baseUrl,
+          `local_sites/${siteId.value}/operations/ws`,
+        )
+        collaborationToken = () => platformApi.userToken?.value
+      }
     } else {
       if (props.siteApiUrl) {
         serverAddress = props.siteApiUrl
@@ -223,6 +249,13 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
       updateFn = api.updateSite
       submitFn = api.submitOperations
       operationsFn = api.getOperations
+      if (typeof window !== 'undefined') {
+        collaborationUrl = makeWebSocketUrl(
+          apiClient.baseUrl,
+          `sites/${siteId.value}/operations/ws`,
+        )
+        collaborationToken = () => apiClient.userToken?.value
+      }
     }
     clientId = getClientId()
     setCollaborationClientId(clientId)
@@ -263,9 +296,60 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
     }
   }
 
-  // Fetch operations after the canonical revision and merge them under the local edits.
-  // Any inconsistency in the log (gap, compaction, replaced content, version switch)
-  // flags a full snapshot reload instead of guessing.
+  // Merge durable catch-up or socket operations under this tab's pending edits.
+  // Any gap, compaction, or unlogged revision bump requires a snapshot reload.
+  const mergeOperations = (response: IOperationsResponse): void => {
+    if (!apiSnapshot) return
+    const revision = revisionOf(apiSnapshot)
+    const operations = response.operations
+      .filter((operation) => operation.revision > revision)
+      .sort((left, right) => left.revision - right.revision)
+    const contiguous = operations.every(
+      (operation, index) => operation.revision === revision + 1 + index,
+    )
+    if (
+      response.snapshot_required ||
+      response.operation_floor > revision + 1 ||
+      response.current_revision < revision ||
+      !contiguous ||
+      (!operations.length && response.current_revision > revision)
+    ) {
+      snapshotRefreshRequired = true
+      return
+    }
+    if (!operations.length) {
+      apiSnapshot.operation_floor = response.operation_floor
+      apiSnapshot.content_updated_at = response.content_updated_at
+      return
+    }
+
+    const pendingCommands = pendingSnapshot
+      ? diffStoredSites(apiSnapshot, pendingSnapshot)
+      : []
+    let canonical: IStoredSite
+    try {
+      canonical = applyAcceptedOperations(apiSnapshot, operations)
+    } catch (error) {
+      console.log('Operation replay failed, reloading site:', error)
+      snapshotRefreshRequired = true
+      return
+    }
+    canonical.operation_floor = response.operation_floor
+    canonical.content_updated_at = response.content_updated_at
+    const rebased = rebasePending(canonical, pendingCommands)
+    apiSnapshot = canonical
+    pendingSnapshot = { ...rebased, ...privateState() }
+    pendingSnapshot.content_updated_at = response.content_updated_at
+    contentDirty.value =
+      pendingCommands.length > 0 &&
+      diffStoredSites(apiSnapshot, pendingSnapshot).length > 0
+    if (!contentDirty.value) markClean()
+    updateLocalCache(response.content_updated_at)
+    if (operations.some((operation) => operation.client_id !== clientId)) {
+      remoteChangePending = true
+    }
+  }
+
   const syncOperations = (): Promise<void> => {
     if (syncPromise) return syncPromise
     syncPromise = (async () => {
@@ -273,56 +357,159 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
       const revision = revisionOf(apiSnapshot)
       const response = await operationsFn(siteId.value, revision)
       if (!apiSnapshot || revisionOf(apiSnapshot) !== revision) return
-      const operations = response.operations
-        .filter((operation) => operation.revision > revision)
-        .sort((left, right) => left.revision - right.revision)
-      const contiguous = operations.every(
-        (operation, index) => operation.revision === revision + 1 + index,
-      )
-      if (
-        response.snapshot_required ||
-        response.operation_floor > revision + 1 ||
-        response.current_revision < revision ||
-        !contiguous ||
-        (!operations.length && response.current_revision > revision)
-      ) {
-        snapshotRefreshRequired = true
-        return
-      }
-      if (!operations.length) return
-
-      const pendingCommands = pendingSnapshot
-        ? diffStoredSites(apiSnapshot, pendingSnapshot)
-        : []
-      let canonical: IStoredSite
-      try {
-        canonical = applyAcceptedOperations(apiSnapshot, operations)
-      } catch (error) {
-        console.log('Operation replay failed, reloading site:', error)
-        snapshotRefreshRequired = true
-        return
-      }
-      canonical.operation_floor = response.operation_floor
-      canonical.content_updated_at = response.content_updated_at
-      const rebased = rebasePending(canonical, pendingCommands)
-      apiSnapshot = canonical
-      pendingSnapshot = { ...rebased, ...privateState() }
-      pendingSnapshot.content_updated_at = response.content_updated_at
-      contentDirty.value =
-        pendingCommands.length > 0 &&
-        diffStoredSites(apiSnapshot, pendingSnapshot).length > 0
-      if (!contentDirty.value) markClean()
-      updateLocalCache(response.content_updated_at)
-      if (operations.some((operation) => operation.client_id !== clientId)) {
-        remoteChangePending = true
-      }
+      mergeOperations(response)
     })().finally(() => {
       syncPromise = undefined
     })
     return syncPromise
   }
 
-  const recordSaveError = (error: unknown) => {
+  const mergeSocketOperation = async (
+    operation: IAcceptedOperation,
+    contentUpdatedAt: number,
+  ) => {
+    if (!apiSnapshot || operation.revision <= revisionOf(apiSnapshot)) return
+    if (operation.revision !== revisionOf(apiSnapshot) + 1) {
+      await syncOperations()
+      return
+    }
+    mergeOperations({
+      current_revision: operation.revision,
+      operation_floor: apiSnapshot.operation_floor ?? 0,
+      content_updated_at: contentUpdatedAt,
+      operations: [operation],
+      snapshot_required: false,
+    })
+  }
+
+  const notifyCollaboration = () => {
+    if (!remoteChangePending && !snapshotRefreshRequired) return
+    for (const listener of collaborationListeners) listener()
+  }
+
+  const handleSocketMessage = async (message: CollaborationServerMessage) => {
+    switch (message.type) {
+      case 'authenticated':
+        reconnectAttempt = 0
+        // The server streams durable catch-up before its revision acknowledgement.
+        // A write that failed while disconnected is retried as soon as the socket is back
+        if (retryWrite && !outboundPaused) startSaveTimer(0, retryWrite)
+        break
+      case 'operation':
+        await mergeSocketOperation(message.operation, message.content_updated_at)
+        break
+      case 'revision':
+        if (
+          apiSnapshot &&
+          (message.current_revision > revisionOf(apiSnapshot) ||
+            message.operation_floor > revisionOf(apiSnapshot) + 1)
+        ) {
+          await syncOperations()
+        }
+        break
+      case 'snapshot_reset':
+        // Let an in-flight full save record its revision, then ignore this tab's own reset
+        await updatePromise?.catch(() => undefined)
+        if (message.revision === ownSnapshotRevision) {
+          ownSnapshotRevision = undefined
+          break
+        }
+        persistPending()
+        snapshotRefreshRequired = true
+        break
+      case 'error':
+        console.log(`Collaboration socket error (${message.code}): ${message.message}`)
+        break
+    }
+    notifyCollaboration()
+  }
+
+  const scheduleReconnect = () => {
+    if (!socketWanted || reconnectTimer || typeof window === 'undefined') return
+    const delay = Math.min(30_000, 500 * 2 ** reconnectAttempt) + Math.random() * 250
+    reconnectAttempt += 1
+    reconnectTimer = setTimeout(() => {
+      reconnectTimer = undefined
+      connectCollaboration()
+    }, delay)
+  }
+
+  const connectCollaboration = () => {
+    socketWanted = loadedVersionId === 'latest' && collaborationListeners.size > 0
+    if (
+      !socketWanted ||
+      !collaborationUrl ||
+      typeof WebSocket === 'undefined' ||
+      collaborationSocket?.readyState === WebSocket.CONNECTING ||
+      collaborationSocket?.readyState === WebSocket.OPEN
+    ) {
+      return
+    }
+    const token = collaborationToken?.()
+    if (!token) {
+      scheduleReconnect()
+      return
+    }
+
+    const socket = new WebSocket(collaborationUrl)
+    collaborationSocket = socket
+    socket.onopen = () => {
+      socket.send(
+        JSON.stringify({
+          type: 'authenticate',
+          token,
+          after_revision: revisionOf(apiSnapshot),
+        }),
+      )
+    }
+    socket.onmessage = (event) => {
+      let message: CollaborationServerMessage
+      try {
+        message = JSON.parse(String(event.data)) as CollaborationServerMessage
+      } catch (error) {
+        console.log('Invalid collaboration socket message:', error)
+        return
+      }
+      socketMessages = socketMessages
+        .catch(() => undefined)
+        .then(() => {
+          if (collaborationSocket === socket) return handleSocketMessage(message)
+        })
+        .catch((error) => console.log('Collaboration socket sync failed:', error))
+    }
+    socket.onclose = () => {
+      if (collaborationSocket !== socket) return
+      collaborationSocket = undefined
+      scheduleReconnect()
+    }
+  }
+
+  const disconnectCollaboration = () => {
+    socketWanted = false
+    if (reconnectTimer) {
+      clearTimeout(reconnectTimer)
+      reconnectTimer = undefined
+    }
+    const socket = collaborationSocket
+    collaborationSocket = undefined
+    if (socket) {
+      socket.onopen = null
+      socket.onmessage = null
+      socket.onclose = null
+      socket.close()
+    }
+  }
+
+  const subscribeCollaboration = (listener: () => void) => {
+    collaborationListeners.add(listener)
+    connectCollaboration()
+    return () => {
+      collaborationListeners.delete(listener)
+      if (!collaborationListeners.size) disconnectCollaboration()
+    }
+  }
+
+  const recordSaveError = (error: unknown, retry: () => Promise<void>) => {
     const apiError = toApiError(error) ?? {
       status: 0,
       code: 'CollaborationNetworkError',
@@ -337,7 +524,19 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
       preserveRecovery(apiError.message ?? apiError.code)
     } else {
       persistPending()
+      // Network failures and server errors are retried with backoff
+      if (apiError.status === 0 || apiError.status >= 500) {
+        retryWrite = retry
+        startSaveTimer(Math.min(30_000, 1000 * 2 ** retryAttempt), retry)
+        retryAttempt += 1
+      }
     }
+  }
+
+  const markSaved = () => {
+    lastSavedAt.value = Date.now()
+    retryAttempt = 0
+    retryWrite = undefined
   }
 
   const submitPending = async () => {
@@ -368,11 +567,13 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
         }
       }
       const result = await submitFn(siteId.value, pendingBatch)
-      pendingSnapshot.content_updated_at = result.content_updated_at
-      lastSavedAt.value = Date.now()
-      await syncOperations()
+      if (pendingSnapshot) {
+        pendingSnapshot.content_updated_at = result.content_updated_at
+      }
+      markSaved()
+      await mergeSocketOperation(result.operation, result.content_updated_at)
     } catch (error) {
-      recordSaveError(error)
+      recordSaveError(error, submitPending)
     } finally {
       requestInFlight.value = false
     }
@@ -398,13 +599,14 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
         content_updated_at: result.content_updated_at,
       }
       pendingSnapshot = { ...apiSnapshot, ...privateState() }
+      ownSnapshotRevision = result.revision
       snapshotRefreshRequired = result.revision === undefined
       outboundPaused = false
       markClean()
       updateLocalCache(result.content_updated_at)
-      lastSavedAt.value = Date.now()
+      markSaved()
     } catch (error) {
-      recordSaveError(error)
+      recordSaveError(error, replaceSnapshot)
     } finally {
       requestInFlight.value = false
     }
@@ -421,11 +623,11 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
     return run
   }
 
-  const startSaveTimer = (timeout: number) => {
+  const startSaveTimer = (timeout: number, write = submitPending) => {
     if (saveTimer) clearTimeout(saveTimer)
     saveTimer = setTimeout(() => {
       saveTimer = undefined
-      void enqueue(submitPending)
+      void enqueue(write)
     }, timeout)
   }
 
@@ -476,6 +678,7 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
 
   const restoreFull = async (): Promise<ISiteRestore | undefined> => {
     const versionId = activeVersionId()
+    if (versionId !== loadedVersionId) disconnectCollaboration()
     const siteData = await getFn(siteId.value, versionId)
     if (!siteData) return undefined
     loadedVersionId = versionId
@@ -519,6 +722,7 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
       }
     }
     updateLocalCache(data.content_updated_at)
+    if (loadedVersionId === 'latest') connectCollaboration()
     return restoreSiteHelper(pendingSnapshot)
   }
 
@@ -534,6 +738,10 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
       }
       // Older versions are read-only; operations are logged against the latest version
       if (loadedVersionId !== 'latest') return undefined
+      if (remoteChangePending && pendingSnapshot) {
+        remoteChangePending = false
+        return restoreSiteHelper(pendingSnapshot)
+      }
       try {
         await syncOperations()
       } catch (error) {
@@ -569,6 +777,7 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
     save,
     saveEditor,
     restore,
+    subscribeCollaboration,
     setUpdateKey,
   }
 }

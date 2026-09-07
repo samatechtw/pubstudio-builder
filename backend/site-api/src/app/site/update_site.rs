@@ -4,6 +4,7 @@ use axum::{
     Extension, Json,
 };
 use chrono::Utc;
+use lib_command_replay::CollaborationServerMessage;
 use lib_shared_site_api::{
     db::db_error::DbError,
     error::{api_error::ApiError, helpers::check_bad_form},
@@ -60,6 +61,12 @@ pub async fn update_site(
         validator.validate_pages(value)?;
     }
     let has_update_key = dto.update_key.is_some();
+    let document_changed = dto.name.is_some()
+        || dto.version.is_some()
+        || dto.context.is_some()
+        || dto.defaults.is_some()
+        || dto.pages.is_some()
+        || dto.page_order.is_some();
 
     // Update `content_updated_at` if any of `defaults`, `context`, or `pages` changes.
     let mut content_updated_at: Option<i64> = None;
@@ -110,6 +117,17 @@ pub async fn update_site(
     // its static pages must be regenerated (debounced via content_updated_at)
     if site.published && content_updated_at.is_some() {
         spawn_regenerate_static_pages(&context, &id, Some(site.content_updated_at));
+    }
+
+    if document_changed {
+        context.collaboration.publish(
+            id,
+            CollaborationServerMessage::SnapshotReset {
+                revision: site.revision,
+                operation_floor: 0,
+                content_updated_at: site.content_updated_at,
+            },
+        );
     }
 
     Ok((StatusCode::OK, Json(to_api_response(site))))

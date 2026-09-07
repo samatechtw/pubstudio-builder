@@ -5,7 +5,10 @@ use axum::{
 use lib_shared_site_api::error::api_error::ApiError;
 use lib_shared_types::shared::user::RequestUser;
 
-use crate::{api_context::ApiContext, middleware::auth::verify_site_owner};
+use crate::{
+    api_context::ApiContext, app::site::collaboration::publish_snapshot_reset,
+    middleware::auth::verify_site_owner,
+};
 
 use super::{
     backup_sites::backup_site,
@@ -66,6 +69,7 @@ pub async fn restore_backup(
     let _ = backup_site(&context, site).await;
 
     restore_backup_helper(&context, &site_id, &backup.url).await?;
+    publish_snapshot_reset(&context, &site_id).await;
 
     Ok(())
 }

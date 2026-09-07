@@ -21,6 +21,9 @@
     "strict": true,
     "strictPropertyInitialization": false,
     "paths": {
+      "@pubstudio/shared/util-test-collaboration": [
+        "libs/shared/util-test-collaboration/src/index.ts"
+      ],
       "@frontend-assets/*": ["libs/frontend/ui-assets/src/*"],
       "@pubstudio/frontend/data-access-api": [
         "libs/frontend/data-access-api/src/index.ts"

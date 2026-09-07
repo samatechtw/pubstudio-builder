@@ -1,3 +1,4 @@
+use lib_shared_site_api::collaboration::CollaborationHub;
 use lib_shared_site_api::{cache::cache::AppCache, clients::s3_client::S3Client};
 
 use crate::{
@@ -21,4 +22,5 @@ pub struct ApiContext {
     pub custom_data_info_repo: DynCustomDataInfoRepo,
     pub custom_data_repo: DynCustomDataRepo,
     pub cache: AppCache,
+    pub collaboration: CollaborationHub,
 }

@@ -10,6 +10,7 @@ name = "lib_shared_site_api"
 path = "src/lib.rs"
 
 [dependencies]
+lib-command-replay = { workspace = true }
 lib-shared-types = { workspace = true }
 aes = { workspace = true }
 axum = { workspace = true }

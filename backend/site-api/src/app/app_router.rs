@@ -67,6 +67,10 @@ fn api_router(context: &ApiContext) -> Router<ApiContext> {
                 .route_layer(from_fn_with_state(context.clone(), auth_admin_owner)),
         )
         .route(
+            "/sites/{site_id}/operations/ws",
+            get(site::collaboration::subscribe_operations),
+        )
+        .route(
             "/sites/{site_id}/head",
             get(site::get_site_head::get_site_head),
         )
