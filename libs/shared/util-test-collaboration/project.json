@@ -1,0 +1,14 @@
+{
+  "name": "shared-util-test-collaboration",
+  "projectType": "library",
+  "sourceRoot": "libs/shared/util-test-collaboration/src",
+  "targets": {
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "options": {
+        "lintFilePatterns": ["libs/shared/util-test-collaboration/**/*.ts"]
+      }
+    }
+  },
+  "tags": ["scope:shared", "type:util"]
+}

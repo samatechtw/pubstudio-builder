@@ -9,3 +9,4 @@ pub mod db;
 pub mod layer;
 pub mod mail;
 pub mod validator;
+pub mod collaboration;

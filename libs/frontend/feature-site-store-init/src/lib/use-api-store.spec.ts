@@ -2,7 +2,7 @@ import { deserializeSite } from '@pubstudio/frontend/util-site-deserialize'
 import { storeSite } from '@pubstudio/frontend/util-site-store'
 import { mockSerializedSite } from '@pubstudio/frontend/util-test-mock'
 import { ICommandBatch, IAcceptedOperation } from '@pubstudio/shared/type-command'
-import { ISite, IStoredSite } from '@pubstudio/shared/type-site'
+import { ISite, IStoredSite, SiteSaveState } from '@pubstudio/shared/type-site'
 import { useApiStore } from './use-api-store'
 
 const api = vi.hoisted(() => ({
@@ -10,6 +10,11 @@ const api = vi.hoisted(() => ({
   update: vi.fn(),
   submit: vi.fn(),
   operations: vi.fn(),
+}))
+
+const injectedApi = vi.hoisted(() => ({
+  baseUrl: 'https://api.example/api/',
+  userToken: { value: 'owner-token' },
 }))
 
 const webStore = vi.hoisted(() => {
@@ -48,7 +53,7 @@ const webStore = vi.hoisted(() => {
 
 vi.mock('vue', async (importOriginal) => ({
   ...(await importOriginal<typeof import('vue')>()),
-  inject: vi.fn(() => ({})),
+  inject: vi.fn(() => injectedApi),
 }))
 
 vi.mock('@pubstudio/frontend/data-access-api', () => ({
@@ -66,6 +71,34 @@ vi.mock('@pubstudio/frontend/data-access-web-store', () => ({
   store: webStore.store,
 }))
 
+class MockWebSocket {
+  static readonly CONNECTING = 0
+  static readonly OPEN = 1
+  static instances: MockWebSocket[] = []
+
+  readyState = MockWebSocket.CONNECTING
+  sent: string[] = []
+  onopen: (() => void) | null = null
+  onmessage: ((event: MessageEvent) => void) | null = null
+  onclose: (() => void) | null = null
+
+  constructor(readonly url: string) {
+    MockWebSocket.instances.push(this)
+  }
+
+  send(message: string) {
+    this.sent.push(message)
+  }
+
+  close() {
+    this.readyState = 3
+  }
+
+  receive(message: object) {
+    this.onmessage?.({ data: JSON.stringify(message) } as MessageEvent)
+  }
+}
+
 const storedSite = (): { site: ISite; stored: IStoredSite } => {
   const site = deserializeSite(JSON.stringify(mockSerializedSite)) as ISite
   return { site, stored: storeSite(site) }
@@ -77,6 +110,7 @@ describe('useApiStore collaboration queue', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     accepted = []
+    MockWebSocket.instances = []
     webStore.store.version.editingEnabled.value = true
     webStore.store.version.activeVersionId.value = undefined
     for (const field of Object.values(webStore.fields)) field.value = undefined
@@ -106,6 +140,11 @@ describe('useApiStore collaboration queue', () => {
     })
   })
 
+  afterEach(() => {
+    vi.unstubAllGlobals()
+    vi.useRealTimers()
+  })
+
   const restore = async () => {
     const fixture = storedSite()
     api.get.mockResolvedValue({
@@ -119,6 +158,18 @@ describe('useApiStore collaboration queue', () => {
     await siteStore.initialize()
     const restored = await siteStore.restore()
     return { siteStore, site: restored?.site as ISite, stored: fixture.stored }
+  }
+
+  const restoreWithSocket = async () => {
+    vi.stubGlobal('window', { addEventListener: vi.fn() })
+    vi.stubGlobal('WebSocket', MockWebSocket)
+    const restored = await restore()
+    const listener = vi.fn()
+    const unsubscribe = restored.siteStore.subscribeCollaboration?.(listener)
+    const socket = MockWebSocket.instances[0]
+    socket.readyState = MockWebSocket.OPEN
+    socket.onopen?.()
+    return { ...restored, socket, listener, unsubscribe }
   }
 
   it('submits only preconditioned commands instead of a site snapshot', async () => {
@@ -202,6 +253,142 @@ describe('useApiStore collaboration queue', () => {
     expect(rebased?.site.history).toEqual(site.history)
   })
 
+  it('delivers socket operations without polling the HTTP operation log', async () => {
+    const { siteStore, socket, listener, unsubscribe } = await restoreWithSocket()
+    expect(socket.url).toEqual(
+      'wss://api.example/api/local_sites/identity-id/operations/ws',
+    )
+    expect(JSON.parse(socket.sent[0])).toMatchObject({
+      type: 'authenticate',
+      token: 'owner-token',
+      after_revision: 0,
+    })
+
+    socket.receive({
+      type: 'operation',
+      operation: remoteOperation('socket-version'),
+      content_updated_at: 51,
+    })
+    await vi.waitFor(() => expect(listener).toHaveBeenCalledTimes(1))
+    const restored = await siteStore.restore(123)
+
+    expect(restored?.site.version).toEqual('socket-version')
+    expect(api.operations).not.toHaveBeenCalled()
+    unsubscribe?.()
+    expect(socket.readyState).toEqual(3)
+  })
+
+  it('uses socket catch-up after authentication without a redundant HTTP read', async () => {
+    const { socket, listener, unsubscribe } = await restoreWithSocket()
+    socket.receive({
+      type: 'authenticated',
+      current_revision: 1,
+      operation_floor: 0,
+      content_updated_at: 51,
+    })
+    socket.receive({
+      type: 'operation',
+      operation: remoteOperation('catch-up'),
+      content_updated_at: 51,
+    })
+    socket.receive({
+      type: 'revision',
+      current_revision: 1,
+      operation_floor: 0,
+      content_updated_at: 51,
+    })
+    await vi.waitFor(() => expect(listener).toHaveBeenCalled())
+    expect(api.operations).not.toHaveBeenCalled()
+    unsubscribe?.()
+  })
+
+  it('discards queued messages when the last subscriber disconnects', async () => {
+    const { socket, listener, unsubscribe } = await restoreWithSocket()
+    socket.receive({
+      type: 'operation',
+      operation: remoteOperation('stale-socket'),
+      content_updated_at: 51,
+    })
+    unsubscribe?.()
+    await new Promise((resolve) => setTimeout(resolve, 10))
+    expect(listener).not.toHaveBeenCalled()
+    expect(socket.onmessage).toBeNull()
+  })
+
+  it('ignores the snapshot reset caused by its own full save', async () => {
+    const { siteStore, site, socket, listener } = await restoreWithSocket()
+    api.update.mockResolvedValue({
+      revision: 1,
+      operation_floor: 0,
+      content_updated_at: 70,
+    })
+    api.operations.mockResolvedValue({
+      current_revision: 1,
+      operation_floor: 0,
+      content_updated_at: 70,
+      operations: [],
+      snapshot_required: false,
+    })
+
+    await siteStore.save(site, { snapshot: true })
+    socket.receive({
+      type: 'snapshot_reset',
+      revision: 1,
+      operation_floor: 0,
+      content_updated_at: 70,
+    })
+    await new Promise((resolve) => setTimeout(resolve, 10))
+
+    expect(listener).not.toHaveBeenCalled()
+    expect(await siteStore.restore(123)).toBeUndefined()
+    expect(api.get).toHaveBeenCalledTimes(1)
+
+    socket.receive({
+      type: 'snapshot_reset',
+      revision: 2,
+      operation_floor: 0,
+      content_updated_at: 80,
+    })
+    await vi.waitFor(() => expect(listener).toHaveBeenCalledTimes(1))
+    expect((await siteStore.restore(123))?.site).toBeDefined()
+    expect(api.get).toHaveBeenCalledTimes(2)
+  })
+
+  it('retries a failed submit with backoff and right after the socket reconnects', async () => {
+    vi.useFakeTimers()
+    const { siteStore, site, socket } = await restoreWithSocket()
+    api.submit.mockRejectedValueOnce(new TypeError('Failed to fetch'))
+    site.name = 'Offline edit'
+
+    await siteStore.save(site, { immediate: true })
+
+    expect(api.submit).toHaveBeenCalledTimes(1)
+    expect(siteStore.saveError.value?.code).toEqual('CollaborationNetworkError')
+    expect(siteStore.saveState.value).toEqual(SiteSaveState.Saving)
+
+    api.submit.mockRejectedValueOnce(new TypeError('Failed to fetch'))
+    await vi.advanceTimersByTimeAsync(1000)
+    expect(api.submit).toHaveBeenCalledTimes(2)
+
+    // The second retry backs off to 2s; a socket reconnect resubmits immediately
+    await vi.advanceTimersByTimeAsync(500)
+    expect(api.submit).toHaveBeenCalledTimes(2)
+    socket.receive({
+      type: 'authenticated',
+      current_revision: 0,
+      operation_floor: 0,
+      content_updated_at: 50,
+    })
+    await vi.advanceTimersByTimeAsync(1)
+    await vi.advanceTimersByTimeAsync(1)
+
+    expect(api.submit).toHaveBeenCalledTimes(3)
+    expect(siteStore.saveError.value).toBeUndefined()
+    expect(siteStore.saveState.value).toEqual(SiteSaveState.Saved)
+    await vi.advanceTimersByTimeAsync(30_000)
+    expect(api.submit).toHaveBeenCalledTimes(3)
+  })
+
   it('does not replace the reactive site after its own accepted save', async () => {
     const { siteStore, site } = await restore()
     site.name = 'Own edit'
@@ -246,7 +433,7 @@ describe('useApiStore collaboration queue', () => {
     expect(api.get).toHaveBeenCalledTimes(2)
   })
 
-  it('loads a newly selected version, then stops polling while it is active', async () => {
+  it('loads a newly selected version, then stops collaboration sync while it is active', async () => {
     const { siteStore } = await restore()
     webStore.store.version.activeVersionId.value = 'live-version' as never
 

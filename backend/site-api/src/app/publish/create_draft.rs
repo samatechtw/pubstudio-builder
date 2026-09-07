@@ -12,7 +12,10 @@ use lib_shared_types::{
     shared::user::RequestUser,
 };
 
-use crate::{api_context::ApiContext, middleware::auth::verify_site_owner};
+use crate::{
+    api_context::ApiContext, app::site::collaboration::publish_snapshot_reset,
+    middleware::auth::verify_site_owner,
+};
 
 pub async fn list_versions(
     context: &ApiContext,
@@ -57,6 +60,8 @@ pub async fn create_draft(
         .into_iter()
         .map(|version| to_api_response(version))
         .collect();
+
+    publish_snapshot_reset(&context, &id).await;
 
     Ok(Json(view_models))
 }

@@ -35,6 +35,44 @@ pub struct OperationsResponse {
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
+#[serde(tag = "type", rename_all = "snake_case")]
+pub enum CollaborationClientMessage {
+    Authenticate {
+        token: String,
+        #[serde(default)]
+        after_revision: i64,
+    },
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
+#[serde(tag = "type", rename_all = "snake_case")]
+pub enum CollaborationServerMessage {
+    Authenticated {
+        current_revision: i64,
+        operation_floor: i64,
+        content_updated_at: i64,
+    },
+    Operation {
+        operation: AcceptedOperation,
+        content_updated_at: i64,
+    },
+    Revision {
+        current_revision: i64,
+        operation_floor: i64,
+        content_updated_at: i64,
+    },
+    SnapshotReset {
+        revision: i64,
+        operation_floor: i64,
+        content_updated_at: i64,
+    },
+    Error {
+        code: String,
+        message: String,
+    },
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct CommandBatch {
     pub protocol_version: u16,
     pub batch_id: String,

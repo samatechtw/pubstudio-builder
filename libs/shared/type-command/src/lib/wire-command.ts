@@ -92,3 +92,35 @@ export interface IOperationsResponse {
   operations: IAcceptedOperation[]
   snapshot_required: boolean
 }
+
+export interface ICollaborationAuthenticateMessage {
+  type: 'authenticate'
+  token: string
+  after_revision: number
+}
+
+export type CollaborationServerMessage =
+  | {
+      type: 'authenticated'
+      current_revision: number
+      operation_floor: number
+      content_updated_at: number
+    }
+  | {
+      type: 'operation'
+      operation: IAcceptedOperation
+      content_updated_at: number
+    }
+  | {
+      type: 'revision'
+      current_revision: number
+      operation_floor: number
+      content_updated_at: number
+    }
+  | {
+      type: 'snapshot_reset'
+      revision: number
+      operation_floor: number
+      content_updated_at: number
+    }
+  | { type: 'error'; code: string; message: string }

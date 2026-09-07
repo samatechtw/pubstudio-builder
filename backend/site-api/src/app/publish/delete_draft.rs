@@ -5,7 +5,10 @@ use axum::{
 use lib_shared_site_api::{db::db_error::DbError, error::api_error::ApiError};
 use lib_shared_types::shared::user::RequestUser;
 
-use crate::{api_context::ApiContext, middleware::auth::verify_site_owner};
+use crate::{
+    api_context::ApiContext, app::site::collaboration::publish_snapshot_reset,
+    middleware::auth::verify_site_owner,
+};
 
 use super::create_draft::list_versions;
 
@@ -32,6 +35,8 @@ pub async fn delete_draft(
                 _ => ApiError::internal_error().message(e),
             })?;
     }
+
+    publish_snapshot_reset(&context, &id).await;
 
     Ok(())
 }

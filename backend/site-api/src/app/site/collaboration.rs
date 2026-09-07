@@ -1,40 +1,43 @@
 use axum::{
-    extract::{Path, Query, State},
+    extract::{
+        ws::{WebSocket, WebSocketUpgrade},
+        Path, Query, State,
+    },
     http::StatusCode,
     response::{IntoResponse, Response},
     Extension, Json,
 };
 use chrono::{DateTime, Utc};
 use lib_command_replay::{
-    encode_stored_value, has_content_changes, replay_batch, AcceptedOperation, CommandBatch,
-    OperationsResponse, ReplayError, StoredSiteDocument, SubmitBatchResponse,
+    encode_stored_value, has_content_changes, replay_batch, AcceptedOperation,
+    CollaborationServerMessage, CommandBatch, OperationsResponse, StoredSiteDocument,
+    SubmitBatchResponse,
+};
+use lib_shared_site_api::collaboration::error::{
+    collaboration_error, internal_error, replay_error,
 };
 use lib_shared_site_api::{
     error::api_error::ApiError, util::json_extractor::PsJson,
     validator::site_data_len_validator::SiteDataValidator,
 };
 use lib_shared_types::shared::user::{RequestUser, UserType};
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 use sqlx::{sqlite::SqliteRow, Connection, Row, Sqlite};
 
 use crate::{
-    api_context::ApiContext, app::ssg::generate_static::spawn_regenerate_static_pages,
-    middleware::auth::verify_site_owner,
+    api_context::ApiContext,
+    app::ssg::generate_static::spawn_regenerate_static_pages,
+    middleware::auth::{authenticate_token, verify_site_owner},
+};
+
+use lib_shared_site_api::collaboration::socket::{
+    close_with_error, read_authentication, serve, MAX_CLIENT_MESSAGE_BYTES,
 };
 
 #[derive(Deserialize)]
 pub struct OperationsQuery {
     #[serde(default)]
     after_revision: i64,
-}
-
-#[derive(Serialize)]
-struct CollaborationError {
-    code: &'static str,
-    status: u16,
-    message: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    conflict: Option<lib_command_replay::ReplayConflict>,
 }
 
 pub async fn submit_operations(
@@ -45,6 +48,15 @@ pub async fn submit_operations(
 ) -> Response {
     match submit_operations_result(&site_id, &context, &user, batch).await {
         Ok((response, published, content_changed, site_size, site_type)) => {
+            if !response.duplicate {
+                context.collaboration.publish(
+                    site_id.clone(),
+                    CollaborationServerMessage::Operation {
+                        operation: response.operation.clone(),
+                        content_updated_at: response.content_updated_at,
+                    },
+                );
+            }
             context.cache.remove_site(&site_id).await;
             context.cache.sync().await;
             context
@@ -240,15 +252,29 @@ pub async fn get_operations(
     Extension(user): Extension<RequestUser>,
 ) -> Result<Json<OperationsResponse>, ApiError> {
     verify_site_owner(&context, &user, &site_id).await?;
+    Ok(Json(
+        load_operations(&context, &site_id, query.after_revision).await?,
+    ))
+}
+
+async fn load_operations(
+    context: &ApiContext,
+    site_id: &str,
+    after_revision: i64,
+) -> Result<OperationsResponse, ApiError> {
     let mut connection = context
         .site_repo
-        .get_db_conn(&site_id)
+        .get_db_conn(site_id)
         .await
         .map_err(|error| ApiError::not_found().message(error))?;
+    let mut tx = connection
+        .begin()
+        .await
+        .map_err(|error| ApiError::internal_error().message(error))?;
     let site = sqlx::query(
         "SELECT id, revision, content_updated_at FROM site_versions ORDER BY id DESC LIMIT 1",
     )
-    .fetch_one(&mut *connection)
+    .fetch_one(&mut *tx)
     .await
     .map_err(|error| ApiError::not_found().message(error))?;
     let version_id: i64 = site
@@ -268,8 +294,8 @@ pub async fn get_operations(
            ORDER BY revision ASC LIMIT 1000"#,
     )
     .bind(version_id)
-    .bind(query.after_revision.max(0))
-    .fetch_all(&mut *connection)
+    .bind(after_revision.max(0))
+    .fetch_all(&mut *tx)
     .await
     .map_err(|error| ApiError::internal_error().message(error))?;
     let operations = rows
@@ -277,13 +303,77 @@ pub async fn get_operations(
         .map(map_operation)
         .collect::<Result<Vec<_>, _>>()
         .map_err(|error| ApiError::internal_error().message(error))?;
-    Ok(Json(OperationsResponse {
+    Ok(OperationsResponse {
         current_revision,
         operation_floor: 0,
         content_updated_at,
         operations,
         snapshot_required: false,
-    }))
+    })
+}
+
+// The caller's write is already committed; failing to notify must not fail the request
+pub async fn publish_snapshot_reset(context: &ApiContext, site_id: &str) {
+    match load_operations(context, site_id, i64::MAX).await {
+        Ok(response) => context.collaboration.publish(
+            site_id.to_string(),
+            CollaborationServerMessage::SnapshotReset {
+                revision: response.current_revision,
+                operation_floor: response.operation_floor,
+                content_updated_at: response.content_updated_at,
+            },
+        ),
+        Err(error) => {
+            tracing::warn!("Snapshot reset not published for site {site_id}: {error:?}")
+        }
+    }
+}
+
+pub async fn subscribe_operations(
+    Path(site_id): Path<String>,
+    State(context): State<ApiContext>,
+    upgrade: WebSocketUpgrade,
+) -> impl IntoResponse {
+    upgrade
+        .max_frame_size(MAX_CLIENT_MESSAGE_BYTES)
+        .max_message_size(MAX_CLIENT_MESSAGE_BYTES)
+        .on_upgrade(move |socket| collaboration_socket(socket, site_id, context))
+}
+
+async fn collaboration_socket(mut socket: WebSocket, site_id: String, context: ApiContext) {
+    let Some((token, after_revision)) = read_authentication(&mut socket).await else {
+        return;
+    };
+
+    let user = match authenticate_token(&context, &token, &[UserType::Admin, UserType::Owner]) {
+        Ok(user) => user,
+        Err(_) => {
+            close_with_error(&mut socket, "InvalidAuth", "authentication failed").await;
+            return;
+        }
+    };
+    if verify_site_owner(&context, &user, &site_id).await.is_err() {
+        close_with_error(&mut socket, "Forbidden", "site access denied").await;
+        return;
+    }
+    let metadata = match context.metadata_repo.get_site_metadata(&site_id).await {
+        Ok(metadata) => metadata,
+        Err(_) => {
+            close_with_error(&mut socket, "NotFound", "site not found").await;
+            return;
+        }
+    };
+    if metadata.disabled && user.user_type != UserType::Admin && user.user_type != UserType::Cron {
+        close_with_error(&mut socket, "Forbidden", "site access denied").await;
+        return;
+    }
+
+    // Subscribe before reading the durable log so racing commits are retained.
+    let receiver = context.collaboration.subscribe(site_id.clone());
+    serve(socket, receiver, after_revision, |revision| {
+        load_operations(&context, &site_id, revision)
+    })
+    .await;
 }
 
 async fn find_operation(
@@ -328,52 +418,4 @@ fn stored_size(row: &SqliteRow) -> Result<u64, Response> {
     let defaults: String = row.try_get("defaults").map_err(internal_error)?;
     let pages: String = row.try_get("pages").map_err(internal_error)?;
     Ok((context.len() + defaults.len() + pages.len()) as u64)
-}
-
-fn replay_error(error: ReplayError) -> Response {
-    match error {
-        ReplayError::Conflict(conflict) => {
-            let message = conflict.reason.clone();
-            collaboration_error(
-                StatusCode::CONFLICT,
-                "CollaborationConflict",
-                &message,
-                Some(conflict),
-            )
-        }
-        ReplayError::UnsupportedProtocol(version) => collaboration_error(
-            StatusCode::UPGRADE_REQUIRED,
-            "ClientUpgradeRequired",
-            &format!("unsupported collaboration protocol version {version}"),
-            None,
-        ),
-        other => collaboration_error(
-            StatusCode::BAD_REQUEST,
-            "InvalidCollaborationBatch",
-            &other.to_string(),
-            None,
-        ),
-    }
-}
-
-fn collaboration_error(
-    status: StatusCode,
-    code: &'static str,
-    message: &str,
-    conflict: Option<lib_command_replay::ReplayConflict>,
-) -> Response {
-    (
-        status,
-        Json(CollaborationError {
-            code,
-            status: status.as_u16(),
-            message: message.into(),
-            conflict,
-        }),
-    )
-        .into_response()
-}
-
-fn internal_error(error: impl std::fmt::Display) -> Response {
-    ApiError::internal_error().message(error).into_response()
 }

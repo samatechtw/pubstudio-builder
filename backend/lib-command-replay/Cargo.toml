@@ -12,4 +12,3 @@ serde = { workspace = true }
 # preserve_order keeps the frontend's object key order (CSS property order matters)
 serde_json = { workspace = true, features = ["preserve_order"] }
 thiserror = { workspace = true }
-

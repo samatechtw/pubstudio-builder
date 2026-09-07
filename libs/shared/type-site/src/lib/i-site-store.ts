@@ -50,5 +50,7 @@ export interface ISiteStore {
   save(site: ISite, options?: ISiteSaveOptions): Promise<void>
   saveEditor(editor: IEditorContext): Promise<void>
   restore(updateKey?: number): Promise<ISiteRestore | undefined>
+  /** Subscribe to server-pushed document changes. Returns an unsubscribe callback. */
+  subscribeCollaboration?(listener: () => void): () => void
   setUpdateKey(key: string | undefined): void
 }

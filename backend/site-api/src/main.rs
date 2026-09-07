@@ -1,5 +1,6 @@
 use axum::http::{header, Method};
 use axum::Router;
+use lib_shared_site_api::collaboration::CollaborationHub;
 use lib_shared_site_api::cache::cache::AppCache;
 use lib_shared_site_api::clients::s3_client::S3Client;
 use lib_shared_site_api::log::{create_trace_layer, setup_logging};
@@ -113,6 +114,7 @@ async fn main() {
         custom_data_info_repo,
         custom_data_repo,
         cache,
+        collaboration: CollaborationHub::default(),
     };
     let _ = populate_usage_cache(&context).await;
 

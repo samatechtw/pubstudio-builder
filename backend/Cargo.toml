@@ -12,7 +12,7 @@ lib-command-replay = { path = "./lib-command-replay" }
 lib-shared-site-api = { path = "./lib-shared-site-api" }
 lib-shared-types = { path = "./lib-shared-types" }
 aes = "0.8.4"
-axum = "0.8.1"
+axum = { version = "0.8.1", features = ["ws"] }
 axum-extra = { version = "0.10.0", features = ["typed-header"] }
 axum-macros = "0.5.0"
 base64 = "0.22.1"

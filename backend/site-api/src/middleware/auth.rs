@@ -50,6 +50,27 @@ pub fn check_auth_bypass(context: &ApiContext, token: &str) -> bool {
     false
 }
 
+pub fn authenticate_token(
+    context: &ApiContext,
+    token: &str,
+    expected_types: &[UserType],
+) -> Result<RequestUser, ApiError> {
+    if check_auth_bypass(context, token) {
+        return Ok(RequestUser {
+            user_type: UserType::Admin,
+            user_id: None,
+        });
+    }
+    let user_token = verify_jwt(context.config.admin_public_key.to_string(), token)?;
+    if !expected_types.contains(&user_token.user_type) {
+        return Err(ApiError::forbidden());
+    }
+    Ok(RequestUser {
+        user_type: user_token.user_type,
+        user_id: Some(user_token.user_id),
+    })
+}
+
 pub async fn auth_admin(
     State(context): State<ApiContext>,
     request: Request<Body>,
@@ -118,28 +139,9 @@ pub async fn auth_user(
     mut request: Request<Body>,
     next: Next,
 ) -> Result<Response, ApiError> {
-    let token = auth.token();
-    if check_auth_bypass(&context, token) {
-        request.extensions_mut().insert(RequestUser {
-            user_type: UserType::Admin,
-            user_id: None,
-        });
-        return Ok(next.run(request).await);
-    }
-    match verify_jwt(context.config.admin_public_key.to_string(), token) {
-        Ok(user_token) => {
-            if expected_types.contains(&user_token.user_type) {
-                request.extensions_mut().insert(RequestUser {
-                    user_type: user_token.user_type,
-                    user_id: Some(user_token.user_id),
-                });
-                Ok(next.run(request).await)
-            } else {
-                Err(ApiError::forbidden())
-            }
-        }
-        Err(e) => Err(e),
-    }
+    let user = authenticate_token(&context, auth.token(), &expected_types)?;
+    request.extensions_mut().insert(user);
+    Ok(next.run(request).await)
 }
 
 pub async fn error_cache(
