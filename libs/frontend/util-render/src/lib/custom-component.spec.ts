@@ -1,6 +1,9 @@
 import { IComponent, ISiteContext } from '@pubstudio/shared/type-site'
 import {
+  expandedChildId,
+  expandedInstanceId,
   isCustomComponentPart,
+  isExpandedId,
   overrideSelectorIds,
   renderChildren,
 } from './custom-component'
@@ -127,5 +130,54 @@ describe('custom component expansion', () => {
 
     expect(isCustomComponentPart(context, context.components['deeper'])).toBe(true)
     expect(isCustomComponentPart(context, instance)).toBe(false)
+  })
+})
+
+describe('expansion path ids', () => {
+  // Collaborative stores suffix generated ids with the tab client id, so a component id
+  // contains the same `_` that joins the expansion path
+  const instanceId = 'test-c-3_a1b2c3d4e5'
+  const childId = 'test-c-7_a1b2c3d4e5'
+  const grandchildId = 'test-c-9_a1b2c3d4e5'
+
+  const collaborativeContext = () => {
+    const definition = node('test-c-1_a1b2c3d4e5', {
+      children: [node(childId, { children: [node(grandchildId)] })],
+    })
+    const instance = node(instanceId, { customSourceId: definition.id })
+    return makeContext([definition, instance], [definition.id])
+  }
+
+  it('resolves the instance and definition child of an expanded id', () => {
+    const context = collaborativeContext()
+    const expandedId = `${instanceId}_${childId}`
+
+    expect(isExpandedId(context, expandedId)).toBe(true)
+    expect(expandedInstanceId(context, expandedId)).toEqual(instanceId)
+    expect(expandedChildId(context, expandedId)).toEqual(childId)
+  })
+
+  it('resolves the deepest definition descendant of a nested expansion', () => {
+    const context = collaborativeContext()
+    const expandedId = `${instanceId}_${childId}_${grandchildId}`
+
+    expect(expandedInstanceId(context, expandedId)).toEqual(instanceId)
+    expect(expandedChildId(context, expandedId)).toEqual(grandchildId)
+  })
+
+  it('treats a stored component with a client suffix as a plain id', () => {
+    const context = collaborativeContext()
+
+    expect(isExpandedId(context, instanceId)).toBe(false)
+    expect(expandedInstanceId(context, instanceId)).toBeUndefined()
+    expect(expandedChildId(context, instanceId)).toBeUndefined()
+  })
+
+  it('ignores ids that are not an expansion path', () => {
+    const context = collaborativeContext()
+
+    expect(isExpandedId(context, '__arena_root')).toBe(false)
+    expect(expandedInstanceId(context, `${instanceId}_test-c-404`)).toBeUndefined()
+    expect(expandedChildId(context, `${instanceId}_test-c-404`)).toBeUndefined()
   })
 })

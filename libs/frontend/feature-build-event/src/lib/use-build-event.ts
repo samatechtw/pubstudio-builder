@@ -142,7 +142,10 @@ export const useBuildEvent = () => {
         if (component) {
           componentChanged = selectComponent(site.value, component, selectOptions)
           if (instanceId && editor.value) {
-            editor.value.selectedInstanceChildId = expandedChildId(componentId)
+            editor.value.selectedInstanceChildId = expandedChildId(
+              site.value.context,
+              componentId,
+            )
           }
         }
         // If the root component doesn't extend to the whole editor width/height,

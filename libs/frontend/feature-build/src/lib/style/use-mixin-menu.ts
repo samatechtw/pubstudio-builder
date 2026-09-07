@@ -11,7 +11,7 @@ import {
 } from '@pubstudio/frontend/feature-site-source'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 import { computeFlattenedStyles } from '@pubstudio/frontend/util-component'
-import { styleId } from '@pubstudio/frontend/util-ids'
+import { peekNextId, styleId } from '@pubstudio/frontend/util-ids'
 import { ICommand, StyleType } from '@pubstudio/shared/type-command'
 import {
   Css,
