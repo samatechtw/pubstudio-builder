@@ -1,6 +1,7 @@
 import { CollaborationServerMessage, ICommandBatch } from '@pubstudio/shared/type-command'
 import supertest from 'supertest'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import WebSocket from 'ws'
 
 const waitForMessage = (
   socket: WebSocket,
@@ -17,7 +18,7 @@ const waitForMessage = (
       cleanup()
       reject(new Error(`Socket closed waiting for ${type}`))
     }
-    const listener = (event: MessageEvent) => {
+    const listener = (event: WebSocket.MessageEvent) => {
       try {
         const message = JSON.parse(String(event.data)) as CollaborationServerMessage
         if (message.type !== type) return
