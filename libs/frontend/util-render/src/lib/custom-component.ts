@@ -2,7 +2,7 @@ import { resolveComponent } from '@pubstudio/frontend/util-resolve'
 import { IComponent, IInstanceOverrides, ISiteContext } from '@pubstudio/shared/type-site'
 
 // Joins the expansion path: `<instanceId>_<defChildId>[_<defGrandchildId>…]`.
-// Real component ids are `<namespace>-c-<n>`, so `_` cannot appear in one.
+// The separator alone doesn't mark a segment boundary. See `expandedPath`.
 export const EXPANDED_ID_SEPARATOR = '_'
 
 // True for a definition root or any of its descendants
@@ -20,24 +20,50 @@ export const isCustomComponentPart = (
   return false
 }
 
+// Segments of an expansion path. Every segment is a stored component, so boundaries are
+// found by matching against `context.components` instead of splitting on separators,
+// which component ids can contain. Undefined when the id isn't a full path.
+const expandedPath = (
+  context: ISiteContext,
+  componentId: string,
+): string[] | undefined => {
+  const parts = componentId.split(EXPANDED_ID_SEPARATOR)
+  const ids: string[] = []
+  let start = 0
+  for (let end = 1; end <= parts.length; end += 1) {
+    const candidate = parts.slice(start, end).join(EXPANDED_ID_SEPARATOR)
+    if (context.components[candidate]) {
+      ids.push(candidate)
+      start = end
+    }
+  }
+  return start === parts.length ? ids : undefined
+}
+
 // Expanded children are synthesized at render time and never enter `context.components`
 export const isExpandedId = (context: ISiteContext, componentId: string): boolean =>
-  componentId.includes(EXPANDED_ID_SEPARATOR) && !context.components[componentId]
+  !context.components[componentId] &&
+  (expandedPath(context, componentId)?.length ?? 0) > 1
 
 export const expandedInstanceId = (
   context: ISiteContext,
   componentId: string | undefined,
 ): string | undefined => {
-  if (!componentId || !isExpandedId(context, componentId)) {
+  if (!componentId || context.components[componentId]) {
     return undefined
   }
-  const instanceId = componentId.split(EXPANDED_ID_SEPARATOR)[0]
-  return context.components[instanceId] ? instanceId : undefined
+  const path = expandedPath(context, componentId)
+  return path && path.length > 1 ? path[0] : undefined
 }
 
 // Definition descendant an expanded child stands for: the last segment of the path
-export const expandedChildId = (componentId: string): string =>
-  componentId.split(EXPANDED_ID_SEPARATOR).pop() as string
+export const expandedChildId = (
+  context: ISiteContext,
+  componentId: string,
+): string | undefined => {
+  const path = expandedPath(context, componentId)
+  return path && path.length > 1 ? path[path.length - 1] : undefined
+}
 
 // `seen` guards against a definition that instantiates itself
 const definitionChildren = (

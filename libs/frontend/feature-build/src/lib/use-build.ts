@@ -34,7 +34,7 @@ import {
   flattenedComponentStyle,
 } from '@pubstudio/frontend/util-component'
 import { DEFAULT_BREAKPOINT_ID } from '@pubstudio/frontend/util-defaults'
-import { breakpointId } from '@pubstudio/frontend/util-ids'
+import { breakpointId, peekNextId } from '@pubstudio/frontend/util-ids'
 import { resolveComponent } from '@pubstudio/frontend/util-resolve'
 import { serializeComponent, serializePage } from '@pubstudio/frontend/util-site-store'
 import { uiAlert } from '@pubstudio/frontend/util-ui-alert'
