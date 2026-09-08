@@ -79,7 +79,11 @@ export const buildHtmlPage = (options: IHtmlPageOptions): string => {
     ...head.meta.map((meta) => `<meta${tagAttrs(meta)} />`),
     ...socialMeta(head, canonicalUrl).map((meta) => `<meta${tagAttrs(meta)} />`),
     ...links.map((link) => `<link${tagAttrs(link)} />`),
-    ...head.script.map((script) => `<script${tagAttrs(script)}></script>`),
+    // Hydrated pages load scripts after the runtime exposes window.Vue and mounts.
+    // Executable head scripts can otherwise race the deferred runtime.
+    ...(payloadJson && runtimeSrc ? [] : head.script).map(
+      (script) => `<script${tagAttrs(script)}></script>`,
+    ),
     `<style>${BASE_PAGE_CSS}</style>`,
   ]
   const bodyLines = [`<div id="app">${bodyHtml}</div>`]

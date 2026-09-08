@@ -1,5 +1,4 @@
 import { EventHandler } from '@pubstudio/shared/type-site'
-import { Ref, VNode } from 'vue'
 
 export interface IRuntimeContext {
   eventHandlers: {
@@ -12,13 +11,6 @@ export interface IRuntimeContext {
     scroll: Record<string, EventHandler>
   }
   scrollEventAdded: boolean
-  loadVueComponent: ILoadVueComponent
-}
-
-export interface ILoadVueComponent {
-  loadComponentTimer: ReturnType<typeof setTimeout> | undefined
-  loadedComponents: Record<string, Ref<VNode | undefined>>
-  retries: number
 }
 
 export interface IComponentTreeRenameData {
@@ -38,11 +30,6 @@ const initialHandlers = () => ({
 export const runtimeContext: IRuntimeContext = {
   eventHandlers: initialHandlers(),
   scrollEventAdded: false,
-  loadVueComponent: {
-    loadComponentTimer: undefined,
-    loadedComponents: {},
-    retries: 0,
-  },
 }
 
 const keyupHandler = (e: KeyboardEvent) => {
@@ -73,14 +60,6 @@ export const registerScroll = (id: string, handler: EventHandler) => {
 
 export const resetRuntimeContext = () => {
   runtimeContext.eventHandlers = initialHandlers()
-  if (runtimeContext.loadVueComponent.loadComponentTimer) {
-    clearInterval(runtimeContext.loadVueComponent.loadComponentTimer)
-  }
-  runtimeContext.loadVueComponent = {
-    loadComponentTimer: undefined,
-    loadedComponents: {},
-    retries: 0,
-  }
   runtimeContext.scrollEventAdded = false
   // `document` is undefined during static prerendering (SSG) in Node
   if (typeof document === 'undefined') {

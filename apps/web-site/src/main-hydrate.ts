@@ -113,6 +113,7 @@ const main = async () => {
   await waitForRoute(router)
 
   createSSRApp(App).mount('#app')
+  replaceHead(site.value, activePage.value, undefined)
 
   // Apply the user's stored/browser language after hydration to avoid mismatch.
   loadSiteLanguage(site.value)
