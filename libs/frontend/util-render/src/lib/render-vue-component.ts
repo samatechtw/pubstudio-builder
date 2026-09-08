@@ -1,50 +1,16 @@
 import { resolveComponent } from '@pubstudio/frontend/util-resolve'
-import { runtimeContext } from '@pubstudio/frontend/util-runtime'
 import { IComponent, ISiteContext } from '@pubstudio/shared/type-site'
-import { defineComponent, h, PropType, Ref, shallowRef, toRefs, VNode } from 'vue'
+import {
+  Component,
+  defineComponent,
+  h,
+  onMounted,
+  PropType,
+  shallowRef,
+  VNode,
+  watch,
+} from 'vue'
 import { computeInputs } from './compute-inputs'
-
-const checkComponentsLoaded = () => {
-  const components = runtimeContext.loadVueComponent.loadedComponents
-  let loadComplete = true
-  for (const [componentName, componentRef] of Object.entries(components)) {
-    if (!componentRef.value) {
-      const windowComponent = window[componentName as keyof Window]
-      if (windowComponent) {
-        componentRef.value = windowComponent
-      } else {
-        loadComplete = false
-      }
-    }
-  }
-  runtimeContext.loadVueComponent.retries += 1
-  if (loadComplete || runtimeContext.loadVueComponent.retries > 20) {
-    clearInterval(runtimeContext.loadVueComponent.loadComponentTimer)
-  }
-}
-
-const getOrWaitComponent = (
-  componentName: string,
-  componentRef: Ref<VNode | undefined>,
-) => {
-  // No `window` when prerendering in Node. Leave the placeholder for the hydrating client
-  // to fill in, and keep the render from throwing (Vue would swallow it and emit a comment
-  // node, which then mismatches the client's div).
-  if (typeof window === 'undefined') {
-    return
-  }
-  runtimeContext.loadVueComponent.loadedComponents[componentName] = componentRef
-  if (window[componentName as keyof Window]) {
-    componentRef.value = window[componentName as keyof Window]
-    return
-  }
-  if (!runtimeContext.loadVueComponent.loadComponentTimer) {
-    runtimeContext.loadVueComponent.loadComponentTimer = setInterval(
-      checkComponentsLoaded,
-      400,
-    )
-  }
-}
 
 interface IVueComponentProps {
   componentName: string
@@ -63,14 +29,43 @@ const VueComponent = defineComponent({
     },
   },
   setup(props: IVueComponentProps) {
-    const { componentName, customProps } = toRefs(props)
-    const component: Ref<VNode | undefined> = shallowRef()
+    const component = shallowRef<Component>()
+    const mounted = shallowRef(false)
 
-    getOrWaitComponent(componentName.value, component)
+    // Start after mount so SSG and the first hydration render both use the placeholder.
+    // Each instance owns its watcher: duplicate names must not overwrite other waiters.
+    watch(
+      () => (mounted.value ? props.componentName : undefined),
+      (name, _oldName, onCleanup) => {
+        component.value = undefined
+        if (!name || typeof window === 'undefined') return
+        const resolve = () => {
+          const loaded = (window as unknown as Record<string, Component>)[name]
+          if (loaded) component.value = loaded
+          return !!loaded
+        }
+        if (resolve()) return
+        let attempts = 0
+        const timer = setInterval(() => {
+          if (resolve()) {
+            clearInterval(timer)
+          } else if (++attempts === 20) {
+            console.warn(
+              `Vue component "${name}" has not registered on window. Check its script URL and exported name.`,
+            )
+          }
+        }, 400)
+        onCleanup(() => clearInterval(timer))
+      },
+      { immediate: false },
+    )
+    onMounted(() => {
+      mounted.value = true
+    })
 
     return () => {
       if (component.value) {
-        return h(component.value, customProps.value)
+        return h(component.value, props.customProps)
       }
       return h('div', '')
     }

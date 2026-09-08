@@ -51,6 +51,21 @@ describe('generateSite', () => {
     expect(sitemap?.body).toContain('<loc>https://mock.example.com/</loc>')
   })
 
+  it('keeps custom scripts in the payload until the hydration runtime is ready', async () => {
+    const result = await generateSite(
+      makeInput((site) => {
+        site.defaults.head.script = [{ src: '/vendor.js' }]
+        site.pages['/home'].head.script = [{ src: '/component.js', async: true }]
+      }),
+    )
+    const html = result.pages.find((p) => p.route === '/')?.body
+    expect(html).not.toContain('<script src="/vendor.js"')
+    expect(html).not.toContain('<script src="/component.js"')
+    expect(html).toContain('/vendor.js')
+    expect(html).toContain('/component.js')
+    expect(html).toContain('<script defer src="/_ps/site.js"></script>')
+  })
+
   it('excludes private pages from output and payload', async () => {
     const input = makeInput((site) => {
       site.pages['/home'].public = false
@@ -160,8 +175,7 @@ describe('generateSite', () => {
     const result = await generateSite(input)
     const home = result.pages.find((p) => p.route === '/')
 
-    // Without the SSR guard in getOrWaitComponent, Vue emits a comment node that
-    // mismatches the `div` the client hydrates
+    // The initial client render must match this placeholder, even for cached bundles.
     expect(result.warnings).toEqual([])
     expect(home?.body).toContain('id="test-c-0"><div></div></div>')
     // Custom components need the runtime, so they block noJs output

@@ -23,7 +23,8 @@ export interface IRenderSiteHead {
   script: IHeadScript[]
 }
 
-const keySel = (p: string, k: string | undefined): string => (k ? `[${p}='${k}']` : '')
+const keySel = (p: string, k: string | undefined): string =>
+  k === undefined ? '' : `[${p}='${k.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}']`
 
 const metaKey = (meta: IHeadMeta) => {
   const { 'http-equiv': equiv, property, name } = meta
@@ -92,8 +93,31 @@ export function getHead(
   }
 }
 
+const tagAttributes = (tag: IHeadMeta | IHeadScript | IHeadLink) =>
+  Object.entries(tag)
+    .filter(
+      ([attr, value]) =>
+        value !== undefined && value !== null && value !== false && attr !== 'key',
+    )
+    .map(([attr, value]) => [attr, value === true ? '' : String(value)])
+    .sort(([a], [b]) => a.localeCompare(b))
+
 const keyFn = (tag: IHeadMeta | IHeadScript | IHeadLink) =>
-  Object.entries(tag).reduce((a, b) => `${a}${keySel(b[0], b[1])}`, '')
+  JSON.stringify(tagAttributes(tag))
+
+const findTag = (
+  tag: 'meta' | 'script' | 'link',
+  attrs: IHeadMeta | IHeadScript | IHeadLink,
+) => {
+  if (tag === 'meta') return document.querySelector(`meta${metaKey(attrs as IHeadMeta)}`)
+  const key = keyFn(attrs)
+  return Array.from(document.querySelectorAll(tag)).find((element) => {
+    const attributes = Object.fromEntries(
+      Array.from(element.attributes).map((attr) => [attr.name, attr.value]),
+    )
+    return keyFn(attributes) === key
+  })
+}
 
 // Update scripts/links.
 function updateTags(
@@ -115,19 +139,30 @@ function updateTags(
   )
 
   // Remove outdated tags
-  oldTags.forEach((_t, key) => {
+  oldTags.forEach((t, key) => {
     if (tag === 'meta' || !newTags.has(key)) {
-      document.querySelector(`${tag}${key}`)?.remove()
+      findTag(tag, t)?.remove()
     }
   })
   // Add new tags
   newTags.forEach((t, key) => {
     if (tag === 'meta' || !oldTags.has(key)) {
       if (tag === 'meta') {
-        document.querySelector(`${tag}${key}`)?.remove()
+        findTag(tag, t)?.remove()
       }
+      // Reuse prerendered links/scripts on the first hydration update.
+      if (tag !== 'meta' && findTag(tag, t)) return
       const newElement = document.createElement(tag)
-      Object.keys(t).forEach((attr) => newElement.setAttribute(attr, t[attr]))
+      if (tag === 'script') {
+        // Dynamic scripts default to async, even when the attribute is absent.
+        // Preserve dependency order unless the author explicitly opts into async.
+        ;(newElement as HTMLScriptElement).async = t.async === true
+      }
+      Object.entries(t).forEach(([attr, value]) => {
+        if (value !== undefined && value !== null && value !== false && attr !== 'key') {
+          newElement.setAttribute(attr, value === true ? '' : String(value))
+        }
+      })
       document.head.appendChild(newElement)
     }
   })
