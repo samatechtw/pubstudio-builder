@@ -347,6 +347,11 @@ Included in `identify()`'s orientation payload, but important enough to repeat:
   `docs/agent-tools-reference.md` generated from `OP_REGISTRY` with a CI drift check was
   designed but not built.
 - **No skill package** for the agent side of the workflow.
+- **No `insertHtml` op.** An HTML/CSS snippet → `IAddComponentData` tree converter would let
+  an agent add a whole section in one op instead of dozens of id-threaded add/style ops.
+  `AddComponent` already recurses through `children`; only the parse-and-map step is missing.
+  Open choices: class → mixin policy, theme-variable rewriting, `replace`/`wrap` positions,
+  and whether a bad tag rejects the whole snippet (preferred) or is skipped.
 - **Composite builtins cannot be inserted directly.** `MailingList`, `ContactForm`,
   `ImageGallery`, `NavMenu`, `LightboxGallery` and friends are most of what makes a builtin
   worth having, and `addComponent` rejects their ids rather than producing an empty tag.

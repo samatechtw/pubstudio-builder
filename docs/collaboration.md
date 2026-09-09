@@ -1,4 +1,17 @@
-# Collaboration transport
+# Collaboration
+
+## Model
+
+Edits are sent as command batches. The server replays each batch against the latest site
+and commits the new snapshot, a revision bump, and the operation log. Non-overlapping
+edits from different sources merge on their own. A command whose precondition fails
+(expected prior value, parent exists, id absent) rejects the whole batch with a 409,
+and the client keeps the rejected work for recovery. Undo history is per tab, undo
+submits the inverse as a new command. Full snapshot writes remain for imports, migrations,
+and restores, and trigger a `snapshot_reset` so clients reload. Presence, cursors,
+and character-level text merging are not handled.
+
+## Transport
 
 The builder submits idempotent command batches over HTTP and receives committed
 operations over an authenticated WebSocket. HTTP operation reads are retained for
