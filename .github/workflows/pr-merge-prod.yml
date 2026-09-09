@@ -191,7 +191,7 @@ jobs:
       - name: Checkout code into workspace directory
         uses: actions/checkout@v7
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
+        uses: docker/setup-qemu-action@v4
       - name: Download arm64 binary
         uses: actions/download-artifact@v8
         with:
@@ -263,7 +263,7 @@ jobs:
       - name: Checkout code into workspace directory
         uses: actions/checkout@v7
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
+        uses: docker/setup-qemu-action@v4
       - name: Download ssg bundle
         uses: actions/download-artifact@v8
         with:
@@ -304,7 +304,7 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
       - name: Set up NodeJS (LTS)
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version: 'lts/*'
       - name: Install dependencies
