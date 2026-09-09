@@ -212,6 +212,7 @@ jobs:
     steps:
       - uses: geekyeggo/delete-artifact@v6
         with:
+          failOnError: false
           name: |
             site-api-*
             backend-binaries
