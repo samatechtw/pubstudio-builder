@@ -139,6 +139,7 @@ impl SlackLayer {
         message: String,
         event: &Event,
         metadata: String,
+        exec_env: &ExecEnv,
     ) -> Result<String, serde_json::Error> {
         let event_level = event.metadata().level();
         let event_level_emoji = match *event_level {
@@ -155,10 +156,14 @@ impl SlackLayer {
             _ => String::new(),
         };
 
+        let host = std::env::var("HOSTNAME")
+            .map(|h| format!(" {h}"))
+            .unwrap_or_default();
+
         let mut blocks = vec![
             SlackMessage::section_text(&format!(
-                "{} *{}*{}",
-                event_level_emoji, event_level, location
+                "{} *{}* `{}{}`{}",
+                event_level_emoji, event_level, exec_env, host, location
             )),
             SlackMessage::section_text(&format!("> *{}*", message)),
         ];
@@ -206,7 +211,7 @@ where
         };
 
         // Build blocks
-        let blocks_result = Self::build_blocks(message, event, metadata);
+        let blocks_result = Self::build_blocks(message, event, metadata, &self.exec_env);
         match blocks_result {
             Ok(blocks) => {
                 if self.exec_env == ExecEnv::Dev || self.exec_env == ExecEnv::Ci {

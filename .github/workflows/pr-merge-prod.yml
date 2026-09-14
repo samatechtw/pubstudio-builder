@@ -1,5 +1,7 @@
 name: PR Merge (prod)
 
+# Fast-forwards `prod` to `main` and cuts a release.
+
 on:
   pull_request:
     types: [edited]
@@ -11,10 +13,6 @@ on:
       source:
         description: 'Input a trigger source'
 
-env:
-  WORKSPACE_ROOT: .
-  ENVIRONMENT: prod
-
 # Cancel redundant workflow runs
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -23,7 +21,12 @@ concurrency:
 jobs:
   fast_forward_job:
     name: Fast Forward
-    if: github.event_name == 'workflow_dispatch' || (github.event.issue.pull_request && contains(github.event.comment.body, '/ff'))
+    # Only trusted commenters may trigger `/ff`
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.issue.pull_request &&
+      contains(github.event.comment.body, '/ff') &&
+      contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.comment.author_association))
     runs-on: ubuntu-22.04
     steps:
       # To use this repository's private action, you must check out the repository
@@ -32,7 +35,6 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
-      # Basic use case example
       - name: Fast Forward PR
         if: ${{ github.event_name != 'workflow_dispatch' }}
         id: ff-action
@@ -44,257 +46,8 @@ jobs:
           staging_branch: 'main'
           production_branch: 'prod'
 
-  pre_job:
-    needs: fast_forward_job
-    name: Run Workflow?
-    runs-on: ubuntu-22.04
-    outputs:
-      should_skip: ${{ steps.skip_check.outputs.should_skip }}
-    steps:
-      - id: skip_check
-        if: ${{ github.event_name != 'workflow_dispatch' }}
-        uses: fkirc/skip-duplicate-actions@v5
-        with:
-          concurrent_skipping: 'never'
-          skip_after_successful_duplicate: 'true'
-          # Changes to paths must be synced with pr-merge*.yml
-          paths: '[".github/workflows/pr-merge-*.yml", "apps/**", "backend/**", "libs/**", "*"]'
-          paths_ignore: '["**/README.md", "skaffold*.yaml"]'
-
-  repo-metadata:
-    needs: pre_job
-    if: ${{ needs.pre_job.outputs.should_skip != 'true' }}
-    name: Get repo metadata
-    runs-on: ubuntu-latest
-    outputs:
-      next_version: ${{ steps.meta.outputs.next_version }}
-      sha8: ${{ steps.meta.outputs.sha8 }}
-      repo_slug: ${{ steps.meta.outputs.repo_slug }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
-          persist-credentials: false
-      - id: meta
-        uses: ./.github/actions/repo-metadata
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-
-  build-apps:
-    needs: pre_job
-    if: ${{ needs.pre_job.outputs.should_skip != 'true' }}
-    name: Build Apps
-    runs-on: ubuntu-22.04
-    steps:
-      - name: Checkout code into workspace directory
-        uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
-      - uses: ./.github/actions/env-setup
-      - name: Build apps
-        run: npx nx run-many -t build --projects="web*" --parallel=3 && npx nx build-hydrate web-site && npx nx build ssg
-      - name: Upload web-site bundle
-        uses: actions/upload-artifact@v7
-        with:
-          name: web-site-bundle
-          path: |
-            ./dist/apps/web-site/index.html
-          if-no-files-found: error
-          retention-days: 1
-      - name: Upload hydration runtime
-        uses: actions/upload-artifact@v7
-        with:
-          name: web-site-hydrate-bundle
-          path: |
-            ./dist/apps/web-site-hydrate/site.js
-          if-no-files-found: error
-          retention-days: 1
-      - name: Upload ssg bundle
-        uses: actions/upload-artifact@v7
-        with:
-          name: ssg-bundle
-          path: |
-            ./dist/apps/ssg
-          if-no-files-found: error
-          retention-days: 1
-
-  build-backend:
-    needs: pre_job
-    if: ${{ needs.pre_job.outputs.should_skip != 'true' }}
-    name: Build Backend
-    runs-on: ubuntu-22.04
-    env:
-      TARGET_FLAGS:
-      CARGO: cargo
-      CROSS_VERSION: v0.2.5
-    strategy:
-      matrix:
-        include:
-          - target: aarch64-unknown-linux-gnu
-            folder: linux/arm64
-          - target: x86_64-unknown-linux-gnu
-            folder: linux/amd64
-    steps:
-      - name: Checkout code into workspace directory
-        uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
-      - name: Install rust
-        uses: dtolnay/rust-toolchain@master
-        with:
-          toolchain: '1.90.0'
-      - name: Use Cross
-        if: matrix.target == 'aarch64-unknown-linux-gnu'
-        run: |
-          # In the past, new releases of 'cross' have broken CI. So for now, we
-          # pin it. We also use their pre-compiled binary releases because cross
-          # has over 100 dependencies and takes a bit to compile.
-          dir="$RUNNER_TEMP/cross-download"
-          mkdir "$dir"
-          echo "$dir" >> $GITHUB_PATH
-          cd "$dir"
-          curl -LO "https://github.com/cross-rs/cross/releases/download/$CROSS_VERSION/cross-x86_64-unknown-linux-musl.tar.gz"
-          tar xf cross-x86_64-unknown-linux-musl.tar.gz
-          echo "CARGO=cross" >> $GITHUB_ENV
-          echo "TARGET_FLAGS=--target ${{ matrix.target }}" >> $GITHUB_ENV
-          # echo "TARGET_DIR=./target/${{ matrix.target }}" >> $GITHUB_ENV
-      - name: Cache build
-        uses: Swatinem/rust-cache@v2
-        with:
-          key: pr-${{ matrix.target }}-${{ env.CACHE_SUFFIX }}
-          workspaces: backend
-      - name: Build app in release mode
-        run: cd backend && ${{ env.CARGO }} build --release --target ${{ matrix.target }}
-      - name: Copy app to target folder for Docker multi-arch build
-        run: |
-          mkdir -p ./backend/target/${{ matrix.folder }}/release
-          cp ./backend/target/${{ matrix.target }}/release/site-api ./backend/target/${{ matrix.folder }}/release/site-api
-      - name: Upload binaries
-        uses: actions/upload-artifact@v7
-        with:
-          name: backend-binaries-${{ matrix.target }}
-          path: |
-            ./backend/target/${{ matrix.folder }}/release/site-api
-          if-no-files-found: error
-          retention-days: 1
-
-  build-docker-site-api-prod:
-    needs: [pre_job, build-backend, repo-metadata]
-    if: ${{ needs.pre_job.outputs.should_skip != 'true' }}
-    name: Site API Production Image
-    runs-on: ubuntu-22.04
-    env:
-      APP_NAME: site-api
-      BRANCH_NAME: main
-    steps:
-      - name: Checkout code into workspace directory
-        uses: actions/checkout@v7
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v4
-      - name: Download arm64 binary
-        uses: actions/download-artifact@v8
-        with:
-          name: backend-binaries-aarch64-unknown-linux-gnu
-          path: ./backend/target/linux/arm64/release/${{env.APP_NAME}}
-      - name: Download amd64 binary
-        uses: actions/download-artifact@v8
-        with:
-          name: backend-binaries-x86_64-unknown-linux-gnu
-          path: ./backend/target/linux/amd64/release/${{env.APP_NAME}}
-      - name: Download web-site bundle
-        uses: actions/download-artifact@v8
-        with:
-          name: web-site-bundle
-          path: ./dist/apps/web-site/index.html
-      - name: Download hydration runtime
-        uses: actions/download-artifact@v8
-        with:
-          name: web-site-hydrate-bundle
-          path: ./dist/apps/web-site-hydrate/site.js
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v4
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v4
-        with:
-          registry: ghcr.io
-          username: ${{github.actor}}
-          password: ${{secrets.GITHUB_TOKEN}}
-      - name: Build and push prod docker image
-        id: docker_build
-        uses: docker/build-push-action@v7
-        with:
-          context: ${{env.WORKSPACE_ROOT}}
-          # Include non-secret args so we don't need them in the site-api server env
-          # Except SITE_API_HOST, which is unique to each server
-          build-args: |
-            "EXEC_ENV=prod"
-            "PLATFORM_WEB_URL=https://pubstud.io"
-            "DATABASE_URL=sqlite:site-api/db/metadata/sites_metadata.db"
-            "SITE_API_PORT=3100"
-            "SITE_API_HOST=0.0.0.0"
-            "SITE_ADMIN_PUBLIC_KEY=${{ secrets.SITE_ADMIN_PUBLIC_KEY_PROD }}"
-            "S3_URL=${{ secrets.S3_URL_PROD }}"
-            "S3_ACCESS_KEY_ID=${{ secrets.S3_SECRET_ACCESS_KEY_ID_PROD }}"
-            "S3_SECRET_ACCESS_KEY=${{ secrets.S3_SECRET_ACCESS_KEY_PROD }}"
-            "MAX_BACKUPS=10"
-            "MAILSENDER_API_KEY=${{ secrets.MAILSENDER_API_KEY_PROD }}"
-            "SLACK_WEBHOOK_INFO_URL=${{ secrets.SITE_API_SLACK_WEBHOOK_URL_PROD }}"
-            "SLACK_WEBHOOK_ERROR_URL=${{ secrets.SITE_API_SLACK_WEBHOOK_URL_PROD }}"
-            "LAST_COMMIT_SHA=${{needs.repo-metadata.outputs.sha8}}"
-            "RELEASE_VERSION=${{needs.repo-metadata.outputs.next_version}}"
-          push: true
-          file: ${{env.WORKSPACE_ROOT}}/backend/${{env.APP_NAME}}/Dockerfile
-          target: prod
-          platforms: linux/amd64,linux/arm64
-          tags: |
-            ${{needs.repo-metadata.outputs.repo_slug}}/${{env.ENVIRONMENT}}/${{env.APP_NAME}}:${{env.BRANCH_NAME}}-${{needs.repo-metadata.outputs.sha8}}-${{github.run_number}}
-            ${{needs.repo-metadata.outputs.repo_slug}}/${{env.ENVIRONMENT}}/${{env.APP_NAME}}:latest
-
-  build-docker-ssg-prod:
-    needs: [pre_job, build-apps, repo-metadata]
-    if: ${{ needs.pre_job.outputs.should_skip != 'true' }}
-    name: SSG Production Image
-    runs-on: ubuntu-22.04
-    env:
-      APP_NAME: ssg
-      BRANCH_NAME: main
-    steps:
-      - name: Checkout code into workspace directory
-        uses: actions/checkout@v7
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v4
-      - name: Download ssg bundle
-        uses: actions/download-artifact@v8
-        with:
-          name: ssg-bundle
-          path: ./dist/apps/${{env.APP_NAME}}
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v4
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v4
-        with:
-          registry: ghcr.io
-          username: ${{github.actor}}
-          password: ${{secrets.GITHUB_TOKEN}}
-      - name: Build and push ssg docker image
-        id: docker_build
-        uses: docker/build-push-action@v7
-        with:
-          context: ${{env.WORKSPACE_ROOT}}
-          push: true
-          # The generator is an app, not a backend service, so its Dockerfile
-          # lives under apps/ rather than backend/
-          file: ${{env.WORKSPACE_ROOT}}/apps/${{env.APP_NAME}}/Dockerfile
-          platforms: linux/amd64,linux/arm64
-          tags: |
-            ${{needs.repo-metadata.outputs.repo_slug}}/${{env.ENVIRONMENT}}/${{env.APP_NAME}}:${{env.BRANCH_NAME}}-${{needs.repo-metadata.outputs.sha8}}-${{github.run_number}}
-            ${{needs.repo-metadata.outputs.repo_slug}}/${{env.ENVIRONMENT}}/${{env.APP_NAME}}:latest
-
   release:
-    needs:
-      - build-docker-site-api-prod
-      - build-docker-ssg-prod
+    needs: fast_forward_job
     name: Release
     runs-on: ubuntu-latest
     steps:
