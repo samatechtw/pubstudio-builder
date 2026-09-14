@@ -1,6 +1,7 @@
 name: PR Merge (main)
 
-# This workflow publishes secret-free CI images used by pubstudio's integration tests.
+# Publishes the secret-free CI images used by pubstudio's integration tests, then
+# cuts a release. pubstudio builds and deploys site-api and ssg.
 
 on:
   push:
@@ -177,3 +178,32 @@ jobs:
           tags: |
             ${{needs.repo-metadata.outputs.repo_slug}}/ci/${{env.APP_NAME}}:${{env.BRANCH_NAME}}-${{needs.repo-metadata.outputs.sha8}}-${{github.run_number}}
             ${{needs.repo-metadata.outputs.repo_slug}}/ci/${{env.APP_NAME}}:latest
+
+  release:
+    needs: build-docker-site-api-ci
+    name: Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Set up NodeJS (LTS)
+        uses: actions/setup-node@v7
+        with:
+          node-version: 'lts/*'
+      - name: Install dependencies
+        run: |
+          npm install -g semantic-release@23
+          npm install -g @semantic-release/changelog@6
+          npm install -g conventional-changelog-conventionalcommits@7
+      - name: Release
+        env:
+          # Default GITHUB_TOKEN is OK as long as there no workflows triggered
+          # on "create release" event as the latter will not be emitted.
+          # See https://github.com/semantic-release/github
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git branch -avv
+          npx semantic-release --debug
