@@ -11,6 +11,12 @@ pub struct ErrorResponse {
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum ApiErrorCode {
+    SignupsAtCapacity,
+    AuthEmailUnavailable,
+    AuthEmailSendFailed,
+    AccountCreatedEmailUnavailable,
+    AccountCreatedEmailFailed,
+
     InvalidAuth,
     InvalidFormData,
     InvalidOldPassword,
