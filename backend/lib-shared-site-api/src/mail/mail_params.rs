@@ -48,6 +48,8 @@ impl Email {
 
 #[derive(Debug, Error)]
 pub enum MailError {
+    #[error("Mail provider authentication or quota unavailable")]
+    Unavailable,
     #[error("Failed to send: {0}")]
     Failed(String),
     #[error("Template parse: {0}")]
