@@ -11,7 +11,7 @@ import {
 export interface IApiAuth {
   registerUser(user: IRegisterUserApiRequest): Promise<IRegisterUserApiResponse>
   loginUser: (user: ILoginUserApiRequest) => Promise<ILoginUserApiResponse>
-  resetPassword: (email: string) => Promise<void>
+  resetPassword: (email: string, challengeToken?: string) => Promise<void>
   updatePassword: (jwt: string, password: string) => Promise<void>
   confirmEmail: (code: string) => Promise<void>
   resendConfirmEmail: () => Promise<void>
@@ -40,11 +40,11 @@ export const useAuthApi = (api: PSApi): IApiAuth => {
     return data as unknown as ILoginUserApiResponse
   }
 
-  const resetPassword = async (email: string): Promise<void> => {
+  const resetPassword = async (email: string, challengeToken?: string): Promise<void> => {
     await api.request({
       url: 'auth/logins/reset-password',
       method: 'POST',
-      data: { email },
+      data: { email, challenge_token: challengeToken },
     })
   }
 

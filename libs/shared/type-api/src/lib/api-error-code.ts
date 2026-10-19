@@ -4,6 +4,8 @@ export enum ApiErrorCode {
   AuthEmailSendFailed = 'AuthEmailSendFailed',
   AccountCreatedEmailUnavailable = 'AccountCreatedEmailUnavailable',
   AccountCreatedEmailFailed = 'AccountCreatedEmailFailed',
+  ChallengeFailed = 'ChallengeFailed',
+  ChallengeUnavailable = 'ChallengeUnavailable',
 
   UpdateStale = 'UpdateStale',
   CollaborationConflict = 'CollaborationConflict',
