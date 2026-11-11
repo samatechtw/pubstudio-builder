@@ -19,7 +19,7 @@ export interface IAuthFeature {
   registerUser: (user: IRegisterUserApiRequest) => Promise<IRegisterUserApiResponse>
   loginUser: (user: ILoginUserApiRequest) => Promise<void>
   resetPassword: (email: string) => Promise<void>
-  updatePassword: (jwt: string, password: string) => Promise<void>
+  updatePassword: (token: string, password: string) => Promise<void>
   logoutUser: () => void
   validatePassword: (password: string) => boolean
   loggedIn: ComputedRef<boolean>
@@ -53,8 +53,8 @@ export const useAuth = (): IAuthFeature => {
     await api.resetPassword(email)
   }
 
-  const updatePassword = async (jwt: string, password: string): Promise<void> => {
-    await api.updatePassword(jwt, password)
+  const updatePassword = async (token: string, password: string): Promise<void> => {
+    await api.updatePassword(token, password)
   }
 
   const logoutUser = () => {

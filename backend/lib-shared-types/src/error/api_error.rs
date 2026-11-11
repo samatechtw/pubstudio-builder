@@ -48,6 +48,7 @@ pub enum ApiErrorCode {
     SubscriptionCancelFailed,
     AlreadyConfirmed,
     ConfirmExpired,
+    ResetTokenInvalid,
     ReAuthFailed,
     SiteUnpublished,
     SubdomainReserved,
