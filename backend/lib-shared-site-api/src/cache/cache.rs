@@ -194,18 +194,25 @@ impl AppCache {
         Ok(count)
     }
 
-    pub async fn reset_bandwidth(&self, clear_monthly: bool) {
+    pub async fn reset_bandwidth(&self) {
         for (site_id, mut usage_data) in self.cache.iter() {
             usage_data.request_count = 0;
             usage_data.site_view_count = 0;
             usage_data.request_error_count = 0;
             usage_data.page_views.clear();
             usage_data.total_bandwidth = 0;
-            if clear_monthly {
-                usage_data.current_monthly_bandwidth = 0;
-            }
             usage_data.last_updated = JsDate::now();
 
+            self.cache.insert(site_id.to_string(), usage_data).await;
+        }
+    }
+
+    pub async fn set_monthly_bandwidth(&self, monthly_bandwidth: &HashMap<String, u64>) {
+        for (site_id, mut usage_data) in self.cache.iter() {
+            usage_data.current_monthly_bandwidth = monthly_bandwidth
+                .get(site_id.as_str())
+                .copied()
+                .unwrap_or(0);
             self.cache.insert(site_id.to_string(), usage_data).await;
         }
     }

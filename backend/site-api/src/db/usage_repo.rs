@@ -130,12 +130,12 @@ impl UsageRepoTrait for UsageRepo {
           site_id,
           SUM(request_count),
           SUM(site_view_count),
-          SUM(CASE WHEN start_time >= ? THEN total_bandwidth ELSE 0 END)
+          -- The 00:00 UTC persist records the previous day, so a row on the 1st belongs to the prior month
+          SUM(CASE WHEN strftime('%Y-%m', end_time, '-1 hour') = strftime('%Y-%m', 'now') THEN total_bandwidth ELSE 0 END)
         FROM site_usage
         GROUP BY site_id
         "#,
         )
-        .bind(0)
         .fetch_all(&mut *self.get_db_conn().await?)
         .await?;
 
