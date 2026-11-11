@@ -12,7 +12,7 @@ export interface IApiAuth {
   registerUser(user: IRegisterUserApiRequest): Promise<IRegisterUserApiResponse>
   loginUser: (user: ILoginUserApiRequest) => Promise<ILoginUserApiResponse>
   resetPassword: (email: string) => Promise<void>
-  updatePassword: (jwt: string, password: string) => Promise<void>
+  updatePassword: (token: string, password: string) => Promise<void>
   confirmEmail: (code: string) => Promise<void>
   resendConfirmEmail: () => Promise<void>
 }
@@ -48,14 +48,11 @@ export const useAuthApi = (api: PSApi): IApiAuth => {
     })
   }
 
-  const updatePassword = async (jwt: string, password: string): Promise<void> => {
+  const updatePassword = async (token: string, password: string): Promise<void> => {
     await api.request({
       url: 'auth/logins/passwords',
       method: 'PATCH',
-      data: { password },
-      headers: {
-        Authorization: `Bearer ${jwt}`,
-      },
+      data: { token, password },
     })
   }
 
