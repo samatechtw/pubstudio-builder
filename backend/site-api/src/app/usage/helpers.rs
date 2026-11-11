@@ -89,13 +89,36 @@ async fn persist_custom_data_usage(context: &ApiContext) -> Result<i64, DbError>
     result
 }
 
+async fn refresh_monthly_bandwidth(context: &ApiContext) -> Result<(), DbError> {
+    let monthly_bandwidth = context
+        .usage_repo
+        .list_usage_totals()
+        .await?
+        .into_iter()
+        .map(|usage| (usage.site_id, usage.current_monthly_bandwidth))
+        .collect();
+    context
+        .cache
+        .set_monthly_bandwidth(&monthly_bandwidth)
+        .await;
+    Ok(())
+}
+
 pub async fn persist_usage_helper(context: ApiContext) -> () {
+    // insert_usage skips an apparently empty cache, and moka's entry count lags recent writes
+    context.cache.sync().await;
     let cache_length = context.cache.cache.weighted_size();
 
-    if let Err(e) = context.usage_repo.insert_usage(&context.cache.cache).await {
-        error!(err = e.to_string(), "Failed to save site usage to DB");
+    let insert_result = context.usage_repo.insert_usage(&context.cache.cache).await;
+    context.cache.reset_bandwidth().await;
+    match insert_result {
+        Ok(()) => {
+            if let Err(e) = refresh_monthly_bandwidth(&context).await {
+                error!(err = e.to_string(), "Failed to refresh monthly bandwidth");
+            }
+        }
+        Err(e) => error!(err = e.to_string(), "Failed to save site usage to DB"),
     }
-    context.cache.reset_bandwidth(false).await;
 
     let custom_data_usage = match persist_custom_data_usage(&context).await {
         Err(e) => {
@@ -106,13 +129,5 @@ pub async fn persist_usage_helper(context: ApiContext) -> () {
     };
 
     info!("Persisted site data cache and custom data usage, len={cache_length}, usage={custom_data_usage}");
-    ()
-}
-
-// Reset cache bandwidth monthly, so
-pub async fn reset_cache_helper(context: ApiContext) -> () {
-    context.cache.reset_bandwidth(true).await;
-
-    info!("Resetting cache bandwidth data");
     ()
 }

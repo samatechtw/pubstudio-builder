@@ -183,7 +183,6 @@ pub async fn backup_site(
     }
 }
 
-// To satisfy tokio-cron async closure constraints, which expects an async function with empty return
 pub async fn backup_sites_helper(context: ApiContext) -> () {
     let result = match check_s3_config(&context.config) {
         Ok(()) => backup_all_sites(context).await,
