@@ -16,6 +16,8 @@ pub enum ApiErrorCode {
     AuthEmailSendFailed,
     AccountCreatedEmailUnavailable,
     AccountCreatedEmailFailed,
+    ChallengeFailed,
+    ChallengeUnavailable,
 
     InvalidAuth,
     InvalidFormData,

@@ -18,7 +18,7 @@ export interface IAuthFeature {
   api: IApiAuth
   registerUser: (user: IRegisterUserApiRequest) => Promise<IRegisterUserApiResponse>
   loginUser: (user: ILoginUserApiRequest) => Promise<void>
-  resetPassword: (email: string) => Promise<void>
+  resetPassword: (email: string, challengeToken?: string) => Promise<void>
   updatePassword: (token: string, password: string) => Promise<void>
   logoutUser: () => void
   validatePassword: (password: string) => boolean
@@ -49,8 +49,8 @@ export const useAuth = (): IAuthFeature => {
     await getUser()
   }
 
-  const resetPassword = async (email: string): Promise<void> => {
-    await api.resetPassword(email)
+  const resetPassword = async (email: string, challengeToken?: string): Promise<void> => {
+    await api.resetPassword(email, challengeToken)
   }
 
   const updatePassword = async (token: string, password: string): Promise<void> => {

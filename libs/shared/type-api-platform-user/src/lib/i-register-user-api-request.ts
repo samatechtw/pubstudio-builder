@@ -3,4 +3,5 @@ export interface IRegisterUserApiRequest {
   password: string
   identity: string
   subdomain: string
+  challenge_token?: string
 }
