@@ -4,6 +4,7 @@ import {
   IHeadScript,
   IPage,
   ISite,
+  isAsyncScript,
 } from '@pubstudio/shared/type-site'
 
 const activePageName = (activePage: IPage | undefined) => {
@@ -53,7 +54,7 @@ export function getHead(
   const script: IHeadScript[] = [
     ...(site?.defaults.head.script ?? []),
     ...(activePage.head.script ?? []),
-  ]
+  ].map((script) => ({ ...script, async: isAsyncScript(script.async) }))
   // Merge meta. site?.name matches what platform-api substitutes into the SPA shell.
   const description =
     activePage.head.description ??

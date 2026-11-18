@@ -24,12 +24,14 @@ describe('page scripts', () => {
           { src: '/dependency.js' },
           { src: '/component.js', async: false },
           { src: '/analytics.js', async: true },
+          JSON.parse('{"src":"/old-ordered.js","async":"false"}'),
+          JSON.parse('{"src":"/old-async.js","async":"true"}'),
         ],
       }),
       undefined,
     )
     const scripts = Array.from(document.scripts)
-    expect(scripts.map((s) => s.async)).toEqual([false, false, true])
+    expect(scripts.map((s) => s.async)).toEqual([false, false, true, false, true])
     expect(scripts[1].hasAttribute('async')).toBe(false)
     expect(scripts[2].getAttribute('async')).toBe('')
   })

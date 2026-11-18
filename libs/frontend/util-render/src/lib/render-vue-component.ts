@@ -67,7 +67,8 @@ const VueComponent = defineComponent({
       if (component.value) {
         return h(component.value, props.customProps)
       }
-      return h('div', '')
+      const { id, class: className, style } = props.customProps
+      return h('div', { id, class: className, style })
     }
   },
 })

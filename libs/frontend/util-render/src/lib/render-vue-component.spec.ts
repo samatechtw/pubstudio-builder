@@ -54,12 +54,13 @@ describe('Vue embeds', () => {
     app = createApp({
       render: () =>
         h('main', [
-          embed('TestEmbed', { label: 'one' }),
+          embed('TestEmbed', { id: 'one', class: 'embed', label: 'one' }),
           embed('TestEmbed', { label: 'two' }),
         ]),
     })
     app.mount(root)
     await nextTick()
+    expect(root.querySelector('#one.embed')?.tagName).toBe('DIV')
     globals.TestEmbed = loaded
     await vi.advanceTimersByTimeAsync(400)
     expect(root.textContent).toBe('onetwo')

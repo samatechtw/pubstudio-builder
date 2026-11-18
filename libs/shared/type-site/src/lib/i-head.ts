@@ -32,6 +32,9 @@ export interface IHeadScript {
   blocking?: string
 }
 
+export const isAsyncScript = (value: unknown): boolean =>
+  value === true || value === 'true'
+
 export interface IHead {
   title?: string
   description?: string

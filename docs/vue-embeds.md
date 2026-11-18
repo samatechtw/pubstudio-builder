@@ -14,7 +14,8 @@ is found by name on `window` and rendered by `render-vue-component.ts`.
   templates. There is no runtime template compiler, router, or Pinia.
 - Each embed polls for its export after mount, reports one console diagnostic after eight
   seconds, and keeps polling while mounted. The first hydration render is always the empty
-  placeholder.
+  placeholder. Set a minimum height in the builder to reserve space until the bundle loads.
+  The static HTML contains only the placeholder, so it has no embed content to index.
 
 ## Script ordering
 

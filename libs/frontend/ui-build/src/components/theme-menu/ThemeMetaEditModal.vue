@@ -167,12 +167,6 @@
           </div>
           <div class="meta-row">
             <STInput
-              :modelValue="data.meta.async || ''"
-              name="async"
-              placeholder="async"
-              @update:modelValue="update('async', $event)"
-            />
-            <STInput
               :modelValue="data.meta.crossorigin || ''"
               name="crossorigin"
               placeholder="crossorigin"
@@ -191,6 +185,10 @@
               @update:modelValue="update('id', $event)"
             />
           </div>
+          <label class="meta-row">
+            <input v-model="asyncScript" type="checkbox" name="async" />
+            {{ t('theme.async_script') }}
+          </label>
         </div>
         <div class="actions">
           <PSButton :text="t('save')" class="submit-button" @click="save" />
@@ -206,7 +204,7 @@ import { computed, ref, toRefs, watch } from 'vue'
 import { useI18n } from 'petite-vue-i18n'
 import { STInput, STMultiselect } from '@samatech/vue-components'
 import { Modal, PSButton } from '@pubstudio/frontend/ui-widgets'
-import { IHeadObject, IHeadTagStr } from '@pubstudio/shared/type-site'
+import { IHeadObject, IHeadTagStr, isAsyncScript } from '@pubstudio/shared/type-site'
 import { IThemeMetaEditData } from './i-theme-meta-edit-data'
 
 const props = defineProps<{
@@ -221,6 +219,13 @@ const emit = defineEmits<{
 }>()
 
 const data = ref()
+
+const asyncScript = computed({
+  get: () => isAsyncScript(data.value.meta.async),
+  set: (value: boolean) => {
+    data.value.meta.async = value
+  },
+})
 
 const tags = computed(() => {
   const strs: IHeadTagStr[] = ['link', 'meta', 'script']
