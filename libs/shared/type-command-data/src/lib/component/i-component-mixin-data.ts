@@ -5,7 +5,9 @@ export interface IComponentMixinData {
 
 export type IAddComponentMixinData = IComponentMixinData
 
-export type IRemoveComponentMixinData = IComponentMixinData
+export interface IRemoveComponentMixinData extends IComponentMixinData {
+  mixinIndex?: number
+}
 
 export interface IReplaceComponentMixinData {
   componentId: string

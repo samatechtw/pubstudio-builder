@@ -6,14 +6,18 @@ export interface IComponentMixinData {
   mixinId: string
 }
 
-export const addComponentMixin = (context: ISiteContext, data: IComponentMixinData) => {
+export const addComponentMixin = (
+  context: ISiteContext,
+  data: IComponentMixinData,
+  index?: number,
+) => {
   const { componentId, mixinId } = data
   const component = resolveComponent(context, componentId)
   const style = component?.style
   if (style) {
     if (!style.mixins?.includes(mixinId)) {
       if (style.mixins) {
-        style.mixins.push(mixinId)
+        style.mixins.splice(index ?? style.mixins.length, 0, mixinId)
       } else {
         style.mixins = [mixinId]
       }

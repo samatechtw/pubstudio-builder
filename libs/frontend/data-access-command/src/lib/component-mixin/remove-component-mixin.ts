@@ -23,7 +23,7 @@ export const undoRemoveComponentMixin = (
   site: ISite,
   data: IRemoveComponentMixinData,
 ) => {
-  addComponentMixin(site.context, data)
+  addComponentMixin(site.context, data, data.mixinIndex)
   // Select edited component for undo
   const component = resolveComponent(site.context, data.componentId)
   setSelectedComponent(site, component)

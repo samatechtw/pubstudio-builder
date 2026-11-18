@@ -125,7 +125,13 @@ export const removePageOp = defineOp<IRemovePageData>()({
     'Delete a page and its component tree. The last remaining page cannot be removed, ' +
     'and neither can the home page — point setHomePage elsewhere first.',
   input: obj({ route: routeField() }),
-  derived: ['pageRoute', 'orderIndex', 'serializedPage', 'selectedComponentId'],
+  derived: [
+    'activePageRoute',
+    'pageRoute',
+    'orderIndex',
+    'serializedPage',
+    'selectedComponentId',
+  ],
   omitted: {},
   resolve: (ctx, input) => {
     const page = mustResolvePage(ctx.site, input.route)
@@ -136,6 +142,7 @@ export const removePageOp = defineOp<IRemovePageData>()({
       constraint(`${page.route} is the home page; call setHomePage first.`)
     }
     const data: IRemovePageData = {
+      activePageRoute: ctx.site.editor?.active,
       pageRoute: page.route,
       orderIndex: ctx.site.pageOrder.indexOf(page.route),
       serializedPage: serializePage(page),

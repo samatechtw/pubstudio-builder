@@ -654,6 +654,7 @@ export const useBuild = (): IUseBuild => {
       return
     }
     const data: IRemoveComponentMixinData = {
+      mixinIndex: selected.style.mixins.indexOf(mixinId),
       componentId: selected.id,
       mixinId,
     }
@@ -822,8 +823,9 @@ export const useBuild = (): IUseBuild => {
   const flattenComponentMixin = (componentId: string, mixinId: string) => {
     const component = resolveComponent(site.value.context, componentId)
     const mixin = site.value.context.styles[mixinId]
-    if (component && mixin) {
+    if (component?.style.mixins?.includes(mixinId) && mixin) {
       const removeMixinData: IRemoveComponentMixinData = {
+        mixinIndex: component.style.mixins.indexOf(mixinId),
         componentId,
         mixinId,
       }
@@ -936,6 +938,7 @@ export const useBuild = (): IUseBuild => {
       const removedPage = site.value.pages[route]
       if (removedPage) {
         const data: IRemovePageData = {
+          activePageRoute: editor.active,
           pageRoute: route,
           orderIndex: site.value.pageOrder.indexOf(route),
           serializedPage: serializePage(removedPage),
