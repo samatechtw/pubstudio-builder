@@ -177,7 +177,9 @@ describe('generateSite', () => {
 
     // The initial client render must match this placeholder, even for cached bundles.
     expect(result.warnings).toEqual([])
-    expect(home?.body).toContain('id="test-c-0"><div></div></div>')
+    expect(home?.body).toContain(
+      'id="test-c-0"><div id="test-c-1" class="global-s-0 test-c-1" style=""></div></div>',
+    )
     // Custom components need the runtime, so they block noJs output
     expect(result.blockers.join(' ')).toContain('custom Vue component')
   })
