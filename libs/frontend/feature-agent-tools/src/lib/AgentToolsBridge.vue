@@ -1,5 +1,5 @@
 <template>
-  <div class="agent-tools-badge" :title="title">
+  <div v-if="connected" class="agent-tools-badge" :title="title">
     <span class="agent-tools-dot" />
     <span class="agent-tools-label">{{ label }}</span>
     <button class="agent-tools-off" title="Disconnect agent tools" @click="disconnect">
@@ -10,6 +10,7 @@
 
 <script lang="ts" setup>
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
+import { useRoute, useRouter } from '@pubstudio/frontend/util-router'
 import { computed, onBeforeUnmount, ref } from 'vue'
 import { disableAgentTools } from './agent-tools-enabled'
 import { installAgentTools } from './install'
@@ -30,7 +31,14 @@ const title = computed(() =>
     : 'window.PubStudio is available; after every page reload, call PubStudio.identify({ client: "your client" }) before using other tools',
 )
 
+const route = useRoute()
+const router = useRouter()
+
 const disconnect = () => {
+  if (route.value?.query.ai === '1') {
+    const { name, params, query, hash } = route.value
+    router.replace({ name, params, query: { ...query, ai: '0' }, hash })
+  }
   uninstall()
   disableAgentTools()
   connected.value = false
