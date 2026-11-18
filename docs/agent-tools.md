@@ -13,7 +13,8 @@ page covers non-obvious design constraints and maintenance rules.
 `<AgentToolsBridge v-if="agentToolsEnabled()" />` is mounted from the builder shell
 (`Build.vue` in the private repo). It is on for `import.meta.env.DEV`, for `?ai=1` (which
 also persists to `localStorage['pubstudio.agent-tools']`), and off again for `?ai=0`. A
-badge with a disconnect button renders bottom-right while it is installed.
+badge with a disconnect button renders bottom-right while it is installed. Disconnecting
+hides the badge and keeps tools off across reloads until enabled with `?ai=1`.
 
 This is not a capability boundary. Any script on the builder page already reaches the site
 model and API token, `window.store` has always been exposed for debugging. The flag exists
@@ -357,4 +358,4 @@ Included in `identify()`'s orientation payload, but important enough to repeat:
   worth having, and `addComponent` rejects their ids rather than producing an empty tag.
   Recursive `children` lets an agent build equivalent structures in one op, but the builtin
   definitions themselves are still only reachable through `use-build.ts`.
-- Extend scratch-site browser coverage to disabling the bridge and saving API-backed sites.
+- Extend browser coverage to saving API-backed sites.

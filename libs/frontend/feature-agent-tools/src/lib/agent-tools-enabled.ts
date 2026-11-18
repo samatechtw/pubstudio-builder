@@ -9,17 +9,14 @@ export const agentToolsEnabled = (): boolean => {
     return false
   }
   const param = new URLSearchParams(window.location.search).get('ai')
-  if (param === '1') {
-    window.localStorage.setItem(STORAGE_KEY, '1')
-    return true
+  if (param === '1' || param === '0') {
+    window.localStorage.setItem(STORAGE_KEY, param)
+    return param === '1'
   }
-  if (param === '0') {
-    window.localStorage.removeItem(STORAGE_KEY)
-    return false
-  }
-  return import.meta.env.DEV || window.localStorage.getItem(STORAGE_KEY) === '1'
+  const saved = window.localStorage.getItem(STORAGE_KEY)
+  return saved === null ? import.meta.env.DEV : saved === '1'
 }
 
 export const disableAgentTools = () => {
-  window.localStorage.removeItem(STORAGE_KEY)
+  window.localStorage.setItem(STORAGE_KEY, '0')
 }
