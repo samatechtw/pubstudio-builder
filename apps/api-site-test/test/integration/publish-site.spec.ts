@@ -21,7 +21,11 @@ describe('Publish Site', () => {
   beforeAll(() => {
     api = supertest(testConfig.get('apiUrl'))
     adminAuth = adminAuthHeader()
-    resetService = new SiteApiResetService('http://127.0.0.1:3100', adminAuth, SITE_SEEDS)
+    resetService = new SiteApiResetService(
+      testConfig.get('apiUrl'),
+      adminAuth,
+      SITE_SEEDS,
+    )
   })
 
   beforeEach(async () => {
@@ -81,16 +85,33 @@ describe('Publish Site', () => {
 
     it('creates a draft, updates it, and publishes', async () => {
       const newData1 = '{"test":"SOME TEST DATA"}'
+      const initialOrder = ['/', '/about']
+      const draftOrder = ['/about', '/']
+      const original = await api
+        .patch(`/api/sites/${siteId}`)
+        .send({ pageOrder: initialOrder })
+        .set('Authorization', ownerAuth)
+        .expect(200)
+      expect(original.body.revision).toBeGreaterThan(0)
+
       // Create a draft
       await api
         .post(`/api/sites/${siteId}/actions/create_draft`)
         .set('Authorization', ownerAuth)
         .expect(200)
 
+      const draft = await api
+        .get(`/api/sites/${siteId}/versions/latest`)
+        .set('Authorization', ownerAuth)
+        .expect(200)
+      expect(draft.body.id).not.toEqual(original.body.id)
+      expect(draft.body.pageOrder).toEqual(JSON.stringify(initialOrder))
+      expect(draft.body.revision).toEqual(original.body.revision)
+
       // Update the draft
-      await api
+      const updated = await api
         .patch(`/api/sites/${siteId}`)
-        .send({ pages: newData1 })
+        .send({ pages: newData1, pageOrder: draftOrder })
         .set('Authorization', ownerAuth)
         .expect(200)
 
@@ -107,6 +128,8 @@ describe('Publish Site', () => {
         .set('Authorization', ownerAuth)
         .expect(200)
       const body1: IGetSiteVersionApiResponse = r1.body
+      expect(body1.pageOrder).toEqual(JSON.stringify(draftOrder))
+      expect(body1.revision).toEqual(updated.body.revision + 1)
       expect(body1.pages).toEqual(JSON.stringify(newData1))
 
       // Update the draft again
