@@ -221,16 +221,17 @@ export const removeComponentMixinOp = defineOp<IRemoveComponentMixinData>()({
     'Remove a style mixin from a component. The mixin itself is untouched; use ' +
     'removeMixin to delete it from the site.',
   input: obj({ componentId: componentIdField(), mixinId: mixinIdField() }),
-  derived: [],
+  derived: ['mixinIndex'],
   omitted: {},
   resolve: (ctx, input) => {
     const component = mustResolveComponent(ctx.site, input.componentId)
-    if (!component.style.mixins?.includes(input.mixinId)) {
+    const mixinIndex = component.style.mixins?.indexOf(input.mixinId) ?? -1
+    if (mixinIndex < 0) {
       constraint(`${component.id} does not use mixin ${input.mixinId}.`)
     }
     return {
       type: CommandType.RemoveComponentMixin,
-      data: { componentId: component.id, mixinId: input.mixinId },
+      data: { componentId: component.id, mixinId: input.mixinId, mixinIndex },
     }
   },
   example: (site) => {

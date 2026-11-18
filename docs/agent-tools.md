@@ -357,9 +357,4 @@ Included in `identify()`'s orientation payload, but important enough to repeat:
   worth having, and `addComponent` rejects their ids rather than producing an empty tag.
   Recursive `children` lets an agent build equivalent structures in one op, but the builtin
   definitions themselves are still only reachable through `use-build.ts`.
-- **No e2e spec.** The flow has been driven by hand over chrome-devtools-mcp; a Playwright
-  spec would keep the bridge, gating flag, save path and reactivity covered.
-- **`undoRemoveComponentMixin` re-adds with `push`**, losing the mixin's position in the
-  component's list, so undoing a removal can change the cascade.
-- **`undoRemovePage` activates the restored page**, not the page that was active before the
-  removal — so `removePage` is not an exact round trip on editor state.
+- Extend scratch-site browser coverage to disabling the bridge and saving API-backed sites.

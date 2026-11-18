@@ -52,6 +52,7 @@ import {
   ISetPageHeadData,
   ISetTranslationsData,
   IComponentMixinData,
+  IRemoveComponentMixinData,
   IUpdateMixinOrderData,
 } from '@pubstudio/shared/type-command-data'
 import { Infer } from '../schema/schema'
@@ -157,7 +158,8 @@ const _rmOverride: Accounted<
   typeof removeOverrideStyleOp
 > = true
 const _addCmpMixin: Accounted<IComponentMixinData, typeof addComponentMixinOp> = true
-const _rmCmpMixin: Accounted<IComponentMixinData, typeof removeComponentMixinOp> = true
+const _rmCmpMixin: Accounted<IRemoveComponentMixinData, typeof removeComponentMixinOp> =
+  true
 const _repCmpMixin: Accounted<
   IReplaceComponentMixinData,
   typeof replaceComponentMixinOp
