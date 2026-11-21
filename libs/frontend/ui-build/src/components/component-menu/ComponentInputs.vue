@@ -50,7 +50,7 @@
 import { resolveComponent } from '@pubstudio/frontend/util-resolve'
 import { IComponent, IComponentInput, ISite } from '@pubstudio/shared/type-site'
 import { omit } from '@pubstudio/frontend/util-component'
-import { resolveInput } from '@pubstudio/frontend/util-render'
+import { maxLinesInput, resolveInput } from '@pubstudio/frontend/util-render'
 import { useSiteSource } from '@pubstudio/frontend/feature-site-store'
 
 interface IComponentInputWithSource extends IComponentInput {
@@ -136,6 +136,7 @@ const inputArray = computed(() => {
   const custom = resolveComponent(site.value.context, cmp.customSourceId)
 
   for (const [key, input] of Object.entries({ ...custom?.inputs, ...cmp.inputs })) {
+    if (key === maxLinesInput) continue
     inputs[key] = resolveInput(site.value.context, input.is ?? input.default, false)
   }
   return Object.entries(inputs).sort((entryA, entryB) =>

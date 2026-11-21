@@ -12,7 +12,9 @@
     <template v-else>
       <ComponentTabInfo :component="component" />
       <ComponentInstanceChild :component="component" />
-      <ToolbarText :show="showTextStyle" />
+      <ToolbarText :show="showTextStyle">
+        <ComponentMaxLines :key="component.id" :component="component" :source="source" />
+      </ToolbarText>
       <ToolbarContainer />
       <ComponentFlex />
       <ComponentDimensions />
@@ -71,6 +73,7 @@ import { PSButton } from '@pubstudio/frontend/ui-widgets'
 import { prosemirrorEditing } from '@pubstudio/frontend/util-edit-text'
 import { BuildSubmenu, ComponentTabState, IComponent } from '@pubstudio/shared/type-site'
 import { serializeComponent } from '@pubstudio/frontend/util-site-store'
+import { resolveComponent } from '@pubstudio/frontend/util-resolve'
 import { isDev } from '@pubstudio/frontend/util-config'
 import ComponentTabInfo from './ComponentTabInfo.vue'
 import ComponentInstanceChild from './ComponentInstanceChild.vue'
@@ -92,6 +95,7 @@ import ComponentEvents from './ComponentEvents.vue'
 import ComponentEditorEvents from './ComponentEditorEvents.vue'
 import ComponentEventEdit from './ComponentEventEdit.vue'
 import StyleMenuEdit from '../style-menu/StyleMenuEdit.vue'
+import ComponentMaxLines from './ComponentMaxLines.vue'
 import ComponentFlex from './ComponentFlex.vue'
 import ToolbarContainer from '../toolbar/ToolbarContainer.vue'
 import ToolbarText from '../toolbar/ToolbarText.vue'
@@ -121,12 +125,14 @@ const debugComponent = () => {
   }
 }
 
-const showTextStyle = computed(() => {
-  return (
-    editor.value?.selectedComponent?.content !== undefined ||
-    prosemirrorEditing(editor.value)
-  )
-})
+const source = computed(() =>
+  resolveComponent(site.value.context, component.value.customSourceId),
+)
+const showTextStyle = computed(
+  () =>
+    (component.value.content ?? source.value?.content) !== undefined ||
+    prosemirrorEditing(editor.value),
+)
 
 const showToCustomComponent = computed(() => {
   return canBecomeCustom(site.value.context, component.value.id)

@@ -11,6 +11,7 @@ import {
 import { resetBuilderContext } from '@pubstudio/frontend/util-builder'
 import {
   IBuildContent,
+  lineClampStyle,
   IPropsBuildContent,
   renderChildren,
   RenderMode,
@@ -135,6 +136,7 @@ export const computePropsContent = (
       content.push(
         h('div', {
           class: 'component-content-container',
+          style: data.maxLines ? lineClampStyle(data.maxLines) : undefined,
           innerHTML: parseI18n(site.context.i18n, active, cmpContent),
         }),
       )
