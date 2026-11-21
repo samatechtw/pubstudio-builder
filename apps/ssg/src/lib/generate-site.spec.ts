@@ -51,6 +51,33 @@ describe('generateSite', () => {
     expect(sitemap?.body).toContain('<loc>https://mock.example.com/</loc>')
   })
 
+  it('clamps rich text inside its flex parent without client JavaScript', async () => {
+    const input = makeInput((site) => {
+      const root = site.pages['/home'].root
+      root.children = [
+        {
+          id: 'summary',
+          name: 'Summary',
+          tag: Tag.Div,
+          parentId: root.id,
+          content: 'Plain text <a href="/home">with a link</a>',
+          inputs: {
+            'pubstudio:max-lines': {
+              name: 'pubstudio:max-lines',
+              type: ComponentArgPrimitive.Number,
+              is: 2,
+            },
+          },
+          style: { custom: { 'breakpoint-1': { default: { display: 'flex' } } } },
+        },
+      ]
+    })
+    const result = await generateSite(input, { noJs: true })
+    const html = result.pages.find((page) => page.route === '/')?.body
+    expect(html).toMatch(/id="summary"><span style="[^"]*-webkit-line-clamp:2;/)
+    expect(html).toContain('>Plain text <a href="/home">with a link</a></span></div>')
+  })
+
   it('keeps custom scripts in the payload until the hydration runtime is ready', async () => {
     const result = await generateSite(
       makeInput((site) => {

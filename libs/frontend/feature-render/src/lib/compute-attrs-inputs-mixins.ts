@@ -1,5 +1,7 @@
 import {
   computeInputs,
+  getMaxLines,
+  supportsMaxLines,
   isCustomComponentPart,
   RenderModeType,
 } from '@pubstudio/frontend/util-render'
@@ -68,5 +70,6 @@ export const computeAttrsInputsMixins = (
     attrs.href = attrs.href?.toString()
   }
 
-  return { content, attrs, mixins }
+  const maxLines = supportsMaxLines(c.tag) ? getMaxLines(c, r) : undefined
+  return { content, attrs, mixins, maxLines }
 }

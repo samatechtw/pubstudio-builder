@@ -1,6 +1,7 @@
 import {
   IContent,
   IPropsContent,
+  lineClampStyle,
   renderChildren,
   RenderModeType,
 } from '@pubstudio/frontend/util-render'
@@ -43,6 +44,12 @@ export const computePropsContent = (
     id: component.id,
   }
 
+  if (data.maxLines && typeof content === 'string' && content) {
+    return {
+      props,
+      content: [h('span', { style: lineClampStyle(data.maxLines), innerHTML: content })],
+    }
+  }
   return {
     content,
     props,

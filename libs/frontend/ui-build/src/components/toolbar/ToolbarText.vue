@@ -51,6 +51,7 @@
           @select="setFontUnit"
         />
       </STInput>
+      <slot />
     </div>
   </div>
 </template>
@@ -269,7 +270,7 @@ onMounted(() => {
   transition: all 0.2s ease;
   &.show {
     opacity: 1;
-    max-height: 92px;
+    max-height: none;
   }
 }
 .toolbar-text-row {
@@ -282,17 +283,14 @@ onMounted(() => {
     padding: 4px 0 3px;
   }
   &:last-child {
-    padding: 3px 0 8px;
+    padding: 3px 4px 8px;
+    flex-wrap: wrap;
   }
-}
-
-.underline {
-  margin-left: 16px;
 }
 
 .font-size {
   display: flex;
-  margin-left: 16px;
+  margin-left: 8px;
   :deep(.st-input) {
     border: 1px solid $color-light1;
     width: 100px;
