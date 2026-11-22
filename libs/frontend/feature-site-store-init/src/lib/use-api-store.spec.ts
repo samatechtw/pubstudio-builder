@@ -505,4 +505,33 @@ describe('useApiStore collaboration queue', () => {
     await siteStore.save(site, { immediate: true })
     expect(api.submit).toHaveBeenCalledTimes(2)
   })
+
+  it('drops undo history for edits discarded by a conflict', async () => {
+    const storage = new Map<string, string>()
+    vi.stubGlobal('sessionStorage', {
+      getItem: (key: string) => storage.get(key) ?? null,
+      setItem: (key: string, value: string) => storage.set(key, value),
+      removeItem: (key: string) => storage.delete(key),
+    })
+    const { siteStore, site } = await restore()
+    const historyEntry = (name: string) => ({ type: name as never, data: {} })
+    site.name = 'Accepted'
+    site.history.back.push(historyEntry('accepted'))
+    await siteStore.save(site, { immediate: true })
+
+    api.submit.mockRejectedValueOnce({
+      status: 409,
+      code: 'CollaborationConflict',
+      message: 'the scalar value changed',
+    })
+    site.name = 'Rejected'
+    site.history.back.push(historyEntry('rejected'))
+    await siteStore.save(site, { immediate: true })
+    site.history.back.push(historyEntry('paused'))
+    await siteStore.save(site)
+
+    const reloaded = await siteStore.restore()
+    const history = reloaded?.site.history.back.map((entry) => entry.type)
+    expect(history?.slice(-1)).toEqual(['accepted'])
+  })
 })

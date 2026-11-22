@@ -116,6 +116,9 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
   let pendingSnapshot: IStoredSite | undefined
   let pendingBatch: ICommandBatch | undefined
   let outboundPaused = false
+  // Undo history from the last time this tab had no unsaved edits. Edits discarded by a
+  // conflict take their history with them, or undoing them would revert accepted work.
+  let cleanHistory: string | null | undefined
   let syncPromise: Promise<void> | undefined
   let updatePromise: Promise<void> | undefined
   let snapshotRefreshRequired = false
@@ -170,7 +173,8 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
   }
 
   const savePrivateState = (stored: IStoredSite) => {
-    if (!writeSession('private', { editor: stored.editor, history: stored.history })) {
+    const history = outboundPaused ? cleanHistory : stored.history
+    if (!writeSession('private', { editor: stored.editor, history })) {
       writeSession('private', { editor: stored.editor })
     }
   }
@@ -203,6 +207,12 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
       site: pendingSnapshot,
       commands: commands ?? pendingBatch?.commands,
     })
+  }
+
+  const pauseOutbound = (reason: string, commands?: WireCommand[]) => {
+    outboundPaused = true
+    preserveRecovery(reason, commands)
+    if (pendingSnapshot) savePrivateState(pendingSnapshot)
   }
 
   const revisionOf = (stored: IStoredSite | undefined) => stored?.revision ?? 0
@@ -273,6 +283,7 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
   }
 
   const markClean = () => {
+    cleanHistory = pendingSnapshot?.history
     contentDirty.value = false
     pendingBatch = undefined
     removeSession('pending')
@@ -282,8 +293,7 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
     try {
       return applyWireCommands(canonical, pendingCommands)
     } catch (error) {
-      outboundPaused = true
-      preserveRecovery(
+      pauseOutbound(
         error instanceof Error ? error.message : String(error),
         pendingCommands,
       )
@@ -520,8 +530,7 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
       saveError.value = apiError
     }
     if (apiError.status === 409 || apiError.code === 'CollaborationConflict') {
-      outboundPaused = true
-      preserveRecovery(apiError.message ?? apiError.code)
+      pauseOutbound(apiError.message ?? apiError.code)
     } else {
       persistPending()
       // Network failures and server errors are retried with backoff
@@ -710,6 +719,7 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
           ...privateValue,
         }
         pendingBatch = persisted.batch
+        cleanHistory = null
         contentDirty.value = diffStoredSites(apiSnapshot, pendingSnapshot).length > 0
         if (contentDirty.value) startSaveTimer(3000)
       } catch (error) {
@@ -718,7 +728,8 @@ export const useApiStore = (props: IUseApiStoreProps): ISiteStore => {
           error instanceof Error ? error.message : String(error),
           persisted.commands,
         )
-        pendingSnapshot = { ...apiSnapshot, ...privateValue }
+        pendingSnapshot = { ...apiSnapshot, ...privateValue, history: null }
+        savePrivateState(pendingSnapshot)
       }
     }
     updateLocalCache(data.content_updated_at)
