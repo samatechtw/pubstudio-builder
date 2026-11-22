@@ -7,7 +7,9 @@ and commits the new snapshot, a revision bump, and the operation log. Non-overla
 edits from different sources merge on their own. A command whose precondition fails
 (expected prior value, parent exists, id absent) rejects the whole batch with a 409,
 and the client keeps the rejected work for recovery. Undo history is per tab, undo
-submits the inverse as a new command. Full snapshot writes remain for imports, migrations,
+submits the inverse as a new command. Loading the accepted version after a conflict
+restores the tab's history from its last clean state, so rejected edits cannot be undone
+over the other writer's values. Full snapshot writes remain for imports, migrations,
 and restores, and trigger a `snapshot_reset` so clients reload. Presence, cursors,
 and character-level text merging are not handled.
 
