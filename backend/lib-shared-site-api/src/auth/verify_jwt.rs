@@ -40,6 +40,7 @@ pub fn verify_jwt(public_key: String, token: &str) -> Result<UserToken, ApiError
         user_id,
         user_type,
         expires_in: None,
+        token_version: decoded.claims.ver,
     })
 }
 

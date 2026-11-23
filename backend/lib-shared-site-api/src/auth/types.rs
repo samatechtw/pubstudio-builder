@@ -8,6 +8,7 @@ pub struct UserToken {
     pub user_type: UserType,
     pub user_id: Uuid,
     pub expires_in: Option<i64>,
+    pub token_version: i32,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -15,6 +16,8 @@ pub struct JwtClaims {
     pub sub: String,
     pub user_type: String,
     pub exp: i64,
+    #[serde(default)]
+    pub ver: i32,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

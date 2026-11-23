@@ -14,6 +14,7 @@ pub fn generate_admin_jwt(private_key: String) -> Result<UserToken, ApiError> {
     generate_jwt(
         Uuid::from_str("b8d4843e-4b83-4340-9104-5b225ae551d5").unwrap(),
         UserType::Admin,
+        0,
         52034400,
         private_key,
     )
@@ -22,6 +23,7 @@ pub fn generate_admin_jwt(private_key: String) -> Result<UserToken, ApiError> {
 pub fn generate_jwt(
     user_id: Uuid,
     user_type: UserType,
+    token_version: i32,
     // TTL in minutes
     ttl: i64,
     private_key: String,
@@ -38,12 +40,14 @@ pub fn generate_jwt(
         user_type,
         expires_in: Some((now + Duration::minutes(ttl)).timestamp()),
         token: None,
+        token_version,
     };
 
     let claims = JwtClaims {
         sub: token_details.user_id.to_string(),
         user_type: user_type.to_string(),
         exp: token_details.expires_in.ok_or(ApiError::internal_error())?,
+        ver: token_version,
     };
 
     let header = jsonwebtoken::Header::new(jsonwebtoken::Algorithm::RS256);
